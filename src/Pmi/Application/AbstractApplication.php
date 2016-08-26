@@ -1,10 +1,9 @@
 <?php
-namespace Pmi;
+namespace Pmi\Application;
 
 use Exception;
 use Memcache;
 use Pmi\Datastore\DatastoreSessionHandler;
-use Pmi\Twig\MarkdownExtension;
 use Pmi\Twig\TwigMemcache;
 use Silex\Application;
 use Silex\Provider\FormServiceProvider;
@@ -15,7 +14,6 @@ use Silex\Provider\ValidatorServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Twig_SimpleFilter;
 use Twig_SimpleFunction;
 
 abstract class AbstractApplication extends Application
@@ -169,12 +167,6 @@ abstract class AbstractApplication extends Application
             return $twig;
         }));
 
-        // Register custom Twig markdown filter
-        $this['twig'] = $this->share($this->extend('twig', function($twig) {
-            $twig->addExtension(new MarkdownExtension());
-            return $twig;
-        }));
-
         // Register custom Twig Memcache cacher
         if (class_exists('Memcache')) {
             $this['twig'] = $this->share($this->extend('twig', function($twig) {
@@ -200,7 +192,9 @@ abstract class AbstractApplication extends Application
 
     public function generateUrl($route, $parameters = [])
     {
-        $route = $this->getName() . '_' . $route;
+        if ($this->getName()) {
+            $route = $this->getName() . '_' . $route;
+        }
         return $this['url_generator']->generate($route, $parameters);
     }
 
@@ -216,5 +210,22 @@ abstract class AbstractApplication extends Application
             $subRequest->setSession($request->getSession());
         }
         return $this->handle($subRequest, HttpKernelInterface::SUB_REQUEST, false);
+    }
+
+    public function addFlash(Request $request, $type, $value)
+    {
+        $request->getSession()->getFlashBag()->add($type, $value);
+    }
+
+    public function addFlashError(Request $request, $string, array $translationParams = [])
+    {
+        $string = $this['translator']->trans($string, $translationParams);
+        $this->addFlash($request, 'error', $string);
+    }
+
+    public function addFlashNotice(Request $request, $string, array $translationParams = [])
+    {
+        $string = $this['translator']->trans($string, $translationParams);
+        $this->addFlash($request, 'notice', $string);
     }
 }
