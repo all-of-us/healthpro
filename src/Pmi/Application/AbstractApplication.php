@@ -7,7 +7,9 @@ use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Twig\TwigMemcache;
 use Silex\Application;
 use Silex\Provider\FormServiceProvider;
+use Silex\Provider\LocaleServiceProvider;
 use Silex\Provider\SessionServiceProvider;
+use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -104,6 +106,15 @@ abstract class AbstractApplication extends Application
             $this->after([$this, 'finishCallback']);
         }
 
+        $this->register(new LocaleServiceProvider());
+        $this->register(new TranslationServiceProvider(), [
+            'locale_fallbacks' => ['en'],
+        ]);
+
+        // Register Form service
+        $this->register(new FormServiceProvider());
+        $this->register(new ValidatorServiceProvider());
+
         // Register and configure Twig
         if (isset($this['templatesDirectory']) && $this['templatesDirectory']) {
             $this->enableTwig();
@@ -118,10 +129,6 @@ abstract class AbstractApplication extends Application
         if (isset($this['datastoreSession']) && $this['datastoreSession']) {
             $this->enableDatastoreSession();
         }
-        
-        // Register Form service
-        $this->register(new FormServiceProvider());
-        $this->register(new ValidatorServiceProvider());
 
         return $this;
     }
@@ -131,7 +138,7 @@ abstract class AbstractApplication extends Application
         // Register Twig service
         $this->register(new TwigServiceProvider(), [
             'twig.path' => $this['templatesDirectory'],
-            'twig.form.templates' => ['form.html.twig']
+            'twig.form.templates' => ['bootstrap_3_layout.html.twig']
         ]);
         // Set error callback using error template
         $this->error(function (Exception $e, $request, $code) {

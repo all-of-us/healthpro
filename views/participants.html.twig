@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2>Participant Lookup</h2>
+    </div>
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <p><button type="submit" class="btn btn-primary">Search</button></p>
+    {{ form_end(form) }}
+{% endblock %}

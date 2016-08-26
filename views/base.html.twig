@@ -13,10 +13,31 @@
     <![endif]-->
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="page-header">
-            <h1>Precision Medicine Initiative Physical Evaluation and Biobank</h1>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pmi-navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ path('home') }}">PMI Eval and Biobank</a>
+            </div>
+            <div class="collapse navbar-collapse" id="pmi-navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="{{ path('participants') }}">Participant Lookup</a></li>
+                    <li><a href="#">Sample Lookup</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Logout</a></li>
+                </ul>
+            </div>
         </div>
+    </nav>
+
+    <div class="container-fluid">
         {% block body %}{% endblock %}
     </div>
 </body>
