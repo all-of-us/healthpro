@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# Convenience script to run the Composer-installed version of the `npm`
+# command, passing along all arguments.
+#
+
+APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
+NPM="${APP_DIR}/vendor/bin/npm"
+
+$NPM "$@"

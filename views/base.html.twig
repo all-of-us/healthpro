@@ -5,14 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ asset('dist/css/all.min.css') }}?v={{ app.assetVer }}">
+    <link rel="stylesheet" href="{{ asset('dist/css/lib.min.css') }}?v={{ app.assetVer }}">
+    <link rel="stylesheet" href="{{ asset('dist/css/app.min.css') }}?v={{ app.assetVer }}">
     <!--[if lt IE 9]>
         <script src="{{ asset('js/html5shiv.min.js') }}"></script>
         <script src="{{ asset('js/respond.min.js') }}"></script>
     <![endif]-->
 </head>
 <body>
-    <h1>PMIHPODVFQHCSTOOHWFH</h1>
-    {% block body %}{% endblock %}
+    <div class="container-fluid">
+        <div class="page-header">
+            <h1>Precision Medicine Initiative Physical Evaluation and Biobank</h1>
+        </div>
+        {% block body %}{% endblock %}
+    </div>
 </body>
 </html>
