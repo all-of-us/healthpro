@@ -9,7 +9,6 @@ use Silex\Application;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TwigServiceProvider;
-use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
@@ -119,9 +118,6 @@ abstract class AbstractApplication extends Application
         if (isset($this['datastoreSession']) && $this['datastoreSession']) {
             $this->enableDatastoreSession();
         }
-
-        // Register URL Generator service
-        $this->register(new UrlGeneratorServiceProvider());
         
         // Register Form service
         $this->register(new FormServiceProvider());
@@ -138,7 +134,7 @@ abstract class AbstractApplication extends Application
             'twig.form.templates' => ['form.html.twig']
         ]);
         // Set error callback using error template
-        $this->error(function (Exception $e, $code) {
+        $this->error(function (Exception $e, $request, $code) {
             // run application-specific error callback
             if (method_exists($this, 'onErrorCallback')) {
                 $response = $this->onErrorCallback($e, $code);
@@ -158,21 +154,15 @@ abstract class AbstractApplication extends Application
             }
         });
         // Register custom Twig asset function
-        $this['twig'] = $this->share($this->extend('twig', function($twig) {
-            $twig->addFunction(new Twig_SimpleFunction('asset', function($asset) {
-                $basePath = $this['request']->getBasepath();
-                $basePath .= '/assets/';
-                return $basePath . ltrim($asset, '/');
-            }));
-            return $twig;
+        $this['twig']->addFunction(new Twig_SimpleFunction('asset', function($asset) {
+            $basePath = $this['request']->getBasepath();
+            $basePath .= '/assets/';
+            return $basePath . ltrim($asset, '/');
         }));
 
         // Register custom Twig Memcache cacher
-        if (class_exists('Memcache')) {
-            $this['twig'] = $this->share($this->extend('twig', function($twig) {
-                $twig->setCache(new TwigMemcache());
-                return $twig;
-            }));
+        if (class_exists('Memcache') && class_exists('TwigMemcache')) {
+            $this['twig']->setCache(new TwigMemcache());
         }
     }
 
