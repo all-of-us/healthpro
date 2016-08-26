@@ -40,5 +40,6 @@
     <div class="container-fluid">
         {% block body %}{% endblock %}
     </div>
+    <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
 </body>
 </html>
