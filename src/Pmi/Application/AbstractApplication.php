@@ -155,7 +155,7 @@ abstract class AbstractApplication extends Application
         });
         // Register custom Twig asset function
         $this['twig']->addFunction(new Twig_SimpleFunction('asset', function($asset) {
-            $basePath = $this['request']->getBasepath();
+            $basePath = $this['request_stack']->getCurrentRequest()->getBasepath();
             $basePath .= '/assets/';
             return $basePath . ltrim($asset, '/');
         }));
