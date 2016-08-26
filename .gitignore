@@ -1,1 +1,7 @@
 /vendor/
+app.yaml
+cron.yaml
+php.ini
+/node_modules/
+/web/assets/dist
+/web/favicon.ico
