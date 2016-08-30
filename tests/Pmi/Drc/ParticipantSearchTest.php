@@ -3,21 +3,40 @@ use Pmi\Drc\ParticipantSearch;
 
 class ParticipantSearchTest extends \PHPUnit_Framework_TestCase
 {
+    protected function getDrcParticipantClient()
+    {
+        $client = new ParticipantSearch();
+        return $client;
+    }
+
+    protected function assertIsValidParticipant($participant)
+    {
+        $this->assertObjectHasAttribute('firstName', $participant);
+        $this->assertObjectHasAttribute('lastName', $participant);
+        $this->assertObjectHasAttribute('dob', $participant);
+        $this->assertObjectHasAttribute('id', $participant);
+        $this->assertInstanceOf(\DateTime::class, $participant->dob);
+    }
+
     public function testSearch()
     {
-        $search = new ParticipantSearch();
+        $client = $this->getDrcParticipantClient();
         $parameters = [
             'firstName' => 'John',
             'lastName' => 'Doe',
             'dob' => new \DateTime('1980-01-01')
         ];
-        $result = $search->search($parameters);
+        $result = $client->search($parameters);
         $this->assertTrue(is_array($result));
         $this->assertArrayHasKey(0, $result);
         $participant = $result[0];
-        $this->assertObjectHasAttribute('firstName', $participant);
-        $this->assertObjectHasAttribute('lastName', $participant);
-        $this->assertObjectHasAttribute('dob', $participant);
-        $this->assertInstanceOf(\DateTime::class, $participant->dob);
+        $this->assertIsValidParticipant($participant);
+    }
+
+    public function testRetrieve()
+    {
+        $client = $this->getDrcParticipantClient();
+        $participant = $client->getById(1001);
+        $this->assertIsValidParticipant($participant);
     }
 }

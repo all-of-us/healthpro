@@ -10,7 +10,8 @@ class DefaultController extends AbstractController
 {
     protected static $routes = [
         ['home', '/'],
-        ['participants', '/participants', ['method' => 'GET|POST']]
+        ['participants', '/participants', ['method' => 'GET|POST']],
+        ['participant', '/participant/{id}']
     ];
 
     public function homeAction(Application $app, Request $request)
@@ -38,6 +39,17 @@ class DefaultController extends AbstractController
 
         return $app['twig']->render('participants.html.twig', [
             'form' => $form->createView()
+        ]);
+    }
+
+    public function participantAction($id, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participantsearch']->getById($id);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        return $app['twig']->render('participant.html.twig', [
+            'participant' => $participant
         ]);
     }
 }
