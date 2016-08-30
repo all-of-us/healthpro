@@ -12,6 +12,9 @@ class HpoApplicationTest extends \PHPUnit_Framework_TestCase
             'errorTemplate' => 'error.html.twig'
         ]);
         $app->setup();
+        $app->register(new \Silex\Provider\SessionServiceProvider(), [
+            'session.test' => true
+        ]);
 
         $this->assertArrayHasKey('locale', $app);
         $this->assertArrayHasKey('translator', $app);

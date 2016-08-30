@@ -209,20 +209,21 @@ abstract class AbstractApplication extends Application
         return $this->handle($subRequest, HttpKernelInterface::SUB_REQUEST, false);
     }
 
-    public function addFlash(Request $request, $type, $value)
+    public function addFlash($type, $value)
     {
+        $request = $this['request_stack']->getCurrentRequest();
         $request->getSession()->getFlashBag()->add($type, $value);
     }
 
-    public function addFlashError(Request $request, $string, array $translationParams = [])
+    public function addFlashError($string, array $translationParams = [])
     {
         $string = $this['translator']->trans($string, $translationParams);
-        $this->addFlash($request, 'error', $string);
+        $this->addFlash('error', $string);
     }
 
-    public function addFlashNotice(Request $request, $string, array $translationParams = [])
+    public function addFlashNotice($string, array $translationParams = [])
     {
         $string = $this['translator']->trans($string, $translationParams);
-        $this->addFlash($request, 'notice', $string);
+        $this->addFlash('notice', $string);
     }
 }
