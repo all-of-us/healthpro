@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# Script to run phpunit using GAE's PHP environment
+#
+
+APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
+GAE_DIR="/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources"
+
+php_cli.py --php_executable_path="$GAE_DIR/php55/php" $APP_DIR/vendor/phpunit/phpunit/phpunit $APP_DIR/tests/Pmi -c $APP_DIR/phpunit.xml
+
