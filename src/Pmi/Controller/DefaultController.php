@@ -29,7 +29,11 @@ class DefaultController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $data = $form->getData();
+            $searchParameters = $form->getData();
+            $searchResults = $app['pmi.drc.participantsearch']->search($searchParameters);
+            return $app['twig']->render('participants-list.html.twig', [
+                'participants' => $searchResults
+            ]);
         }
 
         return $app['twig']->render('participants.html.twig', [

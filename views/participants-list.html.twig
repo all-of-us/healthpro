@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2>Participants</h2>
+    </div>
+
+    <p><a href="{{ path('participants') }}">Return to participant lookup</a></p>
+
+    {% if participants %}
+        <table class="table">
+            <thead><tr><th>Last Name</th><th>First Name</th><th>Date of Birth</th></tr></thead>
+            <tbody>
+                {% for participant in participants %}
+                    <tr>
+                        <td>{{ participant.lastName }}</td>
+                        <td>{{ participant.firstName }}</td>
+                        <td>{{ participant.dob|date('n/j/Y') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-warning">No participants found</div>
+    {% endif %}
+{% endblock %}
