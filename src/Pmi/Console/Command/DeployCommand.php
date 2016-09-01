@@ -145,7 +145,7 @@ class DeployCommand extends Command {
             // compile (concat/minify/copy) assets
             $output->writeln('');
             $output->writeln("Compiling assets...");
-            $this->exec("{$this->appDir}/bin/gulp compile-proto1");
+            $this->exec("{$this->appDir}/bin/gulp compile");
         }
 
         // unit tests should pass before production deploy
