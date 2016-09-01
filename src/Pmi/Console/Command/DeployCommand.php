@@ -129,7 +129,7 @@ class DeployCommand extends Command {
         chdir($this->appDir);
 
         // deal with GAE conflict with libxml_disable_entity_loader()
-        $this->patchXmlUtils();
+        $this->patchLibxmlDisable();
 
         // generate config files
         $this->generateAppConfig();
@@ -238,19 +238,29 @@ class DeployCommand extends Command {
 
     /**
      * GAE disables the libxml_disable_entity_loader() function for security,
-     * but XmlUtils tries to call it (also for security). This results in a PHP
-     * Warning on every page that will always be visible to app admins due to
-     * this: http://stackoverflow.com/a/23026196/1402028
+     * but several Symfony files try to call it (also for security). This results
+     * in a PHP warning on every page that will always be visible to app admins
+     * due to this: http://stackoverflow.com/a/23026196/1402028
      * Rather than override GAE by enabling this insecure function, comment out
      * the calls.
      */
-    private function patchXmlUtils()
+    private function patchLibxmlDisable()
     {
-        $filename = "{$this->appDir}/vendor/symfony/config/Util/XmlUtils.php";
-        $contents = file_get_contents($filename);
-        $patched = preg_replace('#^[^/][^/].*libxml_disable_entity_loader\(.*$#m', '//$0', $contents);
-        if ($contents !== $patched) {
-            file_put_contents($filename, $patched);
+        $files = [
+            'symfony/translation/Loader/XliffFileLoader.php',
+            'symfony/config/Util/XmlUtils.php'
+        ];
+        foreach ($files as $file) {
+            $filename = "{$this->appDir}/vendor/{$file}";
+            $contents = file_get_contents($filename);
+
+            // Added the negation for the new line character because if the previous line is blank,
+            // the match would include the leading new line and place the comment on the previous line.
+            $patched = preg_replace('#^[^/\n][^/].*libxml_disable_entity_loader\(.*$#m', '//$0', $contents);
+
+            if ($contents !== $patched) {
+                file_put_contents($filename, $patched);
+            }
         }
     }
 
