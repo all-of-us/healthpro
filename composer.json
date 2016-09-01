@@ -25,5 +25,13 @@
     "require-dev": {
         "mouf/nodejs-installer": "^1.0",
         "phpunit/phpunit": "4.8.*"
+    },
+    "scripts": {
+        "post-package-install" : [
+            "./bin/cleanVendorTests"
+        ],
+        "post-package-update" : [
+            "./bin/cleanVendorTests"
+        ]
     }
 }
