@@ -135,11 +135,19 @@ abstract class AbstractApplication extends Application
 
     protected function enableTwig()
     {
-        // Register Twig service
-        $this->register(new TwigServiceProvider(), [
+        $options = [
             'twig.path' => $this['templatesDirectory'],
             'twig.form.templates' => ['bootstrap_3_layout.html.twig']
-        ]);
+        ];
+        if (isset($this['cacheDirectory'])) {
+            $options['twig.options'] = [
+                'cache' => $this['cacheDirectory'] . '/twig'
+            ];
+        }
+
+        // Register Twig service
+        $this->register(new TwigServiceProvider(), $options);
+
         // Set error callback using error template
         $this->error(function (Exception $e, $request, $code) {
             // run application-specific error callback
