@@ -6,3 +6,4 @@ php.ini
 /bower_components/
 /web/assets/dist
 /web/favicon.ico
+/cache/

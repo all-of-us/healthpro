@@ -3,6 +3,7 @@ namespace Pmi\Console\Command;
 
 use Pmi\Application\AbstractApplication;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -146,6 +147,13 @@ class DeployCommand extends Command {
             $output->writeln('');
             $output->writeln("Compiling assets...");
             $this->exec("{$this->appDir}/bin/gulp compile");
+
+            // warmup twig cache
+            $output->writeln('');
+            $output->writeln('Warming up Twig cache...');
+            $command = $this->getApplication()->find('pmi:twig');
+            $twigInput = new ArrayInput(['command' => 'pmi:twig']);
+            $command->run($twigInput, $output);
         }
 
         // unit tests should pass before production deploy

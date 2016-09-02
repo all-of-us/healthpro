@@ -4,13 +4,12 @@ namespace Pmi\Application;
 use Exception;
 use Memcache;
 use Pmi\Datastore\DatastoreSessionHandler;
-use Pmi\Twig\TwigMemcache;
+use Pmi\Twig\Provider\TwigServiceProvider;
 use Silex\Application;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\LocaleServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
-use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
@@ -135,11 +134,14 @@ abstract class AbstractApplication extends Application
 
     protected function enableTwig()
     {
-        // Register Twig service
-        $this->register(new TwigServiceProvider(), [
+        $options = [
             'twig.path' => $this['templatesDirectory'],
             'twig.form.templates' => ['bootstrap_3_layout.html.twig']
-        ]);
+        ];
+
+        // Register Twig service
+        $this->register(new TwigServiceProvider(), $options);
+
         // Set error callback using error template
         $this->error(function (Exception $e, $request, $code) {
             // run application-specific error callback
@@ -167,9 +169,20 @@ abstract class AbstractApplication extends Application
             return $basePath . ltrim($asset, '/');
         }));
 
-        // Register custom Twig Memcache cacher
-        if (class_exists('Memcache') && class_exists('TwigMemcache')) {
-            $this['twig']->setCache(new TwigMemcache());
+        // Register custom Twig cache
+        if (isset($this['twigCacheHandler'])) {
+            switch ($this['twigCacheHandler']) {
+                case 'memcache':
+                    if (class_exists('Memcache')) {
+                        $this['twig']->setCache(new \Pmi\Twig\Cache\Memcache());
+                    }
+                    break;
+                case 'file':
+                    if (isset($this['cacheDirectory'])) {
+                        $this['twig']->setCache(new \Twig_Cache_Filesystem($this['cacheDirectory'] . '/twig'));
+                    }
+                    break;
+            }
         }
     }
 
