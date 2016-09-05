@@ -286,7 +286,9 @@ class DeployCommand extends Command {
 
         // lock down all the test sites
         if ($this->isTest() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS)) {
-            $this->requireLogin($config);
+            $this->requireAdminLogin($config);
+        } elseif ($this->isProd()) {
+            $this->requireGoogleLogin($config);
         }
 
         // crash the deploy if our handlers are not secure
@@ -334,11 +336,19 @@ class DeployCommand extends Command {
         file_put_contents($configFile, $ini);
     }
 
-    /** Tell all handlers to require login. */
-    private function requireLogin(&$config)
+    /** Tell all handlers to require admin login. */
+    private function requireAdminLogin(&$config)
     {
         foreach (array_keys($config['handlers']) as $idx) {
             $config['handlers'][$idx]['login'] = 'admin';
+        }
+    }
+    
+    /** Tell all handlers to require Google login. */
+    private function requireGoogleLogin(&$config)
+    {
+        foreach (array_keys($config['handlers']) as $idx) {
+            $config['handlers'][$idx]['login'] = 'required';
         }
     }
 

@@ -16,8 +16,12 @@ if ($app->isDev()) {
     $app['twigCacheHandler'] = 'file';
 }
 
+// currently used for POC for authenticating against Google Apps domain
+$app['gaDomain'] = null;
+
 $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
+    ->mount('/googleapps', new Controller\GoogleAppsController())
     ->run()
 ;

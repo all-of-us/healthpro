@@ -28,10 +28,13 @@
                 <ul class="nav navbar-nav">
                     <li><a href="{{ path('participants') }}">Participant Lookup</a></li>
                     <li><a href="#">Sample Lookup</a></li>
+                    <li><a href="{{ path('googleapps_home') }}">Apps Auth</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#">Settings</a></li>
-                    <li><a href="#">Logout</a></li>
+                    {% if (app.logoutUrl) %}
+                        <li><a href="{{ app.logoutUrl }}">Logout</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

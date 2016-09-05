@@ -2,6 +2,7 @@
 namespace Pmi\Application;
 
 use Exception;
+use google\appengine\api\users\UserService;
 use Memcache;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
@@ -56,6 +57,8 @@ abstract class AbstractApplication extends Application
         }
         $values['assetVer'] = $values['env'] === self::ENV_DEV ?
             date('YmdHis') : $values['release'];
+        $googleUser = UserService::getCurrentUser();
+        $values['logoutUrl'] = $googleUser ? UserService::createLogoutURL('/') : null;
         
         parent::__construct($values);
     }
