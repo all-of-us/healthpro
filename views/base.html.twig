@@ -32,7 +32,9 @@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#">Settings</a></li>
-                    <li><a href="#">Logout</a></li>
+                    {% if (app.logoutUrl) %}
+                        <li><a href="{{ app.logoutUrl }}">Logout</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

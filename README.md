@@ -23,3 +23,5 @@ Run local App Engine dev server:
 `./bin/console pmi:deploy --local`
  
 **NOTE** persist your Datastore with: `./bin/console pmi:deploy --local --datastoreDir=~/datastore`
+
+To setup credentials configuration info, login as admin to http://localhost:8080/_ah/login
