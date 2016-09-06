@@ -23,5 +23,6 @@ $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
     ->mount('/googleapps', new Controller\GoogleAppsController())
+    ->mount('/dashboard', new Controller\DashboardController())
     ->run()
 ;

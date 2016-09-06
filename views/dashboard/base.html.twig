@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ asset('dist/css/lib.min.css') }}?v={{ app.assetVer }}">
+    <link rel="stylesheet" href="{{ asset('dist/css/app.min.css') }}?v={{ app.assetVer }}">
+    <!--[if lt IE 9]>
+        <script src="{{ asset('js/html5shiv.min.js') }}"></script>
+        <script src="{{ asset('js/respond.min.js') }}"></script>
+    <![endif]-->
+</head>
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pmi-navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ path('dashboard_home') }}">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="pmi-navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="#">Participants</a></li>
+                    <li><a href="#">HPO</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if (app.logoutUrl) %}
+                        <li><a href="{{ app.logoutUrl }}">Logout</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="flash-notices">
+            {% for flashMessage in app.session.flashbag.get('error') %}
+                <div class="alert alert-danger">{{ flashMessage }}</div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('notice') %}
+                <div class="alert alert-info">{{ flashMessage }}</div>
+            {% endfor %}
+        </div>
+
+        {% block body %}{% endblock %}
+    </div>
+
+    <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
+    {% block pagejs %}{% endblock %}
+</body>
+</html>
