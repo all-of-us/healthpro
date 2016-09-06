@@ -40,6 +40,9 @@ class HpoApplication extends AbstractApplication
 
     public function loadConfiguration()
     {
+        if ($this['isUnitTest']) {
+            return;
+        }
         $configs = Configuration::fetchBy([]);
         foreach ($configs as $config) {
             $this->configuration[$config->getKey()] = $config->getValue();
