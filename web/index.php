@@ -22,6 +22,7 @@ $app['gaDomain'] = null;
 $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
+    ->mount('/_dev', new Controller\DevController())
     ->mount('/googleapps', new Controller\GoogleAppsController())
     ->run()
 ;

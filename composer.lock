@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b21d6dcd950dd97c57e644bc5feefe2a",
-    "content-hash": "1e2c1ef98fea98d805bfea39a2b080d3",
+    "hash": "cbec7662e6a7cdeff5562f1630ac9b88",
+    "content-hash": "c79e5e232dc8c6d9345404d98e98727c",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -1983,6 +1983,66 @@
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
             "time": "2016-09-02 02:12:52"
+        },
+        {
+            "name": "tomwalder/php-gds",
+            "version": "v2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tomwalder/php-gds.git",
+                "reference": "997f40aec99d3e2611c584a03c93a30f372b2705"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tomwalder/php-gds/zipball/997f40aec99d3e2611c584a03c93a30f372b2705",
+                "reference": "997f40aec99d3e2611c584a03c93a30f372b2705",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "google/apiclient": "1.1.6",
+                "google/appengine-php-sdk": ">=1.9.22",
+                "phpunit/phpunit": "~4.8",
+                "satooshi/php-coveralls": "dev-master"
+            },
+            "suggest": {
+                "google/apiclient": "Allows you to use the JSON API Gateway/Datastore endpoints. Tested with 1.1.6"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ],
+                "psr-4": {
+                    "GDS\\": "src/GDS/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "include-path": [
+                "src/"
+            ],
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Tom Walder",
+                    "email": "tom@docnet.nu"
+                }
+            ],
+            "description": "Google Cloud Datastore Library for PHP",
+            "homepage": "https://github.com/tomwalder/php-gds",
+            "keywords": [
+                "appengine",
+                "cloud datastore",
+                "datastore",
+                "gae",
+                "google",
+                "nosql"
+            ],
+            "time": "2015-12-07 20:16:31"
         },
         {
             "name": "twig/twig",

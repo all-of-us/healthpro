@@ -2,13 +2,17 @@
 namespace Pmi\Application;
 
 use Symfony\Component\HttpFoundation\Response;
+use Pmi\Entities\Configuration;
 
 class HpoApplication extends AbstractApplication
 {
+    protected $configuration = [];
+
     public function setup()
     {
         parent::setup();
 
+        $this->loadConfiguration();
         $this['pmi.drc.participantsearch'] = new \Pmi\Drc\ParticipantSearch();
 
         $app = $this;
@@ -33,7 +37,24 @@ class HpoApplication extends AbstractApplication
         
         return $this;
     }
-    
+
+    public function loadConfiguration()
+    {
+        $configs = Configuration::fetchBy([]);
+        foreach ($configs as $config) {
+            $this->configuration[$config->getKey()] = $config->getValue();
+        }
+    }
+
+    public function getConfig($key)
+    {
+        if (isset($this->configuration[$key])) {
+            return $this->configuration[$key];
+        } else {
+            return null;
+        }
+    }
+
     public function setHeaders(Response $response)
     {
         // prevent clickjacking attacks
