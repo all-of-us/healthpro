@@ -35,10 +35,11 @@ class HpoApplication extends AbstractApplication
             ]
         ]);
         
+        $this->registerDb();
         return $this;
     }
 
-    public function loadConfiguration()
+    protected function loadConfiguration()
     {
         if ($this['isUnitTest']) {
             return;
@@ -56,6 +57,35 @@ class HpoApplication extends AbstractApplication
         } else {
             return null;
         }
+    }
+
+    protected function registerDb()
+    {
+        $socket = $this->getConfig('mysql_socket');
+        $host = $this->getConfig('mysql_host');
+        $schema = $this->getConfig('mysql_schema');
+        $user = $this->getConfig('mysql_user');
+        $password = $this->getConfig('mysql_password');
+        if ($socket) {
+            $options = [
+                'driver'   => 'pdo_mysql',
+                'unix_socket' => $socket,
+                'dbname'    => $schema,
+                'user'      => $user,
+                'password'  => $password,
+                'charset'   => 'utf8mb4'
+            ];
+        } else {
+            $options = [
+                'driver'   => 'pdo_mysql',
+                'host' => $host,
+                'dbname'    => $schema,
+                'user'      => $user,
+                'password'  => $password,
+                'charset'   => 'utf8mb4'
+            ];
+        }
+        $this->register(new \Silex\Provider\DoctrineServiceProvider(), $options);
     }
 
     public function setHeaders(Response $response)
