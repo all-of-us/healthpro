@@ -10,6 +10,7 @@ class HpoApplication extends AbstractApplication
         parent::setup();
 
         $this['pmi.drc.participantsearch'] = new \Pmi\Drc\ParticipantSearch();
+        $this['pmi.drc.appsclient'] = new \Pmi\Drc\AppsClient($this);
 
         $app = $this;
         
