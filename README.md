@@ -33,8 +33,8 @@ By default, the local server stores Datastore data in a temporary location that 
 ## Credentials
 Credentials are stored using Configuration datastore entities.  The GAE SDK local server has a data store interface that runs by default on [port 8000](http://localhost:8000/datastore).  However, there is no way to manually create the first entity of a type.  There is a route accessible only in dev and test that creates this first Configuration entity:
 
-1. Log in as an admin to http://localhost:8080/_ah/login
-2. Go to http://localhost:8080/_dev/datastore-init
+1. Log in as an admin to [http://localhost:8080/_ah/login](http://localhost:8080/_ah/login)
+2. Go to [http://localhost:8080/_dev/datastore-init](http://localhost:8080/_dev/datastore-init)
 
 ### MySQL database configuration
 Configure your local MySQL database connection by creating the following Configuration entities:
