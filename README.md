@@ -1,8 +1,10 @@
+# PMI Provider Portal and Admin Dashboard
+
 ## Developer Quick Start
 
 Install the [Google App Engine SDK for PHP](https://cloud.google.com/appengine/downloads).
 
-Install PHP dependencies via Composer:
+Install PHP dependencies via [Composer](https://getcomposer.org/doc/00-intro.md#globally):
 
 `composer install`
 
@@ -22,6 +24,22 @@ Run local App Engine dev server:
 
 `./bin/console pmi:deploy --local`
  
-**NOTE** persist your Datastore with: `./bin/console pmi:deploy --local --datastoreDir=~/datastore`
+### Datastore persistence
+By default, the local server stores Datastore data in a temporary location that can be wiped out at any time.  In order to maintain persistent Datastore locally, create a directory to store the data in, and specify the `datastoreDir` parameter:
 
-To setup credentials configuration info, login as admin to http://localhost:8080/_ah/login
+`./bin/console pmi:deploy --local --datastoreDir=~/datastore`
+
+
+## Credentials
+Credentials are stored using Configuration datastore entities.  The GAE SDK local server has a data store interface that runs by default on [port 8000](http://localhost:8000/datastore).  However, there is no way to manually create the first entity of a type.  There is a route accessible only in dev and test that creates this first Configuration entity:
+
+1. Log in as an admin to http://localhost:8080/_ah/login
+2. Go to http://localhost:8080/_dev/datastore-init
+
+### MySQL database configuration
+Configure your local MySQL database connection by creating the following Configuration entities:
+
+* `mysql_host`
+* `mysql_schema` (database name)
+* `mysql_username`
+* `mysql_password`
