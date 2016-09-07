@@ -68,24 +68,26 @@ class HpoApplication extends AbstractApplication
         $password = $this->getConfig('mysql_password');
         if ($socket) {
             $options = [
-                'driver'   => 'pdo_mysql',
+                'driver' => 'pdo_mysql',
                 'unix_socket' => $socket,
-                'dbname'    => $schema,
-                'user'      => $user,
-                'password'  => $password,
-                'charset'   => 'utf8mb4'
+                'dbname' => $schema,
+                'user' => $user,
+                'password' => $password,
+                'charset' => 'utf8mb4'
             ];
         } else {
             $options = [
-                'driver'   => 'pdo_mysql',
+                'driver' => 'pdo_mysql',
                 'host' => $host,
-                'dbname'    => $schema,
-                'user'      => $user,
-                'password'  => $password,
-                'charset'   => 'utf8mb4'
+                'dbname' => $schema,
+                'user' => $user,
+                'password' => $password,
+                'charset' => 'utf8mb4'
             ];
         }
-        $this->register(new \Silex\Provider\DoctrineServiceProvider(), $options);
+        $this->register(new \Silex\Provider\DoctrineServiceProvider(), [
+            'db.options' => $options
+        ]);
     }
 
     public function setHeaders(Response $response)
