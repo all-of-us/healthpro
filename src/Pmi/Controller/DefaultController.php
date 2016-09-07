@@ -11,7 +11,11 @@ class DefaultController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['participants', '/participants', ['method' => 'GET|POST']],
-        ['participant', '/participant/{id}']
+        ['participant', '/participant/{id}'],
+        ['participantOrder', '/participant/{participantId}/order/{orderId}', [
+            'method' => 'GET|POST',
+            'defaults' => ['orderId' => null]
+        ]]
     ];
 
     public function homeAction(Application $app, Request $request)
@@ -64,8 +68,30 @@ class DefaultController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
+        $orders = $app['db']->fetchAll('SELECT * FROM orders WHERE participant_id = ?', [$id]);
         return $app['twig']->render('participant.html.twig', [
-            'participant' => $participant
+            'participant' => $participant,
+            'orders' => $orders
+        ]);
+    }
+
+    public function participantOrderAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if ($orderId) {
+            $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE id = ? AND participant_id = ?', [$orderId, $participantId]);
+            if (!$order) {
+                $app->abort(404);
+            }
+        } else {
+            $order = null;
+        }
+        return $app['twig']->render('order.html.twig', [
+            'participant' => $participant,
+            'order' => $order
         ]);
     }
 }

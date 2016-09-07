@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-medkit" aria-hidden="true"></i>
+            {% if order %}
+                {{ order.created_ts|date('n/j/Y g:ia') }}
+            {% else %}
+                New order
+            {% endif %}
+            <small>{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</small>
+        </h2>
+    </div>
+{% endblock %}
