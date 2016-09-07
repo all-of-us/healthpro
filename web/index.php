@@ -16,12 +16,16 @@ if ($app->isDev()) {
     $app['twigCacheHandler'] = 'file';
 }
 
-// currently used for POC for authenticating against Google Apps domain
+// currently used for POC for Google Apps API
+$app['gaApplicationName'] = 'PMI DRC HPO';
 $app['gaDomain'] = null;
+$app['gaAdminEmail'] = null;
+$app['gaAuthJson'] = null;
 
 $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
     ->mount('/googleapps', new Controller\GoogleAppsController())
+    ->mount('/googlegroups', new Controller\GoogleGroupsController())
     ->run()
 ;
