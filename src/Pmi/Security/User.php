@@ -32,6 +32,11 @@ class User implements UserInterface
         return $this->googleUser->getEmail();
     }
     
+    public function getEmail()
+    {
+        return $this->googleUser->getEmail();
+    }
+    
     public function eraseCredentials()
     {
         // we don't actually store any credentials

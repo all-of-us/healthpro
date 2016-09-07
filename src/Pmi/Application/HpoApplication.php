@@ -17,6 +17,9 @@ class HpoApplication extends AbstractApplication
         $this['app.googleapps_authenticator'] = function ($app) {
             return new \Pmi\Security\GoogleAppsAuthenticator($app);
         };
+        $this['app.googlegroups_authenticator'] = function ($app) {
+            return new \Pmi\Security\GoogleGroupsAuthenticator($app);
+        };
         
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
@@ -26,6 +29,15 @@ class HpoApplication extends AbstractApplication
                     'guard' => [
                         'authenticators' => [
                             'app.googleapps_authenticator'
+                        ]
+                    ]
+                ],
+                'googlegroups' => [
+                    'pattern' => '^/googlegroups',
+                    'stateless' => true, // because Google handles auth state
+                    'guard' => [
+                        'authenticators' => [
+                            'app.googlegroups_authenticator'
                         ]
                     ]
                 ]
