@@ -1,0 +1,21 @@
+{% extends 'dashboard/base.html.twig' %}
+{% block body %}
+    <h2>Demo</h2>
+    <table class="table table-striped">
+        <thead><tr><th>State</th><th>Value</th></tr></thead>
+        <tbody>
+            {% for state, value in states %}
+                <tr>
+                    <td>{{ state }}</td>
+                    <td>{{ value|number_format }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p><a href="{{ path('dashboard_home') }}">Return home</a></p>
+
+    <script>
+        var states = {{ states|json_encode|raw }};
+        console.log(states);
+    </script>
+{% endblock %}

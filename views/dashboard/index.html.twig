@@ -1,0 +1,27 @@
+{% extends 'dashboard/base.html.twig' %}
+{% block body %}
+    <h2><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard</h2>
+    <br />
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Demo</h3>
+                </div>
+                <div class="panel-body text-center text-muted">
+                    <a href="{{ path('dashboard_demo') }}"><i class="fa fa-5x fa-area-chart" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Demo</h3>
+                </div>
+                <div class="panel-body text-center text-muted">
+                    <i class="fa fa-5x fa-bar-chart" aria-hidden="true"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
