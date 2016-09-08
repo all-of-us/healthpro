@@ -30,7 +30,7 @@ class DefaultController extends AbstractController
     public function participantsAction(Application $app, Request $request)
     {
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
-            ->add('participantId', TextType::class)
+            ->add('participantId', TextType::class, ['label' => 'Participant ID'])
             ->getForm();
 
         $idForm->handleRequest($request);
@@ -45,9 +45,9 @@ class DefaultController extends AbstractController
         }
 
         $searchForm = $app['form.factory']->createNamedBuilder('search', FormType::class)
-            ->add('lastName', TextType::class)
+            ->add('lastName', TextType::class, ['required' => false])
             ->add('firstName', TextType::class, ['required' => false])
-            ->add('dob', TextType::class)
+            ->add('dob', TextType::class, ['label' => 'Date of birth', 'required' => false])
             ->getForm();
 
         $searchForm->handleRequest($request);
