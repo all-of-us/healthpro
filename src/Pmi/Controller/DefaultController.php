@@ -14,6 +14,7 @@ class DefaultController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['participants', '/participants', ['method' => 'GET|POST']],
+        ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
         ['participantOrderCreate', '/participant/{participantId}/order/create', [
             'method' => 'GET|POST'
@@ -63,6 +64,36 @@ class DefaultController extends AbstractController
         return $app['twig']->render('participants.html.twig', [
             'searchForm' => $searchForm->createView(),
             'idForm' => $idForm->createView()
+        ]);
+    }
+
+    public function ordersAction(Application $app, Request $request)
+    {
+        $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
+            ->add('mayoId', TextType::class, ['label' => 'MayoLINK order ID', 'attr' => ['placeholder' => 'Scan barcode']])
+            ->getForm();
+
+        $idForm->handleRequest($request);
+
+        if ($idForm->isValid()) {
+            $id = $idForm->get('mayoId')->getData();
+            $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE mayo_id=?', [$id]);
+            if ($order) {
+                return $app->redirectToRoute('participantOrder', [
+                    'participantId' => $order['participant_id'],
+                    'orderId' => $order['id']
+                ]);
+            }
+            $app->addFlashError('Participant ID not found');
+        }
+
+        $recentOrders = $app['db']->fetchAll('SELECT * FROM orders ORDER BY created_ts DESC, id DESC LIMIT 5');
+        foreach ($recentOrders as &$order) {
+            $order['participant'] = $app['pmi.drc.participantsearch']->getById($order['participant_id']);
+        }
+        return $app['twig']->render('orders.html.twig', [
+            'idForm' => $idForm->createView(),
+            'recentOrders' => $recentOrders
         ]);
     }
 
