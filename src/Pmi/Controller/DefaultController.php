@@ -164,7 +164,8 @@ class DefaultController extends AbstractController
         }
         return $app['twig']->render('order.html.twig', [
             'participant' => $participant,
-            'order' => $order
+            'order' => $order,
+            'real' => $request->query->has('real')
         ]);
     }
 }
