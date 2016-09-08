@@ -5,6 +5,8 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Pmi\Mayolink\Order;
 
 class DefaultController extends AbstractController
 {
@@ -12,10 +14,10 @@ class DefaultController extends AbstractController
         ['home', '/'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
-        ['participantOrder', '/participant/{participantId}/order/{orderId}', [
-            'method' => 'GET|POST',
-            'defaults' => ['orderId' => null]
-        ]]
+        ['participantOrderCreate', '/participant/{participantId}/order/create', [
+            'method' => 'GET|POST'
+        ]],
+        ['participantOrder', '/participant/{participantId}/order/{orderId}']
     ];
 
     public function homeAction(Application $app, Request $request)
@@ -68,10 +70,63 @@ class DefaultController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        $orders = $app['db']->fetchAll('SELECT * FROM orders WHERE participant_id = ?', [$id]);
+        $orders = $app['db']->fetchAll('SELECT * FROM orders WHERE participant_id = ? ORDER BY created_ts DESC, id DESC', [$id]);
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders
+        ]);
+    }
+
+    public function participantOrderCreateAction($participantId, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $confirmForm = $app['form.factory']->createBuilder(FormType::class)
+            ->add('confirm', HiddenType::class)
+            ->getForm();
+        $confirmForm->handleRequest($request);
+        if ($confirmForm->isValid()) {
+            $order = new Order();
+            $options = [
+                // TODO: figure out test code, specimen, and temperature parameters
+                'test_code' => 'ACE',
+                'specimen' => 'Serum',
+                'temperature' => 'Ambient',
+                'first_name' => '*',
+                'last_name' => $participant->id,
+                'gender' => $participant->gender,
+                'birth_date' => $participant->dob,
+                'physician_name' => 'None',
+                'physician_phone' => 'None',
+                // TODO: not sure how ML is handling time zone. setting to yesterday for now
+                'collected_at' => new \DateTime('-1 day')
+            ];
+            $mlOrderId = $order->loginAndCreateOrder(
+                $app->getConfig('ml_username'),
+                $app->getConfig('ml_password'),
+                $options
+            );
+            if ($mlOrderId) {
+                $success = $app['db']->insert('orders', [
+                    'participant_id' => $participant->id,
+                    'created_ts' => (new \DateTime())->format('Y-m-d H:i:s'),
+                    'mayo_id' => $mlOrderId
+                ]);
+                if ($success && ($orderId = $app['db']->lastInsertId())) {
+                    return $app->redirectToRoute('participantOrder', [
+                        'participantId' => $participant->id,
+                        'orderId' => $orderId
+                    ]);
+                }
+            }
+            $app->addFlashError('Failed to create order.');
+        }
+
+        return $app['twig']->render('order-create.html.twig', [
+            'participant' => $participant,
+            'confirmForm' => $confirmForm->createView()
         ]);
     }
 

@@ -75,4 +75,10 @@ class Order
         }
         return $matches[1];
     }
+
+    public function loginAndCreateOrder($username, $password, $options)
+    {
+        $this->login($username, $password);
+        return $this->create($options);
+    }
 }
