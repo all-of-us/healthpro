@@ -41,5 +41,5 @@ Configure your local MySQL database connection by creating the following Configu
 
 * `mysql_host`
 * `mysql_schema` (database name)
-* `mysql_username`
+* `mysql_user`
 * `mysql_password`
