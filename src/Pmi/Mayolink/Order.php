@@ -76,9 +76,25 @@ class Order
         return $matches[1];
     }
 
+    public function getPdf($id)
+    {
+        $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/label-set");
+        if ($response->getStatusCode() !== 200) {
+            return false;
+        }
+        $stream = $response->getBody();
+        return $stream->getContents();
+    }
+
     public function loginAndCreateOrder($username, $password, $options)
     {
         $this->login($username, $password);
         return $this->create($options);
+    }
+
+    public function loginAndGetPdf($username, $password, $id)
+    {
+        $this->login($username, $password);
+        return $this->getPdf($id);
     }
 }

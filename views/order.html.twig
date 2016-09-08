@@ -7,5 +7,14 @@
             <small>{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</small>
         </h2>
     </div>
+
     <p class="lead">MayoLINK ID: <strong>{{ order.mayo_id }}</strong></p>
+
+    <p>
+        <a href="javascript:window.label.print();" class="btn btn-primary">
+            <i class="fa fa-print" aria-hidden="true"></i> Print Label
+        </a>
+    </p>
+
+    <iframe name="label" class="pdf-label" src="{{ path('participantOrderPdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
 {% endblock %}

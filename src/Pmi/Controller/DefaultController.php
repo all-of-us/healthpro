@@ -3,6 +3,7 @@ namespace Pmi\Controller;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -17,6 +18,7 @@ class DefaultController extends AbstractController
         ['participantOrderCreate', '/participant/{participantId}/order/create', [
             'method' => 'GET|POST'
         ]],
+        ['participantOrderPdf', '/participant/{participantId}/order/{orderId}.pdf'],
         ['participantOrder', '/participant/{participantId}/order/{orderId}']
     ];
 
@@ -130,19 +132,35 @@ class DefaultController extends AbstractController
         ]);
     }
 
+    public function participantOrderPdfAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE id = ? AND participant_id = ?', [$orderId, $participantId]);
+        if (!$order) {
+            $app->abort(404);
+        }
+        $mlOrder = new Order();
+        $pdf = $mlOrder->loginAndGetPdf(
+            $app->getConfig('ml_username'),
+            $app->getConfig('ml_password'),
+            $order['mayo_id']
+        );
+
+        return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+    }
+
     public function participantOrderAction($participantId, $orderId, Application $app, Request $request)
     {
         $participant = $app['pmi.drc.participantsearch']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
         }
-        if ($orderId) {
-            $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE id = ? AND participant_id = ?', [$orderId, $participantId]);
-            if (!$order) {
-                $app->abort(404);
-            }
-        } else {
-            $order = null;
+        $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE id = ? AND participant_id = ?', [$orderId, $participantId]);
+        if (!$order) {
+            $app->abort(404);
         }
         return $app['twig']->render('order.html.twig', [
             'participant' => $participant,

@@ -4,3 +4,7 @@
 .page-header h2 {
     margin-top: 0;
 }
+iframe.pdf-label {
+    width: 300px;
+    height: 300px;
+}
