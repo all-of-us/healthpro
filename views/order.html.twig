@@ -10,17 +10,45 @@
 
     <p class="lead">MayoLINK ID: <strong>{{ order.mayo_id }}</strong></p>
 
-    <p>
-        <a href="javascript:window.label.print();" class="btn btn-primary">
-            <i class="fa fa-print" aria-hidden="true"></i> Print Label
-        </a>
-    </p>
+    <div class="row">
+        <div class="col-sm-6 col-md-8">
+            <dl class="dl-horizontal">
+                <dt>Status</dt>
+                <dd>In progress<br /><br /></dd>
+                <dt>Tubes</dt>
+                <dd>
+                    <input type="checkbox" checked="checked" /> 1<br />
+                    <input type="checkbox" checked="checked" /> 2<br />
+                    <input type="checkbox" checked="checked" /> 3<br />
+                    <input type="checkbox" checked="checked" /> 4<br />
+                    <input type="checkbox" checked="checked" /> 5<br />
+                    <input type="checkbox" checked="checked" /> 6<br />
+                    <input type="checkbox" checked="checked" /> 7<br />
+                    <br />
+                </dd>
+                <dt>Log</dt>
+                <dd>
+                    <p><button class="btn btn-default btn-xs">Collected</button></p>
+                    <p><button class="btn btn-default btn-xs">Processed</button></p>
+                    <p><button class="btn btn-default btn-xs">Pickup</button></p>
+                </dd>
+            </dl>
+            <p><button class="btn btn-primary">Finalize</button></p>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <p>
+                <a href="javascript:window.label.print();" class="btn btn-primary">
+                    <i class="fa fa-print" aria-hidden="true"></i> Print Label
+                </a>
+            </p>
 
-    {% if real %}
-        <iframe name="label" class="pdf-label" src="{{ path('participantOrderPdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
-        <p>Attempted to load real label<br /><a href="{{ path('participantOrder', { participantId: participant.id, orderId: order.id }) }}">Return to sample label</a></p>
-    {% else %}
-        <iframe name="label" class="pdf-label" src="{{ asset('OrderLabel.pdf') }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
-        <p>Sample label<br /><a href="{{ path('participantOrder', { participantId: participant.id, orderId: order.id, real: 1 }) }}">Request actual label</a></p>
-    {% endif %}
+            {% if real %}
+                <iframe name="label" class="pdf-label" src="{{ path('participantOrderPdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
+                <p>Attempted to load real label<br /><a href="{{ path('participantOrder', { participantId: participant.id, orderId: order.id }) }}">Return to sample label</a></p>
+            {% else %}
+                <iframe name="label" class="pdf-label" src="{{ asset('OrderLabel.pdf') }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
+                <p>Sample label<br /><a href="{{ path('participantOrder', { participantId: participant.id, orderId: order.id, real: 1 }) }}">Request actual label</a></p>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
