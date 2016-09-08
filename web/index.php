@@ -7,7 +7,7 @@ use Pmi\Application\HpoApplication;
 $app = new HpoApplication();
 $app['templatesDirectory'] = realpath(__DIR__ . '/../views');
 $app['errorTemplate'] = 'error.html.twig';
-if ($app->isDev()) {
+if ($app->isProd() || $app->isDev()) { // for now, use twig memcache in prod
     $app['memcacheSession'] = true;
     $app['twigCacheHandler'] = 'memcache';
 } else {

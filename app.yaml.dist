@@ -1,4 +1,4 @@
-application: pmi-drc-hpo-test
+application: pmi-hpo-staging
 version: 1
 runtime: php55
 api_version: 1

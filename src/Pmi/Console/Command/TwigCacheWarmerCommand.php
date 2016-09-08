@@ -33,7 +33,8 @@ class TwigCacheWarmerCommand extends Command
         $app = new HpoApplication([
             'templatesDirectory' => $viewDir,
             'cacheDirectory' => $cacheDir,
-            'twigCacheHandler' => 'file'
+            'twigCacheHandler' => 'file',
+            'isUnitTest' => true
         ]);
         $app->setup();
 

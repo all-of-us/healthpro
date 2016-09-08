@@ -57,8 +57,12 @@ abstract class AbstractApplication extends Application
         }
         $values['assetVer'] = $values['env'] === self::ENV_DEV ?
             date('YmdHis') : $values['release'];
-        $googleUser = UserService::getCurrentUser();
-        $values['logoutUrl'] = $googleUser ? UserService::createLogoutURL('/') : null;
+        if (class_exists(UserService::class)) {
+            $googleUser = UserService::getCurrentUser();
+            $values['logoutUrl'] = $googleUser ? UserService::createLogoutURL('/') : null;
+        } else {
+            $values['logoutUrl'] = null;
+        }
         
         parent::__construct($values);
     }

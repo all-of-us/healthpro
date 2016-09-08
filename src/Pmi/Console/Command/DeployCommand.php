@@ -18,7 +18,9 @@ use Exception;
 class DeployCommand extends Command {
 
     /** GAE application IDs for production. */
-    private static $PROD_APP_IDS = [];
+    private static $PROD_APP_IDS = [
+        'pmi-hpo-staging'
+    ];
 
     /** Create release tag when deploying these application IDs. */
     private static $TAG_APP_IDS = [];
@@ -383,7 +385,7 @@ class DeployCommand extends Command {
 
     private function runUnitTests()
     {
-        $this->exec("{$this->appDir}/vendor/bin/phpunit --testsuite unit");
+        $this->exec("{$this->appDir}/bin/phpunit");
     }
 
     /** Runs a shell command, displaying output as it is generated. */
