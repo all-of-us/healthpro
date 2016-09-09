@@ -237,7 +237,7 @@ class DefaultController extends AbstractController
                 $dbArray['participant_id'] = $participant->id;
                 $dbArray['created_ts'] = $dbArray['updated_ts'];
                 if ($app['db']->insert('evaluations', $dbArray) && ($evalId = $app['db']->lastInsertId())) {
-                    $app->addFlashNotice('Evalution saved');
+                    $app->addFlashNotice('Evaluation saved');
                     return $app->redirectToRoute('participantEval', [
                         'participantId' => $participant->id,
                         'evalId' => $evalId
@@ -247,7 +247,7 @@ class DefaultController extends AbstractController
                 }
             } else {
                 if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
-                    $app->addFlashNotice('Evalution saved');
+                    $app->addFlashNotice('Evaluation saved');
                     return $app->redirectToRoute('participantEval', [
                         'participantId' => $participant->id,
                         'evalId' => $evalId
