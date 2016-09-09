@@ -196,7 +196,11 @@ class DefaultController extends AbstractController
         return $app['twig']->render('order.html.twig', [
             'participant' => $participant,
             'order' => $order,
-            'real' => $request->query->has('real')
+            'real' => $request->query->has('real'),
+            'events' => [
+                ['type' => 'Collected', 'ts' => new \DateTime('-15 minutes')],
+                ['type' => 'Processed', 'ts' => new \DateTime('-8 minutes')]
+            ]
         ]);
     }
 }
