@@ -4,7 +4,7 @@
         <h2>
             <i class="fa fa-medkit" aria-hidden="true"></i>
             {{ order.created_ts|date('n/j/Y g:ia') }}
-            <small>{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</small>
+            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</a></small>
         </h2>
     </div>
 
@@ -90,7 +90,15 @@
                     <h4 class="modal-title" id="eventModalLabel">Log event</h4>
                 </div>
                 <div class="modal-body">
-                    Picked up
+                    <div class="form-group">
+                        <label>Picked up</label>
+                        <div class="input-group date" id="event-time">
+                            <input type="text" class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-time"></span>
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -99,4 +107,14 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(function () {
+    $('#event-time').datetimepicker({
+        format: 'LT'
+    });
+});
+</script>
 {% endblock %}

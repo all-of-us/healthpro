@@ -4,7 +4,7 @@
         <h2>
             <i class="fa fa-medkit" aria-hidden="true"></i>
             New order
-            <small>{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</small>
+            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</a></small>
         </h2>
     </div>
     <div>
