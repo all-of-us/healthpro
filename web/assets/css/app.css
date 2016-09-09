@@ -11,3 +11,14 @@ iframe.pdf-label {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+.inline-buttons .btn {
+    margin-bottom: 10px;
+}
+@media(max-width:767px) {
+    h2 {
+        font-size: 24px;
+    }
+    h3 {
+        font-size: 20px;
+    }
+}
