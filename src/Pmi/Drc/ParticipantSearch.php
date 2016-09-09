@@ -5,8 +5,8 @@ class ParticipantSearch
 {
     // Mock API data
     protected static $data = [
-        1001 => ['John', 'Doe', '1980-01-01'],
-        1002 => ['Jane', 'Smith', '1985-01-01']
+        1001 => ['John', 'Doe', '1980-01-01', 'M'],
+        1002 => ['Jane', 'Smith', '1985-01-01', 'F']
     ];
 
     protected function rowToObject($row, $id)
@@ -15,7 +15,8 @@ class ParticipantSearch
             'id' => $id,
             'firstName' => $row[0],
             'lastName' => $row[1],
-            'dob' => new \DateTime($row[2])
+            'dob' => new \DateTime($row[2]),
+            'gender' => $row[3]
         ];
     }
 

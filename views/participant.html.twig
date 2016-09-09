@@ -11,7 +11,7 @@
                     <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Evaluation</h3>
                 </div>
                 <div class="panel-body">
-                    <a href="#" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> Start Exam</a>
+                    <a href="#" class="btn btn-block btn-lg btn-default disabled"><i class="fa fa-plus-circle" aria-hidden="true"></i> Start Exam</a>
                 </div>
             </div>
         </div>
@@ -22,10 +22,13 @@
                     <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
                 </div>
                 <div class="panel-body">
-                    <a href="{{ path('participantOrder', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
                     {% for order in orders %}
-                        <a href="{{ path('participantOrder', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">{{ order.created_ts|date('n/j/Y g:ia') }}</a>
+                        <a href="{{ path('participantOrder', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
+                            {{ order.created_ts|date('n/j/Y g:ia') }}<br />
+                            <small class="text-muted">{{ order.mayo_id }}</small>
+                        </a>
                     {% endfor %}
+                    <a href="{{ path('participantOrderCreate', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
                 </div>
             </div>
         </div>
