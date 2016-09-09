@@ -8,10 +8,23 @@
     <link rel="stylesheet" href="{{ asset('dist/css/lib.min.css') }}?v={{ app.assetVer }}">
     <link rel="stylesheet" href="{{ asset('dist/css/app.min.css') }}?v={{ app.assetVer }}">
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ app.assetVer }}">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css" />
     <!--[if lt IE 9]>
         <script src="{{ asset('js/html5shiv.min.js') }}"></script>
         <script src="{{ asset('js/respond.min.js') }}"></script>
     <![endif]-->
+
+    <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
+    <script src="{{ asset('js/dashboard.js') }}?v={{ app.assetVer }}"></script>
+    <script src="//code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+    <script src="//cdn.plot.ly/plotly-latest.min.js"></script>
+    <script type="text/javascript">
+        // attach various handlers to bootstrap items and turn on functionality
+        $(function() {
+            $('.datepicker').datepicker({dateFormat: 'yy-mm-dd'});
+            $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+        });
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-default">
@@ -50,8 +63,7 @@
         {% block body %}{% endblock %}
     </div>
 
-    <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
-    <script src="{{ asset('js/dashboard.js') }}?v={{ app.assetVer }}"></script>
+
     {% block pagejs %}{% endblock %}
 </body>
 </html>

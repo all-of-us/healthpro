@@ -1,21 +1,86 @@
 {% extends 'dashboard/base.html.twig' %}
 {% block body %}
-    <h2>Demo</h2>
-    <table class="table table-striped">
-        <thead><tr><th>State</th><th>Value</th></tr></thead>
-        <tbody>
-            {% for state, value in states %}
-                <tr>
-                    <td>{{ state }}</td>
-                    <td>{{ value|number_format }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <p><a href="{{ path('dashboard_home') }}">Return home</a></p>
+    <ul class="nav nav-tabs top-pad" role="tablist">
+        <li role="presentation" class="active"><a href="#participants-by-time" role="tab" data-toggle="tab"><span class="fa fa-calendar"></span> Participant Categories Over Time</a></li>
+        <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab"><span class="fa fa-map"></span> Participants by Region</a></li>
+    </ul>
+    <div id="plotly-tabs" class="tab-content">
+        <div id="participants-by-time" class="tab-pane pad active fade in">
+            <div class="well">
+                <div class="row form-group-sm">
+                    <div class="col-sm-4">
+                        <label>Plot</label>
+                        <select class="form-control time-plot-control" id="plot-value">
+                            <option value="enrollment_status" selected>Participant Tier</option>
+                            <option value="race">Race</option>
+                            <option value="ethnicity">Ethnicity</option>
+                            <option value="gender">Gender</option>
+                            <option value="age">Age</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Cutoff Date (inclusive)</label>
+                        <input type="text" class="form-control datepicker time-plot-control" id="end-date" />
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Interval</label>
+                        <select class="form-control time-plot-control" id="interval">
+                            <option value="months">Months</option>
+                            <option value="weeks">Weeks</option>
+                            <option value="days">Days</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="plotly-participants-by-time"></div>
+            <script type="text/javascript">
 
-    <script>
-        var states = {{ states|json_encode|raw }};
-        console.log(states);
+
+            </script>
+        </div>
+        <div id="participants-by-region" class="tab-pane pad fade">
+            <div class="row form-group-sm">
+                <div class="col-sm-offset-5 col-sm-2 well">
+                    <label>Cutoff Date (inclusive)</label>
+                    <input type="text" class="form-control datepicker" id="region-date" />
+                </div>
+            </div>
+            <div class="row">
+                <div id="plotly-participants-by-region" class="col-md-offset-2 col-md-8"></div>
+            </div>
+
+        </div>
+    </div>
+    <script type="text/javascript">
+        // function to grab current filter values and load JSON from load_data REST endpoint
+        // success handler calls Plotly.newplot()
+        function renderPlot() {
+            var width = $('#plotly-participants-by-time').width() - 30;
+            var endDate = $('#end-date').val()
+            var attribute = $('#plot-value').val();
+            var displayText = $('#plot-value option:selected').text();
+            var interval = $('#interval').val();
+            $.getJSON('/dashboard/load_data?end_date=' + endDate + '&attribute=' + attribute + '&interval=' + interval, function(data) {
+                Plotly.newPlot('plotly-participants-by-time', data, {title: 'Participant Registrations by ' + displayText + ' as of ' + endDate, width: width, barmode: 'stack'}, PLOTLY_OPTS);
+            });
+        }
+
+        // set default of today's date
+        var today = new Date().toISOString().split('T')[0];
+        $('#end-date').val(today);
+
+        // load default plot
+        renderPlot();
+
+        // re-render on filter change
+        $('.time-plot-control').change(function() {
+            renderPlot();
+        });
+
+        // re-render on window resizeEnd
+        $( window ).on('resizeEnd', function() {
+            renderPlot();
+        });
     </script>
+
 {% endblock %}
