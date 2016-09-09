@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-clipboard" aria-hidden="true"></i>
+            {% if evaluation %}
+                {{ evaluation.created_ts|date('n/j/Y') }}
+            {% else %}
+                New Evaluation
+            {% endif %}
+            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</a></small>
+        </h2>
+    </div>
+    <dl class="dl-horizontal">
+        <dt>DOB</dt>
+        <dd>{{ participant.dob|date('n/j/Y') }}</dd>
+        <dt>Gender</dt>
+        <dd>{{ participant.gender }}</dd>
+        {% if evaluation %}
+            <dt>Evaluation updated</dt>
+            <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia') }}</dd>
+        {% endif %}
+    </dl>
+
+    {{ form_start(evaluationForm) }}
+        {{ form_widget(evaluationForm) }}
+        <p><a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a> <button type="submit" class="btn btn-primary">Save</button></p>
+    {{ form_end(evaluationForm) }}
+{% endblock %}
