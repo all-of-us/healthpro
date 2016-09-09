@@ -1,0 +1,13 @@
+{
+    "version": "0.1",
+    "fields": [
+        {
+            "name": "height",
+            "label": "Height"
+        },
+        {
+            "name": "weight",
+            "label": "weight"
+        }
+    ]
+}

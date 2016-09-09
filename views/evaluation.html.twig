@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-clipboard" aria-hidden="true"></i>
+            {% if evaluation %}
+                {{ evaluation.created_ts|date('n/j/Y g:ia') }}
+            {% else %}
+                New Evaluation
+            {% endif %}
+            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</a></small>
+        </h2>
+    </div>
+    {{ form_start(evaluationForm) }}
+        {{ form_widget(evaluationForm) }}
+        <p><a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a> <button type="submit" class="btn btn-primary">Save</button></p>
+    {{ form_end(evaluationForm) }}
+{% endblock %}

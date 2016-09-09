@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Pmi\Evaluation\Evaluation;
 use Pmi\Mayolink\Order;
 
 class DefaultController extends AbstractController
@@ -20,7 +21,11 @@ class DefaultController extends AbstractController
             'method' => 'GET|POST'
         ]],
         ['participantOrderPdf', '/participant/{participantId}/order/{orderId}.pdf'],
-        ['participantOrder', '/participant/{participantId}/order/{orderId}']
+        ['participantOrder', '/participant/{participantId}/order/{orderId}'],
+        ['participantEval', '/participant/{participantId}/eval/{evalId}', [
+            'method' => 'GET|POST',
+            'defaults' => ['evalId' => null]
+        ]]
     ];
 
     public function homeAction(Application $app, Request $request)
@@ -104,9 +109,11 @@ class DefaultController extends AbstractController
             $app->abort(404);
         }
         $orders = $app['db']->fetchAll('SELECT * FROM orders WHERE participant_id = ? ORDER BY created_ts DESC, id DESC', [$id]);
+        $evaluations = $app['db']->fetchAll('SELECT * FROM evaluations WHERE participant_id = ? ORDER BY updated_ts DESC, id DESC', [$id]);
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
-            'orders' => $orders
+            'orders' => $orders,
+            'evaluations' => $evaluations
         ]);
     }
 
@@ -201,6 +208,60 @@ class DefaultController extends AbstractController
                 ['type' => 'Collected', 'ts' => new \DateTime('-15 minutes')],
                 ['type' => 'Processed', 'ts' => new \DateTime('-8 minutes')]
             ]
+        ]);
+    }
+
+    public function participantEvalAction($participantId, $evalId, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $evaluationService = new Evaluation();
+        if ($evalId) {
+            $evaluation = $app['db']->fetchAssoc('SELECT * FROM evaluations WHERE id = ? AND participant_id = ?', [$evalId, $participantId]);
+            if (!$evaluation) {
+                $app->abort(404);
+            }
+            $evaluationService->loadFromArray($evaluation);
+        } else {
+            $evaluation = null;
+        }
+        $evaluationForm = $evaluationService->getForm($app['form.factory']);
+        $evaluationForm->handleRequest($request);
+        if ($evaluationForm->isValid()) {
+            $evaluationService->setData($evaluationForm->getData());
+            if (!$evaluation) {
+                $insertArray = $evaluationService->toArray();
+                $insertArray['participant_id'] = $participant->id;
+                $insertArray['created_ts'] = $insertArray['updated_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
+                $success = $app['db']->insert('evaluations', $insertArray);
+                if ($success && ($evalId = $app['db']->lastInsertId())) {
+                    return $app->redirectToRoute('participantEval', [
+                        'participantId' => $participant->id,
+                        'evalId' => $evalId
+                    ]);
+                } else {
+                    $app->addFlashError('Failed to create new evaluation');
+                }
+            } else {
+                $updateArray = $evaluationService->toArray();
+                $updateArray['updated_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
+                if ($app['db']->update('evaluations', $updateArray, ['id' => $evalId])) {
+                    return $app->redirectToRoute('participantEval', [
+                        'participantId' => $participant->id,
+                        'evalId' => $evalId
+                    ]);
+                } else {
+                    $app->addFlashError('Failed to update evaluation');
+                }
+            }
+        }
+
+        return $app['twig']->render('evaluation.html.twig', [
+            'participant' => $participant,
+            'evaluation' => $evaluation,
+            'evaluationForm' => $evaluationForm->createView()
         ]);
     }
 }
