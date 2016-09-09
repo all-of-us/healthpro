@@ -15,6 +15,7 @@ class Evaluation
     public function __construct()
     {
         $this->version = self::CURRENT_VERSION;
+        $this->data = new \StdClass();
         $this->loadSchema();
     }
 
@@ -55,7 +56,9 @@ class Evaluation
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
         foreach ($this->schema->fields as $field) {
-            $formBuilder->add($field->name, TextType::class);
+            $formBuilder->add($field->name, TextType::class, [
+                'required' => false
+            ]);
         }
         return $formBuilder->getForm();
     }
@@ -67,8 +70,13 @@ class Evaluation
             throw new MissingSchemaException();
         }
         $this->schema = json_decode(file_get_contents($file));
-        if (!is_object($this->schema)) {
+        if (!is_object($this->schema) || !is_array($this->schema->fields)) {
             throw new InvalidSchemaException();
+        }
+        foreach ($this->schema->fields as $field) {
+            if (!isset($this->data->{$field->name})) {
+                $this->data->{$field->name} = null;
+            }
         }
     }
 

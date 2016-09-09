@@ -7,7 +7,23 @@
         },
         {
             "name": "weight",
-            "label": "weight"
+            "label": "Weight"
+        },
+        {
+            "name": "blood_pressure",
+            "label": "Blood Pressure"
+        },
+        {
+            "name": "heart_rate",
+            "label": "Heart Rate"
+        },
+        {
+            "name": "hip_circumference",
+            "label": "Hip Circumference"
+        },
+        {
+            "name": "waist_circumference",
+            "label": "Waist Circumference"
         }
     ]
 }

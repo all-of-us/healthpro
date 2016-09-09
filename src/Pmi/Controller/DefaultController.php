@@ -231,12 +231,13 @@ class DefaultController extends AbstractController
         $evaluationForm->handleRequest($request);
         if ($evaluationForm->isValid()) {
             $evaluationService->setData($evaluationForm->getData());
+            $dbArray = $evaluationService->toArray();
+            $dbArray['updated_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
             if (!$evaluation) {
-                $insertArray = $evaluationService->toArray();
-                $insertArray['participant_id'] = $participant->id;
-                $insertArray['created_ts'] = $insertArray['updated_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
-                $success = $app['db']->insert('evaluations', $insertArray);
-                if ($success && ($evalId = $app['db']->lastInsertId())) {
+                $dbArray['participant_id'] = $participant->id;
+                $dbArray['created_ts'] = $dbArray['updated_ts'];
+                if ($app['db']->insert('evaluations', $dbArray) && ($evalId = $app['db']->lastInsertId())) {
+                    $app->addFlashNotice('Evalution saved');
                     return $app->redirectToRoute('participantEval', [
                         'participantId' => $participant->id,
                         'evalId' => $evalId
@@ -245,9 +246,8 @@ class DefaultController extends AbstractController
                     $app->addFlashError('Failed to create new evaluation');
                 }
             } else {
-                $updateArray = $evaluationService->toArray();
-                $updateArray['updated_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
-                if ($app['db']->update('evaluations', $updateArray, ['id' => $evalId])) {
+                if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
+                    $app->addFlashNotice('Evalution saved');
                     return $app->redirectToRoute('participantEval', [
                         'participantId' => $participant->id,
                         'evalId' => $evalId
