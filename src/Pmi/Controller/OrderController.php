@@ -10,8 +10,6 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Pmi\Evaluation\Evaluation;
-use Pmi\Mayolink\Order;
 
 class OrderController extends AbstractController
 {
@@ -225,60 +223,6 @@ class OrderController extends AbstractController
             'participant' => $this->participant,
             'order' => $this->order,
             'finalizeForm' => $finalizeForm->createView()
-        ]);
-    }
-
-    public function participantEvalAction($participantId, $evalId, Application $app, Request $request)
-    {
-        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
-        if (!$participant) {
-            $app->abort(404);
-        }
-        $evaluationService = new Evaluation();
-        if ($evalId) {
-            $evaluation = $app['db']->fetchAssoc('SELECT * FROM evaluations WHERE id = ? AND participant_id = ?', [$evalId, $participantId]);
-            if (!$evaluation) {
-                $app->abort(404);
-            }
-            $evaluationService->loadFromArray($evaluation);
-        } else {
-            $evaluation = null;
-        }
-        $evaluationForm = $evaluationService->getForm($app['form.factory']);
-        $evaluationForm->handleRequest($request);
-        if ($evaluationForm->isValid()) {
-            $evaluationService->setData($evaluationForm->getData());
-            $dbArray = $evaluationService->toArray();
-            $dbArray['updated_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
-            if (!$evaluation) {
-                $dbArray['participant_id'] = $participant->id;
-                $dbArray['created_ts'] = $dbArray['updated_ts'];
-                if ($app['db']->insert('evaluations', $dbArray) && ($evalId = $app['db']->lastInsertId())) {
-                    $app->addFlashNotice('Evaluation saved');
-                    return $app->redirectToRoute('participantEval', [
-                        'participantId' => $participant->id,
-                        'evalId' => $evalId
-                    ]);
-                } else {
-                    $app->addFlashError('Failed to create new evaluation');
-                }
-            } else {
-                if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
-                    $app->addFlashNotice('Evaluation saved');
-                    return $app->redirectToRoute('participantEval', [
-                        'participantId' => $participant->id,
-                        'evalId' => $evalId
-                    ]);
-                } else {
-                    $app->addFlashError('Failed to update evaluation');
-                }
-            }
-        }
-
-        return $app['twig']->render('evaluation.html.twig', [
-            'participant' => $participant,
-            'evaluation' => $evaluation,
-            'evaluationForm' => $evaluationForm->createView()
         ]);
     }
 }
