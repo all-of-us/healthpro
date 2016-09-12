@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Lookup</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-5">
+            <h3><i class="fa fa-barcode" aria-hidden="true"></i> Find by ID</h3>
+            {{ form_start(idForm) }}
+                {{ form_widget(idForm) }}
+                <p><button type="submit" class="btn btn-primary">Go</button></p>
+            {{ form_end(idForm) }}
+        </div>
+
+        <div class="col-sm-7">
+            <hr class="visible-xs" />
+            <h3><i class="fa fa-clock-o" aria-hidden="true"></i> Recent orders</h3>
+            <table class="table table-striped">
+                <thead><tr><th>Date</th><th>Order ID</th><th>Participant</th></tr></thead>
+                <tbody>
+                    {% for order in recentOrders %}
+                        <tr>
+                            <td><a href="{{ path('participantOrder', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.created_ts|date('n/j/Y g:ia') }}</a></td>
+                            <td><a href="{{ path('participantOrder', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.mayo_id }}</a></td>
+                            <td><a href="{{ path('participantOrder', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

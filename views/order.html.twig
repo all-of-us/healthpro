@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-medkit" aria-hidden="true"></i>
+            {{ order.created_ts|date('n/j/Y g:ia') }}
+            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</a></small>
+        </h2>
+    </div>
+
+    <p class="lead">MayoLINK ID: <strong>{{ order.mayo_id }}</strong></p>
+
+    <div class="row">
+        <div class="col-sm-6 col-md-7">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Event log</h3>
+                </div>
+                <div class="panel-body">
+                    <dl>
+                        <dt>Created</dt>
+                        <dd>{{ order.created_ts|date('n/j/Y g:ia') }}</dd>
+                        {% for event in events %}
+                            <dt>{{ event.type }}</dt>
+                            <dd>{{ event.ts|date('n/j/Y g:ia') }}</dd>
+                        {% endfor %}
+                    </dl>
+                    <dl>
+                        <dt>Log event</dt>
+                        <dd>
+                            <button class="btn btn-default btn-sm" data-toggle="modal" data-target="#eventModal">Collected</button>
+                            <button class="btn btn-default btn-sm" data-toggle="modal" data-target="#eventModal">Processed</button>
+                            <button class="btn btn-default btn-sm" data-toggle="modal" data-target="#eventModal">Picked up</button>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="pull-right label label-warning">In progress</span>
+                    <h3 class="panel-title">Status</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <strong>Tubes</strong>
+                        {% for tube in 1..7 %}
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" checked="checked">
+                                    Tube {{ tube }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button class="btn btn-primary btn-sm"><i class="fa fa-check" aria-hidden="true"></i> Finalize</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Label</h3>
+                </div>
+                <div class="panel-body">
+                    <p class="text-center">
+                        <a href="javascript:window.label.print();" class="btn btn-primary btn-sm">
+                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                        </a>
+                    </p>
+                    {% if real %}
+                        <iframe name="label" class="pdf-label" src="{{ path('participantOrderPdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
+                        <p><strong>Attempted to load real label</strong> &bull; <a href="{{ path('participantOrder', { participantId: participant.id, orderId: order.id }) }}">Return to sample label</a></p>
+                    {% else %}
+                        <iframe name="label" class="pdf-label" src="{{ asset('OrderLabel.pdf') }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
+                        <p><strong>Sample label</strong> &bull; <a href="{{ path('participantOrder', { participantId: participant.id, orderId: order.id, real: 1 }) }}">Request actual label</a></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="eventModalLabel">Log event</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Picked up</label>
+                        <div class="input-group date" id="event-time">
+                            <input type="text" class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-time"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Add event</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(function () {
+    $('#event-time').datetimepicker({
+        format: 'LT'
+    });
+});
+</script>
+{% endblock %}

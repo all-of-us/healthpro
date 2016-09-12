@@ -9,7 +9,8 @@ class HpoApplicationTest extends \PHPUnit_Framework_TestCase
         putenv('PMI_ENV=' . HpoApplication::ENV_DEV);
         $app = new HpoApplication([
             'templatesDirectory' => __DIR__ . '/../../../views',
-            'errorTemplate' => 'error.html.twig'
+            'errorTemplate' => 'error.html.twig',
+            'isUnitTest' => true
         ]);
         $app->setup();
         $app->register(new \Silex\Provider\SessionServiceProvider(), [
@@ -34,7 +35,8 @@ class HpoApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function testController($app)
     {
-        $app->mount('/', new Controller\DefaultController());
+        $app->mount('/', new Controller\DefaultController())
+            ->mount('/googleapps', new Controller\GoogleAppsController());
         ob_start();
         $app->run();
         $output = ob_get_clean();

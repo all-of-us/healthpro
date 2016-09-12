@@ -7,7 +7,7 @@
     <p><a href="{{ path('participants') }}">Return to participant lookup</a></p>
 
     {% if participants %}
-        <table class="table">
+        <table class="table table-striped">
             <thead><tr><th>Last Name</th><th>First Name</th><th>Date of Birth</th></tr></thead>
             <tbody>
                 {% for participant in participants %}

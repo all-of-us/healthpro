@@ -3,14 +3,17 @@ var BOWER_DIR = './bower_components';
 var ASSETS = {
     'js': [
         BOWER_DIR + '/jquery/dist/jquery.min.js',
+        BOWER_DIR + '/moment/min/moment.min.js',
         BOWER_DIR + '/bootstrap/dist/js/bootstrap.min.js',
         BOWER_DIR + '/underscore/underscore-min.js',
         BOWER_DIR + '/backbone/backbone-min.js',
+        BOWER_DIR + '/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
         ASSETS_DIR + '/js/app.js'
     ],
     'css': [
         BOWER_DIR + '/bootstrap/dist/css/bootstrap.min.css',
-        BOWER_DIR + '/font-awesome/css/font-awesome.min.css'
+        BOWER_DIR + '/font-awesome/css/font-awesome.min.css',
+        BOWER_DIR + 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css'
     ],
     'csslocal': [
         ASSETS_DIR + '/css/app.css'
