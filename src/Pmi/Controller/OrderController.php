@@ -83,10 +83,24 @@ class OrderController extends AbstractController
 
     protected function createOrderForm($set, $formFactory)
     {
+        switch ($set) {
+            case 'collected':
+                $verb = 'collected';
+                $noun = 'collection';
+                break;
+            case 'processed':
+                $verb = 'processed';
+                $noun = 'processing';
+                break;
+            case 'finalized':
+                $verb = 'finalized';
+                $noun = 'finalization';
+                break;
+        }
         $formData = $this->getOrderFormData($set);
-        $collectForm = $formFactory->createBuilder(FormType::class, $formData)
+        $form = $formFactory->createBuilder(FormType::class, $formData)
             ->add("{$set}_ts", DateTimeType::class, [
-                'label' => 'Collected time',
+                'label' => ucfirst($verb) . ' time',
                 'date_widget' => 'single_text',
                 'time_widget' => 'single_text',
                 'required' => false
@@ -94,16 +108,16 @@ class OrderController extends AbstractController
             ->add("{$set}_samples", ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
-                'label' => 'Which samples were successfully collected?',
+                'label' => "Which samples were successfully {$verb}?",
                 'choices' => array_combine(range(1,7), range(1,7)),
                 'required' => false
             ])
             ->add("{$set}_notes", TextareaType::class, [
-                'label' => 'Additional notes on collection',
+                'label' => "Additional notes on {$noun}",
                 'required' => false
             ])
             ->getForm();
-        return $collectForm;
+        return $form;
     }
 
     public function orderAction($participantId, $orderId, Application $app, Request $request)
@@ -163,6 +177,54 @@ class OrderController extends AbstractController
             'participant' => $this->participant,
             'order' => $this->order,
             'collectForm' => $collectForm->createView()
+        ]);
+    }
+
+    public function orderProcessAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $this->loadOrder($participantId, $orderId, $app);
+        $processForm = $this->createOrderForm('processed', $app['form.factory']);
+        $processForm->handleRequest($request);
+        if ($processForm->isValid()) {
+            $updateArray = $this->getOrderUpdateFromForm('processed', $processForm);
+            if ($app['db']->update('orders', $updateArray, ['id' => $orderId])) {
+                $app->addFlashNotice('Order processing updated');
+
+                return $app->redirectToRoute('orderProcess', [
+                    'participantId' => $this->participant->id,
+                    'orderId' => $orderId
+                ]);
+            }
+        }
+
+        return $app['twig']->render('order-process.html.twig', [
+            'participant' => $this->participant,
+            'order' => $this->order,
+            'processForm' => $processForm->createView()
+        ]);
+    }
+
+    public function orderFinalizeAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $this->loadOrder($participantId, $orderId, $app);
+        $finalizeForm = $this->createOrderForm('finalized', $app['form.factory']);
+        $finalizeForm->handleRequest($request);
+        if ($finalizeForm->isValid()) {
+            $updateArray = $this->getOrderUpdateFromForm('finalized', $finalizeForm);
+            if ($app['db']->update('orders', $updateArray, ['id' => $orderId])) {
+                $app->addFlashNotice('Order finalization updated');
+
+                return $app->redirectToRoute('orderFinalize', [
+                    'participantId' => $this->participant->id,
+                    'orderId' => $orderId
+                ]);
+            }
+        }
+
+        return $app['twig']->render('order-finalize.html.twig', [
+            'participant' => $this->participant,
+            'order' => $this->order,
+            'finalizeForm' => $finalizeForm->createView()
         ]);
     }
 

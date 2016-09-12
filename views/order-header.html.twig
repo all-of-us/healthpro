@@ -6,11 +6,23 @@
 <p class="lead">MayoLINK ID: <strong>{{ order.mayo_id }}</strong></p>
 
 {% set params = { participantId: participant.id, orderId: order.id } %}
+{% set steps = {
+    print: 'printed',
+    collect: 'collected',
+    process: 'processed',
+    finalize: 'finalized'
+} %}
 <ul class="nav nav-tabs">
     <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle text-success" aria-hidden="true"></i> Create</a></li>
-    <li role="presentation"{% if active == 'print' %} class="active"{% endif %}><a href="{{ path('orderPrint', params) }}">Print</a></li>
-    <li role="presentation"{% if active == 'collect' %} class="active"{% endif %}><a href="{{ path('orderCollect', params) }}">Collect</a></li>
-    <li role="presentation"><a href="#">Process</a></li>
-    <li role="presentation"><a href="#">Finalize</a></li>
+    {% for step, column in steps %}
+        <li role="presentation"{% if active == step %} class="active"{% endif %}>
+            <a href="{{ path('order'~(step|capitalize), params) }}">
+                {% if attribute(order, column~'_ts') %}
+                    <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                {% endif %}
+                {{ step|capitalize }}
+            </a>
+        </li>
+    {% endfor %}
 </ul>
 <br />
