@@ -242,22 +242,66 @@ class DefaultController extends AbstractController
             $app->abort(404);
         }
 
-        $collectForm = $app['form.factory']->createBuilder(FormType::class)
+        $formData = [];
+        if ($order['collected_notes']) {
+            $formData['collected_notes'] = $order['collected_notes'];
+        };
+        if ($order['collected_ts']) {
+            $formData['collected_ts'] = new \DateTime($order['collected_ts']);
+        }
+        if ($order['collected_samples']) {
+            $samples = json_decode($order['collected_samples']);
+            if (is_array($samples) && count($samples) > 0) {
+                $formData['collected_samples'] = $samples;
+            }
+        }
+        $collectForm = $app['form.factory']->createBuilder(FormType::class, $formData)
             ->add('collected_ts', DateTimeType::class, [
                 'label' => 'Collected time',
                 'date_widget' => 'single_text',
-                'time_widget' => 'single_text'
+                'time_widget' => 'single_text',
+                'required' => false
             ])
             ->add('collected_samples', ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Which samples were successfully collected?',
-                'choices' => array_combine(range(1,7), range(1,7))
+                'choices' => array_combine(range(1,7), range(1,7)),
+                'required' => false
             ])
             ->add('collected_notes', TextareaType::class, [
-                'label' => 'Additional notes on collection'
+                'label' => 'Additional notes on collection',
+                'required' => false
             ])
             ->getForm();
+
+        $collectForm->handleRequest($request);
+        if ($collectForm->isValid()) {
+            $updateArray = [];
+            $formData = $collectForm->getData();
+            if ($formData['collected_notes']) {
+                $updateArray['collected_notes'] = $formData['collected_notes'];
+            } else {
+                $updateArray['collected_notes'] = null;
+            }
+            if ($formData['collected_ts']) {
+                $updateArray['collected_ts'] = $formData['collected_ts']->format('Y-m-d H:i:s');
+            } else {
+                $updateArray['collected_ts'] = null;
+            }
+            if ($formData['collected_samples'] && is_array($formData['collected_samples'])) {
+                $updateArray['collected_samples'] = json_encode($formData['collected_samples']);
+            } else {
+                $updateArray['collected_samples'] = null;
+            }
+            if ($app['db']->update('orders', $updateArray, ['id' => $orderId])) {
+                $app->addFlashNotice('Order collection updated');
+                return $app->redirectToRoute('orderCollect', [
+                    'participantId' => $participant->id,
+                    'orderId' => $orderId
+                ]);
+            }
+        }
 
         return $app['twig']->render('order-collect.html.twig', [
             'participant' => $participant,
