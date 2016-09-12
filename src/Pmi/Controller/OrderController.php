@@ -122,8 +122,22 @@ class OrderController extends AbstractController
     {
         $this->loadOrder($participantId, $orderId, $app);
 
-        // TODO: redirect to current step based on order status
-        return $app->redirectToRoute('orderPrint', [
+        $columns = [
+            'print' => 'printed',
+            'collect' => 'collected',
+            'process' => 'processed',
+            'finalize' => 'finalized'
+        ];
+        foreach ($columns as $name => $column) {
+            if (!$this->order["{$column}_ts"]) {
+                $action = ucfirst($name);
+                break;
+            }
+        }
+        if (!isset($action)) {
+            $action = 'Finalize';
+        }
+        return $app->redirectToRoute("order{$action}", [
             'participantId' => $this->order['participant_id'],
             'orderId' => $this->order['id']
         ]);
