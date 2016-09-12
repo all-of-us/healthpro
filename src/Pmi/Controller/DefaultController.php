@@ -4,8 +4,11 @@ namespace Pmi\Controller;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Mayolink\Order;
@@ -17,11 +20,15 @@ class DefaultController extends AbstractController
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
-        ['participantOrderCreate', '/participant/{participantId}/order/create', [
+        ['orderCreate', '/participant/{participantId}/order/create', [
             'method' => 'GET|POST'
         ]],
-        ['participantOrderPdf', '/participant/{participantId}/order/{orderId}.pdf'],
-        ['participantOrder', '/participant/{participantId}/order/{orderId}'],
+        ['order', '/participant/{participantId}/order/{orderId}'],
+        ['orderPdf', '/participant/{participantId}/order/{orderId}.pdf'],
+        ['orderPrint', '/participant/{participantId}/order/{orderId}/print'],
+        ['orderCollect', '/participant/{participantId}/order/{orderId}/collect', ['method' => 'GET|POST']],
+        ['orderProcess', '/participant/{participantId}/order/{orderId}/process', ['method' => 'GET|POST']],
+        ['orderFinalize', '/participant/{participantId}/order/{orderId}/finalize', ['method' => 'GET|POST']],
         ['participantEval', '/participant/{participantId}/eval/{evalId}', [
             'method' => 'GET|POST',
             'defaults' => ['evalId' => null]
@@ -84,7 +91,7 @@ class DefaultController extends AbstractController
             $id = $idForm->get('mayoId')->getData();
             $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE mayo_id=?', [$id]);
             if ($order) {
-                return $app->redirectToRoute('participantOrder', [
+                return $app->redirectToRoute('order', [
                     'participantId' => $order['participant_id'],
                     'orderId' => $order['id']
                 ]);
@@ -117,7 +124,7 @@ class DefaultController extends AbstractController
         ]);
     }
 
-    public function participantOrderCreateAction($participantId, Application $app, Request $request)
+    public function orderCreateAction($participantId, Application $app, Request $request)
     {
         $participant = $app['pmi.drc.participantsearch']->getById($participantId);
         if (!$participant) {
@@ -155,7 +162,7 @@ class DefaultController extends AbstractController
                     'mayo_id' => $mlOrderId
                 ]);
                 if ($success && ($orderId = $app['db']->lastInsertId())) {
-                    return $app->redirectToRoute('participantOrder', [
+                    return $app->redirectToRoute('order', [
                         'participantId' => $participant->id,
                         'orderId' => $orderId
                     ]);
@@ -170,7 +177,7 @@ class DefaultController extends AbstractController
         ]);
     }
 
-    public function participantOrderPdfAction($participantId, $orderId, Application $app, Request $request)
+    public function orderPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $participant = $app['pmi.drc.participantsearch']->getById($participantId);
         if (!$participant) {
@@ -190,7 +197,7 @@ class DefaultController extends AbstractController
         return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
     }
 
-    public function participantOrderAction($participantId, $orderId, Application $app, Request $request)
+    public function orderAction($participantId, $orderId, Application $app, Request $request)
     {
         $participant = $app['pmi.drc.participantsearch']->getById($participantId);
         if (!$participant) {
@@ -200,14 +207,62 @@ class DefaultController extends AbstractController
         if (!$order) {
             $app->abort(404);
         }
-        return $app['twig']->render('order.html.twig', [
+        // TODO: redirect to current step based on order status
+        return $app->redirectToRoute('orderPrint', [
+            'participantId' => $order['participant_id'],
+            'orderId' => $order['id']
+        ]);
+    }
+
+    public function orderPrintAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE id = ? AND participant_id = ?', [$orderId, $participantId]);
+        if (!$order) {
+            $app->abort(404);
+        }
+        return $app['twig']->render('order-print.html.twig', [
             'participant' => $participant,
             'order' => $order,
-            'real' => $request->query->has('real'),
-            'events' => [
-                ['type' => 'Collected', 'ts' => new \DateTime('-15 minutes')],
-                ['type' => 'Processed', 'ts' => new \DateTime('-8 minutes')]
-            ]
+            'real' => $request->query->has('real')
+        ]);
+    }
+
+    public function orderCollectAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE id = ? AND participant_id = ?', [$orderId, $participantId]);
+        if (!$order) {
+            $app->abort(404);
+        }
+
+        $collectForm = $app['form.factory']->createBuilder(FormType::class)
+            ->add('collected_ts', DateTimeType::class, [
+                'label' => 'Collected time',
+                'date_widget' => 'single_text',
+                'time_widget' => 'single_text'
+            ])
+            ->add('collected_samples', ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => true,
+                'label' => 'Which samples were successfully collected?',
+                'choices' => array_combine(range(1,7), range(1,7))
+            ])
+            ->add('collected_notes', TextareaType::class, [
+                'label' => 'Additional notes on collection'
+            ])
+            ->getForm();
+
+        return $app['twig']->render('order-collect.html.twig', [
+            'participant' => $participant,
+            'order' => $order,
+            'collectForm' => $collectForm->createView()
         ]);
     }
 

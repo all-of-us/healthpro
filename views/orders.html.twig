@@ -20,9 +20,9 @@
                 <tbody>
                     {% for order in recentOrders %}
                         <tr>
-                            <td><a href="{{ path('participantOrder', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.created_ts|date('n/j/Y g:ia') }}</a></td>
-                            <td><a href="{{ path('participantOrder', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.mayo_id }}</a></td>
-                            <td><a href="{{ path('participantOrder', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a></td>
+                            <td><a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.created_ts|date('n/j/Y g:ia') }}</a></td>
+                            <td><a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.mayo_id }}</a></td>
+                            <td><a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
