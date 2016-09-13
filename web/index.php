@@ -19,6 +19,7 @@ if ($app->isProd() || $app->isDev()) { // for now, use twig memcache in prod
 $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
+    ->mount('/', new Controller\OrderController())
     ->mount('/_dev', new Controller\DevController())
     ->mount('/dashboard', new Controller\DashboardController())
     ->run()

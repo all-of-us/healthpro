@@ -20,11 +20,9 @@ class DefaultController extends AbstractController
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
-        ['participantOrderCreate', '/participant/{participantId}/order/create', [
+        ['orderCreate', '/participant/{participantId}/order/create', [
             'method' => 'GET|POST'
         ]],
-        ['participantOrderPdf', '/participant/{participantId}/order/{orderId}.pdf'],
-        ['participantOrder', '/participant/{participantId}/order/{orderId}'],
         ['participantEval', '/participant/{participantId}/eval/{evalId}', [
             'method' => 'GET|POST',
             'defaults' => ['evalId' => null]
@@ -108,7 +106,7 @@ class DefaultController extends AbstractController
             $id = $idForm->get('mayoId')->getData();
             $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE mayo_id=?', [$id]);
             if ($order) {
-                return $app->redirectToRoute('participantOrder', [
+                return $app->redirectToRoute('order', [
                     'participantId' => $order['participant_id'],
                     'orderId' => $order['id']
                 ]);
@@ -141,7 +139,7 @@ class DefaultController extends AbstractController
         ]);
     }
 
-    public function participantOrderCreateAction($participantId, Application $app, Request $request)
+    public function orderCreateAction($participantId, Application $app, Request $request)
     {
         $participant = $app['pmi.drc.participantsearch']->getById($participantId);
         if (!$participant) {
@@ -179,7 +177,7 @@ class DefaultController extends AbstractController
                     'mayo_id' => $mlOrderId
                 ]);
                 if ($success && ($orderId = $app['db']->lastInsertId())) {
-                    return $app->redirectToRoute('participantOrder', [
+                    return $app->redirectToRoute('order', [
                         'participantId' => $participant->id,
                         'orderId' => $orderId
                     ]);
@@ -191,47 +189,6 @@ class DefaultController extends AbstractController
         return $app['twig']->render('order-create.html.twig', [
             'participant' => $participant,
             'confirmForm' => $confirmForm->createView()
-        ]);
-    }
-
-    public function participantOrderPdfAction($participantId, $orderId, Application $app, Request $request)
-    {
-        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
-        if (!$participant) {
-            $app->abort(404);
-        }
-        $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE id = ? AND participant_id = ?', [$orderId, $participantId]);
-        if (!$order) {
-            $app->abort(404);
-        }
-        $mlOrder = new Order();
-        $pdf = $mlOrder->loginAndGetPdf(
-            $app->getConfig('ml_username'),
-            $app->getConfig('ml_password'),
-            $order['mayo_id']
-        );
-
-        return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
-    }
-
-    public function participantOrderAction($participantId, $orderId, Application $app, Request $request)
-    {
-        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
-        if (!$participant) {
-            $app->abort(404);
-        }
-        $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE id = ? AND participant_id = ?', [$orderId, $participantId]);
-        if (!$order) {
-            $app->abort(404);
-        }
-        return $app['twig']->render('order.html.twig', [
-            'participant' => $participant,
-            'order' => $order,
-            'real' => $request->query->has('real'),
-            'events' => [
-                ['type' => 'Collected', 'ts' => new \DateTime('-15 minutes')],
-                ['type' => 'Processed', 'ts' => new \DateTime('-8 minutes')]
-            ]
         ]);
     }
 
