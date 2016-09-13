@@ -14,15 +14,22 @@
 } %}
 <ul class="nav nav-tabs">
     <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle text-success" aria-hidden="true"></i> Create</a></li>
+    {% set nextEnabled = true %}
     {% for step, column in steps %}
-        <li role="presentation"{% if active == step %} class="active"{% endif %}>
-            <a href="{{ path('order'~(step|capitalize), params) }}">
-                {% if attribute(order, column~'_ts') %}
-                    <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
-                {% endif %}
-                {{ step|capitalize }}
-            </a>
-        </li>
+        {% if nextEnabled %}
+            <li role="presentation"{% if active == step %} class="active"{% endif %}>
+                <a href="{{ path('order'~(step|capitalize), params) }}">
+                    {% if attribute(order, column~'_ts') %}
+                        <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                    {% else %}
+                        {% set nextEnabled = false %}
+                    {% endif %}
+                    {{ step|capitalize }}
+                </a>
+            </li>
+        {% else %}
+            <li role="presentation" class="disabled"><a href="#">{{ step|capitalize }}</a></li>
+        {% endif %}
     {% endfor %}
 </ul>
 <br />
