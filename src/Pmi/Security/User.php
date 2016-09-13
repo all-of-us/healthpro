@@ -6,15 +6,22 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
 {
-    private $googleUser;
+    protected $googleUser;
+    protected $groups;
     
-    public function __construct(GoogleUser $googleUser) {
+    public function __construct(GoogleUser $googleUser, array $groups) {
         $this->googleUser = $googleUser;
+        $this->groups = $groups;
+    }
+    
+    public function getGroups()
+    {
+        return $this->groups;
     }
     
     public function getRoles()
     {
-        return ['ROLE_USER'];
+        return count($this->groups) > 0 ? ['ROLE_USER'] : [];
     }
     
     public function getPassword()

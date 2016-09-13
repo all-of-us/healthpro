@@ -34,6 +34,10 @@ class HpoApplication extends AbstractApplication
                         return new UserProvider($app);
                     }
                 ]
+            ],
+            'security.access_rules' => [
+                ['^/logout$', 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                ['^/.*$', 'ROLE_USER']
             ]
         ]);
         

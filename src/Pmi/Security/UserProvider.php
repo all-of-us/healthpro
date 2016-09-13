@@ -8,6 +8,14 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 class UserProvider implements UserProviderInterface
 {
+    
+    protected $app;
+    
+    public function __construct($app)
+    {
+        $this->app = $app;
+    }
+    
     public function loadUserByUsername($username)
     {
         $googleUser = UserService::getCurrentUser();
@@ -15,7 +23,8 @@ class UserProvider implements UserProviderInterface
             throw new \Exception("User $username is not logged in!");
         }
         
-        return new User($googleUser);
+        $groups = $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail());
+        return new User($googleUser, $groups);
     }
     
     public function refreshUser(UserInterface $user)

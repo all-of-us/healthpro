@@ -46,7 +46,7 @@ class DefaultController extends AbstractController
     {
         $token = $app['security.token_storage']->getToken();
         $user = $token->getUser();
-        $groups = $app['pmi.drc.appsclient']->getGroups($user->getEmail());
+        $groups = $user->getGroups();
         
         $groupNames = [];
         foreach ($groups as $group) {

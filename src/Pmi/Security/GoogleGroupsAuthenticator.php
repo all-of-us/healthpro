@@ -41,7 +41,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return new User($this->googleUser);
+        return $userProvider->loadUserByUsername($this->googleUser->getEmail());
     }
     
     public function checkCredentials($credentials, UserInterface $user)
