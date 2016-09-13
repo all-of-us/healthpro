@@ -22,3 +22,8 @@ iframe.pdf {
         font-size: 20px;
     }
 }
+label.required::after {
+    content: "*";
+    color: #a94442;
+    margin-left: 2px;
+}

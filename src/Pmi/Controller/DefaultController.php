@@ -49,9 +49,9 @@ class DefaultController extends AbstractController
         }
 
         $searchForm = $app['form.factory']->createNamedBuilder('search', FormType::class)
-            ->add('lastName', TextType::class, ['required' => false])
+            ->add('lastName', TextType::class, ['required' => true])
             ->add('firstName', TextType::class, ['required' => false])
-            ->add('dob', TextType::class, ['label' => 'Date of birth', 'required' => false])
+            ->add('dob', TextType::class, ['label' => 'Date of birth', 'required' => true])
             ->getForm();
 
         $searchForm->handleRequest($request);
