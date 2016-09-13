@@ -16,18 +16,10 @@ if ($app->isProd() || $app->isDev()) { // for now, use twig memcache in prod
     $app['twigCacheHandler'] = 'file';
 }
 
-// currently used for POC for Google Apps API
-$app['gaApplicationName'] = 'PMI DRC HPO';
-$app['gaDomain'] = null;
-$app['gaAdminEmail'] = null;
-$app['gaAuthJson'] = null;
-
 $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
     ->mount('/_dev', new Controller\DevController())
-    ->mount('/googleapps', new Controller\GoogleAppsController())
-    ->mount('/googlegroups', new Controller\GoogleGroupsController())
     ->mount('/dashboard', new Controller\DashboardController())
     ->run()
 ;

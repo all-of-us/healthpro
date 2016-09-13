@@ -16,6 +16,7 @@ class DefaultController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['logout', '/logout'],
+        ['groups', '/groups'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
@@ -39,6 +40,21 @@ class DefaultController extends AbstractController
     {
         $request->getSession()->invalidate();
         return $app->redirect(UserService::createLogoutURL('/'));
+    }
+    
+    public function groupsAction(Application $app, Request $request)
+    {
+        $token = $app['security.token_storage']->getToken();
+        $user = $token->getUser();
+        $groups = $app['pmi.drc.appsclient']->getGroups($user->getEmail());
+        
+        $groupNames = [];
+        foreach ($groups as $group) {
+            $groupNames[] = $group->getName();
+        }
+        return $app['twig']->render('googlegroups.html.twig', [
+            'groupNames' => $groupNames
+        ]);
     }
 
     public function participantsAction(Application $app, Request $request)

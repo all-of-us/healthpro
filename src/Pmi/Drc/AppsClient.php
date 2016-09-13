@@ -1,7 +1,7 @@
 <?php
 namespace Pmi\Drc;
 
-use Pmi\Application\AbstractApplication;
+use Pmi\Application\HpoApplication;
 
 /**
  * Used to access data from Google Apps.
@@ -15,19 +15,21 @@ class AppsClient
     private $client;
     private $directory;
     
-    public function __construct(AbstractApplication $app)
+    public function __construct(HpoApplication $app)
     {
         $this->app = $app;
-        $this->client = new \Google_Client();
-        $this->client->setApplicationName($app['gaApplicationName']);
-        $this->client->setAuthConfig(json_decode($app['gaAuthJson'], true));
-        $this->client->setSubject($app['gaAdminEmail']);
-        // TODO: http://stackoverflow.com/a/33838098/1402028
-        $this->client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
-        $this->client->setScopes(implode(' ', [
-            \Google_Service_Directory::ADMIN_DIRECTORY_GROUP_READONLY
-        ]));
-        $this->directory = new \Google_Service_Directory($this->client);
+        if ($this->app->getConfig('gaAuthJson')) {
+            $this->client = new \Google_Client();
+            $this->client->setApplicationName($this->app->getConfig('gaApplicationName'));
+            $this->client->setAuthConfig(json_decode($this->app->getConfig('gaAuthJson'), true));
+            $this->client->setSubject($this->app->getConfig('gaAdminEmail'));
+            // TODO: http://stackoverflow.com/a/33838098/1402028
+            $this->client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
+            $this->client->setScopes(implode(' ', [
+                \Google_Service_Directory::ADMIN_DIRECTORY_GROUP_READONLY
+            ]));
+            $this->directory = new \Google_Service_Directory($this->client);
+        }
     }
     
     /**
@@ -86,7 +88,7 @@ class AppsClient
         $groups = [];
         $nextToken = null;
         do {
-            $params = ['domain' => $this->app['gaDomain']];
+            $params = ['domain' => $this->app->getConfig('gaDomain')];
             if ($userEmail) {
                 $params['userKey'] = $userEmail;
             }
