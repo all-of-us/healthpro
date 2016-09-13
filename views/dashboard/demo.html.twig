@@ -1,8 +1,8 @@
 {% extends 'dashboard/base.html.twig' %}
 {% block body %}
     <ul class="nav nav-tabs top-pad" role="tablist">
-        <li role="presentation" class="active"><a href="#participants-by-time" role="tab" data-toggle="tab"><span class="fa fa-calendar"></span> Participant Categories Over Time</a></li>
-        <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab"><span class="fa fa-map"></span> Participants by Region</a></li>
+        <li role="presentation" class="active"><a href="#participants-by-time" role="tab" data-toggle="tab" id="participants-by-time-nav"><span class="fa fa-calendar"></span> Participant Categories Over Time</a></li>
+        <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab" id="participants-by-region-nav"><span class="fa fa-map"></span> Participants by Region</a></li>
     </ul>
     <div id="plotly-tabs" class="tab-content">
         <div id="participants-by-time" class="tab-pane pad active fade in">
@@ -34,53 +34,116 @@
             </div>
             <div id="plotly-participants-by-time"></div>
             <script type="text/javascript">
+                // function to grab current filter values and load JSON from load_data REST endpoint
+                // success handler calls Plotly.newplot()
+                function renderPlot() {
+                    launchSpinner('participants-by-time');
+                    var width = $('#plotly-participants-by-time').width() - 30;
+                    var endDate = $('#end-date').val()
+                    var attribute = $('#plot-value').val();
+                    var displayText = $('#plot-value option:selected').text();
+                    var interval = $('#interval').val();
+                    $.getJSON('/dashboard/load_data?end_date=' + endDate + '&attribute=' + attribute + '&interval=' + interval, function(data) {
+                        var timeLayout = {
+                            title: 'Participant registrations by ' + displayText + ' as of ' + endDate,
+                            width: width,
+                            barmode: 'stack',
+                            font: PLOTLY_LABEL_FONT
+                        };
+                        Plotly.newPlot('plotly-participants-by-time', data, timeLayout, PLOTLY_OPTS);
+                        stopSpinner('participants-by-time');
+                    });
+                }
 
+                // set default of today's date
+                var today = new Date().toISOString().split('T')[0];
+                $('#end-date').val(today);
+                renderPlot();
 
+                // load default plot on tab render (to save loading time)
+                $('#participants-by-time-nav').on('shown.bs.tab', function (e) {
+                    console.log('Showing time plot charts');
+                    renderPlot();
+                });
+
+                // re-render on filter change
+                $('.time-plot-control').change(function() {
+                    renderPlot();
+                });
+
+                // re-render on window resizeEnd if tab is visible
+                $( window ).on('resizeEnd', function() {
+                    if ($('#participants-by-time').is(':visible')) {
+                        renderPlot();
+                    }
+                });
             </script>
         </div>
         <div id="participants-by-region" class="tab-pane pad fade">
-            <div class="row form-group-sm">
-                <div class="col-sm-offset-5 col-sm-2 well">
-                    <label>Cutoff Date (inclusive)</label>
-                    <input type="text" class="form-control datepicker" id="region-date" />
+            <div class="well">
+                <div class="row form-group-sm">
+                    <div class="col-sm-4">
+                        <label>Plot</label>
+                        <select class="form-control region-plot-control" id="map-mode">
+                            <option value="states" selected>States</option>
+                            <option value="regions">Census Regions</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Cutoff Date (inclusive)</label>
+                        <input type="text" class="form-control region-plot-control datepicker" id="region-date" />
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div id="plotly-participants-by-region" class="col-md-offset-2 col-md-8"></div>
+                <div id="plotly-participants-by-region" class="col-md-offset-1 col-md-10"></div>
             </div>
+            <script type="text/javascript">
+                // function to grab current filter values and load JSON from load_map_data REST endpoint
+                // success handler calls Plotly.newplot()
+                function renderMap() {
+                    launchSpinner('participants-by-region');
+                    var mapWidth = $('#plotly-participants-by-region').width() - 30;
+                    var mapEndDate = $('#region-date').val();
+                    var mapMode = $('#map-mode').val();
+                    var mapModeText = $('#map-mode option:selected').text();
+                    $.getJSON('/dashboard/load_map_data?end_date=' + mapEndDate + '&map_mode=' + mapMode, function(data) {
+                        var mapLayout = {
+                            title: 'Participant registrations by ' + mapModeText + ' as of ' + mapEndDate,
+                            font: PLOTLY_LABEL_FONT,
+                            showlegend: false,
+                            width: mapWidth,
+                            height: mapWidth / 1.66,
+                            geo: GEO_OPTS
+                        };
+                        Plotly.newPlot('plotly-participants-by-region', data, mapLayout, PLOTLY_OPTS);
+                        stopSpinner('participants-by-region');
+                    });
+                }
 
+                // set default of today's date
+                var today = new Date().toISOString().split('T')[0];
+                $('#region-date').val(today);
+
+                // load plot on tab show (to save loading time)
+                $('#participants-by-region-nav').on('shown.bs.tab', function (e) {
+                    console.log('Showing region plot charts');
+                    renderMap();
+                });
+
+                // re-render on date change
+                $('.region-plot-control').change(function() {
+                    renderMap();
+                });
+
+                // re-render on window resizeEnd if tab is visible
+                $( window ).on('resizeEnd', function() {
+                    if ($('#participants-by-region').is(':visible')) {
+                        renderMap();
+                    }
+                });
+            </script>
         </div>
     </div>
-    <script type="text/javascript">
-        // function to grab current filter values and load JSON from load_data REST endpoint
-        // success handler calls Plotly.newplot()
-        function renderPlot() {
-            var width = $('#plotly-participants-by-time').width() - 30;
-            var endDate = $('#end-date').val()
-            var attribute = $('#plot-value').val();
-            var displayText = $('#plot-value option:selected').text();
-            var interval = $('#interval').val();
-            $.getJSON('/dashboard/load_data?end_date=' + endDate + '&attribute=' + attribute + '&interval=' + interval, function(data) {
-                Plotly.newPlot('plotly-participants-by-time', data, {title: 'Participant Registrations by ' + displayText + ' as of ' + endDate, width: width, barmode: 'stack'}, PLOTLY_OPTS);
-            });
-        }
-
-        // set default of today's date
-        var today = new Date().toISOString().split('T')[0];
-        $('#end-date').val(today);
-
-        // load default plot
-        renderPlot();
-
-        // re-render on filter change
-        $('.time-plot-control').change(function() {
-            renderPlot();
-        });
-
-        // re-render on window resizeEnd
-        $( window ).on('resizeEnd', function() {
-            renderPlot();
-        });
-    </script>
 
 {% endblock %}

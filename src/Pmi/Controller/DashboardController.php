@@ -12,7 +12,8 @@ class DashboardController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['demo', '/demo'],
-        ['load_data', '/load_data']
+        ['load_data', '/load_data'],
+        ['load_map_data', '/load_map_data']
     ];
 
     public function homeAction(Application $app, Request $request)
@@ -23,7 +24,7 @@ class DashboardController extends AbstractController
     public function demoAction(Application $app, Request $request)
     {
 
-        return $app['twig']->render('dashboard/demo.html.twig', []);
+        return $app['twig']->render('dashboard/demo.html.twig', ['app' => $app]);
     }
 
     public function load_dataAction(Application $app, Request $request) {
@@ -62,19 +63,13 @@ class DashboardController extends AbstractController
                 break;
         }
 
-        // get date interval breakdown and end date
+        // get date interval breakdown and end date from request parameters
         $interval = $request->get('interval');
         $end_date = $request->get('end_date');
         $oldest_reg = $app['db']->fetchColumn("SELECT min(enrollment_date) from dashboard_participants");
-        // assemble array of dates to key graph off of
-        $dates = [$end_date];
-        $i = 0;
-        while (strtotime($dates[$i]) >= strtotime($oldest_reg)){
-            $d = strtotime("-1 $interval", strtotime($dates[$i]));
-            array_push($dates, date('Y-m-d', $d));
-            $i++;
-        }
-        $data = [];
+
+        // assemble array of dates to key graph off of using helper function
+        $dates = $this->getDashboardDates($oldest_reg, $end_date, $interval);
 
         // iterate through search key/value pairs to load results from DB
         foreach($search_vals as $key => $value){
@@ -123,8 +118,90 @@ class DashboardController extends AbstractController
         };
 
         // render JSON data for Plotly
-        return $app['twig']->render('dashboard/load_data.json.twig', [
-            'data' => $data
-        ]);
+        return $app->json($data);
+    }
+
+    public function load_map_dataAction(Application $app, Request $request) {
+        // array of US states and census regions
+        $states = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY',
+            'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH',
+            'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'];
+
+        $census_regions = array(
+            'South' => ["AL", "AR", "DC", "DE", "FL", "GA", "KY", "LA", "MD", "MS", "NC", "OK", "SC", "TN", "TX", "VA", "WV"],
+            'West' => ["AK", "AZ", "CA", "CO", "HI", "ID", "MT", "NM", "NV", "OR", "UT", "WA", "WY"],
+            'Midwest' => ["IA", "IN", "IL", "KS", "MI", "MN", "MO", "ND", "NE", "OH", "SD", "WI"],
+            'Northeast' => ["CT", "MA", "ME", "NH", "NJ", "NY", "PA", "RI", "VT"]
+        );
+
+        // arrays of latitude/longitude coords for approx. locations of centers of census regions
+        $census_lats = array('South' => '33.65', 'West' => '40.78', 'Midwest' => '41.90', 'Northeast' => '42.75');
+        $census_longs = array('South' => '-84.42', 'West' => '-111.97', 'Midwest' => '-87.65', 'Northeast' => '-73.80');
+
+        // request parameters
+        $end_date = $request->get('end_date');
+        $map_mode = $request->get('map_mode');
+
+        if ($map_mode == 'states') {
+            // load state-level registration numbers as of end date
+            $state_registrations = [];
+
+            foreach($states as $state) {
+                $count = $app['db']->fetchColumn("select count(*) FROM dashboard_participants
+                                              WHERE enrollment_date <= ? and state = ?", [$end_date, $state]);
+                array_push($state_registrations, $count);
+            }
+
+            $map_data[] = array(
+                'type' => 'choropleth',
+                'locationmode' => 'USA-states',
+                'locations' => $states,
+                'z' => $state_registrations,
+                'text' => $states
+            );
+        } else {
+            foreach($census_regions as $region => $region_states) {
+                $total = 0;
+                $curr_states = "{$region}: ";
+                foreach($region_states as $state) {
+                    $count = $app['db']->fetchColumn("select count(*) FROM dashboard_participants
+                                              WHERE enrollment_date <= ? and state = ?", [$end_date, $state]);
+                    $total += $count;
+                    $curr_states .= $state.',';
+                }
+
+                $map_data[] = array(
+                    'type' => 'scattergeo',
+                    'locationmode' => 'USA-states',
+                    'lat' => [$census_lats[$region]],
+                    'lon' => [$census_longs[$region]],
+                    'mode' => 'markers+text',
+                    'hoverinfo' => 'none',
+                    'text' => ["{$region}: {$total}"],
+                    'marker' => array(
+                        'size' => $total,
+                        'line' => array(
+                            'color' => 'black',
+                            'width' => 1
+                        )
+                    )
+                );
+            }
+        }
+
+        // render JSON for Plotly
+        return $app->json($map_data);
+    }
+
+    // helper function to return array of dates segmented by interval
+    private function getDashboardDates($start_date, $end_date, $interval) {
+        $dates = [$end_date];
+        $i = 0;
+        while (strtotime($dates[$i]) >= strtotime($start_date)){
+            $d = strtotime("-1 $interval", strtotime($dates[$i]));
+            array_push($dates, date('Y-m-d', $d));
+            $i++;
+        }
+        return $dates;
     }
 }
