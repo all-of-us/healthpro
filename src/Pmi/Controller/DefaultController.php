@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Controller;
 
+use google\appengine\api\users\UserService;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,6 +15,7 @@ class DefaultController extends AbstractController
 {
     protected static $routes = [
         ['home', '/'],
+        ['logout', '/logout'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
@@ -31,6 +33,12 @@ class DefaultController extends AbstractController
     public function homeAction(Application $app, Request $request)
     {
         return $app['twig']->render('index.html.twig');
+    }
+    
+    public function logoutAction(Application $app, Request $request)
+    {
+        $request->getSession()->invalidate();
+        return $app->redirect(UserService::createLogoutURL('/'));
     }
 
     public function participantsAction(Application $app, Request $request)

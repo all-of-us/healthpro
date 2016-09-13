@@ -59,10 +59,8 @@ abstract class AbstractApplication extends Application
             date('YmdHis') : $values['release'];
         if (class_exists(UserService::class)) {
             $googleUser = UserService::getCurrentUser();
-            $values['logoutUrl'] = $googleUser ? UserService::createLogoutURL('/') : null;
             $values['googleUser'] = $googleUser;
         } else {
-            $values['logoutUrl'] = null;
             $values['googleUser'] = null;
         }
         
