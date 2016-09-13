@@ -8,6 +8,7 @@ class User implements UserInterface
 {
     protected $googleUser;
     protected $groups;
+    public $sites = [];
     
     public function __construct(GoogleUser $googleUser, array $groups) {
         $this->googleUser = $googleUser;

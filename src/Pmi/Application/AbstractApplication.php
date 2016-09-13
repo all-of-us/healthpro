@@ -57,12 +57,6 @@ abstract class AbstractApplication extends Application
         }
         $values['assetVer'] = $values['env'] === self::ENV_DEV ?
             date('YmdHis') : $values['release'];
-        if (class_exists(UserService::class)) {
-            $googleUser = UserService::getCurrentUser();
-            $values['googleUser'] = $googleUser;
-        } else {
-            $values['googleUser'] = null;
-        }
         
         parent::__construct($values);
     }
