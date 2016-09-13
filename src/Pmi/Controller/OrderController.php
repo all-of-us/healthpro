@@ -184,7 +184,13 @@ class OrderController extends AbstractController
     public function orderPrintAction($participantId, $orderId, Application $app, Request $request)
     {
         $this->loadOrder($participantId, $orderId, $app);
-
+        if (!$this->order['printed_ts']) {
+            $app['db']->update(
+                'orders',
+                ['printed_ts' => (new \DateTime())->format('Y-m-d H:i:s')],
+                ['id' => $orderId]
+            );
+        }
         return $app['twig']->render('order-print.html.twig', [
             'participant' => $this->participant,
             'order' => $this->order,
