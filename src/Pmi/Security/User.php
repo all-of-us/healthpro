@@ -6,18 +6,39 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
 {
-    protected $googleUser;
-    protected $groups;
-    public $sites = [];
+    private $googleUser;
+    private $groups;
+    private $sites;
     
     public function __construct(GoogleUser $googleUser, array $groups) {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
+        $this->sites = $this->computeSites();
     }
     
     public function getGroups()
     {
         return $this->groups;
+    }
+    
+    private function computeSites()
+    {
+        $sites = [];
+        // site membership is determined by the user's groups
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), 'hpo-site-') === 0) {
+                $sites[] = (object) [
+                    'email' => $group->getEmail(),
+                    'name' => $group->getName()
+                ];
+            }
+        }
+        return $sites;
+    }
+    
+    public function getSites()
+    {
+        return $this->sites;
     }
     
     public function getRoles()

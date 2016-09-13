@@ -77,7 +77,7 @@
                         {% else %}
                             <select class="form-control">
                             {% for site in app.user.sites %}
-                                <option value="{{ site.groupEmail }}">{{ site.groupName }}</option>
+                                <option value="{{ site.email }}">{{ site.name }}</option>
                             {% endfor %}
                         </select>
                         {% endif %}
