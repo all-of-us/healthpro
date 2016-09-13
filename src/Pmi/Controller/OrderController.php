@@ -10,12 +10,13 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Pmi\Mayolink\Order;
 
 class OrderController extends AbstractController
 {
     protected static $routes = [
+        ['orderPdf', '/participant/{participantId}/order/{orderId}-{type}.pdf'],
         ['order', '/participant/{participantId}/order/{orderId}'],
-        ['orderPdf', '/participant/{participantId}/order/{orderId}.pdf'],
         ['orderPrint', '/participant/{participantId}/order/{orderId}/print'],
         ['orderCollect', '/participant/{participantId}/order/{orderId}/collect', ['method' => 'GET|POST']],
         ['orderProcess', '/participant/{participantId}/order/{orderId}/process', ['method' => 'GET|POST']],
@@ -158,18 +159,26 @@ class OrderController extends AbstractController
         ]);
     }
 
-    public function orderPdfAction($participantId, $orderId, Application $app, Request $request)
+    public function orderPdfAction($type, $participantId, $orderId, Application $app, Request $request)
     {
+        if (!in_array($type, ['labels', 'requisition'])) {
+            $app->abort(404);
+        }
         $this->loadOrder($participantId, $orderId, $app);
 
         $mlOrder = new Order();
         $pdf = $mlOrder->loginAndGetPdf(
             $app->getConfig('ml_username'),
             $app->getConfig('ml_password'),
-            $this->order['mayo_id']
+            $this->order['mayo_id'],
+            $type
         );
 
-        return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+        if ($pdf) {
+            return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+        } else {
+            $app->abort(500, 'Failed to load PDF');
+        }
     }
 
     public function orderPrintAction($participantId, $orderId, Application $app, Request $request)

@@ -5,21 +5,15 @@
         <div class="col-sm-6 col-md-7">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Manifest</h3>
+                    <h3 class="panel-title">Requisition</h3>
                 </div>
                 <div class="panel-body">
                     <p class="text-center">
-                        <a href="javascript:window.label.print();" class="btn btn-primary btn-sm">
+                        <a href="javascript:window.requisition.print();" class="btn btn-primary btn-sm">
                             <i class="fa fa-print" aria-hidden="true"></i> Print
                         </a>
                     </p>
-                    {% if real %}
-                        <iframe name="label" class="pdf-label" src="{{ path('orderPdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
-                        <p><strong>Attempted to load real label</strong> &bull; <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}">Return to sample label</a></p>
-                    {% else %}
-                        <iframe name="label" class="pdf-label" src="{{ asset('OrderLabel.pdf') }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
-                        <p><strong>Sample label</strong> &bull; <a href="{{ path('order', { participantId: participant.id, orderId: order.id, real: 1 }) }}">Request actual label</a></p>
-                    {% endif %}
+                    <iframe name="requisition" class="pdf pdf-requisition" src="{{ path('orderPdf', { participantId: participant.id, orderId: order.id, type: 'requisition' }) }}#view=FitH"></iframe>
                 </div>
             </div>
         </div>
@@ -27,21 +21,15 @@
         <div class="col-sm-6 col-md-5">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Label</h3>
+                    <h3 class="panel-title">Labels</h3>
                 </div>
                 <div class="panel-body">
                     <p class="text-center">
-                        <a href="javascript:window.label.print();" class="btn btn-primary btn-sm">
+                        <a href="javascript:window.labels.print();" class="btn btn-primary btn-sm">
                             <i class="fa fa-print" aria-hidden="true"></i> Print
                         </a>
                     </p>
-                    {% if real %}
-                        <iframe name="label" class="pdf-label" src="{{ path('orderPdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
-                        <p><strong>Attempted to load real label</strong> &bull; <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}">Return to sample label</a></p>
-                    {% else %}
-                        <iframe name="label" class="pdf-label" src="{{ asset('OrderLabel.pdf') }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
-                        <p><strong>Sample label</strong> &bull; <a href="{{ path('order', { participantId: participant.id, orderId: order.id, real: 1 }) }}">Request actual label</a></p>
-                    {% endif %}
+                    <iframe name="labels" class="pdf pdf-labels" src="{{ path('orderPdf', { participantId: participant.id, orderId: order.id, type: 'labels' }) }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
                 </div>
             </div>
         </div>
