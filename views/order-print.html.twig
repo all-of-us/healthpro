@@ -8,11 +8,14 @@
                     <h3 class="panel-title">Requisition</h3>
                 </div>
                 <div class="panel-body">
-                    <p class="text-center">
-                        <a href="javascript:window.requisition.print();" class="btn btn-primary btn-sm">
-                            <i class="fa fa-print" aria-hidden="true"></i> Print
-                        </a>
-                    </p>
+                    <div class="text-center">
+                        <p id="requisition-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
+                        <p id="requisition-loaded">
+                            <a href="javascript:window.requisition.print();" class="btn btn-primary btn-sm">
+                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                            </a>
+                        </p>
+                    </div>
                     <iframe name="requisition" class="pdf pdf-requisition" src="{{ path('orderPdf', { participantId: participant.id, orderId: order.id, type: 'requisition' }) }}#view=FitH"></iframe>
                 </div>
             </div>
@@ -24,14 +27,35 @@
                     <h3 class="panel-title">Labels</h3>
                 </div>
                 <div class="panel-body">
-                    <p class="text-center">
-                        <a href="javascript:window.labels.print();" class="btn btn-primary btn-sm">
-                            <i class="fa fa-print" aria-hidden="true"></i> Print
-                        </a>
-                    </p>
+                    <div class="text-center">
+                        <p id="labels-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
+                        <p id="labels-loaded">
+                            <a href="javascript:window.labels.print();" class="btn btn-primary btn-sm">
+                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                            </a>
+                        </p>
+                    </div>
                     <iframe name="labels" class="pdf pdf-labels" src="{{ path('orderPdf', { participantId: participant.id, orderId: order.id, type: 'labels' }) }}#view=FitH&amp;toolbar=0&amp;navpanes=0"></iframe>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    $('#requisition-loaded').hide();
+    $('iframe[name=requisition]').on('load', function() {
+        $('#requisition-loading').hide();
+        $('#requisition-loaded').show();
+    });
+
+    $('#labels-loaded').hide();
+    $('iframe[name=labels]').on('load', function() {
+        $('#labels-loading').hide();
+        $('#labels-loaded').show();
+    });
+});
+</script>
 {% endblock %}
