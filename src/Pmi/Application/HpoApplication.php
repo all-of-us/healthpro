@@ -3,6 +3,7 @@ namespace Pmi\Application;
 
 use Symfony\Component\HttpFoundation\Response;
 use Pmi\Entities\Configuration;
+use Pmi\Security\UserProvider;
 
 class HpoApplication extends AbstractApplication
 {
@@ -16,8 +17,6 @@ class HpoApplication extends AbstractApplication
         $this['pmi.drc.participantsearch'] = new \Pmi\Drc\ParticipantSearch();
         $this['pmi.drc.appsclient'] = new \Pmi\Drc\AppsClient($this);
 
-        $app = $this;
-        
         $this['app.googleapps_authenticator'] = function ($app) {
             return new \Pmi\Security\GoogleAppsAuthenticator($app);
         };
@@ -25,25 +24,18 @@ class HpoApplication extends AbstractApplication
             return new \Pmi\Security\GoogleGroupsAuthenticator($app);
         };
         
+        $app = $this;
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
-                'googleapps' => [
-                    'pattern' => '^/googleapps',
-                    'stateless' => true, // because Google handles auth state
-                    'guard' => [
-                        'authenticators' => [
-                            'app.googleapps_authenticator'
-                        ]
-                    ]
-                ],
-                'googlegroups' => [
-                    'pattern' => '^/googlegroups',
-                    'stateless' => true, // because Google handles auth state
+                'main' => [
                     'guard' => [
                         'authenticators' => [
                             'app.googlegroups_authenticator'
                         ]
-                    ]
+                    ],
+                    'users' => function () use ($app) {
+                        return new UserProvider($app);
+                    }
                 ]
             ]
         ]);
