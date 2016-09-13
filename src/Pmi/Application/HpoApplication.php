@@ -17,9 +17,6 @@ class HpoApplication extends AbstractApplication
         $this['pmi.drc.participantsearch'] = new \Pmi\Drc\ParticipantSearch();
         $this['pmi.drc.appsclient'] = new \Pmi\Drc\AppsClient($this);
 
-        $this['app.googleapps_authenticator'] = function ($app) {
-            return new \Pmi\Security\GoogleAppsAuthenticator($app);
-        };
         $this['app.googlegroups_authenticator'] = function ($app) {
             return new \Pmi\Security\GoogleGroupsAuthenticator($app);
         };
