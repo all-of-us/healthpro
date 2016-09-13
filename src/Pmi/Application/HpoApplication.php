@@ -17,6 +17,12 @@ class HpoApplication extends AbstractApplication
         $this['pmi.drc.participantsearch'] = new \Pmi\Drc\ParticipantSearch();
         $this['pmi.drc.appsclient'] = new \Pmi\Drc\AppsClient($this);
 
+        $this->registerDb();
+        return $this;
+    }
+    
+    protected function registerSecurity()
+    {
         $this['app.googlegroups_authenticator'] = function ($app) {
             return new \Pmi\Security\GoogleGroupsAuthenticator($app);
         };
@@ -40,9 +46,6 @@ class HpoApplication extends AbstractApplication
                 ['^/.*$', 'ROLE_USER']
             ]
         ]);
-        
-        $this->registerDb();
-        return $this;
     }
 
     protected function loadConfiguration()
