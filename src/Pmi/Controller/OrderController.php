@@ -67,7 +67,7 @@ class OrderController extends AbstractController
                 $formData["{$set}_samples"] = $samples;
             }
         } else {
-            $formData["{$set}_samples"] = array_values(self::$samples);
+            $formData["{$set}_samples"] = $this->getEnabledSamples($set);
         }
         return $formData;
     }
@@ -87,7 +87,7 @@ class OrderController extends AbstractController
             $updateArray["{$set}_ts"] = null;
         }
         if ($formData["{$set}_samples"] && is_array($formData["{$set}_samples"])) {
-            $updateArray["{$set}_samples"] = json_encode($formData["{$set}_samples"]);
+            $updateArray["{$set}_samples"] = json_encode(array_values($formData["{$set}_samples"]));
         } else {
             $updateArray["{$set}_samples"] = json_encode([]);
         }
