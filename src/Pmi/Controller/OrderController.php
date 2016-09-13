@@ -25,6 +25,16 @@ class OrderController extends AbstractController
 
     protected $order;
     protected $participant;
+    protected static $samples = [
+        'Tube 1' => 1,
+        'Tube 2' => 2,
+        'Tube 3' => 3,
+        'Tube 4' => 4,
+        'Tube 5' => 5,
+        'Tube 6' => 6,
+        'Tube 7' => 7
+    ];
+    protected static $samplesRequiringProcessing = [6,7];
 
     protected function loadOrder($participantId, $orderId, Application $app)
     {
@@ -57,7 +67,7 @@ class OrderController extends AbstractController
                 $formData["{$set}_samples"] = $samples;
             }
         } else {
-            $formData["{$set}_samples"] = range(1,7);
+            $formData["{$set}_samples"] = array_values(self::$samples);
         }
         return $formData;
     }
@@ -82,6 +92,44 @@ class OrderController extends AbstractController
             $updateArray["{$set}_samples"] = json_encode([]);
         }
         return $updateArray;
+    }
+
+    protected function getEnabledSamples($set)
+    {
+        if ($this->order['collected_samples'] &&
+            ($collectedArray = json_decode($this->order['collected_samples'])) &&
+            is_array($collectedArray)
+        ) {
+            $collected = $collectedArray;
+        } else {
+            $collected = [];
+        }
+
+        if ($this->order['processed_samples'] &&
+            ($processedArray = json_decode($this->order['processed_samples'])) &&
+            is_array($processedArray)
+        ) {
+            $processed = $processedArray;
+        } else {
+            $processed = [];
+        }
+
+        switch ($set) {
+            case 'processed':
+                return array_intersect($collected, self::$samplesRequiringProcessing);
+            case 'finalized':
+                $enabled = array_intersect($collected, self::$samples);
+                foreach ($enabled as $key => $sample) {
+                    if (in_array($sample, self::$samplesRequiringProcessing) &&
+                        !in_array($sample, $processed)
+                    ) {
+                        unset($enabled[$key]);
+                    }
+                }
+                return array_values($enabled);
+            default:
+                return array_values(self::$samples);
+        }
     }
 
     protected function createOrderForm($set, $formFactory)
@@ -112,6 +160,12 @@ class OrderController extends AbstractController
         }
 
         $formData = $this->getOrderFormData($set);
+        if ($set == 'processed') {
+            $samples = array_intersect(self::$samples, self::$samplesRequiringProcessing);
+        } else {
+            $samples = self::$samples;
+        }
+        $enabledSamples = $this->getEnabledSamples($set);
         $form = $formFactory->createBuilder(FormType::class, $formData)
             ->add("{$set}_ts", DateTimeType::class, [
                 'label' => $tsLabel,
@@ -123,8 +177,15 @@ class OrderController extends AbstractController
                 'expanded' => true,
                 'multiple' => true,
                 'label' => $samplesLabel,
-                'choices' => array_combine(range(1,7), range(1,7)),
-                'required' => false
+                'choices' => $samples,
+                'required' => false,
+                'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
+                    if (in_array($val, $enabledSamples)) {
+                        return [];
+                    } else {
+                        return ['disabled' => true];
+                    }
+                }
             ])
             ->add("{$set}_notes", TextareaType::class, [
                 'label' => $notesLabel,
