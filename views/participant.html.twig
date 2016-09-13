@@ -4,47 +4,62 @@
         <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>#{{ participant.id }}</small></h2>
     </div>
 
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Evaluation</h3>
-                </div>
-                <div class="panel-body">
-                    {% for evaluation in evaluations %}
-                        <a href="{{ path('participantEval', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg btn-default">
-                            {{ evaluation.created_ts|date('n/j/Y g:ia') }}<br />
-                            <small class="text-muted">Last updated {{ evaluation.updated_ts|date('n/j/Y g:ia') }}</small>
+    {% if participant.consentComplete %}
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Evaluation</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% for evaluation in evaluations %}
+                            <a href="{{ path('participantEval', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg btn-default">
+                                {{ evaluation.created_ts|date('n/j/Y g:ia') }}<br />
+                                <small class="text-muted">Last updated {{ evaluation.updated_ts|date('n/j/Y g:ia') }}</small>
+                            </a>
+                        {% endfor %}
+                        <a href="{{ path('participantEval', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
+                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                            {% if evaluations|length > 0 %}
+                                New
+                            {% else %}
+                                Start
+                            {% endif %}
+                            Evaluation
                         </a>
-                    {% endfor %}
-                    <a href="{{ path('participantEval', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                        {% if evaluations|length > 0 %}
-                            New
-                        {% else %}
-                            Start
-                        {% endif %}
-                        Evaluation
-                    </a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-sm-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
-                </div>
-                <div class="panel-body">
-                    {% for order in orders %}
-                        <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
-                            {{ order.created_ts|date('n/j/Y g:ia') }}<br />
-                            <small class="text-muted">{{ order.mayo_id }}</small>
-                        </a>
-                    {% endfor %}
-                    <a href="{{ path('orderCreate', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
+            <div class="col-sm-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% for order in orders %}
+                            <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
+                                {{ order.created_ts|date('n/j/Y g:ia') }}<br />
+                                <small class="text-muted">{{ order.mayo_id }}</small>
+                            </a>
+                        {% endfor %}
+                        <a href="{{ path('orderCreate', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    {% else %}
+        <div class="row">
+            <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> Consent not complete</h3>
+                    </div>
+                    <div class="panel-body">
+                        This participant does not meet consent requirements. Please direct participant to the Participant Technologies Center resource.  For more information call <span class="text-muted">[call center phone number]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
