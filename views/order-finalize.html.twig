@@ -15,3 +15,12 @@
         </p>
     {{ form_end(finalizeForm) }}
 {% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function () {
+    $('input.sample-disabled').closest('label').addClass('text-danger');
+    $('input.sample-disabled').closest('div.checkbox').append('<small class="text-muted">was not collected or processed</small>');
+});
+</script>
+{% endblock %}

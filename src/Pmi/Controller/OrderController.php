@@ -183,7 +183,7 @@ class OrderController extends AbstractController
                     if (in_array($val, $enabledSamples)) {
                         return [];
                     } else {
-                        return ['disabled' => true];
+                        return ['disabled' => true, 'class' => 'sample-disabled'];
                     }
                 }
             ])
