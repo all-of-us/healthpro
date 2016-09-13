@@ -37,12 +37,12 @@
                 </div>
                 <div class="panel-body">
                     {% for order in orders %}
-                        <a href="{{ path('participantOrder', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
+                        <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
                             {{ order.created_ts|date('n/j/Y g:ia') }}<br />
                             <small class="text-muted">{{ order.mayo_id }}</small>
                         </a>
                     {% endfor %}
-                    <a href="{{ path('participantOrderCreate', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
+                    <a href="{{ path('orderCreate', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
                 </div>
             </div>
         </div>

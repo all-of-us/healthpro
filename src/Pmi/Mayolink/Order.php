@@ -76,9 +76,15 @@ class Order
         return $matches[1];
     }
 
-    public function getPdf($id)
+    public function getPdf($id, $type)
     {
-        $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/label-set");
+        if ($type == 'labels') {
+            $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/label-set");
+        } elseif ($type == 'requisition') {
+            $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/requisition");
+        } else {
+            return false;
+        }
         if ($response->getStatusCode() !== 200) {
             return false;
         }
@@ -88,13 +94,19 @@ class Order
 
     public function loginAndCreateOrder($username, $password, $options)
     {
-        $this->login($username, $password);
-        return $this->create($options);
+        if ($this->login($username, $password)) {
+            return $this->create($options);
+        } else {
+            return false;
+        }
     }
 
-    public function loginAndGetPdf($username, $password, $id)
+    public function loginAndGetPdf($username, $password, $id, $type)
     {
-        $this->login($username, $password);
-        return $this->getPdf($id);
+        if ($this->login($username, $password)) {
+            return $this->getPdf($id, $type);
+        } else {
+            return false;
+        }
     }
 }
