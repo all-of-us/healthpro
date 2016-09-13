@@ -47,12 +47,16 @@ class OrderController extends AbstractController
         };
         if ($this->order["{$set}_ts"]) {
             $formData["{$set}_ts"] = new \DateTime($this->order["{$set}_ts"]);
+        } else {
+            $formData["{$set}_ts"] = new \DateTime();
         }
         if ($this->order["{$set}_samples"]) {
             $samples = json_decode($this->order["{$set}_samples"]);
             if (is_array($samples) && count($samples) > 0) {
                 $formData["{$set}_samples"] = $samples;
             }
+        } else {
+            $formData["{$set}_samples"] = range(1,7);
         }
         return $formData;
     }
@@ -74,7 +78,7 @@ class OrderController extends AbstractController
         if ($formData["{$set}_samples"] && is_array($formData["{$set}_samples"])) {
             $updateArray["{$set}_samples"] = json_encode($formData["{$set}_samples"]);
         } else {
-            $updateArray["{$set}_samples"] = null;
+            $updateArray["{$set}_samples"] = json_encode([]);
         }
         return $updateArray;
     }
@@ -94,11 +98,22 @@ class OrderController extends AbstractController
                 $verb = 'finalized';
                 $noun = 'finalization';
                 break;
+            default:
+                $verb = $set;
+                $adjective = $verb;
+                $noun = "$adjective samples";
         }
+        $tsLabel = ucfirst($verb) . ' time';
+        $samplesLabel = "Which samples were successfully {$verb}?";
+        $notesLabel = "Additional notes on {$noun}";
+        if ($set == 'finalized') {
+            $samplesLabel = "Which samples are being shipped to the PMI Biobank?";
+        }
+
         $formData = $this->getOrderFormData($set);
         $form = $formFactory->createBuilder(FormType::class, $formData)
             ->add("{$set}_ts", DateTimeType::class, [
-                'label' => ucfirst($verb) . ' time',
+                'label' => $tsLabel,
                 'date_widget' => 'single_text',
                 'time_widget' => 'single_text',
                 'required' => false
@@ -106,12 +121,12 @@ class OrderController extends AbstractController
             ->add("{$set}_samples", ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
-                'label' => "Which samples were successfully {$verb}?",
+                'label' => $samplesLabel,
                 'choices' => array_combine(range(1,7), range(1,7)),
                 'required' => false
             ])
             ->add("{$set}_notes", TextareaType::class, [
-                'label' => "Additional notes on {$noun}",
+                'label' => $notesLabel,
                 'required' => false
             ])
             ->getForm();
