@@ -49,9 +49,9 @@ class DefaultController extends AbstractController
         }
 
         $searchForm = $app['form.factory']->createNamedBuilder('search', FormType::class)
-            ->add('lastName', TextType::class, ['required' => false])
+            ->add('lastName', TextType::class, ['required' => true])
             ->add('firstName', TextType::class, ['required' => false])
-            ->add('dob', TextType::class, ['label' => 'Date of birth', 'required' => false])
+            ->add('dob', TextType::class, ['label' => 'Date of birth', 'required' => true])
             ->getForm();
 
         $searchForm->handleRequest($request);
@@ -121,6 +121,9 @@ class DefaultController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
+        if (!$participant->consentComplete) {
+            $app->abort(403);
+        }
         $confirmForm = $app['form.factory']->createBuilder(FormType::class)
             ->add('confirm', HiddenType::class)
             ->getForm();
@@ -173,6 +176,9 @@ class DefaultController extends AbstractController
         $participant = $app['pmi.drc.participantsearch']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
+        }
+        if (!$participant->consentComplete) {
+            $app->abort(403);
         }
         $evaluationService = new Evaluation();
         if ($evalId) {
