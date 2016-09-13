@@ -21,7 +21,7 @@
                 <a href="{{ path('order'~(step|capitalize), params) }}">
                     {% if attribute(order, column~'_ts') %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
-                    {% else %}
+                    {% elseif step != 'print' %} {# since the printed_ts is set automatically after the first page load, don't disable to next tab #}
                         {% set nextEnabled = false %}
                     {% endif %}
                     {{ step|capitalize }}
