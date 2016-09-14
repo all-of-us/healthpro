@@ -23,8 +23,10 @@ class AppsClient
             $this->client->setApplicationName($this->app->getConfig('gaApplicationName'));
             $this->client->setAuthConfig(json_decode($this->app->getConfig('gaAuthJson'), true));
             $this->client->setSubject($this->app->getConfig('gaAdminEmail'));
-            // TODO: http://stackoverflow.com/a/33838098/1402028
-            $this->client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
+            // http://stackoverflow.com/a/33838098/1402028
+            if ($app->isDev()) {
+                $this->client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
+            }
             $this->client->setScopes(implode(' ', [
                 \Google_Service_Directory::ADMIN_DIRECTORY_GROUP_READONLY
             ]));
