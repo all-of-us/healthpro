@@ -26,13 +26,13 @@ class OrderController extends AbstractController
     protected $order;
     protected $participant;
     protected static $samples = [
-        'EDTA 4 mL' => 1,
-        'EDTA 10 mL' => 2,
-        'Clot Activator (SST) 8 mL' => 3,
-        'Plasma Separator (PST) 8 mL' => 4,
-        'EDTA 10 mL' => 5,
-        'Na-Heparin 4 mL' => 6,
-        'Urine 10 mL' => 7
+        '(1) EDTA 4 mL' => 1,
+        '(2) EDTA 10 mL' => 2,
+        '(3) Clot Activator (SST) 8 mL' => 3,
+        '(4) Plasma Separator (PST) 8 mL' => 4,
+        '(5) EDTA 10 mL' => 5,
+        '(6) Na-Heparin 4 mL' => 6,
+        '(7) Urine 10 mL' => 7
     ];
     protected static $samplesRequiringProcessing = [3,4];
 
