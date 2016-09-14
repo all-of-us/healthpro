@@ -4,6 +4,7 @@ namespace Pmi\Controller;
 use GuzzleHttp\Psr7\Response;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Constraints\Date;
 
 class DashboardController extends AbstractController
 {
@@ -66,6 +67,8 @@ class DashboardController extends AbstractController
         // get date interval breakdown and end date from request parameters
         $interval = $request->get('interval');
         $end_date = $request->get('end_date');
+        $oldest_reg = $request->get('start_date');
+
         $oldest_reg = $app['db']->fetchColumn("SELECT min(enrollment_date) from dashboard_participants");
 
         // assemble array of dates to key graph off of using helper function
@@ -134,13 +137,18 @@ class DashboardController extends AbstractController
             'Northeast' => ["CT", "MA", "ME", "NH", "NJ", "NY", "PA", "RI", "VT"]
         );
 
-        // arrays of latitude/longitude coords for approx. locations of centers of census regions
-        $census_lats = array('South' => '33.65', 'West' => '40.78', 'Midwest' => '41.90', 'Northeast' => '42.75');
-        $census_longs = array('South' => '-84.42', 'West' => '-111.97', 'Midwest' => '-87.65', 'Northeast' => '-73.80');
+        $hpo_locations = ["FQHC - Cherokee Health Systems, Knoxville, Tennessee", "FQHC - Community Health Center, Inc., Middletown, Connecticut",
+            "FQHC - Eau Claire Cooperative Health Center, Columbia, South Carolina", "FQHC - HRHCare, Peekskill, New York",
+            "FQHC - Jackson-Hinds Comprehensive Health Center, Jackson, Mississippi", "FQHC - San Ysidro Health Center, San Ysidro, California",
+            "RMC Arizona", "RMC Illinois", "RMC Pitt", "RMC New York", "Direct Volunteer", "Veterans Administration Medical Center (VA)"];
 
         // request parameters
         $end_date = $request->get('end_date');
         $map_mode = $request->get('map_mode');
+
+        // colorbrewer 12-element qualitative colors
+        $colors = ['rgb(166,206,227)','rgb(31,120,180)','rgb(178,223,138)','rgb(51,160,44)','rgb(251,154,153)','rgb(227,26,28)',
+            'rgb(253,191,111)','rgb(255,127,0)','rgb(202,178,214)','rgb(106,61,154)','rgb(255,255,153)','rgb(177,89,40)'];
 
         if ($map_mode == 'states') {
             // load state-level registration numbers as of end date
@@ -159,33 +167,52 @@ class DashboardController extends AbstractController
                 'z' => $state_registrations,
                 'text' => $states
             );
-        } else {
+
+        } elseif ($map_mode == 'regions') {
+            $states_by_region = [];
+            $registrations_by_state = [];
+            $region_text = [];
             foreach($census_regions as $region => $region_states) {
-                $total = 0;
-                $curr_states = "{$region}: ";
+                $rows = $app['db']->fetchAll("select * FROM dashboard_participants
+                                              WHERE enrollment_date <= '$end_date' and state in (?)", [$region_states], [\Doctrine\DBAL\Connection::PARAM_STR_ARRAY]);
                 foreach($region_states as $state) {
-                    $count = $app['db']->fetchColumn("select count(*) FROM dashboard_participants
-                                              WHERE enrollment_date <= ? and state = ?", [$end_date, $state]);
-                    $total += $count;
-                    $curr_states .= $state.',';
+                    array_push($states_by_region, $state);
+                    array_push($registrations_by_state, count($rows));
+                    array_push($region_text, $region);
                 }
+            }
+
+            $map_data[] = array(
+                'type' => 'choropleth',
+                'locationmode' => 'USA-states',
+                'locations' => $states_by_region,
+                'z' => $registrations_by_state,
+                'text' => $region_text
+            );
+        } elseif ($map_mode == 'hpo_category') {
+            $i = 0;
+            foreach($hpo_locations as $location) {
+                $count = $app['db']->fetchColumn("SELECT count(*) FROM dashboard_participants 
+                                                  WHERE enrollment_date <= ? and hpo_category = ?", [$end_date, $location]);
+                $entity = $app['db']->fetchAll("SELECT * FROM entity_location WHERE entity = ?", [$location]);
 
                 $map_data[] = array(
                     'type' => 'scattergeo',
                     'locationmode' => 'USA-states',
-                    'lat' => [$census_lats[$region]],
-                    'lon' => [$census_longs[$region]],
-                    'mode' => 'markers+text',
-                    'hoverinfo' => 'none',
-                    'text' => ["{$region}: {$total}"],
+                    'lat' => [$entity[0]['latitude']],
+                    'lon' => [$entity[0]['longitude']],
+                    'hoverinfo' => 'text',
+                    'text' => ["{$location}: <b>{$count}</b>"],
                     'marker' => array(
-                        'size' => $total,
+                        'size' => [$count],
+                        'color' => $colors[$i],
                         'line' => array(
                             'color' => 'black',
                             'width' => 1
                         )
                     )
                 );
+                $i++;
             }
         }
 
