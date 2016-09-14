@@ -27,3 +27,6 @@ label.required::after {
     color: #a94442;
     margin-left: 2px;
 }
+.nav-tabs li.active a {
+    font-weight: bold;
+}

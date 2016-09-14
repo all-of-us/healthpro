@@ -13,4 +13,11 @@ $(document).ready(function()
         else if (_.isUndefined(val)) return false;
         else return !!val;
     };
+
+    /*************************************************************************
+     * Disable click on disabled tabs (prevents unnecessary navigation to #)
+     ************************************************************************/
+     $('.nav-tabs li.disabled a').on('click', function(e) {
+        e.preventDefault();
+     });
 });
