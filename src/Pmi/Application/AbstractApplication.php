@@ -115,14 +115,15 @@ abstract class AbstractApplication extends Application
         $this->register(new FormServiceProvider());
         $this->register(new ValidatorServiceProvider());
 
-        // Configure Memcache session handler
-        if (isset($this['memcacheSession']) && $this['memcacheSession']) {
-            $this->enableMemcacheSession();
-        }
-
-        // Configure Datastore session handler
-        if (isset($this['datastoreSession']) && $this['datastoreSession']) {
-            $this->enableDatastoreSession();
+        if (isset($this['sessionHandler'])) {
+            switch ($this['sessionHandler']) {
+                case 'memcache':
+                    $this->enableMemcacheSession();
+                    break;
+                case 'datastore':
+                    $this->enableDatastoreSession();
+                    break;
+            }
         }
         
         // configure security and boot before enabling twig so that `is_granted` will be available

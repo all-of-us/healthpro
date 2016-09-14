@@ -8,10 +8,10 @@ $app = new HpoApplication();
 $app['templatesDirectory'] = realpath(__DIR__ . '/../views');
 $app['errorTemplate'] = 'error.html.twig';
 if ($app->isProd() || $app->isDev()) { // for now, use twig memcache in prod
-    $app['memcacheSession'] = true;
+    $app['sessionHandler'] = 'datastore';
     $app['twigCacheHandler'] = 'memcache';
 } else {
-    $app['memcacheSession'] = true;
+    $app['sessionHandler'] = 'datastore';
     $app['cacheDirectory'] = realpath(__DIR__ . '/../cache');
     $app['twigCacheHandler'] = 'file';
 }
