@@ -57,14 +57,6 @@ abstract class AbstractApplication extends Application
         }
         $values['assetVer'] = $values['env'] === self::ENV_DEV ?
             date('YmdHis') : $values['release'];
-        if (class_exists(UserService::class)) {
-            $googleUser = UserService::getCurrentUser();
-            $values['logoutUrl'] = $googleUser ? UserService::createLogoutURL('/') : null;
-            $values['googleUser'] = $googleUser;
-        } else {
-            $values['logoutUrl'] = null;
-            $values['googleUser'] = null;
-        }
         
         parent::__construct($values);
     }
@@ -123,11 +115,6 @@ abstract class AbstractApplication extends Application
         $this->register(new FormServiceProvider());
         $this->register(new ValidatorServiceProvider());
 
-        // Register and configure Twig
-        if (isset($this['templatesDirectory']) && $this['templatesDirectory']) {
-            $this->enableTwig();
-        }
-
         // Configure Memcache session handler
         if (isset($this['memcacheSession']) && $this['memcacheSession']) {
             $this->enableMemcacheSession();
@@ -137,9 +124,20 @@ abstract class AbstractApplication extends Application
         if (isset($this['datastoreSession']) && $this['datastoreSession']) {
             $this->enableDatastoreSession();
         }
+        
+        // configure security and boot before enabling twig so that `is_granted` will be available
+        $this->registerSecurity();
+        $this->boot();
+
+        // Register and configure Twig
+        if (isset($this['templatesDirectory']) && $this['templatesDirectory']) {
+            $this->enableTwig();
+        }
 
         return $this;
     }
+
+    abstract protected function registerSecurity();
 
     protected function enableTwig()
     {

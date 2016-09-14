@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Patches the GAE file change watcher to not watch too many files.
+# See http://johanndutoit.net/app-engine-too-many-files/
+#
+
+APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
+WATCHER_DIR=/usr/local/google_appengine/google/appengine/tools/devappserver2
+patch ${WATCHER_DIR}/mtime_file_watcher.py ${APP_DIR}/bin/mtime_file_watcher.patch

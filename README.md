@@ -4,6 +4,10 @@
 
 Install the [Google App Engine SDK for PHP](https://cloud.google.com/appengine/downloads).
 
+Make GAE SDK not watch too many files:
+
+`./bin/patchWatcher`
+
 Install PHP dependencies via [Composer](https://getcomposer.org/doc/00-intro.md#globally):
 
 `composer install`

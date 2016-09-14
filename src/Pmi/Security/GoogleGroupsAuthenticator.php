@@ -2,6 +2,7 @@
 namespace Pmi\Security;
 
 use google\appengine\api\users\UserService;
+use Pmi\Application\AbstractApplication;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,20 +13,20 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
- * Authenticates by checking that the incoming Google user is part of a
- * specified Google Apps domain.
+ * Authenticates by checking that the incoming Google user is a member of a
+ * group in the Apps domain.
  */
-class GoogleAppsAuthenticator extends AbstractGuardAuthenticator
+class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 {
     private $app;
-    private $gaDomain;
     private $googleUser;
     
-    public function __construct(\Pmi\Application\AbstractApplication $app)
+    public function __construct(AbstractApplication $app)
     {
         $this->app = $app;
-        $this->gaDomain = isset($app['gaDomain']) ? $app['gaDomain'] : null;
-        $this->googleUser = UserService::getCurrentUser();
+        if (class_exists(UserService::class)) {
+            $this->googleUser = UserService::getCurrentUser();
+        }
     }
     
     public function getCredentials(Request $request)
@@ -42,17 +43,12 @@ class GoogleAppsAuthenticator extends AbstractGuardAuthenticator
     
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return new User($this->googleUser);
+        return $userProvider->loadUserByUsername($this->googleUser->getEmail());
     }
     
     public function checkCredentials($credentials, UserInterface $user)
     {
-        $userDomain = null;
-        if ($this->googleUser && preg_match('/.*?@(.*)$/', $this->googleUser->getEmail(), $m)) {
-            $userDomain = $m[1];
-        }
-        
-        return $userDomain && $userDomain === $this->gaDomain;
+        return (boolean) $this->googleUser;
     }
     
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)

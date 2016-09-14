@@ -16,15 +16,11 @@ if ($app->isProd() || $app->isDev()) { // for now, use twig memcache in prod
     $app['twigCacheHandler'] = 'file';
 }
 
-// currently used for POC for authenticating against Google Apps domain
-$app['gaDomain'] = null;
-
 $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
     ->mount('/', new Controller\OrderController())
     ->mount('/_dev', new Controller\DevController())
-    ->mount('/googleapps', new Controller\GoogleAppsController())
     ->mount('/dashboard', new Controller\DashboardController())
     ->run()
 ;

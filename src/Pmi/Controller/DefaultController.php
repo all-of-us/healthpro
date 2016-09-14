@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Controller;
 
+use google\appengine\api\users\UserService;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,6 +15,9 @@ class DefaultController extends AbstractController
 {
     protected static $routes = [
         ['home', '/'],
+        ['logout', '/logout'],
+        ['groups', '/groups'],
+        ['switchSite', '/site/{id}/switch'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
@@ -29,6 +33,39 @@ class DefaultController extends AbstractController
     public function homeAction(Application $app, Request $request)
     {
         return $app['twig']->render('index.html.twig');
+    }
+    
+    public function logoutAction(Application $app, Request $request)
+    {
+        $app['security.token_storage']->setToken(null);
+        $request->getSession()->invalidate();
+        return $app->redirect(UserService::createLogoutURL('/'));
+    }
+    
+    public function groupsAction(Application $app, Request $request)
+    {
+        $token = $app['security.token_storage']->getToken();
+        $user = $token->getUser();
+        $groups = $user->getGroups();
+        
+        $groupNames = [];
+        foreach ($groups as $group) {
+            $groupNames[] = $group->getName();
+        }
+        return $app['twig']->render('googlegroups.html.twig', [
+            'groupNames' => $groupNames
+        ]);
+    }
+    
+    public function switchSiteAction($id, Application $app, Request $request)
+    {
+        $user = $app['security.token_storage']->getToken()->getUser();
+        if ($user->belongsToSite($id)) {
+            $app['session']->set('site', $user->getSite($id));
+            return $app->redirectToRoute('home');
+        } else {
+            return $app->abort(403);
+        }
     }
 
     public function participantsAction(Application $app, Request $request)
