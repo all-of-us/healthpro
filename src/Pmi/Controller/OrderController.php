@@ -26,15 +26,15 @@ class OrderController extends AbstractController
     protected $order;
     protected $participant;
     protected static $samples = [
-        'Tube 1' => 1,
-        'Tube 2' => 2,
-        'Tube 3' => 3,
-        'Tube 4' => 4,
-        'Tube 5' => 5,
-        'Tube 6' => 6,
-        'Tube 7' => 7
+        'EDTA 4 mL' => 1,
+        'EDTA 10 mL' => 2,
+        'Clot Activator (SST) 8 mL' => 3,
+        'Plasma Separator (PST) 8 mL' => 4,
+        'EDTA 10 mL' => 5,
+        'Na-Heparin 4 mL' => 6,
+        'Urine 10 mL' => 7
     ];
-    protected static $samplesRequiringProcessing = [6,7];
+    protected static $samplesRequiringProcessing = [3,4];
 
     protected function loadOrder($participantId, $orderId, Application $app)
     {
