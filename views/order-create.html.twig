@@ -1,13 +1,21 @@
 {% extends 'base.html.twig' %}
 {% block title %}Order - {% endblock %}
 {% block body %}
-    <div class="page-header">
-        <h2>
-            <i class="fa fa-medkit" aria-hidden="true"></i>
-            New order
-            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</a></small>
-        </h2>
-    </div>
+    <h2>
+        <i class="fa fa-medkit" aria-hidden="true"></i>
+        New order
+        <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</a></small>
+    </h2>
+
+    <br />
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="active"><a href="#">Create</a></li>
+        {% for step in ['printed', 'collected', 'processed', 'finalized'] %}
+            <li role="presentation" class="disabled"><a href="#">{{ step|capitalize }}</a></li>
+        {% endfor %}
+    </ul>
+    <br />
+
     <div>
         <p class="lead">Create order for this participant?</p>
         <dl class="dl-horizontal">
