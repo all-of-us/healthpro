@@ -35,11 +35,10 @@ class HpoApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function testController($app)
     {
-        $app->mount('/', new Controller\DefaultController())
-            ->mount('/googleapps', new Controller\GoogleAppsController());
+        $app->mount('/', new Controller\DefaultController());
         ob_start();
         $app->run();
         $output = ob_get_clean();
-        $this->assertRegExp('/<h2>Welcome!<\/h2>/', $output);
+        $this->assertRegExp('/Authentication Required/', $output);
     }
 }
