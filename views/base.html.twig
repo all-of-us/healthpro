@@ -71,15 +71,15 @@
         {% block body %}{% endblock %}
     </div>
 
-    <div class="modal fade" id="siteModal" tabindex="-1" role="dialog" aria-labelledby="siteModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="siteModalLabel">Current site</h4>
-                </div>
-                <div class="modal-body">
-                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        <div class="modal fade" id="siteModal" tabindex="-1" role="dialog" aria-labelledby="siteModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="siteModalLabel">Current site</h4>
+                    </div>
+                    <div class="modal-body">
                         {% if app.user.sites|length == 0 %}
                             <span class="text-danger">You do not belong to any HPO sites!</span>
                         {% else %}
@@ -89,18 +89,17 @@
                             {% endfor %}
                         </select>
                         {% endif %}
-                    {% endif %}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    {% if app.user.sites|length > 0 %}
-                    <button type="button" class="btn btn-primary site-submit" data-dismiss="modal">Switch</button>
-                    {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        {% if app.user.sites|length > 0 %}
+                        <button type="button" class="btn btn-primary site-submit" data-dismiss="modal">Switch</button>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
+    {% endif %}
 
     <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
     {% block pagejs %}{% endblock %}
