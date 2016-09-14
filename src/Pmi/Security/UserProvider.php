@@ -22,8 +22,12 @@ class UserProvider implements UserProviderInterface
         if (!$googleUser || $googleUser->getEmail() !== strtolower($username)) {
             throw new \Exception("User $username is not logged in!");
         }
-        
-        $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
+        if ($this->app['session']->has('googlegroups')) {
+            $groups = $this->app['session']->get('googlegroups');
+        } else {
+            $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
+            $this->app['session']->set('googlegroups', $groups);
+        }
         return new User($googleUser, $groups);
     }
     
