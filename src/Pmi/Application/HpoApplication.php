@@ -43,6 +43,7 @@ class HpoApplication extends AbstractApplication
             ],
             'security.access_rules' => [
                 ['^/logout$', 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                ['^/_dev/.*$', 'IS_AUTHENTICATED_FULLY'],
                 ['^/.*$', 'ROLE_USER']
             ]
         ]);
