@@ -11,6 +11,15 @@
         <script src="{{ asset('js/html5shiv.min.js') }}"></script>
         <script src="{{ asset('js/respond.min.js') }}"></script>
     <![endif]-->
+    {# pass parameters to JS #}
+    <script>
+        var PMI = {
+            "path": {
+                "switchSite": {{ path('switchSite', {id: "SITE_ID"})|json_encode|raw }}
+            },
+            "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }}
+        };
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-default">
@@ -35,7 +44,7 @@
                         <li>
                             <a href="#" data-toggle="modal" data-target="#siteModal">
                                 <i class="fa fa-hospital-o" aria-hidden="true"></i>
-                                Choose HPO Site
+                                {{ app.session.get('site') ? app.session.get('site').name : 'Choose HPO Site' }}
                             </a>
                         </li>
                         <li class="dropdown">
@@ -75,9 +84,9 @@
                         {% if app.user.sites|length == 0 %}
                             <span class="text-danger">You do not belong to any HPO sites!</span>
                         {% else %}
-                            <select class="form-control">
+                            <select class="form-control site-id">
                             {% for site in app.user.sites %}
-                                <option value="{{ site.email }}">{{ site.name }}</option>
+                                <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : ''}} >{{ site.name }}</option>
                             {% endfor %}
                         </select>
                         {% endif %}
@@ -86,7 +95,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     {% if app.user.sites|length > 0 %}
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Switch</button>
+                    <button type="button" class="btn btn-primary site-submit" data-dismiss="modal">Switch</button>
                     {% endif %}
                 </div>
             </div>

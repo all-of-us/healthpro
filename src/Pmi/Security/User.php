@@ -41,6 +41,30 @@ class User implements UserInterface
         return $this->sites;
     }
     
+    public function getSite($email)
+    {
+        $site = null;
+        foreach ($this->sites as $s) {
+            if ($s->email === $email) {
+                $site = $s;
+                break;
+            }
+        }
+        return $site;
+    }
+    
+    public function belongsToSite($email)
+    {
+        $belongs = false;
+        foreach ($this->sites as $site) {
+            if ($site->email === $email) {
+                $belongs = true;
+                break;
+            }
+        }
+        return $belongs;
+    }
+    
     public function getRoles()
     {
         return count($this->groups) > 0 ? ['ROLE_USER'] : [];

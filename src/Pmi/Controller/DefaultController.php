@@ -17,6 +17,7 @@ class DefaultController extends AbstractController
         ['home', '/'],
         ['logout', '/logout'],
         ['groups', '/groups'],
+        ['switchSite', '/site/{id}/switch'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
@@ -54,6 +55,17 @@ class DefaultController extends AbstractController
         return $app['twig']->render('googlegroups.html.twig', [
             'groupNames' => $groupNames
         ]);
+    }
+    
+    public function switchSiteAction($id, Application $app, Request $request)
+    {
+        $user = $app['security.token_storage']->getToken()->getUser();
+        if ($user->belongsToSite($id)) {
+            $app['session']->set('site', $user->getSite($id));
+            return $app->redirectToRoute('home');
+        } else {
+            return $app->abort(403);
+        }
     }
 
     public function participantsAction(Application $app, Request $request)
