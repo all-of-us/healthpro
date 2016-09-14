@@ -24,7 +24,9 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     public function __construct(AbstractApplication $app)
     {
         $this->app = $app;
-        $this->googleUser = UserService::getCurrentUser();
+        if (class_exists(UserService::class)) {
+            $this->googleUser = UserService::getCurrentUser();
+        }
     }
     
     public function getCredentials(Request $request)
