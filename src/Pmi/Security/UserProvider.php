@@ -19,7 +19,7 @@ class UserProvider implements UserProviderInterface
     public function loadUserByUsername($username)
     {
         $googleUser = UserService::getCurrentUser();
-        if (!$googleUser || $googleUser->getEmail() !== strtolower($username)) {
+        if (!$googleUser || strcasecmp($googleUser->getEmail(), strtolower($username)) !== 0) {
             throw new \Exception("User $username is not logged in!");
         }
         if ($this->app['session']->has('googlegroups')) {
