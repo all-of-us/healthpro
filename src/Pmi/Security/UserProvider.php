@@ -23,7 +23,7 @@ class UserProvider implements UserProviderInterface
             throw new \Exception("User $username is not logged in!");
         }
         
-        $groups = $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail());
+        $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
         return new User($googleUser, $groups);
     }
     

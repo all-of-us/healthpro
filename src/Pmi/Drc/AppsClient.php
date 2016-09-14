@@ -11,27 +11,34 @@ class AppsClient
     /** Number of times we will retry an API call before failing. */
     const RETRY_LIMIT = 5;
     
-    private $app;
+    private $domain;
     private $client;
     private $directory;
     
-    public function __construct(HpoApplication $app)
+    public static function createFromApp(HpoApplication $app)
     {
-        $this->app = $app;
-        if ($this->app->getConfig('gaAuthJson')) {
-            $this->client = new \Google_Client();
-            $this->client->setApplicationName($this->app->getConfig('gaApplicationName'));
-            $this->client->setAuthConfig(json_decode($this->app->getConfig('gaAuthJson'), true));
-            $this->client->setSubject($this->app->getConfig('gaAdminEmail'));
-            // http://stackoverflow.com/a/33838098/1402028
-            if ($app->isDev()) {
-                $this->client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
-            }
-            $this->client->setScopes(implode(' ', [
-                \Google_Service_Directory::ADMIN_DIRECTORY_GROUP_READONLY
-            ]));
-            $this->directory = new \Google_Service_Directory($this->client);
+        if ($app->getConfig('gaAuthJson')) {
+            return new self($app->getConfig('gaApplicationName'), $app->getConfig('gaAuthJson'), $app->getConfig('gaAdminEmail'), $app->getConfig('gaDomain'), $app->isDev());
+        } else {
+            return null;
         }
+    }
+    
+    public function __construct($appName, $authJson, $adminEmail, $domain, $isDev)
+    {
+        $this->domain = $domain;
+        $this->client = new \Google_Client();
+        $this->client->setApplicationName($appName);
+        $this->client->setAuthConfig(json_decode($authJson, true));
+        $this->client->setSubject($adminEmail);
+        // http://stackoverflow.com/a/33838098/1402028
+        if ($isDev) {
+            $this->client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
+        }
+        $this->client->setScopes(implode(' ', [
+            \Google_Service_Directory::ADMIN_DIRECTORY_GROUP_READONLY
+        ]));
+        $this->directory = new \Google_Service_Directory($this->client);
     }
     
     /**
@@ -90,7 +97,7 @@ class AppsClient
         $groups = [];
         $nextToken = null;
         do {
-            $params = ['domain' => $this->app->getConfig('gaDomain')];
+            $params = ['domain' => $this->domain];
             if ($userEmail) {
                 $params['userKey'] = $userEmail;
             }
