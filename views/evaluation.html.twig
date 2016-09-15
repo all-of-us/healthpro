@@ -30,7 +30,7 @@
     <div id="physicalEvaluation">
         {{ form_start(evaluationForm) }}
             {% for field in schema.fields %}
-                <div class="form-group">
+                <div class="form-group{% if not evaluationForm[field.name].vars.valid %} has-error{% endif %}">
                     {{ form_label(evaluationForm[field.name]) }}
                     {% if field.image is defined %}
                         <div class="row">
