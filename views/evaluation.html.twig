@@ -44,6 +44,7 @@
                                 <div class="input-group-addon">{{ field.unit }}</div>
                             </div>
                         {% endif %}
+                        {{ form_errors(evaluationForm[field.name]) }}
                     {% if field.image is defined %}
                             </div>
                             <div class="col-xs-2 col-sm-1">
@@ -51,7 +52,6 @@
                             </div>
                         </div>
                     {% endif %}
-                    {{ form_errors(evaluationForm[field.name]) }}
                 </div>
             {% endfor %}
             <p><a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a> <button type="submit" class="btn btn-primary">Save</button></p>

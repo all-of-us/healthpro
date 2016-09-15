@@ -5,12 +5,15 @@
             "name": "height",
             "label": "Height",
             "unit": "cm",
-            "image": "height.png"
+            "image": "height.png",
+            "decimals": 1,
+            "max": 300
         },
         {
             "name": "weight",
             "label": "Weight",
-            "unit": "kg"
+            "unit": "kg",
+            "decimals": 1
         },
         {
             "name": "blood_pressure_systolic",
@@ -25,19 +28,22 @@
         {
             "name": "heart_rate",
             "label": "Heart Rate",
-            "unit": "bpm"
+            "unit": "bpm",
+            "min": 20
         },
         {
             "name": "hip_circumference",
             "label": "Hip Circumference",
             "unit": "cm",
-            "image": "hip.png"
+            "image": "hip.png",
+            "decimals": 1
         },
         {
             "name": "waist_circumference",
             "label": "Waist Circumference",
             "unit": "cm",
-            "image": "waist.png"
+            "image": "waist.png",
+            "decimals": 1
         }
     ]
 }
