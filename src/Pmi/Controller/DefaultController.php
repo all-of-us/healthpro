@@ -261,7 +261,8 @@ class DefaultController extends AbstractController
         return $app['twig']->render('evaluation.html.twig', [
             'participant' => $participant,
             'evaluation' => $evaluation,
-            'evaluationForm' => $evaluationForm->createView()
+            'evaluationForm' => $evaluationForm->createView(),
+            'schema' => $evaluationService->getSchema()
         ]);
     }
 }

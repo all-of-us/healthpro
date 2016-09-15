@@ -28,7 +28,20 @@
     </dl>
 
     {{ form_start(evaluationForm) }}
-        {{ form_widget(evaluationForm) }}
+        {% for field in schema.fields %}
+            <div class="form-group">
+                {{ form_label(evaluationForm[field.name]) }}
+                {% if field.unit is defined %}
+                    <div class="input-group">
+                {% endif %}
+                    {{ form_widget(evaluationForm[field.name]) }}
+                {% if field.unit is defined %}
+                        <div class="input-group-addon">{{ field.unit }}</div>
+                    </div>
+                {% endif %}
+                {{ form_errors(evaluationForm[field.name]) }}
+            </div>
+        {% endfor %}
         <p><a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a> <button type="submit" class="btn btn-primary">Save</button></p>
     {{ form_end(evaluationForm) }}
 {% endblock %}
