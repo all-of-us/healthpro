@@ -2,26 +2,172 @@
 {% block body %}
     <h2><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard</h2>
     <br />
-    <div class="row">
-        <div class="col-xs-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Demo</h3>
-                </div>
-                <div class="panel-body text-center text-muted">
-                    <a href="{{ path('dashboard_demo') }}"><i class="fa fa-5x fa-area-chart" aria-hidden="true"></i></a>
+    <ul class="nav nav-tabs top-pad" role="tablist">
+        <li role="presentation" class="active"><a href="#participants-by-time" role="tab" data-toggle="tab" id="participants-by-time-nav"><span class="fa fa-calendar"></span> Participant Categories Over Time</a></li>
+        <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab" id="participants-by-region-nav"><span class="fa fa-map"></span> Participants by Region</a></li>
+    </ul>
+    <div id="plotly-tabs" class="tab-content">
+        <div id="participants-by-time" class="tab-pane pad active fade in">
+            <div class="well">
+                <div class="row form-group-sm">
+                    <div class="col-sm-3">
+                        <label>Plot</label>
+                        <select class="form-control time-plot-control" id="plot-value">
+                            <option value="participant_tiers" selected>Participant Tier</option>
+                            <option value="races">Race</option>
+                            <option value="ethnicities">Ethnicity</option>
+                            <option value="gender_identities">Gender Identity</option>
+                            <option value="age_groups">Age</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Start Date <span class="label label-info">optional</span> </label>
+                        <input type="text" class="form-control datepicker time-plot-control" id="start-date" />
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Cutoff Date</label>
+                        <input type="text" class="form-control datepicker time-plot-control" id="end-date" />
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Interval</label>
+                        <select class="form-control time-plot-control" id="interval">
+                            <option value="months">Months</option>
+                            <option value="weeks">Weeks</option>
+                            <option value="days">Days</option>
+                        </select>
+                    </div>
                 </div>
             </div>
+            <div id="plotly-participants-by-time"></div>
+            <script type="text/javascript">
+                // function to grab current filter values and load JSON from load_data REST endpoint
+                // success handler calls Plotly.newplot()
+                function renderPlot() {
+                    launchSpinner('participants-by-time');
+                    var width = $('#plotly-participants-by-time').width() - 30;
+                    var startDate = $('#start-date').val();
+                    var endDate = $('#end-date').val();
+                    var attribute = $('#plot-value').val();
+                    var displayText = $('#plot-value option:selected').text();
+                    var interval = $('#interval').val();
+                    $.getJSON('/dashboard/load_data?start_date=' + startDate + '&end_date=' + endDate + '&attribute=' + attribute + '&interval=' + interval, function(data) {
+                        var timeTitle;
+                        if ($('#start-date').val() == '') {
+                            timeTitle = 'Participant registrations by ' + displayText + ' as of ' + endDate;
+                        } else {
+                            timeTitle = 'Participant registrations by ' + displayText + ' from ' + startDate + ' to ' + endDate;
+                        }
+                        var timeLayout = {
+                            title: timeTitle,
+                            width: width,
+                            barmode: 'stack',
+                            font: PLOTLY_LABEL_FONT
+                        };
+                        Plotly.newPlot('plotly-participants-by-time', data, timeLayout, PLOTLY_OPTS);
+                        stopSpinner('participants-by-time');
+                    });
+                }
+
+                // set default of today's date
+                var today = new Date().toISOString().split('T')[0];
+                $('#end-date').val(today);
+                renderPlot();
+
+                // load default plot on tab render (to save loading time)
+                $('#participants-by-time-nav').on('shown.bs.tab', function (e) {
+                    console.log('Showing time plot charts');
+                    renderPlot();
+                });
+
+                // re-render on filter change
+                $('.time-plot-control').change(function() {
+                    renderPlot();
+                });
+
+                // re-render on window resizeEnd if tab is visible
+                $( window ).on('resizeEnd', function() {
+                    if ($('#participants-by-time').is(':visible')) {
+                        renderPlot();
+                    }
+                });
+            </script>
         </div>
-        <div class="col-xs-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Demo</h3>
-                </div>
-                <div class="panel-body text-center text-muted">
-                    <i class="fa fa-5x fa-bar-chart" aria-hidden="true"></i>
+        <div id="participants-by-region" class="tab-pane pad fade">
+            <div class="well">
+                <div class="row form-group-sm">
+                    <div class="col-sm-4">
+                        <label>Plot</label>
+                        <select class="form-control region-plot-control" id="map-mode">
+                            <option value="states" selected>States</option>
+                            <option value="census_regions">Census Regions</option>
+                            <option value="recruitment_centers">Recruitment Origin</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Start Date <span class="label label-info">optional</span> </label>
+                        <input type="text" class="form-control region-plot-control datepicker" id="region-date-start" />
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Cutoff Date</label>
+                        <input type="text" class="form-control region-plot-control datepicker" id="region-date-end" />
+                    </div>
                 </div>
             </div>
+            <div class="row">
+                <div id="plotly-participants-by-region" class="col-md-offset-1 col-md-10"></div>
+            </div>
+            <script type="text/javascript">
+                // function to grab current filter values and load JSON from load_map_data REST endpoint
+                // success handler calls Plotly.newplot()
+                function renderMap() {
+                    launchSpinner('participants-by-region');
+                    var mapWidth = $('#plotly-participants-by-region').width() - 30;
+                    var mapStartDate = $('#region-date-start').val();
+                    var mapEndDate = $('#region-date-end').val();
+                    var mapMode = $('#map-mode').val();
+                    var mapModeText = $('#map-mode option:selected').text();
+                    $.getJSON('/dashboard/load_map_data?start_date=' + mapStartDate + '&end_date=' + mapEndDate + '&map_mode=' + mapMode, function(data) {
+                        var mapTitle;
+                        if ($('#region-date-start').val() == '') {
+                            mapTitle = 'Participant registrations by ' + mapModeText + ' as of ' + mapEndDate;
+                        } else {
+                            mapTitle = 'Participant registrations by ' + mapModeText + ' from ' + mapStartDate + ' to ' + mapEndDate;
+                        }
+                        var mapLayout = {
+                            title: mapTitle,
+                            font: PLOTLY_LABEL_FONT,
+                            showlegend: false,
+                            width: mapWidth,
+                            height: mapWidth / 1.66,
+                            geo: GEO_OPTS
+                        };
+                        Plotly.newPlot('plotly-participants-by-region', data, mapLayout, PLOTLY_OPTS);
+                        stopSpinner('participants-by-region');
+                    });
+                }
+
+                // set default of today's date
+                var today = new Date().toISOString().split('T')[0];
+                $('#region-date-end').val(today);
+
+                // load plot on tab show (to save loading time)
+                $('#participants-by-region-nav').on('shown.bs.tab', function (e) {
+                    console.log('Showing region plot charts');
+                    renderMap();
+                });
+
+                // re-render on date change
+                $('.region-plot-control').change(function() {
+                    renderMap();
+                });
+
+                // re-render on window resizeEnd if tab is visible
+                $( window ).on('resizeEnd', function() {
+                    if ($('#participants-by-region').is(':visible')) {
+                        renderMap();
+                    }
+                });
+            </script>
         </div>
     </div>
 {% endblock %}
