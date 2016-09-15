@@ -10,7 +10,7 @@ var PhysicalEvaluation = Backbone.View.extend({
     },
     displayHelpModal: function(e) {
         var image = $(e.target).attr('src');
-        $('#imageModal .modal-body').html('<img src="' + image + '" class="image-responsive" />');
+        $('#imageModal .modal-body').html('<img src="' + image + '" class="img-responsive" />');
         $('#imageModal').modal();
     },
     initialize: function() { this.render(); },
