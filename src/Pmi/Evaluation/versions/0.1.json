@@ -3,27 +3,38 @@
     "fields": [
         {
             "name": "height",
-            "label": "Height"
+            "label": "Height",
+            "unit": "cm"
         },
         {
             "name": "weight",
-            "label": "Weight"
+            "label": "Weight",
+            "unit": "kg"
         },
         {
-            "name": "blood_pressure",
-            "label": "Blood Pressure"
+            "name": "blood_pressure_systolic",
+            "label": "Blood Pressure: systolic",
+            "unit": "mmHg"
+        },
+        {
+            "name": "blood_pressure_diastolic",
+            "label": "Blood Pressure: diastolic",
+            "unit": "mmHg"
         },
         {
             "name": "heart_rate",
-            "label": "Heart Rate"
+            "label": "Heart Rate",
+            "unit": "bpm"
         },
         {
             "name": "hip_circumference",
-            "label": "Hip Circumference"
+            "label": "Hip Circumference",
+            "unit": "cm"
         },
         {
             "name": "waist_circumference",
-            "label": "Waist Circumference"
+            "label": "Waist Circumference",
+            "unit": "cm"
         }
     ]
 }
