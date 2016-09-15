@@ -27,21 +27,46 @@
         {% endif %}
     </dl>
 
-    {{ form_start(evaluationForm) }}
-        {% for field in schema.fields %}
-            <div class="form-group">
-                {{ form_label(evaluationForm[field.name]) }}
-                {% if field.unit is defined %}
-                    <div class="input-group">
-                {% endif %}
-                    {{ form_widget(evaluationForm[field.name]) }}
-                {% if field.unit is defined %}
-                        <div class="input-group-addon">{{ field.unit }}</div>
+    <div id="physicalEvaluation">
+        {{ form_start(evaluationForm) }}
+            {% for field in schema.fields %}
+                <div class="form-group">
+                    {{ form_label(evaluationForm[field.name]) }}
+                    {% if field.image is defined %}
+                        <div class="row">
+                            <div class="col-xs-10 col-sm-11">
+                    {% endif %}
+                        {% if field.unit is defined %}
+                            <div class="input-group">
+                        {% endif %}
+                            {{ form_widget(evaluationForm[field.name]) }}
+                        {% if field.unit is defined %}
+                                <div class="input-group-addon">{{ field.unit }}</div>
+                            </div>
+                        {% endif %}
+                    {% if field.image is defined %}
+                            </div>
+                            <div class="col-xs-2 col-sm-1">
+                                <img src="{{ asset('img/eval/'~field.image) }}" class="img-responsive help-image" />
+                            </div>
+                        </div>
+                    {% endif %}
+                    {{ form_errors(evaluationForm[field.name]) }}
+                </div>
+            {% endfor %}
+            <p><a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a> <button type="submit" class="btn btn-primary">Save</button></p>
+        {{ form_end(evaluationForm) }}
+
+        <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body text-center">
                     </div>
-                {% endif %}
-                {{ form_errors(evaluationForm[field.name]) }}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-        <p><a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a> <button type="submit" class="btn btn-primary">Save</button></p>
-    {{ form_end(evaluationForm) }}
+        </div>
+    </div>
 {% endblock %}

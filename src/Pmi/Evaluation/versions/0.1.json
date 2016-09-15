@@ -4,7 +4,8 @@
         {
             "name": "height",
             "label": "Height",
-            "unit": "cm"
+            "unit": "cm",
+            "image": "height.png"
         },
         {
             "name": "weight",
@@ -29,12 +30,14 @@
         {
             "name": "hip_circumference",
             "label": "Hip Circumference",
-            "unit": "cm"
+            "unit": "cm",
+            "image": "hip.png"
         },
         {
             "name": "waist_circumference",
             "label": "Waist Circumference",
-            "unit": "cm"
+            "unit": "cm",
+            "image": "waist.png"
         }
     ]
 }
