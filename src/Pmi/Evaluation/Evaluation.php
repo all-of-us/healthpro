@@ -58,9 +58,7 @@ class Evaluation
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
         foreach ($this->schema->fields as $field) {
-            $constraints = [
-                new Constraints\GreaterThan(0)
-            ];
+            $constraints = [];
             $options = [
                 'required' => false,
                 'scale' => 0
@@ -73,6 +71,8 @@ class Evaluation
             }
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanOrEqual($field->min);
+            } else {
+                $constraints[] = new Constraints\GreaterThan(0);
             }
             $options['constraints'] = $constraints;
             $formBuilder->add($field->name, NumberType::class, $options);
