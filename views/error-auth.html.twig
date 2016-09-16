@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+{% block title %}Error - {% endblock %}
+{% block body %}
+    <div class="alert alert-danger">
+        <strong>Access denied!</strong> You are currently logged into Google as <strong>{{ email }}</strong>, but this account does not have access to PMI HealthPro. You may <a href="{{ logoutUrl }}">log out of your current Google account</a> and select a different one.
+    </div>
+{% endblock %}

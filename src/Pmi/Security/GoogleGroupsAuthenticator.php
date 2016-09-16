@@ -1,7 +1,6 @@
 <?php
 namespace Pmi\Security;
 
-use google\appengine\api\users\UserService;
 use Pmi\Application\AbstractApplication;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,42 +18,56 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 {
     private $app;
-    private $googleUser;
     
     public function __construct(AbstractApplication $app)
     {
         $this->app = $app;
-        if (class_exists(UserService::class)) {
-            $this->googleUser = UserService::getCurrentUser();
-        }
     }
     
     public function getCredentials(Request $request)
     {
-        if (!$this->googleUser) {
+        $googleUser = $this->app->getGoogleUser();
+        if (!$googleUser) {
             return;
         }
         
         return [
-            $this->googleUser->getEmail(),
+            $googleUser->getEmail(),
             null
         ];
     }
     
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return $userProvider->loadUserByUsername($this->googleUser->getEmail());
+        return $userProvider->loadUserByUsername($credentials[0]);
     }
     
     public function checkCredentials($credentials, UserInterface $user)
     {
-        return (boolean) $this->googleUser;
+        // user must be logged in to their Google account and be a member of
+        // at least one Group to authenticate
+        return is_array($credentials) && count($user->getGroups()) > 0 &&
+            // just a safeguard in case the Google user and our user get out of sync somehow
+            strcasecmp($credentials[0], $user->getEmail()) === 0;
     }
     
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $code = 403;
-        $response = new Response($this->app['twig']->render($this->app['errorTemplate'], ['code' => $code]), $code);
+        $googleUser = $this->app->getGoogleUser();
+        if ($googleUser) {
+            $template = 'error-auth.html.twig';
+            $params = [
+                'email' => $googleUser->getEmail(),
+                'logoutUrl' => $this->app->getGoogleLogoutUrl()
+            ];
+        } else {
+            $template = $this->app['errorTemplate'];
+            $params = ['code' => $code];
+        }
+        // clear session in case Google user and our user are out of sync
+        $this->app->clearSession($request);
+        $response = new Response($this->app['twig']->render($template, $params), $code);
         $this->app->setHeaders($response);
         return $response;
     }
@@ -72,11 +85,8 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        $data = array(
-            // you might translate this message
-            'message' => 'Authentication Required',
-        );
-
-        return new JsonResponse($data, 401);
+        // we never start authentication in our app because Google handles that,
+        // so any call to this method implies an auth failure
+        return $this->onAuthenticationFailure($request, $authException);
     }
 }

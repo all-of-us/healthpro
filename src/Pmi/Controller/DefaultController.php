@@ -37,9 +37,8 @@ class DefaultController extends AbstractController
     
     public function logoutAction(Application $app, Request $request)
     {
-        $app['security.token_storage']->setToken(null);
-        $request->getSession()->invalidate();
-        return $app->redirect(UserService::createLogoutURL('/'));
+        $app->clearSession($request);
+        return $app->redirect($app->getGoogleLogoutUrl());
     }
     
     public function groupsAction(Application $app, Request $request)
