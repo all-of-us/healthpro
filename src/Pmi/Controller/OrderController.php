@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Pmi\Mayolink\Order;
+use Pmi\Mayolink\Order as MayoLinkOrder;
 
 class OrderController extends AbstractController
 {
@@ -227,13 +227,21 @@ class OrderController extends AbstractController
         }
         $this->loadOrder($participantId, $orderId, $app);
 
-        $mlOrder = new Order();
-        $pdf = $mlOrder->loginAndGetPdf(
-            $app->getConfig('ml_username'),
-            $app->getConfig('ml_password'),
-            $this->order['mayo_id'],
-            $type
-        );
+        if ($app->getConfig('ml_mock_order')) {
+            if ($type == 'labels') {
+                $pdf = file_get_contents('assets/SampleLabels.pdf');
+            } else {
+                $pdf = file_get_contents('assets/SampleRequisition.pdf');
+            }
+        } else {
+            $mlOrder = new MayoLinkOrder();
+            $pdf = $mlOrder->loginAndGetPdf(
+                $app->getConfig('ml_username'),
+                $app->getConfig('ml_password'),
+                $this->order['mayo_id'],
+                $type
+            );
+        }
 
         if ($pdf) {
             return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
