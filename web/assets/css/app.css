@@ -42,11 +42,15 @@ label.required::after {
     padding: 6px 3px;
     font-size: 65%;
 }
-#physicalEvaluation .replicate {
+#physicalEvaluation .row {
     margin-right: -6px;
     margin-left: -6px;
 }
-#physicalEvaluation .replicate .col-xs-4 {
+#physicalEvaluation .row .col-sm-1,
+#physicalEvaluation .row .col-sm-11,
+#physicalEvaluation .row .col-xs-2,
+#physicalEvaluation .row .col-xs-4,
+#physicalEvaluation .row .col-xs-10 {
     padding-right: 6px;
     padding-left: 6px;
 }
