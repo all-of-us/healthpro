@@ -1,26 +1,11 @@
 <?php
-use Pmi\Application\HpoApplication;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Evaluation\MissingSchemaException;
 use Symfony\Component\Form\Form;
+use Tests\Pmi\AbstractWebTestCase;
 
-class EvaluationTest extends \PHPUnit_Framework_TestCase
+class EvaluationTest extends AbstractWebTestCase
 {
-    protected function getApplication()
-    {
-        putenv('PMI_ENV=' . HpoApplication::ENV_DEV);
-        $app = new HpoApplication([
-            'templatesDirectory' => __DIR__ . '/../../../views',
-            'errorTemplate' => 'error.html.twig',
-            'isUnitTest' => true
-        ]);
-        $app->setup();
-        $app->register(new \Silex\Provider\SessionServiceProvider(), [
-            'session.test' => true
-        ]);
-        return $app;
-    }
-
     public function testSchema()
     {
         $evaluation = new Evaluation();
@@ -39,9 +24,8 @@ class EvaluationTest extends \PHPUnit_Framework_TestCase
 
     public function testForm()
     {
-        $app = $this->getApplication();
         $evaluation = new Evaluation();
-        $form = $evaluation->getForm($app['form.factory']);
+        $form = $evaluation->getForm($this->app['form.factory']);
         $this->assertInstanceOf(Form::class, $form);
     }
 }

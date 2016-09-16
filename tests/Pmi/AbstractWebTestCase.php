@@ -18,10 +18,12 @@ abstract class AbstractWebTestCase extends WebTestCase
             'errorTemplate' => 'error.html.twig',
             'isUnitTest' => true
         ]);
-        $app->setup();
+        // session must be registered prior to boot()
         $app->register(new \Silex\Provider\SessionServiceProvider(), [
             'session.test' => true
         ]);
+        $app->setup();
+        
         return $app;
     }
     
