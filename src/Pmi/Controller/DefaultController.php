@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Pmi\Evaluation\Evaluation;
-use Pmi\Mayolink\Order;
+use Pmi\Mayolink\Order as MayoLinkOrder;
 
 class DefaultController extends AbstractController
 {
@@ -166,26 +166,30 @@ class DefaultController extends AbstractController
             ->getForm();
         $confirmForm->handleRequest($request);
         if ($confirmForm->isValid()) {
-            $order = new Order();
-            $options = [
-                // TODO: figure out test code, specimen, and temperature parameters
-                'test_code' => 'ACE',
-                'specimen' => 'Serum',
-                'temperature' => 'Ambient',
-                'first_name' => '*',
-                'last_name' => $participant->id,
-                'gender' => $participant->gender,
-                'birth_date' => $participant->dob,
-                'physician_name' => 'None',
-                'physician_phone' => 'None',
-                // TODO: not sure how ML is handling time zone. setting to yesterday for now
-                'collected_at' => new \DateTime('-1 day')
-            ];
-            $mlOrderId = $order->loginAndCreateOrder(
-                $app->getConfig('ml_username'),
-                $app->getConfig('ml_password'),
-                $options
-            );
+            if ($app->getConfig('ml_mock_order')) {
+                $mlOrderId = $app->getConfig('ml_mock_order');
+            } else {
+                $order = new MayoLinkOrder();
+                $options = [
+                    // TODO: figure out test code, specimen, and temperature parameters
+                    'test_code' => 'ACE',
+                    'specimen' => 'Serum',
+                    'temperature' => 'Ambient',
+                    'first_name' => '*',
+                    'last_name' => $participant->id,
+                    'gender' => $participant->gender,
+                    'birth_date' => $participant->dob,
+                    'physician_name' => 'None',
+                    'physician_phone' => 'None',
+                    // TODO: not sure how ML is handling time zone. setting to yesterday for now
+                    'collected_at' => new \DateTime('-1 day')
+                ];
+                $mlOrderId = $order->loginAndCreateOrder(
+                    $app->getConfig('ml_username'),
+                    $app->getConfig('ml_password'),
+                    $options
+                );
+            }
             if ($mlOrderId) {
                 $success = $app['db']->insert('orders', [
                     'participant_id' => $participant->id,
