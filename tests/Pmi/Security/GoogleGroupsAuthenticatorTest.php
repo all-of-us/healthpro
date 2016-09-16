@@ -3,6 +3,7 @@
 use Pmi\Security\GoogleGroupsAuthenticator;
 use Pmi\Security\UserProvider;
 use Pmi\Security\User;
+use Symfony\Component\HttpFoundation\Request;
 use Tests\Pmi\AbstractWebTestCase;
 use Tests\Pmi\GoogleGroup;
 use Tests\Pmi\GoogleUserService;
@@ -21,7 +22,7 @@ class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
         ];
         AppsClient::setGroups($email, $groups);
         $auth = new GoogleGroupsAuthenticator($this->app);
-        $user = $auth->getUser(null, new UserProvider($this->app));
+        $user = $auth->getUser($auth->getCredentials(new Request()), new UserProvider($this->app));
         $this->assertEquals($email, $user->getEmail());
         $this->assertEquals(count($groups), count($user->getGroups()));
     }
@@ -35,10 +36,17 @@ class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
         ];
         AppsClient::setGroups($email, $groups);
         $auth = new GoogleGroupsAuthenticator($this->app);
-        $user = $auth->getUser(null, new UserProvider($this->app));
-        $this->assertEquals(true, $auth->checkCredentials(null, $user));
+        $user = $auth->getUser($auth->getCredentials(new Request()), new UserProvider($this->app));
+        $this->assertEquals(true, $auth->checkCredentials($auth->getCredentials(new Request()), $user));
         
+        GoogleUserService::clearCurrentUser();
         $user = new User(null, []);
-        $this->assertEquals(false, $auth->checkCredentials(null, $user));
+        $this->assertEquals(false, $auth->checkCredentials($auth->getCredentials(new Request()), $user));
+        
+        GoogleUserService::switchCurrentUser('happy@example.com');
+        $user = new User(GoogleUserService::getCurrentUser(), $groups);
+        GoogleUserService::switchCurrentUser('sad@example.com');
+        $auth = new GoogleGroupsAuthenticator($this->app);
+        $this->assertEquals(false, $auth->checkCredentials($auth->getCredentials(new Request()), $user));
     }
 }

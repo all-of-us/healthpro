@@ -18,36 +18,37 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 {
     private $app;
-    private $googleUser;
     
     public function __construct(AbstractApplication $app)
     {
         $this->app = $app;
-        $this->googleUser = $app->getGoogleUser();
     }
     
     public function getCredentials(Request $request)
     {
-        if (!$this->googleUser) {
+        $googleUser = $this->app->getGoogleUser();
+        if (!$googleUser) {
             return;
         }
         
         return [
-            $this->googleUser->getEmail(),
+            $googleUser->getEmail(),
             null
         ];
     }
     
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return $userProvider->loadUserByUsername($this->googleUser->getEmail());
+        return $userProvider->loadUserByUsername($credentials[0]);
     }
     
     public function checkCredentials($credentials, UserInterface $user)
     {
-        // user must be logged in to their Google count and be a member of
+        // user must be logged in to their Google account and be a member of
         // at least one Group to authenticate
-        return $user->getGoogleUser() && count($user->getGroups()) > 0;
+        return is_array($credentials) && count($user->getGroups()) > 0 &&
+            // just a safeguard in case the Google user and our user get out of sync somehow
+            strcasecmp($credentials[0], $user->getEmail()) === 0;
     }
     
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
