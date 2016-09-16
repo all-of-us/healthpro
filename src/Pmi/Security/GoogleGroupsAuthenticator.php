@@ -45,7 +45,9 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     
     public function checkCredentials($credentials, UserInterface $user)
     {
-        return (boolean) $this->googleUser;
+        // user must be logged in to their Google count and be a member of
+        // at least one Group to authenticate
+        return $user->getGoogleUser() && count($user->getGroups()) > 0;
     }
     
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)

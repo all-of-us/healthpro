@@ -8,14 +8,16 @@ class GoogleUserService
     
     public static function getCurrentUser()
     {
-        if (!self::$googleUser) {
-            self::$googleUser = new GoogleUser('unit-test@example.com');
-        }
         return self::$googleUser;
     }
     
     public static function switchCurrentUser($email)
     {
         self::$googleUser = new GoogleUser($email);
+    }
+    
+    public static function clearCurrentUser()
+    {
+        self::$googleUser = null;
     }
 }

@@ -2,6 +2,7 @@
 
 use Pmi\Security\GoogleGroupsAuthenticator;
 use Pmi\Security\UserProvider;
+use Pmi\Security\User;
 use Tests\Pmi\AbstractWebTestCase;
 use Tests\Pmi\GoogleGroup;
 use Tests\Pmi\GoogleUserService;
@@ -29,8 +30,15 @@ class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
     {
         $email = 'test2@testy.com';
         GoogleUserService::switchCurrentUser($email);
+        $groups = [
+            new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1')
+        ];
+        AppsClient::setGroups($email, $groups);
         $auth = new GoogleGroupsAuthenticator($this->app);
         $user = $auth->getUser(null, new UserProvider($this->app));
         $this->assertEquals(true, $auth->checkCredentials(null, $user));
+        
+        $user = new User(null, []);
+        $this->assertEquals(false, $auth->checkCredentials(null, $user));
     }
 }

@@ -66,6 +66,11 @@ class User implements UserInterface
         return $belongs;
     }
     
+    public function getGoogleUser()
+    {
+        return $this->googleUser;
+    }
+    
     public function getRoles()
     {
         return count($this->groups) > 0 ? ['ROLE_USER'] : [];
