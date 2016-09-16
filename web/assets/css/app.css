@@ -14,6 +14,10 @@ iframe.pdf {
 .inline-buttons .btn {
     margin-bottom: 10px;
 }
+#flash-notices {
+    margin-top: -15px;
+    margin-bottom: 15px;
+}
 #flash-notices div {
     padding: 5px;
     text-align: center;
@@ -26,15 +30,6 @@ iframe.pdf {
     }
     h3 {
         font-size: 20px;
-    }
-}
-@media(min-width:768px) {
-    #flash-notices {
-        margin-top: -20px;
-        margin-bottom: 15px;
-    }
-    #flash-notices div {
-        margin: 5px 10px 0 10px;
     }
 }
 label.required::after {
