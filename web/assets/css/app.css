@@ -14,12 +14,27 @@ iframe.pdf {
 .inline-buttons .btn {
     margin-bottom: 10px;
 }
+#flash-notices div {
+    padding: 5px;
+    text-align: center;
+    font-weight: bold;
+    margin: 0;
+}
 @media(max-width:767px) {
     h2 {
         font-size: 24px;
     }
     h3 {
         font-size: 20px;
+    }
+}
+@media(min-width:768px) {
+    #flash-notices {
+        margin-top: -20px;
+        margin-bottom: 15px;
+    }
+    #flash-notices div {
+        margin: 5px 10px 0 10px;
     }
 }
 label.required::after {

@@ -1,44 +1,38 @@
 <?php
-use Pmi\Application\HpoApplication;
-use Pmi\Controller;
+use Tests\Pmi\AbstractWebTestCase;
+use Tests\Pmi\GoogleGroup;
+use Tests\Pmi\GoogleUserService;
+use Tests\Pmi\Drc\AppsClient;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class HpoApplicationTest extends \PHPUnit_Framework_TestCase
+class HpoApplicationTest extends AbstractWebTestCase
 {
-    public function testApplication()
-    {
-        putenv('PMI_ENV=' . HpoApplication::ENV_DEV);
-        $app = new HpoApplication([
-            'templatesDirectory' => __DIR__ . '/../../../views',
-            'errorTemplate' => 'error.html.twig',
-            'isUnitTest' => true
-        ]);
-        $app->setup();
-        $app->register(new \Silex\Provider\SessionServiceProvider(), [
-            'session.test' => true
-        ]);
-
-        $this->assertArrayHasKey('locale', $app);
-        $this->assertArrayHasKey('translator', $app);
-        $this->assertArrayHasKey('form.factory', $app);
-        $this->assertArrayHasKey('translator', $app);
-        $this->assertArrayHasKey('validator', $app);
-        $this->assertArrayHasKey('twig', $app);
-        $this->assertArrayHasKey('pmi.drc.participantsearch', $app);
-
-        $app->boot();
-
-        return $app;
+    private $isLoginAfter;
+    
+    protected function afterCallback(Request $request, Response $response) {
+        $this->isLoginAfter = $this->app['session']->get('isLogin');
     }
-
-    /**
-     * @depends testApplication
-     */
-    public function testController($app)
+    
+    public function testController()
     {
-        $app->mount('/', new Controller\DefaultController());
-        ob_start();
-        $app->run();
-        $output = ob_get_clean();
-        $this->assertRegExp('/Authentication Required/', $output);
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/');
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+    }
+    
+    public function testLogin()
+    {
+        $email = 'testLogin@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $this->assertSame(null, $this->app['session']->get('isLogin'));
+        $client = $this->createClient();
+        // should result in a successful login since the Google stuff is set
+        $crawler = $client->request('GET', '/');
+        // should still be true during the after callbacks
+        $this->assertSame(true, $this->isLoginAfter);
+        // gets set to false by the finishCallback()
+        $this->assertSame(false, $this->app['session']->get('isLogin'));
     }
 }

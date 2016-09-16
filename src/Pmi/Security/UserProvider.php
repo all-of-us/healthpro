@@ -1,14 +1,13 @@
 <?php
 namespace Pmi\Security;
 
-use google\appengine\api\users\UserService;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 class UserProvider implements UserProviderInterface
 {
-    
     protected $app;
     
     public function __construct($app)
@@ -18,9 +17,9 @@ class UserProvider implements UserProviderInterface
     
     public function loadUserByUsername($username)
     {
-        $googleUser = UserService::getCurrentUser();
+        $googleUser = $this->app->getGoogleUser();
         if (!$googleUser || strcasecmp($googleUser->getEmail(), $username) !== 0) {
-            throw new \Exception("User $username is not logged in!");
+            throw new AuthenticationException("User $username is not logged in to Google!");
         }
         if ($this->app['session']->has('googlegroups')) {
             $groups = $this->app['session']->get('googlegroups');

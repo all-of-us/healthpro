@@ -2,7 +2,6 @@
 namespace Pmi\Application;
 
 use Exception;
-use google\appengine\api\users\UserService;
 use Memcache;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
@@ -103,7 +102,7 @@ abstract class AbstractApplication extends Application
         }
         // Register finish middleware
         if (method_exists($this, 'finishCallback')) {
-            $this->after([$this, 'finishCallback']);
+            $this->finish([$this, 'finishCallback']);
         }
 
         $this->register(new LocaleServiceProvider());
@@ -139,6 +138,30 @@ abstract class AbstractApplication extends Application
     }
 
     abstract protected function registerSecurity();
+    
+    public function getGoogleServiceClass()
+    {
+        return $this['isUnitTest'] ? 'Tests\Pmi\GoogleUserService' :
+            'google\appengine\api\users\UserService';
+    }
+    
+    public function getGoogleUser()
+    {
+        $cls = $this->getGoogleServiceClass();
+        return class_exists($cls) ? $cls::getCurrentUser() : null;
+    }
+    
+    public function getGoogleLogoutUrl($dest = '/')
+    {
+        $cls = $this->getGoogleServiceClass();
+        return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
+    }
+    
+    public function getUser()
+    {
+        $token = $this['security.token_storage']->getToken();
+        return $token ? $token->getUser() : null;
+    }
 
     protected function enableTwig()
     {
@@ -207,6 +230,12 @@ abstract class AbstractApplication extends Application
         $this->register(new SessionServiceProvider());
         $this['session.storage.handler'] = new DatastoreSessionHandler();
     }
+    
+    public function logout()
+    {
+        $this['security.token_storage']->setToken(null);
+        $this['session']->invalidate();
+    }
 
     public function generateUrl($route, $parameters = [])
     {
@@ -246,5 +275,11 @@ abstract class AbstractApplication extends Application
     {
         $string = $this['translator']->trans($string, $translationParams);
         $this->addFlash('notice', $string);
+    }
+    
+    public function addFlashSuccess($string, array $translationParams = [])
+    {
+        $string = $this['translator']->trans($string, $translationParams);
+        $this->addFlash('success', $string);
     }
 }

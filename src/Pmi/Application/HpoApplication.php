@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Application;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Pmi\Entities\Configuration;
 use Pmi\Security\UserProvider;
@@ -15,7 +16,8 @@ class HpoApplication extends AbstractApplication
 
         $this->loadConfiguration();
         $this['pmi.drc.participantsearch'] = new \Pmi\Drc\ParticipantSearch();
-        $this['pmi.drc.appsclient'] = \Pmi\Drc\AppsClient::createFromApp($this);
+        $this['pmi.drc.appsclient'] = $this['isUnitTest'] ?
+            new \Tests\Pmi\Drc\AppsClient() : \Pmi\Drc\AppsClient::createFromApp($this);
 
         $this->registerDb();
         return $this;
@@ -118,5 +120,20 @@ class HpoApplication extends AbstractApplication
 
         // prevent browsers from sending unencrypted requests
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    }
+    
+    protected function beforeCallback(Request $request, AbstractApplication $app)
+    {
+        if ($this['session']->get('isLogin')) {
+            $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
+        }
+    }
+    
+    protected function finishCallback(Request $request, Response $response)
+    {
+        // only the first request handled is considered a login
+        if ($this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
+            $this['session']->set('isLogin', false);
+        }
     }
 }
