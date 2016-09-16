@@ -156,6 +156,12 @@ abstract class AbstractApplication extends Application
         $cls = $this->getGoogleServiceClass();
         return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
     }
+    
+    public function getUser()
+    {
+        $token = $this['security.token_storage']->getToken();
+        return $token ? $token->getUser() : null;
+    }
 
     protected function enableTwig()
     {
