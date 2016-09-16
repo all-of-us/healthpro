@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b24e60f8017514ecf91c42320a53b139",
-    "content-hash": "99adec6eab0ff4d1a162ea3e8ab4d14e",
+    "hash": "618a35d54a57cedbe9361058154e5723",
+    "content-hash": "a64022ddc3417df728b495f9de8d3723",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -521,22 +521,22 @@
         },
         {
             "name": "google/apiclient",
-            "version": "v2.0.2",
+            "version": "v2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/google-api-php-client.git",
-                "reference": "18dd5534280318598e8770cb7929e9a542e91c0d"
+                "reference": "37adb8a6f4d4b27b9900d62d67bf1d54995a755c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/18dd5534280318598e8770cb7929e9a542e91c0d",
-                "reference": "18dd5534280318598e8770cb7929e9a542e91c0d",
+                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/37adb8a6f4d4b27b9900d62d67bf1d54995a755c",
+                "reference": "37adb8a6f4d4b27b9900d62d67bf1d54995a755c",
                 "shasum": ""
             },
             "require": {
                 "firebase/php-jwt": "~2.0|~3.0",
-                "google/apiclient-services": "^0.5",
-                "google/auth": "0.9",
+                "google/apiclient-services": "^0.7",
+                "google/auth": "0.10",
                 "guzzlehttp/guzzle": "~5.2|~6.0",
                 "guzzlehttp/psr7": "^1.2",
                 "monolog/monolog": "^1.17",
@@ -576,21 +576,20 @@
             "keywords": [
                 "google"
             ],
-            "time": "2016-07-21 18:41:10"
+            "time": "2016-09-14 19:33:35"
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.5",
-            "target-dir": "Google/Service",
+            "version": "v0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/google-api-php-client-services.git",
-                "reference": "a2d43f4c7eace8c7aa16c5ea83191344c63b4526"
+                "reference": "c07a8a9d424024f1a9fc5d62da8ed5467ed25909"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/google-api-php-client-services/zipball/a2d43f4c7eace8c7aa16c5ea83191344c63b4526",
-                "reference": "a2d43f4c7eace8c7aa16c5ea83191344c63b4526",
+                "url": "https://api.github.com/repos/google/google-api-php-client-services/zipball/c07a8a9d424024f1a9fc5d62da8ed5467ed25909",
+                "reference": "c07a8a9d424024f1a9fc5d62da8ed5467ed25909",
                 "shasum": ""
             },
             "require": {
@@ -599,7 +598,7 @@
             "type": "library",
             "autoload": {
                 "psr-0": {
-                    "Google_Service_": ""
+                    "Google_Service_": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -611,20 +610,20 @@
             "keywords": [
                 "google"
             ],
-            "time": "2016-07-21 18:01:41"
+            "time": "2016-09-14 19:12:27"
         },
         {
             "name": "google/auth",
-            "version": "v0.9",
+            "version": "v0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/google-auth-library-php.git",
-                "reference": "47c3c6bece495e58381a21fed13a735bd23a51cc"
+                "reference": "760e3fbe4064c0525c22e27e5374eada3c103da8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/google-auth-library-php/zipball/47c3c6bece495e58381a21fed13a735bd23a51cc",
-                "reference": "47c3c6bece495e58381a21fed13a735bd23a51cc",
+                "url": "https://api.github.com/repos/google/google-auth-library-php/zipball/760e3fbe4064c0525c22e27e5374eada3c103da8",
+                "reference": "760e3fbe4064c0525c22e27e5374eada3c103da8",
                 "shasum": ""
             },
             "require": {
@@ -659,7 +658,7 @@
                 "google",
                 "oauth2"
             ],
-            "time": "2016-06-01 22:07:52"
+            "time": "2016-08-02 22:00:48"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -1316,6 +1315,63 @@
             "time": "2016-08-22 17:50:21"
         },
         {
+            "name": "symfony/browser-kit",
+            "version": "v3.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/browser-kit.git",
+                "reference": "d2a07cc11c5fa94820240b1e67592ffb18e347b9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/browser-kit/zipball/d2a07cc11c5fa94820240b1e67592ffb18e347b9",
+                "reference": "d2a07cc11c5fa94820240b1e67592ffb18e347b9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9",
+                "symfony/dom-crawler": "~2.8|~3.0"
+            },
+            "require-dev": {
+                "symfony/css-selector": "~2.8|~3.0",
+                "symfony/process": "~2.8|~3.0"
+            },
+            "suggest": {
+                "symfony/process": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\BrowserKit\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony BrowserKit Component",
+            "homepage": "https://symfony.com",
+            "time": "2016-07-26 08:04:17"
+        },
+        {
             "name": "symfony/config",
             "version": "v3.1.4",
             "source": {
@@ -1484,6 +1540,62 @@
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
             "time": "2016-08-23 13:39:15"
+        },
+        {
+            "name": "symfony/dom-crawler",
+            "version": "v3.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/dom-crawler.git",
+                "reference": "bb7395e8b1db3654de82b9f35d019958276de4d7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/bb7395e8b1db3654de82b9f35d019958276de4d7",
+                "reference": "bb7395e8b1db3654de82b9f35d019958276de4d7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9",
+                "symfony/polyfill-mbstring": "~1.0"
+            },
+            "require-dev": {
+                "symfony/css-selector": "~2.8|~3.0"
+            },
+            "suggest": {
+                "symfony/css-selector": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\DomCrawler\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony DomCrawler Component",
+            "homepage": "https://symfony.com",
+            "time": "2016-08-05 08:37:39"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -2856,29 +2968,29 @@
         },
         {
             "name": "tomwalder/php-gds",
-            "version": "v2.1.0",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tomwalder/php-gds.git",
-                "reference": "997f40aec99d3e2611c584a03c93a30f372b2705"
+                "reference": "3cfdfc52b867df2febd0040f17d53f262faeaaa6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tomwalder/php-gds/zipball/997f40aec99d3e2611c584a03c93a30f372b2705",
-                "reference": "997f40aec99d3e2611c584a03c93a30f372b2705",
+                "url": "https://api.github.com/repos/tomwalder/php-gds/zipball/3cfdfc52b867df2febd0040f17d53f262faeaaa6",
+                "reference": "3cfdfc52b867df2febd0040f17d53f262faeaaa6",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": ">=5.5.0"
             },
             "require-dev": {
-                "google/apiclient": "1.1.6",
+                "google/apiclient": "1.1.7",
                 "google/appengine-php-sdk": ">=1.9.22",
                 "phpunit/phpunit": "~4.8",
                 "satooshi/php-coveralls": "dev-master"
             },
             "suggest": {
-                "google/apiclient": "Allows you to use the JSON API Gateway/Datastore endpoints. Tested with 1.1.6"
+                "google/apiclient": "Allows you to use the JSON API Gateway/Datastore endpoints. Tested with 1.1.7"
             },
             "type": "library",
             "autoload": {
@@ -2912,7 +3024,7 @@
                 "google",
                 "nosql"
             ],
-            "time": "2015-12-07 20:16:31"
+            "time": "2016-09-16 10:39:01"
         },
         {
             "name": "twig/twig",
