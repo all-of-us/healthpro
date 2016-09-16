@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormError;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Mayolink\Order as MayoLinkOrder;
 
@@ -232,31 +233,37 @@ class DefaultController extends AbstractController
         }
         $evaluationForm = $evaluationService->getForm($app['form.factory']);
         $evaluationForm->handleRequest($request);
-        if ($evaluationForm->isValid()) {
-            $evaluationService->setData($evaluationForm->getData());
-            $dbArray = $evaluationService->toArray();
-            $dbArray['updated_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
-            if (!$evaluation) {
-                $dbArray['participant_id'] = $participant->id;
-                $dbArray['created_ts'] = $dbArray['updated_ts'];
-                if ($app['db']->insert('evaluations', $dbArray) && ($evalId = $app['db']->lastInsertId())) {
-                    $app->addFlashNotice('Evaluation saved');
-                    return $app->redirectToRoute('participantEval', [
-                        'participantId' => $participant->id,
-                        'evalId' => $evalId
-                    ]);
+        if ($evaluationForm->isSubmitted()) {
+            if ($evaluationForm->isValid()) {
+                $evaluationService->setData($evaluationForm->getData());
+                $dbArray = $evaluationService->toArray();
+                $dbArray['updated_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
+                if (!$evaluation) {
+                    $dbArray['participant_id'] = $participant->id;
+                    $dbArray['created_ts'] = $dbArray['updated_ts'];
+                    if ($app['db']->insert('evaluations', $dbArray) && ($evalId = $app['db']->lastInsertId())) {
+                        $app->addFlashNotice('Evaluation saved');
+                        return $app->redirectToRoute('participantEval', [
+                            'participantId' => $participant->id,
+                            'evalId' => $evalId
+                        ]);
+                    } else {
+                        $app->addFlashError('Failed to create new evaluation');
+                    }
                 } else {
-                    $app->addFlashError('Failed to create new evaluation');
+                    if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
+                        $app->addFlashNotice('Evaluation saved');
+                        return $app->redirectToRoute('participantEval', [
+                            'participantId' => $participant->id,
+                            'evalId' => $evalId
+                        ]);
+                    } else {
+                        $app->addFlashError('Failed to update evaluation');
+                    }
                 }
             } else {
-                if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
-                    $app->addFlashNotice('Evaluation saved');
-                    return $app->redirectToRoute('participantEval', [
-                        'participantId' => $participant->id,
-                        'evalId' => $evalId
-                    ]);
-                } else {
-                    $app->addFlashError('Failed to update evaluation');
+                if (count($evaluationForm->getErrors()) == 0) {
+                    $evaluationForm->addError(new FormError('Please correct the errors below'));
                 }
             }
         }
@@ -264,7 +271,8 @@ class DefaultController extends AbstractController
         return $app['twig']->render('evaluation.html.twig', [
             'participant' => $participant,
             'evaluation' => $evaluation,
-            'evaluationForm' => $evaluationForm->createView()
+            'evaluationForm' => $evaluationForm->createView(),
+            'schema' => $evaluationService->getSchema()
         ]);
     }
 }

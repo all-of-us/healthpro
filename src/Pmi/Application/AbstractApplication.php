@@ -6,6 +6,7 @@ use Memcache;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
 use Silex\Application;
+use Silex\Provider\CsrfServiceProvider;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\LocaleServiceProvider;
 use Silex\Provider\SessionServiceProvider;
@@ -111,6 +112,7 @@ abstract class AbstractApplication extends Application
         ]);
 
         // Register Form service
+        $this->register(new CsrfServiceProvider());
         $this->register(new FormServiceProvider());
         $this->register(new ValidatorServiceProvider());
 
