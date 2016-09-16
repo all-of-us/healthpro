@@ -67,3 +67,24 @@ function launchSpinner(divId) {
 function stopSpinner(divId) {
     $('#' + divId).data('spinner').stop();
 }
+
+// function to transform plotly data object into array of annotations showing total
+// value of stacked bar columns
+function loadBarChartAnnotations(plotlyData, annotationsArray) {
+    for (var i = 0; i < plotlyData[0]['x'].length ; i++){
+        var total = 0;
+        plotlyData.map(function(el) {
+            total += parseInt(el['y'][i]);
+        });
+        var annot = {
+            x: plotlyData[0]['x'][i],
+            y: total,
+            text: total,
+            xanchor: 'center',
+            yanchor: 'bottom',
+            showarrow: false
+        };
+        annotationsArray.push(annot);
+    }
+    return annotationsArray;
+}

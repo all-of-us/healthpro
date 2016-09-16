@@ -13,7 +13,9 @@ class DashboardController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['load_data', '/load_data'],
-        ['load_map_data', '/load_map_data']
+        ['load_map_data', '/load_map_data'],
+        ['load_lifecycle_data', '/load_lifecycle_data'],
+        ['total_progress', '/total_progress']
     ];
 
     public function homeAction(Application $app, Request $request)
@@ -197,6 +199,57 @@ class DashboardController extends AbstractController
 
         // render JSON for Plotly
         return $app->json($map_data);
+    }
+
+    public function load_lifecycle_dataAction(Application $app, Request $request) {
+        // request parameters
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
+
+        // load lifecycle phases and participant tiers for querying
+        $lifecyle_phases = $app['db']->fetchAll("SELECT * FROM lifecycle_phases");
+        $tiers = $app['db']->fetchAll("SELECT * FROM participant_tiers");
+
+        foreach($tiers as $tier){
+            $phases = [];
+            $counts = [];
+            // get participant counts by tier & lifecycle phase
+            foreach($lifecyle_phases as $phase) {
+                $count = $app['db']->fetchColumn("SELECT count(*) from dashboard_participants WHERE enrollment_date <= ? 
+                                                  AND enrollment_date >= ? AND lifecycle_phase = ? AND participant_tier = ?",
+                                                [$end_date, $start_date, $phase['id'], $tier['id']]);
+                array_push($phases, $phase['label']);
+                array_push($counts, $count);
+            };
+
+            $data[] = array(
+                "x" => $phases,
+                "y" => $counts,
+                "type" => 'bar',
+                "name" => $tier['label']
+            );
+        }
+
+        // render JSON data for Plotly
+        return $app->json($data);
+    }
+
+    public function total_progressAction(Application $app, Request $request) {
+        // load all participant tiers to segment count
+        $tiers = $app['db']->fetchAll("SELECT * FROM participant_tiers");
+
+        foreach($tiers as $tier){
+            $count = $app['db']->fetchColumn("SELECT count(*) from dashboard_participants WHERE participant_tier = ?", [$tier['id']]);
+            $data[] = array(
+                "x" => ["Total Progress"],
+                "y" => [$count],
+                "type" => 'bar',
+                "name" => $tier['label']
+            );
+        }
+
+        // render JSON data for Plotly
+        return $app->json($data);
     }
 
     // helper function to return array of dates segmented by interval
