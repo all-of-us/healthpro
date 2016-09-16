@@ -122,6 +122,13 @@ class HpoApplication extends AbstractApplication
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     }
     
+    protected function beforeCallback(Request $request, AbstractApplication $app)
+    {
+        if ($this['session']->get('isLogin')) {
+            $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
+        }
+    }
+    
     protected function finishCallback(Request $request, Response $response)
     {
         // only the first request handled is considered a login
