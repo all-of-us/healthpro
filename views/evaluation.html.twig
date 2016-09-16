@@ -33,7 +33,7 @@
     <div id="physicalEvaluation">
         {{ form_start(evaluationForm) }}
             {% for field in schema.fields %}
-                <div class="form-group{% if not evaluationForm[field.name].vars.valid and field.replicates is not defined %} has-error{% endif %}">
+                <div data-field="{{ field.name }}" class="field field-{{ field.name }} form-group{% if not evaluationForm[field.name].vars.valid and field.replicates is not defined %} has-error{% endif %}">
                     {{ form_label(evaluationForm[field.name]) }}
                     {% if field.image is defined %}
                         <div class="row">
@@ -55,6 +55,7 @@
                                 </div>
                             {% endfor %}
                             </div>
+                            <div id="mean-{{ field.name }}" class="mean"></div>
                         {% else %}
                             {% if field.unit is defined %}
                                 <div class="input-group">

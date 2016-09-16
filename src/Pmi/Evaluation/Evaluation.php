@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints;
 
 class Evaluation
 {
-    const CURRENT_VERSION = '0.1';
+    const CURRENT_VERSION = '0.1.1';
     protected $version;
     protected $data;
     protected $schema;
