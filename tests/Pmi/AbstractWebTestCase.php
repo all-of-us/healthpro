@@ -2,10 +2,12 @@
 namespace tests\Pmi;
 
 use Pmi\Application\HpoApplication;
+use Pmi\Controller;
 use Pmi\Security\GoogleGroupsAuthenticator;
 use Pmi\Security\User;
 use Silex\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractWebTestCase extends WebTestCase
 {
@@ -22,7 +24,12 @@ abstract class AbstractWebTestCase extends WebTestCase
         $app->register(new \Silex\Provider\SessionServiceProvider(), [
             'session.test' => true
         ]);
+        $testCase = $this;
+        $app->after(function (Request $request, Response $response) use ($testCase) {
+            $testCase->afterCallback($request, $response);
+        });
         $app->setup();
+        $app->mount('/', new Controller\DefaultController());
         
         return $app;
     }
@@ -41,4 +48,7 @@ abstract class AbstractWebTestCase extends WebTestCase
         $request->setSession($this->app['session']);
         return $request;
     }
+    
+    /** Children can override to access the after middleware. */
+    protected function afterCallback(Request $request, Response $response) {}
 }

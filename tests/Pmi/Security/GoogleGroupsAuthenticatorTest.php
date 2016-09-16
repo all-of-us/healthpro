@@ -63,10 +63,10 @@ class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
         $auth = new GoogleGroupsAuthenticator($this->app);
         $user = $auth->getUser($auth->getCredentials($this->getRequest()), new UserProvider($this->app));
         $this->loginUser($auth, $user);
-        $this->assertEquals(true, $this->app['session']->get('isLogin'));
+        $this->assertSame(true, $this->app['session']->get('isLogin'));
         
         $this->app->logout();
-        $this->assertEquals(null, $this->app['session']->get('isLogin'));
+        $this->assertSame(null, $this->app['session']->get('isLogin'));
     }
     
     function testGetCredentials()
