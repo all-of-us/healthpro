@@ -1,7 +1,6 @@
 <?php
 namespace Pmi\Security;
 
-use google\appengine\api\users\UserService;
 use Pmi\Application\AbstractApplication;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,9 +23,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     public function __construct(AbstractApplication $app)
     {
         $this->app = $app;
-        if (class_exists(UserService::class)) {
-            $this->googleUser = UserService::getCurrentUser();
-        }
+        $this->googleUser = $app->getGoogleUser();
     }
     
     public function getCredentials(Request $request)

@@ -1,7 +1,6 @@
 <?php
 namespace Pmi\Security;
 
-use google\appengine\api\users\UserService;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -18,7 +17,7 @@ class UserProvider implements UserProviderInterface
     
     public function loadUserByUsername($username)
     {
-        $googleUser = UserService::getCurrentUser();
+        $googleUser = $this->app->getGoogleUser();
         if (!$googleUser || strcasecmp($googleUser->getEmail(), $username) !== 0) {
             throw new \Exception("User $username is not logged in!");
         }

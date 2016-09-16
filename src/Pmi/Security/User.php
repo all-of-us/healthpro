@@ -1,16 +1,17 @@
 <?php
 namespace Pmi\Security;
 
-use google\appengine\api\users\User as GoogleUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
 {
+    const SITE_PREFIX = 'hpo-site-';
+    
     private $googleUser;
     private $groups;
     private $sites;
     
-    public function __construct(GoogleUser $googleUser, array $groups) {
+    public function __construct($googleUser, array $groups) {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
         $this->sites = $this->computeSites();
@@ -26,7 +27,7 @@ class User implements UserInterface
         $sites = [];
         // site membership is determined by the user's groups
         foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), 'hpo-site-') === 0) {
+            if (strpos($group->getEmail(), self::SITE_PREFIX) === 0) {
                 $sites[] = (object) [
                     'email' => $group->getEmail(),
                     'name' => $group->getName()

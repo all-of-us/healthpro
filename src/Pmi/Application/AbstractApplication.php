@@ -2,7 +2,6 @@
 namespace Pmi\Application;
 
 use Exception;
-use google\appengine\api\users\UserService;
 use Memcache;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
@@ -139,6 +138,14 @@ abstract class AbstractApplication extends Application
     }
 
     abstract protected function registerSecurity();
+    
+    public function getGoogleUser()
+    {
+        $cls = $this['isUnitTest'] ?
+            'Tests\Pmi\GoogleUserService' :
+            'google\appengine\api\users\UserService';
+        return class_exists($cls) ? $cls::getCurrentUser() : null;
+    }
 
     protected function enableTwig()
     {

@@ -15,7 +15,8 @@ class HpoApplication extends AbstractApplication
 
         $this->loadConfiguration();
         $this['pmi.drc.participantsearch'] = new \Pmi\Drc\ParticipantSearch();
-        $this['pmi.drc.appsclient'] = \Pmi\Drc\AppsClient::createFromApp($this);
+        $this['pmi.drc.appsclient'] = $this['isUnitTest'] ?
+            new \Tests\Pmi\Drc\AppsClient() : \Pmi\Drc\AppsClient::createFromApp($this);
 
         $this->registerDb();
         return $this;

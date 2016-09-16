@@ -1,6 +1,6 @@
 {
     "autoload": {
-        "psr-4": { "": "src/" }
+        "psr-4": { "": "src/", "Tests\\": "tests/" }
     },
     "require": {
         "doctrine/dbal": "^2.5",
