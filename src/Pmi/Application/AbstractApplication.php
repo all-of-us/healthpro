@@ -102,7 +102,7 @@ abstract class AbstractApplication extends Application
         }
         // Register finish middleware
         if (method_exists($this, 'finishCallback')) {
-            $this->after([$this, 'finishCallback']);
+            $this->finish([$this, 'finishCallback']);
         }
 
         $this->register(new LocaleServiceProvider());
