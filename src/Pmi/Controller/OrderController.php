@@ -229,9 +229,9 @@ class OrderController extends AbstractController
 
         if ($app->getConfig('ml_mock_order')) {
             if ($type == 'labels') {
-                $pdf = file_get_contents('assets/SampleLabels.pdf');
+                return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
             } else {
-                $pdf = file_get_contents('assets/SampleRequisition.pdf');
+                return $app->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
             }
         } else {
             $mlOrder = new MayoLinkOrder();
@@ -241,12 +241,12 @@ class OrderController extends AbstractController
                 $this->order['mayo_id'],
                 $type
             );
-        }
-
-        if ($pdf) {
-            return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
-        } else {
-            $app->abort(500, 'Failed to load PDF');
+            
+            if ($pdf) {
+                return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+            } else {
+                $app->abort(500, 'Failed to load PDF');
+            }
         }
     }
 
