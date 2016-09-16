@@ -276,4 +276,10 @@ abstract class AbstractApplication extends Application
         $string = $this['translator']->trans($string, $translationParams);
         $this->addFlash('notice', $string);
     }
+    
+    public function addFlashSuccess($string, array $translationParams = [])
+    {
+        $string = $this['translator']->trans($string, $translationParams);
+        $this->addFlash('success', $string);
+    }
 }
