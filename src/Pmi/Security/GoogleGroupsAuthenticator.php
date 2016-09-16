@@ -3,7 +3,6 @@ namespace Pmi\Security;
 
 use Pmi\Application\AbstractApplication;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -31,15 +30,16 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             return;
         }
         
+        // a user's credentials are effectively their logged-in Google user,
+        // supplemented later checking their Google Groups
         return [
-            $googleUser->getEmail(),
-            null
+            'googleUser' => $googleUser
         ];
     }
     
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return $userProvider->loadUserByUsername($credentials[0]);
+        return $userProvider->loadUserByUsername($credentials['googleUser']->getEmail());
     }
     
     public function checkCredentials($credentials, UserInterface $user)
@@ -48,7 +48,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         // at least one Group to authenticate
         return is_array($credentials) && count($user->getGroups()) > 0 &&
             // just a safeguard in case the Google user and our user get out of sync somehow
-            strcasecmp($credentials[0], $user->getEmail()) === 0;
+            strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;
     }
     
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
