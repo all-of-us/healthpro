@@ -54,7 +54,20 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $code = 403;
-        $response = new Response($this->app['twig']->render($this->app['errorTemplate'], ['code' => $code]), $code);
+        $googleUser = $this->app->getGoogleUser();
+        if ($googleUser) {
+            $template = 'error-auth.html.twig';
+            $params = [
+                'email' => $googleUser->getEmail(),
+                'logoutUrl' => $this->app->getGoogleLogoutUrl()
+            ];
+        } else {
+            $template = $this->app['errorTemplate'];
+            $params = ['code' => $code];
+        }
+        // clear session in case Google user and our user are out of sync
+        $this->app->clearSession($request);
+        $response = new Response($this->app['twig']->render($template, $params), $code);
         $this->app->setHeaders($response);
         return $response;
     }
@@ -72,11 +85,8 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        $data = array(
-            // you might translate this message
-            'message' => 'Authentication Required',
-        );
-
-        return new JsonResponse($data, 401);
+        // we never start authentication in our app because Google handles that,
+        // so any call to this method implies an auth failure
+        return $this->onAuthenticationFailure($request, $authException);
     }
 }

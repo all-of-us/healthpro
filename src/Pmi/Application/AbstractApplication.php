@@ -139,12 +139,22 @@ abstract class AbstractApplication extends Application
 
     abstract protected function registerSecurity();
     
+    public function getGoogleServiceClass()
+    {
+        return $this['isUnitTest'] ? 'Tests\Pmi\GoogleUserService' :
+            'google\appengine\api\users\UserService';
+    }
+    
     public function getGoogleUser()
     {
-        $cls = $this['isUnitTest'] ?
-            'Tests\Pmi\GoogleUserService' :
-            'google\appengine\api\users\UserService';
+        $cls = $this->getGoogleServiceClass();
         return class_exists($cls) ? $cls::getCurrentUser() : null;
+    }
+    
+    public function getGoogleLogoutUrl($dest = '/')
+    {
+        $cls = $this->getGoogleServiceClass();
+        return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
     }
 
     protected function enableTwig()
@@ -213,6 +223,12 @@ abstract class AbstractApplication extends Application
     {
         $this->register(new SessionServiceProvider());
         $this['session.storage.handler'] = new DatastoreSessionHandler();
+    }
+    
+    public function clearSession($request)
+    {
+        $this['security.token_storage']->setToken(null);
+        $request->getSession()->invalidate();
     }
 
     public function generateUrl($route, $parameters = [])
