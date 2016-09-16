@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Evaluation;
 
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormFactory;
@@ -8,7 +9,7 @@ use Symfony\Component\Validator\Constraints;
 
 class Evaluation
 {
-    const CURRENT_VERSION = '0.1';
+    const CURRENT_VERSION = '0.1.1';
     protected $version;
     protected $data;
     protected $schema;
@@ -18,6 +19,7 @@ class Evaluation
         $this->version = self::CURRENT_VERSION;
         $this->data = new \StdClass();
         $this->loadSchema();
+        $this->normalizeData();
     }
 
     public function loadFromArray($array)
@@ -31,9 +33,9 @@ class Evaluation
             } else {
                 $this->data = json_decode($array['data']);
             }
-            $this->normalizeData();
         }
         $this->loadSchema();
+        $this->normalizeData();
     }
 
     public function toArray($serializeData = true)
@@ -75,7 +77,16 @@ class Evaluation
                 $constraints[] = new Constraints\GreaterThan(0);
             }
             $options['constraints'] = $constraints;
-            $formBuilder->add($field->name, NumberType::class, $options);
+
+            if (isset($field->replicates)) {
+                $formBuilder->add($field->name, CollectionType::class, [
+                    'entry_type' => NumberType::class,
+                    'entry_options' => $options,
+                    'required' => false
+                ]);
+            } else {
+                $formBuilder->add($field->name, NumberType::class, $options);
+            }
         }
         return $formBuilder->getForm();
     }
@@ -100,12 +111,29 @@ class Evaluation
     public function setData($data)
     {
         $this->data = $data;
+        $this->normalizeData();
     }
 
     protected function normalizeData()
     {
         foreach ($this->data as $key => $value) {
-            $this->data->$key = floatval($value) ?: null;
+            if (!is_array($value)) {
+                $this->data->$key = floatval($value) ?: null;
+            }
+        }
+        foreach ($this->schema->fields as $field) {
+            if (isset($field->replicates)) {
+                $key = $field->name;
+                if (is_null($this->data->$key)) {
+                    $dataArray = array_fill(0, $field->replicates, null);
+                    $this->data->$key = $dataArray;
+                }
+                elseif (!is_null($this->data->$key) && !is_array($this->data->$key)) {
+                    $dataArray = array_fill(0, $field->replicates, null);
+                    $dataArray[0] = $this->data->$key;
+                    $this->data->$key = $dataArray;
+                }
+            }
         }
     }
 }
