@@ -81,7 +81,8 @@ class Evaluation
             if (isset($field->replicates)) {
                 $formBuilder->add($field->name, CollectionType::class, [
                     'entry_type' => NumberType::class,
-                    'entry_options' => $options
+                    'entry_options' => $options,
+                    'required' => false
                 ]);
             } else {
                 $formBuilder->add($field->name, NumberType::class, $options);

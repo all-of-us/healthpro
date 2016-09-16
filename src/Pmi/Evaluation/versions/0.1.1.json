@@ -38,14 +38,16 @@
             "label": "Hip Circumference",
             "unit": "cm",
             "image": "hip.png",
-            "decimals": 1
+            "decimals": 1,
+            "replicates": 3
         },
         {
             "name": "waist_circumference",
             "label": "Waist Circumference",
             "unit": "cm",
             "image": "waist.png",
-            "decimals": 1
+            "decimals": 1,
+            "replicates": 3
         }
     ]
 }

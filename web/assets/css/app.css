@@ -34,6 +34,19 @@ label.required::after {
     margin-left: auto;
     margin-right: auto;
 }
+
 #physicalEvaluation .help-image {
     cursor: pointer;
+}
+#physicalEvaluation .replicate .input-group-addon {
+    padding: 6px 3px;
+    font-size: 65%;
+}
+#physicalEvaluation .replicate {
+    margin-right: -6px;
+    margin-left: -6px;
+}
+#physicalEvaluation .replicate .col-xs-4 {
+    padding-right: 6px;
+    padding-left: 6px;
 }
