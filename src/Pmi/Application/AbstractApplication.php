@@ -225,10 +225,10 @@ abstract class AbstractApplication extends Application
         $this['session.storage.handler'] = new DatastoreSessionHandler();
     }
     
-    public function clearSession($request)
+    public function logout()
     {
         $this['security.token_storage']->setToken(null);
-        $request->getSession()->invalidate();
+        $this['session']->invalidate();
     }
 
     public function generateUrl($route, $parameters = [])

@@ -37,7 +37,7 @@ class DefaultController extends AbstractController
     
     public function logoutAction(Application $app, Request $request)
     {
-        $app->clearSession($request);
+        $app->logout();
         return $app->redirect($app->getGoogleLogoutUrl());
     }
     

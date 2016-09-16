@@ -2,7 +2,10 @@
 namespace tests\Pmi;
 
 use Pmi\Application\HpoApplication;
+use Pmi\Security\GoogleGroupsAuthenticator;
+use Pmi\Security\User;
 use Silex\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractWebTestCase extends WebTestCase
 {
@@ -20,5 +23,20 @@ abstract class AbstractWebTestCase extends WebTestCase
             'session.test' => true
         ]);
         return $app;
+    }
+    
+    public function loginUser(GoogleGroupsAuthenticator $authenticator, User $user)
+    {
+        $providerKey = 'main';
+        $token = $authenticator->createAuthenticatedToken($user, $providerKey);
+        $this->app['security.token_storage']->setToken($token);
+        $authenticator->onAuthenticationSuccess($this->getRequest(), $token, $providerKey);
+    }
+    
+    public function getRequest()
+    {
+        $request = new Request();
+        $request->setSession($this->app['session']);
+        return $request;
     }
 }
