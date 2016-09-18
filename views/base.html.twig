@@ -14,7 +14,11 @@
     {# pass parameters to JS #}
     <script>
         var PMI = {
+            "sessionTimeout": {{ app.sessionTimeout|json_encode|raw }},
+            "sessionWarning": {{ app.sessionWarning|json_encode|raw }},
             "path": {
+                "clientTimeout": {{ path('clientTimeout')|json_encode|raw }},
+                "keepAlive": {{ path('keepAlive')|json_encode|raw }},
                 "switchSite": {{ path('switchSite', {id: "SITE_ID"})|json_encode|raw }}
             },
             "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }}

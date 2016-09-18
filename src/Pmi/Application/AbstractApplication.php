@@ -164,6 +164,18 @@ abstract class AbstractApplication extends Application
         $token = $this['security.token_storage']->getToken();
         return $token ? $token->getUser() : null;
     }
+    
+    /** Is the user's session expired? */
+    public function isLoginExpired($request)
+    {
+        $session = $request->getSession();
+        $time = time();
+        // custom "last used" session time updated on keepAliveAction
+        $idle = $time - $session->get('pmiLastUsed', $time);
+        $remaining = $this['sessionTimeout'] - $idle;
+        $isLoggedIn = $this['security.authorization_checker']->isGranted('ROLE_USER');
+        return $isLoggedIn && $remaining <= 0;
+    }
 
     protected function enableTwig()
     {
