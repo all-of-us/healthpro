@@ -153,8 +153,11 @@ abstract class AbstractApplication extends Application
         return class_exists($cls) ? $cls::getCurrentUser() : null;
     }
     
-    public function getGoogleLogoutUrl($dest = '/')
+    public function getGoogleLogoutUrl($dest = null)
     {
+        if (!$dest) {
+            $dest = $this->generateUrl('home');
+        }
         $cls = $this->getGoogleServiceClass();
         return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
     }
