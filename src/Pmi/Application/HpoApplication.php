@@ -126,9 +126,8 @@ class HpoApplication extends AbstractApplication
     {
         // log the user out if their session is expired
         if ($this->isLoginExpired($request)) {
-            $this->logout();
-            $this->addFlashNotice('For security reasons, you have been automatically logged out.');
             return $this->redirectToRoute('logout');
+            $this->logout(); // otherwise we will infinitely redirect to /logout
         }
         
         if ($this['session']->get('isLogin')) {
