@@ -24,6 +24,9 @@ handlers:
 - url: /assets
   static_dir: web/assets
   secure: always
+- url: /timeout
+  script: web/index.php
+  secure: always
 - url: /.*
   script: web/index.php
   secure: always

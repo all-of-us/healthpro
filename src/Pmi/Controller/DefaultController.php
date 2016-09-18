@@ -17,6 +17,7 @@ class DefaultController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['logout', '/logout'],
+        ['timeout', '/timeout'],
         ['keepAlive', '/keepalive', [ 'method' => 'POST' ]],
         ['clientTimeout', '/client-timeout', [ 'method' => 'GET' ]],
         ['groups', '/groups'],
@@ -40,8 +41,14 @@ class DefaultController extends AbstractController
     
     public function logoutAction(Application $app, Request $request)
     {
+        $timeout = $request->get('timeout');
         $app->logout();
-        return $app->redirect($app->getGoogleLogoutUrl());
+        return $app->redirect($app->getGoogleLogoutUrl($timeout ? $app->generateUrl('timeout') : null));
+    }
+    
+    public function timeoutAction(Application $app, Request $request)
+    {
+        return $app['twig']->render('timeout.html.twig');
     }
     
     /** Dummy action that serves to extend the user's session. */
