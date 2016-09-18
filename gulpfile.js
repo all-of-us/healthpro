@@ -55,7 +55,7 @@ gulp.task('compile-css', function() {
     var lib = gulp.src(ASSETS.css)
         .pipe(concat('lib.css'))
         .pipe(gulp.dest(destDir))
-        .pipe(cssnano())
+        .pipe(cssnano({zindex: false}))
         .pipe(rename('lib.min.css'))
         .pipe(gulp.dest(destDir));
 
@@ -64,7 +64,7 @@ gulp.task('compile-css', function() {
         .pipe(cssconcat(cssDir + '/app.css'))
         .pipe(gulp.dest(localDestDir))
         .pipe(sourcemaps.init())
-            .pipe(cssnano())
+            .pipe(cssnano({zindex: false}))
             .pipe(rename(cssDir + '/app.min.css'))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(localDestDir));
