@@ -1,11 +1,11 @@
 <?php
-use Pmi\Drc\ParticipantSearch;
+use Pmi\Drc\MockParticipantSearch;
 
 class ParticipantSearchTest extends \PHPUnit_Framework_TestCase
 {
     protected function getDrcParticipantClient()
     {
-        $client = new ParticipantSearch();
+        $client = new MockParticipantSearch();
         return $client;
     }
 
