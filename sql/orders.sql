@@ -1,6 +1,6 @@
 CREATE TABLE `orders` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `participant_id` int(11) NOT NULL,
+  `participant_id` varchar(50) NOT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `mayo_id` varchar(100) NOT NULL,
   `printed_ts` timestamp NULL DEFAULT NULL,
