@@ -18,7 +18,9 @@ abstract class AbstractWebTestCase extends WebTestCase
         $app = new HpoApplication([
             'templatesDirectory' => __DIR__ . '/../../views',
             'errorTemplate' => 'error.html.twig',
-            'isUnitTest' => true
+            'isUnitTest' => true,
+            'sessionTimeout' => 7 * 60,
+            'sessionWarning' => 2 * 60
         ]);
         // session must be registered prior to boot()
         $app->register(new \Silex\Provider\SessionServiceProvider(), [

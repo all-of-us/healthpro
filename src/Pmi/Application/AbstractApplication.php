@@ -169,14 +169,13 @@ abstract class AbstractApplication extends Application
     }
     
     /** Is the user's session expired? */
-    public function isLoginExpired($request)
+    public function isLoginExpired()
     {
-        $session = $request->getSession();
         $time = time();
         // custom "last used" session time updated on keepAliveAction
-        $idle = $time - $session->get('pmiLastUsed', $time);
+        $idle = $time - $this['session']->get('pmiLastUsed', $time);
         $remaining = $this['sessionTimeout'] - $idle;
-        $isLoggedIn = $this['security.authorization_checker']->isGranted('ROLE_USER');
+        $isLoggedIn = $this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('ROLE_USER');
         return $isLoggedIn && $remaining <= 0;
     }
 

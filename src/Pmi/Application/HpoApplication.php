@@ -130,7 +130,7 @@ class HpoApplication extends AbstractApplication
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
         // log the user out if their session is expired
-        if ($this->isLoginExpired($request)) {
+        if ($this->isLoginExpired()) {
             $this->logout(); // otherwise we will infinitely redirect to /logout
             return $this->redirectToRoute('logout', ['timeout' => true]);
         }
