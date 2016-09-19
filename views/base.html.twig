@@ -106,6 +106,9 @@
             </div>
         </div>
     {% endif %}
+    
+    {% include 'templates/alert.html.twig' %}
+    {% include 'templates/confirm.html.twig' %}
 
     <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
     {% block pagejs %}{% endblock %}
