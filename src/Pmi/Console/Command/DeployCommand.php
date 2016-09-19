@@ -19,7 +19,8 @@ class DeployCommand extends Command {
 
     /** GAE application IDs for production. */
     private static $PROD_APP_IDS = [
-        'pmi-hpo-staging'
+        'pmi-hpo-staging',
+        'pmi-hpo-test'
     ];
 
     /** Create release tag when deploying these application IDs. */
