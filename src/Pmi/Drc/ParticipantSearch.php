@@ -10,6 +10,7 @@ class ParticipantSearch
         $googleClient = new \Google_Client();
         $googleClient->useApplicationDefaultCredentials();
         $googleClient->addScope(\Google_Service_Oauth2::USERINFO_EMAIL);
+
         return $googleClient->authorize(new \GuzzleHttp\Client([
             'base_uri' => self::$endpoint
         ]));
@@ -23,6 +24,7 @@ class ParticipantSearch
         if (!isset($participant->drc_internal_id)) {
             return false;
         }
+
         return (object)[
             'id' => $participant->drc_internal_id,
             'firstName' => $participant->first_name,
@@ -34,7 +36,7 @@ class ParticipantSearch
         ];
     }
 
-    public function search($params)
+    protected function paramsToQuery($params)
     {
         $query = [];
         if (isset($params['lastName'])) {
@@ -48,18 +50,32 @@ class ParticipantSearch
                 $date = new \DateTime($params['dob']);
                 $query['date_of_birth'] = $date->format('Y-m-d\T00:00:00');
             } catch (\Exception $e) {
-
+                throw new Exception\InvalidDobException();
             }
         }
-        $client = $this->getClient();
-        $response = $client->request('GET', 'participants', [
-            'query' => $query
-        ]);
-        $responseObject = json_decode($response->getBody()->getContents());
-        $results = [];
-        if (!is_object($responseObject) || !isset($responseObject->items) || !is_array($responseObject->items)) {
-            return $results;
+
+        return $query;
+    }
+
+    public function search($params)
+    {
+        $query = $this->paramsToQuery($params);
+        try {
+            $client = $this->getClient();
+            $response = $client->request('GET', 'participants', [
+                'query' => $query
+            ]);
+        } catch (\Exception $e) {
+            throw new Exception\FailedRequestException();
         }
+        $responseObject = json_decode($response->getBody()->getContents());
+        if (!is_object($responseObject)) {
+            throw new Exception\InvalidResponseException();
+        }
+        if (!isset($responseObject->items) || !is_array($responseObject->items)) {
+            return [];
+        }
+        $results = [];
         foreach ($responseObject->items as $participant) {
             $result = $this->participantToResult($participant);
             if ($result) {
@@ -72,9 +88,20 @@ class ParticipantSearch
 
     public function getById($id)
     {
-        $client = $this->getClient();
-        $response = $client->request('GET', "participants/{$id}");
-        $participant = json_decode($response->getBody()->getContents());
+        $memcache = new \Memcache();
+        $memcacheKey = 'rdr_participant_' . $id;
+        $participant = $memcache->get($memcacheKey);
+        if (!$participant) {
+            try {
+                $client = $this->getClient();
+                $response = $client->request('GET', "participants/{$id}");
+                $participant = json_decode($response->getBody()->getContents());
+                $memcache->set($memcacheKey, $participant, 0, 300);
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                return false;
+            }
+        }
+
         return $this->participantToResult($participant);
     }
 }
