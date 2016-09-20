@@ -17,7 +17,7 @@ mysql_password: ~
 mysql_host: 127.0.0.1
 
 # RDR API
-# store service account key in rdr_key.json
+#   Note: Store service account key in rdr_key.json
 rdr_endpoint: https://pmi-rdr-api-test.appspot.com/_ah/api/
 
 # MayoLINK configuration
@@ -28,7 +28,10 @@ ml_mock_order: pmitest
 # ml_password:
 
 # Google Apps configuration
-# store service account key in googleapps_key.json
+# Bypass Google Apps auth
+gaBypass: 1
+# Or, configure Google Apps auth
+#   Note: Store service account key in googleapps_key.json
 gaApplicationName: PMI DRC HPO
 gaDomain: staging.pmi-ops.org
 gaAdminEmail: hpo-api@staging.pmi-ops.org
