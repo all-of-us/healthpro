@@ -1,7 +1,7 @@
 <?php
 namespace Pmi\Drc;
 
-class ParticipantSearch
+class RdrParticipantSearch
 {
     protected $rdrHelper;
 
@@ -60,7 +60,6 @@ class ParticipantSearch
                 'query' => $query
             ]);
         } catch (\Exception $e) {
-            throw $e;
             throw new Exception\FailedRequestException();
         }
         $responseObject = json_decode($response->getBody()->getContents());
