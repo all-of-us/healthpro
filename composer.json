@@ -11,6 +11,7 @@
         "symfony/browser-kit": "^3.1",
         "symfony/config": "^3.1",
         "symfony/console": "^3.0",
+        "symfony/css-selector": "^3.1",
         "symfony/finder": "^3.1",
         "symfony/form": "^3.1",
         "symfony/process": "^3.1",
