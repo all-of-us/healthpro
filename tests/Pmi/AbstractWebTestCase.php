@@ -1,5 +1,5 @@
 <?php
-namespace tests\Pmi;
+namespace Tests\Pmi;
 
 use Pmi\Application\HpoApplication;
 use Pmi\Controller;
@@ -26,6 +26,9 @@ abstract class AbstractWebTestCase extends WebTestCase
         $app->register(new \Silex\Provider\SessionServiceProvider(), [
             'session.test' => true
         ]);
+        $app['session.storage.test'] = function () {
+            return new MockFileSessionStorage();
+        };
         $testCase = $this;
         $app->after(function (Request $request, Response $response) use ($testCase) {
             $testCase->afterCallback($request, $response);

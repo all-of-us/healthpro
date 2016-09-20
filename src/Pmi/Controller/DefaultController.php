@@ -20,6 +20,7 @@ class DefaultController extends AbstractController
         ['timeout', '/timeout'],
         ['keepAlive', '/keepalive', [ 'method' => 'POST' ]],
         ['clientTimeout', '/client-timeout', [ 'method' => 'GET' ]],
+        ['agreeUsage', '/agree', ['method' => 'POST']],
         ['groups', '/groups'],
         ['switchSite', '/site/{id}/switch'],
         ['participants', '/participants', ['method' => 'GET|POST']],
@@ -71,6 +72,12 @@ class DefaultController extends AbstractController
         } else {
             return $app->redirect($app->generateUrl('home'));
         }
+    }
+    
+    public function agreeUsageAction(Application $app, Request $request)
+    {
+        $request->getSession()->set('isUsageAgreed', true);
+        return (new JsonResponse())->setData([]);
     }
     
     public function groupsAction(Application $app, Request $request)

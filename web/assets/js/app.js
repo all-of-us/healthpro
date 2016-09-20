@@ -13,6 +13,25 @@ $(document).ready(function()
         else if (_.isUndefined(val)) return false;
         else return !!val;
     };
+    
+    /*************************************************************************
+     * Configure Underscore.js template settings
+     ************************************************************************/
+    // use {{ }} instead of <% %> because the '<' and '>' chars seem to get escaped
+    // on jQuery html() calls
+    _.templateSettings = {
+        interpolate: /\{\{=(.+?)\}\}/g,
+        escape: /\{\{-(.+?)\}\}/g,
+        evaluate: /\{\{(.+?)\}\}/g
+    };
+    var _PMITPL = {}; // cache of templates
+    // global function for views to use to grab templates
+    window.pmiGetTpl = function(tplId) {
+        if (!_PMITPL.hasOwnProperty(tplId)) {
+            _PMITPL[tplId] = _.template($("#" + tplId).html());
+        }
+        return _PMITPL[tplId];
+    };
 
     /*************************************************************************
      * Disable click on disabled tabs (prevents unnecessary navigation to #)
@@ -39,6 +58,26 @@ $(document).ready(function()
             redirAfter: PMI.sessionTimeout * 1000,
             warnAfter: PMI.sessionTimeout * 1000 - (PMI.sessionWarning * 1000),
             warnAutoClose: false
+        });
+    }
+
+    /*************************************************************************
+     * Display system usage agreement when user first logs in
+     ************************************************************************/
+    if (!PMI.isUsageAgreed) {
+        new PmiConfirmModal({
+            title: "FISMA MODERATE ENVIRONMENT",
+            dialogClass: "modal-lg",
+            titleClass: "text-danger",
+            isHTML: true,
+            msg: pmiGetTpl("pmiSystemUsageTpl")(),
+            btnTextTrue: "Agree",
+            onTrue: function() {
+                $.post(PMI.path.agreeUsage);
+            },
+            onFalse: function() {
+                window.location = PMI.path.logout;
+            }
         });
     }
 });

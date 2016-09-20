@@ -49,11 +49,11 @@ abstract class AbstractApplication extends Application
             $values['release'] = getenv('PMI_RELEASE') === false ?
                 date('YmdHis') : getenv('PMI_RELEASE');
         }
-        if (!array_key_exists('debug', $values)) {
-            $values['debug'] = $values['env'] === self::ENV_PROD ? false : true;
-        }
         if (!array_key_exists('isUnitTest', $values)) {
             $values['isUnitTest'] = false;
+        }
+        if (!array_key_exists('debug', $values)) {
+            $values['debug'] = ($values['env'] === self::ENV_PROD || $values['isUnitTest']) ? false : true;
         }
         $values['assetVer'] = $values['env'] === self::ENV_DEV ?
             date('YmdHis') : $values['release'];

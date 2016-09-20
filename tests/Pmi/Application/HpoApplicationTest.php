@@ -49,4 +49,18 @@ class HpoApplicationTest extends AbstractWebTestCase
         sleep($this->app['sessionTimeout']);
         $this->assertSame(true, $this->app->isLoginExpired());
     }
+
+    public function testUsageAgreement()
+    {
+        $email = 'testUsageAgreement@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/');
+        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
+        $crawler = $client->reload();
+        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
+        $crawler = $client->request('POST', '/agree');
+        $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')));
+    }
 }
