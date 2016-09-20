@@ -32,7 +32,12 @@ class HpoApplication extends AbstractApplication
         $app = $this;
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
+                'insecure' => [
+                    'pattern' => '^/timeout$',
+                    'anonymous' => true
+                ],
                 'main' => [
+                    'pattern' => '^/.*$',
                     'guard' => [
                         'authenticators' => [
                             'app.googlegroups_authenticator'
@@ -44,7 +49,7 @@ class HpoApplication extends AbstractApplication
                 ]
             ],
             'security.access_rules' => [
-                ['^/logout$', 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                ['^/timeout$', 'IS_AUTHENTICATED_ANONYMOUSLY'],
                 ['^/_dev/.*$', 'IS_AUTHENTICATED_FULLY'],
                 ['^/.*$', 'ROLE_USER']
             ]
@@ -124,6 +129,12 @@ class HpoApplication extends AbstractApplication
     
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
+        // log the user out if their session is expired
+        if ($this->isLoginExpired()) {
+            $this->logout(); // otherwise we will infinitely redirect to /logout
+            return $this->redirectToRoute('logout', ['timeout' => true]);
+        }
+        
         if ($this['session']->get('isLogin')) {
             $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
         }

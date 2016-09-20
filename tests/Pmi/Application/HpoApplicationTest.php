@@ -35,4 +35,18 @@ class HpoApplicationTest extends AbstractWebTestCase
         // gets set to false by the finishCallback()
         $this->assertSame(false, $this->app['session']->get('isLogin'));
     }
+    
+    public function testTimeout()
+    {
+        $email = 'testTimeout@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $this->app['sessionTimeout'] = 2;
+        $client = $this->createClient();
+        $client->request('POST', '/keepalive');
+        $this->assertSame(false, $this->app->isLoginExpired());
+        $this->assertEquals($email, $this->app->getUser()->getEmail());
+        sleep($this->app['sessionTimeout']);
+        $this->assertSame(true, $this->app->isLoginExpired());
+    }
 }

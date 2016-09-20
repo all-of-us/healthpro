@@ -1,8 +1,8 @@
 <?php
 namespace Pmi\Controller;
 
-use google\appengine\api\users\UserService;
 use Silex\Application;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -17,6 +17,9 @@ class DefaultController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['logout', '/logout'],
+        ['timeout', '/timeout'],
+        ['keepAlive', '/keepalive', [ 'method' => 'POST' ]],
+        ['clientTimeout', '/client-timeout', [ 'method' => 'GET' ]],
         ['groups', '/groups'],
         ['switchSite', '/site/{id}/switch'],
         ['participants', '/participants', ['method' => 'GET|POST']],
@@ -38,8 +41,36 @@ class DefaultController extends AbstractController
     
     public function logoutAction(Application $app, Request $request)
     {
+        $timeout = $request->get('timeout');
         $app->logout();
-        return $app->redirect($app->getGoogleLogoutUrl());
+        return $app->redirect($app->getGoogleLogoutUrl($timeout ? $app->generateUrl('timeout') : null));
+    }
+    
+    public function timeoutAction(Application $app, Request $request)
+    {
+        return $app['twig']->render('timeout.html.twig');
+    }
+    
+    /** Dummy action that serves to extend the user's session. */
+    public function keepAliveAction(Application $app, Request $request) {
+        $request->getSession()->set('pmiLastUsed', time());
+        $response = new JsonResponse();
+        $response->setData(array());
+        return $response;
+    }
+    
+    /**
+     * Handles a clientside session timeout, which might not be a true session
+     * timeout if the user is working in multiple tabs.
+     */
+    public function clientTimeoutAction(Application $app, Request $request) {
+        // if we got to this point, then the beforeCallback() has
+        // already checked the user's session is not expired - simply reload the page
+        if ($request->headers->get('referer')) {
+            return $app->redirect($request->headers->get('referer'));
+        } else {
+            return $app->redirect($app->generateUrl('home'));
+        }
     }
     
     public function groupsAction(Application $app, Request $request)

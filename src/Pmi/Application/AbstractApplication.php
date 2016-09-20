@@ -153,8 +153,11 @@ abstract class AbstractApplication extends Application
         return class_exists($cls) ? $cls::getCurrentUser() : null;
     }
     
-    public function getGoogleLogoutUrl($dest = '/')
+    public function getGoogleLogoutUrl($dest = null)
     {
+        if (!$dest) {
+            $dest = $this->generateUrl('home');
+        }
         $cls = $this->getGoogleServiceClass();
         return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
     }
@@ -163,6 +166,17 @@ abstract class AbstractApplication extends Application
     {
         $token = $this['security.token_storage']->getToken();
         return $token ? $token->getUser() : null;
+    }
+    
+    /** Is the user's session expired? */
+    public function isLoginExpired()
+    {
+        $time = time();
+        // custom "last used" session time updated on keepAliveAction
+        $idle = $time - $this['session']->get('pmiLastUsed', $time);
+        $remaining = $this['sessionTimeout'] - $idle;
+        $isLoggedIn = $this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('ROLE_USER');
+        return $isLoggedIn && $remaining <= 0;
     }
 
     protected function enableTwig()

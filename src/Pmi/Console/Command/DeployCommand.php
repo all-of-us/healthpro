@@ -356,6 +356,12 @@ class DeployCommand extends Command {
     private function requireGoogleLogin(&$config)
     {
         foreach (array_keys($config['handlers']) as $idx) {
+            $route = trim($config['handlers'][$idx]['url']);
+            // so we can display a user-friendly message when the session times
+            // out, rather than the Google account selector
+            if ($route === '/timeout') {
+                continue;
+            }
             $config['handlers'][$idx]['login'] = 'required';
         }
     }
