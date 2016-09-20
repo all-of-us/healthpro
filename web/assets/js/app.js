@@ -46,6 +46,7 @@ $(document).ready(function()
     if (PMI.isLogin) {
         new PmiConfirmModal({
             title: "FISMA MODERATE ENVIRONMENT",
+            dialogClass: "modal-lg",
             isHTML: true,
             msg: pmiGetTpl("pmiSystemUsageTpl")(),
             btnTextTrue: "Agree",
