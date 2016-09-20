@@ -15,11 +15,13 @@
     <script>
         var PMI = {
             "path": {
+                "agreeUsage": {{ path('agreeUsage')|json_encode|raw }},
                 "logout": {{ path('logout')|json_encode|raw }},
                 "switchSite": {{ path('switchSite', {id: "SITE_ID"})|json_encode|raw }}
             },
             "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
-            "isLogin": {{ app.session.get('isLogin') }}
+            "isLogin": {{ app.session.get('isLogin')|json_encode|raw }},
+            "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }}
         };
     </script>
 </head>
@@ -111,7 +113,7 @@
     
     {% include 'templates/alert.html.twig' %}
     {% include 'templates/confirm.html.twig' %}
-    {% if app.session.get('isLogin') %}
+    {% if not app.session.get('isUsageAgreed') %}
         {% include 'templates/system-usage.html.twig' %}
     {% endif %}
 

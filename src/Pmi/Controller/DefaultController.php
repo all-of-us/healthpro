@@ -17,6 +17,7 @@ class DefaultController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['logout', '/logout'],
+        ['agreeUsage', '/agree', ['method' => 'POST']],
         ['groups', '/groups'],
         ['switchSite', '/site/{id}/switch'],
         ['participants', '/participants', ['method' => 'GET|POST']],
@@ -40,6 +41,12 @@ class DefaultController extends AbstractController
     {
         $app->logout();
         return $app->redirect($app->getGoogleLogoutUrl());
+    }
+    
+    public function agreeUsageAction(Application $app, Request $request)
+    {
+        $request->getSession()->set('isUsageAgreed', true);
+        return (new JsonResponse())->setData([]);
     }
     
     public function groupsAction(Application $app, Request $request)

@@ -43,7 +43,7 @@ $(document).ready(function()
     /*************************************************************************
      * Display system usage agreement when user first logs in
      ************************************************************************/
-    if (PMI.isLogin) {
+    if (!PMI.isUsageAgreed) {
         new PmiConfirmModal({
             title: "FISMA MODERATE ENVIRONMENT",
             dialogClass: "modal-lg",
@@ -51,6 +51,9 @@ $(document).ready(function()
             isHTML: true,
             msg: pmiGetTpl("pmiSystemUsageTpl")(),
             btnTextTrue: "Agree",
+            onTrue: function() {
+                $.post(PMI.path.agreeUsage);
+            },
             onFalse: function() {
                 window.location = PMI.path.logout;
             }
