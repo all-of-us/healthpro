@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormError;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Mayolink\Order as MayoLinkOrder;
+use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 
 class DefaultController extends AbstractController
 {
@@ -133,10 +134,14 @@ class DefaultController extends AbstractController
 
         if ($searchForm->isValid()) {
             $searchParameters = $searchForm->getData();
-            $searchResults = $app['pmi.drc.participantsearch']->search($searchParameters);
-            return $app['twig']->render('participants-list.html.twig', [
-                'participants' => $searchResults
-            ]);
+            try {
+                $searchResults = $app['pmi.drc.participantsearch']->search($searchParameters);
+                return $app['twig']->render('participants-list.html.twig', [
+                    'participants' => $searchResults
+                ]);
+            } catch (ParticipantSearchExceptionInterface $e) {
+                $searchForm->addError(new FormError($e->getMessage()));
+            }
         }
 
         return $app['twig']->render('participants.html.twig', [

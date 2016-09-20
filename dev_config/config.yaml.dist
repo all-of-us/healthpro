@@ -1,0 +1,5 @@
+mysql_schema: hpo
+mysql_user: root
+mysql_password: ~
+mysql_host: 127.0.0.1
+rdr_endpoint: https://pmi-rdr-api-test.appspot.com/_ah/api/

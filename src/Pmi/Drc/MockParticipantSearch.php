@@ -1,7 +1,7 @@
 <?php
 namespace Pmi\Drc;
 
-class ParticipantSearch
+class MockParticipantSearch
 {
     // Mock API data
     protected static $data = [

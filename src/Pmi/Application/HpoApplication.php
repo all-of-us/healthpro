@@ -9,13 +9,32 @@ use Pmi\Security\UserProvider;
 class HpoApplication extends AbstractApplication
 {
     protected $configuration = [];
+    protected $participantSource = 'mock';
 
     public function setup()
     {
         parent::setup();
 
         $this->loadConfiguration();
-        $this['pmi.drc.participantsearch'] = new \Pmi\Drc\ParticipantSearch();
+
+        $rdrOptions = [];
+        if ($this->isDev()) {
+            $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
+            if (file_exists($keyFile)) {
+                $rdrOptions['key_file'] = $keyFile;
+            }
+            if ($this->getConfig('rdr_endpoint')) {
+                $rdrOptions['endpoint'] = $this->getConfig('rdr_endpoint');
+            }
+        }
+
+        $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
+        if ($this->participantSource == 'mock') {
+            $this['pmi.drc.participantsearch'] = new \Pmi\Drc\MockParticipantSearch();
+        } else {
+            $this['pmi.drc.participantsearch'] = new \Pmi\Drc\RdrParticipantSearch($this['pmi.drc.rdrhelper']);
+        }
+
         $this['pmi.drc.appsclient'] = $this['isUnitTest'] ?
             new \Tests\Pmi\Drc\AppsClient() : \Pmi\Drc\AppsClient::createFromApp($this);
 
@@ -58,6 +77,16 @@ class HpoApplication extends AbstractApplication
 
     protected function loadConfiguration()
     {
+        $appDir = realpath(__DIR__ . '/../../../');
+        $configFile = $appDir . '/dev_config/config.yml';
+        if ($this->isDev() && file_exists($configFile)) {
+            $yaml = new \Symfony\Component\Yaml\Parser();
+            $config = $yaml->parse(file_get_contents($configFile));
+            if (is_array($config) || count($config) > 0) {
+                $this->configuration = $config;
+            }
+        }
+
         if ($this['isUnitTest']) {
             return;
         }
