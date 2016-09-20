@@ -35,4 +35,18 @@ class HpoApplicationTest extends AbstractWebTestCase
         // gets set to false by the finishCallback()
         $this->assertSame(false, $this->app['session']->get('isLogin'));
     }
+    
+    public function testUsageAgreement()
+    {
+        $email = 'testUsageAgreement@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/');
+        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
+        $crawler = $client->reload();
+        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
+        $crawler = $client->request('POST', '/agree');
+        $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')));
+    }
 }
