@@ -11,6 +11,7 @@ skip_files:
 - ^(.*/)?\.gitignore$
 - ^(.*/)?\.git$
 - ^(.*/)?nbproject$
+- '^(.*/)?dev_config$'
 
 handlers:
 - url: /robots.txt

@@ -3,17 +3,11 @@ namespace Pmi\Drc;
 
 class ParticipantSearch
 {
-    protected static $endpoint = 'https://pmi-rdr-api-test.appspot.com/_ah/api/participant/v1/';
+    protected $rdrHelper;
 
-    protected function getClient()
+    public function __construct(RdrHelper $rdrHelper)
     {
-        $googleClient = new \Google_Client();
-        $googleClient->useApplicationDefaultCredentials();
-        $googleClient->addScope(\Google_Service_Oauth2::USERINFO_EMAIL);
-
-        return $googleClient->authorize(new \GuzzleHttp\Client([
-            'base_uri' => self::$endpoint
-        ]));
+        $this->rdrHelper = $rdrHelper;
     }
 
     protected function participantToResult($participant)
@@ -31,8 +25,8 @@ class ParticipantSearch
             'lastName' => $participant->last_name,
             'dob' => new \DateTime($participant->date_of_birth),
             'gender' => 'F',
-            'zip' => $participant->zip_code,
-            'consentComplete' => $participant->enrollment_status
+            'zip' => isset($participant->zip_code) ? $participant->zip_code : null,
+            'consentComplete' => isset($participant->enrollment_status) ? $participant->enrollment_status : null
         ];
     }
 
@@ -61,11 +55,12 @@ class ParticipantSearch
     {
         $query = $this->paramsToQuery($params);
         try {
-            $client = $this->getClient();
-            $response = $client->request('GET', 'participants', [
+            $client = $this->rdrHelper->getClient();
+            $response = $client->request('GET', 'participant/v1/participants', [
                 'query' => $query
             ]);
         } catch (\Exception $e) {
+            throw $e;
             throw new Exception\FailedRequestException();
         }
         $responseObject = json_decode($response->getBody()->getContents());
@@ -93,8 +88,8 @@ class ParticipantSearch
         $participant = $memcache->get($memcacheKey);
         if (!$participant) {
             try {
-                $client = $this->getClient();
-                $response = $client->request('GET', "participants/{$id}");
+                $client = $this->rdrHelper->getClient();
+                $response = $client->request('GET', "participant/v1/participants/{$id}");
                 $participant = json_decode($response->getBody()->getContents());
                 $memcache->set($memcacheKey, $participant, 0, 300);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
