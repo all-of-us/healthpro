@@ -1,5 +1,34 @@
+###
+# Local development configuration
+#   To avoid the tedious work required to add local Configuration entities to datastore,
+#   you can copy this file to config.yml and edit as necessary.  Any Configuration
+#   datastore entities will take precedence over these values.  Nothing in this directory
+#   is deployed to GAE projects and is only valid in dev.
+#
+# Google service account keys
+#   Store key files in this directory as specified in the comments below
+#   (rdr_key.json and googleapps_key.json)
+###
+
+# MySQL connection
 mysql_schema: hpo
 mysql_user: root
 mysql_password: ~
 mysql_host: 127.0.0.1
+
+# RDR API
+# store service account key in rdr_key.json
 rdr_endpoint: https://pmi-rdr-api-test.appspot.com/_ah/api/
+
+# MayoLINK configuration
+# Specify mock order ID to skip order creation in MayoLINK
+ml_mock_order: pmitest
+# Specify MayoLINK credentials to create real orders in MayoLINK
+# ml_username:
+# ml_password:
+
+# Google Apps configuration
+# store service account key in googleapps_key.json
+gaApplicationName: PMI DRC HPO
+gaDomain: staging.pmi-ops.org
+gaAdminEmail: hpo-api@staging.pmi-ops.org

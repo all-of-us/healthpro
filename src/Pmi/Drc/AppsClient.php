@@ -17,7 +17,10 @@ class AppsClient
     
     public static function createFromApp(HpoApplication $app)
     {
-        if ($app->getConfig('gaAuthJson')) {
+        $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/googleapps_key.json';
+        if ($app->isDev() && file_exists($keyFile)) {
+            return new self($app->getConfig('gaApplicationName'), file_get_contents($keyFile), $app->getConfig('gaAdminEmail'), $app->getConfig('gaDomain'), $app->isDev());
+        } elseif ($app->getConfig('gaAuthJson')) {
             return new self($app->getConfig('gaApplicationName'), $app->getConfig('gaAuthJson'), $app->getConfig('gaAdminEmail'), $app->getConfig('gaDomain'), $app->isDev());
         } else {
             return null;
