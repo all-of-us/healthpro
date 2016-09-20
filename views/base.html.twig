@@ -15,9 +15,11 @@
     <script>
         var PMI = {
             "path": {
+                "logout": {{ path('logout')|json_encode|raw }},
                 "switchSite": {{ path('switchSite', {id: "SITE_ID"})|json_encode|raw }}
             },
-            "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }}
+            "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
+            "isLogin": {{ app.session.get('isLogin') }}
         };
     </script>
 </head>
@@ -109,6 +111,9 @@
     
     {% include 'templates/alert.html.twig' %}
     {% include 'templates/confirm.html.twig' %}
+    {% if app.session.get('isLogin') %}
+        {% include 'templates/system-usage.html.twig' %}
+    {% endif %}
 
     <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
     {% block pagejs %}{% endblock %}

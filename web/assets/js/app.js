@@ -39,4 +39,19 @@ $(document).ready(function()
      $('.nav-tabs li.disabled a').on('click', function(e) {
         e.preventDefault();
      });
+     
+    /*************************************************************************
+     * Display system usage agreement when user first logs in
+     ************************************************************************/
+    if (PMI.isLogin) {
+        new PmiConfirmModal({
+            title: "FISMA MODERATE ENVIRONMENT",
+            isHTML: true,
+            msg: pmiGetTpl("pmiSystemUsageTpl")(),
+            btnTextTrue: "Agree",
+            onFalse: function() {
+                window.location = PMI.path.logout;
+            }
+        });
+    }
 });
