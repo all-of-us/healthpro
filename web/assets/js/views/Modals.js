@@ -32,6 +32,7 @@ window.PmiConfirmModal = Backbone.View.extend({
     _btnTextTrue: "OK",
     _btnTextFalse: "Cancel",
     _dialogClass: "",
+    _titleClass: "",
     _tplId: "pmiConfirmTpl",
     _showX: false,
     constructor: function(options) {
@@ -79,6 +80,11 @@ window.PmiConfirmModal = Backbone.View.extend({
             typeof options.dialogClass === "string")
         {
             this._dialogClass = options.dialogClass;
+        }
+        if (options.hasOwnProperty("titleClass") &&
+            typeof options.titleClass === "string")
+        {
+            this._titleClass = options.titleClass;
         }
         if (options.hasOwnProperty("showX") &&
             _.isBoolean(options.showX))
@@ -138,6 +144,12 @@ window.PmiConfirmModal = Backbone.View.extend({
         // then add any additional classes
         if (this._dialogClass.length > 0)
             this.$(".modal-dialog").addClass(this._dialogClass);
+        // reset the title class
+        this.$(".modal-title").attr("class", "modal-title");
+        // then add any additional classes
+        if (this._titleClass.length > 0)
+            this.$(".modal-title").addClass(this._titleClass);
+        
         this.$el.modal({backdrop: "static"});
     }
 });
