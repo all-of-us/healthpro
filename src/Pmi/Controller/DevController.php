@@ -21,7 +21,7 @@ class DevController extends AbstractController
         } elseif (!UserService::isCurrentUserAdmin()) {
             $app->addFlashError('Access denied!');
         } else {
-            $keys = ['test', 'gaDomain', 'gaApplicationName', 'gaAuthJson', 'gaAdminEmail'];
+            $keys = ['test'];
             foreach ($keys as $key) {
                 $value = $app->getConfig($key);
                 if ($value === null) {
