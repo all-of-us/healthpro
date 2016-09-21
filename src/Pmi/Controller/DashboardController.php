@@ -3,6 +3,7 @@ namespace Pmi\Controller;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Pmi\Drc\RdrMetrics;
 
 class DashboardController extends AbstractController
 {
@@ -10,9 +11,17 @@ class DashboardController extends AbstractController
     
     protected static $routes = [
         ['home', '/'],
-        ['demo', '/demo']
+        ['demo', '/demo'],
+        ['apitest', '/apitest']
     ];
-    
+
+    public function apitestAction(Application $app, Request $request)
+    {
+        $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+        $result = $metricsApi->metrics('PARTICIPANT_TOTAL');
+        return $app->json($result->bucket);
+    }
+
     public function homeAction(Application $app, Request $request)
     {
         return $app['twig']->render('dashboard/index.html.twig');
