@@ -300,6 +300,10 @@ class DefaultController extends AbstractController
                     }
                 } else {
                     if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
+                        $result = $app['pmi.drc.participants']->updateEvaluation($participant->id, $evalId, [
+                            'evaluation_version' => $dbArray['version'],
+                            'evaluation_data' => $dbArray['data']
+                        ]);
                         $app->addFlashNotice('Evaluation saved');
                         return $app->redirectToRoute('participantEval', [
                             'participantId' => $participant->id,

@@ -134,10 +134,40 @@ class RdrParticipants
         return false;
     }
 
+    public function getEvaluation($participantId, $evaluationId)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "participants/{$participantId}/evaluations/{$evaluationId}");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->evaluation_id)) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
+    }
+
     public function createEvaluation($participantId, $evaluation)
     {
         try {
             $response = $this->getClient()->request('POST', "participants/{$participantId}/evaluations", [
+                'json' => $evaluation
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->evaluation_id)) {
+                return $result->evaluation_id;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
+    }
+
+    public function updateEvaluation($participantId, $evaluationId, $evaluation)
+    {
+        try {
+            $response = $this->getClient()->request('PUT', "participants/{$participantId}/evaluations/{$evaluationId}", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
