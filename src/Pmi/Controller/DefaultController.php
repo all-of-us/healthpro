@@ -117,7 +117,7 @@ class DefaultController extends AbstractController
 
         if ($idForm->isValid()) {
             $id = $idForm->get('participantId')->getData();
-            $participant = $app['pmi.drc.participantsearch']->getById($id);
+            $participant = $app['pmi.drc.participants']->getById($id);
             if ($participant) {
                 return $app->redirectToRoute('participant', ['id' => $id]);
             }
@@ -135,7 +135,7 @@ class DefaultController extends AbstractController
         if ($searchForm->isValid()) {
             $searchParameters = $searchForm->getData();
             try {
-                $searchResults = $app['pmi.drc.participantsearch']->search($searchParameters);
+                $searchResults = $app['pmi.drc.participants']->search($searchParameters);
                 return $app['twig']->render('participants-list.html.twig', [
                     'participants' => $searchResults
                 ]);
@@ -172,7 +172,7 @@ class DefaultController extends AbstractController
 
         $recentOrders = $app['db']->fetchAll('SELECT * FROM orders ORDER BY created_ts DESC, id DESC LIMIT 5');
         foreach ($recentOrders as &$order) {
-            $order['participant'] = $app['pmi.drc.participantsearch']->getById($order['participant_id']);
+            $order['participant'] = $app['pmi.drc.participants']->getById($order['participant_id']);
         }
         return $app['twig']->render('orders.html.twig', [
             'idForm' => $idForm->createView(),
@@ -182,7 +182,7 @@ class DefaultController extends AbstractController
 
     public function participantAction($id, Application $app, Request $request)
     {
-        $participant = $app['pmi.drc.participantsearch']->getById($id);
+        $participant = $app['pmi.drc.participants']->getById($id);
         if (!$participant) {
             $app->abort(404);
         }
@@ -197,7 +197,7 @@ class DefaultController extends AbstractController
 
     public function orderCreateAction($participantId, Application $app, Request $request)
     {
-        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
+        $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
         }
@@ -257,7 +257,7 @@ class DefaultController extends AbstractController
 
     public function participantEvalAction($participantId, $evalId, Application $app, Request $request)
     {
-        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
+        $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
         }
@@ -285,6 +285,11 @@ class DefaultController extends AbstractController
                     $dbArray['participant_id'] = $participant->id;
                     $dbArray['created_ts'] = $dbArray['updated_ts'];
                     if ($app['db']->insert('evaluations', $dbArray) && ($evalId = $app['db']->lastInsertId())) {
+                        $app['pmi.drc.participants']->createEvaluation($participant->id, [
+                            'evaluation_id' => $evalId,
+                            'evaluation_version' => $dbArray['version'],
+                            'evaluation_data' => $dbArray['data']
+                        ]);
                         $app->addFlashNotice('Evaluation saved');
                         return $app->redirectToRoute('participantEval', [
                             'participantId' => $participant->id,
@@ -295,6 +300,10 @@ class DefaultController extends AbstractController
                     }
                 } else {
                     if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
+                        $result = $app['pmi.drc.participants']->updateEvaluation($participant->id, $evalId, [
+                            'evaluation_version' => $dbArray['version'],
+                            'evaluation_data' => $dbArray['data']
+                        ]);
                         $app->addFlashNotice('Evaluation saved');
                         return $app->redirectToRoute('participantEval', [
                             'participantId' => $participant->id,
