@@ -18,7 +18,10 @@ use Exception;
 class DeployCommand extends Command {
 
     /** GAE application IDs for production. */
-    private static $PROD_APP_IDS = [];
+    private static $PROD_APP_IDS = [
+        'pmi-hpo-staging',
+        'pmi-hpo-test'
+    ];
 
     /** Create release tag when deploying these application IDs. */
     private static $TAG_APP_IDS = [];
@@ -142,6 +145,11 @@ class DeployCommand extends Command {
             $output->writeln('');
             $output->writeln("Checking NPM dependencies...");
             $this->exec("{$this->appDir}/bin/npm install");
+
+            // ensure that we are up-to-date with the latest Bower dependencies
+            $output->writeln('');
+            $output->writeln("Checking Bower dependencies...");
+            $this->exec("{$this->appDir}/bin/bower install");
 
             // compile (concat/minify/copy) assets
             $output->writeln('');
@@ -348,6 +356,12 @@ class DeployCommand extends Command {
     private function requireGoogleLogin(&$config)
     {
         foreach (array_keys($config['handlers']) as $idx) {
+            $route = trim($config['handlers'][$idx]['url']);
+            // so we can display a user-friendly message when the session times
+            // out, rather than the Google account selector
+            if ($route === '/timeout') {
+                continue;
+            }
             $config['handlers'][$idx]['login'] = 'required';
         }
     }
@@ -383,7 +397,7 @@ class DeployCommand extends Command {
 
     private function runUnitTests()
     {
-        $this->exec("{$this->appDir}/vendor/bin/phpunit --testsuite unit");
+        $this->exec("{$this->appDir}/bin/phpunit");
     }
 
     /** Runs a shell command, displaying output as it is generated. */

@@ -1,4 +1,4 @@
-application: pmi-drc-hpo-test
+application: pmi-hpo-staging
 version: 1
 runtime: php55
 api_version: 1
@@ -7,9 +7,11 @@ skip_files:
 - ^(.*/)?vendor/mouf/nodejs-installer/.*$
 - ^(.*/)?vendor/nodejs/.*$
 - ^(.*/)?node_modules.*$
+- ^(.*/)?bower_components.*$
 - ^(.*/)?\.gitignore$
 - ^(.*/)?\.git$
 - ^(.*/)?nbproject$
+- '^(.*/)?dev_config$'
 
 handlers:
 - url: /robots.txt
@@ -22,6 +24,9 @@ handlers:
   secure: always
 - url: /assets
   static_dir: web/assets
+  secure: always
+- url: /timeout
+  script: web/index.php
   secure: always
 - url: /.*
   script: web/index.php

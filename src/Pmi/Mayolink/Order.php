@@ -75,4 +75,38 @@ class Order
         }
         return $matches[1];
     }
+
+    public function getPdf($id, $type)
+    {
+        if ($type == 'labels') {
+            $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/label-set");
+        } elseif ($type == 'requisition') {
+            $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/requisition");
+        } else {
+            return false;
+        }
+        if ($response->getStatusCode() !== 200) {
+            return false;
+        }
+        $stream = $response->getBody();
+        return $stream->getContents();
+    }
+
+    public function loginAndCreateOrder($username, $password, $options)
+    {
+        if ($this->login($username, $password)) {
+            return $this->create($options);
+        } else {
+            return false;
+        }
+    }
+
+    public function loginAndGetPdf($username, $password, $id, $type)
+    {
+        if ($this->login($username, $password)) {
+            return $this->getPdf($id, $type);
+        } else {
+            return false;
+        }
+    }
 }

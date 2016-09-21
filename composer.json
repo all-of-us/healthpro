@@ -1,12 +1,18 @@
 {
     "autoload": {
-        "psr-4": { "": "src/" }
+        "psr-4": { "": "src/", "Tests\\": "tests/" }
     },
     "require": {
+        "doctrine/dbal": "^2.5",
+        "google/apiclient": "^2.0",
+        "guzzlehttp/guzzle": "^6.2",
+        "paragonie/random_compat": "1.4.*",
         "silex/silex": "~2.0",
-        "twig/twig": "^1.24",
+        "symfony/browser-kit": "^3.1",
         "symfony/config": "^3.1",
         "symfony/console": "^3.0",
+        "symfony/css-selector": "^3.1",
+        "symfony/finder": "^3.1",
         "symfony/form": "^3.1",
         "symfony/process": "^3.1",
         "symfony/security": "^3.1",
@@ -14,10 +20,8 @@
         "symfony/twig-bridge": "^3.1",
         "symfony/validator": "^3.1",
         "symfony/yaml": "^3.1",
-        "symfony/finder": "^3.1",
-        "guzzlehttp/guzzle": "^6.2",
         "tomwalder/php-gds": "^2.1",
-        "doctrine/dbal": "^2.5"
+        "twig/twig": "^1.24"
     },
     "extra": {
         "mouf": {

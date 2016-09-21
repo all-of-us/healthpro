@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% block title %}Collect - Order {{ order.id }} - {% endblock %}
+{% block body %}
+    {% include 'order-header.html.twig' with { active: 'collect' } %}
+
+    {{ form_start(collectForm) }}
+        {{ form_widget(collectForm) }}
+        <p>
+            <button type="submit" class="btn btn-primary">
+                {% if order.collected_ts %}
+                    Update
+                {% else %}
+                    Save and mark as collected
+                {% endif %}
+            </button>
+        </p>
+    {{ form_end(collectForm) }}
+{% endblock %}

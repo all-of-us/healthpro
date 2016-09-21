@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+{% block title %}Finalize - Order {{ order.id }} - {% endblock %}
+{% block body %}
+    {% include 'order-header.html.twig' with { active: 'finalize' } %}
+
+    {{ form_start(finalizeForm) }}
+        {{ form_widget(finalizeForm) }}
+        <p>
+            <button type="submit" class="btn btn-primary">
+                {% if order.finalized_ts %}
+                    Update
+                {% else %}
+                    Save and mark as finalized
+                {% endif %}
+            </button>
+        </p>
+    {{ form_end(finalizeForm) }}
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function () {
+    $('input.sample-disabled').closest('label').addClass('text-danger');
+    $('input.sample-disabled').closest('div.checkbox').append('<small class="text-muted">was not collected/processed</small>');
+});
+</script>
+{% endblock %}

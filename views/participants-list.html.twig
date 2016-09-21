@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% block title %}Participants - {% endblock %}
 {% block body %}
     <div class="page-header">
         <h2>Participants</h2>
@@ -7,14 +8,22 @@
     <p><a href="{{ path('participants') }}">Return to participant lookup</a></p>
 
     {% if participants %}
-        <table class="table">
-            <thead><tr><th>Last Name</th><th>First Name</th><th>Date of Birth</th></tr></thead>
+        <table class="table table-striped">
+            <thead><tr><th></th><th>Last Name</th><th>First Name</th><th>Date of Birth</th><th>ZIP Code</th></tr></thead>
             <tbody>
                 {% for participant in participants %}
                     <tr>
+                        <td>
+                            {% if participant.consentComplete %}
+                                <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="fa fa-times-circle text-danger" aria-hidden="true"></i>
+                            {% endif %}
+                        </td>
                         <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}</a></td>
                         <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a></td>
                         <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.dob|date('n/j/Y') }}</a></td>
+                        <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.zip }}</a></td>
                     </tr>
                 {% endfor %}
             </tbody>

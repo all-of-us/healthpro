@@ -1,46 +1,92 @@
 <?php
 namespace Pmi\Application;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Pmi\Entities\Configuration;
+use Pmi\Security\UserProvider;
 
 class HpoApplication extends AbstractApplication
 {
     protected $configuration = [];
+    protected $participantSource = 'mock';
 
     public function setup()
     {
         parent::setup();
 
         $this->loadConfiguration();
-        $this['pmi.drc.participantsearch'] = new \Pmi\Drc\ParticipantSearch();
 
-        $app = $this;
-        
-        $this['app.googleapps_authenticator'] = function ($app) {
-            return new \Pmi\Security\GoogleAppsAuthenticator($app);
-        };
-        
-        $this->register(new \Silex\Provider\SecurityServiceProvider(), [
-            'security.firewalls' => [
-                'googleapps' => [
-                    'pattern' => '^/googleapps',
-                    'stateless' => true, // because Google handles auth state
-                    'guard' => [
-                        'authenticators' => [
-                            'app.googleapps_authenticator'
-                        ]
-                    ]
-                ]
-            ]
-        ]);
-        
+        $rdrOptions = [];
+        if ($this->isDev()) {
+            $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
+            if (file_exists($keyFile)) {
+                $rdrOptions['key_file'] = $keyFile;
+            }
+            if ($this->getConfig('rdr_endpoint')) {
+                $rdrOptions['endpoint'] = $this->getConfig('rdr_endpoint');
+            }
+        }
+
+        $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
+        if ($this->participantSource == 'mock') {
+            $this['pmi.drc.participantsearch'] = new \Pmi\Drc\MockParticipantSearch();
+        } else {
+            $this['pmi.drc.participantsearch'] = new \Pmi\Drc\RdrParticipantSearch($this['pmi.drc.rdrhelper']);
+        }
+
+        $this['pmi.drc.appsclient'] = $this['isUnitTest'] ?
+            new \Tests\Pmi\Drc\AppsClient() : \Pmi\Drc\AppsClient::createFromApp($this);
+
         $this->registerDb();
         return $this;
+    }
+    
+    protected function registerSecurity()
+    {
+        $this['app.googlegroups_authenticator'] = function ($app) {
+            return new \Pmi\Security\GoogleGroupsAuthenticator($app);
+        };
+        
+        $app = $this;
+        $this->register(new \Silex\Provider\SecurityServiceProvider(), [
+            'security.firewalls' => [
+                'insecure' => [
+                    'pattern' => '^/timeout$',
+                    'anonymous' => true
+                ],
+                'main' => [
+                    'pattern' => '^/.*$',
+                    'guard' => [
+                        'authenticators' => [
+                            'app.googlegroups_authenticator'
+                        ]
+                    ],
+                    'users' => function () use ($app) {
+                        return new UserProvider($app);
+                    }
+                ]
+            ],
+            'security.access_rules' => [
+                ['^/timeout$', 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                ['^/_dev/.*$', 'IS_AUTHENTICATED_FULLY'],
+                ['^/.*$', 'ROLE_USER']
+            ]
+        ]);
     }
 
     protected function loadConfiguration()
     {
+        $appDir = realpath(__DIR__ . '/../../../');
+        $configFile = $appDir . '/dev_config/config.yml';
+        if ($this->isDev() && file_exists($configFile)) {
+            $yaml = new \Symfony\Component\Yaml\Parser();
+            $config = $yaml->parse(file_get_contents($configFile));
+            if (is_array($config) || count($config) > 0) {
+                $this->configuration = $config;
+            }
+        }
+
         if ($this['isUnitTest']) {
             return;
         }
@@ -108,5 +154,26 @@ class HpoApplication extends AbstractApplication
 
         // prevent browsers from sending unencrypted requests
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    }
+    
+    protected function beforeCallback(Request $request, AbstractApplication $app)
+    {
+        // log the user out if their session is expired
+        if ($this->isLoginExpired()) {
+            $this->logout(); // otherwise we will infinitely redirect to /logout
+            return $this->redirectToRoute('logout', ['timeout' => true]);
+        }
+        
+        if ($this['session']->get('isLogin')) {
+            $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
+        }
+    }
+    
+    protected function finishCallback(Request $request, Response $response)
+    {
+        // only the first request handled is considered a login
+        if ($this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
+            $this['session']->set('isLogin', false);
+        }
     }
 }

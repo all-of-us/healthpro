@@ -2,11 +2,11 @@
 namespace Pmi\Application;
 
 use Exception;
-use google\appengine\api\users\UserService;
 use Memcache;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
 use Silex\Application;
+use Silex\Provider\CsrfServiceProvider;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\LocaleServiceProvider;
 use Silex\Provider\SessionServiceProvider;
@@ -49,16 +49,14 @@ abstract class AbstractApplication extends Application
             $values['release'] = getenv('PMI_RELEASE') === false ?
                 date('YmdHis') : getenv('PMI_RELEASE');
         }
-        if (!array_key_exists('debug', $values)) {
-            $values['debug'] = $values['env'] === self::ENV_PROD ? false : true;
-        }
         if (!array_key_exists('isUnitTest', $values)) {
             $values['isUnitTest'] = false;
         }
+        if (!array_key_exists('debug', $values)) {
+            $values['debug'] = ($values['env'] === self::ENV_PROD || $values['isUnitTest']) ? false : true;
+        }
         $values['assetVer'] = $values['env'] === self::ENV_DEV ?
             date('YmdHis') : $values['release'];
-        $googleUser = UserService::getCurrentUser();
-        $values['logoutUrl'] = $googleUser ? UserService::createLogoutURL('/') : null;
         
         parent::__construct($values);
     }
@@ -105,7 +103,7 @@ abstract class AbstractApplication extends Application
         }
         // Register finish middleware
         if (method_exists($this, 'finishCallback')) {
-            $this->after([$this, 'finishCallback']);
+            $this->finish([$this, 'finishCallback']);
         }
 
         $this->register(new LocaleServiceProvider());
@@ -114,25 +112,71 @@ abstract class AbstractApplication extends Application
         ]);
 
         // Register Form service
+        $this->register(new CsrfServiceProvider());
         $this->register(new FormServiceProvider());
         $this->register(new ValidatorServiceProvider());
+
+        if (isset($this['sessionHandler'])) {
+            switch ($this['sessionHandler']) {
+                case 'memcache':
+                    $this->enableMemcacheSession();
+                    break;
+                case 'datastore':
+                    $this->enableDatastoreSession();
+                    break;
+            }
+        }
+        
+        // configure security and boot before enabling twig so that `is_granted` will be available
+        $this->registerSecurity();
+        $this->boot();
 
         // Register and configure Twig
         if (isset($this['templatesDirectory']) && $this['templatesDirectory']) {
             $this->enableTwig();
         }
 
-        // Configure Memcache session handler
-        if (isset($this['memcacheSession']) && $this['memcacheSession']) {
-            $this->enableMemcacheSession();
-        }
-
-        // Configure Datastore session handler
-        if (isset($this['datastoreSession']) && $this['datastoreSession']) {
-            $this->enableDatastoreSession();
-        }
-
         return $this;
+    }
+
+    abstract protected function registerSecurity();
+    
+    public function getGoogleServiceClass()
+    {
+        return $this['isUnitTest'] ? 'Tests\Pmi\GoogleUserService' :
+            'google\appengine\api\users\UserService';
+    }
+    
+    public function getGoogleUser()
+    {
+        $cls = $this->getGoogleServiceClass();
+        return class_exists($cls) ? $cls::getCurrentUser() : null;
+    }
+    
+    public function getGoogleLogoutUrl($dest = null)
+    {
+        if (!$dest) {
+            $dest = $this->generateUrl('home');
+        }
+        $cls = $this->getGoogleServiceClass();
+        return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
+    }
+    
+    public function getUser()
+    {
+        $token = $this['security.token_storage']->getToken();
+        return $token ? $token->getUser() : null;
+    }
+    
+    /** Is the user's session expired? */
+    public function isLoginExpired()
+    {
+        $time = time();
+        // custom "last used" session time updated on keepAliveAction
+        $idle = $time - $this['session']->get('pmiLastUsed', $time);
+        $remaining = $this['sessionTimeout'] - $idle;
+        $isLoggedIn = $this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('ROLE_USER');
+        return $isLoggedIn && $remaining <= 0;
     }
 
     protected function enableTwig()
@@ -202,6 +246,12 @@ abstract class AbstractApplication extends Application
         $this->register(new SessionServiceProvider());
         $this['session.storage.handler'] = new DatastoreSessionHandler();
     }
+    
+    public function logout()
+    {
+        $this['security.token_storage']->setToken(null);
+        $this['session']->invalidate();
+    }
 
     public function generateUrl($route, $parameters = [])
     {
@@ -241,5 +291,11 @@ abstract class AbstractApplication extends Application
     {
         $string = $this['translator']->trans($string, $translationParams);
         $this->addFlash('notice', $string);
+    }
+    
+    public function addFlashSuccess($string, array $translationParams = [])
+    {
+        $string = $this['translator']->trans($string, $translationParams);
+        $this->addFlash('success', $string);
     }
 }

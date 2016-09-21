@@ -1,45 +1,66 @@
 <?php
-use Pmi\Application\HpoApplication;
-use Pmi\Controller;
+use Tests\Pmi\AbstractWebTestCase;
+use Tests\Pmi\GoogleGroup;
+use Tests\Pmi\GoogleUserService;
+use Tests\Pmi\Drc\AppsClient;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class HpoApplicationTest extends \PHPUnit_Framework_TestCase
+class HpoApplicationTest extends AbstractWebTestCase
 {
-    public function testApplication()
+    private $isLoginAfter;
+    
+    protected function afterCallback(Request $request, Response $response) {
+        $this->isLoginAfter = $this->app['session']->get('isLogin');
+    }
+    
+    public function testController()
     {
-        putenv('PMI_ENV=' . HpoApplication::ENV_DEV);
-        $app = new HpoApplication([
-            'templatesDirectory' => __DIR__ . '/../../../views',
-            'errorTemplate' => 'error.html.twig',
-            'isUnitTest' => true
-        ]);
-        $app->setup();
-        $app->register(new \Silex\Provider\SessionServiceProvider(), [
-            'session.test' => true
-        ]);
-
-        $this->assertArrayHasKey('locale', $app);
-        $this->assertArrayHasKey('translator', $app);
-        $this->assertArrayHasKey('form.factory', $app);
-        $this->assertArrayHasKey('translator', $app);
-        $this->assertArrayHasKey('validator', $app);
-        $this->assertArrayHasKey('twig', $app);
-        $this->assertArrayHasKey('pmi.drc.participantsearch', $app);
-
-        $app->boot();
-
-        return $app;
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/');
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+    }
+    
+    public function testLogin()
+    {
+        $email = 'testLogin@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $this->assertSame(null, $this->app['session']->get('isLogin'));
+        $client = $this->createClient();
+        // should result in a successful login since the Google stuff is set
+        $crawler = $client->request('GET', '/');
+        // should still be true during the after callbacks
+        $this->assertSame(true, $this->isLoginAfter);
+        // gets set to false by the finishCallback()
+        $this->assertSame(false, $this->app['session']->get('isLogin'));
+    }
+    
+    public function testTimeout()
+    {
+        $email = 'testTimeout@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $this->app['sessionTimeout'] = 2;
+        $client = $this->createClient();
+        $client->request('POST', '/keepalive');
+        $this->assertSame(false, $this->app->isLoginExpired());
+        $this->assertEquals($email, $this->app->getUser()->getEmail());
+        sleep($this->app['sessionTimeout']);
+        $this->assertSame(true, $this->app->isLoginExpired());
     }
 
-    /**
-     * @depends testApplication
-     */
-    public function testController($app)
+    public function testUsageAgreement()
     {
-        $app->mount('/', new Controller\DefaultController())
-            ->mount('/googleapps', new Controller\GoogleAppsController());
-        ob_start();
-        $app->run();
-        $output = ob_get_clean();
-        $this->assertRegExp('/<h2>Welcome!<\/h2>/', $output);
+        $email = 'testUsageAgreement@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/');
+        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
+        $crawler = $client->reload();
+        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
+        $crawler = $client->request('POST', '/agree');
+        $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')));
     }
 }

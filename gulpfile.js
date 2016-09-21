@@ -3,14 +3,19 @@ var BOWER_DIR = './bower_components';
 var ASSETS = {
     'js': [
         BOWER_DIR + '/jquery/dist/jquery.min.js',
+        BOWER_DIR + '/moment/min/moment.min.js',
         BOWER_DIR + '/bootstrap/dist/js/bootstrap.min.js',
         BOWER_DIR + '/underscore/underscore-min.js',
         BOWER_DIR + '/backbone/backbone-min.js',
-        ASSETS_DIR + '/js/app.js'
+        BOWER_DIR + '/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
+        ASSETS_DIR + '/js/bootstrap-session-timeout.js',
+        ASSETS_DIR + '/js/app.js',
+        ASSETS_DIR + '/js/views/*'
     ],
     'css': [
         BOWER_DIR + '/bootstrap/dist/css/bootstrap.min.css',
-        BOWER_DIR + '/font-awesome/css/font-awesome.min.css'
+        BOWER_DIR + '/font-awesome/css/font-awesome.min.css',
+        BOWER_DIR + 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css'
     ],
     'csslocal': [
         ASSETS_DIR + '/css/app.css'
@@ -51,7 +56,7 @@ gulp.task('compile-css', function() {
     var lib = gulp.src(ASSETS.css)
         .pipe(concat('lib.css'))
         .pipe(gulp.dest(destDir))
-        .pipe(cssnano())
+        .pipe(cssnano({zindex: false}))
         .pipe(rename('lib.min.css'))
         .pipe(gulp.dest(destDir));
 
@@ -60,7 +65,7 @@ gulp.task('compile-css', function() {
         .pipe(cssconcat(cssDir + '/app.css'))
         .pipe(gulp.dest(localDestDir))
         .pipe(sourcemaps.init())
-            .pipe(cssnano())
+            .pipe(cssnano({zindex: false}))
             .pipe(rename(cssDir + '/app.min.css'))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(localDestDir));

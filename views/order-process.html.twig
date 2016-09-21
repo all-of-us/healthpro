@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+{% block title %}Process - Order {{ order.id }} - {% endblock %}
+{% block body %}
+    {% include 'order-header.html.twig' with { active: 'process' } %}
+
+    {{ form_start(processForm) }}
+        {{ form_widget(processForm) }}
+        <p>
+            <button type="submit" class="btn btn-primary">
+                {% if order.processed_ts %}
+                    Update
+                {% else %}
+                    Save and mark as processed
+                {% endif %}
+            </button>
+        </p>
+    {{ form_end(processForm) }}
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function () {
+    $('input.sample-disabled').closest('label').addClass('text-danger');
+    $('input.sample-disabled').closest('div.checkbox').append('<small class="text-muted">was not collected</small>');
+});
+</script>
+{% endblock %}

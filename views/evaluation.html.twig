@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+{% block title %}Physical Evaluation - {% endblock %}
+{% block body %}
+    {{ form_errors(evaluationForm) }}
+
+    <div class="alert alert-warning">
+        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+        Evaluation form is under construction and incomplete
+    </div>
+
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-clipboard" aria-hidden="true"></i>
+            {% if evaluation %}
+                {{ evaluation.created_ts|date('n/j/Y') }}
+            {% else %}
+                New Evaluation
+            {% endif %}
+            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</a></small>
+        </h2>
+    </div>
+    <dl class="dl-horizontal">
+        <dt>DOB</dt>
+        <dd>{{ participant.dob|date('n/j/Y') }}</dd>
+        <dt>Gender</dt>
+        <dd>{{ participant.gender }}</dd>
+        {% if evaluation %}
+            <dt>Evaluation updated</dt>
+            <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia') }}</dd>
+        {% endif %}
+    </dl>
+
+    <div id="physicalEvaluation">
+        {{ form_start(evaluationForm) }}
+            {% for field in schema.fields %}
+                <div data-field="{{ field.name }}" class="field field-{{ field.name }} form-group{% if not evaluationForm[field.name].vars.valid and field.replicates is not defined %} has-error{% endif %}">
+                    {{ form_label(evaluationForm[field.name]) }}
+                    {% if field.image is defined %}
+                        <div class="row">
+                            <div class="col-xs-10 col-sm-11">
+                    {% endif %}
+                        {% if field.replicates is defined %}
+                            <div class="row replicate">
+                            {% for replicateField in evaluationForm[field.name] %}
+                                <div class="col-xs-4{% if not replicateField.vars.valid %} has-error{% endif %}">
+                                {% if field.unit is defined %}
+                                    <div class="input-group">
+                                {% endif %}
+                                    {{ form_widget(replicateField) }}
+                                {% if field.unit is defined %}
+                                        <div class="input-group-addon">{{ field.unit }}</div>
+                                    </div>
+                                {% endif %}
+                                {{ form_errors(replicateField) }}
+                                </div>
+                            {% endfor %}
+                            </div>
+                            <div id="mean-{{ field.name }}" class="mean"></div>
+                        {% else %}
+                            {% if field.unit is defined %}
+                                <div class="input-group">
+                            {% endif %}
+                                {{ form_widget(evaluationForm[field.name]) }}
+                            {% if field.unit is defined %}
+                                    <div class="input-group-addon">{{ field.unit }}</div>
+                                </div>
+                            {% endif %}
+                            {{ form_errors(evaluationForm[field.name]) }}
+                        {% endif %}
+                    {% if field.image is defined %}
+                            </div>
+                            <div class="col-xs-2 col-sm-1">
+                                <img src="{{ asset('img/eval/'~field.image) }}" class="img-responsive help-image" />
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <p><a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a> <button type="submit" class="btn btn-primary">Save</button></p>
+        {{ form_end(evaluationForm) }}
+
+        <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body text-center">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
