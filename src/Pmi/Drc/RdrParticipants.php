@@ -1,7 +1,9 @@
 <?php
 namespace Pmi\Drc;
 
-class RdrParticipantSearch
+use Ramsey\Uuid\Uuid;
+
+class RdrParticipants
 {
     protected $rdrHelper;
     protected $client;
@@ -28,15 +30,19 @@ class RdrParticipantSearch
         if (!isset($participant->drc_internal_id)) {
             return false;
         }
-
+        if (isset($participant->enrollment_status) && $participant->enrollment_status == 'CONSENTED') {
+            $consentStatus = true;
+        } else {
+            $consentStatus = false;
+        }
         return (object)[
             'id' => $participant->drc_internal_id,
             'firstName' => $participant->first_name,
             'lastName' => $participant->last_name,
             'dob' => new \DateTime($participant->date_of_birth),
-            'gender' => 'F',
+            'gender' => 'U',
             'zip' => isset($participant->zip_code) ? $participant->zip_code : null,
-            'consentComplete' => isset($participant->enrollment_status) ? $participant->enrollment_status : null
+            'consentComplete' => isset($participant->enrollment_status) ? $participant->enrollment_status == 'CONSENTED' : null
         ];
     }
 
@@ -105,5 +111,26 @@ class RdrParticipantSearch
         }
 
         return $this->participantToResult($participant);
+    }
+
+    public function create($parameters)
+    {
+        if (isset($parameters['date_of_birth'])) {
+            $dt = new \DateTime($parameters['date_of_birth']);
+            $parameters['date_of_birth'] = $dt->format('Y-m-d\T00:00:00');
+        }
+        $parameters['biobank_id'] = Uuid::uuid4();
+        try {
+            $response = $this->getClient()->request('POST', 'participants', [
+                'json' => $parameters
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->biobank_id) && $result->biobank_id == $parameters['biobank_id']) {
+                return $result->drc_internal_id;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
     }
 }

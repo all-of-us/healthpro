@@ -9,7 +9,7 @@ use Pmi\Security\UserProvider;
 class HpoApplication extends AbstractApplication
 {
     protected $configuration = [];
-    protected $participantSource = 'mock';
+    protected $participantSource = 'rdr';
 
     public function setup()
     {
@@ -32,7 +32,7 @@ class HpoApplication extends AbstractApplication
         if ($this->participantSource == 'mock') {
             $this['pmi.drc.participantsearch'] = new \Pmi\Drc\MockParticipantSearch();
         } else {
-            $this['pmi.drc.participantsearch'] = new \Pmi\Drc\RdrParticipantSearch($this['pmi.drc.rdrhelper']);
+            $this['pmi.drc.participantsearch'] = new \Pmi\Drc\RdrParticipants($this['pmi.drc.rdrhelper']);
         }
 
         $this['pmi.drc.appsclient'] = $this['isUnitTest'] ?
