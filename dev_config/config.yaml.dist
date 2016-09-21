@@ -35,3 +35,6 @@ gaBypass: 1
 gaApplicationName: PMI DRC HPO
 gaDomain: staging.pmi-ops.org
 gaAdminEmail: hpo-api@staging.pmi-ops.org
+
+# IP whitelist (CSV)
+ip_whitelist:

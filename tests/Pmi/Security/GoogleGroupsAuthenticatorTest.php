@@ -102,4 +102,35 @@ class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
         GoogleUserService::switchCurrentUser('rogue@hacker.com');
         $this->assertEquals($auth->buildCredentials(null), $auth->getCredentials($this->getRequest()));
     }
+    
+    function testIpWhitelist()
+    {
+        $this->app->setConfig('ip_whitelist', '');
+        $auth = new GoogleGroupsAuthenticator($this->app);
+        $this->assertEquals([], $auth->getIpWhitelist());
+        
+        $this->app->setConfig('ip_whitelist', '127.0.0.1');
+        $auth = new GoogleGroupsAuthenticator($this->app);
+        $this->assertEquals(['127.0.0.1' => '127.0.0.1'], $auth->getIpWhitelist());
+        
+        $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.8 ');
+        $auth = new GoogleGroupsAuthenticator($this->app);
+        $this->assertEquals(['127.0.0.1' => '127.0.0.1', '8.8.8.8' => '8.8.8.8'], $auth->getIpWhitelist());
+        
+        $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.8 , 0.0.0.0');
+        $auth = new GoogleGroupsAuthenticator($this->app);
+        $this->assertEquals(['127.0.0.1' => '127.0.0.1', '8.8.8.8' => '8.8.8.8', '0.0.0.0' => '0.0.0.0'], $auth->getIpWhitelist());
+        
+        try {
+            $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.256 , 0.0.0.0');
+            $auth = new GoogleGroupsAuthenticator($this->app);
+            $caught = false;
+            $msg = '';
+        } catch (\Exception $e) {
+            $caught = true;
+            $msg = $e->getMessage();
+        }
+        $this->assertSame(true, $caught);
+        $this->assertNotEquals(false, strstr($msg, '8.8.8.256'));
+    }
 }

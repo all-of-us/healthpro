@@ -17,10 +17,35 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 {
     private $app;
+    private $ipWhitelist;
     
     public function __construct(AbstractApplication $app)
     {
         $this->app = $app;
+        $this->ipWhitelist = $this->buildIpWhitelist();
+    }
+    
+    private function buildIpWhitelist()
+    {
+        $list = [];
+        $config = $this->app->getConfig('ip_whitelist');
+        if ($config) {
+            $ips = explode(',', $config);
+            foreach ($ips as $ip) {
+                $ip = trim($ip);
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    $list[$ip] = $ip;
+                } else {
+                    throw new \Exception("Bad IP address in whitelist: $ip");
+                }
+            }
+        }
+        return $list;
+    }
+    
+    public function getIpWhitelist()
+    {
+        return $this->ipWhitelist;
     }
     
     public function buildCredentials($googleUser)
