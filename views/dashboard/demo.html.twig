@@ -1,28 +1,36 @@
 {% extends 'dashboard/base.html.twig' %}
 {% block body %}
+    <h2><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard</h2>
+    <br />
     <ul class="nav nav-tabs top-pad" role="tablist">
         <li role="presentation" class="active"><a href="#participants-by-time" role="tab" data-toggle="tab" id="participants-by-time-nav"><span class="fa fa-calendar"></span> Participant Categories Over Time</a></li>
-        <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab" id="participants-by-region-nav"><span class="fa fa-map"></span> Participants by Region</a></li>
+        <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab" id="participants-by-region-nav"><span class="fa fa-globe"></span> Participants by Region</a></li>
+        <li role="presentation"><a href="#participants-by-lifecycle" role="tab" data-toggle="tab" id="participants-by-lifecycle-nav"><span class="fa fa-sitemap"></span> Participants by Lifecycle Phase</a></li>
+        <li role="presentation"><a href="#total-progress" role="tab" data-toggle="tab" id="total-progress-nav"><span class="fa fa-users"></span> Total Progress to Date</a></li>
     </ul>
     <div id="plotly-tabs" class="tab-content">
         <div id="participants-by-time" class="tab-pane pad active fade in">
             <div class="well">
                 <div class="row form-group-sm">
-                    <div class="col-sm-4">
+                    <div class="col-sm-3">
                         <label>Plot</label>
                         <select class="form-control time-plot-control" id="plot-value">
-                            <option value="enrollment_status" selected>Participant Tier</option>
-                            <option value="race">Race</option>
-                            <option value="ethnicity">Ethnicity</option>
-                            <option value="gender">Gender</option>
-                            <option value="age">Age</option>
+                            <option value="participant_tiers" selected>Participant Tier</option>
+                            <option value="races">Race</option>
+                            <option value="ethnicities">Ethnicity</option>
+                            <option value="gender_identities">Gender Identity</option>
+                            <option value="age_groups">Age</option>
                         </select>
                     </div>
-                    <div class="col-sm-4">
-                        <label>Cutoff Date (inclusive)</label>
+                    <div class="col-sm-3">
+                        <label>Start Date <span class="label label-info">optional</span> </label>
+                        <input type="text" class="form-control datepicker time-plot-control" id="start-date" />
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Cutoff Date</label>
                         <input type="text" class="form-control datepicker time-plot-control" id="end-date" />
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-3">
                         <label>Interval</label>
                         <select class="form-control time-plot-control" id="interval">
                             <option value="months">Months</option>
@@ -39,17 +47,33 @@
                 function renderPlot() {
                     launchSpinner('participants-by-time');
                     var width = $('#plotly-participants-by-time').width() - 30;
-                    var endDate = $('#end-date').val()
+                    var startDate = $('#start-date').val();
+                    var endDate = $('#end-date').val();
                     var attribute = $('#plot-value').val();
                     var displayText = $('#plot-value option:selected').text();
                     var interval = $('#interval').val();
-                    $.getJSON('/dashboard/load_data?end_date=' + endDate + '&attribute=' + attribute + '&interval=' + interval, function(data) {
+                    $.getJSON('/dashboard/load_data?start_date=' + startDate + '&end_date=' + endDate + '&attribute=' + attribute + '&interval=' + interval, function(data) {
+                        var timeTitle;
+                        if ($('#start-date').val() == '') {
+                            timeTitle = 'Participant registrations by ' + displayText + ' as of ' + endDate;
+                        } else {
+                            timeTitle = 'Participant registrations by ' + displayText + ' from ' + startDate + ' to ' + endDate;
+                        }
+
+                        var timeAnnot = [];
                         var timeLayout = {
-                            title: 'Participant registrations by ' + displayText + ' as of ' + endDate,
+                            title: timeTitle,
                             width: width,
                             barmode: 'stack',
-                            font: PLOTLY_LABEL_FONT
+                            font: PLOTLY_LABEL_FONT,
+                            annotations: timeAnnot
                         };
+
+                        // only load totals when interval is not set to days
+                        if (interval != 'days') {
+                            loadBarChartAnnotations(data, timeAnnot);
+                        }
+
                         Plotly.newPlot('plotly-participants-by-time', data, timeLayout, PLOTLY_OPTS);
                         stopSpinner('participants-by-time');
                     });
@@ -86,13 +110,17 @@
                         <label>Plot</label>
                         <select class="form-control region-plot-control" id="map-mode">
                             <option value="states" selected>States</option>
-                            <option value="regions">Census Regions</option>
-                            <option value="hpo_category">Recruitment Origin</option>
+                            <option value="census_regions">Census Regions</option>
+                            <option value="recruitment_centers">Recruitment Origin</option>
                         </select>
                     </div>
                     <div class="col-sm-4">
-                        <label>Cutoff Date (inclusive)</label>
-                        <input type="text" class="form-control region-plot-control datepicker" id="region-date" />
+                        <label>Start Date <span class="label label-info">optional</span> </label>
+                        <input type="text" class="form-control region-plot-control datepicker" id="region-date-start" />
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Cutoff Date</label>
+                        <input type="text" class="form-control region-plot-control datepicker" id="region-date-end" />
                     </div>
                 </div>
             </div>
@@ -105,12 +133,19 @@
                 function renderMap() {
                     launchSpinner('participants-by-region');
                     var mapWidth = $('#plotly-participants-by-region').width() - 30;
-                    var mapEndDate = $('#region-date').val();
+                    var mapStartDate = $('#region-date-start').val();
+                    var mapEndDate = $('#region-date-end').val();
                     var mapMode = $('#map-mode').val();
                     var mapModeText = $('#map-mode option:selected').text();
-                    $.getJSON('/dashboard/load_map_data?end_date=' + mapEndDate + '&map_mode=' + mapMode, function(data) {
+                    $.getJSON('/dashboard/load_map_data?start_date=' + mapStartDate + '&end_date=' + mapEndDate + '&map_mode=' + mapMode, function(data) {
+                        var mapTitle;
+                        if ($('#region-date-start').val() == '') {
+                            mapTitle = 'Participant registrations by ' + mapModeText + ' as of ' + mapEndDate;
+                        } else {
+                            mapTitle = 'Participant registrations by ' + mapModeText + ' from ' + mapStartDate + ' to ' + mapEndDate;
+                        }
                         var mapLayout = {
-                            title: 'Participant registrations by ' + mapModeText + ' as of ' + mapEndDate,
+                            title: mapTitle,
                             font: PLOTLY_LABEL_FONT,
                             showlegend: false,
                             width: mapWidth,
@@ -124,7 +159,7 @@
 
                 // set default of today's date
                 var today = new Date().toISOString().split('T')[0];
-                $('#region-date').val(today);
+                $('#region-date-end').val(today);
 
                 // load plot on tab show (to save loading time)
                 $('#participants-by-region-nav').on('shown.bs.tab', function (e) {
@@ -145,6 +180,110 @@
                 });
             </script>
         </div>
-    </div>
+        <div id="participants-by-lifecycle" class="tab-pane pad fade">
+            <div class="well">
+                <div class="row form-group-sm">
+                    <div class="col-sm-4">
+                        <label>Start Date <span class="label label-info">optional</span> </label>
+                        <input type="text" class="form-control lifecycle-plot-control datepicker" id="lifecycle-date-start" />
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Cutoff Date</label>
+                        <input type="text" class="form-control lifecycle-plot-control datepicker" id="lifecycle-date-end" />
+                    </div>
+                </div>
+            </div>
+            <div id="plotly-participants-by-lifecycle"></div>
+            <script type="text/javascript">
+                // function to grab current filter values and load JSON from load_map_data REST endpoint
+                // success handler calls Plotly.newplot()
+                function renderLcPlot() {
+                    launchSpinner('participants-by-lifecycle');
+                    var lcWidth = $('#plotly-participants-by-lifecycle').width() - 30;
+                    var lcStartDate = $('#lifecycle-date-start').val();
+                    var lcEndDate = $('#lifecycle-date-end').val();
+                    $.getJSON('/dashboard/load_lifecycle_data?start_date=' + lcStartDate + '&end_date=' + lcEndDate, function(data) {
+                        var lcTitle;
+                        if ($('#lifecycle-date-start').val() == '') {
+                            lcTitle = 'Participant registrations by participant tier and life cycle as of ' + lcEndDate;
+                        } else {
+                            lcTitle = 'Participant registrations by participant tier and life cycle from ' + lcStartDate + ' to ' + lcEndDate;
+                        }
+                        var lcAnnot = [];
+                        var lcLayout = {
+                            title: lcTitle,
+                            font: PLOTLY_LABEL_FONT,
+                            barmode: 'stack',
+                            width: lcWidth,
+                            annotations: loadBarChartAnnotations(data, lcAnnot)
+                        };
+                        Plotly.newPlot('plotly-participants-by-lifecycle', data, lcLayout, PLOTLY_OPTS);
+                        stopSpinner('participants-by-lifecycle');
+                    });
+                }
 
+                // set default of today's date
+                var today = new Date().toISOString().split('T')[0];
+                $('#lifecycle-date-end').val(today);
+
+                // load plot on tab show (to save loading time)
+                $('#participants-by-lifecycle-nav').on('shown.bs.tab', function (e) {
+                    console.log('Showing lifecycle plot charts');
+                    renderLcPlot();
+                });
+
+                // re-render on date change
+                $('.lifecycle-plot-control').change(function() {
+                    renderLcPlot();
+                });
+
+                // re-render on window resizeEnd if tab is visible
+                $( window ).on('resizeEnd', function() {
+                    if ($('#participants-by-lifecycle').is(':visible')) {
+                        renderLcPlot();
+                    }
+                });
+            </script>
+        </div>
+        <div id="total-progress" class="tab-pane pad fade">
+            <div class="row">
+                <div id="plotly-total-progress" class="col-md-offset-3 col-md-6"></div>
+            </div>
+            <script type="text/javascript">
+                // function to grab current filter values and load JSON from load_map_data REST endpoint
+                // success handler calls Plotly.newplot()
+                function renderTotalProgressPlot() {
+                    launchSpinner('total-progress');
+                    var tpWidth = $('#plotly-total-progress').width() - 30;
+                    $.getJSON('/dashboard/total_progress', function(data) {
+                        var tpLayout = {
+                            title: 'Total Progress to Date',
+                            font: PLOTLY_LABEL_FONT,
+                            barmode: 'stack',
+                            yaxis: {
+                                range: [0, 1000000]
+                            },
+                            width: tpWidth,
+                            height: tpWidth
+                        };
+                        Plotly.newPlot('plotly-total-progress', data, tpLayout, PLOTLY_OPTS);
+                        stopSpinner('total-progress');
+                    });
+                }
+
+                // load plot on tab show (to save loading time)
+                $('#total-progress-nav').on('shown.bs.tab', function (e) {
+                    console.log('Showing total progress charts');
+                    renderTotalProgressPlot();
+                });
+
+                // re-render on window resizeEnd if tab is visible
+                $( window ).on('resizeEnd', function() {
+                    if ($('#total-progress').is(':visible')) {
+                        renderTotalProgressPlot();
+                    }
+                });
+            </script>
+        </div>
+    </div>
 {% endblock %}

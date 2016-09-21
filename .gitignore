@@ -9,3 +9,4 @@ php.ini
 /cache/
 /dev_config/*
 !dev_config/config.yaml.dist
+.idea

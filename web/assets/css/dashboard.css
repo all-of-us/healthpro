@@ -1,1 +1,5 @@
 /* Styles for dashboard interface */
+
+.plotly-div {
+    min-height: 500px;
+}

@@ -2,6 +2,10 @@
  * Dashboard scripts to run on every page in /dashboard
  */
 
+var COLORBREWER_SET = ['rgb(166,206,227)','rgb(31,120,180)','rgb(178,223,138)','rgb(51,160,44)','rgb(251,154,153)',
+    'rgb(227,26,28)', 'rgb(253,191,111)','rgb(255,127,0)','rgb(202,178,214)','rgb(106,61,154)','rgb(255,255,153)',
+    'rgb(177,89,40)'];
+
 var PLOTLY_OPTS = {
     modeBarButtonsToRemove: ['sendDataToCloud']
 };
