@@ -105,6 +105,11 @@ class HpoApplication extends AbstractApplication
         }
     }
 
+    public function setConfig($key, $val)
+    {
+        $this->configuration[$key] = $val;
+    }
+    
     protected function registerDb()
     {
         $socket = $this->getConfig('mysql_socket');
