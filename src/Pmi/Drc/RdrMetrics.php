@@ -10,14 +10,12 @@ class RdrMetrics
         $this->rdrHelper = $rdrHelper;
     }
 
-    public function metrics()
+    public function metrics($metric)
     {
         $client = $this->rdrHelper->getClient();
-
-        // TODO: not sure what the POST content format the API is expecting
         $response = $client->request('POST', 'metrics/v1/metrics', [
-            'form_params' => [
-                'metric' => 'PARTICIPANT_TOTAL'
+            'json' => [
+                'metric' => $metric
             ]
         ]);
         $responseObject = json_decode($response->getBody()->getContents());
