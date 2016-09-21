@@ -8,4 +8,4 @@ php.ini
 /web/favicon.ico
 /cache/
 /dev_config/*
-!dev_config/config.yaml.dist
+!dev_config/config.yml.dist
