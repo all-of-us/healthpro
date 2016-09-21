@@ -95,16 +95,14 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     
     public function checkCredentials($credentials, UserInterface $user)
     {
+        $validCredentials = is_array($credentials) && $credentials['googleUser'] &&
+            // just a safeguard in case the Google user and our user get out of sync somehow
+            strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;
+
         if ($this->app->isDev() && $this->app->getConfig('gaBypass')) {
-            // Bypass groups auth
-            return is_array($credentials) && $credentials['googleUser'] &&
-                strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;
+            return $validCredentials; // Bypass groups auth
         } else {
-            // user must be logged in to their Google account and be a member of
-            // at least one Group to authenticate
-            return is_array($credentials) && $credentials['googleUser'] && count($user->getGroups()) > 0 &&
-                // just a safeguard in case the Google user and our user get out of sync somehow
-                strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;
+            return $validCredentials && count($user->getGroups()) > 0;
         }
     }
     

@@ -34,6 +34,8 @@ abstract class AbstractWebTestCase extends WebTestCase
             $testCase->afterCallback($request, $response);
         });
         $app->setup();
+        // don't bypass groups auth because we handle this with fixtures
+        $app->setConfig('gaBypass', false);
         $app->mount('/', new Controller\DefaultController());
         
         return $app;

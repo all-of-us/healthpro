@@ -38,17 +38,26 @@ class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
         $user = $auth->getUser($auth->getCredentials($this->getRequest()), new UserProvider($this->app));
         $this->assertEquals(true, $auth->checkCredentials($auth->getCredentials($this->getRequest()), $user));
         
+        $this->app->logout();
         GoogleUserService::clearCurrentUser();
         $user = new User(null, []);
         $this->assertEquals(false, $auth->checkCredentials($auth->getCredentials($this->getRequest()), $user));
         
+        $this->app->logout();
         GoogleUserService::switchCurrentUser('happy@example.com');
         $user = new User(GoogleUserService::getCurrentUser(), $groups);
         GoogleUserService::switchCurrentUser('sad@example.com');
         $auth = new GoogleGroupsAuthenticator($this->app);
         $this->assertEquals(false, $auth->checkCredentials($auth->getCredentials($this->getRequest()), $user));
-        
         $this->assertEquals(false, $auth->checkCredentials($auth->buildCredentials(null), $user));
+        
+        $this->app->logout();
+        $email = 'no-groups@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, []);
+        $auth = new GoogleGroupsAuthenticator($this->app);
+        $user = $auth->getUser($auth->getCredentials($this->getRequest()), new UserProvider($this->app));
+        $this->assertEquals(false, $auth->checkCredentials($auth->getCredentials($this->getRequest()), $user));
     }
     
     function testLogin()
