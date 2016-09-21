@@ -45,6 +45,13 @@ class HpoApplication extends AbstractApplication
             return new \Pmi\Security\GoogleGroupsAuthenticator($app);
         };
         
+        // use an IP whitelist until GAE has built-in firewall rules
+        $ips = $this->getIpWhitelist();
+        // if we have bad configuration values then just use the loopback address
+        if ($ips === null) {
+            $ips = ['127.0.0.1', '::1'];
+        }
+        
         $app = $this;
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
@@ -65,9 +72,14 @@ class HpoApplication extends AbstractApplication
                 ]
             ],
             'security.access_rules' => [
-                ['^/timeout$', 'IS_AUTHENTICATED_ANONYMOUSLY'],
-                ['^/_dev/.*$', 'IS_AUTHENTICATED_FULLY'],
-                ['^/.*$', 'ROLE_USER']
+                [['path' => '^/timeout$', 'ips' => $ips], 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                [['path' => '^/timeout$'], 'ROLE_NO_ACCESS'],
+                
+                [['path' => '^/_dev/.*$', 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
+                [['path' => '^/_dev/.*$'], 'ROLE_NO_ACCESS'],
+                
+                [['path' => '^/.*$', 'ips' => $ips], 'ROLE_USER'],
+                [['path' => '^/.*$'], 'ROLE_NO_ACCESS']
             ]
         ]);
     }
@@ -85,6 +97,7 @@ class HpoApplication extends AbstractApplication
         }
 
         if ($this['isUnitTest']) {
+            $this->configuration['ip_whitelist'] = null;
             return;
         }
         $configs = Configuration::fetchBy([]);

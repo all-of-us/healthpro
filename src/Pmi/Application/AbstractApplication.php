@@ -148,6 +148,26 @@ abstract class AbstractApplication extends Application
     /** Sets up authentication and firewall. */
     abstract protected function registerSecurity();
     
+    /** Returns an array of IPs or null if configuration error. */
+    public function getIpWhitelist()
+    {
+        $list = [];
+        $config = $this->getConfig('ip_whitelist');
+        if ($config) {
+            $ips = explode(',', $config);
+            foreach ($ips as $ip) {
+                $ip = trim($ip);
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    $list[] = $ip;
+                } else {
+                    error_log("Whitelisted IP '{$ip}' is not valid!");
+                    return null;
+                }
+            }
+        }
+        return $list;
+    }
+    
     public function getGoogleServiceClass()
     {
         return $this['isUnitTest'] ? 'Tests\Pmi\GoogleUserService' :

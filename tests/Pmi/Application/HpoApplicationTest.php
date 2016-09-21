@@ -60,7 +60,31 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
         $crawler = $client->reload();
         $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
-        $crawler = $client->request('POST', '/agree');
+        $client->request('POST', '/agree');
+        $crawler = $client->request('GET', '/');
         $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')));
+    }
+    
+    function testGetIpWhitelist()
+    {
+        $this->app->setConfig('ip_whitelist', '');
+        $this->assertEquals([], $this->app->getIpWhitelist());
+        
+        $this->app->setConfig('ip_whitelist', '127.0.0.1');
+        $this->assertEquals(['127.0.0.1'], $this->app->getIpWhitelist());
+        
+        $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.8 ');
+        $this->assertEquals(['127.0.0.1', '8.8.8.8'], $this->app->getIpWhitelist());
+        
+        $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.8 , 0.0.0.0');
+        $this->assertEquals(['127.0.0.1', '8.8.8.8', '0.0.0.0'], $this->app->getIpWhitelist());
+        
+        $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.256 , 0.0.0.0');
+        $this->assertSame(null, $this->app->getIpWhitelist());
+    }
+    
+    function testIpWhitelist()
+    {
+        $this->app->registerSecurity();
     }
 }

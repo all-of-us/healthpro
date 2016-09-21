@@ -111,27 +111,4 @@ class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
         GoogleUserService::switchCurrentUser('rogue@hacker.com');
         $this->assertEquals($auth->buildCredentials(null), $auth->getCredentials($this->getRequest()));
     }
-    
-    function testIpWhitelist()
-    {
-        $this->app->setConfig('ip_whitelist', '');
-        $auth = new GoogleGroupsAuthenticator($this->app);
-        $this->assertEquals([], $auth->getIpWhitelist());
-        
-        $this->app->setConfig('ip_whitelist', '127.0.0.1');
-        $auth = new GoogleGroupsAuthenticator($this->app);
-        $this->assertEquals(['127.0.0.1' => '127.0.0.1'], $auth->getIpWhitelist());
-        
-        $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.8 ');
-        $auth = new GoogleGroupsAuthenticator($this->app);
-        $this->assertEquals(['127.0.0.1' => '127.0.0.1', '8.8.8.8' => '8.8.8.8'], $auth->getIpWhitelist());
-        
-        $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.8 , 0.0.0.0');
-        $auth = new GoogleGroupsAuthenticator($this->app);
-        $this->assertEquals(['127.0.0.1' => '127.0.0.1', '8.8.8.8' => '8.8.8.8', '0.0.0.0' => '0.0.0.0'], $auth->getIpWhitelist());
-        
-        $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.256 , 0.0.0.0');
-        $auth = new GoogleGroupsAuthenticator($this->app);            
-        $this->assertSame(null, $auth->getIpWhitelist());
-    }
 }
