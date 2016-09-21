@@ -24,6 +24,7 @@ abstract class AbstractApplication extends Application
     const ENV_PROD = 'prod'; // production environment
     
     protected $name;
+    protected $configuration = [];
 
     /** Determines the environment under which the code is running. */
     private static function determineEnv()
@@ -127,6 +128,8 @@ abstract class AbstractApplication extends Application
             }
         }
         
+        $this->loadConfiguration();
+        
         // configure security and boot before enabling twig so that `is_granted` will be available
         $this->registerSecurity();
         $this->boot();
@@ -139,6 +142,10 @@ abstract class AbstractApplication extends Application
         return $this;
     }
 
+    /** Populates $this->configuration */
+    abstract protected function loadConfiguration();
+    
+    /** Sets up authentication and firewall. */
     abstract protected function registerSecurity();
     
     public function getGoogleServiceClass()

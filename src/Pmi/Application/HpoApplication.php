@@ -8,14 +8,11 @@ use Pmi\Security\UserProvider;
 
 class HpoApplication extends AbstractApplication
 {
-    protected $configuration = [];
     protected $participantSource = 'mock';
 
     public function setup()
     {
         parent::setup();
-
-        $this->loadConfiguration();
 
         $rdrOptions = [];
         if ($this->isDev()) {
