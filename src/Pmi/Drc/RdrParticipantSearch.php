@@ -4,10 +4,20 @@ namespace Pmi\Drc;
 class RdrParticipantSearch
 {
     protected $rdrHelper;
+    protected $client;
+    protected static $resourceEndpoint = 'participant/v1/';
 
     public function __construct(RdrHelper $rdrHelper)
     {
         $this->rdrHelper = $rdrHelper;
+    }
+
+    protected function getClient()
+    {
+        if (!is_object($this->client)) {
+            $this->client = $this->rdrHelper->getClient(self::$resourceEndpoint);
+        }
+        return $this->client;
     }
 
     protected function participantToResult($participant)
@@ -55,8 +65,7 @@ class RdrParticipantSearch
     {
         $query = $this->paramsToQuery($params);
         try {
-            $client = $this->rdrHelper->getClient();
-            $response = $client->request('GET', 'participant/v1/participants', [
+            $response = $this->getClient()->request('GET', 'participants', [
                 'query' => $query
             ]);
         } catch (\Exception $e) {
@@ -87,8 +96,7 @@ class RdrParticipantSearch
         $participant = $memcache->get($memcacheKey);
         if (!$participant) {
             try {
-                $client = $this->rdrHelper->getClient();
-                $response = $client->request('GET', "participant/v1/participants/{$id}");
+                $response = $this->getClient()->request('GET', "participants/{$id}");
                 $participant = json_decode($response->getBody()->getContents());
                 $memcache->set($memcacheKey, $participant, 0, 300);
             } catch (\GuzzleHttp\Exception\ClientException $e) {

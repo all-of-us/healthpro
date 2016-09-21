@@ -17,7 +17,7 @@ class RdrHelper
         }
     }
 
-    public function getClient()
+    public function getClient($resourceEndpoint = null)
     {
         if (!empty($this->options['key_file'])) {
             putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $this->options['key_file']);
@@ -27,8 +27,13 @@ class RdrHelper
         $googleClient->useApplicationDefaultCredentials();
         $googleClient->addScope(\Google_Service_Oauth2::USERINFO_EMAIL);
 
+        if ($resourceEndpoint) {
+            $endpoint = $this->endpoint . $resourceEndpoint;
+        } else {
+            $endpoint = $this->endpoint;
+        }
         return $googleClient->authorize(new \GuzzleHttp\Client([
-            'base_uri' => $this->endpoint
+            'base_uri' => $endpoint
         ]));
     }
 }
