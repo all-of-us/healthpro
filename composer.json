@@ -7,6 +7,7 @@
         "google/apiclient": "^2.0",
         "guzzlehttp/guzzle": "^6.2",
         "paragonie/random_compat": "1.4.*",
+        "ramsey/uuid": "^3.5",
         "silex/silex": "~2.0",
         "symfony/browser-kit": "^3.1",
         "symfony/config": "^3.1",
