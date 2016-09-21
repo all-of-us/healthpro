@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 {
     private $app;
+    
+    /** Array of whitelisted IPs, or null if configuration error. */
     private $ipWhitelist;
     
     public function __construct(AbstractApplication $app)
@@ -36,7 +38,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
                 if (filter_var($ip, FILTER_VALIDATE_IP)) {
                     $list[$ip] = $ip;
                 } else {
-                    throw new \Exception("Bad IP address in whitelist: $ip");
+                    return null;
                 }
             }
         }

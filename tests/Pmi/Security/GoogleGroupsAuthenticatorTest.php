@@ -121,16 +121,8 @@ class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
         $auth = new GoogleGroupsAuthenticator($this->app);
         $this->assertEquals(['127.0.0.1' => '127.0.0.1', '8.8.8.8' => '8.8.8.8', '0.0.0.0' => '0.0.0.0'], $auth->getIpWhitelist());
         
-        try {
-            $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.256 , 0.0.0.0');
-            $auth = new GoogleGroupsAuthenticator($this->app);
-            $caught = false;
-            $msg = '';
-        } catch (\Exception $e) {
-            $caught = true;
-            $msg = $e->getMessage();
-        }
-        $this->assertSame(true, $caught);
-        $this->assertNotEquals(false, strstr($msg, '8.8.8.256'));
+        $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.256 , 0.0.0.0');
+        $auth = new GoogleGroupsAuthenticator($this->app);            
+        $this->assertSame(null, $auth->getIpWhitelist());
     }
 }
