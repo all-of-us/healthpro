@@ -30,9 +30,9 @@ class HpoApplication extends AbstractApplication
 
         $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
         if ($this->participantSource == 'mock') {
-            $this['pmi.drc.participantsearch'] = new \Pmi\Drc\MockParticipantSearch();
+            $this['pmi.drc.participants'] = new \Pmi\Drc\MockParticipantSearch();
         } else {
-            $this['pmi.drc.participantsearch'] = new \Pmi\Drc\RdrParticipants($this['pmi.drc.rdrhelper']);
+            $this['pmi.drc.participants'] = new \Pmi\Drc\RdrParticipants($this['pmi.drc.rdrhelper']);
         }
 
         $this['pmi.drc.appsclient'] = $this['isUnitTest'] ?

@@ -63,7 +63,7 @@ class DevController extends AbstractController
             if ($form->isValid()) {
                 $data = $form->getData();
                 $participantsApi = new \Pmi\Drc\RdrParticipants($app['pmi.drc.rdrhelper']);
-                $result = $participantsApi->create($data);
+                $result = $participantsApi->createParticipant($data);
                 if ($result) {
                     $app->addFlashSuccess('Participant created: ' . $result);
                 } else {

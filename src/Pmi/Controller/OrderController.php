@@ -38,7 +38,7 @@ class OrderController extends AbstractController
 
     protected function loadOrder($participantId, $orderId, Application $app)
     {
-        $participant = $app['pmi.drc.participantsearch']->getById($participantId);
+        $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
         }

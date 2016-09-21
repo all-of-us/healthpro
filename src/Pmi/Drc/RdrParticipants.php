@@ -113,20 +113,36 @@ class RdrParticipants
         return $this->participantToResult($participant);
     }
 
-    public function create($parameters)
+    public function createParticpant($participant)
     {
-        if (isset($parameters['date_of_birth'])) {
-            $dt = new \DateTime($parameters['date_of_birth']);
-            $parameters['date_of_birth'] = $dt->format('Y-m-d\T00:00:00');
+        if (isset($participant['date_of_birth'])) {
+            $dt = new \DateTime($participant['date_of_birth']);
+            $participant['date_of_birth'] = $dt->format('Y-m-d\T00:00:00');
         }
-        $parameters['biobank_id'] = Uuid::uuid4();
+        $participant['biobank_id'] = Uuid::uuid4();
         try {
             $response = $this->getClient()->request('POST', 'participants', [
-                'json' => $parameters
+                'json' => $participant
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->biobank_id) && $result->biobank_id == $parameters['biobank_id']) {
+            if (is_object($result) && isset($result->biobank_id) && $result->biobank_id == $participant['biobank_id']) {
                 return $result->drc_internal_id;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
+    }
+
+    public function createEvaluation($participantId, $evaluation)
+    {
+        try {
+            $response = $this->getClient()->request('POST', "participants/{$participantId}/evaluations", [
+                'json' => $evaluation
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->evaluation_id)) {
+                return $result->evaluation_id;
             }
         } catch (\Exception $e) {
             return false;
