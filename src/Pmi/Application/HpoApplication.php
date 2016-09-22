@@ -52,7 +52,7 @@ class HpoApplication extends AbstractApplication
             $ips = ['127.0.0.1', '::1'];
         } elseif (count($ips) === 0) {
             // no config specified - allow everything
-            $ips = ['0.0.0.0/0'];
+            $ips = ['0.0.0.0/0', '::/0', '::1/128'];
         }
         
         $app = $this;
