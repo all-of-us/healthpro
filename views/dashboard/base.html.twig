@@ -8,17 +8,34 @@
     <link rel="stylesheet" href="{{ asset('dist/css/lib.min.css') }}?v={{ app.assetVer }}">
     <link rel="stylesheet" href="{{ asset('dist/css/app.min.css') }}?v={{ app.assetVer }}">
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ app.assetVer }}">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css" />
+    <link rel="stylesheet" href="{{ asset('css/jquery-ui.min.css') }}?v=1.12.0" />
     <!--[if lt IE 9]>
         <script src="{{ asset('js/html5shiv.min.js') }}"></script>
         <script src="{{ asset('js/respond.min.js') }}"></script>
     <![endif]-->
 
+    {# pass parameters to JS #}
+    <script>
+        var PMI = {
+            "sessionTimeout": {{ app.sessionTimeout|json_encode|raw }},
+            "sessionWarning": {{ app.sessionWarning|json_encode|raw }},
+            "path": {
+                "clientTimeout": {{ path('clientTimeout')|json_encode|raw }},
+                "logout": {{ path('logout')|json_encode|raw }},
+                "keepAlive": {{ path('keepAlive')|json_encode|raw }},
+                "agreeUsage": {{ path('agreeUsage')|json_encode|raw }},
+                "switchSite": {{ path('switchSite', {id: "SITE_ID"})|json_encode|raw }}
+            },
+            "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
+            "isLogin": {{ app.session.get('isLogin')|json_encode|raw }},
+            "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }}
+        };
+    </script>
     <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
     <script src="{{ asset('js/dashboard.js') }}?v={{ app.assetVer }}"></script>
-    <script src="//code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
-    <script src="//cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="//spin.js.org/spin.min.js"></script>
+    <script src="{{ asset('js/jquery-ui.min.js') }}?v=1.12.0"></script>
+    <script src="{{ asset('js/plotly.min.js') }}?v=1.17.3"></script>
+    <script src="{{ asset('js/spin.min.js') }}?v=2.3.2"></script>
     <script type="text/javascript">
         // attach various handlers to bootstrap items and turn on functionality
         $(function() {
