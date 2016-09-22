@@ -19,12 +19,17 @@ class RdrHelper
 
     public function getClient($resourceEndpoint = null)
     {
-        if (!empty($this->options['key_file'])) {
-            putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $this->options['key_file']);
+        $googleClient = new \Google_Client();
+
+        if (!empty($this->options['key_contents'])) {
+            $googleClient->setAuthConfig(json_decode($this->options['key_contents'], true));
+        } else {
+            if (!empty($this->options['key_file'])) {
+                putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $this->options['key_file']);
+            }
+            $googleClient->useApplicationDefaultCredentials();
         }
 
-        $googleClient = new \Google_Client();
-        $googleClient->useApplicationDefaultCredentials();
         $googleClient->addScope(\Google_Service_Oauth2::USERINFO_EMAIL);
 
         if ($resourceEndpoint) {
