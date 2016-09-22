@@ -10,9 +10,9 @@ class HpoApplication extends AbstractApplication
 {
     protected $participantSource = 'mock';
 
-    public function setup()
+    public function setup($config = [])
     {
-        parent::setup();
+        parent::setup($config);
 
         $rdrOptions = [];
         if ($this->isDev()) {
@@ -47,9 +47,12 @@ class HpoApplication extends AbstractApplication
         
         // use an IP whitelist until GAE has built-in firewall rules
         $ips = $this->getIpWhitelist();
-        // if we have bad configuration values then just use the loopback address
         if ($ips === null) {
+            // null implies bad configuration - limit to loopback address
             $ips = ['127.0.0.1', '::1'];
+        } elseif (count($ips) === 0) {
+            // no config specified - allow everything
+            $ips = ['0.0.0.0/0'];
         }
         
         $app = $this;
@@ -84,7 +87,7 @@ class HpoApplication extends AbstractApplication
         ]);
     }
 
-    protected function loadConfiguration()
+    protected function loadConfiguration($override = [])
     {
         $appDir = realpath(__DIR__ . '/../../../');
         $configFile = $appDir . '/dev_config/config.yml';
@@ -96,13 +99,16 @@ class HpoApplication extends AbstractApplication
             }
         }
 
-        if ($this['isUnitTest']) {
-            $this->configuration['ip_whitelist'] = null;
-            return;
+        // unit tests don't have access to Datastore
+        if (!$this['isUnitTest']) {
+            $configs = Configuration::fetchBy([]);
+            foreach ($configs as $config) {
+                $this->configuration[$config->getKey()] = $config->getValue();
+            }
         }
-        $configs = Configuration::fetchBy([]);
-        foreach ($configs as $config) {
-            $this->configuration[$config->getKey()] = $config->getValue();
+        
+        foreach ($override as $key => $val) {
+            $this->configuration[$key] = $val;
         }
     }
 

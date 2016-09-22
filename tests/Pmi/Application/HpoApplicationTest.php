@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class HpoApplicationTest extends AbstractWebTestCase
 {
     private $isLoginAfter;
+    private $ipWhitelist = null;
     
     protected function afterCallback(Request $request, Response $response) {
         $this->isLoginAfter = $this->app['session']->get('isLogin');
@@ -83,8 +84,34 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertSame(null, $this->app->getIpWhitelist());
     }
     
-    function testIpWhitelist()
+    function testIpWhitelist0()
     {
-        $this->app->registerSecurity();
+        $this->ipWhitelist = '192.168.1.1';
+        $this->app = $this->createApplication();
+        $email = 'testIpWhitelist@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/');
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+    }
+    
+    function testIpWhitelist1()
+    {
+        $this->ipWhitelist = '192.168.1.1,8.8.8.8,127.0.0.1';
+        $this->app = $this->createApplication();
+        $email = 'testIpWhitelist@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $crawler = $client->request('GET', '/timeout');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+    }
+    
+    protected function getIpWhitelist()
+    {
+        return $this->ipWhitelist;
     }
 }

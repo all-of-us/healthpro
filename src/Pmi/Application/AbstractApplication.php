@@ -82,7 +82,7 @@ abstract class AbstractApplication extends Application
         return $this->name;
     }
 
-    public function setup()
+    public function setup($config = [])
     {
         // GAE SDK dev AppServer has a conflict with loading external XML entities
         // https://github.com/GoogleCloudPlatform/appengine-symfony-starter-project/blob/master/src/AppEngine/Environment.php#L52-L69
@@ -128,7 +128,7 @@ abstract class AbstractApplication extends Application
             }
         }
         
-        $this->loadConfiguration();
+        $this->loadConfiguration($config);
         
         // configure security and boot before enabling twig so that `is_granted` will be available
         $this->registerSecurity();
@@ -143,7 +143,7 @@ abstract class AbstractApplication extends Application
     }
 
     /** Populates $this->configuration */
-    abstract protected function loadConfiguration();
+    abstract protected function loadConfiguration($override = []);
     
     /** Sets up authentication and firewall. */
     abstract protected function registerSecurity();
