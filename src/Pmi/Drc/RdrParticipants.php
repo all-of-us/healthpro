@@ -42,7 +42,7 @@ class RdrParticipants
             'dob' => new \DateTime($participant->date_of_birth),
             'gender' => 'U',
             'zip' => isset($participant->zip_code) ? $participant->zip_code : null,
-            'consentComplete' => isset($participant->enrollment_status) ? $participant->enrollment_status == 'CONSENTED' : null
+            'consentComplete' => isset($participant->membership_tier) ? $participant->membership_tier == 'CONSENTED' : null
         ];
     }
 
@@ -109,11 +109,10 @@ class RdrParticipants
                 return false;
             }
         }
-
         return $this->participantToResult($participant);
     }
 
-    public function createParticpant($participant)
+    public function createParticipant($participant)
     {
         if (isset($participant['date_of_birth'])) {
             $dt = new \DateTime($participant['date_of_birth']);
