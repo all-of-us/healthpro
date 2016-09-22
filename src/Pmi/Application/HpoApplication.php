@@ -70,6 +70,7 @@ class HpoApplication extends AbstractApplication
             'security.access_rules' => [
                 ['^/timeout$', 'IS_AUTHENTICATED_ANONYMOUSLY'],
                 ['^/_dev/.*$', 'IS_AUTHENTICATED_FULLY'],
+                ['^/dashboard/.*$', 'ROLE_DASHBOARD'],
                 ['^/.*$', 'ROLE_USER']
             ]
         ]);
