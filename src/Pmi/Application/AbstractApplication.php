@@ -12,9 +12,11 @@ use Silex\Provider\LocaleServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
+use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Twig_SimpleFunction;
 
 abstract class AbstractApplication extends Application
@@ -152,7 +154,7 @@ abstract class AbstractApplication extends Application
     public function getIpWhitelist()
     {
         $list = [];
-        $config = $this->getConfig('ip_whitelist');
+        $config = trim($this->getConfig('ip_whitelist'));
         if ($config) {
             $ips = explode(',', $config);
             foreach ($ips as $ip) {
@@ -231,6 +233,15 @@ abstract class AbstractApplication extends Application
                 if ($code >= 500) {
                     error_log($e);
                 }
+                
+                if ($e instanceof AccessDeniedHttpException && $code === 403) {
+                    // display custom page if being denied due to IP whitelist
+                    $ips = $this->getIpWhitelist();
+                    if (is_array($ips) && count($ips) > 0 && !IpUtils::checkIp($request->getClientIp(), $ips)) {
+                        return $this['twig']->render('error-ip.html.twig', ['code' => $code]);
+                    }
+                }
+                
                 return $this['twig']->render($this['errorTemplate'], ['code' => $code]);
             } else {
                 return;
