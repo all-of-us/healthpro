@@ -51,8 +51,8 @@ class HpoApplication extends AbstractApplication
             // null implies bad configuration - limit to loopback address
             $ips = ['127.0.0.1', '::1'];
         } elseif (count($ips) === 0) {
-            // no config specified - allow everything
-            $ips = ['0.0.0.0/0', '::/0', '::1/128'];
+            // no config specified - allow everything ('::/0' doesn't work with IpUtils)
+            $ips = ['0.0.0.0/0', '::/1'];
         }
         
         $app = $this;
