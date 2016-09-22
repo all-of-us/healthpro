@@ -12,9 +12,11 @@ use Silex\Provider\LocaleServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
+use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Twig_SimpleFunction;
 
 abstract class AbstractApplication extends Application
@@ -24,6 +26,7 @@ abstract class AbstractApplication extends Application
     const ENV_PROD = 'prod'; // production environment
     
     protected $name;
+    protected $configuration = [];
 
     /** Determines the environment under which the code is running. */
     private static function determineEnv()
@@ -81,7 +84,7 @@ abstract class AbstractApplication extends Application
         return $this->name;
     }
 
-    public function setup()
+    public function setup($config = [])
     {
         // GAE SDK dev AppServer has a conflict with loading external XML entities
         // https://github.com/GoogleCloudPlatform/appengine-symfony-starter-project/blob/master/src/AppEngine/Environment.php#L52-L69
@@ -127,6 +130,8 @@ abstract class AbstractApplication extends Application
             }
         }
         
+        $this->loadConfiguration($config);
+        
         // configure security and boot before enabling twig so that `is_granted` will be available
         $this->registerSecurity();
         $this->boot();
@@ -139,7 +144,31 @@ abstract class AbstractApplication extends Application
         return $this;
     }
 
+    /** Populates $this->configuration */
+    abstract protected function loadConfiguration($override = []);
+    
+    /** Sets up authentication and firewall. */
     abstract protected function registerSecurity();
+    
+    /** Returns an array of IPs or null if configuration error. */
+    public function getIpWhitelist()
+    {
+        $list = [];
+        $config = trim($this->getConfig('ip_whitelist'));
+        if ($config) {
+            $ips = explode(',', $config);
+            foreach ($ips as $ip) {
+                $ip = trim($ip);
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    $list[] = $ip;
+                } else {
+                    error_log("Whitelisted IP '{$ip}' is not valid!");
+                    return null;
+                }
+            }
+        }
+        return $list;
+    }
     
     public function getGoogleServiceClass()
     {
@@ -204,6 +233,15 @@ abstract class AbstractApplication extends Application
                 if ($code >= 500) {
                     error_log($e);
                 }
+                
+                if ($e instanceof AccessDeniedHttpException && $code === 403) {
+                    // display custom page if being denied due to IP whitelist
+                    $ips = $this->getIpWhitelist();
+                    if (is_array($ips) && count($ips) > 0 && !IpUtils::checkIp($request->getClientIp(), $ips)) {
+                        return $this['twig']->render('error-ip.html.twig', ['code' => $code]);
+                    }
+                }
+                
                 return $this['twig']->render($this['errorTemplate'], ['code' => $code]);
             } else {
                 return;

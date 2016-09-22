@@ -11,11 +11,9 @@ class HpoApplication extends AbstractApplication
     protected $configuration = [];
     protected $participantSource = 'rdr';
 
-    public function setup()
+    public function setup($config = [])
     {
-        parent::setup();
-
-        $this->loadConfiguration();
+        parent::setup($config);
 
         $rdrOptions = [];
         if ($this->isDev()) {
@@ -51,6 +49,16 @@ class HpoApplication extends AbstractApplication
             return new \Pmi\Security\GoogleGroupsAuthenticator($app);
         };
         
+        // use an IP whitelist until GAE has built-in firewall rules
+        $ips = $this->getIpWhitelist();
+        if ($ips === null) {
+            // null implies bad configuration - limit to loopback address
+            $ips = ['127.0.0.1', '::1'];
+        } elseif (count($ips) === 0) {
+            // no config specified - allow everything ('::/0' doesn't work with IpUtils)
+            $ips = ['0.0.0.0/0', '::/1'];
+        }
+        
         $app = $this;
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
@@ -71,15 +79,22 @@ class HpoApplication extends AbstractApplication
                 ]
             ],
             'security.access_rules' => [
-                ['^/timeout$', 'IS_AUTHENTICATED_ANONYMOUSLY'],
-                ['^/_dev/.*$', 'IS_AUTHENTICATED_FULLY'],
-                ['^/dashboard/.*$', 'ROLE_DASHBOARD'],
-                ['^/.*$', 'ROLE_USER']
+                [['path' => '^/timeout$', 'ips' => $ips], 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                [['path' => '^/timeout$'], 'ROLE_NO_ACCESS'],
+                
+                [['path' => '^/_dev/.*$', 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
+                [['path' => '^/_dev/.*$'], 'ROLE_NO_ACCESS'],
+                
+                [['path' => '^/dashboard/.*$', 'ips' => $ips], 'ROLE_DASHBOARD'],
+                [['path' => '^/dashboard/.*$'], 'ROLE_NO_ACCESS'],
+
+                [['path' => '^/.*$', 'ips' => $ips], 'ROLE_USER'],
+                [['path' => '^/.*$'], 'ROLE_NO_ACCESS']
             ]
         ]);
     }
 
-    protected function loadConfiguration()
+    protected function loadConfiguration($override = [])
     {
         $appDir = realpath(__DIR__ . '/../../../');
         $configFile = $appDir . '/dev_config/config.yml';
@@ -91,12 +106,16 @@ class HpoApplication extends AbstractApplication
             }
         }
 
-        if ($this['isUnitTest']) {
-            return;
+        // unit tests don't have access to Datastore
+        if (!$this['isUnitTest']) {
+            $configs = Configuration::fetchBy([]);
+            foreach ($configs as $config) {
+                $this->configuration[$config->getKey()] = $config->getValue();
+            }
         }
-        $configs = Configuration::fetchBy([]);
-        foreach ($configs as $config) {
-            $this->configuration[$config->getKey()] = $config->getValue();
+        
+        foreach ($override as $key => $val) {
+            $this->configuration[$key] = $val;
         }
     }
 
@@ -109,6 +128,11 @@ class HpoApplication extends AbstractApplication
         }
     }
 
+    public function setConfig($key, $val)
+    {
+        $this->configuration[$key] = $val;
+    }
+    
     protected function registerDb()
     {
         $socket = $this->getConfig('mysql_socket');

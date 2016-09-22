@@ -18,9 +18,36 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 {
     private $app;
     
+    /** Array of whitelisted IPs, or null if configuration error. */
+    private $ipWhitelist;
+    
     public function __construct(AbstractApplication $app)
     {
         $this->app = $app;
+        $this->ipWhitelist = $this->buildIpWhitelist();
+    }
+    
+    private function buildIpWhitelist()
+    {
+        $list = [];
+        $config = $this->app->getConfig('ip_whitelist');
+        if ($config) {
+            $ips = explode(',', $config);
+            foreach ($ips as $ip) {
+                $ip = trim($ip);
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    $list[$ip] = $ip;
+                } else {
+                    return null;
+                }
+            }
+        }
+        return $list;
+    }
+    
+    public function getIpWhitelist()
+    {
+        return $this->ipWhitelist;
     }
     
     public function buildCredentials($googleUser)
@@ -68,16 +95,14 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     
     public function checkCredentials($credentials, UserInterface $user)
     {
+        $validCredentials = is_array($credentials) && $credentials['googleUser'] &&
+            // just a safeguard in case the Google user and our user get out of sync somehow
+            strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;
+
         if ($this->app->isDev() && $this->app->getConfig('gaBypass')) {
-            // Bypass groups auth
-            return is_array($credentials) && $credentials['googleUser'] &&
-                strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;
+            return $validCredentials; // Bypass groups auth
         } else {
-            // user must be logged in to their Google account and be a member of
-            // at least one Group to authenticate
-            return is_array($credentials) && $credentials['googleUser'] && count($user->getGroups()) > 0 &&
-                // just a safeguard in case the Google user and our user get out of sync somehow
-                strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;
+            return $validCredentials && count($user->getGroups()) > 0;
         }
     }
     

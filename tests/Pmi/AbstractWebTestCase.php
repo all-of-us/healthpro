@@ -33,7 +33,11 @@ abstract class AbstractWebTestCase extends WebTestCase
         $app->after(function (Request $request, Response $response) use ($testCase) {
             $testCase->afterCallback($request, $response);
         });
-        $app->setup();
+        $app->setup([
+            // don't bypass groups auth because we handle this with fixtures
+            'gaBypass' => false,
+            'ip_whitelist' => $this->getIpWhitelist()
+        ]);
         $app->mount('/', new Controller\DefaultController());
         $app->mount('/dashboard', new Controller\DashboardController());
         
@@ -55,6 +59,12 @@ abstract class AbstractWebTestCase extends WebTestCase
         return $request;
     }
     
-    /** Children can override to access the after middleware. */
+    /** Override to access the after middleware. */
     protected function afterCallback(Request $request, Response $response) {}
+    
+    /** Override to specify IP whitelist. */
+    protected function getIpWhitelist()
+    {
+        return null;
+    }
 }
