@@ -48,14 +48,21 @@ class DevController extends AbstractController
             return $app->abort(403);
         } else {
             $form = $app['form.factory']->createBuilder(FormType::class)
-                ->add('first_name', TextType::class)
                 ->add('last_name', TextType::class)
+                ->add('first_name', TextType::class)
                 ->add('zip_code', TextType::class)
                 ->add('date_of_birth', TextType::class)
-                ->add('enrollment_status', ChoiceType::class, [
+                ->add('membership_tier', ChoiceType::class, [
                     'choices' => [
                         'CONSENTED' => 'CONSENTED',
                         'NONE' => 'NONE'
+                    ]
+                ])
+                ->add('gender_identity', ChoiceType::class, [
+                    'choices' => [
+                        'FEMALE' => 'FEMALE',
+                        'MALE' => 'MALE',
+                        'OTHER' => 'OTHER'
                     ]
                 ])
                 ->getForm();
