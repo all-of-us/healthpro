@@ -35,6 +35,7 @@ abstract class AbstractWebTestCase extends WebTestCase
         });
         $app->setup();
         $app->mount('/', new Controller\DefaultController());
+        $app->mount('/dashboard', new Controller\DashboardController());
         
         return $app;
     }
