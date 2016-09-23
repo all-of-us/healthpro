@@ -163,7 +163,7 @@ abstract class AbstractApplication extends Application
                 if (filter_var($ip, FILTER_VALIDATE_IP)) {
                     $list[] = $ip;
                 } else {
-                    error_log("Whitelisted IP '{$ip}' is not valid!");
+                    syslog(LOG_WARNING, "Whitelisted IP '{$ip}' is not valid!");
                     return null;
                 }
             }
@@ -343,6 +343,8 @@ abstract class AbstractApplication extends Application
     {
         $log = new Log($this, $action, $data);
         $log->logSyslog();
-        $log->logDatastore();
+        if (!$this['isUnitTest']) {
+            $log->logDatastore();
+        }
     }
 }
