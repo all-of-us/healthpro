@@ -16,6 +16,10 @@ class Log
     const LOGIN_FAIL = 'LOGIN_FAIL';
     const LOGOUT = 'LOGOUT';
     const INVALID_IP = 'INVALID_IP';
+    const ORDER_CREATE = 'ORDER_CREATE';
+    const ORDER_EDIT = 'ORDER_EDIT';
+    const EVALUATION_CREATE = 'EVALUATION_CREATE';
+    const EVALUATION_EDIT = 'EVALUATION_EDIT';
 
     public function __construct($app, $action, $data)
     {

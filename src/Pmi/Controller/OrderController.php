@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Pmi\Audit\Log;
 use Pmi\Mayolink\Order as MayoLinkOrder;
 
 class OrderController extends AbstractController
@@ -254,6 +255,7 @@ class OrderController extends AbstractController
     {
         $this->loadOrder($participantId, $orderId, $app);
         if (!$this->order['printed_ts']) {
+            $app->log(Log::ORDER_EDIT, $orderId);
             $app['db']->update(
                 'orders',
                 ['printed_ts' => (new \DateTime())->format('Y-m-d H:i:s')],
@@ -275,6 +277,7 @@ class OrderController extends AbstractController
         if ($collectForm->isValid()) {
             $updateArray = $this->getOrderUpdateFromForm('collected', $collectForm);
             if ($app['db']->update('orders', $updateArray, ['id' => $orderId])) {
+                $app->log(Log::ORDER_EDIT, $orderId);
                 $app->addFlashNotice('Order collection updated');
 
                 return $app->redirectToRoute('orderCollect', [
@@ -299,6 +302,7 @@ class OrderController extends AbstractController
         if ($processForm->isValid()) {
             $updateArray = $this->getOrderUpdateFromForm('processed', $processForm);
             if ($app['db']->update('orders', $updateArray, ['id' => $orderId])) {
+                $app->log(Log::ORDER_EDIT, $orderId);
                 $app->addFlashNotice('Order processing updated');
 
                 return $app->redirectToRoute('orderProcess', [
@@ -323,6 +327,7 @@ class OrderController extends AbstractController
         if ($finalizeForm->isValid()) {
             $updateArray = $this->getOrderUpdateFromForm('finalized', $finalizeForm);
             if ($app['db']->update('orders', $updateArray, ['id' => $orderId])) {
+                $app->log(Log::ORDER_EDIT, $orderId);
                 $app->addFlashNotice('Order finalization updated');
 
                 return $app->redirectToRoute('orderFinalize', [
