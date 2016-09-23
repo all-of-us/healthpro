@@ -20,7 +20,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     {
         $client = $this->createClient();
         $crawler = $client->request('GET', '/');
-        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     public function testLogin()

@@ -295,8 +295,6 @@ class DeployCommand extends Command {
         // lock down all the test sites
         if ($this->isTest() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS)) {
             $this->requireAdminLogin($config);
-        } else {
-            $this->requireGoogleLogin($config);
         }
 
         // crash the deploy if our handlers are not secure

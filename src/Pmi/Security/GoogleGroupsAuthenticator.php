@@ -112,21 +112,20 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $code = 403;
         $googleUser = $this->app->getGoogleUser();
         if ($googleUser) {
-            $template = 'error-auth.html.twig';
             $params = [
                 'email' => $googleUser->getEmail(),
                 'logoutUrl' => $this->app->getGoogleLogoutUrl()
             ];
+            $this->app->log(Log::LOGIN_FAIL);
+            // clear session in case Google user and our user are out of sync
+            $this->app->logout();
+            $response = new Response($this->app['twig']->render('error-auth.html.twig', $params), $code);
+            $this->app->setHeaders($response);
+
+            return $response;
         } else {
-            $template = $this->app['errorTemplate'];
-            $params = ['code' => $code];
+            return $this->app->redirectToRoute('login');
         }
-        $this->app->log(Log::LOGIN_FAIL);
-        // clear session in case Google user and our user are out of sync
-        $this->app->logout();
-        $response = new Response($this->app['twig']->render($template, $params), $code);
-        $this->app->setHeaders($response);
-        return $response;
     }
     
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)

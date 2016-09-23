@@ -2,6 +2,7 @@
 namespace Pmi\Controller;
 
 use Silex\Application;
+use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +14,7 @@ use Pmi\Audit\Log;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Mayolink\Order as MayoLinkOrder;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
+use google\appengine\api\users\UserService;
 
 class DefaultController extends AbstractController
 {
@@ -51,15 +53,18 @@ class DefaultController extends AbstractController
         return $app->redirect($app->getGoogleLogoutUrl($timeout ? $app->generateUrl('timeout') : null));
     }
     
-    /**
-     * This is hack. When authorization fails on the "insecure" firewall due
-     * to IP whitelist, security will redirect the user to a /login route.
-     * Rather than write a custom authorization class or something just render
-     * the error page here.
-     */
     public function loginAction(Application $app, Request $request)
     {
-        return $app['twig']->render('error-ip.html.twig');
+        $ips = $app->getIpWhitelist();
+        if (is_array($ips) && count($ips) > 0 && !IpUtils::checkIp($request->getClientIp(), $ips)) {
+            return $app['twig']->render('error-ip.html.twig');
+        } else {
+            if ($app->getConfig('login_url')) {
+                return $app->redirect(UserService::createLoginURL($app->getConfig('login_url')));
+            } else {
+                return $app->redirect(UserService::createLoginURL('/'));
+            }
+        }
     }
     
     public function timeoutAction(Application $app, Request $request)

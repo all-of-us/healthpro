@@ -18,6 +18,12 @@ if ($app->isProd() || $app->isDev()) { // for now, use twig memcache in prod
     $app['twigCacheHandler'] = 'file';
 }
 
+// TODO: set trusted proxies to IP whitelist
+/*
+Symfony\Component\HttpFoundation\Request::setTrustedProxies([
+]);
+*/
+
 $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
