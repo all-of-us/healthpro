@@ -5,6 +5,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Pmi\Entities\Configuration;
 use Pmi\Security\UserProvider;
+use Pmi\Audit\Log;
 
 class HpoApplication extends AbstractApplication
 {
@@ -193,6 +194,7 @@ class HpoApplication extends AbstractApplication
         }
         
         if ($this['session']->get('isLogin')) {
+            $app->log(Log::LOGIN_SUCCESS, $this->getUser()->getRoles());
             $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
         }
     }

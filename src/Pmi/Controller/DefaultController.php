@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormError;
+use Pmi\Audit\Log;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Mayolink\Order as MayoLinkOrder;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
@@ -45,6 +46,7 @@ class DefaultController extends AbstractController
     public function logoutAction(Application $app, Request $request)
     {
         $timeout = $request->get('timeout');
+        $app->log(Log::LOGOUT);
         $app->logout();
         return $app->redirect($app->getGoogleLogoutUrl($timeout ? $app->generateUrl('timeout') : null));
     }
@@ -268,6 +270,7 @@ class DefaultController extends AbstractController
                     'mayo_id' => $mlOrderId
                 ]);
                 if ($success && ($orderId = $app['db']->lastInsertId())) {
+                    $app->log(Log::ORDER_CREATE, $orderId);
                     return $app->redirectToRoute('order', [
                         'participantId' => $participant->id,
                         'orderId' => $orderId
@@ -313,6 +316,7 @@ class DefaultController extends AbstractController
                     $dbArray['participant_id'] = $participant->id;
                     $dbArray['created_ts'] = $dbArray['updated_ts'];
                     if ($app['db']->insert('evaluations', $dbArray) && ($evalId = $app['db']->lastInsertId())) {
+                        $app->log(Log::EVALUATION_CREATE, $evalId);
                         $app['pmi.drc.participants']->createEvaluation($participant->id, [
                             'evaluation_id' => $evalId,
                             'evaluation_version' => $dbArray['version'],
@@ -328,6 +332,7 @@ class DefaultController extends AbstractController
                     }
                 } else {
                     if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
+                        $app->log(Log::EVALUATION_EDIT, $evalId);
                         $result = $app['pmi.drc.participants']->updateEvaluation($participant->id, $evalId, [
                             'evaluation_version' => $dbArray['version'],
                             'evaluation_data' => $dbArray['data']
