@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormError;
+use Pmi\Audit\Log;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Mayolink\Order as MayoLinkOrder;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
@@ -45,6 +46,7 @@ class DefaultController extends AbstractController
     public function logoutAction(Application $app, Request $request)
     {
         $timeout = $request->get('timeout');
+        $app->log(Log::LOGOUT);
         $app->logout();
         return $app->redirect($app->getGoogleLogoutUrl($timeout ? $app->generateUrl('timeout') : null));
     }

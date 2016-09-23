@@ -3,6 +3,7 @@ namespace Pmi\Application;
 
 use Exception;
 use Memcache;
+use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
 use Silex\Application;
@@ -238,6 +239,7 @@ abstract class AbstractApplication extends Application
                     // display custom page if being denied due to IP whitelist
                     $ips = $this->getIpWhitelist();
                     if (is_array($ips) && count($ips) > 0 && !IpUtils::checkIp($request->getClientIp(), $ips)) {
+                        $this->log(Log::INVALID_IP);
                         return $this['twig']->render('error-ip.html.twig', ['code' => $code]);
                     }
                 }
@@ -335,5 +337,12 @@ abstract class AbstractApplication extends Application
     {
         $string = $this['translator']->trans($string, $translationParams);
         $this->addFlash('success', $string);
+    }
+
+    public function log($action, $data = null)
+    {
+        $log = new Log($this, $action, $data);
+        $log->logSyslog();
+        $log->logDatastore();
     }
 }

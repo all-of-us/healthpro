@@ -13,6 +13,9 @@ class Log
 
     // Actions
     const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+    const LOGIN_FAIL = 'LOGIN_FAIL';
+    const LOGOUT = 'LOGOUT';
+    const INVALID_IP = 'INVALID_IP';
 
     public function __construct($app, $action, $data)
     {
@@ -29,6 +32,8 @@ class Log
         $logArray['ts'] = new \DateTime();
         if ($user = $this->app->getUser()) {
             $logArray['user'] = $user->getUsername();
+        } elseif ($user = $this->app->getGoogleUser()) {
+            $logArray['user'] = $user->getEmail();
         } else {
             $logArray['user'] = null;
         }

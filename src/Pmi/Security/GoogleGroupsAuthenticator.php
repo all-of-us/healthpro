@@ -2,6 +2,7 @@
 namespace Pmi\Security;
 
 use Pmi\Application\AbstractApplication;
+use Pmi\Audit\Log;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -120,6 +121,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             $template = $this->app['errorTemplate'];
             $params = ['code' => $code];
         }
+        $this->app->log(Log::LOGIN_FAIL);
         // clear session in case Google user and our user are out of sync
         $this->app->logout();
         $response = new Response($this->app['twig']->render($template, $params), $code);

@@ -194,7 +194,7 @@ class HpoApplication extends AbstractApplication
         }
         
         if ($this['session']->get('isLogin')) {
-            $app->log(Log::LOGIN_SUCCESS);
+            $app->log(Log::LOGIN_SUCCESS, $this->getUser()->getRoles());
             $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
         }
     }
@@ -205,12 +205,5 @@ class HpoApplication extends AbstractApplication
         if ($this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
             $this['session']->set('isLogin', false);
         }
-    }
-
-    public function log($action, $data = null)
-    {
-        $log = new Log($this, $action, $data);
-        $log->logSyslog();
-        $log->logDatastore();
     }
 }
