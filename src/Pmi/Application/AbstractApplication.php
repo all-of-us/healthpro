@@ -160,12 +160,7 @@ abstract class AbstractApplication extends Application
             $ips = explode(',', $config);
             foreach ($ips as $ip) {
                 $ip = trim($ip);
-                if (filter_var($ip, FILTER_VALIDATE_IP)) {
-                    $list[] = $ip;
-                } else {
-                    syslog(LOG_WARNING, "Whitelisted IP '{$ip}' is not valid!");
-                    return null;
-                }
+                $list[] = $ip;
             }
         }
         return $list;
