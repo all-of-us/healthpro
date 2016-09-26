@@ -22,6 +22,7 @@ class DefaultController extends AbstractController
         ['home', '/'],
         ['logout', '/logout'],
         ['login', '/login'],
+        ['loginReturn', '/login-return'],
         ['timeout', '/timeout'],
         ['keepAlive', '/keepalive', [ 'method' => 'POST' ]],
         ['clientTimeout', '/client-timeout', [ 'method' => 'GET' ]],
@@ -53,18 +54,54 @@ class DefaultController extends AbstractController
         return $app->redirect($app->getGoogleLogoutUrl($timeout ? $app->generateUrl('timeout') : null));
     }
     
+    protected function getAuthLoginClient($app, $state = null)
+    {
+        if ($state) {
+            $client = new \Google_Client([
+                'state' => $state
+            ]);
+        } else {
+            $client = new \Google_Client();
+        }
+        $client->setClientId($app->getConfig('auth_client_id'));
+        $client->setClientSecret($app->getConfig('auth_client_secret'));
+
+        if ($app->getConfig('login_url')) {
+            $callbackUrl = $app->getConfig() . $app['url_generator']->generate('loginReturn');
+        } else {
+            $callbackUrl = $app['url_generator']->generate('loginReturn', [], \Symfony\Component\Routing\Generator\UrlGenerator::ABSOLUTE_URL);
+        }
+        $client->setRedirectUri($callbackUrl);
+        $client->setScopes(['email', 'profile']);
+        return $client;
+    }
+
     public function loginAction(Application $app, Request $request)
     {
         $ips = $app->getIpWhitelist();
         if (is_array($ips) && count($ips) > 0 && !IpUtils::checkIp($request->getClientIp(), $ips)) {
             return $app['twig']->render('error-ip.html.twig');
         } else {
-            if ($app->getConfig('login_url')) {
-                return $app->redirect(UserService::createLoginURL($app->getConfig('login_url')));
-            } else {
-                return $app->redirect(UserService::createLoginURL('/'));
-            }
+            $authState = sha1(openssl_random_pseudo_bytes(1024));
+            $app['session']->set('auth_state', $authState);
+            $client = $this->getAuthLoginClient($app, $authState);
+            return $app->redirect($client->createAuthUrl());
         }
+    }
+
+    public function loginReturnAction(Application $app, Request $request)
+    {
+        if (!$request->query->get('state') || $request->query->get('state') != $app['session']->get('auth_state')) {
+            return $app->abort(403);
+        }
+
+        $client = $this->getAuthLoginClient($app);
+        $token = $client->fetchAccessTokenWithAuthCode($request->query->get('code'));
+        $client->setAccessToken($token);
+        $idToken = $client->verifyIdToken();
+        $userEmail = $idToken['email'];
+        $userId = $idToken['sub'];
+        // TODO: connect to symfony auth
     }
     
     public function timeoutAction(Application $app, Request $request)

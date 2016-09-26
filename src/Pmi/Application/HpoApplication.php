@@ -64,7 +64,7 @@ class HpoApplication extends AbstractApplication
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
                 'insecure' => [
-                    'pattern' => '^/(timeout|login)$',
+                    'pattern' => '^/(timeout|login|login-return)$',
                     'anonymous' => true
                 ],
                 'main' => [
@@ -80,7 +80,7 @@ class HpoApplication extends AbstractApplication
                 ]
             ],
             'security.access_rules' => [
-                [['path' => '^/(login)$'], 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                [['path' => '^/(login|login-return)$'], 'IS_AUTHENTICATED_ANONYMOUSLY'],
 
                 [['path' => '^/(timeout)$', 'ips' => $ips], 'IS_AUTHENTICATED_ANONYMOUSLY'],
                 [['path' => '^/(timeout)$'], 'ROLE_NO_ACCESS'],
