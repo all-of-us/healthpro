@@ -67,7 +67,7 @@ class DefaultController extends AbstractController
         $client->setClientSecret($app->getConfig('auth_client_secret'));
 
         if ($app->getConfig('login_url')) {
-            $callbackUrl = $app->getConfig() . $app['url_generator']->generate('loginReturn');
+            $callbackUrl = $app->getConfig('login_url') . $app['url_generator']->generate('loginReturn');
         } else {
             $callbackUrl = $app['url_generator']->generate('loginReturn', [], \Symfony\Component\Routing\Generator\UrlGenerator::ABSOLUTE_URL);
         }
