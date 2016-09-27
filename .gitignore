@@ -1,6 +1,7 @@
 /vendor/
 app.yaml
 cron.yaml
+dos.yaml
 php.ini
 /node_modules/
 /bower_components/

@@ -137,6 +137,7 @@ class DeployCommand extends Command {
 
         // generate config files
         $this->generateAppConfig();
+        $this->generateDosConfig();
         $this->generatePhpConfig();
 
         // If not local, compile assets. Run ./bin/gulp when developing locally.
@@ -312,6 +313,23 @@ class DeployCommand extends Command {
 
         $dumper = new Dumper();
         file_put_contents($configFile, $dumper->dump($config, PHP_INT_MAX));
+    }
+    
+    /** Generate Denial of Service config (currently used for whitelisting). */
+    private function generateDosConfig()
+    {
+        $configFile = $this->appDir . DIRECTORY_SEPARATOR . 'dos.yaml';
+        $distFile = "{$configFile}.dist";
+        if (!file_exists($distFile)) {
+            throw new Exception("Couldn't find $distFile");
+        }
+        
+        if ($this->isProd()) {
+            copy($distFile, $configFile);
+        } else {
+            // https://cloud.google.com/appengine/docs/php/config/dos#delete
+            file_put_contents($configFile, 'blacklist:');
+        }
     }
 
     /** Generate PHP configuration. */
