@@ -2,6 +2,8 @@
 namespace Pmi\Console\Command;
 
 use Pmi\Application\AbstractApplication;
+use SensioLabs\Security\SecurityChecker;
+use SensioLabs\Security\Formatters\SimpleFormatter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -138,6 +140,8 @@ class DeployCommand extends Command {
         // generate config files
         $this->generateAppConfig();
         $this->generatePhpConfig();
+
+        $this->runSecurityCheck();
 
         // If not local, compile assets. Run ./bin/gulp when developing locally.
         if (!$this->local && !$this->index) {
@@ -398,6 +402,28 @@ class DeployCommand extends Command {
     private function runUnitTests()
     {
         $this->exec("{$this->appDir}/bin/phpunit");
+    }
+
+    private function runSecurityCheck()
+    {
+        $composerLockFile = $this->appDir . DIRECTORY_SEPARATOR . 'composer.lock';
+        $this->out->writeln("Running SensioLabs Security Checker...");
+        $checker = new SecurityChecker();
+        $vulnerabilities = $checker->check($composerLockFile);
+        if (count($vulnerabilities) === 0) {
+            $this->out->writeln('No packages have known vulnerabilities');
+        } else {
+            $formatter = new SimpleFormatter($this->getHelper('formatter'));
+            $formatter->displayResults($this->out, $composerLockFile, $vulnerabilities);
+            if (!$this->local && !$this->index) {
+                throw new \Exception('Fix security vulnerablities before deploying');
+            } else {
+                $helper = $this->getHelper('question');
+                if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
+                    throw new \Exception('Aborting due to security vulnerability');
+                }
+            }
+        }
     }
 
     /** Runs a shell command, displaying output as it is generated. */
