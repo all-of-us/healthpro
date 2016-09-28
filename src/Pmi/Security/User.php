@@ -6,16 +6,20 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class User implements UserInterface
 {
     const SITE_PREFIX = 'hpo-site-';
+    const DASHBOARD_GROUP = 'admin-dashboard';
     
     private $googleUser;
     private $groups;
     private $sites;
+    private $dashboardAccess;
     private $bypassGroupsAuth = false;
     
-    public function __construct($googleUser, array $groups, $bypassGroupsAuth = false) {
+    public function __construct($googleUser, array $groups, $bypassGroupsAuth = false)
+    {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
         $this->sites = $this->computeSites();
+        $this->dashboardAccess = $this->computeDashboardAccess();
         $this->bypassGroupsAuth = $bypassGroupsAuth;
     }
     
@@ -38,7 +42,18 @@ class User implements UserInterface
         }
         return $sites;
     }
-    
+
+    private function computeDashboardAccess()
+    {
+        $hasAccess = false;
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::DASHBOARD_GROUP . '@') === 0) {
+                $hasAccess = true;
+            }
+        }
+        return $hasAccess;
+    }
+
     public function getSites()
     {
         return $this->sites;
@@ -76,9 +91,16 @@ class User implements UserInterface
     public function getRoles()
     {
         if ($this->bypassGroupsAuth) {
-            return ['ROLE_USER'];
+            return ['ROLE_USER', 'ROLE_DASHBOARD'];
         } else {
-            return count($this->groups) > 0 ? ['ROLE_USER'] : [];
+            $roles = [];
+            if (count($this->sites) > 0) {
+                $roles[] = 'ROLE_USER';
+            }
+            if ($this->dashboardAccess) {
+                $roles[] = 'ROLE_DASHBOARD';
+            }
+            return $roles;
         }
     }
     
