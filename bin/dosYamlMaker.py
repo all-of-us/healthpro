@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Outputs a dos.yaml file to whitelist IPs
 
 from netaddr import *
