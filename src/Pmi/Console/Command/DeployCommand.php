@@ -23,6 +23,10 @@ class DeployCommand extends Command {
         'pmi-hpo-test'
     ];
 
+    /** Restrict access by IP using dos.yaml */
+    private static $IPRESTRICT_APP_IDS = [
+    ];
+
     /** Create release tag when deploying these application IDs. */
     private static $TAG_APP_IDS = [];
 
@@ -324,7 +328,7 @@ class DeployCommand extends Command {
             throw new Exception("Couldn't find $distFile");
         }
         
-        if ($this->isProd()) {
+        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
             copy($distFile, $configFile);
         } else {
             // https://cloud.google.com/appengine/docs/php/config/dos#delete
