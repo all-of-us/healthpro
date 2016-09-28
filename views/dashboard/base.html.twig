@@ -19,13 +19,6 @@
     <script src="//code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
     <script src="//cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="//spin.js.org/spin.min.js"></script>
-    <script type="text/javascript">
-        // attach various handlers to bootstrap items and turn on functionality
-        $(function() {
-            $('.datepicker').datepicker({dateFormat: 'yy-mm-dd', showButtonPanel: true});
-            $('[data-toggle="tooltip"]').tooltip({container: 'body'});
-        });
-    </script>
 </head>
 <body>
     <nav class="navbar navbar-default">
@@ -49,7 +42,7 @@
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container" id="dashboard-container">
         <div id="flash-notices">
             {% for flashMessage in app.session.flashbag.get('error') %}
                 <div class="alert alert-danger">{{ flashMessage }}</div>
