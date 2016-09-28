@@ -61,10 +61,11 @@ class HpoApplication extends AbstractApplication
         }
         
         $app = $this;
+        $anonRegex = '^/(timeout|login)$';
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
-                'insecure' => [
-                    'pattern' => '^/(timeout|login|login-return)$',
+                'anonymous' => [
+                    'pattern' => $anonRegex,
                     'anonymous' => true
                 ],
                 'main' => [
@@ -80,10 +81,8 @@ class HpoApplication extends AbstractApplication
                 ]
             ],
             'security.access_rules' => [
-                [['path' => '^/(login|login-return)$'], 'IS_AUTHENTICATED_ANONYMOUSLY'],
-
-                [['path' => '^/(timeout)$', 'ips' => $ips], 'IS_AUTHENTICATED_ANONYMOUSLY'],
-                [['path' => '^/(timeout)$'], 'ROLE_NO_ACCESS'],
+                [['path' => $anonRegex, 'ips' => $ips], 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                [['path' => $anonRegex], 'ROLE_NO_ACCESS'],
                 
                 [['path' => '^/_dev/.*$', 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
                 [['path' => '^/_dev/.*$'], 'ROLE_NO_ACCESS'],

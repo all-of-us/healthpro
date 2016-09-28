@@ -179,8 +179,7 @@ abstract class AbstractApplication extends Application
     
     public function getGoogleUser()
     {
-        $cls = $this->getGoogleServiceClass();
-        return class_exists($cls) ? $cls::getCurrentUser() : null;
+        return $this['session']->get('googleUser');
     }
     
     public function getGoogleLogoutUrl($dest = null)

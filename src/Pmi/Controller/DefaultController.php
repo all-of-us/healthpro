@@ -2,7 +2,6 @@
 namespace Pmi\Controller;
 
 use Silex\Application;
-use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +13,6 @@ use Pmi\Audit\Log;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Mayolink\Order as MayoLinkOrder;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
-use google\appengine\api\users\UserService;
 
 class DefaultController extends AbstractController
 {
@@ -53,57 +51,21 @@ class DefaultController extends AbstractController
         $app->logout();
         return $app->redirect($app->getGoogleLogoutUrl($timeout ? $app->generateUrl('timeout') : null));
     }
-    
-    protected function getAuthLoginClient($app, $state = null)
-    {
-        if ($state) {
-            $client = new \Google_Client([
-                'state' => $state
-            ]);
-        } else {
-            $client = new \Google_Client();
-        }
-        $client->setClientId($app->getConfig('auth_client_id'));
-        $client->setClientSecret($app->getConfig('auth_client_secret'));
 
-        if ($app->getConfig('login_url')) {
-            $path = $app->getConfig('login_url');
-            $path = preg_replace('/\/$/', '', $path);
-            $callbackUrl = $path . $app['url_generator']->generate('loginReturn');
-        } else {
-            $callbackUrl = $app['url_generator']->generate('loginReturn', [], \Symfony\Component\Routing\Generator\UrlGenerator::ABSOLUTE_URL);
-        }
-        $client->setRedirectUri($callbackUrl);
-        $client->setScopes(['email', 'profile']);
-        return $client;
-    }
-
+    /**
+     * This is hack. When authorization fails on the "anonymous" firewall due
+     * to IP whitelist, security will redirect the user to a /login route.
+     * Rather than write a custom authorization class or something just render
+     * the error page here.
+     */
     public function loginAction(Application $app, Request $request)
     {
-        $ips = $app->getIpWhitelist();
-        if (is_array($ips) && count($ips) > 0 && !IpUtils::checkIp($request->getClientIp(), $ips)) {
-            return $app['twig']->render('error-ip.html.twig');
-        } else {
-            $authState = sha1(openssl_random_pseudo_bytes(1024));
-            $app['session']->set('auth_state', $authState);
-            $client = $this->getAuthLoginClient($app, $authState);
-            return $app->redirect($client->createAuthUrl());
-        }
+        return $app['twig']->render('error-ip.html.twig');
     }
 
     public function loginReturnAction(Application $app, Request $request)
     {
-        if (!$request->query->get('state') || $request->query->get('state') != $app['session']->get('auth_state')) {
-            return $app->abort(403);
-        }
-
-        $client = $this->getAuthLoginClient($app);
-        $token = $client->fetchAccessTokenWithAuthCode($request->query->get('code'));
-        $client->setAccessToken($token);
-        $idToken = $client->verifyIdToken();
-        $userEmail = $idToken['email'];
-        $userId = $idToken['sub'];
-        // TODO: connect to symfony auth
+        return $app->redirect($app->generateUrl('home'));
     }
     
     public function timeoutAction(Application $app, Request $request)
