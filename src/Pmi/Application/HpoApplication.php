@@ -161,6 +161,9 @@ class HpoApplication extends AbstractApplication
         $this->register(new \Silex\Provider\DoctrineServiceProvider(), [
             'db.options' => $options
         ]);
+
+        $this['em'] = new \Pmi\EntityManager\EntityManager();
+        $this['em']->setDbal($this['db']);
     }
 
     public function setHeaders(Response $response)

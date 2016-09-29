@@ -43,7 +43,10 @@ class OrderController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE id = ? AND participant_id = ?', [$orderId, $participantId]);
+        $order = $app['em']->getRepository('orders')->fetchOneBy([
+            'id' => $orderId,
+            'participant_id' => $participantId
+        ]);
         if (!$order) {
             $app->abort(404);
         }
