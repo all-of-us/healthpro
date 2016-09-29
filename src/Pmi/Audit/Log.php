@@ -53,9 +53,10 @@ class Log
     public function logSyslog()
     {
         $logArray = $this->buildLogArray();
-        $logArray['action'] = self::PMI_AUDIT_PREFIX . $logArray['action'];
         $syslogData = [];
-        $syslogData[] = $logArray['action'];
+        $syslogData[] = $logArray['ip'];
+        $syslogData[] = $logArray['user'];
+        $syslogData[] = '[' . self::PMI_AUDIT_PREFIX . $logArray['action'] . ']';
         if ($logArray['data']) {
             $syslogData[] = json_encode($logArray['data']);
         }
