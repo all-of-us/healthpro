@@ -11,3 +11,4 @@ php.ini
 /dev_config/*
 !dev_config/config.yml.dist
 .idea
+/bin/GeoLite2-Country.mmdb

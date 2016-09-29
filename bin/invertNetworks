@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+#
+# Given a CSV of CIDR networks, outputs a CSV of CIDR networks that describe
+# their inverse (i.e., all networks except the given networks).
+#
+
+import sys
+from netaddr import *
+
+networks = sys.argv[1].split(",")
+
+# Initial blacklist is *all nets*
+blacklist = IPSet(['0.0.0.0/0'])
+blacklist_ipv6 = IPSet(['::/0'])
+
+# Remove all given networks
+for net in networks:
+	net = IPNetwork(net.strip())
+	if (net.version == 4):
+		blacklist.remove(net)
+	if (net.version == 6):
+		blacklist_ipv6.remove(net)
+
+# Join the two IPSets together
+blacklist = IPSet(blacklist.iter_cidrs() + blacklist_ipv6.iter_cidrs())
+inverseNetwork = []
+for net in blacklist.iter_cidrs():
+	inverseNetwork.append(str(net))
+print ",".join(inverseNetwork)
