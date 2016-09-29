@@ -2,6 +2,7 @@
 app.yaml
 cron.yaml
 dos.yaml
+ip_whitelist.yml
 php.ini
 /node_modules/
 /bower_components/
