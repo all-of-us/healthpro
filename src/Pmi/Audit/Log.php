@@ -35,7 +35,7 @@ class Log
         $logArray['action'] = $this->action;
         $logArray['data'] = $this->data;
         $logArray['ts'] = new \DateTime();
-        if ($user = $this->app->getUser()) {
+        if (($user = $this->app->getUser()) && is_object($user)) {
             $logArray['user'] = $user->getUsername();
         } elseif ($user = $this->app->getGoogleUser()) {
             $logArray['user'] = $user->getEmail();
