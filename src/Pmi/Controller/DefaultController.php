@@ -49,7 +49,7 @@ class DefaultController extends AbstractController
         $timeout = $request->get('timeout');
         $app->log(Log::LOGOUT);
         $app->logout();
-        return $app->redirect($app->getGoogleLogoutUrl($timeout ? $app->generateUrl('timeout') : null));
+        return $app->redirect($app->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
 
     /**

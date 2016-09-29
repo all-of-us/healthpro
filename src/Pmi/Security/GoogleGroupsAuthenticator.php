@@ -68,14 +68,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             $client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
         }
 
-        // `login_url` is the URL prefix to use in the event that our site
-        // is being reverse-proxied from a different domain (i.e., from the WAF)
-        if ($this->app->getConfig('login_url')) {
-            $path = preg_replace('/\/$/', '', $this->app->getConfig('login_url'));
-            $callbackUrl = $path . $this->app['url_generator']->generate('loginReturn');
-        } else {
-            $callbackUrl = $this->app['url_generator']->generate('loginReturn', [], \Symfony\Component\Routing\Generator\UrlGenerator::ABSOLUTE_URL);
-        }
+        $callbackUrl = $this->app->generateUrl('loginReturn', [], true);
         $client->setRedirectUri($callbackUrl);
         $client->setScopes(['email', 'profile']);
         return $client;

@@ -182,13 +182,11 @@ abstract class AbstractApplication extends Application
         return $this['session']->get('googleUser');
     }
     
-    public function getGoogleLogoutUrl($dest = null)
+    public function getGoogleLogoutUrl($route = 'home')
     {
-        if (!$dest) {
-            $dest = $this->generateUrl('home');
-        }
-        $cls = $this->getGoogleServiceClass();
-        return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
+        $dest = $this->generateUrl($route, [], true);
+        // http://stackoverflow.com/a/14831349/1402028
+        return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
     }
     
     public function getUser()
@@ -292,12 +290,24 @@ abstract class AbstractApplication extends Application
         $this['session']->invalidate();
     }
 
-    public function generateUrl($route, $parameters = [])
+    public function generateUrl($route, $parameters = [], $absolute = false)
     {
         if ($this->getName()) {
             $route = $this->getName() . '_' . $route;
         }
-        return $this['url_generator']->generate($route, $parameters);
+        
+        if ($absolute) {
+            // `login_url` is the URL prefix to use in the event that our site
+            // is being reverse-proxied from a different domain (i.e., from the WAF)
+            if ($this->getConfig('login_url')) {
+                $path = preg_replace('/\/$/', '', $this->getConfig('login_url'));
+                return $path . $this['url_generator']->generate($route, $parameters);
+            } else {
+                return $this['url_generator']->generate($route, $parameters, \Symfony\Component\Routing\Generator\UrlGenerator::ABSOLUTE_URL);
+            }
+        } else {
+            return $this['url_generator']->generate($route, $parameters);
+        }
     }
 
     public function redirectToRoute($route, $parameters = [])
