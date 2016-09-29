@@ -12,6 +12,7 @@ class Log
     const PMI_AUDIT_PREFIX = 'PMI_AUDIT_';
 
     // Actions
+    const REQUEST = 'REQUEST';
     const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
     const LOGIN_FAIL = 'LOGIN_FAIL';
     const LOGOUT = 'LOGOUT';

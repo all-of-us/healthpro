@@ -347,7 +347,7 @@ abstract class AbstractApplication extends Application
     {
         $log = new Log($this, $action, $data);
         $log->logSyslog();
-        if (!$this['isUnitTest']) {
+        if (!$this['isUnitTest'] && $action != Log::REQUEST) {
             $log->logDatastore();
         }
     }
