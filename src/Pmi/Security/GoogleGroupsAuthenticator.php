@@ -181,6 +181,13 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         if (!$authException || $authException instanceof AuthenticationCredentialsNotFoundException) {
             $authState = sha1(openssl_random_pseudo_bytes(1024));
             $this->app['session']->set('auth_state', $authState);
+            if ($request->attributes->get('_route') !== 'login' &&
+                $request->attributes->get('_route') !== 'logout' &&
+                $request->attributes->get('_route') !== 'loginReturn' &&
+                $request->attributes->get('_route') !== 'timeout')
+            {
+                $this->app['session']->set('loginDestUrl', $request->getRequestUri());
+            }
             $client = $this->getAuthLoginClient($authState);
             return $this->app->redirect($client->createAuthUrl());
         } else {

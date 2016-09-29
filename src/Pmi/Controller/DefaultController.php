@@ -65,7 +65,8 @@ class DefaultController extends AbstractController
 
     public function loginReturnAction(Application $app, Request $request)
     {
-        return $app->redirect($app->generateUrl('home'));
+        $url = $app['session']->get('loginDestUrl', $app->generateUrl('home'));
+        return $app->redirect($url);
     }
     
     public function timeoutAction(Application $app, Request $request)
