@@ -20,6 +20,7 @@ class DefaultController extends AbstractController
         ['home', '/'],
         ['logout', '/logout'],
         ['login', '/login'],
+        ['loginReturn', '/login-return'],
         ['timeout', '/timeout'],
         ['keepAlive', '/keepalive', [ 'method' => 'POST' ]],
         ['clientTimeout', '/client-timeout', [ 'method' => 'GET' ]],
@@ -48,11 +49,11 @@ class DefaultController extends AbstractController
         $timeout = $request->get('timeout');
         $app->log(Log::LOGOUT);
         $app->logout();
-        return $app->redirect($app->getGoogleLogoutUrl($timeout ? $app->generateUrl('timeout') : null));
+        return $app->redirect($app->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
-    
+
     /**
-     * This is hack. When authorization fails on the "insecure" firewall due
+     * This is hack. When authorization fails on the "anonymous" firewall due
      * to IP whitelist, security will redirect the user to a /login route.
      * Rather than write a custom authorization class or something just render
      * the error page here.
@@ -60,6 +61,12 @@ class DefaultController extends AbstractController
     public function loginAction(Application $app, Request $request)
     {
         return $app['twig']->render('error-ip.html.twig');
+    }
+
+    public function loginReturnAction(Application $app, Request $request)
+    {
+        $url = $app['session']->get('loginDestUrl', $app->generateUrl('home'));
+        return $app->redirect($url);
     }
     
     public function timeoutAction(Application $app, Request $request)

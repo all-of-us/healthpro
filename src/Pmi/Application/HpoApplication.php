@@ -58,10 +58,11 @@ class HpoApplication extends AbstractApplication
         }
         
         $app = $this;
+        $anonRegex = '^/(timeout|login)$';
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
-                'insecure' => [
-                    'pattern' => '^/timeout$',
+                'anonymous' => [
+                    'pattern' => $anonRegex,
                     'anonymous' => true
                 ],
                 'main' => [
@@ -77,8 +78,8 @@ class HpoApplication extends AbstractApplication
                 ]
             ],
             'security.access_rules' => [
-                [['path' => '^/timeout$', 'ips' => $ips], 'IS_AUTHENTICATED_ANONYMOUSLY'],
-                [['path' => '^/timeout$'], 'ROLE_NO_ACCESS'],
+                [['path' => $anonRegex, 'ips' => $ips], 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                [['path' => $anonRegex], 'ROLE_NO_ACCESS'],
                 
                 [['path' => '^/_dev/.*$', 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
                 [['path' => '^/_dev/.*$'], 'ROLE_NO_ACCESS'],
@@ -185,8 +186,7 @@ class HpoApplication extends AbstractApplication
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
         // log the user out if their session is expired
-        if ($this->isLoginExpired()) {
-            $this->logout(); // otherwise we will infinitely redirect to /logout
+        if ($this->isLoginExpired() && $request->attributes->get('_route') !== 'logout') {
             return $this->redirectToRoute('logout', ['timeout' => true]);
         }
         
