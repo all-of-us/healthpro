@@ -16,7 +16,6 @@ VALUES
 	(4,'Physical Exam Scheduled'),
 	(5,'Physical Exam Completed'),
 	(6,'Biosample Received'),
-	(7,'Biosample Recorded'),
-	(8,'Full Participant');
+	(7,'Full Participant');
 
 UNLOCK TABLES;

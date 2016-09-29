@@ -1,0 +1,37 @@
+<div class="row" id="{{ id }}-filters">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="panel-title">
+                    <h4><a href="#{{ id }}-filters-content" data-toggle="collapse">Recruitment Filters <span class='fa fa-plus toggle-glyph'></span></a></h4>
+                </div>
+            </div>
+            <div id="{{ id }}-filters-content" class="panel-collapse collapse">
+                <div class="panel-body center-filter-panel">
+                   <div class="row">
+                        <div class="col-xs-12">
+                            <p class="text-center"><a href="javascript:;" class="redraw-plotly btn btn-primary"><span class="fa fa-filter"></span> Filter Results</a></p>
+                            {% for group, centers in recruitment_centers %}
+                                <ul class="list-group {{ group }}-center-filters">
+                                    {% if group != 'Misc' %}
+                                        <li class="list-group-item"><h4 class="list-group-item-heading">{{ group }}
+                                                {% if centers|length > 1 %}
+                                                    <a href="javascript:;" class="toggle-center-filters label label-primary pull-right" data-identifier="{{ group }}-center-filters">Toggle All</a>
+                                                {% endif %}
+                                            </h4>
+                                        </li>
+                                    {% endif %}
+                                    {% for center in centers %}
+                                        <li class="list-group-item">
+                                            <label><input type="checkbox" name="recruitment_centers[]" value="{{ center['id'] }}" class="center-filter" checked> {{ center['label'] }}</label>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endfor %}
+                        </div>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

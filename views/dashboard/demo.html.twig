@@ -11,39 +11,47 @@
     <div id="plotly-tabs" class="tab-content">
         <div id="participants-by-time" class="tab-pane pad active fade in">
             <div class="row">
-                <div class="col-md-2">
-                    <div class="well">
-                        <div class="row form-group-sm">
-                            <div class="col-md-12 col-xs-3">
-                                <label>Plot</label>
-                                <select class="form-control time-plot-control" id="plot-value">
-                                    <option value="participant_tiers" selected>Participant Tier</option>
-                                    <option value="races">Race</option>
-                                    <option value="ethnicities">Ethnicity</option>
-                                    <option value="gender_identities">Gender Identity</option>
-                                    <option value="age_groups">Age</option>
-                                </select>
+                <div class="col-md-3">
+                    {% include 'dashboard/centers.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-time'} %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <h4 class="text-primary">Plot Options</h4>
                             </div>
-                            <div class="col-md-12 col-xs-3">
-                                <label>Start Date</label>
-                                <input type="text" class="form-control datepicker time-plot-control" id="start-date" />
-                            </div>
-                            <div class="col-md-12 col-xs-3">
-                                <label>Cutoff Date</label>
-                                <input type="text" class="form-control datepicker time-plot-control" id="end-date" />
-                            </div>
-                            <div class="col-md-12 col-xs-3">
-                                <label>Interval</label>
-                                <select class="form-control time-plot-control" id="interval">
-                                    <option value="months">Months</option>
-                                    <option value="weeks">Weeks</option>
-                                    <option value="days">Days</option>
-                                </select>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row form-group-sm">
+                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
+                                    <label>Participant Field</label>
+                                    <select class="form-control time-plot-control" id="plot-value">
+                                        <option value="participant_tiers" selected>Participant Tier</option>
+                                        <option value="races">Race</option>
+                                        <option value="ethnicities">Ethnicity</option>
+                                        <option value="gender_identities">Gender Identity</option>
+                                        <option value="age_groups">Age</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-xs-3 form-group form-group-sm">
+                                    <label>Start</label>
+                                    <input type="text" class="form-control datepicker time-plot-control" id="start-date" />
+                                </div>
+                                <div class="col-md-6 col-xs-3 form-group form-group-sm">
+                                    <label>Cutoff</label>
+                                    <input type="text" class="form-control datepicker time-plot-control" id="end-date" />
+                                </div>
+                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
+                                    <label>Interval</label>
+                                    <select class="form-control time-plot-control" id="interval">
+                                        <option value="months">Months</option>
+                                        <option value="weeks">Weeks</option>
+                                        <option value="days">Days</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-10" id="plotly-participants-by-time"></div>
+                <div class="col-md-9 plotly-div" id="plotly-participants-by-time"></div>
             </div>
 
             <script type="text/javascript">
@@ -59,7 +67,8 @@
                     var attribute = $('#plot-value').val();
                     var displayText = $('#plot-value option:selected').text();
                     var interval = $('#interval').val();
-                    $.getJSON('/dashboard/demo_load_data?start_date=' + startDate + '&end_date=' + endDate + '&attribute=' + attribute + '&interval=' + interval, function(data) {
+                    var centers = loadRecruitmentFilters('participants-by-time');
+                    $.getJSON('/dashboard/demo_load_data?start_date=' + startDate + '&end_date=' + endDate + '&attribute=' + attribute + '&interval=' + interval + "&centers=" + centers, function(data) {
                         var timeTitle;
                         if ($('#start-date').val() == '') {
                             timeTitle = 'Participant registrations by ' + displayText + ' as of ' + endDate;
@@ -79,7 +88,7 @@
 
                         // only load totals when interval is not set to days
                         if (interval != 'days') {
-                            loadBarChartAnnotations(data, timeAnnot);
+                            loadBarChartAnnotations(data, timeAnnot, interval);
                         }
 
                         Plotly.newPlot('plotly-participants-by-time', data, timeLayout, PLOTLY_OPTS);
@@ -111,33 +120,51 @@
                         renderPlot(false);
                     }
                 });
+
+                $('#participants-by-time').find('.toggle-center-filters').click(function(e) {
+                    var listGroup = $(e.target).data('identifier');
+                    console.log('toggling ' + listGroup);
+                    var cb = $('#participants-by-time').find('.' + listGroup).find('input');
+                    cb.prop('checked', !cb.prop('checked'));
+                });
+
+                $('#participants-by-time').find('.redraw-plotly').click(function() {
+                    renderPlot(true);
+                });
             </script>
         </div>
         <div id="participants-by-region" class="tab-pane pad fade">
             <div class="row">
-                <div class="col-md-2">
-                    <div class="well">
-                        <div class="row form-group-sm">
-                            <div class="col-md-12 col-xs-4">
-                                <label>Plot</label>
-                                <select class="form-control region-plot-control" id="map-mode">
-                                    <option value="states" selected>States</option>
-                                    <option value="census_regions">Census Regions</option>
-                                    <option value="recruitment_centers">Recruitment Origin</option>
-                                </select>
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <h4 class="text-primary">Plot Options</h4>
                             </div>
-                            <div class="col-md-12 col-xs-4">
-                                <label>Start Date</label>
-                                <input type="text" class="form-control region-plot-control datepicker" id="region-date-start" />
-                            </div>
-                            <div class="col-md-12 col-xs-4">
-                                <label>Cutoff Date</label>
-                                <input type="text" class="form-control region-plot-control datepicker" id="region-date-end" />
+                        </div>
+                        <div class="panel-body">
+                            <div class="row form-group-sm">
+                                <div class="col-md-12 col-xs-4 form-group form-group-sm">
+                                    <label>Participant Field</label>
+                                    <select class="form-control region-plot-control" id="map-mode">
+                                        <option value="states" selected>States</option>
+                                        <option value="census_regions">Census Regions</option>
+                                        <option value="recruitment_centers">Recruitment Origin</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-xs-4 form-group form-group-sm">
+                                    <label>Start</label>
+                                    <input type="text" class="form-control region-plot-control datepicker" id="region-date-start" />
+                                </div>
+                                <div class="col-md-6 col-xs-4 form-group form-group-sm">
+                                    <label>Cutoff</label>
+                                    <input type="text" class="form-control region-plot-control datepicker" id="region-date-end" />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div id="plotly-participants-by-region" class="col-md-10"></div>
+                <div id="plotly-participants-by-region" class="col-md-9 plotly-div"></div>
             </div>
 
             <script type="text/javascript">
@@ -199,21 +226,29 @@
         </div>
         <div id="participants-by-lifecycle" class="tab-pane pad fade">
             <div class="row">
-                <div class="col-md-2">
-                    <div class="well">
-                        <div class="row form-group-sm">
-                            <div class="col-md-12 col-xs-3">
-                                <label>Start Date</label>
-                                <input type="text" class="form-control lifecycle-plot-control datepicker" id="lifecycle-date-start" />
+                <div class="col-md-3">
+                    {% include 'dashboard/centers.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-lifecycle'} %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <h4 class="text-primary">Plot Options</h4>
                             </div>
-                            <div class="col-md-12 col-xs-3">
-                                <label>Cutoff Date</label>
-                                <input type="text" class="form-control lifecycle-plot-control datepicker" id="lifecycle-date-end" />
+                        </div>
+                        <div class="panel-body">
+                            <div class="row form-group-sm">
+                                <div class="col-md-6 col-xs-3 form-group form-group-sm">
+                                    <label>Start</label>
+                                    <input type="text" class="form-control lifecycle-plot-control datepicker" id="lifecycle-date-start" />
+                                </div>
+                                <div class="col-md-6 col-xs-3 form-group form-group-sm">
+                                    <label>Cutoff</label>
+                                    <input type="text" class="form-control lifecycle-plot-control datepicker" id="lifecycle-date-end" />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-10" id="plotly-participants-by-lifecycle"></div>
+                <div class="col-md-9 plotly-div" id="plotly-participants-by-lifecycle"></div>
             </div>
 
             <script type="text/javascript">
@@ -226,7 +261,9 @@
                     var lcWidth = $('#plotly-participants-by-lifecycle').width() - 30;
                     var lcStartDate = $('#lifecycle-date-start').val();
                     var lcEndDate = $('#lifecycle-date-end').val();
-                    $.getJSON('/dashboard/demo_load_lifecycle_data?start_date=' + lcStartDate + '&end_date=' + lcEndDate, function(data) {
+                    var lcCenters = loadRecruitmentFilters('participants-by-lifecycle');
+
+                    $.getJSON('/dashboard/demo_load_lifecycle_data?start_date=' + lcStartDate + '&end_date=' + lcEndDate + '&centers=' + lcCenters, function(data) {
                         var lcTitle;
                         if ($('#lifecycle-date-start').val() == '') {
                             lcTitle = 'Participant registrations by lifecycle phase as of ' + lcEndDate;
@@ -240,7 +277,7 @@
                             barmode: 'stack',
                             width: lcWidth,
                             height: lcWidth / 1.66,
-                            annotations: loadBarChartAnnotations(data, lcAnnot),
+                            annotations: loadBarChartAnnotations(data, lcAnnot, ''),
                             xaxis: {
                                 tickangle: -45
                             },
@@ -277,11 +314,26 @@
                         renderLcPlot(false);
                     }
                 });
+
+                $('#participants-by-lifecycle').find('.toggle-center-filters').click(function(e) {
+                    var listGroup = $(e.target).data('identifier');
+                    console.log('toggling ' + listGroup);
+                    var cb = $('#participants-by-lifecycle').find('.' + listGroup).find('input');
+                    cb.prop('checked', !cb.prop('checked'));
+                });
+
+                $('#participants-by-lifecycle').find('.redraw-plotly').click(function() {
+                    renderLcPlot(true);
+                });
             </script>
         </div>
     </div>
 
     <script type="text/javascript">
         $('.datepicker').datepicker({dateFormat: 'yy-mm-dd', showButtonPanel: true});
+
+        $('.panel-collapse').on('show.bs.collapse hide.bs.collapse', function() {
+            toggleGlyph($(this).prev().find('span.toggle-glyph'));
+        });
     </script>
 {% endblock %}
