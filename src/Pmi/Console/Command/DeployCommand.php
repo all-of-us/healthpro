@@ -31,7 +31,9 @@ class DeployCommand extends Command {
     ];
 
     /** Create release tag when deploying these application IDs. */
-    private static $TAG_APP_IDS = [];
+    private static $TAG_APP_IDS = [
+        'pmi-hpo-test'
+    ];
 
     /** Don't require `login: admin` for these application IDs. */
     private static $SKIP_ADMIN_APP_IDS = [];
