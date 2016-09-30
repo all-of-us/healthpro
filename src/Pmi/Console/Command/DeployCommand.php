@@ -27,6 +27,7 @@ class DeployCommand extends Command {
 
     /** Restrict access by IP using dos.yaml */
     private static $IPRESTRICT_APP_IDS = [
+        'pmi-hpo-test'
     ];
 
     /** Create release tag when deploying these application IDs. */

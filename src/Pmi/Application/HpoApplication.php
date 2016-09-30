@@ -203,6 +203,8 @@ class HpoApplication extends AbstractApplication
         if ($this['session']->get('isLogin')) {
             $app->log(Log::LOGIN_SUCCESS, $this->getUser()->getRoles());
             $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
+        } else {
+            $app->log(Log::REQUEST);
         }
     }
     
