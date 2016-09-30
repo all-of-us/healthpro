@@ -23,7 +23,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
     }
 
-    /*public function testLogin()
+    public function testLogin()
     {
         $email = 'testLogin@example.com';
         GoogleUserService::switchCurrentUser($email);
@@ -87,7 +87,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $client->request('POST', '/agree');
         $crawler = $client->request('GET', '/');
         $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')));
-    }*/
+    }
     
     function testGetIpWhitelist()
     {
@@ -104,7 +104,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertEquals(['127.0.0.1', '8.8.8.8', '0.0.0.0'], $this->app->getIpWhitelist());
     }
     
-    /*function testIpWhitelist0()
+    function testIpWhitelist0()
     {
         $this->ipWhitelist = '192.168.1.1';
         $this->app = $this->createApplication();
@@ -128,7 +128,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $crawler = $client->request('GET', '/timeout');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-    }*/
+    }
     
     protected function getIpWhitelist()
     {
