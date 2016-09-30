@@ -148,6 +148,20 @@ abstract class AbstractApplication extends Application
     /** Populates $this->configuration */
     abstract protected function loadConfiguration($override = []);
     
+    public function getConfig($key)
+    {
+        if (isset($this->configuration[$key])) {
+            return $this->configuration[$key];
+        } else {
+            return null;
+        }
+    }
+
+    public function setConfig($key, $val)
+    {
+        $this->configuration[$key] = $val;
+    }
+    
     /** Sets up authentication and firewall. */
     abstract protected function registerSecurity();
     
@@ -174,14 +188,35 @@ abstract class AbstractApplication extends Application
     
     public function getGoogleUser()
     {
-        return $this['session']->get('googleUser');
+        if ($this->getConfig('gae_auth')) {
+            $cls = $this->getGoogleServiceClass();
+            return class_exists($cls) ? $cls::getCurrentUser() : null;
+        } else {
+            return $this['session']->get('googleUser');
+        }
     }
     
     public function getGoogleLogoutUrl($route = 'home')
     {
         $dest = $this->generateUrl($route, [], true);
-        // http://stackoverflow.com/a/14831349/1402028
-        return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
+        
+        if ($this->getConfig('gae_auth')) {
+            $cls = $this->getGoogleServiceClass();
+            return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
+        } else {
+            // http://stackoverflow.com/a/14831349/1402028
+            return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
+        }
+    }
+    
+    public function getGoogleLoginUrl($route = 'home')
+    {
+        $dest = $this->generateUrl($route, [], true);
+        
+        if ($this->getConfig('gae_auth')) {
+            $cls = $this->getGoogleServiceClass();
+            return class_exists($cls) ? $cls::createLoginURL($dest) : null;
+        }
     }
     
     public function getUser()

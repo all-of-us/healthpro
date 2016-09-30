@@ -117,20 +117,6 @@ class HpoApplication extends AbstractApplication
             $this->configuration[$key] = $val;
         }
     }
-
-    public function getConfig($key)
-    {
-        if (isset($this->configuration[$key])) {
-            return $this->configuration[$key];
-        } else {
-            return null;
-        }
-    }
-
-    public function setConfig($key, $val)
-    {
-        $this->configuration[$key] = $val;
-    }
     
     protected function registerDb()
     {
