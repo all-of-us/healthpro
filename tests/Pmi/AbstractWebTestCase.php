@@ -4,7 +4,6 @@ namespace Tests\Pmi;
 use Pmi\Application\HpoApplication;
 use Pmi\Controller;
 use Pmi\Security\GoogleGroupsAuthenticator;
-use Pmi\Security\UserProvider;
 use Pmi\Security\User;
 use Silex\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -69,26 +68,5 @@ abstract class AbstractWebTestCase extends WebTestCase
     protected function getIpWhitelist()
     {
         return null;
-    }
-    
-    protected function getCurrentUser()
-    {
-        return $this->app['session']->get('googleUser');
-    }
-    
-    protected function switchCurrentUser($email, $login = false)
-    {
-        $this->app['session']->set('googleUser', new GoogleUser($email));
-        if ($login) {
-            $provider = new UserProvider($this->app);
-            $user = $provider->loadUserByUsername($email);
-            $this->loginUser(new GoogleGroupsAuthenticator($this->app), $user);
-            return $this->app->getUser();
-        }
-    }
-    
-    protected function clearCurrentUser()
-    {
-        $this->app['session']->set('googleUser', null);
     }
 }

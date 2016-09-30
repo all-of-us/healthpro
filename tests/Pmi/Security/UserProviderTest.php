@@ -9,7 +9,7 @@ class UserProviderTest extends AbstractWebTestCase
     public function testLoadUserByUsername()
     {
         $email = 'test@testLoadUserByUsername.com';
-        $this->switchCurrentUser($email);
+        GoogleUserService::switchCurrentUser($email);
         $provider = new UserProvider($this->app);
         $user = $provider->loadUserByUsername($email);
         $this->assertEquals($email, $user->getEmail());
@@ -22,7 +22,7 @@ class UserProviderTest extends AbstractWebTestCase
     public function testNoGoogleUser()
     {
         $email = 'test@testNoGoogleUser.com';
-        $this->clearCurrentUser();
+        GoogleUserService::clearCurrentUser();
         $provider = new UserProvider($this->app);
         $caught = false; // because we don't have expectException
         try {
