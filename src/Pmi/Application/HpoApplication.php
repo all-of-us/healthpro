@@ -113,6 +113,16 @@ class HpoApplication extends AbstractApplication
             }
         }
         
+        // load IP whitelist
+        $whitelistFile = $appDir . '/ip_whitelist.yml';
+        if (file_exists($whitelistFile)) {
+            $yaml = new \Symfony\Component\Yaml\Parser();
+            $whitelistConfig = $yaml->parse(file_get_contents($whitelistFile));
+            if (is_array($whitelistConfig['whitelist'])) {
+                $this->configuration['ip_whitelist'] = implode(',', $whitelistConfig['whitelist']);
+            }
+        }
+        
         foreach ($override as $key => $val) {
             $this->configuration[$key] = $val;
         }
