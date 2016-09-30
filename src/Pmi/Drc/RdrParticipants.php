@@ -148,9 +148,9 @@ class RdrParticipants
     public function getEvaluation($participantId, $evaluationId)
     {
         try {
-            $response = $this->getClient()->request('GET', "participants/{$participantId}/evaluations/{$evaluationId}");
+            $response = $this->getClient()->request('GET', "participants/{$participantId}/evaluation/{$evaluationId}");
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->evaluation_id)) {
+            if (is_object($result) && isset($result->id)) {
                 return $result;
             }
         } catch (\Exception $e) {
@@ -162,12 +162,12 @@ class RdrParticipants
     public function createEvaluation($participantId, $evaluation)
     {
         try {
-            $response = $this->getClient()->request('POST', "participants/{$participantId}/evaluations", [
+            $response = $this->getClient()->request('POST', "participants/{$participantId}/evaluation", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->evaluation_id)) {
-                return $result->evaluation_id;
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
             }
         } catch (\Exception $e) {
             return false;
@@ -178,7 +178,7 @@ class RdrParticipants
     public function updateEvaluation($participantId, $evaluationId, $evaluation)
     {
         try {
-            $response = $this->getClient()->request('PUT', "participants/{$participantId}/evaluations/{$evaluationId}", [
+            $response = $this->getClient()->request('POST', "participants/{$participantId}/evaluation/{$evaluationId}", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
@@ -186,6 +186,7 @@ class RdrParticipants
                 return $result->evaluation_id;
             }
         } catch (\Exception $e) {
+            throw $e;
             return false;
         }
         return false;
