@@ -36,7 +36,8 @@ abstract class AbstractWebTestCase extends WebTestCase
         $app->setup([
             // don't bypass groups auth because we handle this with fixtures
             'gaBypass' => false,
-            'ip_whitelist' => $this->getIpWhitelist()
+            'ip_whitelist' => $this->getIpWhitelist(),
+            'gae_auth' => true
         ]);
         $app->mount('/', new Controller\DefaultController());
         $app->mount('/dashboard', new Controller\DashboardController());

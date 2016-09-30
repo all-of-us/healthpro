@@ -108,6 +108,8 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
                 $this->app['session']->set('googleUser', new \Pmi\Drc\GoogleUser($idToken['sub'], $idToken['email']));
             }
             return $this->buildCredentials($this->app->getGoogleUser());
+        } elseif ($this->app->getConfig('gae_auth') && $this->app->getGoogleUser()) {
+            return $this->buildCredentials($this->app->getGoogleUser());
         } else {
             // firewall rules will fail and $this->start() will be called
             return;
@@ -142,6 +144,9 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
                 'email' => $googleUser->getEmail(),
                 'logoutUrl' => $this->app->getGoogleLogoutUrl()
             ];
+        } elseif ($this->app->getConfig('gae_auth')) {
+            $template = 'error-gae-auth.html.twig';
+            $params = ['loginUrl' => $this->app->getGoogleLoginUrl()];
         } else {
             $template = $this->app['errorTemplate'];
             $params = ['code' => $code];
@@ -171,7 +176,9 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        if (!$authException || $authException instanceof AuthenticationCredentialsNotFoundException) {
+        if ($this->app->getConfig('gae_auth')) {
+            return $this->onAuthenticationFailure($request, $authException);
+        } elseif (!$authException || $authException instanceof AuthenticationCredentialsNotFoundException) {
             $authState = sha1(openssl_random_pseudo_bytes(1024));
             $this->app['session']->set('auth_state', $authState);
             if ($request->attributes->get('_route') !== 'login' &&
