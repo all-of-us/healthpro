@@ -30,19 +30,31 @@ class RdrParticipants
         if (!isset($participant->drc_internal_id)) {
             return false;
         }
-        if (isset($participant->enrollment_status) && $participant->enrollment_status == 'CONSENTED') {
+        if (isset($participant->membership_tier) && $participant->membership_tier == 'CONSENTED') {
             $consentStatus = true;
         } else {
             $consentStatus = false;
         }
+        switch ($participant->gender_identity) {
+            case 'FEMALE':
+                $gender = 'F';
+                break;
+            case 'MALE':
+                $gender = 'M';
+                break;
+            default:
+                $gender = 'U';
+                break;
+        }
         return (object)[
             'id' => $participant->drc_internal_id,
             'firstName' => $participant->first_name,
+            'middleName' => $participant->middle_name,
             'lastName' => $participant->last_name,
             'dob' => new \DateTime($participant->date_of_birth),
-            'gender' => 'U',
-            'zip' => isset($participant->zip_code) ? $participant->zip_code : null,
-            'consentComplete' => isset($participant->membership_tier) ? $participant->membership_tier == 'CONSENTED' : null
+            'gender' => $gender,
+            'zip' => $participant->zip_code,
+            'consentComplete' => $consentStatus
         ];
     }
 
@@ -58,7 +70,7 @@ class RdrParticipants
         if (isset($params['dob'])) {
             try {
                 $date = new \DateTime($params['dob']);
-                $query['date_of_birth'] = $date->format('Y-m-d\T00:00:00');
+                $query['date_of_birth'] = $date->format('Y-m-d');
             } catch (\Exception $e) {
                 throw new Exception\InvalidDobException();
             }
@@ -116,7 +128,7 @@ class RdrParticipants
     {
         if (isset($participant['date_of_birth'])) {
             $dt = new \DateTime($participant['date_of_birth']);
-            $participant['date_of_birth'] = $dt->format('Y-m-d\T00:00:00');
+            $participant['date_of_birth'] = $dt->format('Y-m-d');
         }
         $participant['biobank_id'] = Uuid::uuid4();
         try {
