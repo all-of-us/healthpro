@@ -28,9 +28,9 @@ class IpWhitelistCommand extends Command
         $output->setFormatter(new OutputFormatter(true)); // color output
         
         $output->writeln("Downloading GeoIP2 country database...");
-        //$db = file_get_contents('http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz');
+        $db = file_get_contents('http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz');
         $dbFile = "{$this->appDir}/bin/GeoLite2-Country.mmdb";
-        //file_put_contents($dbFile, gzdecode($db));
+        file_put_contents($dbFile, gzdecode($db));
         $output->writeln("... database downloaded to {$dbFile}");
         $output->writeln('');
         
