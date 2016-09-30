@@ -1,7 +1,10 @@
 {% extends 'dashboard/base.html.twig' %}
 {% block body %}
-    <h2><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard <span class="pull-right label label-primary" style="margin-top: 2px;">Total Participants to Date: {{ total_participants }}</span>
-    </h2>
+    <div class="row">
+        <div class="col-md-6"><h2><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard</h2></div>
+        <div class="col-md-6"><h2 class="text-right"><small>Participants as of {{ today }}: <span class="text-primary">{{ total_participants }} ({{ percentage }}%)</span></small></h2></div>
+    </div>
+
     <br />
     <ul class="nav nav-tabs top-pad" role="tablist">
         <li role="presentation" class="active"><a href="#participants-by-time" role="tab" data-toggle="tab" id="participants-by-time-nav"><span class="fa fa-calendar"></span> Participant Categories Over Time</a></li>
@@ -12,7 +15,7 @@
         <div id="participants-by-time" class="tab-pane pad active fade in">
             <div class="row">
                 <div class="col-md-3">
-                    {% include 'dashboard/centers.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-time'} %}
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-time'} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -121,13 +124,6 @@
                     }
                 });
 
-                $('#participants-by-time').find('.toggle-center-filters').click(function(e) {
-                    var listGroup = $(e.target).data('identifier');
-                    console.log('toggling ' + listGroup);
-                    var cb = $('#participants-by-time').find('.' + listGroup).find('input');
-                    cb.prop('checked', !cb.prop('checked'));
-                });
-
                 $('#participants-by-time').find('.redraw-plotly').click(function() {
                     renderPlot(true);
                 });
@@ -144,7 +140,7 @@
                         </div>
                         <div class="panel-body">
                             <div class="row form-group-sm">
-                                <div class="col-md-12 col-xs-4 form-group form-group-sm">
+                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
                                     <label>Participant Field</label>
                                     <select class="form-control region-plot-control" id="map-mode">
                                         <option value="states" selected>States</option>
@@ -152,13 +148,25 @@
                                         <option value="recruitment_centers">Recruitment Origin</option>
                                     </select>
                                 </div>
-                                <div class="col-md-6 col-xs-4 form-group form-group-sm">
+                                <div class="col-md-6 col-xs-3 form-group form-group-sm">
                                     <label>Start</label>
                                     <input type="text" class="form-control region-plot-control datepicker" id="region-date-start" />
                                 </div>
-                                <div class="col-md-6 col-xs-4 form-group form-group-sm">
+                                <div class="col-md-6 col-xs-3 form-group form-group-sm">
                                     <label>Cutoff</label>
                                     <input type="text" class="form-control region-plot-control datepicker" id="region-date-end" />
+                                </div>
+                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
+                                    <label>Color Profile <span class="fa fa-question-circle-o" data-toggle="tooltip" title="Only applies to states and census regions maps"></span></label>
+                                    <select class="form-control region-plot-control" id="map-color-profile">
+                                        {% for color in color_profiles %}
+                                            {% if color == 'Greens' %}
+                                                <option value="{{ color }}" selected>{{ color }}</option>
+                                            {% else %}
+                                                <option value="{{ color }}">{{ color }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -179,7 +187,8 @@
                     var mapEndDate = $('#region-date-end').val();
                     var mapMode = $('#map-mode').val();
                     var mapModeText = $('#map-mode option:selected').text();
-                    $.getJSON('/dashboard/demo_load_map_data?start_date=' + mapStartDate + '&end_date=' + mapEndDate + '&map_mode=' + mapMode, function(data) {
+                    var mapColor = $('#map-color-profile').val();
+                    $.getJSON('/dashboard/demo_load_map_data?start_date=' + mapStartDate + '&end_date=' + mapEndDate + '&map_mode=' + mapMode + '&color_profile=' + mapColor, function(data) {
                         var mapTitle;
                         if ($('#region-date-start').val() == '') {
                             mapTitle = 'Participant registrations by ' + mapModeText + ' as of ' + mapEndDate;
@@ -227,7 +236,7 @@
         <div id="participants-by-lifecycle" class="tab-pane pad fade">
             <div class="row">
                 <div class="col-md-3">
-                    {% include 'dashboard/centers.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-lifecycle'} %}
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-lifecycle'} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -313,13 +322,6 @@
                     if ($('#participants-by-lifecycle').is(':visible')) {
                         renderLcPlot(false);
                     }
-                });
-
-                $('#participants-by-lifecycle').find('.toggle-center-filters').click(function(e) {
-                    var listGroup = $(e.target).data('identifier');
-                    console.log('toggling ' + listGroup);
-                    var cb = $('#participants-by-lifecycle').find('.' + listGroup).find('input');
-                    cb.prop('checked', !cb.prop('checked'));
                 });
 
                 $('#participants-by-lifecycle').find('.redraw-plotly').click(function() {

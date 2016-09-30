@@ -8,7 +8,7 @@
     <div id="plotly-tabs" class="tab-content">
         <div id="total-progress" class="tab-pane pad active fade in">
             <div class="row">
-                <div id="total-progress-filters" class="col-md-4">
+                <div id="total-progress-filters" class="col-md-3">
                     <div class="well well-sm">
                         <div class="form-group form-group-sm">
                             <label>Display Metric</label>
@@ -23,7 +23,7 @@
 
                     </div>
                 </div>
-                <div id="plotly-total-progress" class="col-md-8 plotly-div"></div>
+                <div id="plotly-total-progress" class="col-md-9 plotly-div"></div>
             </div>
             <script type="text/javascript">
                 // function to grab current filter values and load JSON from load_map_data REST endpoint
@@ -45,6 +45,7 @@
                             font: PLOTLY_LABEL_FONT,
                             barmode: 'stack',
                             width: tpWidth,
+                            height: tpWidth / 1.66,
                             annotations: progressAnnot
                         };
 

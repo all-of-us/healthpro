@@ -8,6 +8,8 @@ use Pmi\Drc\RdrMetrics;
 class DashboardController extends AbstractController
 {
     protected static $name = 'dashboard';
+
+    const PARTICIPANT_GOAL = 1000000;
     
     protected static $routes = [
         ['home', '/'],
@@ -39,6 +41,9 @@ class DashboardController extends AbstractController
     public function demoAction(Application $app, Request $request)
     {
         $total = $app['db']->fetchColumn("SELECT count(*) from dashboard_participants");
+        $percentage = number_format(($total / DashboardController::PARTICIPANT_GOAL * 100), 2);
+
+        // load recruitement centers for filtering
         $all_centers = $app['db']->fetchAll("SELECT * FROM recruitment_centers");
         $recruitment_centers = array();
         foreach($all_centers as $center) {
@@ -49,9 +54,18 @@ class DashboardController extends AbstractController
                 $recruitment_centers[$category][] = $center;
             }
         }
+
+        $today = date('Y-m-d');
+
+        // array of Plotly color profiles for dropdown
+        $color_profiles = ['Blackbody', 'Bluered', 'Blues', 'Earth', 'Electric', 'Greens', 'Hot', 'Jet', 'Picnic',
+                           'Portland', 'Rainbow', 'RdBu', 'Reds', 'Viridis', 'YlGnBu', 'YlOrRd'];
         return $app['twig']->render('dashboard/demo.html.twig', [
             'total_participants' => $total,
-            'recruitment_centers' => $recruitment_centers
+            'recruitment_centers' => $recruitment_centers,
+            'color_profiles' => $color_profiles,
+            'today' => $today,
+            'percentage' => $percentage
         ]);
     }
 
@@ -146,6 +160,7 @@ class DashboardController extends AbstractController
         $map_mode = $request->get('map_mode');
         $end_date = $request->get('end_date');
         $start_date = $request->get('start_date');
+        $color_profile = $request->get('color_profile');
 
         // if no start date is supplied, check oldest registration in database
         if (empty($start_date)) {
@@ -175,8 +190,7 @@ class DashboardController extends AbstractController
                 'locations' => $state_names,
                 'z' => $state_registrations,
                 'text' => $state_names,
-                "colorscale" => 'Greens'
-
+                "colorscale" => $color_profile
             );
 
         } elseif ($map_mode == 'census_regions') {
@@ -207,7 +221,7 @@ class DashboardController extends AbstractController
                 'locations' => $states_by_region,
                 'z' => $registrations_by_state,
                 'text' => $region_text,
-                "colorscale" => 'Greens'
+                "colorscale" => $color_profile
             );
 
         } elseif ($map_mode == 'recruitment_centers') {
@@ -217,6 +231,11 @@ class DashboardController extends AbstractController
                 $count = $app['db']->fetchColumn("SELECT count(*) FROM dashboard_participants 
                                                   WHERE enrollment_date >= ? AND enrollment_date <= ? 
                                                   AND recruitment_center = ?", [$start_date, $end_date, $location["id"]]);
+                if ($location["category"] == 'Misc') {
+                    $label = "{$location["label"]}: <b>{$count}</b>";
+                } else {
+                    $label = "{$location["label"]} ({$location['category']}): <b>{$count}</b>";
+                }
 
                 $map_data[] = array(
                     'type' => 'scattergeo',
@@ -224,7 +243,7 @@ class DashboardController extends AbstractController
                     'lat' => [$location['latitude']],
                     'lon' => [$location['longitude']],
                     'hoverinfo' => 'text',
-                    'text' => ["{$location["label"]}: <b>{$count}</b>"],
+                    'text' => [$label],
                     'marker' => array(
                         'size' => [$count],
                         'color' => $this->getColorBrewerVal($i),
