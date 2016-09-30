@@ -20,7 +20,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     {
         $client = $this->createClient();
         $crawler = $client->request('GET', '/');
-        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
     }
 
     /*public function testLogin()
@@ -102,9 +102,6 @@ class HpoApplicationTest extends AbstractWebTestCase
         
         $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.8 , 0.0.0.0');
         $this->assertEquals(['127.0.0.1', '8.8.8.8', '0.0.0.0'], $this->app->getIpWhitelist());
-        
-        $this->app->setConfig('ip_whitelist', '  127.0.0.1, 8.8.8.256 , 0.0.0.0');
-        $this->assertSame(null, $this->app->getIpWhitelist());
     }
     
     /*function testIpWhitelist0()

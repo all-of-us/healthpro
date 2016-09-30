@@ -53,3 +53,9 @@ Configure your local MySQL database connection by creating the following Configu
 * `mysql_schema` (database name)
 * `mysql_user`
 * `mysql_password`
+
+## Generate IP whitelists
+
+IP whitelisting is used to allow only traffic coming from the WAF. This is a mitigation until Google implements their GAE firewall. The whitelists are versioned in git for better clarity/auditing rather than generated on the fly. They can be rebuilt with:
+
+`./bin/console pmi:ipwhitelist`

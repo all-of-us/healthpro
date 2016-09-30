@@ -52,10 +52,7 @@ class HpoApplication extends AbstractApplication
         
         // use an IP whitelist until GAE has built-in firewall rules
         $ips = $this->getIpWhitelist();
-        if ($ips === null) {
-            // null implies bad configuration - limit to loopback address
-            $ips = ['127.0.0.1', '::1'];
-        } elseif (count($ips) === 0) {
+        if (count($ips) === 0) {
             // no config specified - allow everything ('::/0' doesn't work with IpUtils)
             $ips = ['0.0.0.0/0', '::/1'];
         }
@@ -116,23 +113,19 @@ class HpoApplication extends AbstractApplication
             }
         }
         
+        // load IP whitelist
+        $whitelistFile = $appDir . '/ip_whitelist.yml';
+        if (file_exists($whitelistFile)) {
+            $yaml = new \Symfony\Component\Yaml\Parser();
+            $whitelistConfig = $yaml->parse(file_get_contents($whitelistFile));
+            if (is_array($whitelistConfig['whitelist'])) {
+                $this->configuration['ip_whitelist'] = implode(',', $whitelistConfig['whitelist']);
+            }
+        }
+        
         foreach ($override as $key => $val) {
             $this->configuration[$key] = $val;
         }
-    }
-
-    public function getConfig($key)
-    {
-        if (isset($this->configuration[$key])) {
-            return $this->configuration[$key];
-        } else {
-            return null;
-        }
-    }
-
-    public function setConfig($key, $val)
-    {
-        $this->configuration[$key] = $val;
     }
     
     protected function registerDb()
@@ -196,6 +189,8 @@ class HpoApplication extends AbstractApplication
         if ($this['session']->get('isLogin')) {
             $app->log(Log::LOGIN_SUCCESS, $this->getUser()->getRoles());
             $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
+        } else {
+            $app->log(Log::REQUEST);
         }
     }
     

@@ -2,6 +2,7 @@
 namespace Pmi\Audit;
 
 use Pmi\Entities\AuditLog;
+use Symfony\Component\HttpFoundation\Request;
 
 class Log
 {
@@ -12,6 +13,7 @@ class Log
     const PMI_AUDIT_PREFIX = 'PMI_AUDIT_';
 
     // Actions
+    const REQUEST = 'REQUEST';
     const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
     const LOGIN_FAIL = 'LOGIN_FAIL';
     const LOGOUT = 'LOGOUT';
@@ -34,7 +36,7 @@ class Log
         $logArray['action'] = $this->action;
         $logArray['data'] = $this->data;
         $logArray['ts'] = new \DateTime();
-        if ($user = $this->app->getUser()) {
+        if (($user = $this->app->getUser()) && is_object($user)) {
             $logArray['user'] = $user->getUsername();
         } elseif ($user = $this->app->getGoogleUser()) {
             $logArray['user'] = $user->getEmail();
@@ -43,7 +45,15 @@ class Log
         }
 
         if ($request = $this->app['request_stack']->getCurrentRequest()) {
-            $logArray['ip'] = $request->getClientIp();
+            if ($list = $this->app->getConfig('ip_whitelist')) {
+                $trustedProxies = explode(',', $list);
+                $originalTrustedProxies = Request::getTrustedProxies();
+                Request::setTrustedProxies($trustedProxies);
+                $logArray['ip'] = $request->getClientIp();
+                Request::setTrustedProxies($originalTrustedProxies);
+            } else {
+                $logArray['ip'] = $request->getClientIp();
+            }
         } else {
             $logArray['ip'] = null;
         }
@@ -53,9 +63,10 @@ class Log
     public function logSyslog()
     {
         $logArray = $this->buildLogArray();
-        $logArray['action'] = self::PMI_AUDIT_PREFIX . $logArray['action'];
         $syslogData = [];
-        $syslogData[] = $logArray['action'];
+        $syslogData[] = $logArray['ip'];
+        $syslogData[] = $logArray['user'];
+        $syslogData[] = '[' . self::PMI_AUDIT_PREFIX . $logArray['action'] . ']';
         if ($logArray['data']) {
             $syslogData[] = json_encode($logArray['data']);
         }

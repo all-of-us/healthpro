@@ -1,6 +1,8 @@
 /vendor/
 app.yaml
 cron.yaml
+dos.yaml
+ip_whitelist.yml
 php.ini
 /node_modules/
 /bower_components/
@@ -10,3 +12,4 @@ php.ini
 /dev_config/*
 !dev_config/config.yml.dist
 .idea
+/bin/GeoLite2-Country.mmdb
