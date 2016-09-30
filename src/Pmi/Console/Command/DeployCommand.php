@@ -143,7 +143,7 @@ class DeployCommand extends Command {
 
         // generate config files
         $this->generateAppConfig();
-        $this->generateDosConfig();
+        $this->generateIpWhitelistConfig();
         $this->generatePhpConfig();
 
         $this->runSecurityCheck();
@@ -321,20 +321,33 @@ class DeployCommand extends Command {
         file_put_contents($configFile, $dumper->dump($config, PHP_INT_MAX));
     }
     
-    /** Generate Denial of Service config (currently used for whitelisting). */
-    private function generateDosConfig()
+    /** Generate IP whitelisting config. */
+    private function generateIpWhitelistConfig()
     {
-        $configFile = $this->appDir . DIRECTORY_SEPARATOR . 'dos.yaml';
-        $distFile = "{$configFile}.dist";
-        if (!file_exists($distFile)) {
-            throw new Exception("Couldn't find $distFile");
+        $dosFile = $this->appDir . DIRECTORY_SEPARATOR . 'dos.yaml';
+        $dosDistFile = "{$dosFile}.dist";
+        if (!file_exists($dosDistFile)) {
+            throw new Exception("Couldn't find $dosDistFile");
         }
         
         if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
-            copy($distFile, $configFile);
+            copy($dosDistFile, $dosFile);
         } else {
             // https://cloud.google.com/appengine/docs/php/config/dos#delete
-            file_put_contents($configFile, 'blacklist:');
+            file_put_contents($dosFile, 'blacklist:');
+        }
+        
+        $whitelistFile = $this->appDir . DIRECTORY_SEPARATOR . 'ip_whitelist.yml';
+        $whitelistDistFile = "{$whitelistFile}.dist";
+        if (!file_exists($whitelistDistFile)) {
+            throw new Exception("Couldn't find $whitelistDistFile");
+        }
+        
+        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
+            copy($whitelistDistFile, $whitelistFile);
+        } else {
+            // https://cloud.google.com/appengine/docs/php/config/dos#delete
+            file_put_contents($whitelistFile, 'whitelist:');
         }
     }
 

@@ -4,6 +4,7 @@
     },
     "require": {
         "doctrine/dbal": "^2.5",
+        "geoip2/geoip2": "~2.0",
         "google/apiclient": "^2.0",
         "guzzlehttp/guzzle": "^6.2",
         "paragonie/random_compat": "1.4.*",
