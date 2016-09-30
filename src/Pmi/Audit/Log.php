@@ -2,6 +2,7 @@
 namespace Pmi\Audit;
 
 use Pmi\Entities\AuditLog;
+use Symfony\Component\HttpFoundation\Request;
 
 class Log
 {
@@ -44,7 +45,15 @@ class Log
         }
 
         if ($request = $this->app['request_stack']->getCurrentRequest()) {
-            $logArray['ip'] = $request->getClientIp();
+            if ($list = $this->app->getConfig('ip_whitelist')) {
+                $trustedProxies = explode(',', $list);
+                $originalTrustedProxies = Request::getTrustedProxies();
+                Request::setTrustedProxies($trustedProxies);
+                $logArray['ip'] = $request->getClientIp();
+                Request::setTrustedProxies($originalTrustedProxies);
+            } else {
+                $logArray['ip'] = $request->getClientIp();
+            }
         } else {
             $logArray['ip'] = null;
         }
