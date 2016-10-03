@@ -6,12 +6,20 @@
 <p class="lead">MayoLINK ID: <strong>{{ order.mayo_id }}</strong></p>
 
 {% set params = { participantId: participant.id, orderId: order.id } %}
-{% set steps = {
-    print: 'printed',
-    collect: 'collected',
-    process: 'processed',
-    finalize: 'finalized'
-} %}
+{% if order.existing %}
+    {% set steps = {
+        collect: 'collected',
+        process: 'processed',
+        finalize: 'finalized'
+    } %}
+{% else %}
+    {% set steps = {
+        print: 'printed',
+        collect: 'collected',
+        process: 'processed',
+        finalize: 'finalized'
+    } %}
+{% endif %}
 <ul class="nav nav-tabs">
     <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
     {% set nextEnabled = true %}

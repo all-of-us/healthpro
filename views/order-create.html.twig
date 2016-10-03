@@ -16,8 +16,7 @@
     </ul>
     <br />
 
-    <div>
-        <p class="lead">Create order for this participant?</p>
+    <div id="createOrder">
         <dl class="dl-horizontal">
             <dt>Name</dt>
             <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
@@ -25,13 +24,41 @@
             <dd>{{ participant.dob|date('n/j/Y') }}</dd>
             <dt>Gender</dt>
             <dd>{{ participant.gender }}</dd>
-            <dt>Biobank ID</dt>
-            <dd>{{ participant.id }}</dd>
         </dl>
         {{ form_start(confirmForm) }}
-            {{ form_widget(confirmForm) }}
-            <p><a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">No</a> <button type="submit" class="btn btn-primary">Yes</button></p>
+            {{ form_errors(confirmForm) }}
+            <div class="row text-center">
+                <div class="col-xs-6 col-sm-4 col-sm-offset-2">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Standard</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>Create a standard PMI Biobank Order</p>
+                            <button type="submit" name="standard" class="btn btn-primary">Create</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Existing Kit</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>Register a PMI Biospecimen Kit</p>
+                            <div class="text-left">
+                                <br />
+                                {{ form_row(confirmForm.kitId) }}
+                            </div>
+                            <button type="submit" name="existing" class="btn btn-primary">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center">
+                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+            </p>
+            {{ form_rest(confirmForm) }}
         {{ form_end(confirmForm) }}
-
     </div>
 {% endblock %}
