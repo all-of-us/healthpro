@@ -63,4 +63,16 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
         $order = $repo->fetchOneBy(['id' => 2]);
         $this->assertEquals('hello', $order['data']);
     }
+
+    /**
+     * @depends testCreateTableAndInsert
+     */
+    public function testDelete($repo)
+    {
+        $repo->delete(1);
+        $order = $repo->fetchOneBy(['id' => 1]);
+        $this->assertFalse($order);
+        $order = $repo->fetchOneBy(['id' => 2]);
+        $this->assertNotFalse($order);
+    }
 }

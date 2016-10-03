@@ -67,4 +67,12 @@ class DoctrineRepository
             ['id' => $id]
         );
     }
+
+    public function delete($id)
+    {
+        return $this->dbal->delete(
+            $this->entity,
+            ['id' => $id]
+        );
+    }
 }
