@@ -48,4 +48,23 @@ class SqlRepository
         }
         return $this->dbal->fetchAll($query, $parameters);
     }
+
+    public function insert($data)
+    {
+        $success = $this->dbal->insert($this->entity, $data);
+        if ($success) {
+            return $this->dbal->lastInsertId();
+        } else {
+            return false;
+        }
+    }
+
+    public function update($id, $data)
+    {
+        return $this->dbal->update(
+            $this->entity,
+            $data,
+            ['id' => $id]
+        );
+    }
 }

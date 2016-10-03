@@ -283,12 +283,12 @@ class DefaultController extends AbstractController
                 );
             }
             if ($mlOrderId) {
-                $success = $app['db']->insert('orders', [
+                $orderId = $app['em']->getRepository('orders')->insert([
                     'participant_id' => $participant->id,
                     'created_ts' => (new \DateTime())->format('Y-m-d H:i:s'),
                     'mayo_id' => $mlOrderId
                 ]);
-                if ($success && ($orderId = $app['db']->lastInsertId())) {
+                if ($orderId) {
                     $app->log(Log::ORDER_CREATE, $orderId);
                     return $app->redirectToRoute('order', [
                         'participantId' => $participant->id,
@@ -337,7 +337,7 @@ class DefaultController extends AbstractController
                 if (!$evaluation) {
                     $dbArray['participant_id'] = $participant->id;
                     $dbArray['created_ts'] = $dbArray['updated_ts'];
-                    if ($app['db']->insert('evaluations', $dbArray) && ($evalId = $app['db']->lastInsertId())) {
+                    if ($evalId = $app['em']->getRepository('evaluations')->insert($dbArray)) {
                         $app->log(Log::EVALUATION_CREATE, $evalId);
                         $app['pmi.drc.participants']->createEvaluation($participant->id, [
                             'evaluation_id' => $evalId,
@@ -353,7 +353,7 @@ class DefaultController extends AbstractController
                         $app->addFlashError('Failed to create new evaluation');
                     }
                 } else {
-                    if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
+                    if ($app['em']->getRepository('evaluations')->update($evalId, $dbArray)) {
                         $app->log(Log::EVALUATION_EDIT, $evalId);
                         $result = $app['pmi.drc.participants']->updateEvaluation($participant->id, $evalId, [
                             'evaluation_version' => $dbArray['version'],
