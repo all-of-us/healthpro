@@ -16,6 +16,7 @@ use Pmi\Mayolink\Order as MayoLinkOrder;
 class OrderController extends AbstractController
 {
     protected static $routes = [
+        ['orderCreate', '/participant/{participantId}/order/create', ['method' => 'GET|POST']],
         ['orderPdf', '/participant/{participantId}/order/{orderId}-{type}.pdf'],
         ['order', '/participant/{participantId}/order/{orderId}'],
         ['orderPrint', '/participant/{participantId}/order/{orderId}/print'],
@@ -197,6 +198,67 @@ class OrderController extends AbstractController
             ])
             ->getForm();
         return $form;
+    }
+
+    public function orderCreateAction($participantId, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->consentComplete) {
+            $app->abort(403);
+        }
+        $confirmForm = $app['form.factory']->createBuilder(FormType::class)
+            ->add('confirm', HiddenType::class)
+            ->getForm();
+        $confirmForm->handleRequest($request);
+        if ($confirmForm->isValid()) {
+            if ($app->getConfig('ml_mock_order')) {
+                $mlOrderId = $app->getConfig('ml_mock_order');
+            } else {
+                $order = new MayoLinkOrder();
+                $options = [
+                    // TODO: figure out test code, specimen, and temperature parameters
+                    'test_code' => 'ACE',
+                    'specimen' => 'Serum',
+                    'temperature' => 'Ambient',
+                    'first_name' => '*',
+                    'last_name' => $participant->id,
+                    'gender' => $participant->gender,
+                    'birth_date' => $participant->dob,
+                    'physician_name' => 'None',
+                    'physician_phone' => 'None',
+                    // TODO: not sure how ML is handling time zone. setting to yesterday for now
+                    'collected_at' => new \DateTime('-1 day')
+                ];
+                $mlOrderId = $order->loginAndCreateOrder(
+                    $app->getConfig('ml_username'),
+                    $app->getConfig('ml_password'),
+                    $options
+                );
+            }
+            if ($mlOrderId) {
+                $orderId = $app['em']->getRepository('orders')->insert([
+                    'participant_id' => $participant->id,
+                    'created_ts' => (new \DateTime())->format('Y-m-d H:i:s'),
+                    'mayo_id' => $mlOrderId
+                ]);
+                if ($orderId) {
+                    $app->log(Log::ORDER_CREATE, $orderId);
+                    return $app->redirectToRoute('order', [
+                        'participantId' => $participant->id,
+                        'orderId' => $orderId
+                    ]);
+                }
+            }
+            $app->addFlashError('Failed to create order.');
+        }
+
+        return $app['twig']->render('order-create.html.twig', [
+            'participant' => $participant,
+            'confirmForm' => $confirmForm->createView()
+        ]);
     }
 
     public function orderAction($participantId, $orderId, Application $app, Request $request)
