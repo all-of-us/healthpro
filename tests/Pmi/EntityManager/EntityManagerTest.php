@@ -1,9 +1,9 @@
 <?php
 use Pmi\EntityManager\EntityManager;
 
-class SqlRepositoryTest extends \PHPUnit_Framework_TestCase
+class EntityManagerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testInsert()
+    public function testCreateTableAndInsert()
     {
         $db = \Doctrine\DBAL\DriverManager::getConnection([
             'url' => 'sqlite:///:memory:'
@@ -29,7 +29,7 @@ class SqlRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testInsert
+     * @depends testCreateTableAndInsert
      */
     public function testFetch($repo)
     {
@@ -55,7 +55,7 @@ class SqlRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testInsert
+     * @depends testCreateTableAndInsert
      */
     public function testUpdate($repo)
     {
