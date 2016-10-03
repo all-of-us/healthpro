@@ -5,6 +5,9 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreateTableAndInsert()
     {
+        if (!extension_loaded('pdo_sqlite')) {
+            $this->markTestSkipped('The PDO SQLite extension is not available.');
+        }
         $db = \Doctrine\DBAL\DriverManager::getConnection([
             'url' => 'sqlite:///:memory:'
         ]);
