@@ -10,7 +10,7 @@ use Tests\Pmi\Drc\AppsClient;
 
 class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
 {
-    /*function testGetUser()
+    function testGetUser()
     {
         $email = 'test1@testy.com';
         GoogleUserService::switchCurrentUser($email);
@@ -110,7 +110,5 @@ class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
         // we want to fail if we are logged in and the google user changed
         GoogleUserService::switchCurrentUser('rogue@hacker.com');
         $this->assertEquals($auth->buildCredentials(null), $auth->getCredentials($this->getRequest()));
-    }*/
-    
-    public function testDummy() {}
+    }
 }

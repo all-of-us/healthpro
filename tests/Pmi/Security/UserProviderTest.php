@@ -6,7 +6,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class UserProviderTest extends AbstractWebTestCase
 {
-    /*public function testLoadUserByUsername()
+    public function testLoadUserByUsername()
     {
         $email = 'test@testLoadUserByUsername.com';
         GoogleUserService::switchCurrentUser($email);
@@ -31,7 +31,5 @@ class UserProviderTest extends AbstractWebTestCase
             $caught = true;
         }
         $this->assertEquals(true, $caught);
-    }*/
-    
-    public function testDummy() {}
+    }
 }
