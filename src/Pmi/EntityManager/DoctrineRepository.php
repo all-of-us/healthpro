@@ -1,7 +1,7 @@
 <?php
 namespace Pmi\EntityManager;
 
-class SqlRepository
+class DoctrineRepository
 {
     protected $dbal;
     protected $entity;

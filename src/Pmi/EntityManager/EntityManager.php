@@ -6,8 +6,8 @@ class EntityManager
     protected $dbal;
 
     protected $entities = [
-        'orders' => 'dbal',
-        'evaluations' => 'dbal'
+        'orders' => 'doctrine',
+        'evaluations' => 'doctrine'
     ];
 
     public function setDbal($dbal)
@@ -20,11 +20,11 @@ class EntityManager
             throw new \Exception('Entity not defined');
         }
         switch ($this->entities[$entity]) {
-            case 'dbal':
+            case 'doctrine':
                 if (!$this->dbal) {
                     throw new \Exception('No DBAL available');
                 }
-                return new SqlRepository($this->dbal, $entity);
+                return new DoctrineRepository($this->dbal, $entity);
 
             default:
                 throw new \Exception('Invalid entity type');
