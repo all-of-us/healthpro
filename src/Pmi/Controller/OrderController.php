@@ -43,7 +43,10 @@ class OrderController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE id = ? AND participant_id = ?', [$orderId, $participantId]);
+        $order = $app['em']->getRepository('orders')->fetchOneBy([
+            'id' => $orderId,
+            'participant_id' => $participantId
+        ]);
         if (!$order) {
             $app->abort(404);
         }
@@ -256,11 +259,9 @@ class OrderController extends AbstractController
         $this->loadOrder($participantId, $orderId, $app);
         if (!$this->order['printed_ts']) {
             $app->log(Log::ORDER_EDIT, $orderId);
-            $app['db']->update(
-                'orders',
-                ['printed_ts' => (new \DateTime())->format('Y-m-d H:i:s')],
-                ['id' => $orderId]
-            );
+            $app['em']->getRepository('orders')->update($orderId, [
+                'printed_ts' => (new \DateTime())->format('Y-m-d H:i:s')
+            ]);
         }
         return $app['twig']->render('order-print.html.twig', [
             'participant' => $this->participant,
@@ -276,7 +277,7 @@ class OrderController extends AbstractController
         $collectForm->handleRequest($request);
         if ($collectForm->isValid()) {
             $updateArray = $this->getOrderUpdateFromForm('collected', $collectForm);
-            if ($app['db']->update('orders', $updateArray, ['id' => $orderId])) {
+            if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
                 $app->addFlashNotice('Order collection updated');
 
@@ -301,7 +302,7 @@ class OrderController extends AbstractController
         $processForm->handleRequest($request);
         if ($processForm->isValid()) {
             $updateArray = $this->getOrderUpdateFromForm('processed', $processForm);
-            if ($app['db']->update('orders', $updateArray, ['id' => $orderId])) {
+            if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
                 $app->addFlashNotice('Order processing updated');
 
@@ -326,7 +327,7 @@ class OrderController extends AbstractController
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isValid()) {
             $updateArray = $this->getOrderUpdateFromForm('finalized', $finalizeForm);
-            if ($app['db']->update('orders', $updateArray, ['id' => $orderId])) {
+            if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
                 $app->addFlashNotice('Order finalization updated');
 

@@ -197,7 +197,9 @@ class DefaultController extends AbstractController
 
         if ($idForm->isValid()) {
             $id = $idForm->get('mayoId')->getData();
-            $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE mayo_id=?', [$id]);
+            $order = $app['em']->getRepository('orders')->fetchOneBy([
+                'mayo_id' => $id
+            ]);
             if ($order) {
                 return $app->redirectToRoute('order', [
                     'participantId' => $order['participant_id'],
@@ -207,7 +209,11 @@ class DefaultController extends AbstractController
             $app->addFlashError('Participant ID not found');
         }
 
-        $recentOrders = $app['db']->fetchAll('SELECT * FROM orders ORDER BY created_ts DESC, id DESC LIMIT 5');
+        $recentOrders = $app['em']->getRepository('orders')->fetchBy(
+            [],
+            ['created_ts' => 'DESC', 'id' => 'DESC'],
+            5
+        );
         foreach ($recentOrders as &$order) {
             $order['participant'] = $app['pmi.drc.participants']->getById($order['participant_id']);
         }
@@ -223,8 +229,14 @@ class DefaultController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        $orders = $app['db']->fetchAll('SELECT * FROM orders WHERE participant_id = ? ORDER BY created_ts DESC, id DESC', [$id]);
-        $evaluations = $app['db']->fetchAll('SELECT * FROM evaluations WHERE participant_id = ? ORDER BY updated_ts DESC, id DESC', [$id]);
+        $orders = $app['em']->getRepository('orders')->fetchBy(
+            ['participant_id' => $id],
+            ['created_ts' => 'DESC', 'id' => 'DESC']
+        );
+        $evaluations = $app['em']->getRepository('evaluations')->fetchBy(
+            ['participant_id' => $id],
+            ['updated_ts' => 'DESC', 'id' => 'DESC']
+        );
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
@@ -271,12 +283,12 @@ class DefaultController extends AbstractController
                 );
             }
             if ($mlOrderId) {
-                $success = $app['db']->insert('orders', [
+                $orderId = $app['em']->getRepository('orders')->insert([
                     'participant_id' => $participant->id,
                     'created_ts' => (new \DateTime())->format('Y-m-d H:i:s'),
                     'mayo_id' => $mlOrderId
                 ]);
-                if ($success && ($orderId = $app['db']->lastInsertId())) {
+                if ($orderId) {
                     $app->log(Log::ORDER_CREATE, $orderId);
                     return $app->redirectToRoute('order', [
                         'participantId' => $participant->id,
@@ -304,7 +316,10 @@ class DefaultController extends AbstractController
         }
         $evaluationService = new Evaluation();
         if ($evalId) {
-            $evaluation = $app['db']->fetchAssoc('SELECT * FROM evaluations WHERE id = ? AND participant_id = ?', [$evalId, $participantId]);
+            $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
+                'id' => $evalId,
+                'participant_id' => $participantId
+            ]);
             if (!$evaluation) {
                 $app->abort(404);
             }
@@ -322,7 +337,7 @@ class DefaultController extends AbstractController
                 if (!$evaluation) {
                     $dbArray['participant_id'] = $participant->id;
                     $dbArray['created_ts'] = $dbArray['updated_ts'];
-                    if ($app['db']->insert('evaluations', $dbArray) && ($evalId = $app['db']->lastInsertId())) {
+                    if ($evalId = $app['em']->getRepository('evaluations')->insert($dbArray)) {
                         $app->log(Log::EVALUATION_CREATE, $evalId);
                         $app['pmi.drc.participants']->createEvaluation($participant->id, [
                             'evaluation_id' => $evalId,
@@ -338,7 +353,7 @@ class DefaultController extends AbstractController
                         $app->addFlashError('Failed to create new evaluation');
                     }
                 } else {
-                    if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
+                    if ($app['em']->getRepository('evaluations')->update($evalId, $dbArray)) {
                         $app->log(Log::EVALUATION_EDIT, $evalId);
                         $result = $app['pmi.drc.participants']->updateEvaluation($participant->id, $evalId, [
                             'evaluation_version' => $dbArray['version'],
