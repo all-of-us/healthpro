@@ -6,6 +6,24 @@ class Order
     protected $ordersEndpoint = 'https://orders.mayomedicallaboratories.com';
     protected $authEndpoint = 'https://profile.mayomedicallaboratories.com/authn';
     protected $providerName = 'www.mayomedicallaboratories.com';
+    protected static $tests = [
+        'HBA1C' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        'BARTB' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        'LBAB' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        'AMPHX' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Urine'
+        ]
+    ];
 
     private $client;
     private $csrfToken;
@@ -48,8 +66,6 @@ class Order
     {
         $body = [
             'authenticity_token' => $this->csrfToken,
-            'order[test_requests_attributes][0][test_code]' => $options['test_code'],
-            "temperatures[{$options['test_code']}][{$options['specimen']}]" => $options['temperature'],
             'order[patient_attributes][first_name]' => $options['first_name'],
             'order[patient_attributes][last_name]' => $options['last_name'],
             'order[patient_attributes][gender]' => $options['gender'],
@@ -62,6 +78,12 @@ class Order
             'order[collected_at(4i)]' => $options['collected_at']->format('H'),
             'order[collected_at(5i)]' => $options['collected_at']->format('i')
         ];
+        $i = 0;
+        foreach (self::$tests as $test => $testOptions) {
+            $body["order[test_requests_attributes][{$i}][test_code]"] = $test;
+            $body["temperatures[{$test}][{$testOptions['specimen']}]"] = $testOptions['temperature'];
+            $i++;
+        }
         $response = $this->client->request('POST', "{$this->ordersEndpoint}/en/orders", [
             'form_params' => $body,
             'allow_redirects' => false

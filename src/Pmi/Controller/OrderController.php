@@ -233,8 +233,6 @@ class OrderController extends AbstractController
                 } else {
                     $order = new MayoLinkOrder();
                     $options = [
-                        // TODO: figure out test code, specimen, and temperature parameters
-                        'test_code' => 'ACE',
                         'specimen' => 'Serum',
                         'temperature' => 'Ambient',
                         'first_name' => '*',
