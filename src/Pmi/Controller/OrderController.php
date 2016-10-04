@@ -31,7 +31,7 @@ class OrderController extends AbstractController
     protected static $samples = [
         '(1) EDTA 4 mL' => 1,
         '(2) EDTA 10 mL' => 2,
-        '(3) Clot Activator (SST) 8 mL' => 3,
+        '(3) Clot Activator (SST) 8.5 mL' => 3,
         '(4) Plasma Separator (PST) 8 mL' => 4,
         '(5) EDTA 10 mL' => 5,
         '(6) Na-Heparin 4 mL' => 6,
@@ -163,6 +163,9 @@ class OrderController extends AbstractController
         $notesLabel = "Additional notes on {$noun}";
         if ($set == 'finalized') {
             $samplesLabel = "Which samples are being shipped to the PMI Biobank?";
+        }
+        if ($set == 'processed') {
+            $tsLabel = 'Time of blood processing completion';
         }
 
         $formData = $this->getOrderFormData($set);
