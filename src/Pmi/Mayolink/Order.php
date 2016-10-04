@@ -36,6 +36,10 @@ class Order
             'specimen' => 'Urine'
         ]
     ];
+    protected static $siteAccounts = [
+        'a' => '7035588',
+        'b' => '7035500'
+    ];
 
     private $client;
     private $csrfToken;
@@ -97,6 +101,9 @@ class Order
             $body["order[test_requests_attributes][{$i}][test_code]"] = $test;
             $body["temperatures[{$test}][{$testOptions['specimen']}]"] = $testOptions['temperature'];
             $i++;
+        }
+        if (isset($options['site']) && isset(self::$siteAccounts[$options['site']])) {
+            $body['account'] = self::$siteAccounts[$options['site']];
         }
         $response = $this->client->request('POST', "{$this->ordersEndpoint}/en/orders", [
             'form_params' => $body,

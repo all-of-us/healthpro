@@ -236,13 +236,16 @@ class OrderController extends AbstractController
                 } else {
                     $order = new MayoLinkOrder();
                     $options = [
-                        'patient_id' => $participant->getMayoId(),
+                        'patient_id' => $participant->getShortId(),
                         'gender' => $participant->gender,
                         'birth_date' => $participant->dob,
                         'order_id' => $orderData['order_id'],
                         // TODO: not sure how ML is handling time zone. setting to yesterday for now
                         'collected_at' => new \DateTime('-1 day')
                     ];
+                    if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
+                        $options['site'] = $app['session']->get('site')->id;
+                    }
                     $orderData['mayo_id'] = $order->loginAndCreateOrder(
                         $app->getConfig('ml_username'),
                         $app->getConfig('ml_password'),
