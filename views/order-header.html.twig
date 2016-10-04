@@ -1,9 +1,9 @@
 <h2>
     <i class="fa fa-medkit" aria-hidden="true"></i>
     {{ order.created_ts|date('n/j/Y g:ia') }}
-    <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</a></small>
+    <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
 </h2>
-<p class="lead">MayoLINK ID: <strong>{{ order.mayo_id }}</strong></p>
+<p class="lead">Order ID: <strong>{{ order.order_id }}</strong></p>
 
 {% set params = { participantId: participant.id, orderId: order.id } %}
 {% if order.existing %}

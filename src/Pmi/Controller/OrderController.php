@@ -225,10 +225,12 @@ class OrderController extends AbstractController
                 if (empty($confirmForm['kitId']->getData())) {
                     $confirmForm['kitId']->addError(new FormError('Please enter a kit order ID'));
                 } else {
+                    $orderData['order_id'] = $confirmForm['kitId']->getData();
                     $orderData['mayo_id'] = $confirmForm['kitId']->getData();
                     $orderData['existing'] = 1;
                 }
             } else {
+                $orderData['order_id'] = Util::generateShortUuid();
                 if ($app->getConfig('ml_mock_order')) {
                     $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
                 } else {
@@ -237,7 +239,7 @@ class OrderController extends AbstractController
                         'patient_id' => $participant->getMayoId(),
                         'gender' => $participant->gender,
                         'birth_date' => $participant->dob,
-                        'order_id' => Util::generateShortUuid(),
+                        'order_id' => $orderData['order_id'],
                         // TODO: not sure how ML is handling time zone. setting to yesterday for now
                         'collected_at' => new \DateTime('-1 day')
                     ];

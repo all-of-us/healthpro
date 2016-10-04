@@ -27,7 +27,7 @@ class Participant
         }
     }
 
-    public function getMayoId()
+    public function getShortId()
     {
         return strtoupper(Util::shortenUuid($this->id));
     }

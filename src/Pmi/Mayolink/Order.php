@@ -7,19 +7,31 @@ class Order
     protected $authEndpoint = 'https://profile.mayomedicallaboratories.com/authn';
     protected $providerName = 'www.mayomedicallaboratories.com';
     protected static $tests = [
-        'HBA1C' => [
+        '1ED04' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'Whole Blood EDTA'
         ],
-        'BARTB' => [
+        '1ED10' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'Whole Blood EDTA'
         ],
-        'LBAB' => [
+        '1SST8' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Serum SST'
+        ],
+        '1PST8' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Plasma PST'
+        ],
+        '2ED10' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'Whole Blood EDTA'
         ],
-        'AMPHX' => [
+        '1HEP4' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'WB Sodium Heparin'
+        ],
+        '1UR10' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'Urine'
         ]
