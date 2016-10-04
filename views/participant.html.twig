@@ -2,7 +2,7 @@
 {% block title %}Participant {{ participant.id }} - {% endblock %}
 {% block body %}
     <div class="page-header">
-        <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>#{{ participant.id }}</small></h2>
+        <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>{{ participant.mayoId }}</small></h2>
     </div>
 
     {% if participant.consentComplete %}

@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
 use Pmi\Mayolink\Order as MayoLinkOrder;
+use Pmi\Util;
 
 class OrderController extends AbstractController
 {
@@ -233,14 +234,10 @@ class OrderController extends AbstractController
                 } else {
                     $order = new MayoLinkOrder();
                     $options = [
-                        'specimen' => 'Serum',
-                        'temperature' => 'Ambient',
-                        'first_name' => '*',
-                        'last_name' => $participant->id,
+                        'patient_id' => $participant->getMayoId(),
                         'gender' => $participant->gender,
                         'birth_date' => $participant->dob,
-                        'physician_name' => 'None',
-                        'physician_phone' => 'None',
+                        'order_id' => Util::generateShortUuid(),
                         // TODO: not sure how ML is handling time zone. setting to yesterday for now
                         'collected_at' => new \DateTime('-1 day')
                     ];

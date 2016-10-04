@@ -66,12 +66,14 @@ class Order
     {
         $body = [
             'authenticity_token' => $this->csrfToken,
-            'order[patient_attributes][first_name]' => $options['first_name'],
-            'order[patient_attributes][last_name]' => $options['last_name'],
+            'order[reference_number]' => $options['order_id'],
+            'order[patient_attributes][medical_record_number]' => $options['patient_id'],
+            'order[patient_attributes][first_name]' => '*',
+            'order[patient_attributes][last_name]' => $options['patient_id'],
             'order[patient_attributes][gender]' => $options['gender'],
             'order[patient_attributes][birth_date]' => $options['birth_date']->format('Y-m-d'),
-            'order[physician_name]' => $options['physician_name'],
-            'order[physician_phone]' => $options['physician_phone'],
+            'order[physician_name]' => 'None',
+            'order[physician_phone]' => 'None',
             'order[collected_at(1i)]' => $options['collected_at']->format('Y'),
             'order[collected_at(2i)]' => $options['collected_at']->format('n'),
             'order[collected_at(3i)]' => $options['collected_at']->format('j'),
