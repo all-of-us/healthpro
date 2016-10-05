@@ -28,6 +28,7 @@ $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
     ->mount('/', new Controller\OrderController())
+    ->mount('/', new Controller\EvaluationController())
     ->mount('/_dev', new Controller\DevController())
     ->mount('/dashboard', new Controller\DashboardController())
     ->run()
