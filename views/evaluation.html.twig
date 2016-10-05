@@ -78,7 +78,18 @@
                     {% endif %}
                 </div>
             {% endfor %}
-            <p><a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a> <button type="submit" class="btn btn-primary">Save</button></p>
+            {% if evaluation and evaluation.finalized_ts %}
+                <p>
+                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
+                    <button type="submit" class="btn btn-warning" name="reopen">Reopen</button>
+                </p>
+            {% else %}
+                <p>
+                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-primary" name="save">Save</button>
+                    <button type="submit" class="btn btn-success" name="finalize">Save and Finalize</button>
+                </p>
+            {% endif %}
         {{ form_end(evaluationForm) }}
 
         <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel">

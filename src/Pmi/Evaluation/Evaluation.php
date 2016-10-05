@@ -13,6 +13,7 @@ class Evaluation
     protected $version;
     protected $data;
     protected $schema;
+    protected $locked = false;
 
     public function __construct()
     {
@@ -33,6 +34,9 @@ class Evaluation
             } else {
                 $this->data = json_decode($array['data']);
             }
+        }
+        if (array_key_exists('finalized_ts', $array) && $array['finalized_ts']) {
+            $this->locked = true;
         }
         $this->loadSchema();
         $this->normalizeData();
@@ -65,6 +69,9 @@ class Evaluation
                 'required' => false,
                 'scale' => 0
             ];
+            if ($this->locked) {
+                $options['disabled'] = true;
+            }
             if (isset($field->decimals)) {
                 $options['scale'] = $field->decimals;
             }

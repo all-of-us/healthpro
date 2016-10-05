@@ -4,6 +4,7 @@ CREATE TABLE `evaluations` (
   `rdr_id` VARCHAR(50) NULL DEFAULT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `finalized_ts` TIMESTAMP NULL DEFAULT NULL,
   `version` varchar(10) NOT NULL,
   `data` text NOT NULL,
   PRIMARY KEY (`id`),
