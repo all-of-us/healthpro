@@ -324,17 +324,6 @@ class DefaultController extends AbstractController
                     $dbArray['created_ts'] = $dbArray['updated_ts'];
                     if ($app['db']->insert('evaluations', $dbArray) && ($evalId = $app['db']->lastInsertId())) {
                         $app->log(Log::EVALUATION_CREATE, $evalId);
-                        $rdrId = $app['pmi.drc.participants']->createEvaluation(
-                            $participant->id,
-                            $dbArray['data']
-                        );
-                        if ($rdrId) {
-                            $app['db']->update(
-                                'evaluations',
-                                ['rdr_id' => $rdrId],
-                                ['id' => $evalId]
-                            );
-                        }
                         $app->addFlashNotice('Evaluation saved');
                         return $app->redirectToRoute('participantEval', [
                             'participantId' => $participant->id,
@@ -346,11 +335,6 @@ class DefaultController extends AbstractController
                 } else {
                     if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
                         $app->log(Log::EVALUATION_EDIT, $evalId);
-                        $result = $app['pmi.drc.participants']->updateEvaluation(
-                            $participant->id,
-                            $evaluation['rdr_id'],
-                            $dbArray['data']
-                        );
                         $app->addFlashNotice('Evaluation saved');
                         return $app->redirectToRoute('participantEval', [
                             'participantId' => $participant->id,

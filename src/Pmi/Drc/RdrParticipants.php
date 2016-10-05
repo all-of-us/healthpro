@@ -178,7 +178,7 @@ class RdrParticipants
     public function updateEvaluation($participantId, $evaluationId, $evaluation)
     {
         try {
-            $response = $this->getClient()->request('POST', "participants/{$participantId}/evaluation/{$evaluationId}", [
+            $response = $this->getClient()->request('PUT', "participants/{$participantId}/evaluation/{$evaluationId}", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
@@ -186,7 +186,6 @@ class RdrParticipants
                 return $result->evaluation_id;
             }
         } catch (\Exception $e) {
-            throw $e;
             return false;
         }
         return false;
