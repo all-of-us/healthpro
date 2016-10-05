@@ -3,11 +3,6 @@
 {% block body %}
     {{ form_errors(evaluationForm) }}
 
-    <div class="alert alert-warning">
-        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-        Evaluation form is under construction and incomplete
-    </div>
-
     <div class="page-header">
         <h2>
             <i class="fa fa-clipboard" aria-hidden="true"></i>
@@ -20,14 +15,12 @@
         </h2>
     </div>
     <dl class="dl-horizontal">
-        <dt>ID</dt>
-        <dd>{{ participant.shortId }}</dd>
         <dt>DOB</dt>
         <dd>{{ participant.dob|date('n/j/Y') }}</dd>
         <dt>Gender</dt>
         <dd>{{ participant.gender }}</dd>
         {% if evaluation %}
-            <dt>Evaluation updated</dt>
+            <dt>Updated</dt>
             <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia') }}</dd>
         {% endif %}
     </dl>
