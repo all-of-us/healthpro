@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Drc;
 
+use Pmi\Entities\Participant;
 use Ramsey\Uuid\Uuid;
 
 class RdrParticipants
@@ -35,7 +36,7 @@ class RdrParticipants
         } else {
             $consentStatus = false;
         }
-        return (object)[
+        return new Participant([
             'id' => $participant->drc_internal_id,
             'firstName' => $participant->first_name,
             'lastName' => $participant->last_name,
@@ -43,7 +44,7 @@ class RdrParticipants
             'gender' => 'U',
             'zip' => isset($participant->zip_code) ? $participant->zip_code : null,
             'consentComplete' => isset($participant->membership_tier) ? $participant->membership_tier == 'CONSENTED' : null
-        ];
+        ]);
     }
 
     protected function paramsToQuery($params)

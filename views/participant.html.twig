@@ -2,7 +2,7 @@
 {% block title %}Participant {{ participant.id }} - {% endblock %}
 {% block body %}
     <div class="page-header">
-        <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>#{{ participant.id }}</small></h2>
+        <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>{{ participant.shortId }}</small></h2>
     </div>
 
     {% if participant.consentComplete %}
@@ -41,7 +41,7 @@
                         {% for order in orders %}
                             <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
                                 {{ order.created_ts|date('n/j/Y g:ia') }}<br />
-                                <small class="text-muted">{{ order.mayo_id }}</small>
+                                <small class="text-muted">{{ order.order_id }}</small>
                             </a>
                         {% endfor %}
                         <a href="{{ path('orderCreate', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>

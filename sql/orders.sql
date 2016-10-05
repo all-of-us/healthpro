@@ -2,6 +2,7 @@ CREATE TABLE `orders` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `participant_id` varchar(50) NOT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `order_id` varchar(100) NOT NULL,
   `mayo_id` varchar(100) NOT NULL,
   `printed_ts` timestamp NULL DEFAULT NULL,
   `collected_ts` timestamp NULL DEFAULT NULL,
@@ -16,5 +17,6 @@ CREATE TABLE `orders` (
   `existing` TINYINT NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `participant_id` (`participant_id`),
+  KEY `order_id` (`order_id`),
   KEY `mayo_id` (`mayo_id`)
 ) DEFAULT CHARSET=utf8mb4;

@@ -16,10 +16,12 @@
             {% else %}
                 New Evaluation
             {% endif %}
-            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</a></small>
+            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
         </h2>
     </div>
     <dl class="dl-horizontal">
+        <dt>ID</dt>
+        <dd>{{ participant.shortId }}</dd>
         <dt>DOB</dt>
         <dd>{{ participant.dob|date('n/j/Y') }}</dd>
         <dt>Gender</dt>
