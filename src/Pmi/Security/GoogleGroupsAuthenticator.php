@@ -68,7 +68,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     
     public function checkCredentials($credentials, UserInterface $user)
     {
-        if ($this->app->isDev() && $this->app->getConfig('gaBypass')) {
+        if (!$this->app->isProd() && $this->app->getConfig('gaBypass')) {
             // Bypass groups auth
             return is_array($credentials) && $credentials['googleUser'] &&
                 strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;

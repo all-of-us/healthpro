@@ -27,7 +27,7 @@ class UserProvider implements UserProviderInterface
             $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
             $this->app['session']->set('googlegroups', $groups);
         }
-        if ($this->app->isDev() && $this->app->getConfig('gaBypass')) {
+        if (!$this->app->isProd() && $this->app->getConfig('gaBypass')) {
             return new User($googleUser, $groups, true);
         } else {
             return new User($googleUser, $groups);
