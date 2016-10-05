@@ -6,6 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
+use Pmi\Util;
 
 class Evaluation
 {
@@ -13,6 +14,7 @@ class Evaluation
     protected $version;
     protected $data;
     protected $schema;
+    protected $participant;
     protected $locked = false;
 
     public function __construct()
@@ -35,9 +37,10 @@ class Evaluation
                 $this->data = json_decode($array['data']);
             }
         }
-        if (array_key_exists('finalized_ts', $array) && $array['finalized_ts']) {
+        if (!empty($array['finalized_ts'])) {
             $this->locked = true;
         }
+        $this->participant = strtoupper(Util::shortenUuid($array['participant_id']));
         $this->loadSchema();
         $this->normalizeData();
     }
@@ -146,5 +149,67 @@ class Evaluation
                 }
             }
         }
+    }
+
+    public function getFhir()
+    {
+        $fhir = new \StdClass();
+        $fhir->resourceType = 'Bundle';
+        $fhir->type = 'document';
+        $date = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d\TH:i:s\Z');
+        $entries = [];
+        $compositionEntry = [
+            'fullUrl' => 'urn:example:report',
+            'resource' => [
+                'author' => [['display' => 'N/A']],
+                'date' => $date,
+                'resourceType' => 'Composition',
+                'section' => [
+                    'entry' => [
+                        ['reference' => 'urn:example:height']
+                    ]
+                ],
+                'status' => 'final',
+                'subject' => "Patient/{$this->participant}",
+                'title' => 'PMI Intake Evaluation',
+                'type' => [
+                    'coding' => [[
+                        'code' => "intake-exam-v{$this->version}",
+                        'display' => "PMI Intake Evaluation v{$this->version}",
+                        'system' => 'http://terminology.pmi-ops.org/document-types'
+                    ]],
+                    'text' => "PMI Intake Evaluation v{$this->version}"
+                ]
+            ]
+        ];
+        $entries[] = $compositionEntry;
+        $heightEntry = [
+            'fullUrl' => 'urn:example:height',
+            'resource' => [
+                'code' => [
+                    'coding' => [[
+                        'code' => '8302-2',
+                        'display' => 'Body height',
+                        'system' => 'http://loinc.org'
+                    ]],
+                    'text' => 'Body height'
+                ],
+                'effectiveDateTime' => $date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->participant}"
+                ],
+                'valueQuantity' => [
+                    'code' => 'cm',
+                    'system' => 'http://unitsofmeasure.org',
+                    'unit' => 'cm',
+                    'value' => $this->data->height
+                ]
+            ]
+        ];
+        $entries[] = $heightEntry;
+        $fhir->entry = $entries;
+        return $fhir;
     }
 }
