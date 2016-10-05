@@ -72,6 +72,9 @@ class Evaluation
             if ($this->locked) {
                 $options['disabled'] = true;
             }
+            if (isset($field->label)) {
+                $options['label'] = $field->label;
+            }
             if (isset($field->decimals)) {
                 $options['scale'] = $field->decimals;
             }
@@ -89,7 +92,8 @@ class Evaluation
                 $formBuilder->add($field->name, CollectionType::class, [
                     'entry_type' => NumberType::class,
                     'entry_options' => $options,
-                    'required' => false
+                    'required' => false,
+                    'label' => isset($options['label']) ? $options['label'] : null
                 ]);
             } else {
                 $formBuilder->add($field->name, NumberType::class, $options);
