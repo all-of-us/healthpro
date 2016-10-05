@@ -275,11 +275,6 @@ class DefaultController extends AbstractController
                     $dbArray['created_ts'] = $dbArray['updated_ts'];
                     if ($evalId = $app['em']->getRepository('evaluations')->insert($dbArray)) {
                         $app->log(Log::EVALUATION_CREATE, $evalId);
-                        $app['pmi.drc.participants']->createEvaluation($participant->id, [
-                            'evaluation_id' => $evalId,
-                            'evaluation_version' => $dbArray['version'],
-                            'evaluation_data' => $dbArray['data']
-                        ]);
                         $app->addFlashNotice('Evaluation saved');
                         return $app->redirectToRoute('participantEval', [
                             'participantId' => $participant->id,
@@ -291,10 +286,6 @@ class DefaultController extends AbstractController
                 } else {
                     if ($app['em']->getRepository('evaluations')->update($evalId, $dbArray)) {
                         $app->log(Log::EVALUATION_EDIT, $evalId);
-                        $result = $app['pmi.drc.participants']->updateEvaluation($participant->id, $evalId, [
-                            'evaluation_version' => $dbArray['version'],
-                            'evaluation_data' => $dbArray['data']
-                        ]);
                         $app->addFlashNotice('Evaluation saved');
                         return $app->redirectToRoute('participantEval', [
                             'participantId' => $participant->id,

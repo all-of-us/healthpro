@@ -31,19 +31,31 @@ class RdrParticipants
         if (!isset($participant->drc_internal_id)) {
             return false;
         }
-        if (isset($participant->enrollment_status) && $participant->enrollment_status == 'CONSENTED') {
+        if (isset($participant->membership_tier) && $participant->membership_tier == 'CONSENTED') {
             $consentStatus = true;
         } else {
             $consentStatus = false;
         }
+        switch ($participant->gender_identity) {
+            case 'FEMALE':
+                $gender = 'F';
+                break;
+            case 'MALE':
+                $gender = 'M';
+                break;
+            default:
+                $gender = 'U';
+                break;
+        }
         return new Participant([
             'id' => $participant->drc_internal_id,
             'firstName' => $participant->first_name,
+            'middleName' => $participant->middle_name,
             'lastName' => $participant->last_name,
             'dob' => new \DateTime($participant->date_of_birth),
-            'gender' => 'U',
-            'zip' => isset($participant->zip_code) ? $participant->zip_code : null,
-            'consentComplete' => isset($participant->membership_tier) ? $participant->membership_tier == 'CONSENTED' : null
+            'gender' => $gender,
+            'zip' => $participant->zip_code,
+            'consentComplete' => $consentStatus
         ]);
     }
 
@@ -59,7 +71,7 @@ class RdrParticipants
         if (isset($params['dob'])) {
             try {
                 $date = new \DateTime($params['dob']);
-                $query['date_of_birth'] = $date->format('Y-m-d\T00:00:00');
+                $query['date_of_birth'] = $date->format('Y-m-d');
             } catch (\Exception $e) {
                 throw new Exception\InvalidDobException();
             }
@@ -117,7 +129,7 @@ class RdrParticipants
     {
         if (isset($participant['date_of_birth'])) {
             $dt = new \DateTime($participant['date_of_birth']);
-            $participant['date_of_birth'] = $dt->format('Y-m-d\T00:00:00');
+            $participant['date_of_birth'] = $dt->format('Y-m-d');
         }
         $participant['biobank_id'] = Uuid::uuid4();
         try {
@@ -137,9 +149,9 @@ class RdrParticipants
     public function getEvaluation($participantId, $evaluationId)
     {
         try {
-            $response = $this->getClient()->request('GET', "participants/{$participantId}/evaluations/{$evaluationId}");
+            $response = $this->getClient()->request('GET', "participants/{$participantId}/evaluation/{$evaluationId}");
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->evaluation_id)) {
+            if (is_object($result) && isset($result->id)) {
                 return $result;
             }
         } catch (\Exception $e) {
@@ -151,12 +163,12 @@ class RdrParticipants
     public function createEvaluation($participantId, $evaluation)
     {
         try {
-            $response = $this->getClient()->request('POST', "participants/{$participantId}/evaluations", [
+            $response = $this->getClient()->request('POST', "participants/{$participantId}/evaluation", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->evaluation_id)) {
-                return $result->evaluation_id;
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
             }
         } catch (\Exception $e) {
             return false;
@@ -167,7 +179,7 @@ class RdrParticipants
     public function updateEvaluation($participantId, $evaluationId, $evaluation)
     {
         try {
-            $response = $this->getClient()->request('PUT', "participants/{$participantId}/evaluations/{$evaluationId}", [
+            $response = $this->getClient()->request('PUT', "participants/{$participantId}/evaluation/{$evaluationId}", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());

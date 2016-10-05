@@ -20,7 +20,11 @@ class RdrMetrics
         ]);
         $responseObject = json_decode($response->getBody()->getContents());
         if (!is_object($responseObject)) {
-            throw new Exception\InvalidResponseException();
+            // Response could be double-encoded. Try double decoding.
+            $responseObject = json_decode($responseObject);
+            if (!is_object($responseObject)) {
+                throw new Exception\InvalidResponseException();
+            }
         }
         return $responseObject;
     }

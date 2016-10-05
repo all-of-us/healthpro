@@ -55,7 +55,7 @@ class DevController extends AbstractController
                 ->add('membership_tier', ChoiceType::class, [
                     'choices' => [
                         'CONSENTED' => 'CONSENTED',
-                        'NONE' => 'NONE'
+                        'INTERESTED' => 'INTERESTED'
                     ]
                 ])
                 ->add('gender_identity', ChoiceType::class, [
