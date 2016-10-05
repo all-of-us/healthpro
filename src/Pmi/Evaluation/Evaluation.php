@@ -164,13 +164,15 @@ class Evaluation
                 'author' => [['display' => 'N/A']],
                 'date' => $date,
                 'resourceType' => 'Composition',
-                'section' => [
+                'section' => [[
                     'entry' => [
                         ['reference' => 'urn:example:height']
                     ]
-                ],
+                ]],
                 'status' => 'final',
-                'subject' => "Patient/{$this->participant}",
+                'subject' => [
+                    'reference' => "Patient/{$this->participant}"
+                ],
                 'title' => 'PMI Intake Evaluation',
                 'type' => [
                     'coding' => [[

@@ -60,6 +60,11 @@ class EvaluationController extends AbstractController
                     $dbArray['updated_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
                     if ($request->request->has('finalize')) {
                         $dbArray['finalized_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
+                        // Send final evaluation to RDR and store resulting id
+                        $fhir = $evaluationService->getFhir();
+                        if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($participant->id, $fhir)) {
+                            $dbArray['rdr_id'] = $rdrEvalId;
+                        }
                     }
                     if (!$evaluation) {
                         $dbArray['participant_id'] = $participant->id;
