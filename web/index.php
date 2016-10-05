@@ -9,7 +9,7 @@ $app['templatesDirectory'] = realpath(__DIR__ . '/../views');
 $app['errorTemplate'] = 'error.html.twig';
 $app['sessionTimeout'] = 7 * 60;
 $app['sessionWarning'] = 2 * 60;
-if ($app->isProd() || $app->isDev()) { // for now, use twig memcache in prod
+if (true) { // for now, use twig memcache everywhere
     $app['sessionHandler'] = 'datastore';
     $app['twigCacheHandler'] = 'memcache';
 } else {
