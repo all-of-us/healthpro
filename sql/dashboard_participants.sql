@@ -519,3 +519,5 @@ VALUES
 	(3,'2016-03-22',77,6,1,4,'96221 Gregoria Vista','Port Nicholeton','KY','77833-5822',12,4),
 	(3,'2016-06-10',18,6,1,6,'21865 Diamond Station','Port Jacey','AZ','34648',5,7),
 	(3,'2016-08-13',82,2,2,6,'40865 Sophia Burg','East Raymond','CA','87216-5802',7,4);
+
+UNLOCK TABLES;

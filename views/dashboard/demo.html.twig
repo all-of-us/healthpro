@@ -160,7 +160,7 @@
                                     <label>Color Profile <span class="fa fa-question-circle-o" data-toggle="tooltip" title="Only applies to states and census regions maps"></span></label>
                                     <select class="form-control region-plot-control" id="map-color-profile">
                                         {% for color in color_profiles %}
-                                            {% if color == 'Greens' %}
+                                            {% if color == 'Custom' %}
                                                 <option value="{{ color }}" selected>{{ color }}</option>
                                             {% else %}
                                                 <option value="{{ color }}">{{ color }}</option>

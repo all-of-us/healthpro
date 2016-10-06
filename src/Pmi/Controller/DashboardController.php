@@ -58,7 +58,7 @@ class DashboardController extends AbstractController
         $today = date('Y-m-d');
 
         // array of Plotly color profiles for dropdown
-        $color_profiles = ['Blackbody', 'Bluered', 'Blues', 'Earth', 'Electric', 'Greens', 'Hot', 'Jet', 'Picnic',
+        $color_profiles = ['Blackbody', 'Bluered', 'Blues', 'Custom', 'Earth', 'Electric', 'Greens', 'Hot', 'Jet', 'Picnic',
                            'Portland', 'Rainbow', 'RdBu', 'Reds', 'Viridis', 'YlGnBu', 'YlOrRd'];
         return $app['twig']->render('dashboard/demo.html.twig', [
             'total_participants' => $total,
@@ -161,6 +161,14 @@ class DashboardController extends AbstractController
         $end_date = $request->get('end_date');
         $start_date = $request->get('start_date');
         $color_profile = $request->get('color_profile');
+
+        if ($color_profile == 'Custom') {
+            $color_profile = [
+                [0, 'rgb(247,252,245)'], [0.125, 'rgb(229,245,224)'],[0.25, 'rgb(199,233,192)'],
+                [0.375, 'rgb(161,217,155)'],[0.5, 'rgb(116,196,118)'], [0.625, 'rgb(65,171,93)'],
+                [0.75, 'rgb(35,139,69)'],[0.875, 'rgb(0,109,44)'],[1, 'rgb(0,68,27)']
+            ];
+        };
 
         // if no start date is supplied, check oldest registration in database
         if (empty($start_date)) {
