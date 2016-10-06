@@ -57,11 +57,12 @@ class EvaluationController extends AbstractController
                 if ($evaluationForm->isValid()) {
                     $evaluationService->setData($evaluationForm->getData());
                     $dbArray = $evaluationService->toArray();
-                    $dbArray['updated_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $now = new \DateTime();
+                    $dbArray['updated_ts'] = $now->format('Y-m-d H:i:s');
                     if ($request->request->has('finalize')) {
-                        $dbArray['finalized_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
+                        $dbArray['finalized_ts'] = $now->format('Y-m-d H:i:s');
                         // Send final evaluation to RDR and store resulting id
-                        $fhir = $evaluationService->getFhir();
+                        $fhir = $evaluationService->getFhir($now);
                         if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($participant->id, $fhir)) {
                             $dbArray['rdr_id'] = $rdrEvalId;
                         }

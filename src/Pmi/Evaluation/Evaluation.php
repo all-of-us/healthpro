@@ -151,67 +151,15 @@ class Evaluation
         }
     }
 
-    public function getFhir()
+    public function getFhir($datetime)
     {
-        $fhir = new \StdClass();
-        $fhir->resourceType = 'Bundle';
-        $fhir->type = 'document';
-        $date = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d\TH:i:s\Z');
-        $entries = [];
-        $compositionEntry = [
-            'fullUrl' => 'urn:example:report',
-            'resource' => [
-                'author' => [['display' => 'N/A']],
-                'date' => $date,
-                'resourceType' => 'Composition',
-                'section' => [[
-                    'entry' => [
-                        ['reference' => 'urn:example:height']
-                    ]
-                ]],
-                'status' => 'final',
-                'subject' => [
-                    'reference' => "Patient/{$this->participant}"
-                ],
-                'title' => 'PMI Intake Evaluation',
-                'type' => [
-                    'coding' => [[
-                        'code' => "intake-exam-v{$this->version}",
-                        'display' => "PMI Intake Evaluation v{$this->version}",
-                        'system' => 'http://terminology.pmi-ops.org/document-types'
-                    ]],
-                    'text' => "PMI Intake Evaluation v{$this->version}"
-                ]
-            ]
-        ];
-        $entries[] = $compositionEntry;
-        $heightEntry = [
-            'fullUrl' => 'urn:example:height',
-            'resource' => [
-                'code' => [
-                    'coding' => [[
-                        'code' => '8302-2',
-                        'display' => 'Body height',
-                        'system' => 'http://loinc.org'
-                    ]],
-                    'text' => 'Body height'
-                ],
-                'effectiveDateTime' => $date,
-                'resourceType' => 'Observation',
-                'status' => 'final',
-                'subject' => [
-                    'reference' => "Patient/{$this->participant}"
-                ],
-                'valueQuantity' => [
-                    'code' => 'cm',
-                    'system' => 'http://unitsofmeasure.org',
-                    'unit' => 'cm',
-                    'value' => $this->data->height
-                ]
-            ]
-        ];
-        $entries[] = $heightEntry;
-        $fhir->entry = $entries;
-        return $fhir;
+        $fhir = new Fhir([
+            'data' => $this->data,
+            'schema' => $this->schema,
+            'patient' => $this->participant,
+            'version' => $this->version,
+            'datetime' => $datetime
+        ]);
+        return $fhir->toObject();
     }
 }
