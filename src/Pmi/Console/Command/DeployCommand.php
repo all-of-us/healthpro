@@ -22,7 +22,8 @@ class DeployCommand extends Command {
     /** GAE application IDs for production. */
     private static $PROD_APP_IDS = [
         'pmi-hpo-staging',
-        'pmi-hpo-test'
+        'pmi-hpo-test',
+        'pmi-hpo-dev'
     ];
 
     /** Restrict access by IP using dos.yaml */
