@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Participant {{ participant.id }} - {% endblock %}
+{% block title %}Participant {{ participant.shortId }} - {% endblock %}
 {% block body %}
     <div class="page-header">
         <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>{{ participant.shortId }}</small></h2>
@@ -15,8 +15,14 @@
                     <div class="panel-body">
                         {% for evaluation in evaluations %}
                             <a href="{{ path('participantEval', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg btn-default">
-                                {{ evaluation.created_ts|date('n/j/Y g:ia') }}<br />
-                                <small class="text-muted">Last updated {{ evaluation.updated_ts|date('n/j/Y g:ia') }}</small>
+                                {{ evaluation.created_ts|date('D n/j/Y') }}<br />
+                                <small class="text-muted">
+                                    {% if evaluation.finalized_ts %}
+                                        <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia') }}</small>
+                                    {% else %}
+                                        <span class="label label-default">Updated</span> {{ evaluation.updated_ts|date('n/j/Y g:ia') }}
+                                    {% endif %}
+                                </small>
                             </a>
                         {% endfor %}
                         <a href="{{ path('participantEval', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
@@ -40,8 +46,17 @@
                     <div class="panel-body">
                         {% for order in orders %}
                             <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
-                                {{ order.created_ts|date('n/j/Y g:ia') }}<br />
-                                <small class="text-muted">{{ order.order_id }}</small>
+                                {{ order.created_ts|date('D n/j/Y') }} <small class="text-muted"><strong>{{ order.order_id }}</strong></small><br />
+                                <small class="text-muted">
+                                    {% if order.finalized_ts %}
+                                        <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia') }}</small>
+                                    {% elseif order.processed_ts %}
+                                        <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia') }}</small>
+                                    {% elseif order.collected_ts %}
+                                        <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia') }}</small>
+                                    {% else %}
+                                    {% endif %}                                    
+                                </small>
                             </a>
                         {% endfor %}
                         <a href="{{ path('orderCreate', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>

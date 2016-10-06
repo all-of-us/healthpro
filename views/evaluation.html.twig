@@ -3,11 +3,6 @@
 {% block body %}
     {{ form_errors(evaluationForm) }}
 
-    <div class="alert alert-warning">
-        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-        Evaluation form is under construction and incomplete
-    </div>
-
     <div class="page-header">
         <h2>
             <i class="fa fa-clipboard" aria-hidden="true"></i>
@@ -20,14 +15,12 @@
         </h2>
     </div>
     <dl class="dl-horizontal">
-        <dt>ID</dt>
-        <dd>{{ participant.shortId }}</dd>
         <dt>DOB</dt>
         <dd>{{ participant.dob|date('n/j/Y') }}</dd>
         <dt>Gender</dt>
         <dd>{{ participant.gender }}</dd>
         {% if evaluation %}
-            <dt>Evaluation updated</dt>
+            <dt>Updated</dt>
             <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia') }}</dd>
         {% endif %}
     </dl>
@@ -78,7 +71,18 @@
                     {% endif %}
                 </div>
             {% endfor %}
-            <p><a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a> <button type="submit" class="btn btn-primary">Save</button></p>
+            {% if evaluation and evaluation.finalized_ts %}
+                <p>
+                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
+                    <button type="submit" class="btn btn-warning" name="reopen">Reopen</button>
+                </p>
+            {% else %}
+                <p>
+                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-primary" name="save">Save</button>
+                    <button type="submit" class="btn btn-success" name="finalize">Save and Finalize</button>
+                </p>
+            {% endif %}
         {{ form_end(evaluationForm) }}
 
         <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel">
