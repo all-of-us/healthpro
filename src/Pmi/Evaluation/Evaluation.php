@@ -82,7 +82,7 @@ class Evaluation
                 $options['scale'] = $field->decimals;
             }
             if (isset($field->max)) {
-                $constraints[] = new Constraints\LessThanOrEqual($field->max);
+                $constraints[] = new Constraints\LessThan($field->max);
             }
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanOrEqual($field->min);

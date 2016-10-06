@@ -13,25 +13,28 @@
             "name": "weight",
             "label": "Weight",
             "unit": "kg",
-            "decimals": 1
+            "decimals": 1,
+            "max": 1000
         },
         {
             "name": "blood-pressure-systolic",
             "label": "Blood Pressure: systolic",
             "unit": "mmHg",
-            "replicates": 3
+            "replicates": 3,
+            "max": 300
         },
         {
             "name": "blood-pressure-diastolic",
             "label": "Blood Pressure: diastolic",
             "unit": "mmHg",
-            "replicates": 3
+            "replicates": 3,
+            "max": 300
         },
         {
             "name": "heart-rate",
             "label": "Heart Rate",
             "unit": "bpm",
-            "min": 20
+            "max": 300
         },
         {
             "name": "hip-circumference",
@@ -39,7 +42,8 @@
             "unit": "cm",
             "image": "hip.png",
             "decimals": 1,
-            "replicates": 3
+            "replicates": 3,
+            "max": 300
         },
         {
             "name": "waist-circumference",
@@ -47,7 +51,8 @@
             "unit": "cm",
             "image": "waist.png",
             "decimals": 1,
-            "replicates": 3
+            "replicates": 3,
+            "max": 300
         }
     ]
 }
