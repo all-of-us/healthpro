@@ -63,10 +63,10 @@ class RdrParticipants
     {
         $query = [];
         if (isset($params['lastName'])) {
-            $query['last_name'] = $params['lastName'];
+            $query['last_name'] = ucfirst($params['lastName']);
         }
         if (isset($params['firstName'])) {
-            $query['first_name'] = $params['firstName'];
+            $query['first_name'] = ucfirst($params['firstName']);
         }
         if (isset($params['dob'])) {
             try {
