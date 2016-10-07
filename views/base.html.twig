@@ -114,10 +114,11 @@
             </div>
         </div>
     {% endif %}
-    
+
+    <div id="is-xs" class="visible-xs"></div>
     {% include 'templates/alert.html.twig' %}
     {% include 'templates/confirm.html.twig' %}
-    {% if not app.session.get('isUsageAgreed') %}
+    {% if hideSystemUsage is not defined and not app.session.get('isUsageAgreed') %}
         {% include 'templates/system-usage.html.twig' %}
     {% endif %}
 

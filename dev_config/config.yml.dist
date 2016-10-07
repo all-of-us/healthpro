@@ -35,3 +35,9 @@ gaBypass: 1
 gaApplicationName: PMI DRC HPO
 gaDomain: staging.pmi-ops.org
 gaAdminEmail: hpo-api@staging.pmi-ops.org
+
+# use Google App Engine auth via UserService instead of Google OAuth
+gae_auth: 1
+
+# IP whitelist (CSV)
+ip_whitelist:

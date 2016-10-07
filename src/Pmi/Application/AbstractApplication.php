@@ -3,6 +3,7 @@ namespace Pmi\Application;
 
 use Exception;
 use Memcache;
+use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
 use Silex\Application;
@@ -12,9 +13,11 @@ use Silex\Provider\LocaleServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
+use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Twig_SimpleFunction;
 
 abstract class AbstractApplication extends Application
@@ -24,6 +27,7 @@ abstract class AbstractApplication extends Application
     const ENV_PROD = 'prod'; // production environment
     
     protected $name;
+    protected $configuration = [];
 
     /** Determines the environment under which the code is running. */
     private static function determineEnv()
@@ -81,7 +85,7 @@ abstract class AbstractApplication extends Application
         return $this->name;
     }
 
-    public function setup()
+    public function setup($config = [])
     {
         // GAE SDK dev AppServer has a conflict with loading external XML entities
         // https://github.com/GoogleCloudPlatform/appengine-symfony-starter-project/blob/master/src/AppEngine/Environment.php#L52-L69
@@ -127,6 +131,8 @@ abstract class AbstractApplication extends Application
             }
         }
         
+        $this->loadConfiguration($config);
+        
         // configure security and boot before enabling twig so that `is_granted` will be available
         $this->registerSecurity();
         $this->boot();
@@ -139,7 +145,40 @@ abstract class AbstractApplication extends Application
         return $this;
     }
 
+    /** Populates $this->configuration */
+    abstract protected function loadConfiguration($override = []);
+    
+    public function getConfig($key)
+    {
+        if (isset($this->configuration[$key])) {
+            return $this->configuration[$key];
+        } else {
+            return null;
+        }
+    }
+
+    public function setConfig($key, $val)
+    {
+        $this->configuration[$key] = $val;
+    }
+    
+    /** Sets up authentication and firewall. */
     abstract protected function registerSecurity();
+    
+    /** Returns an array of (unvalidated) IPs / CIDR blocks. */
+    public function getIpWhitelist()
+    {
+        $list = [];
+        $config = trim($this->getConfig('ip_whitelist'));
+        if ($config) {
+            $ips = explode(',', $config);
+            foreach ($ips as $ip) {
+                $ip = trim($ip);
+                $list[] = $ip;
+            }
+        }
+        return $list;
+    }
     
     public function getGoogleServiceClass()
     {
@@ -149,17 +188,35 @@ abstract class AbstractApplication extends Application
     
     public function getGoogleUser()
     {
-        $cls = $this->getGoogleServiceClass();
-        return class_exists($cls) ? $cls::getCurrentUser() : null;
+        if ($this->getConfig('gae_auth')) {
+            $cls = $this->getGoogleServiceClass();
+            return class_exists($cls) ? $cls::getCurrentUser() : null;
+        } else {
+            return $this['session']->get('googleUser');
+        }
     }
     
-    public function getGoogleLogoutUrl($dest = null)
+    public function getGoogleLogoutUrl($route = 'home')
     {
-        if (!$dest) {
-            $dest = $this->generateUrl('home');
+        $dest = $this->generateUrl($route, [], true);
+        
+        if ($this->getConfig('gae_auth')) {
+            $cls = $this->getGoogleServiceClass();
+            return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
+        } else {
+            // http://stackoverflow.com/a/14831349/1402028
+            return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
         }
-        $cls = $this->getGoogleServiceClass();
-        return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
+    }
+    
+    public function getGoogleLoginUrl($route = 'home')
+    {
+        $dest = $this->generateUrl($route, [], true);
+        
+        if ($this->getConfig('gae_auth')) {
+            $cls = $this->getGoogleServiceClass();
+            return class_exists($cls) ? $cls::createLoginURL($dest) : null;
+        }
     }
     
     public function getUser()
@@ -204,6 +261,16 @@ abstract class AbstractApplication extends Application
                 if ($code >= 500) {
                     error_log($e);
                 }
+                
+                if ($e instanceof AccessDeniedHttpException && $code === 403) {
+                    // display custom page if being denied due to IP whitelist
+                    $ips = $this->getIpWhitelist();
+                    if (is_array($ips) && count($ips) > 0 && !IpUtils::checkIp($request->getClientIp(), $ips)) {
+                        $this->log(Log::INVALID_IP);
+                        return $this['twig']->render('error-ip.html.twig', ['code' => $code]);
+                    }
+                }
+                
                 return $this['twig']->render($this['errorTemplate'], ['code' => $code]);
             } else {
                 return;
@@ -253,12 +320,24 @@ abstract class AbstractApplication extends Application
         $this['session']->invalidate();
     }
 
-    public function generateUrl($route, $parameters = [])
+    public function generateUrl($route, $parameters = [], $absolute = false)
     {
         if ($this->getName()) {
             $route = $this->getName() . '_' . $route;
         }
-        return $this['url_generator']->generate($route, $parameters);
+        
+        if ($absolute) {
+            // `login_url` is the URL prefix to use in the event that our site
+            // is being reverse-proxied from a different domain (i.e., from the WAF)
+            if ($this->getConfig('login_url')) {
+                $path = preg_replace('/\/$/', '', $this->getConfig('login_url'));
+                return $path . $this['url_generator']->generate($route, $parameters);
+            } else {
+                return $this['url_generator']->generate($route, $parameters, \Symfony\Component\Routing\Generator\UrlGenerator::ABSOLUTE_URL);
+            }
+        } else {
+            return $this['url_generator']->generate($route, $parameters);
+        }
     }
 
     public function redirectToRoute($route, $parameters = [])
@@ -297,5 +376,14 @@ abstract class AbstractApplication extends Application
     {
         $string = $this['translator']->trans($string, $translationParams);
         $this->addFlash('success', $string);
+    }
+
+    public function log($action, $data = null)
+    {
+        $log = new Log($this, $action, $data);
+        $log->logSyslog();
+        if (!$this['isUnitTest'] && $action != Log::REQUEST) {
+            $log->logDatastore();
+        }
     }
 }

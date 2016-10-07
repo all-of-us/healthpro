@@ -34,9 +34,12 @@ class User implements UserInterface
         // site membership is determined by the user's groups
         foreach ($this->groups as $group) {
             if (strpos($group->getEmail(), self::SITE_PREFIX) === 0) {
+                $id = preg_replace('/@.*$/', '', $group->getEmail());
+                $id = str_replace(self::SITE_PREFIX, '', $id);
                 $sites[] = (object) [
                     'email' => $group->getEmail(),
-                    'name' => $group->getName()
+                    'name' => $group->getName(),
+                    'id' => $id
                 ];
             }
         }

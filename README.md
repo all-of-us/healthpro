@@ -38,7 +38,7 @@ By default, the local server stores Datastore data in a temporary location that 
 
 ### config.yml
 
-The easiest way to configure your local development parameters is copying the `dev_config/config.yaml.dist` file to `dev_config/config.yaml`.  Edit `config.yaml` as needed.  This file is .gitignore'd.  See comments in the dist file for more details.
+The easiest way to configure your local development parameters is copying the `dev_config/config.yml.dist` file to `dev_config/config.yml`.  Edit `config.yml` as needed.  This file is .gitignore'd.  See comments in the dist file for more details.
 
 ### Configuration datastore entities
 Alternatively, you can set up configuration parameters using Configuration datastore entities.  The GAE SDK local server has a data store interface that runs by default on [port 8000](http://localhost:8000/datastore).  However, there is no way to manually create the first entity of a type.  There is a route accessible only in dev and test that creates this first Configuration entity:
@@ -53,3 +53,9 @@ Configure your local MySQL database connection by creating the following Configu
 * `mysql_schema` (database name)
 * `mysql_user`
 * `mysql_password`
+
+## Generate IP whitelists
+
+IP whitelisting is used to allow only traffic coming from the WAF. This is a mitigation until Google implements their GAE firewall. The whitelists are versioned in git for better clarity/auditing rather than generated on the fly. They can be rebuilt with:
+
+`./bin/console pmi:ipwhitelist`

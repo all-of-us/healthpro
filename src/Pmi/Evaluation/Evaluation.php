@@ -6,6 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
+use Pmi\Util;
 
 class Evaluation
 {
@@ -13,6 +14,8 @@ class Evaluation
     protected $version;
     protected $data;
     protected $schema;
+    protected $participant;
+    protected $locked = false;
 
     public function __construct()
     {
@@ -34,6 +37,10 @@ class Evaluation
                 $this->data = json_decode($array['data']);
             }
         }
+        if (!empty($array['finalized_ts'])) {
+            $this->locked = true;
+        }
+        $this->participant = strtoupper(Util::shortenUuid($array['participant_id']));
         $this->loadSchema();
         $this->normalizeData();
     }
@@ -65,6 +72,12 @@ class Evaluation
                 'required' => false,
                 'scale' => 0
             ];
+            if ($this->locked) {
+                $options['disabled'] = true;
+            }
+            if (isset($field->label)) {
+                $options['label'] = $field->label;
+            }
             if (isset($field->decimals)) {
                 $options['scale'] = $field->decimals;
             }
@@ -82,7 +95,8 @@ class Evaluation
                 $formBuilder->add($field->name, CollectionType::class, [
                     'entry_type' => NumberType::class,
                     'entry_options' => $options,
-                    'required' => false
+                    'required' => false,
+                    'label' => isset($options['label']) ? $options['label'] : null
                 ]);
             } else {
                 $formBuilder->add($field->name, NumberType::class, $options);
@@ -135,5 +149,17 @@ class Evaluation
                 }
             }
         }
+    }
+
+    public function getFhir($datetime)
+    {
+        $fhir = new Fhir([
+            'data' => $this->data,
+            'schema' => $this->schema,
+            'patient' => $this->participant,
+            'version' => $this->version,
+            'datetime' => $datetime
+        ]);
+        return $fhir->toObject();
     }
 }

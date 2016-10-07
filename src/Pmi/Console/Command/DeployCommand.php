@@ -2,6 +2,8 @@
 namespace Pmi\Console\Command;
 
 use Pmi\Application\AbstractApplication;
+use SensioLabs\Security\SecurityChecker;
+use SensioLabs\Security\Formatters\SimpleFormatter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,8 +25,15 @@ class DeployCommand extends Command {
         'pmi-hpo-test'
     ];
 
+    /** Restrict access by IP using dos.yaml */
+    private static $IPRESTRICT_APP_IDS = [
+        'pmi-hpo-test'
+    ];
+
     /** Create release tag when deploying these application IDs. */
-    private static $TAG_APP_IDS = [];
+    private static $TAG_APP_IDS = [
+        'pmi-hpo-test'
+    ];
 
     /** Don't require `login: admin` for these application IDs. */
     private static $SKIP_ADMIN_APP_IDS = [];
@@ -137,7 +146,10 @@ class DeployCommand extends Command {
 
         // generate config files
         $this->generateAppConfig();
+        $this->generateIpWhitelistConfig();
         $this->generatePhpConfig();
+
+        $this->runSecurityCheck();
 
         // If not local, compile assets. Run ./bin/gulp when developing locally.
         if (!$this->local && !$this->index) {
@@ -295,8 +307,6 @@ class DeployCommand extends Command {
         // lock down all the test sites
         if ($this->isTest() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS)) {
             $this->requireAdminLogin($config);
-        } else {
-            $this->requireGoogleLogin($config);
         }
 
         // crash the deploy if our handlers are not secure
@@ -312,6 +322,36 @@ class DeployCommand extends Command {
 
         $dumper = new Dumper();
         file_put_contents($configFile, $dumper->dump($config, PHP_INT_MAX));
+    }
+    
+    /** Generate IP whitelisting config. */
+    private function generateIpWhitelistConfig()
+    {
+        $dosFile = $this->appDir . DIRECTORY_SEPARATOR . 'dos.yaml';
+        $dosDistFile = "{$dosFile}.dist";
+        if (!file_exists($dosDistFile)) {
+            throw new Exception("Couldn't find $dosDistFile");
+        }
+        
+        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
+            copy($dosDistFile, $dosFile);
+        } else {
+            // https://cloud.google.com/appengine/docs/php/config/dos#delete
+            file_put_contents($dosFile, 'blacklist:');
+        }
+        
+        $whitelistFile = $this->appDir . DIRECTORY_SEPARATOR . 'ip_whitelist.yml';
+        $whitelistDistFile = "{$whitelistFile}.dist";
+        if (!file_exists($whitelistDistFile)) {
+            throw new Exception("Couldn't find $whitelistDistFile");
+        }
+        
+        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
+            copy($whitelistDistFile, $whitelistFile);
+        } else {
+            // https://cloud.google.com/appengine/docs/php/config/dos#delete
+            file_put_contents($whitelistFile, 'whitelist:');
+        }
     }
 
     /** Generate PHP configuration. */
@@ -398,6 +438,28 @@ class DeployCommand extends Command {
     private function runUnitTests()
     {
         $this->exec("{$this->appDir}/bin/phpunit");
+    }
+
+    private function runSecurityCheck()
+    {
+        $composerLockFile = $this->appDir . DIRECTORY_SEPARATOR . 'composer.lock';
+        $this->out->writeln("Running SensioLabs Security Checker...");
+        $checker = new SecurityChecker();
+        $vulnerabilities = $checker->check($composerLockFile);
+        if (count($vulnerabilities) === 0) {
+            $this->out->writeln('No packages have known vulnerabilities');
+        } else {
+            $formatter = new SimpleFormatter($this->getHelper('formatter'));
+            $formatter->displayResults($this->out, $composerLockFile, $vulnerabilities);
+            if (!$this->local && !$this->index) {
+                throw new \Exception('Fix security vulnerablities before deploying');
+            } else {
+                $helper = $this->getHelper('question');
+                if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
+                    throw new \Exception('Aborting due to security vulnerability');
+                }
+            }
+        }
     }
 
     /** Runs a shell command, displaying output as it is generated. */

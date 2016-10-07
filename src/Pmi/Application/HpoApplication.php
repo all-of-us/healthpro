@@ -5,17 +5,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Pmi\Entities\Configuration;
 use Pmi\Security\UserProvider;
+use Pmi\Audit\Log;
 
 class HpoApplication extends AbstractApplication
 {
     protected $configuration = [];
-    protected $participantSource = 'mock';
+    protected $participantSource = 'rdr';
 
-    public function setup()
+    public function setup($config = [])
     {
-        parent::setup();
-
-        $this->loadConfiguration();
+        parent::setup($config);
 
         $rdrOptions = [];
         if ($this->isDev()) {
@@ -27,12 +26,15 @@ class HpoApplication extends AbstractApplication
                 $rdrOptions['endpoint'] = $this->getConfig('rdr_endpoint');
             }
         }
+        if ($this->getConfig('rdr_auth_json')) {
+            $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
+        }
 
         $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
         if ($this->participantSource == 'mock') {
-            $this['pmi.drc.participantsearch'] = new \Pmi\Drc\MockParticipantSearch();
+            $this['pmi.drc.participants'] = new \Pmi\Drc\MockParticipantSearch();
         } else {
-            $this['pmi.drc.participantsearch'] = new \Pmi\Drc\RdrParticipantSearch($this['pmi.drc.rdrhelper']);
+            $this['pmi.drc.participants'] = new \Pmi\Drc\RdrParticipants($this['pmi.drc.rdrhelper']);
         }
 
         $this['pmi.drc.appsclient'] = $this['isUnitTest'] ?
@@ -48,11 +50,19 @@ class HpoApplication extends AbstractApplication
             return new \Pmi\Security\GoogleGroupsAuthenticator($app);
         };
         
+        // use an IP whitelist until GAE has built-in firewall rules
+        $ips = $this->getIpWhitelist();
+        if (count($ips) === 0) {
+            // no config specified - allow everything ('::/0' doesn't work with IpUtils)
+            $ips = ['0.0.0.0/0', '::/1'];
+        }
+        
         $app = $this;
+        $anonRegex = '^/(timeout|login)$';
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
-                'insecure' => [
-                    'pattern' => '^/timeout$',
+                'anonymous' => [
+                    'pattern' => $anonRegex,
                     'anonymous' => true
                 ],
                 'main' => [
@@ -68,15 +78,22 @@ class HpoApplication extends AbstractApplication
                 ]
             ],
             'security.access_rules' => [
-                ['^/timeout$', 'IS_AUTHENTICATED_ANONYMOUSLY'],
-                ['^/_dev/.*$', 'IS_AUTHENTICATED_FULLY'],
-                ['^/dashboard/.*$', 'ROLE_DASHBOARD'],
-                ['^/.*$', 'ROLE_USER']
+                [['path' => $anonRegex, 'ips' => $ips], 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                [['path' => $anonRegex], 'ROLE_NO_ACCESS'],
+                
+                [['path' => '^/_dev/.*$', 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
+                [['path' => '^/_dev/.*$'], 'ROLE_NO_ACCESS'],
+                
+                [['path' => '^/dashboard/.*$', 'ips' => $ips], 'ROLE_DASHBOARD'],
+                [['path' => '^/dashboard/.*$'], 'ROLE_NO_ACCESS'],
+
+                [['path' => '^/.*$', 'ips' => $ips], 'ROLE_USER'],
+                [['path' => '^/.*$'], 'ROLE_NO_ACCESS']
             ]
         ]);
     }
 
-    protected function loadConfiguration()
+    protected function loadConfiguration($override = [])
     {
         $appDir = realpath(__DIR__ . '/../../../');
         $configFile = $appDir . '/dev_config/config.yml';
@@ -88,24 +105,29 @@ class HpoApplication extends AbstractApplication
             }
         }
 
-        if ($this['isUnitTest']) {
-            return;
+        // unit tests don't have access to Datastore
+        if (!$this['isUnitTest']) {
+            $configs = Configuration::fetchBy([]);
+            foreach ($configs as $config) {
+                $this->configuration[$config->getKey()] = $config->getValue();
+            }
         }
-        $configs = Configuration::fetchBy([]);
-        foreach ($configs as $config) {
-            $this->configuration[$config->getKey()] = $config->getValue();
+        
+        // load IP whitelist
+        $whitelistFile = $appDir . '/ip_whitelist.yml';
+        if (file_exists($whitelistFile)) {
+            $yaml = new \Symfony\Component\Yaml\Parser();
+            $whitelistConfig = $yaml->parse(file_get_contents($whitelistFile));
+            if (is_array($whitelistConfig['whitelist'])) {
+                $this->configuration['ip_whitelist'] = implode(',', $whitelistConfig['whitelist']);
+            }
+        }
+        
+        foreach ($override as $key => $val) {
+            $this->configuration[$key] = $val;
         }
     }
-
-    public function getConfig($key)
-    {
-        if (isset($this->configuration[$key])) {
-            return $this->configuration[$key];
-        } else {
-            return null;
-        }
-    }
-
+    
     protected function registerDb()
     {
         $socket = $this->getConfig('mysql_socket');
@@ -135,6 +157,9 @@ class HpoApplication extends AbstractApplication
         $this->register(new \Silex\Provider\DoctrineServiceProvider(), [
             'db.options' => $options
         ]);
+
+        $this['em'] = new \Pmi\EntityManager\EntityManager();
+        $this['em']->setDbal($this['db']);
     }
 
     public function setHeaders(Response $response)
@@ -160,13 +185,15 @@ class HpoApplication extends AbstractApplication
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
         // log the user out if their session is expired
-        if ($this->isLoginExpired()) {
-            $this->logout(); // otherwise we will infinitely redirect to /logout
+        if ($this->isLoginExpired() && $request->attributes->get('_route') !== 'logout') {
             return $this->redirectToRoute('logout', ['timeout' => true]);
         }
         
         if ($this['session']->get('isLogin')) {
+            $app->log(Log::LOGIN_SUCCESS, $this->getUser()->getRoles());
             $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
+        } else {
+            $app->log(Log::REQUEST);
         }
     }
     
