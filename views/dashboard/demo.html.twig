@@ -334,6 +334,8 @@
     <script type="text/javascript">
         $('.datepicker').datepicker({dateFormat: 'yy-mm-dd', showButtonPanel: true});
 
+        $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+
         $('.panel-collapse').on('show.bs.collapse hide.bs.collapse', function() {
             toggleGlyph($(this).prev().find('span.toggle-glyph'));
         });

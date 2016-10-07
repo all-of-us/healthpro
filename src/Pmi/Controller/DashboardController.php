@@ -19,7 +19,6 @@ class DashboardController extends AbstractController
         ['demo_load_map_data', '/demo_load_map_data'],
         ['demo_load_lifecycle_data', '/demo_load_lifecycle_data'],
         ['demo_total_progress', '/demo_total_progress']
-
     ];
 
     public function homeAction(Application $app, Request $request)
