@@ -36,6 +36,7 @@
                         </span>
                     {% endif %}
                     {% if field.replicates is defined %}
+                        <span id="mean-{{ field.name }}" class="pull-right mean"></span>
                         <div class="row replicate">
                         {% for replicateField in evaluationForm[field.name] %}
                             <div class="col-sm-4{% if not replicateField.vars.valid %} has-error{% endif %}">
@@ -51,7 +52,6 @@
                             </div>
                         {% endfor %}
                         </div>
-                        <div id="mean-{{ field.name }}" class="mean"></div>
                     {% else %}
                         <div class="row">
                             <div class="col-sm-4">

@@ -54,7 +54,7 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
                 if ((warning.min && val < warning.min) ||
                     (warning.max && val > warning.max))
                 {
-                    container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                    container.append($('<div class="metric-warnings text-danger">').text(warning.message));
                 }
             });
         }
