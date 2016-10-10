@@ -33,7 +33,13 @@ class DefaultController extends AbstractController
 
     public function homeAction(Application $app, Request $request)
     {
-        return $app['twig']->render('index.html.twig');
+        if ($app['security.authorization_checker']->isGranted('ROLE_USER')) {
+            return $app['twig']->render('index.html.twig');
+        } elseif ($app['security.authorization_checker']->isGranted('ROLE_DASHBOARD')) {
+            return $app->redirectToRoute('dashboard_home');
+        } else {
+            return $app->abort(403);
+        }
     }
     
     public function logoutAction(Application $app, Request $request)

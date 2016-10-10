@@ -1,4 +1,5 @@
 <?php
+use Pmi\Security\User;
 use Tests\Pmi\AbstractWebTestCase;
 use Tests\Pmi\GoogleGroup;
 use Tests\Pmi\GoogleUserService;
@@ -72,6 +73,31 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertEquals($email, $this->app->getUser()->getEmail());
         sleep($this->app['sessionTimeout']);
         $this->assertSame(true, $this->app->isLoginExpired());
+    }
+    
+    public function testDashboardTimeout()
+    {
+        $email = 'testDashboardTimeout@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $this->app['sessionTimeout'] = 2;
+        $client = $this->createClient();
+        $crawler = $client->request('POST', '/keepalive');
+        $this->assertSame(false, $this->app->isLoginExpired());
+        $this->assertEquals($email, $this->app->getUser()->getEmail());
+        sleep($this->app['sessionTimeout']);
+        $this->assertSame(true, $this->app->isLoginExpired());
+    }
+    
+    public function testDashboardRedirect()
+    {
+        $email = 'testDashboardRedirect@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $this->app['sessionTimeout'] = 2;
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/');
+        $this->assertSame(true, strpos($crawler->html(), 'Redirecting to <a href="/dashboard/">/dashboard/</a>') !== false);
     }
 
     public function testUsageAgreement()

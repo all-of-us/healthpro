@@ -58,6 +58,8 @@ class HpoApplication extends AbstractApplication
         }
         
         $app = $this;
+        // include `/` in common routes because homeAction will redirect based on role
+        $commonRegex = '^/(logout|login-return|keepalive|client-timeout|agree)?$';
         $anonRegex = '^/(timeout|login)$';
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
@@ -83,6 +85,9 @@ class HpoApplication extends AbstractApplication
                 
                 [['path' => '^/_dev/.*$', 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
                 [['path' => '^/_dev/.*$'], 'ROLE_NO_ACCESS'],
+                
+                [['path' => $commonRegex, 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
+                [['path' => $commonRegex], 'ROLE_NO_ACCESS'],
                 
                 [['path' => '^/dashboard/.*$', 'ips' => $ips], 'ROLE_DASHBOARD'],
                 [['path' => '^/dashboard/.*$'], 'ROLE_NO_ACCESS'],
