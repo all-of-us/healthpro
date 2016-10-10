@@ -8,6 +8,8 @@ var ASSETS = {
         BOWER_DIR + '/underscore/underscore-min.js',
         BOWER_DIR + '/backbone/backbone-min.js',
         BOWER_DIR + '/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
+        BOWER_DIR + '/parsleyjs/dist/parsley.min.js',
+        ASSETS_DIR + '/js/parsley-comparison.js',
         ASSETS_DIR + '/js/bootstrap-session-timeout.js',
         ASSETS_DIR + '/js/app.js',
         ASSETS_DIR + '/js/views/*'
