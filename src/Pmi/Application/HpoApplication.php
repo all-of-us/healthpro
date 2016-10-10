@@ -182,11 +182,37 @@ class HpoApplication extends AbstractApplication
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     }
     
+    public function switchSite($email)
+    {
+        $user = $this->getUser();
+        if ($user && $user->belongsToSite($email)) {
+            $this['session']->set('site', $user->getSite($email));
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /** Returns the user's currently selected HPO site. */
+    public function getSite()
+    {
+        return $this['session']->get('site');
+    }
+    
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
         // log the user out if their session is expired
         if ($this->isLoginExpired() && $request->attributes->get('_route') !== 'logout') {
             return $this->redirectToRoute('logout', ['timeout' => true]);
+        }
+        
+        // HPO users must select their site first
+        if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER')) {
+            $user = $this->getUser();
+            // auto-select since they only have one site
+            if (count($user->getSites()) === 1) {
+                $this->switchSite($user->getSites()[0]->email);
+            }
         }
         
         if ($this['session']->get('isLogin')) {
@@ -200,7 +226,7 @@ class HpoApplication extends AbstractApplication
     protected function finishCallback(Request $request, Response $response)
     {
         // only the first request handled is considered a login
-        if ($this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($this->isLoggedIn()) {
             $this['session']->set('isLogin', false);
         }
     }

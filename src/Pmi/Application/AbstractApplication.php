@@ -235,6 +235,11 @@ abstract class AbstractApplication extends Application
         $isLoggedIn = $this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('ROLE_USER');
         return $isLoggedIn && $remaining <= 0;
     }
+    
+    public function isLoggedIn()
+    {
+        return $this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY');
+    }
 
     protected function enableTwig()
     {

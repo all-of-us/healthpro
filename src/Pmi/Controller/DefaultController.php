@@ -111,9 +111,7 @@ class DefaultController extends AbstractController
     
     public function switchSiteAction($id, Application $app, Request $request)
     {
-        $user = $app['security.token_storage']->getToken()->getUser();
-        if ($user->belongsToSite($id)) {
-            $app['session']->set('site', $user->getSite($id));
+        if ($app->switchSite($id)) {
             return $app->redirectToRoute('home');
         } else {
             return $app->abort(403);

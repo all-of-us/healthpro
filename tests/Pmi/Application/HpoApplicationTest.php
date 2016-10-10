@@ -134,4 +134,16 @@ class HpoApplicationTest extends AbstractWebTestCase
     {
         return $this->ipWhitelist;
     }
+    
+    public function testSiteAutoselect()
+    {
+        $email = 'testSiteAutoselect@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        $groupEmail = 'hpo-site-1@gapps.com';
+        AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
+        $client = $this->createClient();
+        $this->assertSame(null, $this->app->getSite());
+        $crawler = $client->request('GET', '/participants');
+        $this->assertSame($groupEmail, $this->app->getSite()->email);
+    }
 }
