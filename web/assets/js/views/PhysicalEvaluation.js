@@ -6,19 +6,19 @@
 
 var PhysicalEvaluation = Backbone.View.extend({
     events: {
-        "click .help-image": "displayHelpModal",
+        "click .toggle-help-image": "displayHelpModal",
         "change .replicate input": "updateMean",
         "keyup .replicate input": "updateMean",
         "change input": "clearServerErrors",
         "keyup input": "clearServerErrors"
     },
     displayHelpModal: function(e) {
-        var image = $(e.target).attr('src');
+        var image = $(e.currentTarget).data('img');
         this.$('#imageModal .modal-body').html('<img src="' + image + '" class="img-responsive" />');
         this.$('#imageModal').modal();
     },
     updateMean: function(e) {
-        var field = $(e.target).closest('.field').data('field');
+        var field = $(e.currentTarget).closest('.field').data('field');
         this.calculateMean(field);
     },
     calculateMean: function(field) {
