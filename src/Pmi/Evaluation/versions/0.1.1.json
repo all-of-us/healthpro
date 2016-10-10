@@ -13,25 +13,62 @@
             "name": "weight",
             "label": "Weight",
             "unit": "kg",
-            "decimals": 1
+            "decimals": 1,
+            "max": 1000,
+            "warnings": [
+                {
+                    "min": 30,
+                    "max": 450,
+                    "message": "Please verify that this weight is correct"
+                }
+            ]
         },
         {
             "name": "blood-pressure-systolic",
             "label": "Blood Pressure: systolic",
             "unit": "mmHg",
-            "replicates": 3
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "max": 180,
+                    "message": "Participant is in a hypertensive crisis"
+                },
+                {
+                    "min": 70,
+                    "message": "Participant may be hypotensive"
+                }
+            ]
         },
         {
             "name": "blood-pressure-diastolic",
             "label": "Blood Pressure: diastolic",
             "unit": "mmHg",
-            "replicates": 3
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "max": 110,
+                    "message": "Participant is in a hypertensive crisis"
+                },
+                {
+                    "min": 40,
+                    "message": "Participant may be hypotensive"
+                }
+            ]
         },
         {
             "name": "heart-rate",
             "label": "Heart Rate",
             "unit": "bpm",
-            "min": 20
+            "max": 300,
+            "warnings": [
+                {
+                    "min": 50,
+                    "max": 120,
+                    "message": "Please verify that this resting heart rate is correct"
+                }
+            ]
         },
         {
             "name": "hip-circumference",
@@ -39,7 +76,15 @@
             "unit": "cm",
             "image": "hip.png",
             "decimals": 1,
-            "replicates": 3
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "min": 50,
+                    "max": 150,
+                    "message": "Please verify that this circumference is correct"
+                }
+            ]
         },
         {
             "name": "waist-circumference",
@@ -47,7 +92,15 @@
             "unit": "cm",
             "image": "waist.png",
             "decimals": 1,
-            "replicates": 3
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "min": 50,
+                    "max": 150,
+                    "message": "Please verify that this circumference is correct"
+                }
+            ]
         }
     ]
 }

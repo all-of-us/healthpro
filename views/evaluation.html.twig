@@ -31,41 +31,39 @@
                 <div data-field="{{ field.name }}" class="field field-{{ field.name }} form-group{% if not evaluationForm[field.name].vars.valid and field.replicates is not defined %} has-error{% endif %}">
                     {{ form_label(evaluationForm[field.name]) }}
                     {% if field.image is defined %}
-                        <div class="row">
-                            <div class="col-xs-10 col-sm-11">
+                        <span class="toggle-help-image" data-img="{{ asset('img/eval/'~field.image) }}">
+                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                        </span>
                     {% endif %}
-                        {% if field.replicates is defined %}
-                            <div class="row replicate">
-                            {% for replicateField in evaluationForm[field.name] %}
-                                <div class="col-xs-4{% if not replicateField.vars.valid %} has-error{% endif %}">
-                                {% if field.unit is defined %}
-                                    <div class="input-group">
-                                {% endif %}
-                                    {{ form_widget(replicateField) }}
-                                {% if field.unit is defined %}
-                                        <div class="input-group-addon">{{ field.unit }}</div>
-                                    </div>
-                                {% endif %}
-                                {{ form_errors(replicateField) }}
-                                </div>
-                            {% endfor %}
-                            </div>
-                            <div id="mean-{{ field.name }}" class="mean"></div>
-                        {% else %}
+                    {% if field.replicates is defined %}
+                        <span id="mean-{{ field.name }}" class="pull-right mean"></span>
+                        <div class="row replicate">
+                        {% for replicateField in evaluationForm[field.name] %}
+                            <div class="col-sm-4{% if not replicateField.vars.valid %} has-error{% endif %}">
                             {% if field.unit is defined %}
                                 <div class="input-group">
                             {% endif %}
-                                {{ form_widget(evaluationForm[field.name]) }}
+                                {{ form_widget(replicateField) }}
                             {% if field.unit is defined %}
                                     <div class="input-group-addon">{{ field.unit }}</div>
                                 </div>
                             {% endif %}
-                            {{ form_errors(evaluationForm[field.name]) }}
-                        {% endif %}
-                    {% if field.image is defined %}
+                            {{ form_errors(replicateField) }}
                             </div>
-                            <div class="col-xs-2 col-sm-1">
-                                <img src="{{ asset('img/eval/'~field.image) }}" class="img-responsive help-image" />
+                        {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <div class="col-sm-4">
+                                {% if field.unit is defined %}
+                                    <div class="input-group">
+                                {% endif %}
+                                    {{ form_widget(evaluationForm[field.name]) }}
+                                {% if field.unit is defined %}
+                                        <div class="input-group-addon">{{ field.unit }}</div>
+                                    </div>
+                                {% endif %}
+                                {{ form_errors(evaluationForm[field.name]) }}
                             </div>
                         </div>
                     {% endif %}
@@ -80,7 +78,7 @@
                 <p>
                     <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
                     <button type="submit" class="btn btn-primary" name="save">Save</button>
-                    <button type="submit" class="btn btn-success" name="finalize">Save and Finalize</button>
+                    <button type="submit" class="btn btn-success pull-right" name="finalize" onclick="return confirm('Are you sure you want to finalize this evaluation?');">Save and Finalize</button>
                 </p>
             {% endif %}
         {{ form_end(evaluationForm) }}
@@ -97,4 +95,15 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    var evalView = new PMI.views['PhysicalEvaluation']({
+        el: $("#physicalEvaluation"),
+        warnings: {{ warnings|json_encode|raw }}
+    });
+});
+</script>
 {% endblock %}

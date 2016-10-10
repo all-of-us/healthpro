@@ -63,11 +63,23 @@ class Evaluation
         return $this->schema;
     }
 
+    public function getWarnings()
+    {
+        $warnings = [];
+        foreach ($this->schema->fields as $metric) {
+            if (!empty($metric->warnings) && is_array($metric->warnings)) {
+                $warnings[$metric->name] = $metric->warnings;
+            }
+        }
+        return $warnings;
+    }
+
     public function getForm(FormFactory $formFactory)
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
         foreach ($this->schema->fields as $field) {
             $constraints = [];
+            $attributes = [];
             $options = [
                 'required' => false,
                 'scale' => 0
@@ -82,14 +94,18 @@ class Evaluation
                 $options['scale'] = $field->decimals;
             }
             if (isset($field->max)) {
-                $constraints[] = new Constraints\LessThanOrEqual($field->max);
+                $constraints[] = new Constraints\LessThan($field->max);
+                $attributes['data-parsley-lt'] = $field->max;
             }
             if (isset($field->min)) {
-                $constraints[] = new Constraints\GreaterThanOrEqual($field->min);
+                $constraints[] = new Constraints\GreaterThanEqual($field->min);
+                $attributes['data-parsley-gt'] = $field->min;
             } else {
                 $constraints[] = new Constraints\GreaterThan(0);
+                $attributes['data-parsley-gt'] = 0;
             }
             $options['constraints'] = $constraints;
+            $options['attr'] = $attributes;
 
             if (isset($field->replicates)) {
                 $formBuilder->add($field->name, CollectionType::class, [
