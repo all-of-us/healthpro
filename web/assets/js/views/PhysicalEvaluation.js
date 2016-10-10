@@ -1,16 +1,14 @@
 /**
  * Physical evaluation form view
  */
-
-(function ($) { // BEGIN wrapper
-
-var PhysicalEvaluation = Backbone.View.extend({
+PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
     events: {
         "click .toggle-help-image": "displayHelpModal",
         "change .replicate input": "updateMean",
         "keyup .replicate input": "updateMean",
         "change input": "clearServerErrors",
-        "keyup input": "clearServerErrors"
+        "keyup input": "clearServerErrors",
+        "change input": "displayWarnings"
     },
     displayHelpModal: function(e) {
         var image = $(e.currentTarget).data('img');
@@ -40,7 +38,31 @@ var PhysicalEvaluation = Backbone.View.extend({
     clearServerErrors: function() {
         this.$('span.help-block ul li').remove();
     },
-    initialize: function() { this.render(); },
+    displayWarnings: function(e) {
+        var field = $(e.currentTarget).closest('.field').data('field');
+        var container = $(e.currentTarget).closest('.form-group');
+        container.find('.metric-warnings').remove();
+        if (container.find('.metric-errors div').length > 0) {
+            return;
+        }
+        var val = parseFloat($(e.currentTarget).val());
+        if (!val) {
+            return;
+        }
+        if (this.warnings[field]) {
+            _.each(this.warnings[field], function(warning) {
+                if ((warning.min && val < warning.min) ||
+                    (warning.max && val > warning.max))
+                {
+                    container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                }
+            });
+        }
+    },
+    initialize: function(obj) {
+        this.render();
+        this.warnings = obj.warnings
+    },
     render: function() {
         var self = this;
         this.$('form').parsley({
@@ -51,8 +73,8 @@ var PhysicalEvaluation = Backbone.View.extend({
             errorsContainer: function(el) {
                 return el.$element.closest(".form-group");
             },
-            errorsWrapper: '<span class="help-block"></span>',
-            errorTemplate: '<span></span>',
+            errorsWrapper: '<div class="metric-errors help-block"></div>',
+            errorTemplate: '<div></div>',
             trigger: "keyup change"
         });
         this.$('.field').each(function() {
@@ -64,12 +86,3 @@ var PhysicalEvaluation = Backbone.View.extend({
         return this;
     }
 });
-
-// initialize the view if the modal is present
-$(document).ready(function() {
-    if ($("#physicalEvaluation").length > 0) {
-        new PhysicalEvaluation({el: $("#physicalEvaluation") });
-    }
-});
-
-})(jQuery); // END wrapper

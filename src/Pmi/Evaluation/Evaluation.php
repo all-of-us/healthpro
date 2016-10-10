@@ -63,6 +63,17 @@ class Evaluation
         return $this->schema;
     }
 
+    public function getWarnings()
+    {
+        $warnings = [];
+        foreach ($this->schema->fields as $metric) {
+            if (!empty($metric->warnings) && is_array($metric->warnings)) {
+                $warnings[$metric->name] = $metric->warnings;
+            }
+        }
+        return $warnings;
+    }
+
     public function getForm(FormFactory $formFactory)
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);

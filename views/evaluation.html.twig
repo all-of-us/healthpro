@@ -96,3 +96,14 @@
         </div>
     </div>
 {% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    var evalView = new PMI.views['PhysicalEvaluation']({
+        el: $("#physicalEvaluation"),
+        warnings: {{ warnings|json_encode|raw }}
+    });
+});
+</script>
+{% endblock %}
