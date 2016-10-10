@@ -25,7 +25,8 @@ class DefaultController extends AbstractController
         ['clientTimeout', '/client-timeout', [ 'method' => 'GET' ]],
         ['agreeUsage', '/agree', ['method' => 'POST']],
         ['groups', '/groups'],
-        ['switchSite', '/site/{id}/switch'],
+        ['switchSite', '/site/{id}/switch', ['method' => 'GET|POST']],
+        ['selectSite', '/site/select'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
@@ -118,10 +119,16 @@ class DefaultController extends AbstractController
     public function switchSiteAction($id, Application $app, Request $request)
     {
         if ($app->switchSite($id)) {
-            return $app->redirectToRoute('home');
+            return $app->redirect($request->get('destUrl', $app->generateUrl('home')));
         } else {
             return $app->abort(403);
         }
+    }
+    
+    public function selectSiteAction(Application $app, Request $request)
+    {
+        $destUrl = $request->get('destUrl', $app->generateUrl('home'));
+        return $app['twig']->render('site-select.html.twig', ['destUrl' => $destUrl]);
     }
 
     public function participantsAction(Application $app, Request $request)

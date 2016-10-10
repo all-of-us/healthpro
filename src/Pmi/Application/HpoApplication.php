@@ -212,11 +212,22 @@ class HpoApplication extends AbstractApplication
         }
         
         // HPO users must select their site first
-        if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER')) {
+        if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER'))
+        {
             $user = $this->getUser();
             // auto-select since they only have one site
             if (count($user->getSites()) === 1) {
                 $this->switchSite($user->getSites()[0]->email);
+            } elseif ($request->attributes->get('_route') !== 'selectSite' &&
+                    $request->attributes->get('_route') !== 'switchSite' &&
+                    $request->attributes->get('_route') !== 'logout' &&
+                    $request->attributes->get('_route') !== 'loginReturn' &&
+                    $request->attributes->get('_route') !== 'timeout' &&
+                    $request->attributes->get('_route') !== 'keepAlive' &&
+                    $request->attributes->get('_route') !== 'clientTimeout' &&
+                    $request->attributes->get('_route') !== 'agreeUsage') {
+                $request->request->set('destUrl', $request->getRequestUri());
+                return $this->forwardToRoute('selectSite', $request);
             }
         }
         

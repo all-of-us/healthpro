@@ -349,9 +349,9 @@ abstract class AbstractApplication extends Application
         return $this->redirect($this->generateUrl($route, $parameters));
     }
     
-    public function forwardToRoute($route, $request)
+    public function forwardToRoute($route, Request $request)
     {
-        $subRequest = Request::create($this->generateUrl($route), 'GET', array(), $request->cookies->all(), array(), $request->server->all());
+        $subRequest = Request::create($this->generateUrl($route), 'GET', $request->request->all(), $request->cookies->all(), array(), $request->server->all());
         if ($request->getSession()) {
             $subRequest->setSession($request->getSession());
         }

@@ -99,6 +99,16 @@ class HpoApplicationTest extends AbstractWebTestCase
         $crawler = $client->request('GET', '/');
         $this->assertSame(true, strpos($crawler->html(), 'Redirecting to <a href="/dashboard/">/dashboard/</a>') !== false);
     }
+    
+    public function testForceSiteSelect()
+    {
+        $email = 'testForceSiteSelect@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'), new GoogleGroup('hpo-site-2@gapps.com', 'Test Group 2', 'lorem ipsum 2')]);
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/participants');
+        $this->assertEquals(1, count($crawler->filter('#siteSelector')));
+    }
 
     public function testUsageAgreement()
     {
