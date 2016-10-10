@@ -206,6 +206,13 @@ class HpoApplication extends AbstractApplication
     
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
+        if ($this['session']->get('isLogin')) {
+            $app->log(Log::LOGIN_SUCCESS, $this->getUser()->getRoles());
+            $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
+        } else {
+            $app->log(Log::REQUEST);
+        }
+        
         // log the user out if their session is expired
         if ($this->isLoginExpired() && $request->attributes->get('_route') !== 'logout') {
             return $this->redirectToRoute('logout', ['timeout' => true]);
@@ -229,13 +236,6 @@ class HpoApplication extends AbstractApplication
                 $request->request->set('destUrl', $request->getRequestUri());
                 return $this->forwardToRoute('selectSite', $request);
             }
-        }
-        
-        if ($this['session']->get('isLogin')) {
-            $app->log(Log::LOGIN_SUCCESS, $this->getUser()->getRoles());
-            $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
-        } else {
-            $app->log(Log::REQUEST);
         }
     }
     
