@@ -29,6 +29,10 @@ class Participant
 
     public function getShortId()
     {
-        return strtoupper(Util::shortenUuid($this->id));
+        if (strlen($this->id) >= 36) {
+            return strtoupper(Util::shortenUuid($this->id));
+        } else {
+            return $this->id;
+        }
     }
 }
