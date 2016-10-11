@@ -4,13 +4,14 @@ namespace Pmi\Evaluation;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
 
 class Evaluation
 {
-    const CURRENT_VERSION = '0.1.1';
+    const CURRENT_VERSION = '0.1.2';
     protected $version;
     protected $data;
     protected $schema;
@@ -100,22 +101,30 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } else {
+            } elseif (!isset($field->options)) {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
             $options['constraints'] = $constraints;
             $options['attr'] = $attributes;
 
+            if (isset($field->options)) {
+                $class = ChoiceType::class;
+                unset($options['scale']);
+                $options['choices'] = array_combine($field->options, $field->options);
+                $options['placeholder'] = false;
+            } else {
+                $class = NumberType::class;
+            }
             if (isset($field->replicates)) {
                 $formBuilder->add($field->name, CollectionType::class, [
-                    'entry_type' => NumberType::class,
+                    'entry_type' => $class,
                     'entry_options' => $options,
                     'required' => false,
                     'label' => isset($options['label']) ? $options['label'] : null
                 ]);
             } else {
-                $formBuilder->add($field->name, NumberType::class, $options);
+                $formBuilder->add($field->name, $class, $options);
             }
         }
         return $formBuilder->getForm();
