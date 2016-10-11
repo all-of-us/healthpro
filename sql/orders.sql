@@ -4,6 +4,7 @@ CREATE TABLE `orders` (
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `order_id` varchar(100) NOT NULL,
   `mayo_id` varchar(100) NOT NULL,
+  `requested_samples` VARCHAR(255) NULL DEFAULT NULL,
   `printed_ts` timestamp NULL DEFAULT NULL,
   `collected_ts` timestamp NULL DEFAULT NULL,
   `collected_samples` varchar(255) DEFAULT NULL,

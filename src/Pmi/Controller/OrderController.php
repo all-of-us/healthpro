@@ -99,6 +99,19 @@ class OrderController extends AbstractController
         return $updateArray;
     }
 
+    protected function getRequestedSamples()
+    {
+        if ($this->order['requested_samples'] &&
+            ($requestedArray = json_decode($this->order['requested_samples'])) &&
+            is_array($requestedArray) &&
+            count($requestedArray) > 0
+        ) {
+            return array_intersect(self::$samples, $requestedArray);
+        } else {
+            return self::$samples;
+        }
+    }
+
     protected function getEnabledSamples($set)
     {
         if ($this->order['collected_samples'] &&
@@ -121,9 +134,9 @@ class OrderController extends AbstractController
 
         switch ($set) {
             case 'processed':
-                return array_intersect($collected, self::$samplesRequiringProcessing);
+                return array_intersect($collected, self::$samplesRequiringProcessing, $this->getRequestedSamples());
             case 'finalized':
-                $enabled = array_intersect($collected, self::$samples);
+                $enabled = array_intersect($collected, $this->getRequestedSamples());
                 foreach ($enabled as $key => $sample) {
                     if (in_array($sample, self::$samplesRequiringProcessing) &&
                         !in_array($sample, $processed)
@@ -133,7 +146,7 @@ class OrderController extends AbstractController
                 }
                 return array_values($enabled);
             default:
-                return array_values(self::$samples);
+                return array_values($this->getRequestedSamples());
         }
     }
 
@@ -169,9 +182,9 @@ class OrderController extends AbstractController
 
         $formData = $this->getOrderFormData($set);
         if ($set == 'processed') {
-            $samples = array_intersect(self::$samples, self::$samplesRequiringProcessing);
+            $samples = array_intersect($this->getRequestedSamples(), self::$samplesRequiringProcessing);
         } else {
-            $samples = self::$samples;
+            $samples = $this->getRequestedSamples();
         }
         $enabledSamples = $this->getEnabledSamples($set);
         $form = $formFactory->createBuilder(FormType::class, $formData)
