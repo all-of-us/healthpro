@@ -28,7 +28,8 @@
             },
             "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
             "isLogin": {{ app.session.get('isLogin')|json_encode|raw }},
-            "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }}
+            "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }},
+            "views": {}
         };
     </script>
     <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
