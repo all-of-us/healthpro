@@ -1,23 +1,23 @@
 {% extends 'base.html.twig' %}
-{% block title %}Choose Site{% endblock %}
+{% block title %}Choose Site - {% endblock %}
 {% block body %}
     <div class="row">
-        <div class="col-md-6 col-sm-12">
+        <div class="col-md-6 col-md-offset-3">
             <div class="alert alert-info">
                 <span class="glyphicon glyphicon-info-sign"></span>
-                Please choose an HPO site in order to continue.
+                Please select your current site in order to continue.
             </div>
             <form id="siteSelector" method="POST">
                 <input type="hidden" id="destUrl" name="destUrl" value="{{ destUrl }}"/>
                 <div class="form-group">
-                    <label>Choose HPO Site</label>
+                    <label>Choose Site</label>
                     <select class="form-control site-id">
                         {% for site in app.user.sites %}
                             <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : ''}} >{{ site.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary site-submit">Choose</button>
+                <button type="submit" class="btn btn-primary site-submit">Continue</button>
             </form>
         </div>
     </div>
