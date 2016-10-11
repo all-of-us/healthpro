@@ -25,7 +25,8 @@ class DefaultController extends AbstractController
         ['clientTimeout', '/client-timeout', [ 'method' => 'GET' ]],
         ['agreeUsage', '/agree', ['method' => 'POST']],
         ['groups', '/groups'],
-        ['switchSite', '/site/{id}/switch'],
+        ['switchSite', '/site/{id}/switch', ['method' => 'GET|POST']],
+        ['selectSite', '/site/select'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
@@ -33,7 +34,13 @@ class DefaultController extends AbstractController
 
     public function homeAction(Application $app, Request $request)
     {
-        return $app['twig']->render('index.html.twig');
+        if ($app['security.authorization_checker']->isGranted('ROLE_USER')) {
+            return $app['twig']->render('index.html.twig');
+        } elseif ($app['security.authorization_checker']->isGranted('ROLE_DASHBOARD')) {
+            return $app->redirectToRoute('dashboard_home');
+        } else {
+            return $app->abort(403);
+        }
     }
     
     public function logoutAction(Application $app, Request $request)
@@ -111,13 +118,17 @@ class DefaultController extends AbstractController
     
     public function switchSiteAction($id, Application $app, Request $request)
     {
-        $user = $app['security.token_storage']->getToken()->getUser();
-        if ($user->belongsToSite($id)) {
-            $app['session']->set('site', $user->getSite($id));
-            return $app->redirectToRoute('home');
+        if ($app->switchSite($id)) {
+            return $app->redirect($request->get('destUrl', $app->generateUrl('home')));
         } else {
             return $app->abort(403);
         }
+    }
+    
+    public function selectSiteAction(Application $app, Request $request)
+    {
+        $destUrl = $request->get('destUrl', $app->generateUrl('home'));
+        return $app['twig']->render('site-select.html.twig', ['destUrl' => $destUrl]);
     }
 
     public function participantsAction(Application $app, Request $request)

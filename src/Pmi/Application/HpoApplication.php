@@ -58,6 +58,8 @@ class HpoApplication extends AbstractApplication
         }
         
         $app = $this;
+        // include `/` in common routes because homeAction will redirect based on role
+        $commonRegex = '^/(logout|login-return|keepalive|client-timeout|agree)?$';
         $anonRegex = '^/(timeout|login)$';
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
@@ -83,6 +85,9 @@ class HpoApplication extends AbstractApplication
                 
                 [['path' => '^/_dev/.*$', 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
                 [['path' => '^/_dev/.*$'], 'ROLE_NO_ACCESS'],
+                
+                [['path' => $commonRegex, 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
+                [['path' => $commonRegex], 'ROLE_NO_ACCESS'],
                 
                 [['path' => '^/dashboard/.*$', 'ips' => $ips], 'ROLE_DASHBOARD'],
                 [['path' => '^/dashboard/.*$'], 'ROLE_NO_ACCESS'],
@@ -182,25 +187,62 @@ class HpoApplication extends AbstractApplication
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     }
     
+    public function switchSite($email)
+    {
+        $user = $this->getUser();
+        if ($user && $user->belongsToSite($email)) {
+            $this['session']->set('site', $user->getSite($email));
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /** Returns the user's currently selected HPO site. */
+    public function getSite()
+    {
+        return $this['session']->get('site');
+    }
+    
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
+        $app->log(Log::REQUEST);
+        
         // log the user out if their session is expired
         if ($this->isLoginExpired() && $request->attributes->get('_route') !== 'logout') {
             return $this->redirectToRoute('logout', ['timeout' => true]);
         }
-        
+
         if ($this['session']->get('isLogin')) {
             $app->log(Log::LOGIN_SUCCESS, $this->getUser()->getRoles());
-            $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
-        } else {
-            $app->log(Log::REQUEST);
+            $this->addFlashSuccess('Welcome, ' . $this->getUser()->getEmail() . '!');
+        }
+
+        // HPO users must select their site first
+        if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER'))
+        {
+            $user = $this->getUser();
+            // auto-select since they only have one site
+            if (count($user->getSites()) === 1) {
+                $this->switchSite($user->getSites()[0]->email);
+            } elseif ($request->attributes->get('_route') !== 'selectSite' &&
+                    $request->attributes->get('_route') !== 'switchSite' &&
+                    $request->attributes->get('_route') !== 'logout' &&
+                    $request->attributes->get('_route') !== 'loginReturn' &&
+                    $request->attributes->get('_route') !== 'timeout' &&
+                    $request->attributes->get('_route') !== 'keepAlive' &&
+                    $request->attributes->get('_route') !== 'clientTimeout' &&
+                    $request->attributes->get('_route') !== 'agreeUsage') {
+                $request->request->set('destUrl', $request->getRequestUri());
+                return $this->forwardToRoute('selectSite', $request);
+            }
         }
     }
     
     protected function finishCallback(Request $request, Response $response)
     {
         // only the first request handled is considered a login
-        if ($this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($this->isLoggedIn()) {
             $this['session']->set('isLogin', false);
         }
     }

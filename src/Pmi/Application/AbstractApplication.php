@@ -232,8 +232,12 @@ abstract class AbstractApplication extends Application
         // custom "last used" session time updated on keepAliveAction
         $idle = $time - $this['session']->get('pmiLastUsed', $time);
         $remaining = $this['sessionTimeout'] - $idle;
-        $isLoggedIn = $this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('ROLE_USER');
-        return $isLoggedIn && $remaining <= 0;
+        return $this->isLoggedIn() && $remaining <= 0;
+    }
+    
+    public function isLoggedIn()
+    {
+        return $this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY');
     }
 
     protected function enableTwig()
@@ -345,9 +349,9 @@ abstract class AbstractApplication extends Application
         return $this->redirect($this->generateUrl($route, $parameters));
     }
     
-    public function forwardToRoute($route, $request)
+    public function forwardToRoute($route, Request $request)
     {
-        $subRequest = Request::create($this->generateUrl($route), 'GET', array(), $request->cookies->all(), array(), $request->server->all());
+        $subRequest = Request::create($this->generateUrl($route), 'GET', $request->request->all(), $request->cookies->all(), array(), $request->server->all());
         if ($request->getSession()) {
             $subRequest->setSession($request->getSession());
         }
