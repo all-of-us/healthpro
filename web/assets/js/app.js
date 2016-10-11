@@ -81,28 +81,34 @@ $(document).ready(function()
         });
     }
 
+    window.equalizePanelHeight = function(selector) {
+        // reset heights
+        $(selector).each(function() {
+            $(this).find('.panel').height('auto');
+        });
+        // set heights
+        $(selector).each(function() {
+            var height = 0;
+            if ($('#is-xs').is(':visible')) {
+                height = 'auto';
+            } else {
+                $(this).find('.panel').each(function() {
+                    if ($(this).height() > height) {
+                        height = $(this).height();
+                    }
+                });
+            }
+            $(this).find('.panel').each(function() {
+                $(this).height(height);
+            });
+        });
+    };
+
     $.fn.equalizePanelHeight = function() {
         var selector = this.selector;
-        var equalizePanelHeight = function(selector) {
-            $(selector).each(function() {
-                var height = 0;
-                if ($('#is-xs').is(':visible')) {
-                    height = 'auto';
-                } else {
-                    $(this).find('.panel').each(function() {
-                        if ($(this).height() > height) {
-                            height = $(this).height();
-                        }
-                    });
-                }
-                $(this).find('.panel').each(function() {
-                    $(this).height(height);
-                });
-            });
-        };
-        equalizePanelHeight(selector);
+        window.equalizePanelHeight(selector);
         $(window).on('resize', _.debounce(function() {
-            equalizePanelHeight(selector);
+            window.equalizePanelHeight(selector);
         }, 250));
     };
     $('.row-equal-height').equalizePanelHeight();

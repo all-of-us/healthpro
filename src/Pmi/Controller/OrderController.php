@@ -231,7 +231,15 @@ class OrderController extends AbstractController
                 'attr' => ['placeholder' => 'Scan barcode'],
                 'required' => false
             ])
+            ->add('samples', ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => true,
+                'label' => 'Select requested samples',
+                'choices' => self::$samples,
+                'required' => false
+            ])
             ->getForm();
+        $showCustom = false;
         $confirmForm->handleRequest($request);
         if ($confirmForm->isValid()) {
             $orderData = ['existing' => null];
@@ -245,26 +253,37 @@ class OrderController extends AbstractController
                 }
             } else {
                 $orderData['order_id'] = Util::generateShortUuid();
-                if ($app->getConfig('ml_mock_order')) {
-                    $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
-                } else {
-                    $order = new MayoLinkOrder();
-                    $options = [
-                        'patient_id' => $participant->getShortId(),
-                        'gender' => $participant->gender,
-                        'birth_date' => $participant->dob,
-                        'order_id' => $orderData['order_id'],
-                        // TODO: not sure how ML is handling time zone. setting to yesterday for now
-                        'collected_at' => new \DateTime('-1 day')
-                    ];
-                    if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
-                        $options['site'] = $app['session']->get('site')->id;
+                if ($request->request->has('custom')) {
+                    $showCustom = true;
+                    $requestedSamples = $confirmForm['samples']->getData();
+                    if (empty($requestedSamples) || !is_array($requestedSamples)) {
+                        $confirmForm['samples']->addError(new FormError('Please select at least one sample'));
+                    } else {
+                        $orderData['requested_samples'] = json_encode($requestedSamples);
                     }
-                    $orderData['mayo_id'] = $order->loginAndCreateOrder(
-                        $app->getConfig('ml_username'),
-                        $app->getConfig('ml_password'),
-                        $options
-                    );
+                }
+                if ($confirmForm->isValid()) {
+                    if ($app->getConfig('ml_mock_order')) {
+                        $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
+                    } else {
+                        $order = new MayoLinkOrder();
+                        $options = [
+                            'patient_id' => $participant->getShortId(),
+                            'gender' => $participant->gender,
+                            'birth_date' => $participant->dob,
+                            'order_id' => $orderData['order_id'],
+                            // TODO: not sure how ML is handling time zone. setting to yesterday for now
+                            'collected_at' => new \DateTime('-1 day')
+                        ];
+                        if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
+                            $options['site'] = $app['session']->get('site')->id;
+                        }
+                        $orderData['mayo_id'] = $order->loginAndCreateOrder(
+                            $app->getConfig('ml_username'),
+                            $app->getConfig('ml_password'),
+                            $options
+                        );
+                    }
                 }
             }
             if ($confirmForm->isValid()) {
@@ -287,7 +306,8 @@ class OrderController extends AbstractController
 
         return $app['twig']->render('order-create.html.twig', [
             'participant' => $participant,
-            'confirmForm' => $confirmForm->createView()
+            'confirmForm' => $confirmForm->createView(),
+            'showCustom' => $showCustom
         ]);
     }
 
