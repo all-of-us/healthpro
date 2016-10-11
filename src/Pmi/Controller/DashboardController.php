@@ -15,6 +15,7 @@ class DashboardController extends AbstractController
         ['home', '/'],
         ['demo', '/demo'],
         ['metrics_load', '/metrics_load'],
+        ['metrics_load_region', '/metrics_load_region'],
         ['demo_load_data', '/demo_load_data'],
         ['demo_load_map_data', '/demo_load_map_data'],
         ['demo_load_lifecycle_data', '/demo_load_lifecycle_data'],
@@ -23,7 +24,11 @@ class DashboardController extends AbstractController
 
     public function homeAction(Application $app, Request $request)
     {
-        return $app['twig']->render('dashboard/index.html.twig');
+        $color_profiles = ['Blackbody', 'Bluered', 'Blues', 'Custom', 'Earth', 'Electric', 'Greens', 'Hot', 'Jet', 'Picnic',
+            'Portland', 'Rainbow', 'RdBu', 'Reds', 'Viridis', 'YlGnBu', 'YlOrRd'];
+        return $app['twig']->render('dashboard/index.html.twig', [
+            'color_profiles' => $color_profiles
+        ]);
     }
 
     public function metrics_loadAction(Application $app, Request $request)
@@ -31,8 +36,117 @@ class DashboardController extends AbstractController
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
         // load attribute to query
         $metrics_attribute = $request->get('metrics_attribute');
-        $result = $metricsApi->metrics($metrics_attribute)->bucket;
-        return $app->json($result);
+        $bucket_by = $request->get('bucket_by');
+        $result = $metricsApi->metrics($metrics_attribute, $bucket_by)->bucket;
+
+        $data = [];
+
+        $dates = [];
+        $entries = [];
+
+        // grab all entries and dates to use for plotly
+
+        foreach($result as $row){
+            array_push($dates, explode('T', $row->date)[0]);
+            if (property_exists($row, 'entries')) {
+                $row_entries = $row->entries;
+                foreach($row_entries as $ent) {
+                    if (!in_array($ent->name, $entries)) {
+                        array_push($entries, $ent->name);
+                    }
+                }
+            }
+        }
+
+        // assemble data object in Plotly format
+        $i = 0;
+        foreach($entries as $entry) {
+            $trace = array(
+                "x" => $dates,
+                "y" => [],
+                "name" => $entry,
+                "type" => "bar",
+                "marker" => array(
+                    "color" => $this->getColorBrewerVal($i)
+                )
+            );
+            for($x = 0; $x < count($dates); $x++) {
+                if (property_exists($result[$x], 'entries')) {
+                    $row_entries = $result[$x]->entries;
+                    foreach($row_entries as $ent) {
+                        if ($ent->name == $entry) {
+                            array_push($trace['y'], $ent->value);
+                        }
+                    }
+                    if (!array_key_exists($x, $trace['y'])) {
+                        array_push($trace['y'], 0);
+                    }
+                } else {
+                    array_push($trace['y'], 0);
+                }
+            }
+            array_push($data, $trace);
+            $i++;
+        }
+
+        return $app->json($data);
+    }
+
+    public function metrics_load_regionAction(Application $app, Request $request) {
+        $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+        // load attribute to query
+        $metrics_attribute = $request->get('metrics_attribute');
+        $color_profile = $request->get('color_profile');
+
+        if ($color_profile == 'Custom') {
+            $color_profile = [
+                [0, 'rgb(247,252,245)'], [0.125, 'rgb(229,245,224)'],[0.25, 'rgb(199,233,192)'],
+                [0.375, 'rgb(161,217,155)'],[0.5, 'rgb(116,196,118)'], [0.625, 'rgb(65,171,93)'],
+                [0.75, 'rgb(35,139,69)'],[0.875, 'rgb(0,109,44)'],[1, 'rgb(0,68,27)']
+            ];
+        };
+
+        $result = $metricsApi->metrics($metrics_attribute, "NONE")->bucket;
+
+        $all_states = $app['db']->fetchAll("SELECT distinct(state) FROM state_zip_ranges ORDER BY STATE");
+        $state_registrations = [];
+
+        foreach($all_states as $row) {
+            $state = $row['state'];
+            $state_registrations[$state] = 0;
+        }
+
+        foreach($result as $row){
+            if (property_exists($row, 'entries')) {
+                $row_entries = $row->entries;
+                foreach($row_entries as $ent) {
+                    $zip = (int)$ent->name;
+                    $state = $app['db']->fetchColumn("SELECT state FROM state_zip_ranges WHERE zip_min <= ?
+                                                          AND zip_max >= ?", [$zip, $zip]);
+                    if ($state != "0") {
+                        $state_registrations[$state] += $ent->value;
+                    }
+                }
+            }
+        }
+        $names = [];
+        $registrations = [];
+
+        foreach($state_registrations as $state => $count) {
+            array_push($names, $state);
+            array_push($registrations, $count);
+        }
+
+        $data[] = array(
+            'type' => 'choropleth',
+            'locationmode' => 'USA-states',
+            'locations' => $names,
+            'z' => $registrations,
+            'text' => $names,
+            "colorscale" => $color_profile
+        );
+
+        return $app->json($data);
     }
 
     // DEMO ACTIONS, NOT FOR DEPLOYMENT

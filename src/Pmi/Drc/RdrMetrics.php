@@ -10,12 +10,13 @@ class RdrMetrics
         $this->rdrHelper = $rdrHelper;
     }
 
-    public function metrics($metric)
+    public function metrics($metric, $bucket)
     {
         $client = $this->rdrHelper->getClient();
         $response = $client->request('POST', 'metrics/v1/metrics', [
             'json' => [
-                'metric' => $metric
+                'metric' => $metric,
+                'bucket_by' => $bucket
             ]
         ]);
         $responseObject = json_decode($response->getBody()->getContents());
