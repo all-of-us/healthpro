@@ -206,18 +206,18 @@ class HpoApplication extends AbstractApplication
     
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
-        if ($this['session']->get('isLogin')) {
-            $app->log(Log::LOGIN_SUCCESS, $this->getUser()->getRoles());
-            $this->addFlashSuccess('Login successful, welcome ' . $this->getUser()->getEmail() . '!');
-        } else {
-            $app->log(Log::REQUEST);
-        }
+        $app->log(Log::REQUEST);
         
         // log the user out if their session is expired
         if ($this->isLoginExpired() && $request->attributes->get('_route') !== 'logout') {
             return $this->redirectToRoute('logout', ['timeout' => true]);
         }
-        
+
+        if ($this['session']->get('isLogin')) {
+            $app->log(Log::LOGIN_SUCCESS, $this->getUser()->getRoles());
+            $this->addFlashSuccess('Welcome, ' . $this->getUser()->getEmail() . '!');
+        }
+
         // HPO users must select their site first
         if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER'))
         {
