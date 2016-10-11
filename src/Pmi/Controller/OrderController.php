@@ -73,8 +73,6 @@ class OrderController extends AbstractController
             if (is_array($samples) && count($samples) > 0) {
                 $formData["{$set}_samples"] = $samples;
             }
-        } else {
-            $formData["{$set}_samples"] = $this->getEnabledSamples($set);
         }
         return $formData;
     }
