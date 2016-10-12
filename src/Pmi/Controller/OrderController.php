@@ -30,15 +30,15 @@ class OrderController extends AbstractController
     protected $order;
     protected $participant;
     protected static $samples = [
-        '(1) Whole Blood EDTA 4 mL [1ED04]' => 1,
-        '(2) Whole Blood EDTA 10 mL [1ED10]' => 2,
-        '(3) Serum SST 8.5 mL [1SST8]' => 3,
-        '(4) Plasma PST 8 mL [1PST8]' => 4,
-        '(5) Whole Blood EDTA 10 mL [2ED10]' => 5,
-        '(6) WB Sodium Heparin 4 mL [1HEP4]' => 6,
-        '(7) Urine 10 mL [1UR10]' => 7
+        '(1) Whole Blood EDTA 4 mL [1ED04]' => '1ED04',
+        '(2) Whole Blood EDTA 10 mL [1ED10]' => '1ED10',
+        '(3) Serum SST 8.5 mL [1SST8]' => '1SST8',
+        '(4) Plasma PST 8 mL [1PST8]' => '1PST8',
+        '(5) Whole Blood EDTA 10 mL [2ED10]' => '2ED10',
+        '(6) WB Sodium Heparin 4 mL [1HEP4]' => '1HEP4',
+        '(7) Urine 10 mL [1UR10]' => '1UR10'
     ];
-    protected static $samplesRequiringProcessing = [3,4];
+    protected static $samplesRequiringProcessing = ['1SST8', '1PST8'];
 
     protected function loadOrder($participantId, $orderId, Application $app)
     {
@@ -277,6 +277,9 @@ class OrderController extends AbstractController
                         ];
                         if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
                             $options['site'] = $app['session']->get('site')->id;
+                        }
+                        if (isset($requestedSamples) && is_array($requestedSamples)) {
+                            $options['tests'] = $requestedSamples;
                         }
                         $orderData['mayo_id'] = $order->loginAndCreateOrder(
                             $app->getConfig('ml_username'),
