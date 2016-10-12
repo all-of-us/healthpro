@@ -36,6 +36,12 @@ class Order
             'specimen' => 'Urine'
         ]
     ];
+    protected static $salivaTests = [
+        '1SAL' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Saliva'
+        ]
+    ];
     protected static $siteAccounts = [
         'a' => '7035588',
         'b' => '7035500'
@@ -97,7 +103,12 @@ class Order
             'order[collected_at(5i)]' => $options['collected_at']->format('i')
         ];
         $i = 0;
-        foreach (self::$tests as $test => $testOptions) {
+        if (isset($options['type']) && $options['type'] === 'saliva') {
+            $tests = self::$salivaTests;
+        } else {
+            $tests = self::$tests;
+        }
+        foreach ($tests as $test => $testOptions) {
             if (isset($options['tests']) && !in_array($test, $options['tests'])) {
                 continue;
             }

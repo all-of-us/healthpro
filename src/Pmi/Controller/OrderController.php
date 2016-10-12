@@ -38,7 +38,10 @@ class OrderController extends AbstractController
         '(6) WB Sodium Heparin 4 mL [1HEP4]' => '1HEP4',
         '(7) Urine 10 mL [1UR10]' => '1UR10'
     ];
-    protected static $samplesRequiringProcessing = ['1SST8', '1PST8'];
+    protected static $salivaSamples = [
+        'Saliva [1SAL]' => '1SAL'
+    ];
+    protected static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SAL'];
 
     protected function loadOrder($participantId, $orderId, Application $app)
     {
@@ -101,6 +104,9 @@ class OrderController extends AbstractController
 
     protected function getRequestedSamples()
     {
+        if ($this->order['type'] == 'saliva') {
+            return self::$salivaSamples;
+        }
         if ($this->order['requested_samples'] &&
             ($requestedArray = json_decode($this->order['requested_samples'])) &&
             is_array($requestedArray) &&
@@ -242,14 +248,14 @@ class OrderController extends AbstractController
         $showCustom = false;
         $confirmForm->handleRequest($request);
         if ($confirmForm->isValid()) {
-            $orderData = ['existing' => null];
+            $orderData = ['type' => null];
             if ($request->request->has('existing')) {
                 if (empty($confirmForm['kitId']->getData())) {
                     $confirmForm['kitId']->addError(new FormError('Please enter a kit order ID'));
                 } else {
                     $orderData['order_id'] = $confirmForm['kitId']->getData();
                     $orderData['mayo_id'] = $confirmForm['kitId']->getData();
-                    $orderData['existing'] = 1;
+                    $orderData['type'] = 'kit';
                 }
             } else {
                 $orderData['order_id'] = Util::generateShortUuid();
@@ -261,6 +267,8 @@ class OrderController extends AbstractController
                     } else {
                         $orderData['requested_samples'] = json_encode($requestedSamples);
                     }
+                } elseif ($request->request->has('saliva')) {
+                    $orderData['type'] = 'saliva';
                 }
                 if ($confirmForm->isValid()) {
                     if ($app->getConfig('ml_mock_order')) {
@@ -268,12 +276,12 @@ class OrderController extends AbstractController
                     } else {
                         $order = new MayoLinkOrder();
                         $options = [
+                            'type' => $orderData['type'],
                             'patient_id' => $participant->getShortId(),
                             'gender' => $participant->gender,
                             'birth_date' => $participant->dob,
                             'order_id' => $orderData['order_id'],
-                            // TODO: not sure how ML is handling time zone. setting to yesterday for now
-                            'collected_at' => new \DateTime('-1 day')
+                            'collected_at' => new \DateTime('today') // set to today at midnight since time won't be accurate
                         ];
                         if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
                             $options['site'] = $app['session']->get('site')->id;
@@ -324,7 +332,7 @@ class OrderController extends AbstractController
             'process' => 'processed',
             'finalize' => 'finalized'
         ];
-        if ($this->order['existing']) {
+        if ($this->order['type'] === 'kit') {
             unset($columns['print']);
         }
         foreach ($columns as $name => $column) {
