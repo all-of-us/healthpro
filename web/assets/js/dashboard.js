@@ -29,6 +29,11 @@ var PLOTLY_LABEL_FONT = {
     family: 'Helvetica Neue'
 };
 
+// toggle chevron glyphs on clicks
+function toggleGlyph(el) {
+    el.toggleClass('fa-plus fa-minus');
+}
+
 // custom event to trigger resize event only after user has stopped resizing the window
 $(window).resize(function() {
     if(this.resizeTO) clearTimeout(this.resizeTO);
@@ -74,7 +79,11 @@ function stopSpinner(divId) {
 
 // function to transform plotly data object into array of annotations showing total
 // value of stacked bar columns
-function loadBarChartAnnotations(plotlyData, annotationsArray) {
+function loadBarChartAnnotations(plotlyData, annotationsArray, interval) {
+    var fontSize = 12;
+    if (interval == 'weeks') {
+        fontSize = 10;
+    }
     for (var i = 0; i < plotlyData[0]['x'].length ; i++){
         var total = 0;
         plotlyData.map(function(el) {
@@ -86,9 +95,21 @@ function loadBarChartAnnotations(plotlyData, annotationsArray) {
             text: total,
             xanchor: 'center',
             yanchor: 'bottom',
-            showarrow: false
+            showarrow: false,
+            font: {
+                size: fontSize
+            }
         };
         annotationsArray.push(annot);
     }
     return annotationsArray;
+}
+
+// collect all checked recruitment centers filters
+function loadRecruitmentFilters(id) {
+    var centers = [];
+    $('#' + id).find('.center-filter:checked').each(function() {
+        centers.push($(this).val());
+    });
+    return centers;
 }

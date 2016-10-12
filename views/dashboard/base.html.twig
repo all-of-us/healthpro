@@ -28,7 +28,8 @@
             },
             "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
             "isLogin": {{ app.session.get('isLogin')|json_encode|raw }},
-            "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }}
+            "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }},
+            "views": {}
         };
     </script>
     <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
@@ -36,13 +37,6 @@
     <script src="{{ asset('js/jquery-ui.min.js') }}?v=1.12.0"></script>
     <script src="{{ asset('js/plotly.min.js') }}?v=1.17.3"></script>
     <script src="{{ asset('js/spin.min.js') }}?v=2.3.2"></script>
-    <script type="text/javascript">
-        // attach various handlers to bootstrap items and turn on functionality
-        $(function() {
-            $('.datepicker').datepicker({dateFormat: 'yy-mm-dd', showButtonPanel: true});
-            $('[data-toggle="tooltip"]').tooltip({container: 'body'});
-        });
-    </script>
 </head>
 <body>
     <nav class="navbar navbar-default">

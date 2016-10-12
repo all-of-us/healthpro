@@ -28,10 +28,12 @@ class RdrParticipants
         if (!is_object($participant)) {
             return false;
         }
-        if (!isset($participant->drc_internal_id)) {
+        if (isset($participant->participant_id)) {
+            $id = $participant->participant_id;
+        } else {
             return false;
         }
-        if (isset($participant->membership_tier) && $participant->membership_tier == 'CONSENTED') {
+        if (isset($participant->membership_tier) && in_array($participant->membership_tier, ['VOLUNTEER', 'ENROLLEE', 'FULL_PARTICIPANT'])) {
             $consentStatus = true;
         } else {
             $consentStatus = false;
@@ -48,7 +50,7 @@ class RdrParticipants
                 break;
         }
         return new Participant([
-            'id' => $participant->drc_internal_id,
+            'id' => $id,
             'firstName' => $participant->first_name,
             'middleName' => $participant->middle_name,
             'lastName' => $participant->last_name,
@@ -131,14 +133,13 @@ class RdrParticipants
             $dt = new \DateTime($participant['date_of_birth']);
             $participant['date_of_birth'] = $dt->format('Y-m-d');
         }
-        $participant['biobank_id'] = Uuid::uuid4();
         try {
             $response = $this->getClient()->request('POST', 'participants', [
                 'json' => $participant
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->biobank_id) && $result->biobank_id == $participant['biobank_id']) {
-                return $result->drc_internal_id;
+            if (is_object($result) && (isset($result->drc_internal_id) || isset($result->participant_id))) {
+                return isset($result->drc_internal_id) ? $result->drc_internal_id : $result->participant_id;
             }
         } catch (\Exception $e) {
             return false;

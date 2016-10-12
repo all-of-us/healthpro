@@ -3,27 +3,46 @@
     <h2><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard</h2>
     <br />
     <ul class="nav nav-tabs top-pad" role="tablist">
-        <li role="presentation"><a href="#total-progress" role="tab" data-toggle="tab" id="total-progress-nav"><span class="fa fa-users"></span> Total Progress to Date</a></li>
+        <li role="presentation" class="active"><a href="#total-progress" role="tab" data-toggle="tab" id="total-progress-nav"><span class="fa fa-users"></span> Total Progress to Date</a></li>
+        <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab" id="participants-by-region-nav"><span class="fa fa-globe"></span> Participants by Region</a></li>
     </ul>
     <div id="plotly-tabs" class="tab-content">
         <div id="total-progress" class="tab-pane pad active fade in">
             <div class="row">
-                <div id="total-progress-filters" class="col-md-4">
-                    <div class="well well-sm">
-                        <div class="form-group form-group-sm">
-                            <label>Display Metric</label>
-                            <select id="total-progress-metric-attribute" class="form-control total-progress-control">
-                                <option value="PARTICIPANT_TOTAL">Total Participants</option>
-                                <option value="PARTICIPANT_MEMBERSHIP_TIER">Participant Membership Tiers</option>
-                            </select>
+                <div id="total-progress-filters" class="col-md-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <h4 class="text-primary">Plot Options</h4>
+                            </div>
                         </div>
-                        <div class="form-group form-group-sm">
-                            <label>Show Column Totals <input type="checkbox" id="total-progress-show-annot" class="total-progress-control"></label>
+                        <div class="panel-body">
+                            <div class="row form-group-sm">
+                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
+                                    <label>Display Metric</label>
+                                    <select id="total-progress-metric-attribute" class="form-control total-progress-control">
+                                        <option value="PARTICIPANT_TOTAL">Total Participants</option>
+                                        <option value="PARTICIPANT_MEMBERSHIP_TIER">Participant Membership Tiers</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
+                                    <label>Interval</label>
+                                    <select id="total-progress-bucket-by" class="form-control total-progress-control">
+                                        <option value="NONE" selected>None</option>
+                                        <option value="DAY">Days</option>
+                                        <option value="WEEK">Weeks</option>
+                                        <option value="MONTH">Months</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
+                                    <label>Show Column Totals <input type="checkbox" id="total-progress-show-annot" class="total-progress-control"></label>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
                 </div>
-                <div id="plotly-total-progress" class="col-md-8 plotly-div"></div>
+                <div id="plotly-total-progress" class="col-md-9 plotly-div"></div>
             </div>
             <script type="text/javascript">
                 // function to grab current filter values and load JSON from load_map_data REST endpoint
@@ -32,36 +51,35 @@
                     launchSpinner('plotly-total-progress');
                     // gather params
                     var metricAttr = $('#total-progress-metric-attribute').val();
+                    var bucket = $('#total-progress-bucket-by').val();
                     var metricTitle = $('#total-progress-metric-attribute option:selected').text();
                     var showAnnot = $('#total-progress-show-annot').is(':checked');
                     var tpWidth = $('#plotly-total-progress').width() - 30;
                     var today = new Date().toISOString().split('T')[0];
 
                     // load data from metrics API
-                    $.getJSON('/dashboard/metrics_load?metrics_attribute=' + metricAttr, function(data) {
+                    $.getJSON('/dashboard/metrics_load?metrics_attribute=' + metricAttr + '&bucket_by=' + bucket, function(data) {
                         var progressAnnot = [];
-                        var tpLayout = {
-                            title: 'Count of ' + metricTitle + ' as of ' + today,
-                            font: PLOTLY_LABEL_FONT,
-                            barmode: 'stack',
-                            width: tpWidth,
-                            annotations: progressAnnot
-                        };
-
-                        // build arrays of names/values and assemble for Plotly
-                        var plotlyData = [];
-                        $.each(data, function(index, row) {
-                            var trace = {
-                                x: [metricTitle],
-                                y: [row['value']],
-                                type: 'bar',
-                                name: row['name'],
-                                marker: {
-                                    color: COLORBREWER_SET[index]
-                                }
+                        if (metricAttr == 'PARTICIPANT_ZIP_CODE') {
+                            var tpLayout = {
+                                title: 'Participant Registrations by state',
+                                font: PLOTLY_LABEL_FONT,
+                                showlegend: false,
+                                width: tpWidth,
+                                height: tpWidth / 1.66,
+                                geo: GEO_OPTS
                             };
-                            plotlyData.push(trace);
-                        });
+                        } else {
+                            var tpLayout = {
+                                title: 'Count of ' + metricTitle + ' as of ' + today,
+                                font: PLOTLY_LABEL_FONT,
+                                barmode: 'stack',
+                                width: tpWidth,
+                                height: tpWidth / 1.66,
+                                annotations: progressAnnot
+                            };
+                        }
+
 
                         // load column totals if requested
                         if (showAnnot) {
@@ -69,7 +87,7 @@
                         }
 
                         // render plot and stop spinner
-                        Plotly.newPlot('plotly-total-progress', plotlyData, tpLayout, PLOTLY_OPTS);
+                        Plotly.newPlot('plotly-total-progress', data, tpLayout, PLOTLY_OPTS);
                         stopSpinner('plotly-total-progress');
                     });
                 }
@@ -95,5 +113,100 @@
                 });
             </script>
         </div>
+        <div id="participants-by-region" class="tab-pane pad fade">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <h4 class="text-primary">Plot Options</h4>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row form-group-sm">
+                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
+                                    <label>Participant Field</label>
+                                    <select class="form-control region-plot-control" id="map-mode">
+                                        <option value="PARTICIPANT_ZIP_CODE" selected>State</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
+                                    <label>Color Profile <span class="fa fa-question-circle-o" data-toggle="tooltip" title="Only applies to states and census regions maps"></span></label>
+                                    <select class="form-control region-plot-control" id="map-color-profile">
+                                        {% for color in color_profiles %}
+                                            {% if color == 'Custom' %}
+                                                <option value="{{ color }}" selected>{{ color }}</option>
+                                            {% else %}
+                                                <option value="{{ color }}">{{ color }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="plotly-participants-by-region" class="col-md-9 plotly-div"></div>
+
+                <script type="text/javascript">
+                    // function to grab current filter values and load JSON from load_map_data REST endpoint
+                    // success handler calls Plotly.newplot()
+                    function renderMapPlot() {
+                        launchSpinner('plotly-participants-by-region');
+                        // gather params
+                        var mapWidth = $('#plotly-participants-by-region').width() - 30;
+                        var mapMode = $('#map-mode').val();
+                        var mapModeText = $('#map-mode option:selected').text();
+                        var mapColor = $('#map-color-profile').val();
+
+                        // load data from metrics API
+                        $.getJSON('/dashboard/metrics_load_region?metrics_attribute=' + mapMode + '&color_profile=' + mapColor, function(data) {
+
+                            var mapLayout = {
+                                title: 'Participant Registrations by ' + mapModeText,
+                                font: PLOTLY_LABEL_FONT,
+                                showlegend: false,
+                                width: mapWidth,
+                                height: mapWidth / 1.66,
+                                geo: GEO_OPTS
+                            };
+
+
+                            // render plot and stop spinner
+                            Plotly.newPlot('plotly-participants-by-region', data, mapLayout, PLOTLY_OPTS);
+                            stopSpinner('plotly-participants-by-region');
+                        });
+                    }
+
+                    // load plot on tab show (to save loading time)
+                    $('#participants-by-region-nav').on('shown.bs.tab', function (e) {
+                        console.log('Showing region plots');
+                        renderMapPlot();
+                    });
+
+                    // re-render on filter change
+                    $('.region-plot-control').change(function() {
+                        renderMapPlot();
+                    });
+
+                    // re-render on window resizeEnd if tab is visible
+                    $( window ).on('resizeEnd', function() {
+                        if ($('#plotly-participants-by-region').is(':visible')) {
+                            renderMapPlot();
+                        }
+                    });
+                </script>
+            </div>
+        </div>
     </div>
+
+    <script type="text/javascript">
+        $('.datepicker').datepicker({dateFormat: 'yy-mm-dd', showButtonPanel: true});
+
+        $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+
+        $('.panel-collapse').on('show.bs.collapse hide.bs.collapse', function() {
+            toggleGlyph($(this).prev().find('span.toggle-glyph'));
+        });
+    </script>
 {% endblock %}

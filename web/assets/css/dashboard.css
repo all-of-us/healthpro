@@ -1,5 +1,10 @@
 /* Styles for dashboard interface */
 
 .plotly-div {
-    min-height: 500px;
+    margin-top: 15px;
+}
+
+.center-filter-panel {
+    max-height: 400px;
+    overflow-y: scroll;
 }
