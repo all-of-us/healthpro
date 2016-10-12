@@ -46,7 +46,7 @@
                 <ul class="nav navbar-nav">
                     {% if is_granted('IS_AUTHENTICATED_FULLY') and app.user.sites|length > 0 %}
                         <li><a href="{{ path('participants') }}">Participant Lookup</a></li>
-                        <li><a href="{{ path('orders') }}">Order Lookup</a></li>
+                        <li><a href="{{ path('orders') }}">Biobank Order Lookup</a></li>
                         <li><a href="https://docs.google.com/forms/d/e/1FAIpQLScc_wOGZtGeb-qruWztngFm5oarQUlECsMw_7G6siHq9DmIPA/viewform" target="_blank">Feedback</a></li>
                     {% endif %}
                 </ul>
