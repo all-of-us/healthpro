@@ -6,7 +6,7 @@
 <p class="lead">Order ID: <strong>{{ order.order_id }}</strong></p>
 
 {% set params = { participantId: participant.id, orderId: order.id } %}
-{% if order.existing %}
+{% if order.type == 'kit' %}
     {% set steps = {
         collect: 'collected',
         process: 'processed',
