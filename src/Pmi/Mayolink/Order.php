@@ -98,6 +98,9 @@ class Order
         ];
         $i = 0;
         foreach (self::$tests as $test => $testOptions) {
+            if (isset($options['tests']) && !in_array($test, $options['tests'])) {
+                continue;
+            }
             $body["order[test_requests_attributes][{$i}][test_code]"] = $test;
             $body["temperatures[{$test}][{$testOptions['specimen']}]"] = $testOptions['temperature'];
             $i++;

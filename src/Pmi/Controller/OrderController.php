@@ -30,15 +30,15 @@ class OrderController extends AbstractController
     protected $order;
     protected $participant;
     protected static $samples = [
-        '(1) EDTA 4 mL' => 1,
-        '(2) EDTA 10 mL' => 2,
-        '(3) Clot Activator (SST) 8.5 mL' => 3,
-        '(4) Plasma Separator (PST) 8 mL' => 4,
-        '(5) EDTA 10 mL' => 5,
-        '(6) Na-Heparin 4 mL' => 6,
-        '(7) Urine 10 mL' => 7
+        '(1) Whole Blood EDTA 4 mL [1ED04]' => '1ED04',
+        '(2) Whole Blood EDTA 10 mL [1ED10]' => '1ED10',
+        '(3) Serum SST 8.5 mL [1SST8]' => '1SST8',
+        '(4) Plasma PST 8 mL [1PST8]' => '1PST8',
+        '(5) Whole Blood EDTA 10 mL [2ED10]' => '2ED10',
+        '(6) WB Sodium Heparin 4 mL [1HEP4]' => '1HEP4',
+        '(7) Urine 10 mL [1UR10]' => '1UR10'
     ];
-    protected static $samplesRequiringProcessing = [3,4];
+    protected static $samplesRequiringProcessing = ['1SST8', '1PST8'];
 
     protected function loadOrder($participantId, $orderId, Application $app)
     {
@@ -73,8 +73,6 @@ class OrderController extends AbstractController
             if (is_array($samples) && count($samples) > 0) {
                 $formData["{$set}_samples"] = $samples;
             }
-        } else {
-            $formData["{$set}_samples"] = $this->getEnabledSamples($set);
         }
         return $formData;
     }
@@ -101,6 +99,19 @@ class OrderController extends AbstractController
         return $updateArray;
     }
 
+    protected function getRequestedSamples()
+    {
+        if ($this->order['requested_samples'] &&
+            ($requestedArray = json_decode($this->order['requested_samples'])) &&
+            is_array($requestedArray) &&
+            count($requestedArray) > 0
+        ) {
+            return array_intersect(self::$samples, $requestedArray);
+        } else {
+            return self::$samples;
+        }
+    }
+
     protected function getEnabledSamples($set)
     {
         if ($this->order['collected_samples'] &&
@@ -123,9 +134,9 @@ class OrderController extends AbstractController
 
         switch ($set) {
             case 'processed':
-                return array_intersect($collected, self::$samplesRequiringProcessing);
+                return array_intersect($collected, self::$samplesRequiringProcessing, $this->getRequestedSamples());
             case 'finalized':
-                $enabled = array_intersect($collected, self::$samples);
+                $enabled = array_intersect($collected, $this->getRequestedSamples());
                 foreach ($enabled as $key => $sample) {
                     if (in_array($sample, self::$samplesRequiringProcessing) &&
                         !in_array($sample, $processed)
@@ -135,7 +146,7 @@ class OrderController extends AbstractController
                 }
                 return array_values($enabled);
             default:
-                return array_values(self::$samples);
+                return array_values($this->getRequestedSamples());
         }
     }
 
@@ -171,9 +182,9 @@ class OrderController extends AbstractController
 
         $formData = $this->getOrderFormData($set);
         if ($set == 'processed') {
-            $samples = array_intersect(self::$samples, self::$samplesRequiringProcessing);
+            $samples = array_intersect($this->getRequestedSamples(), self::$samplesRequiringProcessing);
         } else {
-            $samples = self::$samples;
+            $samples = $this->getRequestedSamples();
         }
         $enabledSamples = $this->getEnabledSamples($set);
         $form = $formFactory->createBuilder(FormType::class, $formData)
@@ -220,7 +231,15 @@ class OrderController extends AbstractController
                 'attr' => ['placeholder' => 'Scan barcode'],
                 'required' => false
             ])
+            ->add('samples', ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => true,
+                'label' => 'Select requested samples',
+                'choices' => self::$samples,
+                'required' => false
+            ])
             ->getForm();
+        $showCustom = false;
         $confirmForm->handleRequest($request);
         if ($confirmForm->isValid()) {
             $orderData = ['existing' => null];
@@ -234,26 +253,40 @@ class OrderController extends AbstractController
                 }
             } else {
                 $orderData['order_id'] = Util::generateShortUuid();
-                if ($app->getConfig('ml_mock_order')) {
-                    $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
-                } else {
-                    $order = new MayoLinkOrder();
-                    $options = [
-                        'patient_id' => $participant->getShortId(),
-                        'gender' => $participant->gender,
-                        'birth_date' => $participant->dob,
-                        'order_id' => $orderData['order_id'],
-                        // TODO: not sure how ML is handling time zone. setting to yesterday for now
-                        'collected_at' => new \DateTime('-1 day')
-                    ];
-                    if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
-                        $options['site'] = $app['session']->get('site')->id;
+                if ($request->request->has('custom')) {
+                    $showCustom = true;
+                    $requestedSamples = $confirmForm['samples']->getData();
+                    if (empty($requestedSamples) || !is_array($requestedSamples)) {
+                        $confirmForm['samples']->addError(new FormError('Please select at least one sample'));
+                    } else {
+                        $orderData['requested_samples'] = json_encode($requestedSamples);
                     }
-                    $orderData['mayo_id'] = $order->loginAndCreateOrder(
-                        $app->getConfig('ml_username'),
-                        $app->getConfig('ml_password'),
-                        $options
-                    );
+                }
+                if ($confirmForm->isValid()) {
+                    if ($app->getConfig('ml_mock_order')) {
+                        $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
+                    } else {
+                        $order = new MayoLinkOrder();
+                        $options = [
+                            'patient_id' => $participant->getShortId(),
+                            'gender' => $participant->gender,
+                            'birth_date' => $participant->dob,
+                            'order_id' => $orderData['order_id'],
+                            // TODO: not sure how ML is handling time zone. setting to yesterday for now
+                            'collected_at' => new \DateTime('-1 day')
+                        ];
+                        if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
+                            $options['site'] = $app['session']->get('site')->id;
+                        }
+                        if (isset($requestedSamples) && is_array($requestedSamples)) {
+                            $options['tests'] = $requestedSamples;
+                        }
+                        $orderData['mayo_id'] = $order->loginAndCreateOrder(
+                            $app->getConfig('ml_username'),
+                            $app->getConfig('ml_password'),
+                            $options
+                        );
+                    }
                 }
             }
             if ($confirmForm->isValid()) {
@@ -276,7 +309,8 @@ class OrderController extends AbstractController
 
         return $app['twig']->render('order-create.html.twig', [
             'participant' => $participant,
-            'confirmForm' => $confirmForm->createView()
+            'confirmForm' => $confirmForm->createView(),
+            'showCustom' => $showCustom
         ]);
     }
 

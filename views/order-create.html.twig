@@ -3,7 +3,7 @@
 {% block body %}
     <h2>
         <i class="fa fa-medkit" aria-hidden="true"></i>
-        New order
+        New Biobank order
         <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
     </h2>
 
@@ -29,30 +29,51 @@
         </dl>
         {{ form_start(confirmForm) }}
             {{ form_errors(confirmForm) }}
-            <div class="row row-equal-height text-center">
+            <div class="row row-equal-height">
                 <div class="col-sm-6 col-md-4 col-md-offset-2">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Standard</h3>
+                            <h3 class="panel-title text-center">HPO Biobank Order</h3>
                         </div>
                         <div class="panel-body">
-                            <p>Create a standard PMI Biobank Order</p>
-                            <button type="submit" name="standard" class="btn btn-primary">Create</button>
+                            <div class="text-center">
+                                <div id="customize-off" {% if showCustom %} style="display:none"{% endif %}>
+                                    <p>Create an order for all 7 PMI biospecimens</p>
+                                    <p>
+                                        <button type="submit" name="standard" class="btn btn-primary">Create</button>
+                                    </p>
+                                    <p>
+                                        <a href="#" id="customize-enable">Customize order</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div{% if not showCustom %} style="display:none"{% endif %} id="customize-on">
+                                <p class="text-center">Customize your PMI biobank order</p>
+                                {{ form_row(confirmForm.samples) }}
+                                <div class="text-center">
+                                    <p>
+                                        <button type="submit" name="custom" class="btn btn-primary">Create custom order</button>
+                                    </p>
+                                    <p>
+                                        <a href="#" id="customize-disable">Revert to standard order</a>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-6 col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Existing Kit</h3>
+                            <h3 class="panel-title text-center">DV Biobank Order</h3>
                         </div>
                         <div class="panel-body">
-                            <p>Register a PMI Biospecimen Kit</p>
-                            <div class="text-left">
+                            <p class="text-center">Register a PMI Biospecimen Kit</p>
                                 <br />
                                 {{ form_row(confirmForm.kitId) }}
-                            </div>
-                            <button type="submit" name="existing" class="btn btn-primary">Create</button>
+                            <p class="text-center">
+                                <button type="submit" name="existing" class="btn btn-primary">Create</button>
+                            </p>
                         </div>
                     </div>
                 </div>
