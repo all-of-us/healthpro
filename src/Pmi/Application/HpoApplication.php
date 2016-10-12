@@ -218,6 +218,11 @@ class HpoApplication extends AbstractApplication
             $this->addFlashSuccess('Welcome, ' . $this->getUser()->getEmail() . '!');
         }
 
+        // users with multiple roles must select their initial destination
+        if ($this['session']->get('isLogin') && $this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD') && !$this->isUpkeepRoute($request)) {
+            return $this->forwardToRoute('selectHome', $request);
+        }
+        
         // HPO users must select their site first
         if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER'))
         {
@@ -227,12 +232,8 @@ class HpoApplication extends AbstractApplication
                 $this->switchSite($user->getSites()[0]->email);
             } elseif ($request->attributes->get('_route') !== 'selectSite' &&
                     $request->attributes->get('_route') !== 'switchSite' &&
-                    $request->attributes->get('_route') !== 'logout' &&
-                    $request->attributes->get('_route') !== 'loginReturn' &&
-                    $request->attributes->get('_route') !== 'timeout' &&
-                    $request->attributes->get('_route') !== 'keepAlive' &&
-                    $request->attributes->get('_route') !== 'clientTimeout' &&
-                    $request->attributes->get('_route') !== 'agreeUsage') {
+                    strpos($request->attributes->get('_route'), 'dashboard_') !== 0 &&
+                    !$this->isUpkeepRoute($request)) {
                 $request->request->set('destUrl', $request->getRequestUri());
                 return $this->forwardToRoute('selectSite', $request);
             }

@@ -225,6 +225,11 @@ abstract class AbstractApplication extends Application
         return $token ? $token->getUser() : null;
     }
     
+    public function hasRole($role)
+    {
+        return $this->isLoggedIn() && $this['security.authorization_checker']->isGranted($role);
+    }
+    
     /** Is the user's session expired? */
     public function isLoginExpired()
     {
@@ -238,6 +243,20 @@ abstract class AbstractApplication extends Application
     public function isLoggedIn()
     {
         return $this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY');
+    }
+    
+    /**
+     * "Upkeep" routes are routes that we want typically want to allow through
+     * even when workflow dictates otherwise.
+     */
+    public function isUpkeepRoute(Request $request)
+    {
+        return $request->attributes->get('_route') === 'logout' ||
+            $request->attributes->get('_route') === 'loginReturn' ||
+            $request->attributes->get('_route') === 'timeout' ||
+            $request->attributes->get('_route') === 'keepAlive' ||
+            $request->attributes->get('_route') === 'clientTimeout' ||
+            $request->attributes->get('_route') === 'agreeUsage';
     }
 
     protected function enableTwig()
