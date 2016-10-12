@@ -30,12 +30,10 @@ class RdrParticipants
         }
         if (isset($participant->participant_id)) {
             $id = $participant->participant_id;
-        } elseif (isset($participant->drc_internal_id)) {
-            $id = $participant->drc_internal_id;
         } else {
             return false;
         }
-        if (isset($participant->membership_tier) && $participant->membership_tier == 'CONSENTED') {
+        if (isset($participant->membership_tier) && in_array($participant->membership_tier, ['VOLUNTEER', 'ENROLLEE', 'FULL_PARTICIPANT'])) {
             $consentStatus = true;
         } else {
             $consentStatus = false;
