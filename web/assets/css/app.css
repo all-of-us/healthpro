@@ -45,7 +45,7 @@ label.required::after {
     margin-right: auto;
 }
 
-
+/* Physical evaluation */
 #physicalEvaluation .toggle-help-image {
     cursor: pointer;
     color: #337ab7;
@@ -67,4 +67,13 @@ label.required::after {
     #physicalEvaluation .row .col-sm-4 {
         margin-bottom: 6px;
     }
+}
+
+/* Participant page */
+#order-overflow, #evaluation-overflow {
+    display: none;
+    margin-top: 5px;
+}
+#order-overflow-show, #evaluation-overflow-show {
+    margin-top: 5px
 }
