@@ -23,6 +23,9 @@
                         <li><a href="{{ path('orders') }}">Order Lookup</a></li>
                         <li><a href="https://docs.google.com/forms/d/e/1FAIpQLScc_wOGZtGeb-qruWztngFm5oarQUlECsMw_7G6siHq9DmIPA/viewform" target="_blank">Feedback</a></li>
                     {% endif %}
+                    {% if is_granted('ROLE_DASHBOARD') %}
+                        <li><a href="{{ path('dashboard_home') }}">Dashboard</a></li>
+                    {% endif %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
