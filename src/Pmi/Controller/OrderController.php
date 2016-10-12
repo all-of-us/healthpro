@@ -281,8 +281,7 @@ class OrderController extends AbstractController
                             'gender' => $participant->gender,
                             'birth_date' => $participant->dob,
                             'order_id' => $orderData['order_id'],
-                            // TODO: not sure how ML is handling time zone. setting to yesterday for now
-                            'collected_at' => new \DateTime('-1 day')
+                            'collected_at' => new \DateTime('today') // set to today at midnight since time won't be accurate
                         ];
                         if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
                             $options['site'] = $app['session']->get('site')->id;
