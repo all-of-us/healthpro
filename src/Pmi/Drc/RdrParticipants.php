@@ -49,12 +49,15 @@ class RdrParticipants
                 $gender = 'U';
                 break;
         }
+        $genderIdentity = str_replace('_', ' ', $participant->gender_identity);
+        $genderIdentity = ucfirst(strtolower($genderIdentity));
         return new Participant([
             'id' => $id,
             'firstName' => $participant->first_name,
             'middleName' => $participant->middle_name,
             'lastName' => $participant->last_name,
             'dob' => new \DateTime($participant->date_of_birth),
+            'genderIdentity' => $genderIdentity,
             'gender' => $gender,
             'zip' => $participant->zip_code,
             'consentComplete' => $consentStatus

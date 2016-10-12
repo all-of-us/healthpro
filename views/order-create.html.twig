@@ -24,8 +24,8 @@
             <dd>{{ participant.shortId }}</dd>
             <dt>DOB</dt>
             <dd>{{ participant.dob|date('n/j/Y') }}</dd>
-            <dt>Gender</dt>
-            <dd>{{ participant.gender }}</dd>
+            <dt>Gender Identity</dt>
+            <dd>{{ participant.genderIdentity }}</dd>
         </dl>
         {{ form_start(confirmForm) }}
             {{ form_errors(confirmForm) }}
