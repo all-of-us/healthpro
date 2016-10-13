@@ -220,7 +220,7 @@ class HpoApplication extends AbstractApplication
 
         // users with multiple roles must select their initial destination
         if ($this['session']->get('isLogin') && $this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD') && !$this->isUpkeepRoute($request)) {
-            return $this->forwardToRoute('selectHome', $request);
+            return $this->forwardToRoute('dashSplash', $request);
         }
         
         // HPO users must select their site first

@@ -246,7 +246,7 @@ abstract class AbstractApplication extends Application
     }
     
     /**
-     * "Upkeep" routes are routes that we want typically want to allow through
+     * "Upkeep" routes are routes that we typically want to allow through
      * even when workflow dictates otherwise.
      */
     public function isUpkeepRoute(Request $request)

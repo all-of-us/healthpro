@@ -17,7 +17,7 @@ class DefaultController extends AbstractController
 {
     protected static $routes = [
         ['home', '/'],
-        ['selectHome', '/select'],
+        ['dashSplash', '/splash'],
         ['logout', '/logout'],
         ['login', '/login'],
         ['loginReturn', '/login-return'],
@@ -44,9 +44,9 @@ class DefaultController extends AbstractController
         }
     }
     
-    public function selectHomeAction(Application $app, Request $request)
+    public function dashSplashAction(Application $app, Request $request)
     {
-        return $app['twig']->render('home-select.html.twig');
+        return $app['twig']->render('dash-splash.html.twig');
     }
     
     public function logoutAction(Application $app, Request $request)
