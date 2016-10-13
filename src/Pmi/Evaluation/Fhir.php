@@ -45,6 +45,9 @@ class Fhir
                 $metrics[] = $field->name;
             }
         }
+        if (in_array('height', $metrics) && in_array('weight', $metrics)) {
+            $metrics[] = 'bmi';
+        }
         return $metrics;
     }
 
@@ -128,6 +131,22 @@ class Fhir
             'Body weight',
             '29463-7',
             'kg'
+        );
+    }
+
+    protected function bmi()
+    {
+        if (!$this->data->height || !$this->data->weight) {
+            return;
+        }
+        $cm = $this->data->height / 100;
+        $bmi = round($this->data->weight / ($cm * $cm), 1);
+        return $this->simpleMetric(
+            'bmi',
+            $bmi,
+            'Body mass index',
+            '39156-5',
+            'kg/m2'
         );
     }
 
