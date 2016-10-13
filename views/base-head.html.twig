@@ -22,7 +22,6 @@
             "switchSite": {{ path('switchSite', {id: "SITE_ID"})|json_encode|raw }}
         },
         "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
-        "isLogin": {{ app.session.get('isLogin')|json_encode|raw }},
         "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }},
         "views": {}
     };
