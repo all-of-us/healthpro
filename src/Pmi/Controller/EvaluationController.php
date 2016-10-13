@@ -10,13 +10,13 @@ use Pmi\Evaluation\Evaluation;
 class EvaluationController extends AbstractController
 {
     protected static $routes = [
-        ['participantEval', '/participant/{participantId}/eval/{evalId}', [
+        ['evaluation', '/participant/{participantId}/eval/{evalId}', [
             'method' => 'GET|POST',
             'defaults' => ['evalId' => null]
         ]]
     ];
 
-    public function participantEvalAction($participantId, $evalId, Application $app, Request $request)
+    public function evaluationAction($participantId, $evalId, Application $app, Request $request)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
@@ -73,7 +73,7 @@ class EvaluationController extends AbstractController
                         if ($evalId = $app['em']->getRepository('evaluations')->insert($dbArray)) {
                             $app->log(Log::EVALUATION_CREATE, $evalId);
                             $app->addFlashNotice('Evaluation saved');
-                            return $app->redirectToRoute('participantEval', [
+                            return $app->redirectToRoute('evaluation', [
                                 'participantId' => $participant->id,
                                 'evalId' => $evalId
                             ]);
@@ -84,7 +84,7 @@ class EvaluationController extends AbstractController
                         if ($app['em']->getRepository('evaluations')->update($evalId, $dbArray)) {
                             $app->log(Log::EVALUATION_EDIT, $evalId);
                             $app->addFlashNotice('Evaluation saved');
-                            return $app->redirectToRoute('participantEval', [
+                            return $app->redirectToRoute('evaluation', [
                                 'participantId' => $participant->id,
                                 'evalId' => $evalId
                             ]);

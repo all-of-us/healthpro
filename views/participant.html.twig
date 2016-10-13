@@ -27,7 +27,7 @@
                             {% if loop.index == 6 %}
                                 <div id="evaluation-overflow">
                             {% endif %}
-                            <a href="{{ path('participantEval', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg btn-default">
+                            <a href="{{ path('evaluation', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg btn-default">
                                 {{ evaluation.created_ts|date('D n/j/Y') }}<br />
                                 <small class="text-muted">
                                     {% if evaluation.finalized_ts %}
@@ -44,7 +44,7 @@
                                 <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
                             </a>
                         {% endif %}
-                        <a href="{{ path('participantEval', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
+                        <a href="{{ path('evaluation', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
                             <i class="fa fa-plus-circle" aria-hidden="true"></i>
                             {% if evaluations|length > 0 %}
                                 New
