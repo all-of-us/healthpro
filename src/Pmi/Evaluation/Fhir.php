@@ -31,6 +31,10 @@ class Fhir
     {
         $metrics = [];
         foreach ($this->schema->fields as $field) {
+            if (preg_match('/^blood-pressure-/', $field->name) && !preg_match('/^blood-pressure-systolic/', $field->name)) {
+                // only add systolic for now, will process the rest below
+                continue;
+            }
             if (empty($this->data->{$field->name})) {
                 continue;
             }
@@ -39,15 +43,32 @@ class Fhir
                     if (empty($value)) {
                         continue;
                     }
-                    $metrics[] = $field->name . '-' . ($i+1);
+                    $metrics[] = $field->name . '-' . ($i+1); // 1-indexed
                 }
             } else {
                 $metrics[] = $field->name;
             }
         }
+        // add bmi if height and weight are both included
         if (in_array('height', $metrics) && in_array('weight', $metrics)) {
             $metrics[] = 'bmi';
         }
+
+        // check and rename blood pressure metrics
+        $diastolic = $this->data->{'blood-pressure-diastolic'};
+        foreach ($metrics as $k => $metric) {
+            if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
+                continue;
+            }
+            $index = $m[1] - 1;
+            if (!empty($diastolic[$index])) {
+                $metrics[$k] = 'blood-pressure-' . $m[1];
+            } else {
+                // remove if systolic exists but not diastolic
+                unset($metrics[$k]);
+            }
+        }
+        $metrics = array_values($metrics);
         return $metrics;
     }
 
@@ -181,6 +202,88 @@ class Fhir
             '62409-8',
             'cm'
         );
+    }
+
+    protected function getBpBodySite($replicate)
+    {
+        switch ($this->data->{'blood-pressure-location'}[$replicate - 1]) {
+            case 'Left arm':
+                $locationSnomed = '368208006';
+                $locationDisplay = 'Left arm';
+                break;
+            default:
+                $locationSnomed = '368209003';
+                $locationDisplay = 'Right arm';
+                break;
+        }
+        return [
+            'coding' => [[
+                'code' => $locationSnomed,
+                'display' => $locationDisplay,
+                'system' => 'http://snomed.info/sct'
+            ]],
+            'text' => $locationDisplay
+        ];
+    }
+
+    protected function getBpComponent($component, $replicate)
+    {
+        switch ($component) {
+            case 'systolic':
+                $loinc = '8480-6';
+                $display = 'Systolic blood pressure';
+                break;
+            case 'diastolic':
+                $loinc = '8462-4';
+                $display = 'Diastolic blood pressure';
+                break;
+            default:
+                throw new \Exception('Invalid blood pressure component');
+        }
+        return [
+            'code' => [
+                'coding' => [[
+                    'code' => $loinc,
+                    'display' => $display,
+                    'system' => 'http://loinc.org'
+                ]],
+                'text' => $display
+            ],
+            'valueQuantity' => [
+                'code' => 'mm[Hg]',
+                'system' => 'http://unitsofmeasure.org',
+                'unit' => 'mmHg',
+                'value' => $this->data->{'blood-pressure-' . $component}[$replicate - 1]
+            ]
+        ];
+    }
+
+    protected function bloodpressure($replicate)
+    {
+        return [
+            'fullUrl' => 'urn:example:blood-pressure-' . $replicate,
+            'resource' => [
+                'bodySite' => $this->getBpBodySite($replicate),
+                'code' => [
+                    'coding' => [[
+                        'code' => '55284-4',
+                        'display' => 'Blood pressure systolic and diastolic',
+                        'system' => 'http://loinc.org'
+                    ]],
+                    'text' => 'Blood pressure systolic and diastolic'
+                ],
+                'component' => [
+                    $this->getBpComponent('systolic', $replicate),
+                    $this->getBpComponent('diastolic', $replicate)
+                ],
+                'effectiveDateTime' => $this->date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->patient}"
+                ]
+            ]
+        ];
     }
 
     protected function getEntry($metric)
