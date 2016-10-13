@@ -73,6 +73,11 @@
                                 {% endif %}
                                 {{ form_errors(evaluationForm[field.name]) }}
                             </div>
+                            {% if field.name == 'weight' %}
+                                <div class="col-sm-4">
+                                    <div id="bmi"></div>
+                                </div>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>

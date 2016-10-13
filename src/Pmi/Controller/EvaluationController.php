@@ -10,13 +10,38 @@ use Pmi\Evaluation\Evaluation;
 class EvaluationController extends AbstractController
 {
     protected static $routes = [
-        ['participantEval', '/participant/{participantId}/eval/{evalId}', [
+        ['evaluation', '/participant/{participantId}/eval/{evalId}', [
             'method' => 'GET|POST',
             'defaults' => ['evalId' => null]
-        ]]
+        ]],
+        ['evaluationFhir', '/participant/{participantId}/eval/{evalId}/fhir.json']
     ];
 
-    public function participantEvalAction($participantId, $evalId, Application $app, Request $request)
+    /* For debugging */
+    public function evaluationFhirAction($participantId, $evalId, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $evaluationService = new Evaluation();
+        $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
+            'id' => $evalId,
+            'participant_id' => $participantId
+        ]);
+        if (!$evaluation) {
+            $app->abort(404);
+        }
+        $evaluationService->loadFromArray($evaluation);
+        if ($evaluation['finalized_ts']) {
+            $date = new \DateTime($evaluation['finalized_ts']);
+        } else {
+            $date = new \DateTime();
+        }
+        return $app->json($evaluationService->getFhir($date));
+    }
+
+    public function evaluationAction($participantId, $evalId, Application $app, Request $request)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
@@ -73,7 +98,7 @@ class EvaluationController extends AbstractController
                         if ($evalId = $app['em']->getRepository('evaluations')->insert($dbArray)) {
                             $app->log(Log::EVALUATION_CREATE, $evalId);
                             $app->addFlashNotice('Evaluation saved');
-                            return $app->redirectToRoute('participantEval', [
+                            return $app->redirectToRoute('evaluation', [
                                 'participantId' => $participant->id,
                                 'evalId' => $evalId
                             ]);
@@ -84,7 +109,7 @@ class EvaluationController extends AbstractController
                         if ($app['em']->getRepository('evaluations')->update($evalId, $dbArray)) {
                             $app->log(Log::EVALUATION_EDIT, $evalId);
                             $app->addFlashNotice('Evaluation saved');
-                            return $app->redirectToRoute('participantEval', [
+                            return $app->redirectToRoute('evaluation', [
                                 'participantId' => $participant->id,
                                 'evalId' => $evalId
                             ]);
