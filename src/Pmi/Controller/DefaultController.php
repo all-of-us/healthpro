@@ -17,6 +17,7 @@ class DefaultController extends AbstractController
 {
     protected static $routes = [
         ['home', '/'],
+        ['dashSplash', '/splash'],
         ['logout', '/logout'],
         ['login', '/login'],
         ['loginReturn', '/login-return'],
@@ -34,13 +35,18 @@ class DefaultController extends AbstractController
 
     public function homeAction(Application $app, Request $request)
     {
-        if ($app['security.authorization_checker']->isGranted('ROLE_USER')) {
+        if ($app->hasRole('ROLE_USER')) {
             return $app['twig']->render('index.html.twig');
-        } elseif ($app['security.authorization_checker']->isGranted('ROLE_DASHBOARD')) {
+        } elseif ($app->hasRole('ROLE_DASHBOARD')) {
             return $app->redirectToRoute('dashboard_home');
         } else {
             return $app->abort(403);
         }
+    }
+    
+    public function dashSplashAction(Application $app, Request $request)
+    {
+        return $app['twig']->render('dash-splash.html.twig');
     }
     
     public function logoutAction(Application $app, Request $request)

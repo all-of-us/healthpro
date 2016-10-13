@@ -1,34 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    {% include 'base-head.html.twig' %}
     <title>{% block title %}{% endblock %}PMI HealthPro</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ asset('dist/css/lib.min.css') }}?v={{ app.assetVer }}">
-    <link rel="stylesheet" href="{{ asset('dist/css/app.min.css') }}?v={{ app.assetVer }}">
-    <!--[if lt IE 9]>
-        <script src="{{ asset('js/html5shiv.min.js') }}"></script>
-        <script src="{{ asset('js/respond.min.js') }}"></script>
-    <![endif]-->
-    {# pass parameters to JS #}
-    <script>
-        var PMI = {
-            "sessionTimeout": {{ app.sessionTimeout|json_encode|raw }},
-            "sessionWarning": {{ app.sessionWarning|json_encode|raw }},
-            "path": {
-                "clientTimeout": {{ path('clientTimeout')|json_encode|raw }},
-                "logout": {{ path('logout')|json_encode|raw }},
-                "keepAlive": {{ path('keepAlive')|json_encode|raw }},
-                "agreeUsage": {{ path('agreeUsage')|json_encode|raw }},
-                "switchSite": {{ path('switchSite', {id: "SITE_ID"})|json_encode|raw }}
-            },
-            "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
-            "isLogin": {{ app.session.get('isLogin')|json_encode|raw }},
-            "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }},
-            "views": {}
-        };
-    </script>
 </head>
 <body>
     <nav class="navbar navbar-default">
@@ -44,10 +18,13 @@
             </div>
             <div class="collapse navbar-collapse" id="pmi-navbar-collapse">
                 <ul class="nav navbar-nav">
-                    {% if is_granted('IS_AUTHENTICATED_FULLY') and app.user.sites|length > 0 %}
+                    {% if is_granted('ROLE_USER') and app.session.get('site') %}
                         <li><a href="{{ path('participants') }}">Participant Lookup</a></li>
                         <li><a href="{{ path('orders') }}">Biobank Order Lookup</a></li>
                         <li><a href="https://docs.google.com/forms/d/e/1FAIpQLScc_wOGZtGeb-qruWztngFm5oarQUlECsMw_7G6siHq9DmIPA/viewform" target="_blank">Feedback</a></li>
+                    {% endif %}
+                    {% if is_granted('ROLE_DASHBOARD') %}
+                        <li><a href="{{ path('dashboard_home') }}">Dashboard</a></li>
                     {% endif %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
@@ -119,11 +96,7 @@
     {% endif %}
 
     <div id="is-xs" class="visible-xs"></div>
-    {% include 'templates/alert.html.twig' %}
-    {% include 'templates/confirm.html.twig' %}
-    {% if hideSystemUsage is not defined and not app.session.get('isUsageAgreed') %}
-        {% include 'templates/system-usage.html.twig' %}
-    {% endif %}
+    {% include 'base-body.html.twig' %}
 
     <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
     {% block pagejs %}{% endblock %}

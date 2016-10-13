@@ -1,0 +1,6 @@
+{# common elements in the BODY tag #}
+{% include 'templates/alert.html.twig' %}
+{% include 'templates/confirm.html.twig' %}
+{% if hideSystemUsage is not defined and not app.session.get('isUsageAgreed') %}
+    {% include 'templates/system-usage.html.twig' %}
+{% endif %}
