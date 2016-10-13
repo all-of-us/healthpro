@@ -219,7 +219,7 @@ class HpoApplication extends AbstractApplication
         }
 
         // users with multiple roles must select their initial destination
-        if ($this['session']->get('isLogin') && $this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD') && !$this->isUpkeepRoute($request)) {
+        if ($this['session']->get('isLoginReturn') && $this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD') && !$this->isUpkeepRoute($request)) {
             return $this->forwardToRoute('dashSplash', $request);
         }
         
@@ -242,9 +242,14 @@ class HpoApplication extends AbstractApplication
     
     protected function finishCallback(Request $request, Response $response)
     {
-        // only the first request handled is considered a login
         if ($this->isLoggedIn()) {
+            // only the first route handled is considered a login
             $this['session']->set('isLogin', false);
+            
+            // unset after the first route handled following loginReturn
+            if (!$this->isUpkeepRoute($request)) {
+                $this['session']->set('isLoginReturn', false);
+            }
         }
     }
 }
