@@ -33,7 +33,12 @@ class EvaluationController extends AbstractController
             $app->abort(404);
         }
         $evaluationService->loadFromArray($evaluation);
-        return $app->json($evaluationService->getFhir(new \DateTime()));
+        if ($evaluation['finalized_ts']) {
+            $date = new \DateTime($evaluation['finalized_ts']);
+        } else {
+            $date = new \DateTime();
+        }
+        return $app->json($evaluationService->getFhir($date));
     }
 
     public function evaluationAction($participantId, $evalId, Application $app, Request $request)
