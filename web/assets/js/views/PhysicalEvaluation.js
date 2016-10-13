@@ -8,7 +8,9 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
         "keyup .replicate input": "updateMean",
         "change input": "clearServerErrors",
         "keyup input": "clearServerErrors",
-        "change input": "displayWarnings"
+        "change input": "displayWarnings",
+        "keyup #form_height, #form_weight": "calculateBmi",
+        "change #form_height, #form_weight": "calculateBmi"
     },
     displayHelpModal: function(e) {
         var image = $(e.currentTarget).data('img');
@@ -33,6 +35,17 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
             this.$('#mean-' + field).html('<span class="label label-default">Average: ' + mean + '</span>');
         } else {
             this.$('#mean-' + field).text('');
+        }
+    },
+    calculateBmi: function() {
+        var height = parseFloat(this.$('#form_height').val());
+        var weight = parseFloat(this.$('#form_weight').val());
+        if (height && weight) {
+            var bmi = weight / ((height/100) * (height/100));
+            bmi = bmi.toFixed(1);
+            this.$('#bmi').html('<span class="label label-default">BMI: ' + bmi + '</span>');
+        } else {
+            this.$('#bmi').html('');
         }
     },
     clearServerErrors: function() {
@@ -83,6 +96,7 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
                 self.calculateMean(field);
             }
         });
+        self.calculateBmi();
         return this;
     }
 });
