@@ -96,11 +96,7 @@
     {% endif %}
 
     <div id="is-xs" class="visible-xs"></div>
-    {% include 'templates/alert.html.twig' %}
-    {% include 'templates/confirm.html.twig' %}
-    {% if hideSystemUsage is not defined and not app.session.get('isUsageAgreed') %}
-        {% include 'templates/system-usage.html.twig' %}
-    {% endif %}
+    {% include 'base-body.html.twig' %}
 
     <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
     {% block pagejs %}{% endblock %}
