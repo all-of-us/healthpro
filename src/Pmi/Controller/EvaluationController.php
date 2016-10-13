@@ -13,8 +13,28 @@ class EvaluationController extends AbstractController
         ['evaluation', '/participant/{participantId}/eval/{evalId}', [
             'method' => 'GET|POST',
             'defaults' => ['evalId' => null]
-        ]]
+        ]],
+        ['evaluationFhir', '/participant/{participantId}/eval/{evalId}/fhir.json']
     ];
+
+    /* For debugging */
+    public function evaluationFhirAction($participantId, $evalId, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $evaluationService = new Evaluation();
+        $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
+            'id' => $evalId,
+            'participant_id' => $participantId
+        ]);
+        if (!$evaluation) {
+            $app->abort(404);
+        }
+        $evaluationService->loadFromArray($evaluation);
+        return $app->json($evaluationService->getFhir(new \DateTime()));
+    }
 
     public function evaluationAction($participantId, $evalId, Application $app, Request $request)
     {
