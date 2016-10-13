@@ -46,6 +46,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->assertSame(null, $this->app['session']->get('isLogin'));
         $client = $this->createClient();
+        $client->followRedirects();
         $crawler = $client->request('GET', '/dashboard/');
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
     }
@@ -57,6 +58,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         AppsClient::setGroups($email, [new GoogleGroup('admin-dashboard@gapps.com', 'Admin Dashboard', 'lorem ipsum 1')]);
         $this->assertSame(null, $this->app['session']->get('isLogin'));
         $client = $this->createClient();
+        $client->followRedirects();
         $crawler = $client->request('GET', '/dashboard/');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
@@ -68,6 +70,8 @@ class HpoApplicationTest extends AbstractWebTestCase
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->app['sessionTimeout'] = 2;
         $client = $this->createClient();
+        $client->followRedirects();
+        $client->request('GET', '/');
         $client->request('POST', '/keepalive');
         $this->assertSame(false, $this->app->isLoginExpired());
         $this->assertEquals($email, $this->app->getUser()->getEmail());
@@ -82,7 +86,9 @@ class HpoApplicationTest extends AbstractWebTestCase
         AppsClient::setGroups($email, [new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->app['sessionTimeout'] = 2;
         $client = $this->createClient();
-        $crawler = $client->request('POST', '/keepalive');
+        $client->followRedirects();
+        $client->request('GET', '/');
+        $client->request('POST', '/keepalive');
         $this->assertSame(false, $this->app->isLoginExpired());
         $this->assertEquals($email, $this->app->getUser()->getEmail());
         sleep($this->app['sessionTimeout']);
@@ -96,8 +102,9 @@ class HpoApplicationTest extends AbstractWebTestCase
         AppsClient::setGroups($email, [new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->app['sessionTimeout'] = 2;
         $client = $this->createClient();
+        $client->followRedirects();
         $crawler = $client->request('GET', '/');
-        $this->assertSame(true, strpos($crawler->html(), 'Redirecting to <a href="/dashboard/">/dashboard/</a>') !== false);
+        $this->assertSame(true, strstr($crawler->html(), '/dashboard/') !== false);
     }
     
     public function testForceSiteSelect()
@@ -106,6 +113,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         GoogleUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'), new GoogleGroup('hpo-site-2@gapps.com', 'Test Group 2', 'lorem ipsum 2')]);
         $client = $this->createClient();
+        $client->followRedirects();
         $crawler = $client->request('GET', '/participants');
         $this->assertEquals(1, count($crawler->filter('#siteSelector')));
     }
@@ -119,6 +127,7 @@ class HpoApplicationTest extends AbstractWebTestCase
             new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
         ]);
         $client = $this->createClient();
+        $client->followRedirects();
         $crawler = $client->request('GET', '/participants');
         $this->assertEquals(1, count($crawler->filter('#dashSplashSelector')));
     }
@@ -129,6 +138,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         GoogleUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
+        $client->followRedirects();
         $crawler = $client->request('GET', '/');
         $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
         $crawler = $client->reload();
@@ -161,6 +171,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         GoogleUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
+        $client->followRedirects();
         $crawler = $client->request('GET', '/');
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
     }
@@ -173,6 +184,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         GoogleUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
+        $client->followRedirects();
         $crawler = $client->request('GET', '/');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $crawler = $client->request('GET', '/timeout');
@@ -191,6 +203,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $groupEmail = 'hpo-site-1@gapps.com';
         AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
+        $client->followRedirects();
         $this->assertSame(null, $this->app->getSite());
         $crawler = $client->request('GET', '/participants');
         $this->assertSame($groupEmail, $this->app->getSite()->email);

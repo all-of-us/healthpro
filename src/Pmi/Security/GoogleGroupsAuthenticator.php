@@ -165,8 +165,15 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $request->getSession()->set('isLogin', true);
         // has the user agreed to the system usage agreement this session?
         $request->getSession()->set('isUsageAgreed', false);
-        // on success, let the request continue
-        return;
+        
+        if ($this->app->getConfig('gae_auth')) {
+            // simulate the OAuth workflow for more accurate testing
+            $this->app['session']->set('loginDestUrl', $request->getRequestUri());
+            return $this->app->redirectToRoute('loginReturn');
+        } else {
+            // on success, let the request continue
+            return;
+        }
     }
     
     public function supportsRememberMe()

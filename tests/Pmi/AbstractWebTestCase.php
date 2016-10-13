@@ -48,6 +48,10 @@ abstract class AbstractWebTestCase extends WebTestCase
     
     public function loginUser(GoogleGroupsAuthenticator $authenticator, User $user)
     {
+        // hack so that authenticator won't crash building routes
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/');
+        
         $providerKey = 'main';
         $token = $authenticator->createAuthenticatedToken($user, $providerKey);
         $this->app['security.token_storage']->setToken($token);
