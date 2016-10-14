@@ -16,11 +16,13 @@
             "warnings": [
                 {
                     "max": 180,
-                    "message": "Participant is in a hypertensive crisis"
+                    "message": "Participant is in a hypertensive crisis",
+                    "alert": true
                 },
                 {
                     "min": 70,
-                    "message": "Participant may be hypotensive"
+                    "message": "Participant may be hypotensive",
+                    "alert": true
                 }
             ]
         },
@@ -33,11 +35,13 @@
             "warnings": [
                 {
                     "max": 110,
-                    "message": "Participant is in a hypertensive crisis"
+                    "message": "Participant is in a hypertensive crisis",
+                    "alert": true
                 },
                 {
                     "min": 40,
-                    "message": "Participant may be hypotensive"
+                    "message": "Participant may be hypotensive",
+                    "alert": true
                 }
             ]
         },
@@ -50,7 +54,8 @@
                 {
                     "min": 50,
                     "max": 120,
-                    "message": "Please verify that this resting heart rate is correct"
+                    "message": "Please verify that this resting heart rate is correct",
+                    "alert": true
                 }
             ]
         },

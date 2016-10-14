@@ -52,13 +52,14 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
         this.$('span.help-block ul li').remove();
     },
     displayWarnings: function(e) {
-        var field = $(e.currentTarget).closest('.field').data('field');
-        var container = $(e.currentTarget).closest('.form-group');
+        var input = $(e.currentTarget);
+        var field = input.closest('.field').data('field');
+        var container = input.closest('.form-group');
         container.find('.metric-warnings').remove();
         if (container.find('.metric-errors div').length > 0) {
             return;
         }
-        var val = parseFloat($(e.currentTarget).val());
+        var val = parseFloat(input.val());
         if (!val) {
             return;
         }
@@ -67,7 +68,20 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
                 if ((warning.min && val < warning.min) ||
                     (warning.max && val > warning.max))
                 {
-                    container.append($('<div class="metric-warnings text-danger">').text(warning.message));
+                    if (warning.alert) {
+                        new PmiConfirmModal({
+                            msg: warning.message,
+                            onFalse: function() {
+                                input.val('');
+                                input.focus();
+                                input.trigger('change');
+                            },
+                            btnTextTrue: 'Confirm value and seek medical attention',
+                            btnTextFalse: 'Clear value and reenter'
+                        });
+                    } else {
+                        container.append($('<div class="metric-warnings text-danger">').text(warning.message));
+                    }
                 }
             });
         }
