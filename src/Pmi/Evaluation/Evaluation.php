@@ -75,6 +75,17 @@ class Evaluation
         return $warnings;
     }
 
+    public function getConversions()
+    {
+        $conversions = [];
+        foreach ($this->schema->fields as $metric) {
+            if (!empty($metric->convert)) {
+                $conversions[$metric->name] = $metric->convert;
+            }
+        }
+        return $conversions;
+    }
+
     public function getForm(FormFactory $formFactory)
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);

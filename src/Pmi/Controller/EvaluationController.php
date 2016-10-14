@@ -131,6 +131,7 @@ class EvaluationController extends AbstractController
             'evaluationForm' => $evaluationForm->createView(),
             'schema' => $evaluationService->getSchema(),
             'warnings' => $evaluationService->getWarnings(),
+            'conversions' => $evaluationService->getConversions(),
             'latestVersion' => $evaluationService::CURRENT_VERSION
         ]);
     }
