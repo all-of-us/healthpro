@@ -72,7 +72,7 @@ class EvaluationController extends AbstractController
                     'finalized_ts' => null
                 ]);
                 $app->addFlashNotice('Evaluation reopened');
-                return $app->redirectToRoute('participantEval', [
+                return $app->redirectToRoute('evaluation', [
                     'participantId' => $participant->id,
                     'evalId' => $evalId
                 ]);
@@ -131,6 +131,7 @@ class EvaluationController extends AbstractController
             'evaluationForm' => $evaluationForm->createView(),
             'schema' => $evaluationService->getSchema(),
             'warnings' => $evaluationService->getWarnings(),
+            'conversions' => $evaluationService->getConversions(),
             'latestVersion' => $evaluationService::CURRENT_VERSION
         ]);
     }

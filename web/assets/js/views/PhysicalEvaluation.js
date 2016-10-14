@@ -6,11 +6,19 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
         "click .toggle-help-image": "displayHelpModal",
         "change .replicate input": "updateMean",
         "keyup .replicate input": "updateMean",
-        "change input": "clearServerErrors",
-        "keyup input": "clearServerErrors",
-        "change input": "displayWarnings",
+        "change input": "inputChange",
+        "keyup input": "inputKeyup",
         "keyup #form_height, #form_weight": "calculateBmi",
-        "change #form_height, #form_weight": "calculateBmi"
+        "change #form_height, #form_weight": "calculateBmi",
+    },
+    inputChange: function(e) {
+        this.clearServerErrors(e);
+        this.displayWarnings(e);
+        this.updateConversion(e);
+    },
+    inputKeyup: function(e) {
+        this.clearServerErrors(e);
+        this.updateConversion(e);
     },
     displayHelpModal: function(e) {
         var image = $(e.currentTarget).data('img');
@@ -32,9 +40,14 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
         });
         if (count > 0) {
             var mean = (sum / count).toFixed(1);
-            this.$('#mean-' + field).html('<span class="label label-default">Average: ' + mean + '</span>');
+            this.$('#mean-' + field).html('<span class="label label-primary">Average: ' + mean + '</span>');
+            if (this.conversions[field]) {
+                var converted = this.convert(this.conversions[field], mean);
+                this.$('#convert-' + field).html('<small>('+converted+')</small>');
+            }
         } else {
             this.$('#mean-' + field).text('');
+            this.$('#convert-' + field).text('');
         }
     },
     calculateBmi: function() {
@@ -43,7 +56,7 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
         if (height && weight) {
             var bmi = weight / ((height/100) * (height/100));
             bmi = bmi.toFixed(1);
-            this.$('#bmi').html('<span class="label label-default">BMI: ' + bmi + '</span>');
+            this.$('#bmi').html('<span class="label label-primary">BMI: ' + bmi + '</span>');
         } else {
             this.$('#bmi').html('');
         }
@@ -51,14 +64,61 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
     clearServerErrors: function() {
         this.$('span.help-block ul li').remove();
     },
-    displayWarnings: function(e) {
+    kgToLb: function(kg) {
+        return (parseFloat(kg) * 2.2046).toFixed(1);
+    },
+    cmToIn: function(cm) {
+        return (parseFloat(cm) * 0.3937).toFixed(1);
+    },
+    convert: function(type, val) {
+        switch (type) {
+            case 'in':
+                return this.cmToIn(val) + ' in';
+            case 'ftin':
+                var inches = this.cmToIn(val);
+                var feet = Math.floor(inches / 12);
+                inches = (inches % 12).toFixed();
+                return feet + 'ft ' + inches + 'in';
+            case 'lb':
+                return this.kgToLb(val) + ' lb';
+            default:
+                return false;
+        }
+    },
+    updateConversion: function(e) {
         var field = $(e.currentTarget).closest('.field').data('field');
-        var container = $(e.currentTarget).closest('.form-group');
+        this.calculateConversion(field);
+    },
+    calculateConversion: function(field) {
+        var input = this.$('.field-' + field).find('input');
+        if (input.closest('.replicate').length > 0) {
+            // replicate conversions are handled in calculateMean method
+            return;
+        }
+        var field = input.closest('.field').data('field');
+        if (this.conversions[field]) {
+            var val = parseFloat(input.val());
+            if (val) {
+                var converted = this.convert(this.conversions[field], val);
+                if (converted) {
+                    this.$('#convert-' + field).html('<small>('+converted+')</small>');
+                } else {
+                    this.$('#convert-' + field).html('');
+                }
+            } else {
+                this.$('#convert-' + field).html('');
+            }
+        }
+    },
+    displayWarnings: function(e) {
+        var input = $(e.currentTarget);
+        var field = input.closest('.field').data('field');
+        var container = input.closest('.form-group');
         container.find('.metric-warnings').remove();
         if (container.find('.metric-errors div').length > 0) {
             return;
         }
-        var val = parseFloat($(e.currentTarget).val());
+        var val = parseFloat(input.val());
         if (!val) {
             return;
         }
@@ -67,14 +127,28 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
                 if ((warning.min && val < warning.min) ||
                     (warning.max && val > warning.max))
                 {
-                    container.append($('<div class="metric-warnings text-danger">').text(warning.message));
+                    if (warning.alert) {
+                        new PmiConfirmModal({
+                            msg: warning.message,
+                            onFalse: function() {
+                                input.val('');
+                                input.focus();
+                                input.trigger('change');
+                            },
+                            btnTextTrue: 'Confirm value and seek medical attention',
+                            btnTextFalse: 'Clear value and reenter'
+                        });
+                    } else {
+                        container.append($('<div class="metric-warnings text-danger">').text(warning.message));
+                    }
                 }
             });
         }
     },
     initialize: function(obj) {
+        this.warnings = obj.warnings;
+        this.conversions = obj.conversions;
         this.render();
-        this.warnings = obj.warnings
     },
     render: function() {
         var self = this;
@@ -95,6 +169,9 @@ PMI.views['PhysicalEvaluation'] = Backbone.View.extend({
             if ($(this).find('.mean').length > 0) {
                 self.calculateMean(field);
             }
+        });
+        _.each(_.keys(this.conversions), function(field) {
+            self.calculateConversion(field);
         });
         self.calculateBmi();
         return this;
