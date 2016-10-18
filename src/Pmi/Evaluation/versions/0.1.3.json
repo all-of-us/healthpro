@@ -1,5 +1,5 @@
 {
-    "version": "0.1.2",
+    "version": "0.1.3",
     "fields": [
         {
             "name": "blood-pressure-location",
@@ -49,6 +49,7 @@
             "name": "heart-rate",
             "label": "Heart Rate",
             "unit": "bpm",
+            "replicates": 3,
             "max": 300,
             "warnings": [
                 {
