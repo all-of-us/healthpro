@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
 use Pmi\Mayolink\Order as MayoLinkOrder;
@@ -232,10 +233,22 @@ class OrderController extends AbstractController
             $app->abort(403);
         }
         $confirmForm = $app['form.factory']->createBuilder(FormType::class)
-            ->add('kitId', TextType::class, [
-                'label' => 'Kit order ID',
-                'attr' => ['placeholder' => 'Scan barcode'],
-                'required' => false
+            ->add('kitId', RepeatedType::class, [
+                'type' => TextType::class,
+                'invalid_message' => 'The kit order ID fields must match.',
+                'first_options' => [
+                    'label' => 'Kit order ID'
+                ],
+                'second_options' => [
+                    'label' => 'Verify kit order ID',
+                ],
+                'options' => [
+                    'attr' => ['placeholder' => 'Scan barcode']
+                ],
+                'required' => false,
+                'error_mapping' => [
+                    '.' => 'second' // target the second (repeated) field for non-matching error
+                ]
             ])
             ->add('samples', ChoiceType::class, [
                 'expanded' => true,
@@ -251,11 +264,16 @@ class OrderController extends AbstractController
             $orderData = ['type' => null];
             if ($request->request->has('existing')) {
                 if (empty($confirmForm['kitId']->getData())) {
-                    $confirmForm['kitId']->addError(new FormError('Please enter a kit order ID'));
+                    $confirmForm['kitId']['first']->addError(new FormError('Please enter a kit order ID'));
                 } else {
-                    $orderData['order_id'] = $confirmForm['kitId']->getData();
-                    $orderData['mayo_id'] = $confirmForm['kitId']->getData();
-                    $orderData['type'] = 'kit';
+                    $existing = $app['em']->getRepository('orders')->fetchOneBy(['order_id' => $confirmForm['kitId']->getData()]);
+                    if ($existing) {
+                        $confirmForm['kitId']['first']->addError(new FormError('This order ID already exists'));
+                    } else {
+                        $orderData['order_id'] = $confirmForm['kitId']->getData();
+                        $orderData['mayo_id'] = $confirmForm['kitId']->getData();
+                        $orderData['type'] = 'kit';
+                    }
                 }
             } else {
                 $orderData['order_id'] = Util::generateShortUuid();
