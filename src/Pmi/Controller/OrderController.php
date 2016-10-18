@@ -266,9 +266,14 @@ class OrderController extends AbstractController
                 if (empty($confirmForm['kitId']->getData())) {
                     $confirmForm['kitId']['first']->addError(new FormError('Please enter a kit order ID'));
                 } else {
-                    $orderData['order_id'] = $confirmForm['kitId']->getData();
-                    $orderData['mayo_id'] = $confirmForm['kitId']->getData();
-                    $orderData['type'] = 'kit';
+                    $existing = $app['em']->getRepository('orders')->fetchOneBy(['order_id' => $confirmForm['kitId']->getData()]);
+                    if ($existing) {
+                        $confirmForm['kitId']['first']->addError(new FormError('This order ID already exists'));
+                    } else {
+                        $orderData['order_id'] = $confirmForm['kitId']->getData();
+                        $orderData['mayo_id'] = $confirmForm['kitId']->getData();
+                        $orderData['type'] = 'kit';
+                    }
                 }
             } else {
                 $orderData['order_id'] = Util::generateShortUuid();
