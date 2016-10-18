@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
 use Pmi\Mayolink\Order as MayoLinkOrder;
@@ -232,9 +233,18 @@ class OrderController extends AbstractController
             $app->abort(403);
         }
         $confirmForm = $app['form.factory']->createBuilder(FormType::class)
-            ->add('kitId', TextType::class, [
-                'label' => 'Kit order ID',
-                'attr' => ['placeholder' => 'Scan barcode'],
+            ->add('kitId', RepeatedType::class, [
+                'type' => TextType::class,
+                'invalid_message' => 'The kit order ID fields must match.',
+                'first_options' => [
+                    'label' => 'Kit order ID'
+                ],
+                'second_options' => [
+                    'label' => 'Verify kit order ID',
+                ],
+                'options' => [
+                    'attr' => ['placeholder' => 'Scan barcode']
+                ],
                 'required' => false
             ])
             ->add('samples', ChoiceType::class, [
