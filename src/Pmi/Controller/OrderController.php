@@ -245,7 +245,10 @@ class OrderController extends AbstractController
                 'options' => [
                     'attr' => ['placeholder' => 'Scan barcode']
                 ],
-                'required' => false
+                'required' => false,
+                'error_mapping' => [
+                    '.' => 'second' // target the second (repeated) field for non-matching error
+                ]
             ])
             ->add('samples', ChoiceType::class, [
                 'expanded' => true,
@@ -261,7 +264,7 @@ class OrderController extends AbstractController
             $orderData = ['type' => null];
             if ($request->request->has('existing')) {
                 if (empty($confirmForm['kitId']->getData())) {
-                    $confirmForm['kitId']->addError(new FormError('Please enter a kit order ID'));
+                    $confirmForm['kitId']['first']->addError(new FormError('Please enter a kit order ID'));
                 } else {
                     $orderData['order_id'] = $confirmForm['kitId']->getData();
                     $orderData['mayo_id'] = $confirmForm['kitId']->getData();
