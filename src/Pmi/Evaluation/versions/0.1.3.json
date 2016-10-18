@@ -1,0 +1,126 @@
+{
+    "version": "0.1.3",
+    "fields": [
+        {
+            "name": "blood-pressure-location",
+            "label": "Blood Pressure: location",
+            "replicates": 3,
+            "options": ["Right arm", "Left arm"]
+        },
+        {
+            "name": "blood-pressure-systolic",
+            "label": "Blood Pressure: systolic",
+            "unit": "mmHg",
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "max": 180,
+                    "message": "Participant is in a hypertensive crisis. Seek emergency care.",
+                    "alert": true
+                },
+                {
+                    "min": 70,
+                    "message": "Participant is in a hypotensive crisis. Seek emergency care.",
+                    "alert": true
+                }
+            ]
+        },
+        {
+            "name": "blood-pressure-diastolic",
+            "label": "Blood Pressure: diastolic",
+            "unit": "mmHg",
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "max": 110,
+                    "message": "Participant is in a hypertensive crisis. Seek emergency care.",
+                    "alert": true
+                },
+                {
+                    "min": 40,
+                    "message": "Participant is in a hypotensive crisis. Seek emergency care.",
+                    "alert": true
+                }
+            ]
+        },
+        {
+            "name": "heart-rate",
+            "label": "Heart Rate",
+            "unit": "bpm",
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "max": 120,
+                    "message": "Participant is tachycardic and at risk for hypertensive crisis. Seek emergency care.",
+                    "alert": true
+                },
+                {
+                    "min": 50,
+                    "message": "Participant is bradycardic and at risk for hypotensive crisis. Seek emergency care.",
+                    "alert": true
+                }
+            ]
+        },
+        {
+            "name": "height",
+            "label": "Height",
+            "unit": "cm",
+            "image": "height.png",
+            "decimals": 1,
+            "max": 300,
+            "convert": "ftin"
+        },
+        {
+            "name": "weight",
+            "label": "Weight",
+            "unit": "kg",
+            "decimals": 1,
+            "max": 1000,
+            "warnings": [
+                {
+                    "min": 30,
+                    "max": 450,
+                    "message": "Please verify that this weight is correct"
+                }
+            ],
+            "convert": "lb"
+        },
+        {
+            "name": "hip-circumference",
+            "label": "Hip Circumference",
+            "unit": "cm",
+            "image": "hip.png",
+            "decimals": 1,
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "min": 50,
+                    "max": 150,
+                    "message": "Please verify that this circumference is correct"
+                }
+            ],
+            "convert": "in"
+        },
+        {
+            "name": "waist-circumference",
+            "label": "Waist Circumference",
+            "unit": "cm",
+            "image": "waist.png",
+            "decimals": 1,
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "min": 50,
+                    "max": 150,
+                    "message": "Please verify that this circumference is correct"
+                }
+            ],
+            "convert": "in"
+        }
+    ]
+}
