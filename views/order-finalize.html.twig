@@ -5,7 +5,8 @@
 
     {{ form_start(finalizeForm) }}
         {{ form_row(finalizeForm.finalized_ts) }}
-        <div class="form-group{% if not finalizeForm.finalized_ts.vars.valid %} has-error{% endif %}">
+        
+        <div class="form-group{% if not finalizeForm.finalized_samples.vars.valid %} has-error{% endif %}">
             {{ form_label(finalizeForm.finalized_samples) }}
                 <div class="checkbox">
                     <label><input type="checkbox" id="checkall"> <strong>Check all</strong></label>

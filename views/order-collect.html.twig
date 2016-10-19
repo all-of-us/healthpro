@@ -5,7 +5,8 @@
 
     {{ form_start(collectForm) }}
         {{ form_row(collectForm.collected_ts) }}
-        <div class="form-group{% if not collectForm.collected_ts.vars.valid %} has-error{% endif %}">
+
+        <div class="form-group{% if not collectForm.collected_samples.vars.valid %} has-error{% endif %}">
             {{ form_label(collectForm.collected_samples) }}
                 <div class="checkbox">
                     <label><input type="checkbox" id="checkall"> <strong>Check all</strong></label>
