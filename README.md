@@ -1,5 +1,7 @@
 # PMI Provider Portal and Admin Dashboard
 
+![Build Status of master](https://circleci.com/gh/vanderbilt/pmi-drc-hpo.png?circle-token=17ce7a55825cb047e685c2376d7e33441a07c590)
+
 ## Developer Quick Start
 
 Install the [Google App Engine SDK for PHP](https://cloud.google.com/appengine/downloads).
