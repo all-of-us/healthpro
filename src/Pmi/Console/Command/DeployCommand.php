@@ -74,6 +74,12 @@ class DeployCommand extends Command {
                 $appDir
             )
             ->addOption(
+                'phpCgiPath',
+                'c',
+                InputOption::VALUE_OPTIONAL,
+                'Path to the php-cgi binary'
+            )
+            ->addOption(
                 'appId',
                 'i',
                 InputOption::VALUE_OPTIONAL,
@@ -124,6 +130,7 @@ class DeployCommand extends Command {
         $this->local = (boolean) $input->getOption('local');
         $this->port = (integer) $input->getOption('port');
         $this->release = $input->getOption('release');
+        $this->phpCgiPath = $input->getOption('phpCgiPath');
 
         if (!$this->appId && !$this->local) {
             throw new InvalidOptionException('Please specify --appId (-i) or --local');
@@ -184,6 +191,9 @@ class DeployCommand extends Command {
 
         if ($this->local) {
             $cmd = "{$deploy} --port={$this->port} --skip_sdk_update_check=yes";
+            if ($this->phpCgiPath) {
+                $cmd .= " --php_executable_path {$this->phpCgiPath}";
+            }
             if ($dsDir = $input->getOption('datastoreDir')) {
                 $dsDir = rtrim($dsDir, '/');
                 $dsDir .= '/datastore.db';

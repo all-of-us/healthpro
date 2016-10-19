@@ -1,0 +1,6 @@
+dependencies:
+  override:
+    - ./ci/prepare.sh
+test:
+  override:
+    - ./ci/test.sh
