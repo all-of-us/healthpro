@@ -130,7 +130,7 @@ class DeployCommand extends Command {
         $this->local = (boolean) $input->getOption('local');
         $this->port = (integer) $input->getOption('port');
         $this->release = $input->getOption('release');
-	$this->phpCgiPath = $input->getOption('phpCgiPath');
+        $this->phpCgiPath = $input->getOption('phpCgiPath');
 
         if (!$this->appId && !$this->local) {
             throw new InvalidOptionException('Please specify --appId (-i) or --local');
