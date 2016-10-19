@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
 use Pmi\Mayolink\Order as MayoLinkOrder;
@@ -199,7 +200,13 @@ class OrderController extends AbstractController
                 'label' => $tsLabel,
                 'date_widget' => 'single_text',
                 'time_widget' => 'single_text',
-                'required' => false
+                'required' => false,
+                'constraints' => [
+                    new Constraints\LessThanOrEqual([
+                        'value' => new \DateTime(),
+                        'message' => 'Timestamp cannot be in the future'
+                    ])
+                ]
             ])
             ->add("{$set}_samples", ChoiceType::class, [
                 'expanded' => true,
