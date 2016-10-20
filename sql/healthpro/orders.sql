@@ -11,6 +11,7 @@ CREATE TABLE `orders` (
   `collected_notes` text,
   `processed_ts` timestamp NULL DEFAULT NULL,
   `processed_samples` varchar(255) DEFAULT NULL,
+  `processed_samples_ts` VARCHAR(255) NULL DEFAULT NULL,
   `processed_notes` text,
   `finalized_ts` timestamp NULL DEFAULT NULL,
   `finalized_samples` varchar(255) DEFAULT NULL,
