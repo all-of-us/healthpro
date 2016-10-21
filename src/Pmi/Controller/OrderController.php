@@ -84,7 +84,9 @@ class OrderController extends AbstractController
             foreach (self::$samplesRequiringProcessing as $sample) {
                 if (!empty($processedSampleTimes[$sample])) {
                     try {
-                        $formData['processed_samples_ts'][$sample] = new \DateTime('@'.$processedSampleTimes[$sample]);
+                        $sampleTs = new \DateTime();
+                        $sampleTs->setTimestamp($processedSampleTimes[$sample]);
+                        $formData['processed_samples_ts'][$sample] = $sampleTs;
                     } catch (\Exception $e) {
                         $formData['processed_samples_ts'][$sample] = null;
                     }
@@ -266,7 +268,13 @@ class OrderController extends AbstractController
                 'entry_options' => [
                     'date_widget' => 'single_text',
                     'time_widget' => 'single_text',
-                    'label' => false
+                    'label' => false,
+                    'constraints' => [
+                        new Constraints\LessThanOrEqual([
+                            'value' => new \DateTime(),
+                            'message' => 'Timestamp cannot be in the future'
+                        ])
+                    ]
                 ],
                 'required' => false
             ]);
