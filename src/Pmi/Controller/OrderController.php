@@ -63,10 +63,12 @@ class OrderController extends AbstractController
         if ($this->order["{$set}_notes"]) {
             $formData["{$set}_notes"] = $this->order["{$set}_notes"];
         };
-        if ($this->order["{$set}_ts"]) {
-            $formData["{$set}_ts"] = new \DateTime($this->order["{$set}_ts"]);
-        } else {
-            $formData["{$set}_ts"] = new \DateTime();
+        if ($set != 'processed') {
+            if ($this->order["{$set}_ts"]) {
+                $formData["{$set}_ts"] = new \DateTime($this->order["{$set}_ts"]);
+            } else {
+                $formData["{$set}_ts"] = new \DateTime();
+            }
         }
         if ($this->order["{$set}_samples"]) {
             $samples = json_decode($this->order["{$set}_samples"]);
@@ -103,10 +105,12 @@ class OrderController extends AbstractController
         } else {
             $updateArray["{$set}_notes"] = null;
         }
-        if ($formData["{$set}_ts"]) {
-            $updateArray["{$set}_ts"] = $formData["{$set}_ts"]->format('Y-m-d H:i:s');
-        } else {
-            $updateArray["{$set}_ts"] = null;
+        if ($set != 'processed') {
+            if ($formData["{$set}_ts"]) {
+                $updateArray["{$set}_ts"] = $formData["{$set}_ts"]->format('Y-m-d H:i:s');
+            } else {
+                $updateArray["{$set}_ts"] = null;
+            }
         }
         $hasSampleArray = $formData["{$set}_samples"] && is_array($formData["{$set}_samples"]);
         if ($hasSampleArray) {
@@ -222,8 +226,9 @@ class OrderController extends AbstractController
             $samples = $this->getRequestedSamples();
         }
         $enabledSamples = $this->getEnabledSamples($set);
-        $formBuilder = $formFactory->createBuilder(FormType::class, $formData)
-            ->add("{$set}_ts", Type\DateTimeType::class, [
+        $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
+        if ($set != 'processed') {
+            $formBuilder->add("{$set}_ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
                 'date_widget' => 'single_text',
                 'time_widget' => 'single_text',
@@ -234,8 +239,9 @@ class OrderController extends AbstractController
                         'message' => 'Timestamp cannot be in the future'
                     ])
                 ]
-            ])
-            ->add("{$set}_samples", Type\ChoiceType::class, [
+            ]);
+        }
+        $formBuilder->add("{$set}_samples", Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => $samplesLabel,
@@ -491,15 +497,27 @@ class OrderController extends AbstractController
         $processForm = $this->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
         if ($processForm->isValid()) {
-            $updateArray = $this->getOrderUpdateFromForm('processed', $processForm);
-            if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                $app->log(Log::ORDER_EDIT, $orderId);
-                $app->addFlashNotice('Order processing updated');
+            $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
+            foreach ($processForm->get('processed_samples')->getData() as $sample) {
+                if (empty($processedSampleTimes[$sample])) {
+                    $processForm->get('processed_samples')->addError(new FormError('Please specify time of blood processing completion for each sample'));
+                    break;
+                }
+            }
+            if ($processForm->isValid()) {
+                $updateArray = $this->getOrderUpdateFromForm('processed', $processForm);
+                if (!$this->order['processed_ts']) {
+                    $updateArray['processed_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
+                }
+                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                    $app->log(Log::ORDER_EDIT, $orderId);
+                    $app->addFlashNotice('Order processing updated');
 
-                return $app->redirectToRoute('orderProcess', [
-                    'participantId' => $this->participant->id,
-                    'orderId' => $orderId
-                ]);
+                    return $app->redirectToRoute('orderProcess', [
+                        'participantId' => $this->participant->id,
+                        'orderId' => $orderId
+                    ]);
+                }
             }
         }
 
