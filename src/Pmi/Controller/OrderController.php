@@ -66,8 +66,6 @@ class OrderController extends AbstractController
         if ($set != 'processed') {
             if ($this->order["{$set}_ts"]) {
                 $formData["{$set}_ts"] = new \DateTime($this->order["{$set}_ts"]);
-            } else {
-                $formData["{$set}_ts"] = new \DateTime();
             }
         }
         if ($this->order["{$set}_samples"]) {
@@ -109,6 +107,8 @@ class OrderController extends AbstractController
         }
         if ($set != 'processed') {
             if ($formData["{$set}_ts"]) {
+                // TODO: system setting for db timezone
+                $formData["{$set}_ts"]->setTimezone(new \DateTimeZone('America/Chicago'));
                 $updateArray["{$set}_ts"] = $formData["{$set}_ts"]->format('Y-m-d H:i:s');
             } else {
                 $updateArray["{$set}_ts"] = null;
@@ -129,6 +129,7 @@ class OrderController extends AbstractController
                         $processedSampleTimes[$sample] = $dateTime->getTimestamp();
                     }
                 }
+                //print_r($processedSampleTimes);exit;
                 $updateArray['processed_samples_ts'] = json_encode($processedSampleTimes);
             } else {
                 $updateArray['processed_samples_ts'] = json_encode([]);
@@ -232,8 +233,8 @@ class OrderController extends AbstractController
         if ($set != 'processed') {
             $formBuilder->add("{$set}_ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
-                'date_widget' => 'single_text',
-                'time_widget' => 'single_text',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy h:mm a',
                 'required' => false,
                 'constraints' => [
                     new Constraints\LessThanOrEqual([
@@ -268,6 +269,8 @@ class OrderController extends AbstractController
                 'entry_options' => [
                     'date_widget' => 'single_text',
                     'time_widget' => 'single_text',
+                    'widget' => 'single_text',
+                    'format' => 'M/d/yyyy h:mm a',
                     'label' => false,
                     'constraints' => [
                         new Constraints\LessThanOrEqual([

@@ -28,8 +28,15 @@ $(document).ready(function () {
         }
         var checkBoxDiv = $(this).closest('div.checkbox');
         var sample = $(this).val();
-        $('#form_processed_samples_ts_' + sample).closest('.form-group').detach().appendTo(checkBoxDiv).css('margin', '5px 0 10px 17px');
-        $('#form_processed_samples_ts_' + sample + ' input').addClass('input-sm');
+        $('#form_processed_samples_ts_' + sample).closest('.form-group')
+            .detach()
+            .appendTo(checkBoxDiv)
+            .css('margin', '5px 0 15px 20px');
+        $('#form_processed_samples_ts_' + sample)
+            .addClass('input-sm')
+            .datetimepicker({
+                sideBySide: true
+            });
     });
     $('#form_processed_samples_ts').remove();
 });
