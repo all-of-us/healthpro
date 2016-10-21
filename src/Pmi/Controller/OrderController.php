@@ -129,7 +129,6 @@ class OrderController extends AbstractController
                         $processedSampleTimes[$sample] = $dateTime->getTimestamp();
                     }
                 }
-                //print_r($processedSampleTimes);exit;
                 $updateArray['processed_samples_ts'] = json_encode($processedSampleTimes);
             } else {
                 $updateArray['processed_samples_ts'] = json_encode([]);
