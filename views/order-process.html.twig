@@ -34,9 +34,7 @@ $(document).ready(function () {
             .css('margin', '5px 0 15px 20px');
         $('#form_processed_samples_ts_' + sample)
             .addClass('input-sm')
-            .datetimepicker({
-                sideBySide: true
-            });
+            .datetimepicker(PMI.datetimepickerDefaults);
     });
     $('#form_processed_samples_ts').remove();
 });

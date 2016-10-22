@@ -112,4 +112,12 @@ $(document).ready(function()
         }, 250));
     };
     $('.row-equal-height').equalizePanelHeight();
+
+    PMI.datetimepickerDefaults = {
+        toolbarPlacement: 'top',
+        sideBySide: true,
+        showTodayButton: true,
+        showClear: true,
+        showClose: true
+    };
 });
