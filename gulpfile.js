@@ -17,7 +17,7 @@ var ASSETS = {
     'css': [
         BOWER_DIR + '/bootstrap/dist/css/bootstrap.min.css',
         BOWER_DIR + '/font-awesome/css/font-awesome.min.css',
-        BOWER_DIR + 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css'
+        BOWER_DIR + '/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css'
     ],
     'csslocal': [
         ASSETS_DIR + '/css/app.css'
