@@ -13,7 +13,7 @@ class RdrMetrics
     public function metrics($metric, $bucket)
     {
         $client = $this->rdrHelper->getClient();
-        $response = $client->request('POST', 'rdr/v1/metrics', [
+        $response = $client->request('POST', 'rdr/v1/Metrics', [
             'json' => [
                 'metric' => $metric,
                 'bucket_by' => $bucket
