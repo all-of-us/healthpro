@@ -8,7 +8,7 @@ class RdrParticipants
 {
     protected $rdrHelper;
     protected $client;
-    protected static $resourceEndpoint = 'participant/v1/';
+    protected static $resourceEndpoint = 'rdr/v1/';
 
     public function __construct(RdrHelper $rdrHelper)
     {
@@ -89,10 +89,11 @@ class RdrParticipants
     {
         $query = $this->paramsToQuery($params);
         try {
-            $response = $this->getClient()->request('GET', 'participants', [
+            $response = $this->getClient()->request('GET', 'Participant', [
                 'query' => $query
             ]);
         } catch (\Exception $e) {
+            throw $e;
             throw new Exception\FailedRequestException();
         }
         $responseObject = json_decode($response->getBody()->getContents());
@@ -120,7 +121,7 @@ class RdrParticipants
         $participant = $memcache->get($memcacheKey);
         if (!$participant) {
             try {
-                $response = $this->getClient()->request('GET', "participants/{$id}");
+                $response = $this->getClient()->request('GET', "Participant/{$id}");
                 $participant = json_decode($response->getBody()->getContents());
                 $memcache->set($memcacheKey, $participant, 0, 300);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
@@ -137,7 +138,7 @@ class RdrParticipants
             $participant['date_of_birth'] = $dt->format('Y-m-d');
         }
         try {
-            $response = $this->getClient()->request('POST', 'participants', [
+            $response = $this->getClient()->request('POST', 'Participant', [
                 'json' => $participant
             ]);
             $result = json_decode($response->getBody()->getContents());
@@ -153,7 +154,7 @@ class RdrParticipants
     public function getEvaluation($participantId, $evaluationId)
     {
         try {
-            $response = $this->getClient()->request('GET', "participants/{$participantId}/evaluation/{$evaluationId}");
+            $response = $this->getClient()->request('GET', "Participant/{$participantId}/PhysicalEvaluation/{$evaluationId}");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;
@@ -167,7 +168,7 @@ class RdrParticipants
     public function createEvaluation($participantId, $evaluation)
     {
         try {
-            $response = $this->getClient()->request('POST', "participants/{$participantId}/evaluation", [
+            $response = $this->getClient()->request('POST', "Participant/{$participantId}/PhysicalEvaluation", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
@@ -183,7 +184,7 @@ class RdrParticipants
     public function updateEvaluation($participantId, $evaluationId, $evaluation)
     {
         try {
-            $response = $this->getClient()->request('PUT', "participants/{$participantId}/evaluation/{$evaluationId}", [
+            $response = $this->getClient()->request('PUT', "Participant/{$participantId}/PhysicalEvaluation/{$evaluationId}", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
