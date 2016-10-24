@@ -4,13 +4,8 @@ namespace Pmi\Controller;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
@@ -68,15 +63,34 @@ class OrderController extends AbstractController
         if ($this->order["{$set}_notes"]) {
             $formData["{$set}_notes"] = $this->order["{$set}_notes"];
         };
-        if ($this->order["{$set}_ts"]) {
-            $formData["{$set}_ts"] = new \DateTime($this->order["{$set}_ts"]);
-        } else {
-            $formData["{$set}_ts"] = new \DateTime();
+        if ($set != 'processed') {
+            if ($this->order["{$set}_ts"]) {
+                $formData["{$set}_ts"] = new \DateTime($this->order["{$set}_ts"]);
+            }
         }
         if ($this->order["{$set}_samples"]) {
             $samples = json_decode($this->order["{$set}_samples"]);
             if (is_array($samples) && count($samples) > 0) {
                 $formData["{$set}_samples"] = $samples;
+            }
+        }
+        if ($set == 'processed') {
+            $processedSampleTimes = [];
+            if (isset($this->order['processed_samples_ts'])) {
+                $processedSampleTimes = json_decode($this->order['processed_samples_ts'], true);
+            }
+            foreach (self::$samplesRequiringProcessing as $sample) {
+                if (!empty($processedSampleTimes[$sample])) {
+                    try {
+                        $sampleTs = new \DateTime();
+                        $sampleTs->setTimestamp($processedSampleTimes[$sample]);
+                        $formData['processed_samples_ts'][$sample] = $sampleTs;
+                    } catch (\Exception $e) {
+                        $formData['processed_samples_ts'][$sample] = null;
+                    }
+                } else {
+                    $formData['processed_samples_ts'][$sample] = null;
+                }
             }
         }
         return $formData;
@@ -91,15 +105,34 @@ class OrderController extends AbstractController
         } else {
             $updateArray["{$set}_notes"] = null;
         }
-        if ($formData["{$set}_ts"]) {
-            $updateArray["{$set}_ts"] = $formData["{$set}_ts"]->format('Y-m-d H:i:s');
-        } else {
-            $updateArray["{$set}_ts"] = null;
+        if ($set != 'processed') {
+            if ($formData["{$set}_ts"]) {
+                // TODO: system setting for db timezone
+                $formData["{$set}_ts"]->setTimezone(new \DateTimeZone('America/Chicago'));
+                $updateArray["{$set}_ts"] = $formData["{$set}_ts"]->format('Y-m-d H:i:s');
+            } else {
+                $updateArray["{$set}_ts"] = null;
+            }
         }
-        if ($formData["{$set}_samples"] && is_array($formData["{$set}_samples"])) {
+        $hasSampleArray = $formData["{$set}_samples"] && is_array($formData["{$set}_samples"]);
+        if ($hasSampleArray) {
             $updateArray["{$set}_samples"] = json_encode(array_values($formData["{$set}_samples"]));
         } else {
             $updateArray["{$set}_samples"] = json_encode([]);
+        }
+        if ($set == 'processed') {
+            $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
+            if ($hasSampleArray && $hasSampleTimeArray) {
+                $processedSampleTimes = [];
+                foreach ($formData['processed_samples_ts'] as $sample => $dateTime) {
+                    if ($dateTime && in_array($sample, $formData["{$set}_samples"])) {
+                        $processedSampleTimes[$sample] = $dateTime->getTimestamp();
+                    }
+                }
+                $updateArray['processed_samples_ts'] = json_encode($processedSampleTimes);
+            } else {
+                $updateArray['processed_samples_ts'] = json_encode([]);
+            }
         }
         return $updateArray;
     }
@@ -195,11 +228,12 @@ class OrderController extends AbstractController
             $samples = $this->getRequestedSamples();
         }
         $enabledSamples = $this->getEnabledSamples($set);
-        $form = $formFactory->createBuilder(FormType::class, $formData)
-            ->add("{$set}_ts", DateTimeType::class, [
+        $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
+        if ($set != 'processed') {
+            $formBuilder->add("{$set}_ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
-                'date_widget' => 'single_text',
-                'time_widget' => 'single_text',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy h:mm a',
                 'required' => false,
                 'constraints' => [
                     new Constraints\LessThanOrEqual([
@@ -207,8 +241,9 @@ class OrderController extends AbstractController
                         'message' => 'Timestamp cannot be in the future'
                     ])
                 ]
-            ])
-            ->add("{$set}_samples", ChoiceType::class, [
+            ]);
+        }
+        $formBuilder->add("{$set}_samples", Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => $samplesLabel,
@@ -222,11 +257,31 @@ class OrderController extends AbstractController
                     }
                 }
             ])
-            ->add("{$set}_notes", TextareaType::class, [
+            ->add("{$set}_notes", Type\TextareaType::class, [
                 'label' => $notesLabel,
                 'required' => false
-            ])
-            ->getForm();
+            ]);
+        if ($set == 'processed') {
+            $formBuilder->add('processed_samples_ts', Type\CollectionType::class, [
+                'entry_type' => Type\DateTimeType::class,
+                'label' => false,
+                'entry_options' => [
+                    'date_widget' => 'single_text',
+                    'time_widget' => 'single_text',
+                    'widget' => 'single_text',
+                    'format' => 'M/d/yyyy h:mm a',
+                    'label' => false,
+                    'constraints' => [
+                        new Constraints\LessThanOrEqual([
+                            'value' => new \DateTime(),
+                            'message' => 'Timestamp cannot be in the future'
+                        ])
+                    ]
+                ],
+                'required' => false
+            ]);
+        }
+        $form = $formBuilder->getForm();
         return $form;
     }
 
@@ -240,8 +295,8 @@ class OrderController extends AbstractController
             $app->abort(403);
         }
         $confirmForm = $app['form.factory']->createBuilder(FormType::class)
-            ->add('kitId', RepeatedType::class, [
-                'type' => TextType::class,
+            ->add('kitId', Type\RepeatedType::class, [
+                'type' => Type\TextType::class,
                 'invalid_message' => 'The kit order ID fields must match.',
                 'first_options' => [
                     'label' => 'Kit order ID'
@@ -257,7 +312,7 @@ class OrderController extends AbstractController
                     '.' => 'second' // target the second (repeated) field for non-matching error
                 ]
             ])
-            ->add('samples', ChoiceType::class, [
+            ->add('samples', Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Select requested samples',
@@ -452,15 +507,27 @@ class OrderController extends AbstractController
         $processForm = $this->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
         if ($processForm->isValid()) {
-            $updateArray = $this->getOrderUpdateFromForm('processed', $processForm);
-            if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                $app->log(Log::ORDER_EDIT, $orderId);
-                $app->addFlashNotice('Order processing updated');
+            $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
+            foreach ($processForm->get('processed_samples')->getData() as $sample) {
+                if (empty($processedSampleTimes[$sample])) {
+                    $processForm->get('processed_samples')->addError(new FormError('Please specify time of blood processing completion for each sample'));
+                    break;
+                }
+            }
+            if ($processForm->isValid()) {
+                $updateArray = $this->getOrderUpdateFromForm('processed', $processForm);
+                if (!$this->order['processed_ts']) {
+                    $updateArray['processed_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
+                }
+                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                    $app->log(Log::ORDER_EDIT, $orderId);
+                    $app->addFlashNotice('Order processing updated');
 
-                return $app->redirectToRoute('orderProcess', [
-                    'participantId' => $this->participant->id,
-                    'orderId' => $orderId
-                ]);
+                    return $app->redirectToRoute('orderProcess', [
+                        'participantId' => $this->participant->id,
+                        'orderId' => $orderId
+                    ]);
+                }
             }
         }
 

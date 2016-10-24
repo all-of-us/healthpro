@@ -36,6 +36,7 @@ $(document).ready(function () {
     $('#checkall').on('change', function() {
         $('#form_finalized_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
     });
+    $('#form_finalized_ts').datetimepicker(PMI.datetimepickerDefaults);
 });
 </script>
 {% endblock %}
