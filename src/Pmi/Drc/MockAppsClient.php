@@ -24,14 +24,23 @@ class MockAppsClient
     
     public function getGroups($userEmail = null)
     {
-        // when using gaBypass in dev, use fixtures
+        // use fixtures when using gaBypass in dev
         if ($userEmail && !self::$app['isUnitTest'] && empty(self::$groups[$userEmail])) {
-            self::setGroups($userEmail, [
-                new Group(['email' => User::SITE_PREFIX . 'hogwarts@pmi-ops.io', 'name' => 'Hogwarts']),
-                new Group(['email' => User::SITE_PREFIX . 'durmstrang@pmi-ops.io', 'name' => 'Durmstrang']),
-                new Group(['email' => User::SITE_PREFIX . 'beauxbatons@pmi-ops.io', 'name' => 'Beauxbatons']),
-                new Group(['email' => User::DASHBOARD_GROUP . '@pmi-ops.io', 'name' => 'Admin Dashboard'])
-            ]);
+            if (is_array(self::$app->getConfig('gaByassGroups'))) {
+                $groups = [];
+                foreach (self::$app->getConfig('gaByassGroups') as $arr) {
+                    $groups[] = new Group($arr);
+                }
+                
+            } else {
+                $groups = [
+                    new Group(['email' => User::SITE_PREFIX . 'hogwarts@pmi-ops.io', 'name' => 'Hogwarts']),
+                    new Group(['email' => User::SITE_PREFIX . 'durmstrang@pmi-ops.io', 'name' => 'Durmstrang']),
+                    new Group(['email' => User::SITE_PREFIX . 'beauxbatons@pmi-ops.io', 'name' => 'Beauxbatons']),
+                    new Group(['email' => User::DASHBOARD_GROUP . '@pmi-ops.io', 'name' => 'Admin Dashboard'])
+                ];
+            }
+            self::setGroups($userEmail, $groups);
         }
         
         return isset(self::$groups[$userEmail]) ? self::$groups[$userEmail] : [];
