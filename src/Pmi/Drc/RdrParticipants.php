@@ -93,7 +93,6 @@ class RdrParticipants
                 'query' => $query
             ]);
         } catch (\Exception $e) {
-            throw $e;
             throw new Exception\FailedRequestException();
         }
         $responseObject = json_decode($response->getBody()->getContents());
