@@ -12,15 +12,13 @@ class User implements UserInterface
     private $groups;
     private $sites;
     private $dashboardAccess;
-    private $bypassGroupsAuth = false;
     
-    public function __construct($googleUser, array $groups, $bypassGroupsAuth = false)
+    public function __construct($googleUser, array $groups)
     {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
         $this->sites = $this->computeSites();
         $this->dashboardAccess = $this->computeDashboardAccess();
-        $this->bypassGroupsAuth = $bypassGroupsAuth;
     }
     
     public function getGroups()
@@ -93,18 +91,14 @@ class User implements UserInterface
     
     public function getRoles()
     {
-        if ($this->bypassGroupsAuth) {
-            return ['ROLE_USER', 'ROLE_DASHBOARD'];
-        } else {
-            $roles = [];
-            if (count($this->sites) > 0) {
-                $roles[] = 'ROLE_USER';
-            }
-            if ($this->dashboardAccess) {
-                $roles[] = 'ROLE_DASHBOARD';
-            }
-            return $roles;
+        $roles = [];
+        if (count($this->sites) > 0) {
+            $roles[] = 'ROLE_USER';
         }
+        if ($this->dashboardAccess) {
+            $roles[] = 'ROLE_DASHBOARD';
+        }
+        return $roles;
     }
     
     public function getPassword()
