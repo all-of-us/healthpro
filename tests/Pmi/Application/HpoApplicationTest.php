@@ -208,4 +208,13 @@ class HpoApplicationTest extends AbstractWebTestCase
         $crawler = $client->request('GET', '/participants');
         $this->assertSame($groupEmail, $this->app->getSite()->email);
     }
+
+    public function testHeaders()
+    {
+        $client = $this->createClient();
+        $client->followRedirects();
+        $crawler = $client->request('GET', '/');
+        $xframeOptions = $client->getResponse()->headers->get('X-Frame-Options');
+        $this->assertSame('SAMEORIGIN', $xframeOptions);
+    }
 }
