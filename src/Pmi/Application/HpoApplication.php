@@ -174,6 +174,7 @@ class HpoApplication extends AbstractApplication
 
         // whitelist content that the client is allowed to request
         $whitelist =  "default-src 'self'"
+            . " 'unsafe-eval'" // required for setTimeout and setInterval
             . " 'unsafe-inline'"; // for the places we are using inline JS
 
         $response->headers->set('Content-Security-Policy', $whitelist);
