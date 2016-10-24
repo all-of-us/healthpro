@@ -38,7 +38,7 @@ class HpoApplication extends AbstractApplication
         }
 
         $this['pmi.drc.appsclient'] = $this['isUnitTest'] ?
-            new \Tests\Pmi\Drc\AppsClient() : \Pmi\Drc\AppsClient::createFromApp($this);
+             \Pmi\Drc\MockAppsClient::createFromApp($this) : \Pmi\Drc\AppsClient::createFromApp($this);
 
         $this->registerDb();
         return $this;

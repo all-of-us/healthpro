@@ -1,9 +1,9 @@
 <?php
+use Pmi\Drc\MockAppsClient as AppsClient;
 use Pmi\Security\User;
 use Tests\Pmi\AbstractWebTestCase;
 use Tests\Pmi\GoogleGroup;
 use Tests\Pmi\GoogleUserService;
-use Tests\Pmi\Drc\AppsClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

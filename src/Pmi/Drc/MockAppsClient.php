@@ -1,10 +1,19 @@
 <?php
-namespace Tests\Pmi\Drc;
+namespace Pmi\Drc;
 
-/** Provides fixtures for unit tests to simulate the Google API. */
-class AppsClient
+use Pmi\Application\HpoApplication;
+
+/**
+ * Facilitates fixtures for unit tests and gaBypass to simulate the Google API.
+ */
+class MockAppsClient
 {
     public static $groups = [];
+    
+    public static function createFromApp(HpoApplication $app)
+    {
+        return new MockAppsClient();
+    }
     
     public function getGroups($userEmail = null)
     {
