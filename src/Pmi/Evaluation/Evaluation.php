@@ -41,7 +41,7 @@ class Evaluation
         if (!empty($array['finalized_ts'])) {
             $this->locked = true;
         }
-        $this->participant = strtoupper(Util::shortenUuid($array['participant_id']));
+        $this->participant = $array['participant_id'];
         $this->loadSchema();
         $this->normalizeData();
     }
