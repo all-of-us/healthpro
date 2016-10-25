@@ -18,7 +18,8 @@ mysql_host: 127.0.0.1
 
 # RDR API
 #   Note: Store service account key in rdr_key.json
-rdr_endpoint: https://pmi-rdr-api-test.appspot.com/_ah/api/
+# Override API endpoint if necessary
+# rdr_endpoint: https://pmi-drc-api-test.appspot.com/
 
 # MayoLINK configuration
 # Specify mock order ID to skip order creation in MayoLINK
