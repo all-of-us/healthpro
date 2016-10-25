@@ -1,12 +1,12 @@
 <?php
 
+use Pmi\Drc\MockAppsClient as AppsClient;
 use Pmi\Security\GoogleGroupsAuthenticator;
 use Pmi\Security\UserProvider;
 use Pmi\Security\User;
 use Tests\Pmi\AbstractWebTestCase;
 use Tests\Pmi\GoogleGroup;
 use Tests\Pmi\GoogleUserService;
-use Tests\Pmi\Drc\AppsClient;
 
 class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
 {

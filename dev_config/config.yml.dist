@@ -30,6 +30,16 @@ ml_mock_order: pmitest
 # Google Apps configuration
 # Bypass Google Apps auth
 gaBypass: 1
+# Google Groups to use when bypassing Google Apps auth
+gaByassGroups:
+  - email: hpo-site-hogwarts@pmi-ops.io
+    name: Hogwarts
+  - email: hpo-site-durmstrang@pmi-ops.io
+    name: Durmstrang
+  - email: hpo-site-beauxbatons@pmi-ops.io
+    name: Beauxbatons
+  - email: admin-dashboard@pmi-ops.io
+    name: Admin Dashboard
 # Or, configure Google Apps auth
 #   Note: Store service account key in googleapps_key.json
 gaApplicationName: PMI DRC HPO

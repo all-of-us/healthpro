@@ -37,8 +37,8 @@ class HpoApplication extends AbstractApplication
             $this['pmi.drc.participants'] = new \Pmi\Drc\RdrParticipants($this['pmi.drc.rdrhelper']);
         }
 
-        $this['pmi.drc.appsclient'] = $this['isUnitTest'] ?
-            new \Tests\Pmi\Drc\AppsClient() : \Pmi\Drc\AppsClient::createFromApp($this);
+        $this['pmi.drc.appsclient'] = (!$this->isProd() && ($this['isUnitTest'] || $this->getConfig('gaBypass'))) ?
+             \Pmi\Drc\MockAppsClient::createFromApp($this) : \Pmi\Drc\AppsClient::createFromApp($this);
 
         $this->registerDb();
         return $this;
