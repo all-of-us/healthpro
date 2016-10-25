@@ -171,11 +171,15 @@ class Fhir
         );
     }
 
-    protected function heartrate()
+    /*
+     * Heart rate was made a replicate metric starting in 0.1.3
+     * this method is backwards compatible to handle both
+     */
+    protected function heartrate($replicate = null)
     {
         return $this->simpleMetric(
-            'heart-rate',
-            $this->data->{'heart-rate'},
+            is_null($replicate) ? 'heart-rate' : 'heart-rate-' . $replicate,
+            is_null($replicate) ? $this->data->{'heart-rate'} : $this->data->{'heart-rate'}[$replicate - 1],
             'Heart rate',
             '8867-4',
             '/min'
