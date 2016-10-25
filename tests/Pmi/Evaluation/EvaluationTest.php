@@ -52,10 +52,17 @@ class EvaluationTest extends AbstractWebTestCase
         $composition = array_shift($entries);
         $this->assertSame('Composition', $composition['resource']['resourceType']);
         $this->assertSame("Patient/P10000001", $composition['resource']['subject']['reference']);
+        $this->assertTrue(is_array($composition['resource']['section'][0]['entry']));
+        $references = [];
+        foreach ($composition['resource']['section'][0]['entry'] as $refEntry) {
+            $references[] = $refEntry['reference'];
+        }
+        $this->assertSame(6, count($references));
 
         $this->assertSame(6, count($entries));
         for ($i=0; $i<3; $i++) {
             $r = $i+1;
+            $this->assertSame($references[$i], $entries[$i]['fullUrl']);
             $this->assertSame([
                 'coding' => [[
                     'code' => '8867-4',
