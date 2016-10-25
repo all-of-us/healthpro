@@ -56,6 +56,7 @@ class EvaluationTest extends AbstractWebTestCase
         $references = [];
         foreach ($composition['resource']['section'][0]['entry'] as $refEntry) {
             $references[] = $refEntry['reference'];
+            $this->assertRegExp('/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i', $refEntry['reference']);
         }
         $this->assertSame(6, count($references));
 
