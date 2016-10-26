@@ -1,6 +1,8 @@
 <?php
 namespace Pmi\Evaluation;
 
+use Pmi\Util;
+
 class Fhir
 {
     protected $data;
@@ -8,7 +10,7 @@ class Fhir
     protected $patient;
     protected $version;
     protected $date;
-    protected $metrics;
+    protected $metricUrns;
 
     public function __construct(array $options)
     {
@@ -16,7 +18,7 @@ class Fhir
         $this->schema = $options['schema'];
         $this->patient = $options['patient'];
         $this->version = $options['version'];
-        $this->metrics = $this->getMetrics();
+        $this->metricUrns = $this->getMetricUrns();
         // Convert DateTime object to UTC timestamp
         // (can't use 'c' ISO 8601 format because that results in +00:00 instead of Z)
         $date = clone $options['datetime'];
@@ -25,9 +27,10 @@ class Fhir
     }
 
     /*
-     * Determines which metrics have values to represent
+     * Determines which metrics have values to represent and generates
+     * URNs for each
      */
-    protected function getMetrics()
+    protected function getMetricUrns()
     {
         $metrics = [];
         foreach ($this->schema->fields as $field) {
@@ -69,17 +72,24 @@ class Fhir
             }
         }
         $metrics = array_values($metrics);
-        return $metrics;
+
+        // set urns
+        $metricUrns = [];
+        foreach ($metrics as $metric) {
+            $uuid = Util::generateUuid();
+            $metricUrns[$metric] = "urn:uuid:{$uuid}";
+        }
+        return $metricUrns;
     }
 
     protected function getComposition()
     {
         $references = [];
-        foreach ($this->metrics as $metric) {
-            $references[] = ['reference' => 'urn:example:' . $metric];
+        foreach ($this->metricUrns as $metric => $urn) {
+            $references[] = ['reference' => $urn];
         }
         return [
-            'fullUrl' => 'urn:example:report',
+            'fullUrl' => 'urn:uuid:' . Util::generateUuid(),
             'resource' => [
                 'author' => [['display' => 'N/A']],
                 'date' => $this->date,
@@ -107,7 +117,7 @@ class Fhir
     protected function simpleMetric($metric, $value, $display, $loinc, $unit)
     {
         return [
-            'fullUrl' => 'urn:example:' . $metric,
+            'fullUrl' => $this->metricUrns[$metric],
             'resource' => [
                 'code' => [
                     'coding' => [[
@@ -265,7 +275,7 @@ class Fhir
     protected function bloodpressure($replicate)
     {
         return [
-            'fullUrl' => 'urn:example:blood-pressure-' . $replicate,
+            'fullUrl' => $this->metricUrns['blood-pressure-' . $replicate],
             'resource' => [
                 'bodySite' => $this->getBpBodySite($replicate),
                 'code' => [
@@ -316,7 +326,7 @@ class Fhir
         $fhir->resourceType = 'Bundle';
         $fhir->type = 'document';
         $fhir->entry[] = $this->getComposition();
-        foreach ($this->metrics as $metric) {
+        foreach ($this->metricUrns as $metric => $uuid) {
             if ($entry = $this->getEntry($metric)) {
                 $fhir->entry[] = $entry;
             }
