@@ -174,12 +174,8 @@ class HpoApplication extends AbstractApplication
 
         // whitelist content that the client is allowed to request
         $whitelist =  "default-src 'self'"
-            . " 'unsafe-inline'" // for the places we are using inline JS
-            . ' *.googleapis.com'
-            . ' *.gstatic.com'
-            . ' *.google-analytics.com'
-            . ' *.google.com' // reCAPTCHA
-            . ' *.youtube.com';
+            . " 'unsafe-eval'" // required for setTimeout and setInterval
+            . " 'unsafe-inline'"; // for the places we are using inline JS
 
         $response->headers->set('Content-Security-Policy', $whitelist);
 
@@ -238,6 +234,11 @@ class HpoApplication extends AbstractApplication
                 return $this->forwardToRoute('selectSite', $request);
             }
         }
+    }
+
+    protected function afterCallback(Request $request, Response $response)
+    {
+        $this->setHeaders($response);
     }
     
     protected function finishCallback(Request $request, Response $response)
