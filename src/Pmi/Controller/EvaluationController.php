@@ -14,12 +14,16 @@ class EvaluationController extends AbstractController
             'method' => 'GET|POST',
             'defaults' => ['evalId' => null]
         ]],
-        ['evaluationFhir', '/participant/{participantId}/eval/{evalId}/fhir.json']
+        ['evaluationFhir', '/participant/{participantId}/eval/{evalId}/fhir.json'],
+        ['evaluationRdr', '/participant/{participantId}/eval/{evalId}/rdr.json']
     ];
 
-    /* For debugging */
-    public function evaluationFhirAction($participantId, $evalId, Application $app, Request $request)
+    /* For debugging generated FHIR bundle - only allowed in dev */
+    public function evaluationFhirAction($participantId, $evalId, Application $app)
     {
+        if (!$app->isDev()) {
+            $app->abort(404);
+        }
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
@@ -41,8 +45,35 @@ class EvaluationController extends AbstractController
         return $app->json($evaluationService->getFhir($date));
     }
 
+    /* For debugging evaluation object pushed to RDR - only allowed in dev */
+    public function evaluationRdrAction($participantId, $evalId, Application $app)
+    {
+        if (!$app->isDev()) {
+            $app->abort(404);
+        }
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
+            'id' => $evalId,
+            'participant_id' => $participantId
+        ]);
+        if (!$evaluation) {
+            $app->abort(404);
+        }
+        if (!$evaluation['rdr_id']) {
+            $app->abort(500, 'rdr_id is not set');
+        }
+        $rdrEvaluation = $app['pmi.drc.participants']->getEvaluation($participantId, $evaluation['rdr_id']);
+        return $app->json($rdrEvaluation);
+    }
+
     public function evaluationAction($participantId, $evalId, Application $app, Request $request)
     {
+        if (!$app->isDev()) {
+            $app->abort(404);
+        }
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
