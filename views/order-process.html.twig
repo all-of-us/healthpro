@@ -2,9 +2,24 @@
 {% block title %}Process - Order {{ order.id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'process' } %}
-
     {{ form_start(processForm) }}
-        {{ form_widget(processForm) }}
+    {# {{ form_widget(processForm) }} #}
+
+    <div class="form-group">
+        {{ form_label(processForm.processed_samples) }}
+        <span class="toggle-help-image" data-caption="Processed samples help text placeholder.">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
+        {{ form_widget(processForm.processed_samples) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(processForm.processed_notes) }}
+        <span class="toggle-help-image" data-caption="Processed notes help text placeholder.">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
+        {{ form_widget(processForm.processed_notes) }}
+    </div>
         <p>
             <button type="submit" class="btn btn-primary">
                 {% if order.processed_ts %}
@@ -37,6 +52,10 @@ $(document).ready(function () {
             .datetimepicker(PMI.datetimepickerDefaults);
     });
     $('#form_processed_samples_ts').remove();
+
+    var orderView = new PMI.views['OrderSubPage']({
+        el: $("body")
+    });
 });
 </script>
 {% endblock %}
