@@ -12,11 +12,13 @@ class User implements UserInterface
     private $groups;
     private $sites;
     private $dashboardAccess;
+    private $info;
     
-    public function __construct($googleUser, array $groups)
+    public function __construct($googleUser, array $groups, $info)
     {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
+        $this->info = $info;
         $this->sites = $this->computeSites();
         $this->dashboardAccess = $this->computeDashboardAccess();
     }
@@ -26,6 +28,11 @@ class User implements UserInterface
         return $this->groups;
     }
     
+    public function getInfo()
+    {
+        return $this->info;
+    }
+
     private function computeSites()
     {
         $sites = [];
