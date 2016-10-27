@@ -17,7 +17,7 @@ class HpoApplication extends AbstractApplication
         parent::setup($config);
 
         $rdrOptions = [];
-        if ($this->isDev()) {
+        if ($this->isLocal()) {
             $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
             if (file_exists($keyFile)) {
                 $rdrOptions['key_file'] = $keyFile;
@@ -102,7 +102,7 @@ class HpoApplication extends AbstractApplication
     {
         $appDir = realpath(__DIR__ . '/../../../');
         $configFile = $appDir . '/dev_config/config.yml';
-        if ($this->isDev() && file_exists($configFile)) {
+        if ($this->isLocal() && file_exists($configFile)) {
             $yaml = new \Symfony\Component\Yaml\Parser();
             $config = $yaml->parse(file_get_contents($configFile));
             if (is_array($config) || count($config) > 0) {

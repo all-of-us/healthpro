@@ -21,7 +21,7 @@ class EvaluationController extends AbstractController
     /* For debugging generated FHIR bundle - only allowed in dev */
     public function evaluationFhirAction($participantId, $evalId, Application $app)
     {
-        if (!$app->isDev()) {
+        if (!$app->isLocal()) {
             $app->abort(404);
         }
         $participant = $app['pmi.drc.participants']->getById($participantId);
@@ -48,7 +48,7 @@ class EvaluationController extends AbstractController
     /* For debugging evaluation object pushed to RDR - only allowed in dev */
     public function evaluationRdrAction($participantId, $evalId, Application $app)
     {
-        if (!$app->isDev()) {
+        if (!$app->isLocal()) {
             $app->abort(404);
         }
         $participant = $app['pmi.drc.participants']->getById($participantId);
@@ -71,7 +71,7 @@ class EvaluationController extends AbstractController
 
     public function evaluationAction($participantId, $evalId, Application $app, Request $request)
     {
-        if (!$app->isDev()) {
+        if (!$app->isLocal()) {
             $app->abort(404);
         }
         $participant = $app['pmi.drc.participants']->getById($participantId);

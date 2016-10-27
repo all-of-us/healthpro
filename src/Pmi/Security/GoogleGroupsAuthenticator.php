@@ -64,7 +64,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $client->setClientId($this->app->getConfig('auth_client_id'));
         $client->setClientSecret($this->app->getConfig('auth_client_secret'));
         // http://stackoverflow.com/a/33838098/1402028
-        if ($this->app->isDev()) {
+        if ($this->app->isLocal()) {
             $client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
         }
 
@@ -127,7 +127,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             // just a safeguard in case the Google user and our user get out of sync somehow
             strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;
 
-        if ($this->app->isDev() && $this->app->getConfig('gaBypass')) {
+        if (!$this->app->isProd() && $this->app->getConfig('gaBypass')) {
             return $validCredentials; // Bypass groups auth
         } else {
             return $validCredentials && count($user->getGroups()) > 0;
