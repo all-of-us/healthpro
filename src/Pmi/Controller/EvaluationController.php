@@ -124,6 +124,8 @@ class EvaluationController extends AbstractController
                         }
                     }
                     if (!$evaluation) {
+                        $dbArray['user_id'] = $app->getUser()->getId();
+                        $dbArray['site'] = $app->getSiteId();
                         $dbArray['participant_id'] = $participant->id;
                         $dbArray['created_ts'] = $dbArray['updated_ts'];
                         if ($evalId = $app['em']->getRepository('evaluations')->insert($dbArray)) {
