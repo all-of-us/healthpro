@@ -27,8 +27,7 @@ class DeployCommand extends Command {
     /** GAE application IDs for user/security testing. */
     private static $TEST_APP_IDS = [
         'pmi-hpo-staging',
-        'pmi-hpo-test',
-        'pmi-hpo-dev'
+        'pmi-hpo-test'
     ];
 
     /** Restrict access by IP using dos.yaml */
@@ -44,7 +43,9 @@ class DeployCommand extends Command {
     ];
 
     /** Don't require `login: admin` for these application IDs. */
-    private static $SKIP_ADMIN_APP_IDS = [];
+    private static $SKIP_ADMIN_APP_IDS = [
+        'pmi-hpo-dev' // this is behind a WAF so we don't want GAE login
+    ];
 
     /** Apply enhanced instance class and scaling for these application IDs. */
     private static $SCALE_APP_IDS = [
