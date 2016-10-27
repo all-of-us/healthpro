@@ -63,10 +63,6 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         }
         $client->setClientId($this->app->getConfig('auth_client_id'));
         $client->setClientSecret($this->app->getConfig('auth_client_secret'));
-        // http://stackoverflow.com/a/33838098/1402028
-        if ($this->app->isLocal()) {
-            $client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
-        }
 
         $callbackUrl = $this->app->generateUrl('loginReturn', [], true);
         $client->setRedirectUri($callbackUrl);

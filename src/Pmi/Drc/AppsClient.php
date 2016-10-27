@@ -34,10 +34,6 @@ class AppsClient
         $this->client->setApplicationName($appName);
         $this->client->setAuthConfig(json_decode($authJson, true));
         $this->client->setSubject($adminEmail);
-        // http://stackoverflow.com/a/33838098/1402028
-        if ($isLocal) {
-            $this->client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
-        }
         $this->client->setScopes(implode(' ', [
             \Google_Service_Directory::ADMIN_DIRECTORY_GROUP_READONLY
         ]));
