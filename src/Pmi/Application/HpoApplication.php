@@ -199,6 +199,15 @@ class HpoApplication extends AbstractApplication
     {
         return $this['session']->get('site');
     }
+
+    public function getSiteId()
+    {
+        if ($site = $this->getSite()) {
+            return $site->id;
+        } else {
+            return null;
+        }
+    }
     
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {

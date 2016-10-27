@@ -132,4 +132,9 @@ class User implements UserInterface
     {
         // we don't actually store any credentials
     }
+
+    public function getId()
+    {
+        return $this->info['id'];
+    }
 }

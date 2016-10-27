@@ -379,6 +379,8 @@ class OrderController extends AbstractController
             }
             if ($confirmForm->isValid()) {
                 if ($orderData['mayo_id']) {
+                    $orderData['user_id'] = $app->getUser()->getId();
+                    $orderData['site'] = $app->getSiteId();
                     $orderData['participant_id'] = $participant->id;
                     $orderData['created_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
 
