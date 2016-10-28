@@ -130,7 +130,8 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         if ($this->app->isDev() && $this->app->getConfig('gaBypass')) {
             return $validCredentials; // Bypass groups auth
         } else {
-            return $validCredentials && count($user->getGroups()) > 0;
+            $valid2fa = !$this->app->getConfig('enforce2fa') || $user->hasTwoFactorAuth();
+            return $validCredentials && count($user->getGroups()) > 0 && $valid2fa;
         }
     }
     
