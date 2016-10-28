@@ -12,11 +12,13 @@ class User implements UserInterface
     private $groups;
     private $sites;
     private $dashboardAccess;
+    private $info;
     
-    public function __construct($googleUser, array $groups)
+    public function __construct($googleUser, array $groups, $info = null)
     {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
+        $this->info = $info;
         $this->sites = $this->computeSites();
         $this->dashboardAccess = $this->computeDashboardAccess();
     }
@@ -26,6 +28,11 @@ class User implements UserInterface
         return $this->groups;
     }
     
+    public function getInfo()
+    {
+        return $this->info;
+    }
+
     private function computeSites()
     {
         $sites = [];
@@ -124,5 +131,14 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         // we don't actually store any credentials
+    }
+
+    public function getId()
+    {
+        if (isset($this->info['id'])) {
+            return $this->info['id'];
+        } else {
+            return false;
+        }
     }
 }

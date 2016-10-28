@@ -27,7 +27,8 @@ class UserProvider implements UserProviderInterface
             $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
             $this->app['session']->set('googlegroups', $groups);
         }
-        return new User($googleUser, $groups);
+        $userInfo = $this->getUserInfo($googleUser);
+        return new User($googleUser, $groups, $userInfo);
     }
     
     public function refreshUser(UserInterface $user)
@@ -42,5 +43,28 @@ class UserProvider implements UserProviderInterface
     public function supportsClass($class)
     {
         return $class === 'Pmi\Security\User';
+    }
+
+    protected function getUserInfo($googleUser)
+    {
+        if ($this->app['isUnitTest']) {
+            return [
+                'id' => 1,
+                'email' => $googleUser->getEmail(),
+                'google_id' => $googleUser->getUserId(),
+            ];
+        }
+        $userInfo = $this->app['em']->getRepository('users')->fetchOneBy([
+            'email' => $googleUser->getEmail()
+        ]);
+        if (!$userInfo) {
+            $userInfo = [
+                'email' => $googleUser->getEmail(),
+                'google_id' => $googleUser->getUserId(),
+            ];
+            $id = $this->app['em']->getRepository('users')->insert($userInfo);
+            $userInfo['id'] = $id;
+        }
+        return $userInfo;
     }
 }

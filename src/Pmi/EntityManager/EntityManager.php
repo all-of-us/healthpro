@@ -6,6 +6,7 @@ class EntityManager
     protected $dbal;
 
     protected $entities = [
+        'users' => 'doctrine',
         'orders' => 'doctrine',
         'evaluations' => 'doctrine'
     ];
