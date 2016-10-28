@@ -85,3 +85,8 @@ label.required::after {
 #order-overflow-show, #evaluation-overflow-show {
     margin-top: 5px
 }
+
+.toggle-help-image {
+    cursor: pointer;
+    color: #337ab7;
+}

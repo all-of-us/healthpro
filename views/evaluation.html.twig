@@ -39,10 +39,16 @@
                 <div data-field="{{ field.name }}" class="field field-{{ field.name }} form-group{% if not evaluationForm[field.name].vars.valid and field.replicates is not defined %} has-error{% endif %}">
                     {% if field.replicates is defined %}
                         {{ form_label(evaluationForm[field.name]) }}
-                        {% if field.image is defined %}
-                            <span class="toggle-help-image" data-img="{{ asset('img/eval/'~field.image) }}">
-                                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                            </span>
+                        {% if field.help.image is defined or field.help.caption is defined %}
+                            <span class="toggle-help-image"
+                                    {% if field.help.image is defined %}
+                                        data-img="{{ asset('img/eval/'~field.help.image) }}"
+                                    {% endif %}
+                                    {% if field.help.caption is defined %}
+                                        data-caption="{{ field.help.caption }}"
+                                    {% endif %}>
+                                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                                    </span>
                         {% endif %}
                         {% if field.convert is defined and field.convert %}
                             <span id="convert-{{ field.name }}" class="pull-right convert"></span>
@@ -67,8 +73,14 @@
                         <div class="row">
                             <div class="col-sm-4">
                                 {{ form_label(evaluationForm[field.name]) }}
-                                {% if field.image is defined %}
-                                    <span class="toggle-help-image" data-img="{{ asset('img/eval/'~field.image) }}">
+                                {% if field.help.image is defined or field.help.caption is defined %}
+                                    <span class="toggle-help-image"
+                                          {% if field.help.image is defined %}
+                                            data-img="{{ asset('img/eval/'~field.help.image) }}"
+                                          {% endif %}
+                                          {% if field.help.caption is defined %}
+                                            data-caption="{{ field.help.caption }}"
+                                          {% endif %}>
                                         <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                                     </span>
                                 {% endif %}
@@ -107,18 +119,6 @@
                 </p>
             {% endif %}
         {{ form_end(evaluationForm) }}
-
-        <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body text-center">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 {% endblock %}
 

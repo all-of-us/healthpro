@@ -5,7 +5,10 @@
             "name": "blood-pressure-location",
             "label": "Blood Pressure: location",
             "replicates": 3,
-            "options": ["Right arm", "Left arm"]
+            "options": ["Right arm", "Left arm"],
+            "help": {
+                "caption": "Help text placeholder."
+            }
         },
         {
             "name": "blood-pressure-systolic",
@@ -24,7 +27,10 @@
                     "message": "Participant is in a hypotensive crisis. Seek emergency care.",
                     "alert": true
                 }
-            ]
+            ],
+            "help": {
+                "caption": "Help text placeholder."
+            }
         },
         {
             "name": "blood-pressure-diastolic",
@@ -43,7 +49,10 @@
                     "message": "Participant is in a hypotensive crisis. Seek emergency care.",
                     "alert": true
                 }
-            ]
+            ],
+            "help": {
+                "caption": "Help text placeholder."
+            }
         },
         {
             "name": "heart-rate",
@@ -61,16 +70,21 @@
                     "message": "Participant is bradycardic and at risk for hypotensive crisis. Seek emergency care.",
                     "alert": true
                 }
-            ]
+            ],
+            "help": {
+                "caption": "Help text placeholder."
+            }
         },
         {
             "name": "height",
             "label": "Height",
             "unit": "cm",
-            "image": "height.png",
             "decimals": 1,
             "max": 300,
-            "convert": "ftin"
+            "convert": "ftin",
+            "help": {
+                "image": "height.png"
+            }
         },
         {
             "name": "weight",
@@ -85,13 +99,15 @@
                     "message": "Please verify that this weight is correct"
                 }
             ],
-            "convert": "lb"
+            "convert": "lb",
+            "help": {
+                "caption": "Help text placeholder."
+            }
         },
         {
             "name": "hip-circumference",
             "label": "Hip Circumference",
             "unit": "cm",
-            "image": "hip.png",
             "decimals": 1,
             "replicates": 3,
             "max": 300,
@@ -102,13 +118,15 @@
                     "message": "Please verify that this circumference is correct"
                 }
             ],
-            "convert": "in"
+            "convert": "in",
+            "help": {
+                "image": "hip.png"
+            }
         },
         {
             "name": "waist-circumference",
             "label": "Waist Circumference",
             "unit": "cm",
-            "image": "waist.png",
             "decimals": 1,
             "replicates": 3,
             "max": 300,
@@ -119,7 +137,10 @@
                     "message": "Please verify that this circumference is correct"
                 }
             ],
-            "convert": "in"
+            "convert": "in",
+            "help": {
+                 "image": "waist.png"
+            }
         }
     ]
 }
