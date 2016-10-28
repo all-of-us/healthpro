@@ -140,11 +140,26 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $code = 403;
         $googleUser = $this->app->getGoogleUser();
         if ($googleUser) {
-            $template = 'error-auth.html.twig';
             $params = [
                 'email' => $googleUser->getEmail(),
                 'logoutUrl' => $this->app->getGoogleLogoutUrl()
             ];
+            
+            // attempt to load the user object for error msg customization
+            try {
+                $userProvider = new \Pmi\Security\UserProvider($this->app);
+                $user = $userProvider->loadUserByUsername($googleUser->getEmail());
+            } catch (\Exception $e) {
+                $user = null;
+            }
+            
+            // infer the reason behind the auth failure
+            if ($user && $this->app->getConfig('enforce2fa') && !$user->hasTwoFactorAuth()) {
+                $template = 'error-2fa.html.twig';
+            } else {
+                $template = 'error-auth.html.twig';
+            }
+            
         } elseif ($this->app->getConfig('gae_auth')) {
             $template = 'error-gae-auth.html.twig';
             $params = ['loginUrl' => $this->app->getGoogleLoginUrl()];
