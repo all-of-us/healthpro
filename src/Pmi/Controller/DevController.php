@@ -20,7 +20,7 @@ class DevController extends AbstractController
 
     public function datastoreInitAction(Application $app, Request $request)
     {
-        if ($app['env'] !== Application::ENV_DEV && $app['env'] !== Application::ENV_TEST) {
+        if ($app->isProd()) {
             return $app->abort(404);
         } elseif (!UserService::isCurrentUserAdmin()) {
             $app->addFlashError('Access denied!');
@@ -42,7 +42,7 @@ class DevController extends AbstractController
 
     public function createParticipantAction(Application $app, Request $request)
     {
-        if ($app->isProd() && $request->getHost() !== 'pmi-hpo-staging.appspot.com') {
+        if ($app->isProd()) {
             return $app->abort(404);
         }
 

@@ -14,7 +14,7 @@ abstract class AbstractWebTestCase extends WebTestCase
     /** http://silex.sensiolabs.org/doc/master/testing.html#webtestcase */
     public function createApplication()
     {
-        putenv('PMI_ENV=' . HpoApplication::ENV_DEV);
+        putenv('PMI_ENV=' . HpoApplication::ENV_LOCAL);
         $app = new HpoApplication([
             'templatesDirectory' => __DIR__ . '/../../views',
             'errorTemplate' => 'error.html.twig',

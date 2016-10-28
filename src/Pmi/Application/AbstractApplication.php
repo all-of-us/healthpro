@@ -22,9 +22,10 @@ use Twig_SimpleFunction;
 
 abstract class AbstractApplication extends Application
 {
-    const ENV_DEV  = 'dev';  // development environment (local GAE SDK)
-    const ENV_TEST = 'test'; // testing environment (GAE test projects)
-    const ENV_PROD = 'prod'; // production environment
+    const ENV_LOCAL = 'local'; // development environment (local GAE SDK)
+    const ENV_DEV   = 'dev';   // development environment (deployed to GAE)
+    const ENV_TEST  = 'test';  // user/security testing environment
+    const ENV_PROD  = 'prod';  // production environment
     
     protected $name;
     protected $configuration = [];
@@ -33,7 +34,9 @@ abstract class AbstractApplication extends Application
     private static function determineEnv()
     {
         $env = getenv('PMI_ENV');
-        if ($env == self::ENV_DEV) {
+        if ($env == self::ENV_LOCAL) {
+            return self::ENV_LOCAL;
+        } elseif ($env == self::ENV_DEV) {
             return self::ENV_DEV;
         } elseif ($env == self::ENV_TEST) {
             return self::ENV_TEST;
@@ -57,12 +60,17 @@ abstract class AbstractApplication extends Application
             $values['isUnitTest'] = false;
         }
         if (!array_key_exists('debug', $values)) {
-            $values['debug'] = ($values['env'] === self::ENV_PROD || $values['isUnitTest']) ? false : true;
+            $values['debug'] = ($values['env'] === self::ENV_PROD || $values['env'] === self::ENV_TEST || $values['isUnitTest']) ? false : true;
         }
-        $values['assetVer'] = $values['env'] === self::ENV_DEV ?
+        $values['assetVer'] = $values['env'] === self::ENV_LOCAL ?
             date('YmdHis') : $values['release'];
         
         parent::__construct($values);
+    }
+    
+    public function isLocal()
+    {
+        return $this['env'] === self::ENV_LOCAL;
     }
     
     public function isDev()
@@ -89,7 +97,7 @@ abstract class AbstractApplication extends Application
     {
         // GAE SDK dev AppServer has a conflict with loading external XML entities
         // https://github.com/GoogleCloudPlatform/appengine-symfony-starter-project/blob/master/src/AppEngine/Environment.php#L52-L69
-        if ($this->isDev()) {
+        if ($this->isLocal()) {
             libxml_disable_entity_loader(false);
         }
         
