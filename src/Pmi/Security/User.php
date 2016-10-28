@@ -14,7 +14,7 @@ class User implements UserInterface
     private $dashboardAccess;
     private $info;
     
-    public function __construct($googleUser, array $groups, $info)
+    public function __construct($googleUser, array $groups, $info = null)
     {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
@@ -135,6 +135,10 @@ class User implements UserInterface
 
     public function getId()
     {
-        return $this->info['id'];
+        if (isset($this->info['id'])) {
+            return $this->info['id'];
+        } else {
+            return false;
+        }
     }
 }
