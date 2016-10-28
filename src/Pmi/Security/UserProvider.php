@@ -47,6 +47,13 @@ class UserProvider implements UserProviderInterface
 
     protected function getUserInfo($googleUser)
     {
+        if ($this->app['isUnitTest']) {
+            return [
+                'id' => 1,
+                'email' => $googleUser->getEmail(),
+                'google_id' => $googleUser->getUserId(),
+            ];
+        }
         $userInfo = $this->app['em']->getRepository('users')->fetchOneBy([
             'email' => $googleUser->getEmail()
         ]);
