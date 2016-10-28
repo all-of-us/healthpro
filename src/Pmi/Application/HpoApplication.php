@@ -100,13 +100,18 @@ class HpoApplication extends AbstractApplication
 
     protected function loadConfiguration($override = [])
     {
+        // default two-factor setting
+        $this->configuration['enforce2fa'] = $this->isProd();
+        
         $appDir = realpath(__DIR__ . '/../../../');
         $configFile = $appDir . '/dev_config/config.yml';
         if ($this->isLocal() && file_exists($configFile)) {
             $yaml = new \Symfony\Component\Yaml\Parser();
-            $config = $yaml->parse(file_get_contents($configFile));
-            if (is_array($config) || count($config) > 0) {
-                $this->configuration = $config;
+            $configs = $yaml->parse(file_get_contents($configFile));
+            if (is_array($configs) || count($configs) > 0) {
+                foreach ($configs as $key => $val) {
+                    $this->configuration[$key] = $val;
+                }
             }
         }
 

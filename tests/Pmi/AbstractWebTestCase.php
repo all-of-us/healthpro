@@ -38,7 +38,8 @@ abstract class AbstractWebTestCase extends WebTestCase
             'gaBypass' => false,
             'gaDomain' => 'pmi-drc-hpo-unit-tests.biz',
             'ip_whitelist' => $this->getIpWhitelist(),
-            'gae_auth' => true
+            'gae_auth' => true,
+            'enforce2fa' => true
         ]);
         $app->mount('/', new Controller\DefaultController());
         $app->mount('/dashboard', new Controller\DashboardController());

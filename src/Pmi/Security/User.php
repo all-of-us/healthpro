@@ -7,6 +7,8 @@ class User implements UserInterface
 {
     const SITE_PREFIX = 'hpo-site-';
     const DASHBOARD_GROUP = 'admin-dashboard';
+    const TWOFACTOR_GROUP = 'mfa_exception';
+    const TWOFACTOR_PREFIX = 'x-site-';
     
     private $googleUser;
     private $groups;
@@ -60,6 +62,22 @@ class User implements UserInterface
             }
         }
         return $hasAccess;
+    }
+    
+    public function hasTwoFactorAuth()
+    {
+        // Google doesn't expose the user's current 2FA setting via API so
+        // we infer it by checking whether they are in a 2FA exception group
+        $twoFactorAuth = true;
+        foreach ($this->groups as $group) {
+            $email = $group->getEmail();
+            if (strpos($email, self::TWOFACTOR_GROUP . '@') === 0) {
+                $twoFactorAuth = false;
+            } elseif (strpos($email, self::TWOFACTOR_PREFIX) === 0) {
+                $twoFactorAuth = false;
+            }
+        }
+        return $twoFactorAuth;
     }
 
     public function getSites()

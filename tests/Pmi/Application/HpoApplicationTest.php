@@ -38,6 +38,21 @@ class HpoApplicationTest extends AbstractWebTestCase
         // gets set to false by the finishCallback()
         $this->assertSame(false, $this->app['session']->get('isLogin'));
     }
+    
+    public function testTwoFactorDeny()
+    {
+        $email = 'testTwoFactorDeny@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [
+            new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::TWOFACTOR_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
+        ]);
+        $client = $this->createClient();
+        $client->followRedirects();
+        $crawler = $client->request('GET', '/');
+        $this->assertSame(1, count($crawler->filter('#twoFactorAlert')));
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+    }
 
     public function testDashboardDeny()
     {
