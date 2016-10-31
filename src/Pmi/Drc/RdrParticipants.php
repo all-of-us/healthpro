@@ -33,6 +33,11 @@ class RdrParticipants
         } else {
             return false;
         }
+        if (!empty($participant->biobank_id)) {
+            $biobankId = $participant->biobank_id;
+        } else {
+            $biobankId = $participant->participant_id; // for older participants without biobank ids
+        }
         if (isset($participant->membership_tier) && in_array($participant->membership_tier, ['VOLUNTEER', 'ENROLLEE', 'FULL_PARTICIPANT'])) {
             $consentStatus = true;
         } else {
@@ -53,6 +58,7 @@ class RdrParticipants
         $genderIdentity = ucfirst(strtolower($genderIdentity));
         return new Participant([
             'id' => $id,
+            'biobankId' => $biobankId,
             'firstName' => $participant->first_name,
             'middleName' => $participant->middle_name,
             'lastName' => $participant->last_name,
