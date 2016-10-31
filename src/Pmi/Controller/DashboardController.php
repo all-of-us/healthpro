@@ -10,10 +10,11 @@ class DashboardController extends AbstractController
     protected static $name = 'dashboard';
 
     const PARTICIPANT_GOAL = 1000000;
-    
+
     protected static $routes = [
         ['home', '/'],
         ['demo', '/demo'],
+        ['test', '/test'],
         ['metrics_load', '/metrics_load'],
         ['metrics_load_region', '/metrics_load_region'],
         ['demo_load_data', '/demo_load_data'],
@@ -26,8 +27,10 @@ class DashboardController extends AbstractController
     {
         $color_profiles = ['Blackbody', 'Bluered', 'Blues', 'Custom', 'Earth', 'Electric', 'Greens', 'Hot', 'Jet', 'Picnic',
             'Portland', 'Rainbow', 'RdBu', 'Reds', 'Viridis', 'YlGnBu', 'YlOrRd'];
+        $metrics_attributes = $this->getMetricsKeyVals('');
         return $app['twig']->render('dashboard/index.html.twig', [
-            'color_profiles' => $color_profiles
+            'color_profiles' => $color_profiles,
+            'metrics_attributes' => $metrics_attributes
         ]);
     }
 
@@ -35,9 +38,10 @@ class DashboardController extends AbstractController
     {
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
         // load attribute to query
-        $metrics_attribute = $request->get('metrics_attribute');
-        $bucket_by = $request->get('bucket_by');
-        $result = $metricsApi->metrics($metrics_attribute, $bucket_by)->bucket;
+        $filter_by = $request->get('metrics_attribute');
+
+        //$bucket_by = $request->get('bucket_by');
+        $result = $metricsApi->metrics(["NONE"])->bucket;
 
         $data = [];
 
@@ -46,45 +50,37 @@ class DashboardController extends AbstractController
 
         // grab all entries and dates to use for plotly
 
-        foreach($result as $row){
+        foreach($result as $row) {
             array_push($dates, explode('T', $row->date)[0]);
-            if (property_exists($row, 'entries')) {
-                $row_entries = $row->entries;
-                foreach($row_entries as $ent) {
-                    if (!in_array($ent->name, $entries)) {
-                        array_push($entries, $ent->name);
-                    }
+            foreach($row->entries as $entry) {
+                if (strpos($entry->name, '.') !== false) {
+                    $parts = explode('.', $entry->name);
+                    $filter_key = $parts[0] . "." . $parts[1];
+                    $entry_name = $parts[2];
+                } else {
+                    $filter_key = $entry->name;
+                    $entry_name = 'Total Participants';
+                }
+
+                if ($filter_key === $filter_by) {
+                    $entries[$entry_name][] = $entry->value;
                 }
             }
         }
 
+
         // assemble data object in Plotly format
         $i = 0;
-        foreach($entries as $entry) {
+        foreach($entries as $entry => $values) {
             $trace = array(
                 "x" => $dates,
-                "y" => [],
+                "y" => $values,
                 "name" => $entry,
                 "type" => "bar",
                 "marker" => array(
                     "color" => $this->getColorBrewerVal($i)
                 )
             );
-            for($x = 0; $x < count($dates); $x++) {
-                if (property_exists($result[$x], 'entries')) {
-                    $row_entries = $result[$x]->entries;
-                    foreach($row_entries as $ent) {
-                        if ($ent->name == $entry) {
-                            array_push($trace['y'], $ent->value);
-                        }
-                    }
-                    if (!array_key_exists($x, $trace['y'])) {
-                        array_push($trace['y'], 0);
-                    }
-                } else {
-                    array_push($trace['y'], 0);
-                }
-            }
             array_push($data, $trace);
             $i++;
         }
@@ -106,7 +102,7 @@ class DashboardController extends AbstractController
             ];
         };
 
-        $result = $metricsApi->metrics($metrics_attribute, "NONE")->bucket;
+        $result = $metricsApi->metrics($metrics_attribute, "MONTH", "2016-10-01", "2017-10-01")->bucket;
 
         $all_states = $app['db']->fetchAll("SELECT distinct(state) FROM state_zip_ranges ORDER BY STATE");
         $state_registrations = [];
@@ -458,6 +454,14 @@ class DashboardController extends AbstractController
         return $app->json($data);
     }
 
+    // test to get default metrics API response
+    public function testAction(Application $app, Request $request)
+    {
+        $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+        $result = $metricsApi->metrics(["HPO_ID"])->bucket;
+        return $app->json($result);
+    }
+
     // helper function to return array of dates segmented by interval
     private function getDashboardDates($start_date, $end_date, $interval) {
         $dates = [$end_date];
@@ -493,5 +497,34 @@ class DashboardController extends AbstractController
     // helper function to return count values from fetchAll (due to DBAL in query type issues)
     private function getCount($result, $key) {
         return (int) $result[0][$key];
+    }
+
+    // helper to return either the keys or values for metrics
+    // keys are names returned by metrics API, values are for display
+    private function getMetricsKeyVals($kind) {
+        $metrics = array(
+            "Participant" => "Total Participants",
+            "Participant.membership_tier" => "Membership Tier",
+            "Participant.gender_identity" => "Gender Identity",
+            "Participant.age_range" => "Age Range"
+        );
+
+        if ($kind == 'keys') {
+            $return_val = array_keys($metrics);
+        } elseif ($kind == 'values') {
+            $return_val = array_values($metrics);
+        } else {
+            $return_val = $metrics;
+        }
+        return $return_val;
+    }
+
+    // function to filter metrics API response entries based on requested metric
+    private function filterEntries($filter, $entries) {
+        $filtered_vals = [];
+        foreach($entries as $entry) {
+
+        }
+        return $filtered_vals;
     }
 }

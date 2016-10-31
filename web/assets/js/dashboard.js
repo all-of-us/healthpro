@@ -87,7 +87,11 @@ function loadBarChartAnnotations(plotlyData, annotationsArray, interval) {
     for (var i = 0; i < plotlyData[0]['x'].length ; i++){
         var total = 0;
         plotlyData.map(function(el) {
-            total += parseInt(el['y'][i]);
+            var c = parseInt(el['y'][i]);
+            if (isNaN(c)) {
+                c = 0;
+            }
+            total += c;
         });
         var annot = {
             x: plotlyData[0]['x'][i],

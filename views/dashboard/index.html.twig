@@ -21,8 +21,9 @@
                                 <div class="col-md-12 col-xs-3 form-group form-group-sm">
                                     <label>Display Metric</label>
                                     <select id="total-progress-metric-attribute" class="form-control total-progress-control">
-                                        <option value="PARTICIPANT_TOTAL">Total Participants</option>
-                                        <option value="PARTICIPANT_MEMBERSHIP_TIER">Participant Membership Tiers</option>
+                                        {% for metric_key, display_val in metrics_attributes %}
+                                            <option value="{{ metric_key }}">{{ display_val }}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                                 <div class="col-md-12 col-xs-3 form-group form-group-sm">
@@ -83,7 +84,7 @@
 
                         // load column totals if requested
                         if (showAnnot) {
-                            loadBarChartAnnotations(plotlyData, progressAnnot);
+                            loadBarChartAnnotations(data, progressAnnot);
                         }
 
                         // render plot and stop spinner
