@@ -3,6 +3,7 @@ CREATE TABLE `orders` (
   `user_id` int(11) NOT NULL,
   `site` varchar(50) NOT NULL,
   `participant_id` varchar(50) NOT NULL,
+  `biobank_id` varchar(50) NOT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `order_id` varchar(100) NOT NULL,
   `mayo_id` varchar(100) NOT NULL,

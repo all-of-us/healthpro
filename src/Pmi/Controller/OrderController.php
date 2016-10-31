@@ -338,7 +338,7 @@ class OrderController extends AbstractController
                     }
                 }
             } else {
-                $orderData['order_id'] = Util::generateShortUuid();
+                $orderData['order_id'] = Util::generateShortUuid(12);
                 if ($request->request->has('custom')) {
                     $showCustom = true;
                     $requestedSamples = $confirmForm['samples']->getData();
@@ -357,7 +357,7 @@ class OrderController extends AbstractController
                         $order = new MayoLinkOrder();
                         $options = [
                             'type' => $orderData['type'],
-                            'patient_id' => $participant->getShortId(),
+                            'patient_id' => $participant->biobankId,
                             'gender' => $participant->gender,
                             'birth_date' => $participant->dob,
                             'order_id' => $orderData['order_id'],
@@ -382,6 +382,7 @@ class OrderController extends AbstractController
                     $orderData['user_id'] = $app->getUser()->getId();
                     $orderData['site'] = $app->getSiteId();
                     $orderData['participant_id'] = $participant->id;
+                    $orderData['biobank_id'] = $participant->biobankId;
                     $orderData['created_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
 
                     $orderId = $app['em']->getRepository('orders')->insert($orderData);
