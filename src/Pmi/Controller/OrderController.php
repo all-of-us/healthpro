@@ -338,7 +338,7 @@ class OrderController extends AbstractController
                     }
                 }
             } else {
-                $orderData['order_id'] = Util::generateShortUuid();
+                $orderData['order_id'] = Util::generateShortUuid(12);
                 if ($request->request->has('custom')) {
                     $showCustom = true;
                     $requestedSamples = $confirmForm['samples']->getData();
