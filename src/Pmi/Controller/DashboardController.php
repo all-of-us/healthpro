@@ -47,9 +47,9 @@ class DashboardController extends AbstractController
 
         $dates = [];
         $entries = [];
+        $values = [];
 
         // grab all entries and dates to use for plotly
-
         foreach($result as $row) {
             array_push($dates, explode('T', $row->date)[0]);
             foreach($row->entries as $entry) {
@@ -63,18 +63,40 @@ class DashboardController extends AbstractController
                 }
 
                 if ($filter_key === $filter_by) {
-                    $entries[$entry_name][] = $entry->value;
+                    if (!in_array($entry_name, $entries)) {
+                        array_push($entries, $entry_name);
+                    }
                 }
             }
         }
 
+        // iterate again to grab values now that we have all possible entries
+        foreach($result as $row) {
+            foreach($entries as $entry) {
+                if ($filter_by == 'Participant') {
+                    $lookup = $filter_by;
+                } else {
+                    $lookup = $filter_by . "." . $entry;
+                }
+                $row_entries = $row->entries;
+                $match = $this->searchEntries($row_entries, 'name', $lookup);
+                if (empty($match)) {
+                    $values[$entry][] = 0;
+                } else {
+                    $values[$entry][] = $match[0];
+                }
+
+            }
+        }
+
+        rsort($entries);
 
         // assemble data object in Plotly format
         $i = 0;
-        foreach($entries as $entry => $values) {
+        foreach($entries as $entry) {
             $trace = array(
                 "x" => $dates,
-                "y" => $values,
+                "y" => $values[$entry],
                 "name" => $entry,
                 "type" => "bar",
                 "marker" => array(
@@ -520,11 +542,17 @@ class DashboardController extends AbstractController
     }
 
     // function to filter metrics API response entries based on requested metric
-    private function filterEntries($filter, $entries) {
-        $filtered_vals = [];
-        foreach($entries as $entry) {
+    private function searchEntries($array, $key, $value) {
+        $results = array();
 
+        if (is_array($array)) {
+            foreach ($array as $subarray) {
+                if ($subarray->$key == $value) {
+                    $results[] = $subarray->value;
+                }
+            }
         }
-        return $filtered_vals;
+
+        return $results;
     }
 }
