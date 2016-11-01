@@ -21,7 +21,8 @@ class OrderController extends AbstractController
         ['orderPrint', '/participant/{participantId}/order/{orderId}/print'],
         ['orderCollect', '/participant/{participantId}/order/{orderId}/collect', ['method' => 'GET|POST']],
         ['orderProcess', '/participant/{participantId}/order/{orderId}/process', ['method' => 'GET|POST']],
-        ['orderFinalize', '/participant/{participantId}/order/{orderId}/finalize', ['method' => 'GET|POST']]
+        ['orderFinalize', '/participant/{participantId}/order/{orderId}/finalize', ['method' => 'GET|POST']],
+        ['orderJson', '/participant/{participantId}/order/{orderId}/order.json']
     ];
 
     protected $order;
@@ -283,6 +284,36 @@ class OrderController extends AbstractController
         }
         $form = $formBuilder->getForm();
         return $form;
+    }
+
+    protected function getRdrObject()
+    {
+        $created = new \DateTime($this->order['created_ts']);
+        $created->setTimezone(new \DateTimeZone('UTC'));
+
+        $obj = new \StdClass();
+        $obj->subject = 'Patient/' . $this->order['participant_id'];
+        $obj->identifier = [
+            [
+                'system' => 'https://www.pmi-ops-.org',
+                'value' => $this->order['order_id']
+            ],
+            [
+                'system' => 'https://orders.mayomedicallaboratories.com',
+                'value' => $this->order['mayo_id']
+            ]
+        ];
+        $obj->created = $created->format('Y-m-d\TH:i:s\Z');
+        $notes = [];
+        foreach (['collected', 'processed', 'finalized'] as $step) {
+            if ($this->order[$step . '_notes']) {
+                $notes[$step] = $this->order[$step . '_notes'];
+            }
+        }
+        if (!empty($notes)) {
+            $obj->notes = $notes;
+        }
+        return $obj;
     }
 
     public function orderCreateAction($participantId, Application $app, Request $request)
@@ -564,5 +595,17 @@ class OrderController extends AbstractController
             'order' => $this->order,
             'finalizeForm' => $finalizeForm->createView()
         ]);
+    }
+
+
+    /* For debugging generated JSON representation - only allowed in local dev */
+    public function orderJsonAction($participantId, $orderId, Application $app)
+    {
+        if (!$app->isLocal()) {
+            $app->abort(404);
+        }
+        $this->loadOrder($participantId, $orderId, $app);
+        $object = $this->getRdrObject();
+        return $app->json($object);
     }
 }
