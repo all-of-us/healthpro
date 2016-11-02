@@ -36,12 +36,13 @@ class DashboardController extends AbstractController
 
     public function metrics_loadAction(Application $app, Request $request)
     {
-        $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-        // load attribute to query
-        $filter_by = $request->get('metrics_attribute');
 
-        //$bucket_by = $request->get('bucket_by');
-        $result = $metricsApi->metrics(["NONE"])->bucket;
+        // get request attributes
+        $filter_by = $request->get('metrics_attribute');
+        $bucket_by = $request->get('bucket_by');
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
+        $result = $this->getMetricsObject($app, "NONE");
 
         $data = [];
 
@@ -51,41 +52,47 @@ class DashboardController extends AbstractController
 
         // grab all entries and dates to use for plotly
         foreach($result as $row) {
-            array_push($dates, explode('T', $row->date)[0]);
-            foreach($row->entries as $entry) {
-                if (strpos($entry->name, '.') !== false) {
-                    $parts = explode('.', $entry->name);
-                    $filter_key = $parts[0] . "." . $parts[1];
-                    $entry_name = $parts[2];
-                } else {
-                    $filter_key = $entry->name;
-                    $entry_name = 'Total Participants';
-                }
+            $date = explode('T', $row->date)[0];
+            if ($this->checkDates($date, $start_date, $end_date)) {
+                array_push($dates, $date);
+                foreach($row->entries as $entry) {
+                    if (strpos($entry->name, '.') !== false) {
+                        $parts = explode('.', $entry->name);
+                        $filter_key = $parts[0] . "." . $parts[1];
+                        $entry_name = $parts[2];
+                    } else {
+                        $filter_key = $entry->name;
+                        $entry_name = 'Total Participants';
+                    }
 
-                if ($filter_key === $filter_by) {
-                    if (!in_array($entry_name, $entries)) {
-                        array_push($entries, $entry_name);
+                    if ($filter_key === $filter_by) {
+                        if (!in_array($entry_name, $entries)) {
+                            array_push($entries, $entry_name);
+                        }
                     }
                 }
             }
+
         }
 
         // iterate again to grab values now that we have all possible entries
         foreach($result as $row) {
-            foreach($entries as $entry) {
-                if ($filter_by == 'Participant') {
-                    $lookup = $filter_by;
-                } else {
-                    $lookup = $filter_by . "." . $entry;
+            $date = explode('T', $row->date)[0];
+            if ($this->checkDates($date, $start_date, $end_date)) {
+                foreach ($entries as $entry) {
+                    if ($filter_by == 'Participant') {
+                        $lookup = $filter_by;
+                    } else {
+                        $lookup = $filter_by . "." . $entry;
+                    }
+                    $row_entries = $row->entries;
+                    $match = $this->searchEntries($row_entries, 'name', $lookup);
+                    if (empty($match)) {
+                        $values[$entry][] = 0;
+                    } else {
+                        $values[$entry][] = $match[0];
+                    }
                 }
-                $row_entries = $row->entries;
-                $match = $this->searchEntries($row_entries, 'name', $lookup);
-                if (empty($match)) {
-                    $values[$entry][] = 0;
-                } else {
-                    $values[$entry][] = $match[0];
-                }
-
             }
         }
 
@@ -482,6 +489,31 @@ class DashboardController extends AbstractController
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
         $result = $metricsApi->metrics(["HPO_ID"])->bucket;
         return $app->json($result);
+    }
+
+    // Main method for retrieving metrics from API
+    // stores result in memcache as it only updates daily
+    // supports storing multiple entries for faceting
+    private function getMetricsObject(Application $app, $facet) {
+        $memcache = new \Memcache();
+        $memcacheKey = 'metrics_api_facet_' . $facet;
+        $metrics = $memcache->get($memcacheKey);
+        if (!$metrics) {
+            try {
+                $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+                $metrics = $metricsApi->metrics([$facet])->bucket;
+                // set expiration to four hours
+                $memcache->set($memcacheKey, $metrics, 0, 14400);
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                return false;
+            }
+        }
+        return $metrics;
+    }
+
+    // helper function to check date range cutoffs
+    private function checkDates($date, $start, $end) {
+        return strtotime($date) >= strtotime($start) && strtotime($date) <= strtotime($end);
     }
 
     // helper function to return array of dates segmented by interval
