@@ -220,7 +220,6 @@ class OrderController extends AbstractController
             $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
             if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
-                $order->sendToRdr();
                 $app->addFlashNotice('Order collection updated');
 
                 return $app->redirectToRoute('orderCollect', [
@@ -256,7 +255,6 @@ class OrderController extends AbstractController
                 }
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
-                    $order->sendToRdr();
                     $app->addFlashNotice('Order processing updated');
 
                     return $app->redirectToRoute('orderProcess', [
@@ -282,6 +280,7 @@ class OrderController extends AbstractController
             $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
             if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
+                $order = $this->loadOrder($participantId, $orderId, $app);
                 $order->sendToRdr();
                 $app->addFlashNotice('Order finalization updated');
 
