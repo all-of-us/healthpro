@@ -162,7 +162,7 @@ class OrderController extends AbstractController
         $action = ucfirst($order->getCurrentStep());
         return $app->redirectToRoute("order{$action}", [
             'participantId' => $participantId,
-            'orderId' => $order->getId()
+            'orderId' => $orderId
         ]);
     }
 

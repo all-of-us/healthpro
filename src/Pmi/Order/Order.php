@@ -49,11 +49,6 @@ class Order
         return $this->order && $this->participant;
     }
 
-    public function getId()
-    {
-        return $this->order['id'];
-    }
-
     public function getParticipant()
     {
         return $this->participant;
@@ -92,45 +87,6 @@ class Order
             }
         }
         return $step;
-    }
-
-    public function getOrderFormData($set)
-    {
-        $formData = [];
-        if ($this->order["{$set}_notes"]) {
-            $formData["{$set}_notes"] = $this->order["{$set}_notes"];
-        };
-        if ($set != 'processed') {
-            if ($this->order["{$set}_ts"]) {
-                $formData["{$set}_ts"] = new \DateTime($this->order["{$set}_ts"]);
-            }
-        }
-        if ($this->order["{$set}_samples"]) {
-            $samples = json_decode($this->order["{$set}_samples"]);
-            if (is_array($samples) && count($samples) > 0) {
-                $formData["{$set}_samples"] = $samples;
-            }
-        }
-        if ($set == 'processed') {
-            $processedSampleTimes = [];
-            if (isset($this->order['processed_samples_ts'])) {
-                $processedSampleTimes = json_decode($this->order['processed_samples_ts'], true);
-            }
-            foreach (self::$samplesRequiringProcessing as $sample) {
-                if (!empty($processedSampleTimes[$sample])) {
-                    try {
-                        $sampleTs = new \DateTime();
-                        $sampleTs->setTimestamp($processedSampleTimes[$sample]);
-                        $formData['processed_samples_ts'][$sample] = $sampleTs;
-                    } catch (\Exception $e) {
-                        $formData['processed_samples_ts'][$sample] = null;
-                    }
-                } else {
-                    $formData['processed_samples_ts'][$sample] = null;
-                }
-            }
-        }
-        return $formData;
     }
 
     public function getOrderUpdateFromForm($set, $form)
@@ -172,60 +128,6 @@ class Order
             }
         }
         return $updateArray;
-    }
-
-    public function getRequestedSamples()
-    {
-        if ($this->order['type'] == 'saliva') {
-            return self::$salivaSamples;
-        }
-        if ($this->order['requested_samples'] &&
-            ($requestedArray = json_decode($this->order['requested_samples'])) &&
-            is_array($requestedArray) &&
-            count($requestedArray) > 0
-        ) {
-            return array_intersect(self::$samples, $requestedArray);
-        } else {
-            return self::$samples;
-        }
-    }
-
-    public function getEnabledSamples($set)
-    {
-        if ($this->order['collected_samples'] &&
-            ($collectedArray = json_decode($this->order['collected_samples'])) &&
-            is_array($collectedArray)
-        ) {
-            $collected = $collectedArray;
-        } else {
-            $collected = [];
-        }
-
-        if ($this->order['processed_samples'] &&
-            ($processedArray = json_decode($this->order['processed_samples'])) &&
-            is_array($processedArray)
-        ) {
-            $processed = $processedArray;
-        } else {
-            $processed = [];
-        }
-
-        switch ($set) {
-            case 'processed':
-                return array_intersect($collected, self::$samplesRequiringProcessing, $this->getRequestedSamples());
-            case 'finalized':
-                $enabled = array_intersect($collected, $this->getRequestedSamples());
-                foreach ($enabled as $key => $sample) {
-                    if (in_array($sample, self::$samplesRequiringProcessing) &&
-                        !in_array($sample, $processed)
-                    ) {
-                        unset($enabled[$key]);
-                    }
-                }
-                return array_values($enabled);
-            default:
-                return array_values($this->getRequestedSamples());
-        }
     }
 
     public function createOrderForm($set, $formFactory)
@@ -382,6 +284,99 @@ class Order
                     ['rdr_id' => $rdrId]
                 );
             }
+        }
+    }
+
+    protected function getOrderFormData($set)
+    {
+        $formData = [];
+        if ($this->order["{$set}_notes"]) {
+            $formData["{$set}_notes"] = $this->order["{$set}_notes"];
+        };
+        if ($set != 'processed') {
+            if ($this->order["{$set}_ts"]) {
+                $formData["{$set}_ts"] = new \DateTime($this->order["{$set}_ts"]);
+            }
+        }
+        if ($this->order["{$set}_samples"]) {
+            $samples = json_decode($this->order["{$set}_samples"]);
+            if (is_array($samples) && count($samples) > 0) {
+                $formData["{$set}_samples"] = $samples;
+            }
+        }
+        if ($set == 'processed') {
+            $processedSampleTimes = [];
+            if (isset($this->order['processed_samples_ts'])) {
+                $processedSampleTimes = json_decode($this->order['processed_samples_ts'], true);
+            }
+            foreach (self::$samplesRequiringProcessing as $sample) {
+                if (!empty($processedSampleTimes[$sample])) {
+                    try {
+                        $sampleTs = new \DateTime();
+                        $sampleTs->setTimestamp($processedSampleTimes[$sample]);
+                        $formData['processed_samples_ts'][$sample] = $sampleTs;
+                    } catch (\Exception $e) {
+                        $formData['processed_samples_ts'][$sample] = null;
+                    }
+                } else {
+                    $formData['processed_samples_ts'][$sample] = null;
+                }
+            }
+        }
+        return $formData;
+    }
+
+    protected function getRequestedSamples()
+    {
+        if ($this->order['type'] == 'saliva') {
+            return self::$salivaSamples;
+        }
+        if ($this->order['requested_samples'] &&
+            ($requestedArray = json_decode($this->order['requested_samples'])) &&
+            is_array($requestedArray) &&
+            count($requestedArray) > 0
+        ) {
+            return array_intersect(self::$samples, $requestedArray);
+        } else {
+            return self::$samples;
+        }
+    }
+
+    protected function getEnabledSamples($set)
+    {
+        if ($this->order['collected_samples'] &&
+            ($collectedArray = json_decode($this->order['collected_samples'])) &&
+            is_array($collectedArray)
+        ) {
+            $collected = $collectedArray;
+        } else {
+            $collected = [];
+        }
+
+        if ($this->order['processed_samples'] &&
+            ($processedArray = json_decode($this->order['processed_samples'])) &&
+            is_array($processedArray)
+        ) {
+            $processed = $processedArray;
+        } else {
+            $processed = [];
+        }
+
+        switch ($set) {
+            case 'processed':
+                return array_intersect($collected, self::$samplesRequiringProcessing, $this->getRequestedSamples());
+            case 'finalized':
+                $enabled = array_intersect($collected, $this->getRequestedSamples());
+                foreach ($enabled as $key => $sample) {
+                    if (in_array($sample, self::$samplesRequiringProcessing) &&
+                        !in_array($sample, $processed)
+                    ) {
+                        unset($enabled[$key]);
+                    }
+                }
+                return array_values($enabled);
+            default:
+                return array_values($this->getRequestedSamples());
         }
     }
 }
