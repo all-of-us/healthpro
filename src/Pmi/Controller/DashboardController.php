@@ -43,12 +43,18 @@ class DashboardController extends AbstractController
         $start_date = $request->get('start_date');
         $end_date = $request->get('end_date');
         $result = $this->getMetricsObject($app, "NONE");
+        // if start date isn't supplied, grab first date from metrics response object
+        if (empty($start_date)) {
+            $start_date = $result[0]->date;
+        }
 
         $data = [];
 
         $dates = [];
         $entries = [];
         $values = [];
+        $totals = [];
+        $hover_text = [];
 
         // grab all entries and dates to use for plotly
         foreach($result as $row) {
@@ -70,10 +76,18 @@ class DashboardController extends AbstractController
                             array_push($entries, $entry_name);
                         }
                     }
+
+                    // if not performing total participant count, grab total to use for
+                    // percentage text
+                    if ($filter_by != 'Participant' && $filter_key == 'Participant') {
+                        array_push($totals, $entry->value);
+                    }
                 }
             }
 
         }
+        // set counter to keep track of how many rows have been processed (for totals array)
+        $i = 0;
 
         // iterate again to grab values now that we have all possible entries
         foreach($result as $row) {
@@ -88,11 +102,18 @@ class DashboardController extends AbstractController
                     $row_entries = $row->entries;
                     $match = $this->searchEntries($row_entries, 'name', $lookup);
                     if (empty($match)) {
-                        $values[$entry][] = 0;
+                        $val = 0;
                     } else {
-                        $values[$entry][] = $match[0];
+                        $val = $match[0];
+                    }
+
+                    $values[$entry][] = $val;
+
+                    if ($filter_by != 'Participant') {
+                       $hover_text[$entry][] = $this->calculatePercentText($val, $totals[$i]);
                     }
                 }
+                $i++;
             }
         }
 
@@ -110,10 +131,16 @@ class DashboardController extends AbstractController
                     "color" => $this->getColorBrewerVal($i)
                 )
             );
+            // add hover text if needed
+            if ($filter_by != 'Participant') {
+                $trace["text"] = $hover_text[$entry];
+                $trace["hoverinfo"] = "text+name";
+            }
+
             array_push($data, $trace);
             $i++;
         }
-
+        // return json
         return $app->json($data);
     }
 
@@ -487,7 +514,7 @@ class DashboardController extends AbstractController
     public function testAction(Application $app, Request $request)
     {
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-        $result = $metricsApi->metrics(["HPO_ID"])->bucket;
+        $result = $metricsApi->metrics(["NONE"])->bucket;
         return $app->json($result);
     }
 
