@@ -1,5 +1,5 @@
 <?php
-use Pmi\Mayolink\Saml;
+use Pmi\Order\Mayolink\Saml;
 
 class SamlTest extends \PHPUnit_Framework_TestCase
 {

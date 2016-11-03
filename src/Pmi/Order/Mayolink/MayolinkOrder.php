@@ -1,7 +1,7 @@
 <?php
-namespace Pmi\Mayolink;
+namespace Pmi\Order\Mayolink;
 
-class Order
+class MayolinkOrder
 {
     protected $ordersEndpoint = 'https://orders.mayomedicallaboratories.com';
     protected $authEndpoint = 'https://profile.mayomedicallaboratories.com/authn';

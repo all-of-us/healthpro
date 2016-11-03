@@ -1,11 +1,11 @@
 <?php
-use Pmi\Mayolink\Order;
+use Pmi\Order\Mayolink\MayolinkOrder;
 
 class OrderTest extends \PHPUnit_Framework_TestCase
 {
     public function testLogin()
     {
-        $order = new Order();
+        $order = new MayolinkOrder();
         // TODO: retrieve test credentials from... datastore?
         $loginResult = $order->login('username', 'password');
         $this->assertTrue($loginResult, 'Failed to authenticate with MayoLINK');

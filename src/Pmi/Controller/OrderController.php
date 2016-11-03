@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
-use Pmi\Mayolink\Order as MayoLinkOrder;
+use Pmi\Order\Mayolink\MayolinkOrder;
 use Pmi\Util;
 
 class OrderController extends AbstractController
@@ -420,7 +420,7 @@ class OrderController extends AbstractController
                     if ($app->getConfig('ml_mock_order')) {
                         $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
                     } else {
-                        $order = new MayoLinkOrder();
+                        $order = new MayolinkOrder();
                         $options = [
                             'type' => $orderData['type'],
                             'patient_id' => $participant->biobankId,
@@ -513,7 +513,7 @@ class OrderController extends AbstractController
                 return $app->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
             }
         } else {
-            $mlOrder = new MayoLinkOrder();
+            $mlOrder = new MayolinkOrder();
             $pdf = $mlOrder->loginAndGetPdf(
                 $app->getConfig('ml_username'),
                 $app->getConfig('ml_password'),

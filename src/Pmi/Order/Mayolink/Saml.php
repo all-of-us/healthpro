@@ -1,5 +1,5 @@
 <?php
-namespace Pmi\Mayolink;
+namespace Pmi\Order\Mayolink;
 
 class Saml
 {
