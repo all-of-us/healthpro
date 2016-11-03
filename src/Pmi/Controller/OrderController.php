@@ -25,6 +25,7 @@ class OrderController extends AbstractController
         ['orderJson', '/participant/{participantId}/order/{orderId}/order.json']
     ];
 
+    protected $app;
     protected $order;
     protected $participant;
     protected static $samples = [
@@ -54,6 +55,7 @@ class OrderController extends AbstractController
         if (!$order) {
             $app->abort(404);
         }
+        $this->app = $app;
         $this->order = $order;
         $this->participant = $participant;
     }
@@ -293,17 +295,24 @@ class OrderController extends AbstractController
 
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $this->order['participant_id'];
-        $obj->identifier = [
-            [
-                'system' => 'https://www.pmi-ops-.org',
-                'value' => $this->order['order_id']
-            ],
-            [
-                'system' => 'https://orders.mayomedicallaboratories.com',
-                'value' => $this->order['mayo_id']
-            ]
+        $identifiers = [];
+        $identifiers[] = [
+            'system' => 'https://www.pmi-ops.org',
+            'value' => $this->order['order_id']
         ];
+        if (!$this->app->getConfig('ml_mock_order') && $this->order['mayo_id'] != 'pmitest') {
+            $identifiers[] =[
+            'system' => 'https://orders.mayomedicallaboratories.com',
+                'value' => $this->order['mayo_id']
+            ];
+        }
+        $obj->identifier = $identifiers;
         $obj->created = $created->format('Y-m-d\TH:i:s\Z');
+
+        // TODO: generate samples array
+        $samples = [];
+        $obj->samples = $samples;
+
         $notes = [];
         foreach (['collected', 'processed', 'finalized'] as $step) {
             if ($this->order[$step . '_notes']) {
@@ -314,6 +323,32 @@ class OrderController extends AbstractController
             $obj->notes = $notes;
         }
         return $obj;
+    }
+
+    protected function sendToRdr()
+    {
+        if (!$this->order['finalized_ts']) {
+            return false;;
+        }
+        $order = $this->getRdrObject();
+        if ($this->order['rdr_id']) {
+            // TODO: update endpoint for participants is not yet available
+            /*
+            $this->app['pmi.drc.participants']->updateOrder(
+                $this->participant->id,
+                $this->order['rdr_id'],
+                $order
+            );
+            */
+        } else {
+            $rdrId = $this->app['pmi.drc.participants']->createOrder($this->participant->id, $order);
+            if ($rdrId) {
+                $this->app['em']->getRepository('orders')->update(
+                    $this->order['id'],
+                    ['rdr_id' => $rdrId]
+                );
+            }
+        }
     }
 
     public function orderCreateAction($participantId, Application $app, Request $request)
@@ -519,6 +554,7 @@ class OrderController extends AbstractController
             $updateArray = $this->getOrderUpdateFromForm('collected', $collectForm);
             if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
+                $this->sendToRdr();
                 $app->addFlashNotice('Order collection updated');
 
                 return $app->redirectToRoute('orderCollect', [
@@ -555,6 +591,7 @@ class OrderController extends AbstractController
                 }
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
+                    $this->sendToRdr();
                     $app->addFlashNotice('Order processing updated');
 
                     return $app->redirectToRoute('orderProcess', [
@@ -581,6 +618,7 @@ class OrderController extends AbstractController
             $updateArray = $this->getOrderUpdateFromForm('finalized', $finalizeForm);
             if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
+                $this->sendToRdr();
                 $app->addFlashNotice('Order finalization updated');
 
                 return $app->redirectToRoute('orderFinalize', [
@@ -599,13 +637,22 @@ class OrderController extends AbstractController
 
 
     /* For debugging generated JSON representation - only allowed in local dev */
-    public function orderJsonAction($participantId, $orderId, Application $app)
+    public function orderJsonAction($participantId, $orderId, Application $app, Request $request)
     {
         if (!$app->isLocal()) {
             $app->abort(404);
         }
         $this->loadOrder($participantId, $orderId, $app);
-        $object = $this->getRdrObject();
+        if ($request->query->has('rdr')) {
+            if ($this->order['rdr_id']) {
+                $object = $app['pmi.drc.participants']->getOrder($participantId, $this->order['rdr_id']);
+            } else {
+                $object = ['error' => 'Order does not have rdr_id'];
+            }
+        } else {
+            $object = $this->getRdrObject();
+        }
+
         return $app->json($object);
     }
 }

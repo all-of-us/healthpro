@@ -186,6 +186,9 @@ class RdrParticipants
         return false;
     }
 
+    /*
+     * Evaluation PUT method is not yet supported
+     */
     public function updateEvaluation($participantId, $evaluationId, $evaluation)
     {
         try {
@@ -193,8 +196,57 @@ class RdrParticipants
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->evaluation_id)) {
-                return $result->evaluation_id;
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
+    }
+
+    public function getOrder($participantId, $orderId)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "Participant/{$participantId}/BiobankOrder/{$orderId}");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->id)) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
+    }
+
+    public function createOrder($participantId, $order)
+    {
+        try {
+            $response = $this->getClient()->request('POST', "Participant/{$participantId}/BiobankOrder", [
+                'json' => $order
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
+    }
+
+    /*
+     * Order PUT method is not yet supported
+     */
+    public function updateOrder($participantId, $orderId, $order)
+    {
+        try {
+            $response = $this->getClient()->request('PUT', "Participant/{$participantId}/BiobankOrder/{$orderId}", [
+                'json' => $order
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
             }
         } catch (\Exception $e) {
             return false;
