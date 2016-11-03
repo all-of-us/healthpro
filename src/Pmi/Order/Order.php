@@ -245,9 +245,7 @@ class Order
         $obj->identifier = $identifiers;
         $obj->created = $created->format('Y-m-d\TH:i:s\Z');
 
-        // TODO: generate samples array
-        $samples = [];
-        $obj->samples = $samples;
+        $obj->samples = $this->getRdrSamples();
 
         $notes = [];
         foreach (['collected', 'processed', 'finalized'] as $step) {
@@ -285,6 +283,58 @@ class Order
                 );
             }
         }
+    }
+
+    protected function getSampleTime($set, $sample)
+    {
+        $samples = json_decode($this->order["{$set}_samples"]);
+        if (!is_array($samples) || !in_array($sample, $samples)) {
+            return false;
+        }
+        if ($set == 'processed') {
+            $processedSampleTimes = json_decode($this->order['processed_samples_ts'], true);
+            if (!empty($processedSampleTimes[$sample])) {
+                try {
+                    $time = new \DateTime();
+                    $time->setTimestamp($processedSampleTimes[$sample]);
+                    $time->setTimezone(new \DateTimeZone('UTC'));
+                    return $time->format('Y-m-d\TH:i:s\Z');
+                } catch (\Exception $e) {
+                }
+            }
+        } else {
+            if ($this->order["{$set}_ts"]) {
+                $time = new \DateTime($this->order["{$set}_ts"]);
+                $time->setTimezone(new \DateTimeZone('UTC'));
+                return $time->format('Y-m-d\TH:i:s\Z');
+            }
+        }
+    }
+
+    protected function getRdrSamples()
+    {
+        $samples = [];
+        foreach ($this->getRequestedSamples() as $description => $test) {
+            $sample = [
+                'test' => $test,
+                'description' => $description,
+                'processingRequired' => in_array($test, self::$samplesRequiringProcessing)
+            ];
+            if ($collected = $this->getSampleTime('collected', $test)) {
+                $sample['collected'] = $collected;
+            }
+            if ($sample['processingRequired']) {
+                $processed = $this->getSampleTime('processed', $test);
+                if ($processed) {
+                    $sample['processed'] = $processed;
+                }
+            }
+            if ($finalized = $this->getSampleTime('finalized', $test)) {
+                $sample['finalized'] = $finalized;
+            }
+            $samples[] = $sample;
+        }
+        return $samples;
     }
 
     protected function getOrderFormData($set)
