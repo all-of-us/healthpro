@@ -182,7 +182,7 @@ class HpoApplication extends AbstractApplication
             . " 'unsafe-eval'" // required for setTimeout and setInterval
             . " 'unsafe-inline'" // for the places we are using inline JS
             . " cdn.plot.ly;" // allow plot.ly remote requests
-            . " img-src data:"; // allow data: urls for img src
+            . " img-src 'self' data:"; // allow self and data: urls for img src
 
         $response->headers->set('Content-Security-Policy', $whitelist);
 
