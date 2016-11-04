@@ -1,7 +1,7 @@
 <?php
 use Pmi\Order\Mayolink\MayolinkOrder;
 
-class OrderTest extends \PHPUnit_Framework_TestCase
+class MayolinkOrderTest extends \PHPUnit_Framework_TestCase
 {
     public function testLogin()
     {

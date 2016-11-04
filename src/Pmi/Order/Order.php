@@ -26,7 +26,7 @@ class Order
     ];
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SAL'];
 
-    public function __construct($participantId, $orderId, Application $app)
+    public function loadOrder($participantId, $orderId, Application $app)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
@@ -54,6 +54,11 @@ class Order
         return $this->participant;
     }
 
+    public function setParticipant($participant)
+    {
+        $this->participant = $participant;
+    }
+
     public function get($key)
     {
         if (isset($this->order[$key])) {
@@ -66,6 +71,11 @@ class Order
     public function toArray()
     {
         return $this->order;
+    }
+
+    public function setOrder($order)
+    {
+        $this->order = $order;
     }
 
     public function getCurrentStep()
@@ -236,7 +246,7 @@ class Order
             'system' => 'https://www.pmi-ops.org',
             'value' => $this->order['order_id']
         ];
-        if (!$this->app->getConfig('ml_mock_order') && $this->order['mayo_id'] != 'pmitest') {
+        if ($this->app && !$this->app->getConfig('ml_mock_order') && $this->order['mayo_id'] != 'pmitest') {
             $identifiers[] =[
             'system' => 'https://orders.mayomedicallaboratories.com',
                 'value' => $this->order['mayo_id']

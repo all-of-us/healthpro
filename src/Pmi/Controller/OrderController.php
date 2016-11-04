@@ -28,7 +28,8 @@ class OrderController extends AbstractController
 
     protected function loadOrder($participantId, $orderId, Application $app)
     {
-        $order = new Order($participantId, $orderId, $app);
+        $order = new Order();
+        $order->loadOrder($participantId, $orderId, $app);
         if ($order->isValid()) {
             return $order;
         } else {
