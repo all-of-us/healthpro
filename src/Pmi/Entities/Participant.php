@@ -6,6 +6,7 @@ use Pmi\Util;
 class Participant
 {
     public $id;
+    public $biobankId;
     public $firstName;
     public $lastName;
     public $dob;

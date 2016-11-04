@@ -71,9 +71,6 @@ class EvaluationController extends AbstractController
 
     public function evaluationAction($participantId, $evalId, Application $app, Request $request)
     {
-        if (!$app->isLocal()) {
-            $app->abort(404);
-        }
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
