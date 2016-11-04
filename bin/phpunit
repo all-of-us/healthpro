@@ -4,7 +4,12 @@
 #
 
 APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
-GAE_DIR="/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources"
+GAE_PHP_OSX="/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/php55/php"
 
-php_cli.py --php_executable_path="$GAE_DIR/php55/php" $APP_DIR/vendor/phpunit/phpunit/phpunit $APP_DIR/tests/Pmi -c $APP_DIR/phpunit.xml
+if [ -f "$GAE_PHP_OSX" ]; then
+    PHP=$GAE_PHP_OSX
+else
+    PHP=$(which php)
+fi
 
+php_cli.py --php_executable_path="$PHP" $APP_DIR/vendor/phpunit/phpunit/phpunit $APP_DIR/tests/Pmi -c $APP_DIR/phpunit.xml

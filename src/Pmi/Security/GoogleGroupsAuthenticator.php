@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 
 /**
  * Authenticates by checking that the incoming Google user is a member of a
@@ -51,6 +52,24 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         return $this->ipWhitelist;
     }
     
+    private function getAuthLoginClient($state = null)
+    {
+        if ($state) {
+            $client = new \Google_Client([
+                'state' => $state
+            ]);
+        } else {
+            $client = new \Google_Client();
+        }
+        $client->setClientId($this->app->getConfig('auth_client_id'));
+        $client->setClientSecret($this->app->getConfig('auth_client_secret'));
+
+        $callbackUrl = $this->app->generateUrl('loginReturn', [], true);
+        $client->setRedirectUri($callbackUrl);
+        $client->setScopes(['email', 'profile']);
+        return $client;
+    }
+    
     public function buildCredentials($googleUser)
     {
         // a user's credentials are effectively their logged-in Google user,
@@ -63,13 +82,11 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     /** This runs on every request. */
     public function getCredentials(Request $request)
     {
-        $googleUser = $this->app->getGoogleUser();
-        
         // if the user is already authenticated, then don't re-authenticate
-        $hasLogin = $request->getSession()->has('isLogin');
-        if ($hasLogin && $this->app['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($request->getSession()->has('isLogin') && $this->app['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
             $user = $this->app['security.token_storage']->getToken()->getUser();
-            // make sure the user is still logged into Google and has not switched their account somehow
+            $googleUser = $this->app->getGoogleUser();
+            // make sure the user the Google user is the same as our user
             if ($googleUser && strcasecmp($googleUser->getEmail(), $user->getEmail()) === 0) {
                 // firewall rules will pass and $this->start() will not be called
                 return;
@@ -77,16 +94,22 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
                 // force checkCredentials() to fail due to the mismatched users
                 return $this->buildCredentials(null);
             }
-        }
-        
-        // if the user is not logged into Google, then they are not credentialed
-        if (!$googleUser) {
+        } elseif ($request->query->get('state') && $request->query->get('state') === $this->app['session']->get('auth_state')) {
+            // process a return from Google authentication
+            $client = $this->getAuthLoginClient();
+            $token = $client->fetchAccessTokenWithAuthCode($request->query->get('code'));
+            $client->setAccessToken($token);
+            $idToken = $client->verifyIdToken();
+            if ($idToken) {
+                $this->app['session']->set('googleUser', new \Pmi\Drc\GoogleUser($idToken['sub'], $idToken['email']));
+            }
+            return $this->buildCredentials($this->app->getGoogleUser());
+        } elseif ($this->app->getConfig('gae_auth') && $this->app->getGoogleUser()) {
+            return $this->buildCredentials($this->app->getGoogleUser());
+        } else {
             // firewall rules will fail and $this->start() will be called
-            // (though if all GAE handlers require google login, we will never reach this point)
             return;
         }
-        
-        return $this->buildCredentials($googleUser);
     }
     
     public function getUser($credentials, UserProviderInterface $userProvider)
@@ -100,10 +123,11 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             // just a safeguard in case the Google user and our user get out of sync somehow
             strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;
 
-        if ($this->app->isDev() && $this->app->getConfig('gaBypass')) {
+        if (!$this->app->isProd() && $this->app->getConfig('gaBypass')) {
             return $validCredentials; // Bypass groups auth
         } else {
-            return $validCredentials && count($user->getGroups()) > 0;
+            $valid2fa = !$this->app->getConfig('enforce2fa') || $user->hasTwoFactorAuth();
+            return $validCredentials && count($user->getGroups()) > 0 && $valid2fa;
         }
     }
     
@@ -112,11 +136,29 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $code = 403;
         $googleUser = $this->app->getGoogleUser();
         if ($googleUser) {
-            $template = 'error-auth.html.twig';
             $params = [
                 'email' => $googleUser->getEmail(),
                 'logoutUrl' => $this->app->getGoogleLogoutUrl()
             ];
+            
+            // attempt to load the user object for error msg customization
+            try {
+                $userProvider = new \Pmi\Security\UserProvider($this->app);
+                $user = $userProvider->loadUserByUsername($googleUser->getEmail());
+            } catch (\Exception $e) {
+                $user = null;
+            }
+            
+            // infer the reason behind the auth failure
+            if ($user && $this->app->getConfig('enforce2fa') && !$user->hasTwoFactorAuth()) {
+                $template = 'error-2fa.html.twig';
+            } else {
+                $template = 'error-auth.html.twig';
+            }
+            
+        } elseif ($this->app->getConfig('gae_auth')) {
+            $template = 'error-gae-auth.html.twig';
+            $params = ['loginUrl' => $this->app->getGoogleLoginUrl()];
         } else {
             $template = $this->app['errorTemplate'];
             $params = ['code' => $code];
@@ -135,8 +177,15 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $request->getSession()->set('isLogin', true);
         // has the user agreed to the system usage agreement this session?
         $request->getSession()->set('isUsageAgreed', false);
-        // on success, let the request continue
-        return;
+        
+        if ($this->app->getConfig('gae_auth')) {
+            // simulate the OAuth workflow for more accurate testing
+            $this->app['session']->set('loginDestUrl', $request->getRequestUri());
+            return $this->app->redirectToRoute('loginReturn');
+        } else {
+            // on success, let the request continue
+            return;
+        }
     }
     
     public function supportsRememberMe()
@@ -146,8 +195,22 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        // we never start authentication in our app because Google handles that,
-        // so any call to this method implies an auth failure
-        return $this->onAuthenticationFailure($request, $authException);
+        if ($this->app->getConfig('gae_auth')) {
+            return $this->onAuthenticationFailure($request, $authException);
+        } elseif (!$authException || $authException instanceof AuthenticationCredentialsNotFoundException) {
+            $authState = sha1(openssl_random_pseudo_bytes(1024));
+            $this->app['session']->set('auth_state', $authState);
+            if ($request->attributes->get('_route') !== 'login' &&
+                $request->attributes->get('_route') !== 'logout' &&
+                $request->attributes->get('_route') !== 'loginReturn' &&
+                $request->attributes->get('_route') !== 'timeout')
+            {
+                $this->app['session']->set('loginDestUrl', $request->getRequestUri());
+            }
+            $client = $this->getAuthLoginClient($authState);
+            return $this->app->redirect($client->createAuthUrl());
+        } else {
+            return $this->onAuthenticationFailure($request, $authException);
+        }
     }
 }

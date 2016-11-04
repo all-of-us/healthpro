@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+#
+# Outputs a representative IP address given a CIDR network.
+#
+
+import sys
+from netaddr import *
+
+print IPNetwork(sys.argv[1]).ip

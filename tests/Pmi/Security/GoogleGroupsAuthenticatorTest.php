@@ -1,12 +1,12 @@
 <?php
 
+use Pmi\Drc\MockAppsClient as AppsClient;
 use Pmi\Security\GoogleGroupsAuthenticator;
 use Pmi\Security\UserProvider;
 use Pmi\Security\User;
 use Tests\Pmi\AbstractWebTestCase;
 use Tests\Pmi\GoogleGroup;
 use Tests\Pmi\GoogleUserService;
-use Tests\Pmi\Drc\AppsClient;
 
 class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
 {
@@ -55,6 +55,43 @@ class GoogleGroupsAuthenticatorTest extends AbstractWebTestCase
         $email = 'no-groups@example.com';
         GoogleUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, []);
+        $auth = new GoogleGroupsAuthenticator($this->app);
+        $user = $auth->getUser($auth->getCredentials($this->getRequest()), new UserProvider($this->app));
+        $this->assertEquals(false, $auth->checkCredentials($auth->getCredentials($this->getRequest()), $user));
+        
+        // main 2fa exception group
+        $this->app->logout();
+        $email = 'main-2fa@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [
+            new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::TWOFACTOR_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
+        ]);
+        $auth = new GoogleGroupsAuthenticator($this->app);
+        $user = $auth->getUser($auth->getCredentials($this->getRequest()), new UserProvider($this->app));
+        $this->assertEquals(false, $auth->checkCredentials($auth->getCredentials($this->getRequest()), $user));
+        
+        // site 2fa exception group
+        $this->app->logout();
+        $email = 'site-2fa@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [
+            new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::TWOFACTOR_PREFIX . 'mysite@gapps.com', 'Test Group 2', 'lorem ipsum 2')
+        ]);
+        $auth = new GoogleGroupsAuthenticator($this->app);
+        $user = $auth->getUser($auth->getCredentials($this->getRequest()), new UserProvider($this->app));
+        $this->assertEquals(false, $auth->checkCredentials($auth->getCredentials($this->getRequest()), $user));
+        
+        // main and site 2fa exception groups
+        $this->app->logout();
+        $email = 'mainsite-2fa@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [
+            new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::TWOFACTOR_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2'),
+            new GoogleGroup(User::TWOFACTOR_PREFIX . 'mysite@gapps.com', 'Test Group 3', 'lorem ipsum 3')
+        ]);
         $auth = new GoogleGroupsAuthenticator($this->app);
         $user = $auth->getUser($auth->getCredentials($this->getRequest()), new UserProvider($this->app));
         $this->assertEquals(false, $auth->checkCredentials($auth->getCredentials($this->getRequest()), $user));

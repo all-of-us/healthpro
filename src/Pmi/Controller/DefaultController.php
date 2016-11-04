@@ -10,37 +10,42 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
-use Pmi\Evaluation\Evaluation;
-use Pmi\Mayolink\Order as MayoLinkOrder;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 
 class DefaultController extends AbstractController
 {
     protected static $routes = [
         ['home', '/'],
+        ['dashSplash', '/splash'],
         ['logout', '/logout'],
         ['login', '/login'],
+        ['loginReturn', '/login-return'],
         ['timeout', '/timeout'],
         ['keepAlive', '/keepalive', [ 'method' => 'POST' ]],
         ['clientTimeout', '/client-timeout', [ 'method' => 'GET' ]],
         ['agreeUsage', '/agree', ['method' => 'POST']],
         ['groups', '/groups'],
-        ['switchSite', '/site/{id}/switch'],
+        ['switchSite', '/site/{id}/switch', ['method' => 'GET|POST']],
+        ['selectSite', '/site/select'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
-        ['orderCreate', '/participant/{participantId}/order/create', [
-            'method' => 'GET|POST'
-        ]],
-        ['participantEval', '/participant/{participantId}/eval/{evalId}', [
-            'method' => 'GET|POST',
-            'defaults' => ['evalId' => null]
-        ]]
     ];
 
     public function homeAction(Application $app, Request $request)
     {
-        return $app['twig']->render('index.html.twig');
+        if ($app->hasRole('ROLE_USER')) {
+            return $app['twig']->render('index.html.twig');
+        } elseif ($app->hasRole('ROLE_DASHBOARD')) {
+            return $app->redirectToRoute('dashboard_home');
+        } else {
+            return $app->abort(403);
+        }
+    }
+    
+    public function dashSplashAction(Application $app, Request $request)
+    {
+        return $app['twig']->render('dash-splash.html.twig');
     }
     
     public function logoutAction(Application $app, Request $request)
@@ -48,11 +53,11 @@ class DefaultController extends AbstractController
         $timeout = $request->get('timeout');
         $app->log(Log::LOGOUT);
         $app->logout();
-        return $app->redirect($app->getGoogleLogoutUrl($timeout ? $app->generateUrl('timeout') : null));
+        return $app->redirect($app->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
-    
+
     /**
-     * This is hack. When authorization fails on the "insecure" firewall due
+     * This is hack. When authorization fails on the "anonymous" firewall due
      * to IP whitelist, security will redirect the user to a /login route.
      * Rather than write a custom authorization class or something just render
      * the error page here.
@@ -60,6 +65,13 @@ class DefaultController extends AbstractController
     public function loginAction(Application $app, Request $request)
     {
         return $app['twig']->render('error-ip.html.twig');
+    }
+
+    public function loginReturnAction(Application $app, Request $request)
+    {
+        $app['session']->set('isLoginReturn', true);
+        $url = $app['session']->get('loginDestUrl', $app->generateUrl('home'));
+        return $app->redirect($url);
     }
     
     public function timeoutAction(Application $app, Request $request)
@@ -112,13 +124,17 @@ class DefaultController extends AbstractController
     
     public function switchSiteAction($id, Application $app, Request $request)
     {
-        $user = $app['security.token_storage']->getToken()->getUser();
-        if ($user->belongsToSite($id)) {
-            $app['session']->set('site', $user->getSite($id));
-            return $app->redirectToRoute('home');
+        if ($app->switchSite($id)) {
+            return $app->redirect($request->get('destUrl', $app->generateUrl('home')));
         } else {
             return $app->abort(403);
         }
+    }
+    
+    public function selectSiteAction(Application $app, Request $request)
+    {
+        $destUrl = $request->get('destUrl', $app->generateUrl('home'));
+        return $app['twig']->render('site-select.html.twig', ['destUrl' => $destUrl]);
     }
 
     public function participantsAction(Application $app, Request $request)
@@ -190,7 +206,9 @@ class DefaultController extends AbstractController
 
         if ($idForm->isValid()) {
             $id = $idForm->get('mayoId')->getData();
-            $order = $app['db']->fetchAssoc('SELECT * FROM orders WHERE mayo_id=?', [$id]);
+            $order = $app['em']->getRepository('orders')->fetchOneBy([
+                'mayo_id' => $id
+            ]);
             if ($order) {
                 return $app->redirectToRoute('order', [
                     'participantId' => $order['participant_id'],
@@ -200,7 +218,11 @@ class DefaultController extends AbstractController
             $app->addFlashError('Participant ID not found');
         }
 
-        $recentOrders = $app['db']->fetchAll('SELECT * FROM orders ORDER BY created_ts DESC, id DESC LIMIT 5');
+        $recentOrders = $app['em']->getRepository('orders')->fetchBy(
+            [],
+            ['created_ts' => 'DESC', 'id' => 'DESC'],
+            5
+        );
         foreach ($recentOrders as &$order) {
             $order['participant'] = $app['pmi.drc.participants']->getById($order['participant_id']);
         }
@@ -216,148 +238,18 @@ class DefaultController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        $orders = $app['db']->fetchAll('SELECT * FROM orders WHERE participant_id = ? ORDER BY created_ts DESC, id DESC', [$id]);
-        $evaluations = $app['db']->fetchAll('SELECT * FROM evaluations WHERE participant_id = ? ORDER BY updated_ts DESC, id DESC', [$id]);
+        $orders = $app['em']->getRepository('orders')->fetchBy(
+            ['participant_id' => $id],
+            ['created_ts' => 'DESC', 'id' => 'DESC']
+        );
+        $evaluations = $app['em']->getRepository('evaluations')->fetchBy(
+            ['participant_id' => $id],
+            ['updated_ts' => 'DESC', 'id' => 'DESC']
+        );
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
             'evaluations' => $evaluations
-        ]);
-    }
-
-    public function orderCreateAction($participantId, Application $app, Request $request)
-    {
-        $participant = $app['pmi.drc.participants']->getById($participantId);
-        if (!$participant) {
-            $app->abort(404);
-        }
-        if (!$participant->consentComplete) {
-            $app->abort(403);
-        }
-        $confirmForm = $app['form.factory']->createBuilder(FormType::class)
-            ->add('confirm', HiddenType::class)
-            ->getForm();
-        $confirmForm->handleRequest($request);
-        if ($confirmForm->isValid()) {
-            if ($app->getConfig('ml_mock_order')) {
-                $mlOrderId = $app->getConfig('ml_mock_order');
-            } else {
-                $order = new MayoLinkOrder();
-                $options = [
-                    // TODO: figure out test code, specimen, and temperature parameters
-                    'test_code' => 'ACE',
-                    'specimen' => 'Serum',
-                    'temperature' => 'Ambient',
-                    'first_name' => '*',
-                    'last_name' => $participant->id,
-                    'gender' => $participant->gender,
-                    'birth_date' => $participant->dob,
-                    'physician_name' => 'None',
-                    'physician_phone' => 'None',
-                    // TODO: not sure how ML is handling time zone. setting to yesterday for now
-                    'collected_at' => new \DateTime('-1 day')
-                ];
-                $mlOrderId = $order->loginAndCreateOrder(
-                    $app->getConfig('ml_username'),
-                    $app->getConfig('ml_password'),
-                    $options
-                );
-            }
-            if ($mlOrderId) {
-                $success = $app['db']->insert('orders', [
-                    'participant_id' => $participant->id,
-                    'created_ts' => (new \DateTime())->format('Y-m-d H:i:s'),
-                    'mayo_id' => $mlOrderId
-                ]);
-                if ($success && ($orderId = $app['db']->lastInsertId())) {
-                    $app->log(Log::ORDER_CREATE, $orderId);
-                    return $app->redirectToRoute('order', [
-                        'participantId' => $participant->id,
-                        'orderId' => $orderId
-                    ]);
-                }
-            }
-            $app->addFlashError('Failed to create order.');
-        }
-
-        return $app['twig']->render('order-create.html.twig', [
-            'participant' => $participant,
-            'confirmForm' => $confirmForm->createView()
-        ]);
-    }
-
-    public function participantEvalAction($participantId, $evalId, Application $app, Request $request)
-    {
-        $participant = $app['pmi.drc.participants']->getById($participantId);
-        if (!$participant) {
-            $app->abort(404);
-        }
-        if (!$participant->consentComplete) {
-            $app->abort(403);
-        }
-        $evaluationService = new Evaluation();
-        if ($evalId) {
-            $evaluation = $app['db']->fetchAssoc('SELECT * FROM evaluations WHERE id = ? AND participant_id = ?', [$evalId, $participantId]);
-            if (!$evaluation) {
-                $app->abort(404);
-            }
-            $evaluationService->loadFromArray($evaluation);
-        } else {
-            $evaluation = null;
-        }
-        $evaluationForm = $evaluationService->getForm($app['form.factory']);
-        $evaluationForm->handleRequest($request);
-        if ($evaluationForm->isSubmitted()) {
-            if ($evaluationForm->isValid()) {
-                $evaluationService->setData($evaluationForm->getData());
-                $dbArray = $evaluationService->toArray();
-                $dbArray['updated_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
-                if (!$evaluation) {
-                    $dbArray['participant_id'] = $participant->id;
-                    $dbArray['created_ts'] = $dbArray['updated_ts'];
-                    if ($app['db']->insert('evaluations', $dbArray) && ($evalId = $app['db']->lastInsertId())) {
-                        $app->log(Log::EVALUATION_CREATE, $evalId);
-                        $app['pmi.drc.participants']->createEvaluation($participant->id, [
-                            'evaluation_id' => $evalId,
-                            'evaluation_version' => $dbArray['version'],
-                            'evaluation_data' => $dbArray['data']
-                        ]);
-                        $app->addFlashNotice('Evaluation saved');
-                        return $app->redirectToRoute('participantEval', [
-                            'participantId' => $participant->id,
-                            'evalId' => $evalId
-                        ]);
-                    } else {
-                        $app->addFlashError('Failed to create new evaluation');
-                    }
-                } else {
-                    if ($app['db']->update('evaluations', $dbArray, ['id' => $evalId])) {
-                        $app->log(Log::EVALUATION_EDIT, $evalId);
-                        $result = $app['pmi.drc.participants']->updateEvaluation($participant->id, $evalId, [
-                            'evaluation_version' => $dbArray['version'],
-                            'evaluation_data' => $dbArray['data']
-                        ]);
-                        $app->addFlashNotice('Evaluation saved');
-                        return $app->redirectToRoute('participantEval', [
-                            'participantId' => $participant->id,
-                            'evalId' => $evalId
-                        ]);
-                    } else {
-                        $app->addFlashError('Failed to update evaluation');
-                    }
-                }
-            } else {
-                if (count($evaluationForm->getErrors()) == 0) {
-                    $evaluationForm->addError(new FormError('Please correct the errors below'));
-                }
-            }
-        }
-
-        return $app['twig']->render('evaluation.html.twig', [
-            'participant' => $participant,
-            'evaluation' => $evaluation,
-            'evaluationForm' => $evaluationForm->createView(),
-            'schema' => $evaluationService->getSchema()
         ]);
     }
 }

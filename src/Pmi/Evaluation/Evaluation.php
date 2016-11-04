@@ -4,15 +4,19 @@ namespace Pmi\Evaluation;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
+use Pmi\Util;
 
 class Evaluation
 {
-    const CURRENT_VERSION = '0.1.1';
+    const CURRENT_VERSION = '0.1.3';
     protected $version;
     protected $data;
     protected $schema;
+    protected $participant;
+    protected $locked = false;
 
     public function __construct()
     {
@@ -34,6 +38,10 @@ class Evaluation
                 $this->data = json_decode($array['data']);
             }
         }
+        if (!empty($array['finalized_ts'])) {
+            $this->locked = true;
+        }
+        $this->participant = $array['participant_id'];
         $this->loadSchema();
         $this->normalizeData();
     }
@@ -56,36 +64,78 @@ class Evaluation
         return $this->schema;
     }
 
+    public function getWarnings()
+    {
+        $warnings = [];
+        foreach ($this->schema->fields as $metric) {
+            if (!empty($metric->warnings) && is_array($metric->warnings)) {
+                $warnings[$metric->name] = $metric->warnings;
+            }
+        }
+        return $warnings;
+    }
+
+    public function getConversions()
+    {
+        $conversions = [];
+        foreach ($this->schema->fields as $metric) {
+            if (!empty($metric->convert)) {
+                $conversions[$metric->name] = $metric->convert;
+            }
+        }
+        return $conversions;
+    }
+
     public function getForm(FormFactory $formFactory)
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
         foreach ($this->schema->fields as $field) {
             $constraints = [];
+            $attributes = [];
             $options = [
                 'required' => false,
                 'scale' => 0
             ];
+            if ($this->locked) {
+                $options['disabled'] = true;
+            }
+            if (isset($field->label)) {
+                $options['label'] = $field->label;
+            }
             if (isset($field->decimals)) {
                 $options['scale'] = $field->decimals;
             }
             if (isset($field->max)) {
-                $constraints[] = new Constraints\LessThanOrEqual($field->max);
+                $constraints[] = new Constraints\LessThan($field->max);
+                $attributes['data-parsley-lt'] = $field->max;
             }
             if (isset($field->min)) {
-                $constraints[] = new Constraints\GreaterThanOrEqual($field->min);
-            } else {
+                $constraints[] = new Constraints\GreaterThanEqual($field->min);
+                $attributes['data-parsley-gt'] = $field->min;
+            } elseif (!isset($field->options)) {
                 $constraints[] = new Constraints\GreaterThan(0);
+                $attributes['data-parsley-gt'] = 0;
             }
             $options['constraints'] = $constraints;
+            $options['attr'] = $attributes;
 
+            if (isset($field->options)) {
+                $class = ChoiceType::class;
+                unset($options['scale']);
+                $options['choices'] = array_combine($field->options, $field->options);
+                $options['placeholder'] = false;
+            } else {
+                $class = NumberType::class;
+            }
             if (isset($field->replicates)) {
                 $formBuilder->add($field->name, CollectionType::class, [
-                    'entry_type' => NumberType::class,
+                    'entry_type' => $class,
                     'entry_options' => $options,
-                    'required' => false
+                    'required' => false,
+                    'label' => isset($options['label']) ? $options['label'] : null
                 ]);
             } else {
-                $formBuilder->add($field->name, NumberType::class, $options);
+                $formBuilder->add($field->name, $class, $options);
             }
         }
         return $formBuilder->getForm();
@@ -135,5 +185,17 @@ class Evaluation
                 }
             }
         }
+    }
+
+    public function getFhir($datetime)
+    {
+        $fhir = new Fhir([
+            'data' => $this->data,
+            'schema' => $this->schema,
+            'patient' => $this->participant,
+            'version' => $this->version,
+            'datetime' => $datetime
+        ]);
+        return $fhir->toObject();
     }
 }

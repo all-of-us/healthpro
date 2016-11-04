@@ -14,7 +14,7 @@ abstract class AbstractWebTestCase extends WebTestCase
     /** http://silex.sensiolabs.org/doc/master/testing.html#webtestcase */
     public function createApplication()
     {
-        putenv('PMI_ENV=' . HpoApplication::ENV_DEV);
+        putenv('PMI_ENV=' . HpoApplication::ENV_LOCAL);
         $app = new HpoApplication([
             'templatesDirectory' => __DIR__ . '/../../views',
             'errorTemplate' => 'error.html.twig',
@@ -36,7 +36,10 @@ abstract class AbstractWebTestCase extends WebTestCase
         $app->setup([
             // don't bypass groups auth because we handle this with fixtures
             'gaBypass' => false,
-            'ip_whitelist' => $this->getIpWhitelist()
+            'gaDomain' => 'pmi-drc-hpo-unit-tests.biz',
+            'ip_whitelist' => $this->getIpWhitelist(),
+            'gae_auth' => true,
+            'enforce2fa' => true
         ]);
         $app->mount('/', new Controller\DefaultController());
         $app->mount('/dashboard', new Controller\DashboardController());
@@ -46,6 +49,10 @@ abstract class AbstractWebTestCase extends WebTestCase
     
     public function loginUser(GoogleGroupsAuthenticator $authenticator, User $user)
     {
+        // hack so that authenticator won't crash building routes
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/');
+        
         $providerKey = 'main';
         $token = $authenticator->createAuthenticatedToken($user, $providerKey);
         $this->app['security.token_storage']->setToken($token);

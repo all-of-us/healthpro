@@ -29,7 +29,7 @@ class TwigCacheWarmerCommand extends Command
             $process->run();
         }
 
-        putenv('PMI_ENV=' . HpoApplication::ENV_DEV);
+        putenv('PMI_ENV=' . HpoApplication::ENV_LOCAL);
         $app = new HpoApplication([
             'templatesDirectory' => $viewDir,
             'cacheDirectory' => $cacheDir,

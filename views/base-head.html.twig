@@ -1,0 +1,28 @@
+{# common elements in the HEAD tag #}
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{{ asset('dist/css/lib.min.css') }}?v={{ app.assetVer }}">
+<link rel="stylesheet" href="{{ asset('dist/css/app.min.css') }}?v={{ app.assetVer }}">
+<!--[if lt IE 9]>
+    <script src="{{ asset('js/html5shiv.min.js') }}"></script>
+    <script src="{{ asset('js/respond.min.js') }}"></script>
+<![endif]-->
+
+{# pass parameters to JS #}
+<script>
+    var PMI = {
+        "sessionTimeout": {{ app.sessionTimeout|json_encode|raw }},
+        "sessionWarning": {{ app.sessionWarning|json_encode|raw }},
+        "path": {
+            "clientTimeout": {{ path('clientTimeout')|json_encode|raw }},
+            "logout": {{ path('logout')|json_encode|raw }},
+            "keepAlive": {{ path('keepAlive')|json_encode|raw }},
+            "agreeUsage": {{ path('agreeUsage')|json_encode|raw }},
+            "switchSite": {{ path('switchSite', {id: "SITE_ID"})|json_encode|raw }}
+        },
+        "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
+        "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }},
+        "views": {}
+    };
+</script>

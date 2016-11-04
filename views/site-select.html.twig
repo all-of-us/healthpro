@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+{% block title %}Choose Site - {% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="alert alert-info">
+                <span class="glyphicon glyphicon-info-sign"></span>
+                Please select your current site in order to continue.
+            </div>
+            <form id="siteSelector" method="POST">
+                <input type="hidden" id="destUrl" name="destUrl" value="{{ destUrl }}"/>
+                <div class="form-group">
+                    <label>Choose Site</label>
+                    <select class="form-control site-id">
+                        {% for site in app.user.sites %}
+                            <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : ''}} >{{ site.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary site-submit">Continue</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function () {
+    var SiteSelector = Backbone.View.extend({
+        events: {
+            "change .site-id": "switchSite"
+        },
+        switchSite: function() {
+            var siteId = this.$(".site-id").val();
+            if (_.truthy(siteId)) {
+                var path = PMI.path.switchSite.replace("SITE_ID", siteId);
+                this.$el.attr("action", path);
+            }
+            return true;
+        },
+        initialize: function() { this.render(); },
+        render: function() {
+            this.switchSite(); // initialize
+            return this;
+        }
+    });
+    
+    new SiteSelector({el: $("#siteSelector")});
+});
+</script>
+{% endblock %}

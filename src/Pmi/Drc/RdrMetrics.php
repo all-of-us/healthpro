@@ -10,17 +10,21 @@ class RdrMetrics
         $this->rdrHelper = $rdrHelper;
     }
 
-    public function metrics($metric)
+    public function metrics($facets)
     {
         $client = $this->rdrHelper->getClient();
-        $response = $client->request('POST', 'metrics/v1/metrics', [
+        $response = $client->request('POST', 'rdr/v1/Metrics', [
             'json' => [
-                'metric' => $metric
+                'facets' => $facets
             ]
         ]);
         $responseObject = json_decode($response->getBody()->getContents());
         if (!is_object($responseObject)) {
-            throw new Exception\InvalidResponseException();
+            // Response could be double-encoded. Try double decoding.
+            $responseObject = json_decode($responseObject);
+            if (!is_object($responseObject)) {
+                throw new Exception\InvalidResponseException();
+            }
         }
         return $responseObject;
     }

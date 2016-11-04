@@ -1,17 +1,25 @@
 <h2>
     <i class="fa fa-medkit" aria-hidden="true"></i>
-    {{ order.created_ts|date('n/j/Y g:ia') }}
-    <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }} #{{ participant.id }}</a></small>
+    {{ order.created_ts|date('n/j/Y') }}
+    <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
 </h2>
-<p class="lead">MayoLINK ID: <strong>{{ order.mayo_id }}</strong></p>
+<p class="lead">Order ID: <strong>{{ order.order_id }}</strong></p>
 
 {% set params = { participantId: participant.id, orderId: order.id } %}
-{% set steps = {
-    print: 'printed',
-    collect: 'collected',
-    process: 'processed',
-    finalize: 'finalized'
-} %}
+{% if order.type == 'kit' %}
+    {% set steps = {
+        collect: 'collected',
+        process: 'processed',
+        finalize: 'finalized'
+    } %}
+{% else %}
+    {% set steps = {
+        print: 'printed',
+        collect: 'collected',
+        process: 'processed',
+        finalize: 'finalized'
+    } %}
+{% endif %}
 <ul class="nav nav-tabs">
     <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
     {% set nextEnabled = true %}
@@ -33,3 +41,13 @@
     {% endfor %}
 </ul>
 <br />
+<dl class="dl-horizontal">
+    <dt>Name</dt>
+    <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
+    <dt>ID</dt>
+    <dd>{{ participant.shortId }}</dd>
+    <dt>DOB</dt>
+    <dd>{{ participant.dob|date('n/j/Y') }}</dd>
+    <dt>Gender Identity</dt>
+    <dd>{{ participant.genderIdentity }}</dd>
+</dl>

@@ -1,11 +1,51 @@
 <?php
-namespace Pmi\Mayolink;
+namespace Pmi\Order\Mayolink;
 
-class Order
+class MayolinkOrder
 {
     protected $ordersEndpoint = 'https://orders.mayomedicallaboratories.com';
     protected $authEndpoint = 'https://profile.mayomedicallaboratories.com/authn';
     protected $providerName = 'www.mayomedicallaboratories.com';
+    protected static $tests = [
+        '1ED04' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '1ED10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '1SST8' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Serum SST'
+        ],
+        '1PST8' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Plasma PST'
+        ],
+        '2ED10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '1HEP4' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'WB Sodium Heparin'
+        ],
+        '1UR10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Urine'
+        ]
+    ];
+    protected static $salivaTests = [
+        '1SAL' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Saliva'
+        ]
+    ];
+    protected static $siteAccounts = [
+        'a' => '7035588',
+        'b' => '7035500'
+    ];
 
     private $client;
     private $csrfToken;
@@ -48,20 +88,37 @@ class Order
     {
         $body = [
             'authenticity_token' => $this->csrfToken,
-            'order[test_requests_attributes][0][test_code]' => $options['test_code'],
-            "temperatures[{$options['test_code']}][{$options['specimen']}]" => $options['temperature'],
-            'order[patient_attributes][first_name]' => $options['first_name'],
-            'order[patient_attributes][last_name]' => $options['last_name'],
+            'order[reference_number]' => $options['order_id'],
+            'order[patient_attributes][medical_record_number]' => $options['patient_id'],
+            'order[patient_attributes][first_name]' => '*',
+            'order[patient_attributes][last_name]' => $options['patient_id'],
             'order[patient_attributes][gender]' => $options['gender'],
             'order[patient_attributes][birth_date]' => $options['birth_date']->format('Y-m-d'),
-            'order[physician_name]' => $options['physician_name'],
-            'order[physician_phone]' => $options['physician_phone'],
+            'order[physician_name]' => 'None',
+            'order[physician_phone]' => 'None',
             'order[collected_at(1i)]' => $options['collected_at']->format('Y'),
             'order[collected_at(2i)]' => $options['collected_at']->format('n'),
             'order[collected_at(3i)]' => $options['collected_at']->format('j'),
             'order[collected_at(4i)]' => $options['collected_at']->format('H'),
             'order[collected_at(5i)]' => $options['collected_at']->format('i')
         ];
+        $i = 0;
+        if (isset($options['type']) && $options['type'] === 'saliva') {
+            $tests = self::$salivaTests;
+        } else {
+            $tests = self::$tests;
+        }
+        foreach ($tests as $test => $testOptions) {
+            if (isset($options['tests']) && !in_array($test, $options['tests'])) {
+                continue;
+            }
+            $body["order[test_requests_attributes][{$i}][test_code]"] = $test;
+            $body["temperatures[{$test}][{$testOptions['specimen']}]"] = $testOptions['temperature'];
+            $i++;
+        }
+        if (isset($options['site']) && isset(self::$siteAccounts[$options['site']])) {
+            $body['account'] = self::$siteAccounts[$options['site']];
+        }
         $response = $this->client->request('POST', "{$this->ordersEndpoint}/en/orders", [
             'form_params' => $body,
             'allow_redirects' => false

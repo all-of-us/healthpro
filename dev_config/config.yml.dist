@@ -18,7 +18,8 @@ mysql_host: 127.0.0.1
 
 # RDR API
 #   Note: Store service account key in rdr_key.json
-rdr_endpoint: https://pmi-rdr-api-test.appspot.com/_ah/api/
+# Override API endpoint if necessary
+# rdr_endpoint: https://pmi-drc-api-test.appspot.com/
 
 # MayoLINK configuration
 # Specify mock order ID to skip order creation in MayoLINK
@@ -30,11 +31,27 @@ ml_mock_order: pmitest
 # Google Apps configuration
 # Bypass Google Apps auth
 gaBypass: 1
+# Google Groups to use when bypassing Google Apps auth
+gaByassGroups:
+  - email: hpo-site-hogwarts@pmi-ops.io
+    name: Hogwarts
+  - email: hpo-site-durmstrang@pmi-ops.io
+    name: Durmstrang
+  - email: hpo-site-beauxbatons@pmi-ops.io
+    name: Beauxbatons
+  - email: admin-dashboard@pmi-ops.io
+    name: Admin Dashboard
 # Or, configure Google Apps auth
 #   Note: Store service account key in googleapps_key.json
 gaApplicationName: PMI DRC HPO
 gaDomain: staging.pmi-ops.org
 gaAdminEmail: hpo-api@staging.pmi-ops.org
 
+# use Google App Engine auth via UserService instead of Google OAuth
+gae_auth: 1
+
 # IP whitelist (CSV)
 ip_whitelist:
+
+# require user to have two-factor authentication enabled
+enforce2fa: 0

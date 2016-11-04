@@ -1,13 +1,14 @@
 <?php
 namespace Pmi\Drc;
 
+use Pmi\Entities\Participant;
 use Ramsey\Uuid\Uuid;
 
 class RdrParticipants
 {
     protected $rdrHelper;
     protected $client;
-    protected static $resourceEndpoint = 'participant/v1/';
+    protected static $resourceEndpoint = 'rdr/v1/';
 
     public function __construct(RdrHelper $rdrHelper)
     {
@@ -27,38 +28,61 @@ class RdrParticipants
         if (!is_object($participant)) {
             return false;
         }
-        if (!isset($participant->drc_internal_id)) {
+        if (isset($participant->participant_id)) {
+            $id = $participant->participant_id;
+        } else {
             return false;
         }
-        if (isset($participant->enrollment_status) && $participant->enrollment_status == 'CONSENTED') {
+        if (!empty($participant->biobank_id)) {
+            $biobankId = $participant->biobank_id;
+        } else {
+            $biobankId = $participant->participant_id; // for older participants without biobank ids
+        }
+        if (isset($participant->membership_tier) && in_array($participant->membership_tier, ['VOLUNTEER', 'ENROLLEE', 'FULL_PARTICIPANT'])) {
             $consentStatus = true;
         } else {
             $consentStatus = false;
         }
-        return (object)[
-            'id' => $participant->drc_internal_id,
+        switch ($participant->gender_identity) {
+            case 'FEMALE':
+                $gender = 'F';
+                break;
+            case 'MALE':
+                $gender = 'M';
+                break;
+            default:
+                $gender = 'U';
+                break;
+        }
+        $genderIdentity = str_replace('_', ' ', $participant->gender_identity);
+        $genderIdentity = ucfirst(strtolower($genderIdentity));
+        return new Participant([
+            'id' => $id,
+            'biobankId' => $biobankId,
             'firstName' => $participant->first_name,
+            'middleName' => $participant->middle_name,
             'lastName' => $participant->last_name,
             'dob' => new \DateTime($participant->date_of_birth),
-            'gender' => 'U',
-            'zip' => isset($participant->zip_code) ? $participant->zip_code : null,
-            'consentComplete' => isset($participant->membership_tier) ? $participant->membership_tier == 'CONSENTED' : null
-        ];
+            'genderIdentity' => $genderIdentity,
+            'gender' => $gender,
+            'zip' => $participant->zip_code,
+            'consentComplete' => $consentStatus
+        ]);
     }
 
     protected function paramsToQuery($params)
     {
         $query = [];
         if (isset($params['lastName'])) {
-            $query['last_name'] = $params['lastName'];
+            $query['last_name'] = ucfirst($params['lastName']);
         }
         if (isset($params['firstName'])) {
-            $query['first_name'] = $params['firstName'];
+            $query['first_name'] = ucfirst($params['firstName']);
         }
         if (isset($params['dob'])) {
             try {
                 $date = new \DateTime($params['dob']);
-                $query['date_of_birth'] = $date->format('Y-m-d\T00:00:00');
+                $query['date_of_birth'] = $date->format('Y-m-d');
             } catch (\Exception $e) {
                 throw new Exception\InvalidDobException();
             }
@@ -71,7 +95,7 @@ class RdrParticipants
     {
         $query = $this->paramsToQuery($params);
         try {
-            $response = $this->getClient()->request('GET', 'participants', [
+            $response = $this->getClient()->request('GET', 'Participant', [
                 'query' => $query
             ]);
         } catch (\Exception $e) {
@@ -102,7 +126,7 @@ class RdrParticipants
         $participant = $memcache->get($memcacheKey);
         if (!$participant) {
             try {
-                $response = $this->getClient()->request('GET', "participants/{$id}");
+                $response = $this->getClient()->request('GET', "Participant/{$id}");
                 $participant = json_decode($response->getBody()->getContents());
                 $memcache->set($memcacheKey, $participant, 0, 300);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
@@ -116,16 +140,15 @@ class RdrParticipants
     {
         if (isset($participant['date_of_birth'])) {
             $dt = new \DateTime($participant['date_of_birth']);
-            $participant['date_of_birth'] = $dt->format('Y-m-d\T00:00:00');
+            $participant['date_of_birth'] = $dt->format('Y-m-d');
         }
-        $participant['biobank_id'] = Uuid::uuid4();
         try {
-            $response = $this->getClient()->request('POST', 'participants', [
+            $response = $this->getClient()->request('POST', 'Participant', [
                 'json' => $participant
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->biobank_id) && $result->biobank_id == $participant['biobank_id']) {
-                return $result->drc_internal_id;
+            if (is_object($result) && (isset($result->drc_internal_id) || isset($result->participant_id))) {
+                return isset($result->drc_internal_id) ? $result->drc_internal_id : $result->participant_id;
             }
         } catch (\Exception $e) {
             return false;
@@ -136,9 +159,9 @@ class RdrParticipants
     public function getEvaluation($participantId, $evaluationId)
     {
         try {
-            $response = $this->getClient()->request('GET', "participants/{$participantId}/evaluations/{$evaluationId}");
+            $response = $this->getClient()->request('GET', "Participant/{$participantId}/PhysicalEvaluation/{$evaluationId}");
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->evaluation_id)) {
+            if (is_object($result) && isset($result->id)) {
                 return $result;
             }
         } catch (\Exception $e) {
@@ -150,12 +173,12 @@ class RdrParticipants
     public function createEvaluation($participantId, $evaluation)
     {
         try {
-            $response = $this->getClient()->request('POST', "participants/{$participantId}/evaluations", [
+            $response = $this->getClient()->request('POST', "Participant/{$participantId}/PhysicalEvaluation", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->evaluation_id)) {
-                return $result->evaluation_id;
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
             }
         } catch (\Exception $e) {
             return false;
@@ -163,15 +186,67 @@ class RdrParticipants
         return false;
     }
 
+    /*
+     * Evaluation PUT method is not yet supported
+     */
     public function updateEvaluation($participantId, $evaluationId, $evaluation)
     {
         try {
-            $response = $this->getClient()->request('PUT', "participants/{$participantId}/evaluations/{$evaluationId}", [
+            $response = $this->getClient()->request('PUT', "Participant/{$participantId}/PhysicalEvaluation/{$evaluationId}", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->evaluation_id)) {
-                return $result->evaluation_id;
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
+    }
+
+    public function getOrder($participantId, $orderId)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "Participant/{$participantId}/BiobankOrder/{$orderId}");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->id)) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
+    }
+
+    public function createOrder($participantId, $order)
+    {
+        try {
+            $response = $this->getClient()->request('POST', "Participant/{$participantId}/BiobankOrder", [
+                'json' => $order
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
+    }
+
+    /*
+     * Order PUT method is not yet supported
+     */
+    public function updateOrder($participantId, $orderId, $order)
+    {
+        try {
+            $response = $this->getClient()->request('PUT', "Participant/{$participantId}/BiobankOrder/{$orderId}", [
+                'json' => $order
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
             }
         } catch (\Exception $e) {
             return false;

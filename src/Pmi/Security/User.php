@@ -7,20 +7,22 @@ class User implements UserInterface
 {
     const SITE_PREFIX = 'hpo-site-';
     const DASHBOARD_GROUP = 'admin-dashboard';
+    const TWOFACTOR_GROUP = 'mfa_exception';
+    const TWOFACTOR_PREFIX = 'x-site-';
     
     private $googleUser;
     private $groups;
     private $sites;
     private $dashboardAccess;
-    private $bypassGroupsAuth = false;
+    private $info;
     
-    public function __construct($googleUser, array $groups, $bypassGroupsAuth = false)
+    public function __construct($googleUser, array $groups, $info = null)
     {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
+        $this->info = $info;
         $this->sites = $this->computeSites();
         $this->dashboardAccess = $this->computeDashboardAccess();
-        $this->bypassGroupsAuth = $bypassGroupsAuth;
     }
     
     public function getGroups()
@@ -28,15 +30,23 @@ class User implements UserInterface
         return $this->groups;
     }
     
+    public function getInfo()
+    {
+        return $this->info;
+    }
+
     private function computeSites()
     {
         $sites = [];
         // site membership is determined by the user's groups
         foreach ($this->groups as $group) {
             if (strpos($group->getEmail(), self::SITE_PREFIX) === 0) {
+                $id = preg_replace('/@.*$/', '', $group->getEmail());
+                $id = str_replace(self::SITE_PREFIX, '', $id);
                 $sites[] = (object) [
                     'email' => $group->getEmail(),
-                    'name' => $group->getName()
+                    'name' => $group->getName(),
+                    'id' => $id
                 ];
             }
         }
@@ -52,6 +62,22 @@ class User implements UserInterface
             }
         }
         return $hasAccess;
+    }
+    
+    public function hasTwoFactorAuth()
+    {
+        // Google doesn't expose the user's current 2FA setting via API so
+        // we infer it by checking whether they are in a 2FA exception group
+        $twoFactorAuth = true;
+        foreach ($this->groups as $group) {
+            $email = $group->getEmail();
+            if (strpos($email, self::TWOFACTOR_GROUP . '@') === 0) {
+                $twoFactorAuth = false;
+            } elseif (strpos($email, self::TWOFACTOR_PREFIX) === 0) {
+                $twoFactorAuth = false;
+            }
+        }
+        return $twoFactorAuth;
     }
 
     public function getSites()
@@ -90,18 +116,14 @@ class User implements UserInterface
     
     public function getRoles()
     {
-        if ($this->bypassGroupsAuth) {
-            return ['ROLE_USER', 'ROLE_DASHBOARD'];
-        } else {
-            $roles = [];
-            if (count($this->sites) > 0) {
-                $roles[] = 'ROLE_USER';
-            }
-            if ($this->dashboardAccess) {
-                $roles[] = 'ROLE_DASHBOARD';
-            }
-            return $roles;
+        $roles = [];
+        if (count($this->sites) > 0) {
+            $roles[] = 'ROLE_USER';
         }
+        if ($this->dashboardAccess) {
+            $roles[] = 'ROLE_DASHBOARD';
+        }
+        return $roles;
     }
     
     public function getPassword()
@@ -127,5 +149,14 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         // we don't actually store any credentials
+    }
+
+    public function getId()
+    {
+        if (isset($this->info['id'])) {
+            return $this->info['id'];
+        } else {
+            return false;
+        }
     }
 }

@@ -20,7 +20,7 @@ class DevController extends AbstractController
 
     public function datastoreInitAction(Application $app, Request $request)
     {
-        if ($app['env'] !== Application::ENV_DEV && $app['env'] !== Application::ENV_TEST) {
+        if ($app->isProd()) {
             return $app->abort(404);
         } elseif (!UserService::isCurrentUserAdmin()) {
             $app->addFlashError('Access denied!');
@@ -42,45 +42,43 @@ class DevController extends AbstractController
 
     public function createParticipantAction(Application $app, Request $request)
     {
-        if (!$app->isDev()) {
+        if ($app->isProd()) {
             return $app->abort(404);
-        } elseif (!UserService::isCurrentUserAdmin()) {
-            return $app->abort(403);
-        } else {
-            $form = $app['form.factory']->createBuilder(FormType::class)
-                ->add('last_name', TextType::class)
-                ->add('first_name', TextType::class)
-                ->add('zip_code', TextType::class)
-                ->add('date_of_birth', TextType::class)
-                ->add('membership_tier', ChoiceType::class, [
-                    'choices' => [
-                        'CONSENTED' => 'CONSENTED',
-                        'NONE' => 'NONE'
-                    ]
-                ])
-                ->add('gender_identity', ChoiceType::class, [
-                    'choices' => [
-                        'FEMALE' => 'FEMALE',
-                        'MALE' => 'MALE',
-                        'OTHER' => 'OTHER'
-                    ]
-                ])
-                ->getForm();
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                $data = $form->getData();
-                $participantsApi = new \Pmi\Drc\RdrParticipants($app['pmi.drc.rdrhelper']);
-                $result = $participantsApi->createParticipant($data);
-                if ($result) {
-                    $app->addFlashSuccess('Participant created: ' . $result);
-                } else {
-                    $app->addFlashError('Error creating participant');
-                }
-                return $app->redirectToRoute('_dev_createParticipant');
-            }
-            return $app['twig']->render('dev/participant.html.twig', [
-                'form' => $form->createView()
-            ]);
         }
+
+        $form = $app['form.factory']->createBuilder(FormType::class)
+            ->add('last_name', TextType::class)
+            ->add('first_name', TextType::class)
+            ->add('zip_code', TextType::class)
+            ->add('date_of_birth', TextType::class)
+            ->add('membership_tier', ChoiceType::class, [
+                'choices' => [
+                    'REGISTERED' => 'REGISTERED',
+                    'VOLUNTEER' => 'VOLUNTEER'
+                ]
+            ])
+            ->add('gender_identity', ChoiceType::class, [
+                'choices' => [
+                    'FEMALE' => 'FEMALE',
+                    'MALE' => 'MALE',
+                    'OTHER' => 'OTHER'
+                ]
+            ])
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $data = $form->getData();
+            $participantsApi = new \Pmi\Drc\RdrParticipants($app['pmi.drc.rdrhelper']);
+            $result = $participantsApi->createParticipant($data);
+            if ($result) {
+                $app->addFlashSuccess('Participant created: ' . $result);
+            } else {
+                $app->addFlashError('Error creating participant');
+            }
+            return $app->redirectToRoute('_dev_createParticipant');
+        }
+        return $app['twig']->render('dev/participant.html.twig', [
+            'form' => $form->createView()
+        ]);
     }
 }

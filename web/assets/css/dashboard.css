@@ -1,5 +1,15 @@
 /* Styles for dashboard interface */
 
 .plotly-div {
-    min-height: 500px;
+    margin-top: 15px;
+}
+
+.center-filter-panel {
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
+.spinner {
+    /* so the spinner doesn't appear on top of Bootstrap modals */
+    z-index: 999 !important;
 }

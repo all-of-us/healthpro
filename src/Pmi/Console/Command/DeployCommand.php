@@ -2,6 +2,8 @@
 namespace Pmi\Console\Command;
 
 use Pmi\Application\AbstractApplication;
+use SensioLabs\Security\SecurityChecker;
+use SensioLabs\Security\Formatters\SimpleFormatter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,18 +21,36 @@ class DeployCommand extends Command {
 
     /** GAE application IDs for production. */
     private static $PROD_APP_IDS = [
+        'pmi-hpo'
+    ];
+    
+    /** GAE application IDs for user/security testing. */
+    private static $TEST_APP_IDS = [
         'pmi-hpo-staging',
         'pmi-hpo-test'
     ];
 
+    /** Restrict access by IP using dos.yaml */
+    private static $IPRESTRICT_APP_IDS = [
+        'pmi-hpo',
+        'pmi-hpo-test'
+    ];
+
     /** Create release tag when deploying these application IDs. */
-    private static $TAG_APP_IDS = [];
+    private static $TAG_APP_IDS = [
+        'pmi-hpo',
+        'pmi-hpo-test'
+    ];
 
     /** Don't require `login: admin` for these application IDs. */
-    private static $SKIP_ADMIN_APP_IDS = [];
+    private static $SKIP_ADMIN_APP_IDS = [
+        'pmi-hpo-dev' // this is behind a WAF so we don't want GAE login
+    ];
 
     /** Apply enhanced instance class and scaling for these application IDs. */
-    private static $SCALE_APP_IDS = [];
+    private static $SCALE_APP_IDS = [
+        'pmi-hpo'
+    ];
 
     /**#@+ Config settings set by execute(). */
     private $sdkDir;
@@ -62,6 +82,12 @@ class DeployCommand extends Command {
                 InputOption::VALUE_OPTIONAL,
                 'Path to the application code',
                 $appDir
+            )
+            ->addOption(
+                'phpCgiPath',
+                'c',
+                InputOption::VALUE_OPTIONAL,
+                'Path to the php-cgi binary'
             )
             ->addOption(
                 'appId',
@@ -114,6 +140,7 @@ class DeployCommand extends Command {
         $this->local = (boolean) $input->getOption('local');
         $this->port = (integer) $input->getOption('port');
         $this->release = $input->getOption('release');
+        $this->phpCgiPath = $input->getOption('phpCgiPath');
 
         if (!$this->appId && !$this->local) {
             throw new InvalidOptionException('Please specify --appId (-i) or --local');
@@ -137,7 +164,10 @@ class DeployCommand extends Command {
 
         // generate config files
         $this->generateAppConfig();
+        $this->generateIpWhitelistConfig();
         $this->generatePhpConfig();
+
+        $this->runSecurityCheck();
 
         // If not local, compile assets. Run ./bin/gulp when developing locally.
         if (!$this->local && !$this->index) {
@@ -164,13 +194,16 @@ class DeployCommand extends Command {
             $command->run($twigInput, $output);
         }
 
-        // unit tests should pass before production deploy
-        if ($this->isProd()) {
+        // unit tests should pass before deploying to testers or production
+        if ($this->isTest() || $this->isProd()) {
             $this->runUnitTests();
         }
 
         if ($this->local) {
             $cmd = "{$deploy} --port={$this->port} --skip_sdk_update_check=yes";
+            if ($this->phpCgiPath) {
+                $cmd .= " --php_executable_path {$this->phpCgiPath}";
+            }
             if ($dsDir = $input->getOption('datastoreDir')) {
                 $dsDir = rtrim($dsDir, '/');
                 $dsDir .= '/datastore.db';
@@ -216,15 +249,28 @@ class DeployCommand extends Command {
     /** Determines the environment we are deploying to. */
     public function determineEnv() {
         if ($this->local) {
+            return AbstractApplication::ENV_LOCAL;
+        } elseif ($this->isDev()) {
             return AbstractApplication::ENV_DEV;
+        } elseif ($this->isTest()) {
+            return AbstractApplication::ENV_TEST;
         } elseif ($this->isProd()) {
             return AbstractApplication::ENV_PROD;
         } else {
-            return AbstractApplication::ENV_TEST;
+            throw new \Exception('Unable to determine environment!');
         }
     }
 
-    /** Are we deploying to production? */
+    private function isDev()
+    {
+        return !$this->local && !$this->isTest() && !$this->isProd();
+    }
+    
+    private function isTest()
+    {
+        return !$this->local && in_array($this->appId, self::$TEST_APP_IDS);
+    }
+    
     private function isProd()
     {
         return !$this->local && in_array($this->appId, self::$PROD_APP_IDS);
@@ -233,12 +279,6 @@ class DeployCommand extends Command {
     private function isTaggable()
     {
         return !$this->local && in_array($this->appId, self::$TAG_APP_IDS);
-    }
-
-    /** Are we deploying to test? */
-    private function isTest()
-    {
-        return $this->determineEnv() === AbstractApplication::ENV_TEST;
     }
 
     /** Adds and pushes a release tag to git. */
@@ -292,11 +332,9 @@ class DeployCommand extends Command {
         $yaml = new Parser();
         $config = $yaml->parse(file_get_contents($distFile));
 
-        // lock down all the test sites
-        if ($this->isTest() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS)) {
+        // require admin login for developer GAE sites
+        if ($this->isDev() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS)) {
             $this->requireAdminLogin($config);
-        } else {
-            $this->requireGoogleLogin($config);
         }
 
         // crash the deploy if our handlers are not secure
@@ -312,6 +350,36 @@ class DeployCommand extends Command {
 
         $dumper = new Dumper();
         file_put_contents($configFile, $dumper->dump($config, PHP_INT_MAX));
+    }
+    
+    /** Generate IP whitelisting config. */
+    private function generateIpWhitelistConfig()
+    {
+        $dosFile = $this->appDir . DIRECTORY_SEPARATOR . 'dos.yaml';
+        $dosDistFile = "{$dosFile}.dist";
+        if (!file_exists($dosDistFile)) {
+            throw new Exception("Couldn't find $dosDistFile");
+        }
+        
+        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
+            copy($dosDistFile, $dosFile);
+        } else {
+            // https://cloud.google.com/appengine/docs/php/config/dos#delete
+            file_put_contents($dosFile, 'blacklist:');
+        }
+        
+        $whitelistFile = $this->appDir . DIRECTORY_SEPARATOR . 'ip_whitelist.yml';
+        $whitelistDistFile = "{$whitelistFile}.dist";
+        if (!file_exists($whitelistDistFile)) {
+            throw new Exception("Couldn't find $whitelistDistFile");
+        }
+        
+        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
+            copy($whitelistDistFile, $whitelistFile);
+        } else {
+            // https://cloud.google.com/appengine/docs/php/config/dos#delete
+            file_put_contents($whitelistFile, 'whitelist:');
+        }
     }
 
     /** Generate PHP configuration. */
@@ -373,7 +441,7 @@ class DeployCommand extends Command {
         foreach ($config['handlers'] as $handler) {
             if (empty($handler['secure']) || $handler['secure'] !== 'always') {
                 throw new \Exception("Handler URL '{$handler['url']}' does not force SSL!");
-            } elseif ($this->isTest() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS) && (empty($handler['login']) || $handler['login'] !== 'admin')) {
+            } elseif ($this->isDev() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS) && (empty($handler['login']) || $handler['login'] !== 'admin')) {
                 throw new \Exception("Handler URL '{$handler['url']}' does not require login!");
             }
         }
@@ -398,6 +466,28 @@ class DeployCommand extends Command {
     private function runUnitTests()
     {
         $this->exec("{$this->appDir}/bin/phpunit");
+    }
+
+    private function runSecurityCheck()
+    {
+        $composerLockFile = $this->appDir . DIRECTORY_SEPARATOR . 'composer.lock';
+        $this->out->writeln("Running SensioLabs Security Checker...");
+        $checker = new SecurityChecker();
+        $vulnerabilities = $checker->check($composerLockFile);
+        if (count($vulnerabilities) === 0) {
+            $this->out->writeln('No packages have known vulnerabilities');
+        } else {
+            $formatter = new SimpleFormatter($this->getHelper('formatter'));
+            $formatter->displayResults($this->out, $composerLockFile, $vulnerabilities);
+            if (!$this->local && !$this->index) {
+                throw new \Exception('Fix security vulnerablities before deploying');
+            } else {
+                $helper = $this->getHelper('question');
+                if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
+                    throw new \Exception('Aborting due to security vulnerability');
+                }
+            }
+        }
     }
 
     /** Runs a shell command, displaying output as it is generated. */

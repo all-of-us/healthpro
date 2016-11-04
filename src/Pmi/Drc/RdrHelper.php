@@ -4,7 +4,7 @@ namespace Pmi\Drc;
 class RdrHelper
 {
     protected $client;
-    protected $endpoint = 'https://pmi-rdr-api-test.appspot.com/_ah/api/';
+    protected $endpoint = 'https://pmi-drc-api-test.appspot.com/';
     protected $options = [];
 
     public function __construct(array $options)
