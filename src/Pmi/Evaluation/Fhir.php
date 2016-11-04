@@ -213,7 +213,7 @@ class Fhir
             'waist-circumference-' . $replicate,
             $this->data->{'waist-circumference'}[$replicate - 1],
             'Waist circumference',
-            '62409-8',
+            '8280-0',
             'cm'
         );
     }
