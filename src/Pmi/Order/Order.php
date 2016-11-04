@@ -186,7 +186,7 @@ class Order
                 'required' => false,
                 'constraints' => [
                     new Constraints\LessThanOrEqual([
-                        'value' => new \DateTime(),
+                        'value' => new \DateTime('+1 hour'),
                         'message' => 'Timestamp cannot be in the future'
                     ])
                 ]
@@ -222,7 +222,7 @@ class Order
                     'label' => false,
                     'constraints' => [
                         new Constraints\LessThanOrEqual([
-                            'value' => new \DateTime(),
+                            'value' => new \DateTime('+1 hour'),
                             'message' => 'Timestamp cannot be in the future'
                         ])
                     ]
