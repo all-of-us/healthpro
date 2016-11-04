@@ -14,7 +14,6 @@ class DashboardController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['demo', '/demo'],
-        ['test', '/test'],
         ['metrics_load', '/metrics_load'],
         ['metrics_load_region', '/metrics_load_region'],
         ['demo_load_data', '/demo_load_data'],
@@ -39,13 +38,16 @@ class DashboardController extends AbstractController
 
         // get request attributes
         $filter_by = $request->get('metrics_attribute');
-        $bucket_by = $request->get('bucket_by');
+        //$bucket_by = $request->get('bucket_by');
         $start_date = $request->get('start_date');
         $end_date = $request->get('end_date');
-        $result = $this->getMetricsObject($app, "NONE");
+
+        // retrieve metrics from cache, or request new if expired
+        $results = $this->getMetricsObject($app, "NONE");
+
         // if start date isn't supplied, grab first date from metrics response object
         if (empty($start_date)) {
-            $start_date = $result[0]->date;
+            $start_date = $results[0]->date;
         }
 
         $data = [];
@@ -57,7 +59,7 @@ class DashboardController extends AbstractController
         $hover_text = [];
 
         // grab all entries and dates to use for plotly
-        foreach($result as $row) {
+        foreach($results as $row) {
             $date = explode('T', $row->date)[0];
             if ($this->checkDates($date, $start_date, $end_date)) {
                 array_push($dates, $date);
@@ -90,7 +92,7 @@ class DashboardController extends AbstractController
         $i = 0;
 
         // iterate again to grab values now that we have all possible entries
-        foreach($result as $row) {
+        foreach($results as $row) {
             $date = explode('T', $row->date)[0];
             if ($this->checkDates($date, $start_date, $end_date)) {
                 foreach ($entries as $entry) {
@@ -510,14 +512,6 @@ class DashboardController extends AbstractController
         return $app->json($data);
     }
 
-    // test to get default metrics API response
-    public function testAction(Application $app, Request $request)
-    {
-        $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-        $result = $metricsApi->metrics(["NONE"])->bucket;
-        return $app->json($result);
-    }
-
     // Main method for retrieving metrics from API
     // stores result in memcache as it only updates daily
     // supports storing multiple entries for faceting
@@ -603,7 +597,6 @@ class DashboardController extends AbstractController
     // function to filter metrics API response entries based on requested metric
     private function searchEntries($array, $key, $value) {
         $results = array();
-
         if (is_array($array)) {
             foreach ($array as $subarray) {
                 if ($subarray->$key == $value) {
@@ -611,7 +604,6 @@ class DashboardController extends AbstractController
                 }
             }
         }
-
         return $results;
     }
 }
