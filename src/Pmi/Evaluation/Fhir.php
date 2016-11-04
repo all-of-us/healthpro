@@ -106,7 +106,7 @@ class Fhir
                     'coding' => [[
                         'code' => "intake-exam-v{$this->version}",
                         'display' => "PMI Intake Evaluation v{$this->version}",
-                        'system' => 'http://terminology.pmi-ops.org/document-types'
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/document-type'
                     ]],
                     'text' => "PMI Intake Evaluation v{$this->version}"
                 ]
@@ -213,7 +213,7 @@ class Fhir
             'waist-circumference-' . $replicate,
             $this->data->{'waist-circumference'}[$replicate - 1],
             'Waist circumference',
-            '8280-0',
+            '56086-2',
             'cm'
         );
     }
