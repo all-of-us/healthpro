@@ -270,14 +270,18 @@ class DashboardController extends AbstractController
         $search_vals = $app['db']->fetchAll("SELECT * FROM $search_attr");
 
         // get date interval breakdown and end date from request parameters
+        // use sanitize function to prevent SQL injections on date vals
         $interval = $request->get('interval');
-        $end_date = $request->get('end_date');
+        $end_date = $this->sanitizeDate($request->get('end_date'));
         $start_date = $request->get('start_date');
 
         // if no start date is supplied, check oldest registration in database
         if (empty($start_date)) {
             $start_date = $app['db']->fetchColumn("SELECT min(enrollment_date) FROM dashboard_participants");
         }
+
+        // once start date is set, sanitize
+        $start_date = $this->sanitizeDate($start_date);
 
         // assemble array of dates to key graph off of using helper function
         $dates = $this->getDashboardDates($start_date, $end_date, $interval);
@@ -324,8 +328,9 @@ class DashboardController extends AbstractController
 
     public function demo_load_map_dataAction(Application $app, Request $request) {
         // request parameters
+        // use date sanitizers to prevent sql injections
         $map_mode = $request->get('map_mode');
-        $end_date = $request->get('end_date');
+        $end_date = $this->sanitizeDate($request->get('end_date'));
         $start_date = $request->get('start_date');
         $color_profile = $request->get('color_profile');
 
@@ -342,6 +347,8 @@ class DashboardController extends AbstractController
             $start_date = $app['db']->fetchColumn("SELECT min(enrollment_date) FROM dashboard_participants");
         }
 
+        $start_date = $this->sanitizeDate($start_date);
+
         if ($map_mode == 'states') {
             $states = $app['db']->fetchAll("SELECT * FROM state_census_regions");
 
@@ -353,10 +360,10 @@ class DashboardController extends AbstractController
                 array_push($state_names, $row["state"]);
             }
             foreach($state_names as $state) {
-                $count = $app['db']->fetchColumn("SELECT count(*) FROM dashboard_participants
+                $count = $app['db']->fetchAll("SELECT count(*) AS COUNT FROM dashboard_participants
                                                   WHERE enrollment_date >= ? AND enrollment_date <= ? 
-                                                  AND state = ?", [$start_date, $end_date, $state]);
-                array_push($state_registrations, $count);
+                                                  AND state = ?", [$start_date, $end_date, $state], [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR]);
+                array_push($state_registrations, $this->getCount($count, "COUNT"));
             }
 
             $map_data[] = array(
@@ -381,8 +388,8 @@ class DashboardController extends AbstractController
                     array_push($region_states, $state["state"]);
                 }
                 $rows = $app['db']->fetchAll("SELECT * FROM dashboard_participants
-                                              WHERE enrollment_date >= '$start_date' AND enrollment_date <= '$end_date' 
-                                              AND state IN (?)", [$region_states], [\Doctrine\DBAL\Connection::PARAM_STR_ARRAY]);
+                                              WHERE enrollment_date >= ? AND enrollment_date <= ? 
+                                              AND state IN (?)", [$start_date, $end_date, $region_states], [\PDO::PARAM_STR, \PDO::PARAM_STR, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]);
                 foreach($region_states as $state) {
                     array_push($states_by_region, $state);
                     array_push($registrations_by_state, count($rows));
@@ -403,13 +410,13 @@ class DashboardController extends AbstractController
             $i = 0;
             $recruitment_centers = $app['db']->fetchAll("SELECT * FROM recruitment_centers");
             foreach($recruitment_centers as $location) {
-                $count = $app['db']->fetchColumn("SELECT count(*) FROM dashboard_participants 
+                $count = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants 
                                                   WHERE enrollment_date >= ? AND enrollment_date <= ? 
-                                                  AND recruitment_center = ?", [$start_date, $end_date, $location["id"]]);
+                                                  AND recruitment_center = ?", [$start_date, $end_date, $location["id"]], [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_INT]);
                 if ($location["category"] == 'Misc') {
-                    $label = "{$location["label"]}: <b>{$count}</b>";
+                    $label = "{$location["label"]}: <b>{$this->getCount($count, "COUNT")}</b>";
                 } else {
-                    $label = "{$location["label"]} ({$location['category']}): <b>{$count}</b>";
+                    $label = "{$location["label"]} ({$location['category']}): <b>{$this->getCount($count, "COUNT")}</b>";
                 }
 
                 $map_data[] = array(
@@ -420,7 +427,7 @@ class DashboardController extends AbstractController
                     'hoverinfo' => 'text',
                     'text' => [$label],
                     'marker' => array(
-                        'size' => [$count],
+                        'size' => [$this->getCount($count, "COUNT")],
                         'color' => $this->getColorBrewerVal($i),
                         'line' => array(
                             'color' => 'black',
@@ -439,7 +446,7 @@ class DashboardController extends AbstractController
     public function demo_load_lifecycle_dataAction(Application $app, Request $request) {
         // request parameters
         $start_date = $request->get('start_date');
-        $end_date = $request->get('end_date');
+        $end_date = $this->sanitizeDate($request->get('end_date'));
         $raw_filters = explode(',', $request->get('centers'));
         $center_filters = [];
         foreach($raw_filters as $center) {
@@ -454,6 +461,9 @@ class DashboardController extends AbstractController
             $start_date = $app['db']->fetchColumn("SELECT min(enrollment_date) FROM dashboard_participants");
         }
 
+        // sanitize start date once set
+        $start_date = $this->sanitizeDate($start_date);
+
         $phases = [];
         $counts = [];
         $eligible = [];
@@ -463,10 +473,10 @@ class DashboardController extends AbstractController
         foreach($lifecyle_phases as $phase) {
             $completed_raw = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants WHERE enrollment_date <= ? 
                                               AND enrollment_date >= ? AND lifecycle_phase >= ? AND recruitment_center in (?)",
-                                            [$end_date, $start_date, $phase['id'], $center_filters], [null, null, \PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY]);
+                                            [$end_date, $start_date, $phase['id'], $center_filters], [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY]);
             $eligible_raw = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants WHERE enrollment_date <= ? 
                                               AND enrollment_date >= ? AND lifecycle_phase >= ? AND recruitment_center in (?)",
-                                            [$end_date, $start_date, $phase['id'] - 1, $center_filters], [null, null, \PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY]);
+                                            [$end_date, $start_date, $phase['id'] - 1, $center_filters], [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY]);
             $completed_count = $this->getCount($completed_raw, "COUNT");
             $eligible_count = $this->getCount($eligible_raw, "COUNT");
 
@@ -605,5 +615,10 @@ class DashboardController extends AbstractController
             }
         }
         return $results;
+    }
+
+    // sanitize url date parameter to prevent SQL injection
+    private function sanitizeDate($date_string) {
+        return date('Y-m-d', strtotime($date_string));
     }
 }
