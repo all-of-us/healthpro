@@ -361,7 +361,7 @@ class DeployCommand extends Command {
             throw new Exception("Couldn't find $dosDistFile");
         }
         
-        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
+        if (in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
             copy($dosDistFile, $dosFile);
         } else {
             // https://cloud.google.com/appengine/docs/php/config/dos#delete
@@ -374,7 +374,7 @@ class DeployCommand extends Command {
             throw new Exception("Couldn't find $whitelistDistFile");
         }
         
-        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
+        if (in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
             copy($whitelistDistFile, $whitelistFile);
         } else {
             // https://cloud.google.com/appengine/docs/php/config/dos#delete
