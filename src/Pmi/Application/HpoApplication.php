@@ -22,9 +22,9 @@ class HpoApplication extends AbstractApplication
             if (file_exists($keyFile)) {
                 $rdrOptions['key_file'] = $keyFile;
             }
-            if ($this->getConfig('rdr_endpoint')) {
-                $rdrOptions['endpoint'] = $this->getConfig('rdr_endpoint');
-            }
+        }
+        if ($this->getConfig('rdr_endpoint')) {
+            $rdrOptions['endpoint'] = $this->getConfig('rdr_endpoint');
         }
         if ($this->getConfig('rdr_auth_json')) {
             $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
