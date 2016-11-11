@@ -44,7 +44,12 @@ class MayolinkOrder
     ];
     protected static $siteAccounts = [
         'a' => '7035588',
-        'b' => '7035500'
+        'b' => '7035500',
+        'uofacats' => '7035650',
+        'bannerscampus' => '7035651',
+        'bannerphoenix' => '7035652',
+        'bannerestrella' => '7035653',
+        'bannerdesert' => '7035654'
     ];
 
     private $client;
