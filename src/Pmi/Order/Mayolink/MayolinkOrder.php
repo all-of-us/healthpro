@@ -49,7 +49,15 @@ class MayolinkOrder
         'bannerscampus' => '7035651',
         'bannerphoenix' => '7035652',
         'bannerestrella' => '7035653',
-        'bannerdesert' => '7035654'
+        'bannerdesert' => '7035654',
+        'uicresearch' => '7035707',
+        'nwfeinberggalter' => '7035702',
+        'uofchicago' => '7035703',
+        'rushuniv' => '7035704',
+        'northshoree' => '7035705',
+        'irvingcolumbia' => '7035709',
+        'harlem' => '7035710',
+        'weillcornell' => '7035711'
     ];
 
     private $client;
