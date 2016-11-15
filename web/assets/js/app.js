@@ -81,38 +81,43 @@ $(document).ready(function()
         });
     }
 
-    window.equalizePanelHeight = function(selector) {
-        // reset heights
-        $(selector).each(function() {
-            $(this).find('.panel').height('auto');
-        });
-        // set heights
-        $(selector).each(function() {
-            var height = 0;
-            if ($('#is-xs').is(':visible')) {
-                height = 'auto';
-            } else {
-                $(this).find('.panel').each(function() {
-                    if ($(this).height() > height) {
-                        height = $(this).height();
-                    }
-                });
-            }
-            $(this).find('.panel').each(function() {
-                $(this).height(height);
-            });
-        });
-    };
-
+    /*************************************************************************
+     * Plugin for making panels in bootstrap columns equal heights
+     ************************************************************************/
     $.fn.equalizePanelHeight = function() {
         var selector = this.selector;
-        window.equalizePanelHeight(selector);
+        var equalize = function(selector) {
+            // reset heights
+            $(selector).each(function() {
+                $(this).find('.panel').height('auto');
+            });
+            // set heights
+            $(selector).each(function() {
+                var height = 0;
+                if ($('#is-xs').is(':visible')) {
+                    height = 'auto';
+                } else {
+                    $(this).find('.panel').each(function() {
+                        if ($(this).height() > height) {
+                            height = $(this).height();
+                        }
+                    });
+                }
+                $(this).find('.panel').each(function() {
+                    $(this).height(height);
+                });
+            });
+        };
+        equalize(selector);
         $(window).on('resize', _.debounce(function() {
-            window.equalizePanelHeight(selector);
+            equalize(selector);
         }, 250));
     };
     $('.row-equal-height').equalizePanelHeight();
 
+    /*************************************************************************
+     * Store defaults for datetimepicker
+     ************************************************************************/
     PMI.datetimepickerDefaults = {
         toolbarPlacement: 'top',
         sideBySide: true,
