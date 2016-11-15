@@ -34,7 +34,7 @@
     </dl>
 
     <div id="physicalEvaluation">
-        {{ form_start(evaluationForm) }}
+        {{ form_start(evaluationForm, { attr: { class: 'warn-unsaved' } }) }}
             {% for field in schema.fields %}
                 <div data-field="{{ field.name }}" class="field field-{{ field.name }} form-group{% if not evaluationForm[field.name].vars.valid and field.replicates is not defined %} has-error{% endif %}">
                     {% if field.replicates is defined %}
