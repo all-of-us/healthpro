@@ -2,7 +2,7 @@
 {% block title %}Process - Order {{ order.id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'process' } %}
-    {{ form_start(processForm) }}
+    {{ form_start(processForm, { attr: { class: 'warn-unsaved' } }) }}
         {{ form_errors(processForm) }}
 
         <div class="form-group{% if not processForm.processed_samples.vars.valid %} has-error{% endif %}">
@@ -52,7 +52,7 @@ $(document).ready(function () {
             .css('margin', '5px 0 15px 20px');
         $('#form_processed_samples_ts_' + sample)
             .addClass('input-sm')
-            .datetimepicker(PMI.datetimepickerDefaults);
+            .pmiDateTimePicker();
     });
     $('#form_processed_samples_ts').remove();
 

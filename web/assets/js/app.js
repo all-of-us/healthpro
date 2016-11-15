@@ -116,14 +116,22 @@ $(document).ready(function()
     $('.row-equal-height').equalizePanelHeight();
 
     /*************************************************************************
-     * Store defaults for datetimepicker
+     * Plugin to initialize datetimepicker and register change event listener
      ************************************************************************/
-    PMI.datetimepickerDefaults = {
-        toolbarPlacement: 'top',
-        sideBySide: true,
-        showTodayButton: true,
-        showClear: true,
-        showClose: true
+    $.fn.pmiDateTimePicker = function() {
+        // datetimepicker documentation: https://eonasdan.github.io/bootstrap-datetimepicker/
+        var pickerOptions = {
+            toolbarPlacement: 'top',
+            sideBySide: true,
+            showTodayButton: true,
+            showClear: true,
+            showClose: true
+        };
+        var selector = this.selector;
+        $(selector).datetimepicker(pickerOptions);
+        $(selector).on('dp.change', function() {
+            PMI.markUnsaved();
+        });
     };
 
     /*************************************************************************
