@@ -125,4 +125,48 @@ $(document).ready(function()
         showClear: true,
         showClose: true
     };
+
+    /*************************************************************************
+     * Unsaved changes prompter
+     ************************************************************************/
+    PMI.hasChanges = false;
+    PMI.markUnsaved = function() {
+        this.hasChanges = true;
+    };
+    PMI.markSaved = function() {
+        this.hasChanges = false;
+    };
+    PMI.enableUnsavedPrompt = function(selector) {
+        if (typeof selector === 'undefined') {
+            selector = document;
+        }
+        $(window).on('beforeunload', function() {
+            if (PMI.hasChanges) {
+                return 'You have unsaved changes on this page that will not be saved if you continue.';
+            }
+        });
+        var handleChangedInput = function() {
+            // Mark as unsaved unless element has the class "ignore-unsaved"
+            if (!$(this).is('.ignore-unsaved')) {
+                PMI.markUnsaved();
+            }
+        };
+
+        // Mark unsaved on change
+        $(selector).on('change', 'input, select, textarea', handleChangedInput);
+
+        // Also mark unsaved on keyup or paste since the change event
+        // does not fire on text fields until the field loses focus, meaning
+        // that text entry followed by browser forward/back/close would be missed
+        $(selector).on('keyup paste', 'input[type=text], textarea',
+            _.debounce(handleChangedInput, 2000, true)
+        );
+
+        // Mark as saved when clicking a submit button
+        $(selector).on('click', 'button[type=submit]', function() {
+            PMI.markSaved();
+        });
+    };
+    // Automatically enable unsaved prompt on forms with warn-unsaved class
+    PMI.enableUnsavedPrompt('form.warn-unsaved');
 });
