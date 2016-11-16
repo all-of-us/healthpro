@@ -5,9 +5,11 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
 use Pmi\Mayolink\Order as MayoLinkOrder;
@@ -31,6 +33,7 @@ class DefaultController extends AbstractController
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
+        ['settings', '/settings', ['method' => 'GET|POST']],
     ];
 
     public function homeAction(Application $app, Request $request)
@@ -253,4 +256,48 @@ class DefaultController extends AbstractController
             'evaluations' => $evaluations
         ]);
     }
+
+    public function settingsAction(Application $app, Request $request)
+    {
+        $settingsForm = $this->createSettingsForm('settings', $app['form.factory']);
+        $settingsForm->handleRequest($request);
+        $userInfo = $app->getUser()->getInfo();
+        if ($settingsForm->isValid()) {
+            $user = $app->getUser();
+            $user->setTimezone($settingsForm['timezone']->getData());
+            $app['em']->getRepository('users')->update($user->getId(), ['timezone' => $settingsForm['timezone']->getData()]);
+            $userInfo['timezone'] = $settingsForm['timezone']->getData();
+
+            return $app->redirectToRoute('settings', [
+                'timezone' => $userInfo['timezone']
+            ]);
+        }
+
+        return $app['twig']->render('settings.html.twig', [
+            'settingsForm' => $settingsForm->createView(),
+            'timezone' => $userInfo["timezone"]
+        ]);
+    }
+
+    protected function createSettingsForm($set, $formFactory)
+    {
+
+        $formBuilder = $formFactory->createBuilder(FormType::class);
+        $formBuilder->add("timezone", Type\ChoiceType::class, [
+            'label' => 'Timezone',
+            'choices' => array(
+                'Hawaii Time' => 'Pacific/Honolulu',
+                'Alaska Time' => 'America/Anchorage',
+                'Pacific Time' => 'America/Los_Angeles',
+                'Mountain Time' => 'America/Denver',
+                'Mountain Time - Arizona' => 'America/Phoenix',
+                'Central Time' => 'America/Chicago',
+                'Eastern Time' => 'America/New_York'
+            ),
+            'required' => true
+        ]);
+        $form = $formBuilder->getForm();
+        return $form;
+    }
+
 }

@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2>Settings</h2>
+    </div>
+    {{ form_start(settingsForm) }}
+
+    <div class="form-group">
+        {{ form_label(settingsForm.timezone) }}
+
+        {{ form_widget(settingsForm.timezone, {value : timezone}) }}
+    </div>
+    {{ form_rest(settingsForm) }}
+    <p>
+        <button type="submit" class="btn btn-primary">
+                Update Settings
+        </button>
+    </p>
+
+    {{ form_end(settingsForm) }}
+{% endblock %}
