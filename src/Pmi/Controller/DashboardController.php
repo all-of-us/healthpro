@@ -3,6 +3,7 @@ namespace Pmi\Controller;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Drc\RdrMetrics;
 
 class DashboardController extends AbstractController
@@ -35,6 +36,9 @@ class DashboardController extends AbstractController
 
     public function metrics_loadAction(Application $app, Request $request)
     {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
 
         // get request attributes
         $filter_by = $request->get('metrics_attribute');
@@ -146,7 +150,12 @@ class DashboardController extends AbstractController
         return $app->json($data);
     }
 
-    public function metrics_load_regionAction(Application $app, Request $request) {
+    public function metrics_load_regionAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
         // load attribute to query
         $metrics_attribute = $request->get('metrics_attribute');
@@ -236,7 +245,12 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    public function demo_load_dataAction(Application $app, Request $request) {
+    public function demo_load_dataAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('demo', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         // determine search attribute
         $search_attr = $request->get('attribute');
         $raw_filters = explode(',', $request->get('centers'));
@@ -322,7 +336,12 @@ class DashboardController extends AbstractController
         return $app->json($data);
     }
 
-    public function demo_load_map_dataAction(Application $app, Request $request) {
+    public function demo_load_map_dataAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('demo', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         // request parameters
         $map_mode = $request->get('map_mode');
         $end_date = $request->get('end_date');
@@ -436,7 +455,12 @@ class DashboardController extends AbstractController
         return $app->json($map_data);
     }
 
-    public function demo_load_lifecycle_dataAction(Application $app, Request $request) {
+    public function demo_load_lifecycle_dataAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('demo', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         // request parameters
         $start_date = $request->get('start_date');
         $end_date = $request->get('end_date');

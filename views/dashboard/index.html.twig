@@ -71,7 +71,7 @@
                     var today = new Date().toISOString().split('T')[0];
 
                     // load data from metrics API
-                    $.getJSON('/dashboard/metrics_load?metrics_attribute=' + metricAttr + '&bucket_by=' + bucket + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate, function(data) {
+                    $.getJSON('/dashboard/metrics_load?csrf_token={{ csrf_token('dashboard') }}&metrics_attribute=' + metricAttr + '&bucket_by=' + bucket + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate, function(data) {
                         var progressAnnot = [];
                         if (metricAttr == 'PARTICIPANT_ZIP_CODE') {
                             var tpLayout = {
@@ -176,7 +176,7 @@
                         var mapColor = $('#map-color-profile').val();
 
                         // load data from metrics API
-                        $.getJSON('/dashboard/metrics_load_region?metrics_attribute=' + mapMode + '&color_profile=' + mapColor, function(data) {
+                        $.getJSON('/dashboard/metrics_load_region?csrf_token={{ csrf_token('dashboard') }}&metrics_attribute=' + mapMode + '&color_profile=' + mapColor, function(data) {
 
                             var mapLayout = {
                                 title: 'Participant Registrations by ' + mapModeText,
