@@ -64,6 +64,17 @@ class Evaluation
         return $this->schema;
     }
 
+    public function getAssociativeSchema()
+    {
+        $schema = clone $this->schema;
+        $associativeFields = [];
+        foreach ($schema->fields as $field) {
+            $associativeFields[$field->name] = $field;
+        }
+        $schema->fields = $associativeFields;
+        return $schema;
+    }
+
     public function getWarnings()
     {
         $warnings = [];
