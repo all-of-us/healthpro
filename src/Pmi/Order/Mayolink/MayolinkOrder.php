@@ -57,7 +57,9 @@ class MayolinkOrder
         'northshoree' => '7035705',
         'irvingcolumbia' => '7035709',
         'harlem' => '7035710',
-        'weillcornell' => '7035711'
+        'weillcornell' => '7035711',
+        'sdbb' => '7035735', // sdbb and walgreens use the same account
+        'walgreens' => '7035735' // sdbb and walgreens use the same account
     ];
 
     private $client;
