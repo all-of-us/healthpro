@@ -48,14 +48,14 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         });
         if (count > 0) {
             var mean = (sum / count).toFixed(1);
-            this.$('#mean-' + field).html('<span class="label label-primary">Average: ' + mean + '</span>');
+            this.$('#mean-' + field).html('<strong>' + mean + '</strong>');
             if (this.conversions[field]) {
                 var converted = this.convert(this.conversions[field], mean);
-                this.$('#convert-' + field).html('<small>('+converted+')</small>');
+                this.$('#convert-' + field).html('('+converted+')');
             }
         } else {
-            this.$('#mean-' + field).text('');
-            this.$('#convert-' + field).text('');
+            this.$('#mean-' + field).text('--');
+            this.$('#convert-' + field).text();
         }
     },
     calculateBmi: function() {
@@ -64,9 +64,9 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         if (height && weight) {
             var bmi = weight / ((height/100) * (height/100));
             bmi = bmi.toFixed(1);
-            this.$('#bmi').html('<span class="label label-primary">BMI: ' + bmi + '</span>');
+            this.$('#bmi').html('<strong>' + bmi + '</strong>');
         } else {
-            this.$('#bmi').html('');
+            this.$('#bmi').text('');
         }
     },
     clearServerErrors: function() {
@@ -99,7 +99,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
     },
     calculateConversion: function(field) {
         var input = this.$('.field-' + field).find('input');
-        if (input.closest('.replicate').length > 0) {
+        if (input.length > 1) {
             // replicate conversions are handled in calculateMean method
             return;
         }
@@ -109,12 +109,12 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             if (val) {
                 var converted = this.convert(this.conversions[field], val);
                 if (converted) {
-                    this.$('#convert-' + field).html('<small>('+converted+')</small>');
+                    this.$('#convert-' + field).text('('+converted+')');
                 } else {
-                    this.$('#convert-' + field).html('');
+                    this.$('#convert-' + field).text('');
                 }
             } else {
-                this.$('#convert-' + field).html('');
+                this.$('#convert-' + field).text('');
             }
         }
     },
@@ -172,11 +172,9 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             errorTemplate: '<div></div>',
             trigger: "keyup change"
         });
-        this.$('.field').each(function() {
+        this.$('.replicate .field').each(function() {
             var field = $(this).data('field');
-            if ($(this).find('.mean').length > 0) {
-                self.calculateMean(field);
-            }
+            self.calculateMean(field);
         });
         _.each(_.keys(this.conversions), function(field) {
             self.calculateConversion(field);
