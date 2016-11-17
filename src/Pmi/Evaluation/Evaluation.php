@@ -139,7 +139,11 @@ class Evaluation
             if (isset($field->options)) {
                 $class = ChoiceType::class;
                 unset($options['scale']);
-                $options['choices'] = array_combine($field->options, $field->options);
+                if (is_array($field->options)) {
+                    $options['choices'] = array_combine($field->options, $field->options);
+                } else {
+                    $options['choices'] = (array)$field->options;
+                }
                 $options['placeholder'] = false;
             } elseif ($type == 'checkbox') {
                 unset($options['scale']);

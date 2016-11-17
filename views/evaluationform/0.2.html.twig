@@ -4,29 +4,29 @@
     </div>
     <div class="panel-body">
         <div class="well">
-        <div class="row">
-            <div class="col-sm-4">
-                <div data-field="blood-pressure-location" class="field field-blood-pressure-location form-group{% if not evaluationForm['blood-pressure-location'].vars.valid %} has-error{% endif %}">
-                    {{ form_label(evaluationForm['blood-pressure-location']) }}
-                    {{ form_widget(evaluationForm['blood-pressure-location']) }}
-                    {{ form_errors(evaluationForm['blood-pressure-location']) }}
-                </div>
-            </div>
-            <div class="col-sm-4">
-                <div data-field="blood-pressure-arm-circumference" class="field field-blood-pressure-arm-circumference form-group{% if not evaluationForm['blood-pressure-arm-circumference'].vars.valid %} has-error{% endif %}">
-                    {{ form_label(evaluationForm['blood-pressure-arm-circumference']) }}
-                    <div class="input-group">
-                        {{ form_widget(evaluationForm['blood-pressure-arm-circumference']) }}
-                        <div class="input-group-addon">{{ schema.fields['blood-pressure-arm-circumference'].unit }}</div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <div data-field="blood-pressure-location" class="field field-blood-pressure-location form-group{% if not evaluationForm['blood-pressure-location'].vars.valid %} has-error{% endif %}">
+                        {{ form_label(evaluationForm['blood-pressure-location']) }}
+                        {{ form_widget(evaluationForm['blood-pressure-location']) }}
+                        {{ form_errors(evaluationForm['blood-pressure-location']) }}
                     </div>
-                    {{ form_errors(evaluationForm['blood-pressure-arm-circumference']) }}
+                </div>
+                <div class="col-sm-4">
+                    <div data-field="blood-pressure-arm-circumference" class="field field-blood-pressure-arm-circumference form-group{% if not evaluationForm['blood-pressure-arm-circumference'].vars.valid %} has-error{% endif %}">
+                        {{ form_label(evaluationForm['blood-pressure-arm-circumference']) }}
+                        <div class="input-group">
+                            {{ form_widget(evaluationForm['blood-pressure-arm-circumference']) }}
+                            <div class="input-group-addon">{{ schema.fields['blood-pressure-arm-circumference'].unit }}</div>
+                        </div>
+                        {{ form_errors(evaluationForm['blood-pressure-arm-circumference']) }}
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <strong>Recommended Cuff Size</strong>
+                    <p class="lead">--</p>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <strong>Recommended Cuff Size</strong>
-                <p class="lead">--</p>
-            </div>
-        </div>
         </div>
         <div class="row replicate">
             {% for i in 0..2 %}
@@ -84,11 +84,26 @@
                     <span id="mean-heart-rate"></span>
                     {{ schema.fields['heart-rate'].unit }}
                 </p>
-
             </div>
         </div>
     </div>
 </div>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div data-field="pregnant" class="field field-pregnant form-group{% if not evaluationForm['pregnant'].vars.valid %} has-error{% endif %}">
+            {{ form_label(evaluationForm['pregnant']) }}
+            {{ form_widget(evaluationForm['pregnant']) }}
+            {{ form_errors(evaluationForm['pregnant']) }}
+        </div>
+        <div data-field="wheelchair" class="field field-wheelchair form-group{% if not evaluationForm['wheelchair'].vars.valid %} has-error{% endif %}">
+            {{ form_label(evaluationForm['wheelchair']) }}
+            {{ form_widget(evaluationForm['wheelchair']) }}
+            {{ form_errors(evaluationForm['wheelchair']) }}
+        </div>
+    </div>
+</div>
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Height and Weight</h3>
@@ -107,6 +122,11 @@
                             </div>
                             {{ form_errors(evaluationForm['height']) }}
                         </div>
+                        <div data-field="height-protocol-modification" class="field field-height-protocol-modification form-group{% if not evaluationForm['height-protocol-modification'].vars.valid %} has-error{% endif %}">
+                            {{ form_label(evaluationForm['height-protocol-modification']) }}
+                            {{ form_widget(evaluationForm['height-protocol-modification']) }}
+                            {{ form_errors(evaluationForm['height-protocol-modification']) }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -121,6 +141,11 @@
                                 <div class="input-group-addon">{{ schema.fields['weight'].unit }}</div>
                             </div>
                             {{ form_errors(evaluationForm['weight']) }}
+                        </div>
+                        <div data-field="weight-protocol-modification" class="field field-weight-protocol-modification form-group{% if not evaluationForm['weight-protocol-modification'].vars.valid %} has-error{% endif %}">
+                            {{ form_label(evaluationForm['weight-protocol-modification']) }}
+                            {{ form_widget(evaluationForm['weight-protocol-modification']) }}
+                            {{ form_errors(evaluationForm['weight-protocol-modification']) }}
                         </div>
                     </div>
                 </div>
@@ -169,6 +194,18 @@
                 </div>
             </div>
             {% endfor %}
+        </div>
+        <div class="well">
+            <div data-field="waist-circumference-protocol-modification" class="field field-waist-circumference-protocol-modification form-group{% if not evaluationForm['waist-circumference-protocol-modification'].vars.valid %} has-error{% endif %}">
+                {{ form_label(evaluationForm['waist-circumference-protocol-modification']) }}
+                {{ form_widget(evaluationForm['waist-circumference-protocol-modification']) }}
+                {{ form_errors(evaluationForm['waist-circumference-protocol-modification']) }}
+            </div>
+            <div data-field="waist-circumference-location" class="field field-waist-circumference-location form-group{% if not evaluationForm['waist-circumference-location'].vars.valid %} has-error{% endif %}">
+                {{ form_label(evaluationForm['waist-circumference-location']) }}
+                {{ form_widget(evaluationForm['waist-circumference-location']) }}
+                {{ form_errors(evaluationForm['waist-circumference-location']) }}
+            </div>
         </div>
 
         <div class="panel panel-primary">

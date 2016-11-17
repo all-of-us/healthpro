@@ -96,6 +96,28 @@
             }
         },
         {
+            "name": "pregnant",
+            "label": "Is individual pregnant?",
+            "options": {
+                "No": false,
+                "Yes": true
+            },
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "wheelchair",
+            "label": "Is individual wheelchair bound?",
+            "options": {
+                "No": false,
+                "Yes": true
+            },
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
             "name": "height",
             "label": "Height",
             "unit": "cm",
@@ -104,6 +126,21 @@
             "convert": "ftin",
             "help": {
                 "image": "height.png"
+            }
+        },
+        {
+            "name": "height-protocol-modification",
+            "label": "Modification to Height Protocol",
+            "options": {
+                "None": null,
+                "Height is more than measuring device range": 1,
+                "Hair style": 2,
+                "Unable to stand in a straight position": 3,
+                "Refusal": 4,
+                "Other": 5
+            },
+            "help": {
+                "caption": "Help text placeholder."
             }
         },
         {
@@ -120,6 +157,21 @@
                 }
             ],
             "convert": "lb",
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "weight-protocol-modification",
+            "label": "Modification to Weight Protocol",
+            "options": {
+                "None": null,
+                "Weight is more than weight measuring range": 1,
+                "Can't balance on scale": 2,
+                "Pregnancy": 3,
+                "Refusal": 4,
+                "Other": 5
+            },
             "help": {
                 "caption": "Help text placeholder."
             }
@@ -160,6 +212,29 @@
             "convert": "in",
             "help": {
                 "image": "waist.png"
+            }
+        },
+        {
+            "name": "waist-circumference-location",
+            "label": "Waist Circumference Location",
+            "options": {
+                "Smallest part (Natural indent) of the trunk": 1,
+                "Umbilicus": 2
+            },
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "waist-circumference-protocol-modification",
+            "label": "Modification to Waist Circumference Protocol",
+            "options": {
+                "None": null,
+                "Colostomy bag": 1,
+                "Other": 2
+            },
+            "help": {
+                "caption": "Help text placeholder."
             }
         }
     ]
