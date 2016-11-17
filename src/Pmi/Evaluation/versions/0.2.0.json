@@ -11,6 +11,16 @@
             }
         },
         {
+            "name": "blood-pressure-arm-circumference",
+            "label": "Arm Circumference",
+            "help": {
+                "caption": "Help text placeholder."
+            },
+            "unit": "cm",
+            "decimals": 1,
+            "max": 100
+        },
+        {
             "name": "blood-pressure-systolic",
             "label": "Systolic",
             "unit": "mmHg",
@@ -72,6 +82,15 @@
                     "alert": true
                 }
             ],
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "irregular-heart-rate",
+            "label": "Irregular Heart Rate",
+            "type": "checkbox",
+            "replicates": 3,
             "help": {
                 "caption": "Help text placeholder."
             }

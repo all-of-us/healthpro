@@ -5,6 +5,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
@@ -101,6 +102,11 @@ class Evaluation
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
         foreach ($this->schema->fields as $field) {
+            if (isset($field->type)) {
+                $type = $field->type;
+            } else {
+                $type = null;
+            }
             $constraints = [];
             $attributes = [];
             $options = [
@@ -123,7 +129,7 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } elseif (!isset($field->options)) {
+            } elseif (!isset($field->options) && $type != 'checkbox') {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
@@ -135,6 +141,9 @@ class Evaluation
                 unset($options['scale']);
                 $options['choices'] = array_combine($field->options, $field->options);
                 $options['placeholder'] = false;
+            } elseif ($type == 'checkbox') {
+                unset($options['scale']);
+                $class = CheckboxType::class;
             } else {
                 $class = NumberType::class;
             }
