@@ -178,8 +178,8 @@ class Evaluation
     protected function normalizeData()
     {
         foreach ($this->data as $key => $value) {
-            if (!is_array($value)) {
-                $this->data->$key = floatval($value) ?: null;
+            if ($value === 0) {
+                $this->data->$key = null;
             }
         }
         foreach ($this->schema->fields as $field) {

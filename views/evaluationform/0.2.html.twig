@@ -3,6 +3,10 @@
         <h3 class="panel-title">Blood Pressure</h3>
     </div>
     <div class="panel-body">
+        <div data-field="blood-pressure-location" class="field field-blood-pressure-location form-group">
+            <label class="control-label">Location</label>
+            {{ form_widget(evaluationForm['blood-pressure-location']) }}
+        </div>
         <div class="row">
             {% for i in 0..2 %}
             <div class="col-sm-4">
@@ -10,29 +14,92 @@
                     <div class="panel-body">
                         <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
                         <div data-field="blood-pressure-systolic" class="field field-blood-pressure-systolic form-group">
-                            <label class="control-label">Systolic</label>
+                            {{ form_label(evaluationForm['blood-pressure-systolic'][i]) }}
                             <div class="input-group">
                                 {{ form_widget(evaluationForm['blood-pressure-systolic'][i]) }}
                                 <div class="input-group-addon">{{ schema.fields['blood-pressure-systolic'].unit }}</div>
                             </div>
                         </div>
                         <div data-field="blood-pressure-diastolic" class="field field-blood-pressure-diastolic form-group">
-                            <label class="control-label">Diastolic</label>
+                            {{ form_label(evaluationForm['blood-pressure-diastolic'][i]) }}
                             <div class="input-group">
                                 {{ form_widget(evaluationForm['blood-pressure-diastolic'][i]) }}
                                 <div class="input-group-addon">{{ schema.fields['blood-pressure-diastolic'].unit }}</div>
                             </div>
                         </div>
                         <div data-field="heart-rate" class="field field-blood-heart-rate form-group">
-                            <label class="control-label">Heart Rate</label>
+                            {{ form_label(evaluationForm['heart-rate'][i]) }}
                             <div class="input-group">
                                 {{ form_widget(evaluationForm['heart-rate'][i]) }}
                                 <div class="input-group-addon">{{ schema.fields['heart-rate'].unit }}</div>
                             </div>
                         </div>
-                        <div data-field="blood-pressure-location" class="field field-blood-pressure-location form-group">
-                            <label class="control-label">Location</label>
-                            {{ form_widget(evaluationForm['blood-pressure-location'][i]) }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Height and Weight</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div data-field="height" class="field field-height form-group">
+                            {{ form_label(evaluationForm['height']) }}
+                            <div class="input-group">
+                                {{ form_widget(evaluationForm['height']) }}
+                                <div class="input-group-addon">{{ schema.fields['height'].unit }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div data-field="weight" class="field field-weight form-group">
+                            {{ form_label(evaluationForm['weight']) }}
+                            <div class="input-group">
+                                {{ form_widget(evaluationForm['weight']) }}
+                                <div class="input-group-addon">{{ schema.fields['weight'].unit }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Hip and Waist Circumference</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            {% for i in 0..2 %}
+            <div class="col-sm-4">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                        <div data-field="hip-circumference" class="field field-hip-circumference form-group">
+                            {{ form_label(evaluationForm['hip-circumference'][i]) }}
+                            <div class="input-group">
+                                {{ form_widget(evaluationForm['hip-circumference'][i]) }}
+                                <div class="input-group-addon">{{ schema.fields['hip-circumference'].unit }}</div>
+                            </div>
+                        </div>
+                        <div data-field="waist-circumference" class="field field-waist-circumference form-group">
+                            {{ form_label(evaluationForm['waist-circumference'][i]) }}
+                            <div class="input-group">
+                                {{ form_widget(evaluationForm['waist-circumference'][i]) }}
+                                <div class="input-group-addon">{{ schema.fields['waist-circumference'].unit }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
