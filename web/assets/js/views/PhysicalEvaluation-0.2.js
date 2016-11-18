@@ -245,6 +245,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         self.calculateBmi();
         self.calculateCuff();
         self.togglePregnantOrWheelchair();
+        self.triggerEqualize();
         return this;
     }
 });
