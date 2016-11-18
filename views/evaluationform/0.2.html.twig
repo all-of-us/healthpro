@@ -144,6 +144,15 @@
                             </div>
                             {{ form_errors(evaluationForm['weight']) }}
                         </div>
+                        <div data-field="weight-prepregnancy" class="field field-weight-prepregnancy form-group{% if not evaluationForm['weight-prepregnancy'].vars.valid %} has-error{% endif %}">
+                            {{ form_label(evaluationForm['weight-prepregnancy']) }}
+                            <span id="convert-weight-prepregnancy" class="pull-right convert"></span>
+                            <div class="input-group">
+                                {{ form_widget(evaluationForm['weight-prepregnancy']) }}
+                                <div class="input-group-addon">{{ schema.fields['weight-prepregnancy'].unit }}</div>
+                            </div>
+                            {{ form_errors(evaluationForm['weight-prepregnancy']) }}
+                        </div>
                         <div data-field="weight-protocol-modification" class="field field-weight-protocol-modification form-group{% if not evaluationForm['weight-protocol-modification'].vars.valid %} has-error{% endif %}">
                             {{ form_label(evaluationForm['weight-protocol-modification']) }}
                             {{ form_widget(evaluationForm['weight-protocol-modification']) }}

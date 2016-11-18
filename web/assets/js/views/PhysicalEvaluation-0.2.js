@@ -6,7 +6,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         "click .toggle-help-image": "displayHelpModal",
         "change .replicate input": "updateMean",
         "keyup .replicate input": "updateMean",
-        "change input": "inputChange",
+        "change input, select": "inputChange",
         "keyup input": "inputKeyup",
         "keyup #form_height, #form_weight": "calculateBmi",
         "change #form_height, #form_weight": "calculateBmi",
@@ -18,6 +18,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         this.clearServerErrors(e);
         this.displayWarnings(e);
         this.updateConversion(e);
+        this.triggerEqualize();
     },
     inputKeyup: function(e) {
         this.clearServerErrors(e);
@@ -39,6 +40,11 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
     updateMean: function(e) {
         var field = $(e.currentTarget).closest('.field').data('field');
         this.calculateMean(field);
+    },
+    triggerEqualize: function() {
+        window.setTimeout(function() {
+            $(window).trigger('pmi.equalize');
+        }, 50);
     },
     calculateMean: function(field) {
         var sum = 0;
@@ -97,10 +103,13 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             this.$('#hip-waist-skip').html('<span class="label label-danger">Skip</span>');
         }
         if (isPregnant) {
+            this.$('.field-weight-prepregnancy').show();
             this.$('#form_weight-protocol-modification').val(3);
             this.$('#pregnant-message').html('<p class="text-danger">Pregnant women should be measured for both height and weight. Do not measure the hip and waist of pregnant participants.</p>');
         }
         if (!isPregnant) {
+            this.$('#form_weight-prepregnancy').val('');
+            this.$('.field-weight-prepregnancy').hide();
             if (this.$('#form_weight-protocol-modification').val() == 3) {
                 this.$('#form_weight-protocol-modification').val(0);
             }

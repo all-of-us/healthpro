@@ -162,6 +162,17 @@
             }
         },
         {
+            "name": "weight-prepregnancy",
+            "label": "Approx. Pre-pregnancy Weight",
+            "unit": "kg",
+            "decimals": 1,
+            "max": 1000,
+            "convert": "lb",
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
             "name": "weight-protocol-modification",
             "label": "Modification to Weight Protocol",
             "options": {

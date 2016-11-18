@@ -112,6 +112,9 @@ $(document).ready(function()
         $(window).on('resize', _.debounce(function() {
             equalize(selector);
         }, 250));
+        $(window).on('pmi.equalize', function() {
+            equalize(selector);
+        });
     };
     $('.row-equal-height').equalizePanelHeight();
 
