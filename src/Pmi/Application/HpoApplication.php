@@ -234,11 +234,15 @@ class HpoApplication extends AbstractApplication
         if ($this['session']->get('isLoginReturn') && $this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD') && !$this->isUpkeepRoute($request)) {
             return $this->forwardToRoute('dashSplash', $request);
         }
-        
+
+        if($this->isLoggedIn()) {
+            $user = $this->getUser();
+            $this['em']->setTimezone($user->getInfo()['timezone']);
+        }
+
         // HPO users must select their site first
         if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER'))
         {
-            $user = $this->getUser();
             // auto-select since they only have one site
             if (count($user->getSites()) === 1) {
                 $this->switchSite($user->getSites()[0]->email);

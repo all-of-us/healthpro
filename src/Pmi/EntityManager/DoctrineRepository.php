@@ -5,11 +5,13 @@ class DoctrineRepository
 {
     protected $dbal;
     protected $entity;
+    protected $timezone;
 
-    public function __construct($dbal, $entity)
+    public function __construct($dbal, $entity, $timezone)
     {
         $this->dbal = $dbal;
         $this->entity = $entity;
+        $this->timezone = $timezone;
     }
 
     public function fetchOneBy(array $where)
@@ -21,7 +23,16 @@ class DoctrineRepository
             $columns[] = "`{$column}` = ?";
         }
         $query = "SELECT * FROM `{$this->entity}` WHERE " . join(' AND ', $columns);
-        return $this->dbal->fetchAssoc($query, $parameters);
+        $result = $this->dbal->fetchAssoc($query, $parameters);
+
+        // Convert timestamp fields into user's timezone since they're stored as UTC in the database
+        foreach($result as $field => $value) {
+            if(substr($field, -3, 3) == '_ts' && $value !== NULL && preg_match("/^d{4}\-d{2}\-d{2}/", $value)) {
+                $result[$field] = \DateTime::createFromFormat('Y-m-d G:i:s', $value)->setTimezone(new \DateTimeZone($this->timezone));
+            }
+        }
+        return $result;
+
     }
 
     public function fetchBy(array $where, array $order = [], $limit = null)

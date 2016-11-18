@@ -274,7 +274,8 @@ class DefaultController extends AbstractController
 
         return $app['twig']->render('settings.html.twig', [
             'settingsForm' => $settingsForm->createView(),
-            'timezone' => $userInfo["timezone"]
+            'timezone' => $userInfo["timezone"],
+            'current' => new \DateTime()
         ]);
     }
 
