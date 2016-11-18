@@ -24,6 +24,7 @@ $app
     ->mount('/', new Controller\OrderController())
     ->mount('/', new Controller\EvaluationController())
     ->mount('/_dev', new Controller\DevController())
+    ->mount('/cron', new Controller\CronController())
     ->mount('/dashboard', new Controller\DashboardController())
     ->run()
 ;
