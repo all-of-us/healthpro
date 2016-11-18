@@ -435,7 +435,8 @@ class DeployCommand extends Command {
             if (stristr($c['url'], '/ping-test') !== false && $this->isProd()) {
                 continue;
             } elseif (stristr($c['url'], '/_ah/datastore_admin/backup.create') !== false) {
-                if (!$this->isProd()) {
+                // enable DS backup only in production and test sites
+                if (!$this->isProd() && !$this->isTest()) {
                     continue;
                 } else {
                     $c['url'] = str_replace('{BUCKET_PREFIX}', $this->appId, $c['url']);
