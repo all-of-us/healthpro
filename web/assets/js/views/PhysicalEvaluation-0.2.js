@@ -10,6 +10,8 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         "keyup input": "inputKeyup",
         "keyup #form_height, #form_weight": "calculateBmi",
         "change #form_height, #form_weight": "calculateBmi",
+        "change #form_blood-pressure-arm-circumference": "calculateCuff",
+        "keyup #form_blood-pressure-arm-circumference": "calculateCuff"
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
@@ -66,7 +68,21 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             bmi = bmi.toFixed(1);
             this.$('#bmi').html('<strong>' + bmi + '</strong>');
         } else {
-            this.$('#bmi').text('');
+            this.$('#bmi').text('--');
+        }
+    },
+    calculateCuff: function() {
+        var circumference = parseFloat(this.$('#form_blood-pressure-arm-circumference').val());
+        if (!circumference || circumference < 22 || circumference > 52) {
+            this.$('#cuff-size').text('--');
+        } else if (circumference < 27) {
+            this.$('#cuff-size').text('Small adult (12×22 cm)');
+        } else if (circumference < 35) {
+            this.$('#cuff-size').text('Adult (16×30 cm)');
+        } else if (circumference < 45) {
+            this.$('#cuff-size').text('Large adult (16×36 cm)');
+        } else {
+            this.$('#cuff-size').text('Adult thigh (16×42 cm)');
         }
     },
     clearServerErrors: function() {
@@ -180,6 +196,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             self.calculateConversion(field);
         });
         self.calculateBmi();
+        self.calculateCuff();
         return this;
     }
 });
