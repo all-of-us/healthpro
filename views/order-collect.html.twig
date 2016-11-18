@@ -3,7 +3,7 @@
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'collect' } %}
 
-    {{ form_start(collectForm) }}
+    {{ form_start(collectForm, { attr: { class: 'warn-unsaved' } }) }}
 
         <div class="form-group{% if not collectForm.collected_ts.vars.valid %} has-error{% endif %}">
             {{ form_label(collectForm.collected_ts) }}
@@ -54,13 +54,10 @@ $(document).ready(function() {
     $('#checkall').on('change', function() {
         $('#form_collected_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
     });
-    $('#form_collected_ts').datetimepicker(PMI.datetimepickerDefaults);
-
+    $('#form_collected_ts').pmiDateTimePicker();
     var orderView = new PMI.views['OrderSubPage']({
         el: $("body")
     });
 });
-
 </script>
-    <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
 {% endblock %}

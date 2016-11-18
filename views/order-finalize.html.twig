@@ -2,7 +2,7 @@
 {% block title %}Finalize - Order {{ order.id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'finalize' } %}
-    {{ form_start(finalizeForm) }}
+    {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved' } }) }}
         {{ form_errors(finalizeForm) }}
 
         <div class="form-group{% if not finalizeForm.finalized_ts.vars.valid %} has-error{% endif %}">
@@ -57,8 +57,7 @@ $(document).ready(function () {
     $('#checkall').on('change', function() {
         $('#form_finalized_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
     });
-    $('#form_finalized_ts').datetimepicker(PMI.datetimepickerDefaults);
-
+    $('#form_finalized_ts').pmiDateTimePicker();
     var orderView = new PMI.views['OrderSubPage']({
         el: $("body")
     });

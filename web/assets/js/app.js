@@ -81,43 +81,100 @@ $(document).ready(function()
         });
     }
 
-    window.equalizePanelHeight = function(selector) {
-        // reset heights
-        $(selector).each(function() {
-            $(this).find('.panel').height('auto');
-        });
-        // set heights
-        $(selector).each(function() {
-            var height = 0;
-            if ($('#is-xs').is(':visible')) {
-                height = 'auto';
-            } else {
-                $(this).find('.panel').each(function() {
-                    if ($(this).height() > height) {
-                        height = $(this).height();
-                    }
-                });
-            }
-            $(this).find('.panel').each(function() {
-                $(this).height(height);
-            });
-        });
-    };
-
+    /*************************************************************************
+     * Plugin for making panels in bootstrap columns equal heights
+     ************************************************************************/
     $.fn.equalizePanelHeight = function() {
         var selector = this.selector;
-        window.equalizePanelHeight(selector);
+        var equalize = function(selector) {
+            // reset heights
+            $(selector).each(function() {
+                $(this).find('.panel').height('auto');
+            });
+            // set heights
+            $(selector).each(function() {
+                var height = 0;
+                if ($('#is-xs').is(':visible')) {
+                    height = 'auto';
+                } else {
+                    $(this).find('.panel').each(function() {
+                        if ($(this).height() > height) {
+                            height = $(this).height();
+                        }
+                    });
+                }
+                $(this).find('.panel').each(function() {
+                    $(this).height(height);
+                });
+            });
+        };
+        equalize(selector);
         $(window).on('resize', _.debounce(function() {
-            window.equalizePanelHeight(selector);
+            equalize(selector);
         }, 250));
     };
     $('.row-equal-height').equalizePanelHeight();
 
-    PMI.datetimepickerDefaults = {
-        toolbarPlacement: 'top',
-        sideBySide: true,
-        showTodayButton: true,
-        showClear: true,
-        showClose: true
+    /*************************************************************************
+     * Plugin to initialize datetimepicker and register change event listener
+     ************************************************************************/
+    $.fn.pmiDateTimePicker = function() {
+        // datetimepicker documentation: https://eonasdan.github.io/bootstrap-datetimepicker/
+        var pickerOptions = {
+            toolbarPlacement: 'top',
+            sideBySide: true,
+            showTodayButton: true,
+            showClear: true,
+            showClose: true
+        };
+        var selector = this.selector;
+        $(selector).datetimepicker(pickerOptions);
+        $(selector).on('dp.change', function() {
+            PMI.markUnsaved();
+        });
     };
+
+    /*************************************************************************
+     * Unsaved changes prompter
+     ************************************************************************/
+    PMI.hasChanges = false;
+    PMI.markUnsaved = function() {
+        this.hasChanges = true;
+    };
+    PMI.markSaved = function() {
+        this.hasChanges = false;
+    };
+    PMI.enableUnsavedPrompt = function(selector) {
+        if (typeof selector === 'undefined') {
+            selector = document;
+        }
+        $(window).on('beforeunload', function() {
+            if (PMI.hasChanges) {
+                return 'You have unsaved changes on this page that will not be saved if you continue.';
+            }
+        });
+        var handleChangedInput = function() {
+            // Mark as unsaved unless element has the class "ignore-unsaved"
+            if (!$(this).is('.ignore-unsaved')) {
+                PMI.markUnsaved();
+            }
+        };
+
+        // Mark unsaved on change
+        $(selector).on('change', 'input, select, textarea', handleChangedInput);
+
+        // Also mark unsaved on keyup or paste since the change event
+        // does not fire on text fields until the field loses focus, meaning
+        // that text entry followed by browser forward/back/close would be missed
+        $(selector).on('keyup paste', 'input[type=text], textarea',
+            _.debounce(handleChangedInput, 2000, true)
+        );
+
+        // Mark as saved when clicking a submit button
+        $(selector).on('click', 'button[type=submit]', function() {
+            PMI.markSaved();
+        });
+    };
+    // Automatically enable unsaved prompt on forms with warn-unsaved class
+    PMI.enableUnsavedPrompt('form.warn-unsaved');
 });
