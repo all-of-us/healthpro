@@ -3,6 +3,7 @@ namespace Pmi\Controller;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Drc\RdrMetrics;
 
 class DashboardController extends AbstractController
@@ -10,7 +11,7 @@ class DashboardController extends AbstractController
     protected static $name = 'dashboard';
 
     const PARTICIPANT_GOAL = 1000000;
-    
+
     protected static $routes = [
         ['home', '/'],
         ['demo', '/demo'],
@@ -26,73 +27,135 @@ class DashboardController extends AbstractController
     {
         $color_profiles = ['Blackbody', 'Bluered', 'Blues', 'Custom', 'Earth', 'Electric', 'Greens', 'Hot', 'Jet', 'Picnic',
             'Portland', 'Rainbow', 'RdBu', 'Reds', 'Viridis', 'YlGnBu', 'YlOrRd'];
+        $metrics_attributes = $this->getMetricsKeyVals('');
         return $app['twig']->render('dashboard/index.html.twig', [
-            'color_profiles' => $color_profiles
+            'color_profiles' => $color_profiles,
+            'metrics_attributes' => $metrics_attributes
         ]);
     }
 
     public function metrics_loadAction(Application $app, Request $request)
     {
-        $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-        // load attribute to query
-        $metrics_attribute = $request->get('metrics_attribute');
-        $bucket_by = $request->get('bucket_by');
-        $result = $metricsApi->metrics($metrics_attribute, $bucket_by)->bucket;
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+
+        // get request attributes
+        $filter_by = $request->get('metrics_attribute');
+        //$bucket_by = $request->get('bucket_by');
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
+
+        // retrieve metrics from cache, or request new if expired
+        $results = $this->getMetricsObject($app, "NONE");
+
+        // if start date isn't supplied, grab first date from metrics response object
+        if (empty($start_date)) {
+            $start_date = $results[0]->date;
+        }
 
         $data = [];
 
         $dates = [];
         $entries = [];
+        $values = [];
+        $totals = [];
+        $hover_text = [];
 
         // grab all entries and dates to use for plotly
+        foreach($results as $row) {
+            $date = explode('T', $row->date)[0];
+            if ($this->checkDates($date, $start_date, $end_date)) {
+                array_push($dates, $date);
+                foreach($row->entries as $entry) {
+                    if (strpos($entry->name, '.') !== false) {
+                        $parts = explode('.', $entry->name);
+                        $filter_key = $parts[0] . "." . $parts[1];
+                        $entry_name = $parts[2];
+                    } else {
+                        $filter_key = $entry->name;
+                        $entry_name = 'Total Participants';
+                    }
 
-        foreach($result as $row){
-            array_push($dates, explode('T', $row->date)[0]);
-            if (property_exists($row, 'entries')) {
-                $row_entries = $row->entries;
-                foreach($row_entries as $ent) {
-                    if (!in_array($ent->name, $entries)) {
-                        array_push($entries, $ent->name);
+                    if ($filter_key === $filter_by) {
+                        if (!in_array($entry_name, $entries)) {
+                            array_push($entries, $entry_name);
+                        }
+                    }
+
+                    // if not performing total participant count, grab total to use for
+                    // percentage text
+                    if ($filter_by != 'Participant' && $filter_key == 'Participant') {
+                        array_push($totals, $entry->value);
                     }
                 }
             }
+
         }
+        // set counter to keep track of how many rows have been processed (for totals array)
+        $i = 0;
+
+        // iterate again to grab values now that we have all possible entries
+        foreach($results as $row) {
+            $date = explode('T', $row->date)[0];
+            if ($this->checkDates($date, $start_date, $end_date)) {
+                foreach ($entries as $entry) {
+                    if ($filter_by == 'Participant') {
+                        $lookup = $filter_by;
+                    } else {
+                        $lookup = $filter_by . "." . $entry;
+                    }
+                    $row_entries = $row->entries;
+                    $match = $this->searchEntries($row_entries, 'name', $lookup);
+                    if (empty($match)) {
+                        $val = 0;
+                    } else {
+                        $val = $match[0];
+                    }
+
+                    $values[$entry][] = $val;
+
+                    if ($filter_by != 'Participant') {
+                       $hover_text[$entry][] = $this->calculatePercentText($val, $totals[$i]);
+                    }
+                }
+                $i++;
+            }
+        }
+
+        rsort($entries);
 
         // assemble data object in Plotly format
         $i = 0;
         foreach($entries as $entry) {
             $trace = array(
                 "x" => $dates,
-                "y" => [],
+                "y" => $values[$entry],
                 "name" => $entry,
                 "type" => "bar",
                 "marker" => array(
                     "color" => $this->getColorBrewerVal($i)
                 )
             );
-            for($x = 0; $x < count($dates); $x++) {
-                if (property_exists($result[$x], 'entries')) {
-                    $row_entries = $result[$x]->entries;
-                    foreach($row_entries as $ent) {
-                        if ($ent->name == $entry) {
-                            array_push($trace['y'], $ent->value);
-                        }
-                    }
-                    if (!array_key_exists($x, $trace['y'])) {
-                        array_push($trace['y'], 0);
-                    }
-                } else {
-                    array_push($trace['y'], 0);
-                }
+            // add hover text if needed
+            if ($filter_by != 'Participant') {
+                $trace["text"] = $hover_text[$entry];
+                $trace["hoverinfo"] = "text+name";
             }
+
             array_push($data, $trace);
             $i++;
         }
-
+        // return json
         return $app->json($data);
     }
 
-    public function metrics_load_regionAction(Application $app, Request $request) {
+    public function metrics_load_regionAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
         // load attribute to query
         $metrics_attribute = $request->get('metrics_attribute');
@@ -106,7 +169,7 @@ class DashboardController extends AbstractController
             ];
         };
 
-        $result = $metricsApi->metrics($metrics_attribute, "NONE")->bucket;
+        $result = $metricsApi->metrics($metrics_attribute, "MONTH", "2016-10-01", "2017-10-01")->bucket;
 
         $all_states = $app['db']->fetchAll("SELECT distinct(state) FROM state_zip_ranges ORDER BY STATE");
         $state_registrations = [];
@@ -182,7 +245,12 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    public function demo_load_dataAction(Application $app, Request $request) {
+    public function demo_load_dataAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('demo', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         // determine search attribute
         $search_attr = $request->get('attribute');
         $raw_filters = explode(',', $request->get('centers'));
@@ -216,8 +284,9 @@ class DashboardController extends AbstractController
         $search_vals = $app['db']->fetchAll("SELECT * FROM $search_attr");
 
         // get date interval breakdown and end date from request parameters
+        // use sanitize function to prevent SQL injections on date vals
         $interval = $request->get('interval');
-        $end_date = $request->get('end_date');
+        $end_date = $this->sanitizeDate($request->get('end_date'));
         $start_date = $request->get('start_date');
 
         // if no start date is supplied, check oldest registration in database
@@ -225,30 +294,38 @@ class DashboardController extends AbstractController
             $start_date = $app['db']->fetchColumn("SELECT min(enrollment_date) FROM dashboard_participants");
         }
 
+        // once start date is set, sanitize
+        $start_date = $this->sanitizeDate($start_date);
+
         // assemble array of dates to key graph off of using helper function
         $dates = $this->getDashboardDates($start_date, $end_date, $interval);
 
         // iterate through search key/value pairs to load results from DB
         $i = 0;
         foreach($search_vals as $entry){
-            if ($search_attr == 'age_groups') {
-                $vars = [$entry['age_min'], $entry['age_max'], $center_filters];
-                $and_clause = "AND $db_col >= ? AND $db_col <= ? AND recruitment_center IN (?)";
-                $var_types = [\PDO::PARAM_INT, \PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY];
-            } else {
-                $vars = [$entry['id'], $center_filters];
-                $and_clause = "AND $db_col = ? AND recruitment_center IN (?)";
-                $var_types = [\PDO::PARAM_STR, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY];
-            }
             $counts = [];
             $hover_text = [];
             foreach($dates as $date) {
-                $count = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants
-                                                  WHERE enrollment_date <= '$date' $and_clause", $vars, $var_types);
-                $total = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants
-                                                  WHERE enrollment_date <= '$date'", $vars, $var_types);
-                array_push($counts, $this->getCount($count, "COUNT"));
-                array_push($hover_text, $this->calculatePercentText($this->getCount($count, "COUNT"), $this->getCount($total, "COUNT")));
+                if ($search_attr == 'age_groups') {
+                    $count = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants
+                                                  WHERE enrollment_date <= ? and age >= ? and age <= ? AND recruitment_center IN (?)",
+                                                  [$date, $entry['age_min'], $entry['age_max'], $center_filters],
+                                                  [\PDO::PARAM_STR, \PDO::PARAM_INT, \PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY]);
+
+                    $total = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants
+                                                  WHERE enrollment_date <= ?", [$date], [\PDO::PARAM_STR]);
+                    array_push($counts, $this->getCount($count, "COUNT"));
+                    array_push($hover_text, $this->calculatePercentText($this->getCount($count, "COUNT"), $this->getCount($total, "COUNT")));
+
+                } else {
+                    $count = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants
+                                                  WHERE enrollment_date <= ? AND $db_col = ? AND recruitment_center IN (?)", [$date, $entry['id'], $center_filters],
+                                                  [\PDO::PARAM_STR, \PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY]);
+                    $total = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants
+                                                  WHERE enrollment_date <= ?", [$date], [\PDO::PARAM_STR]);
+                    array_push($counts, $this->getCount($count, "COUNT"));
+                    array_push($hover_text, $this->calculatePercentText($this->getCount($count, "COUNT"), $this->getCount($total, "COUNT")));
+                }
             };
             $data[] = array(
                 "x" => $dates,
@@ -268,10 +345,16 @@ class DashboardController extends AbstractController
         return $app->json($data);
     }
 
-    public function demo_load_map_dataAction(Application $app, Request $request) {
+    public function demo_load_map_dataAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('demo', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         // request parameters
+        // use date sanitizers to prevent sql injections
         $map_mode = $request->get('map_mode');
-        $end_date = $request->get('end_date');
+        $end_date = $this->sanitizeDate($request->get('end_date'));
         $start_date = $request->get('start_date');
         $color_profile = $request->get('color_profile');
 
@@ -288,6 +371,8 @@ class DashboardController extends AbstractController
             $start_date = $app['db']->fetchColumn("SELECT min(enrollment_date) FROM dashboard_participants");
         }
 
+        $start_date = $this->sanitizeDate($start_date);
+
         if ($map_mode == 'states') {
             $states = $app['db']->fetchAll("SELECT * FROM state_census_regions");
 
@@ -299,10 +384,10 @@ class DashboardController extends AbstractController
                 array_push($state_names, $row["state"]);
             }
             foreach($state_names as $state) {
-                $count = $app['db']->fetchColumn("SELECT count(*) FROM dashboard_participants
+                $count = $app['db']->fetchAll("SELECT count(*) AS COUNT FROM dashboard_participants
                                                   WHERE enrollment_date >= ? AND enrollment_date <= ? 
-                                                  AND state = ?", [$start_date, $end_date, $state]);
-                array_push($state_registrations, $count);
+                                                  AND state = ?", [$start_date, $end_date, $state], [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR]);
+                array_push($state_registrations, $this->getCount($count, "COUNT"));
             }
 
             $map_data[] = array(
@@ -327,8 +412,8 @@ class DashboardController extends AbstractController
                     array_push($region_states, $state["state"]);
                 }
                 $rows = $app['db']->fetchAll("SELECT * FROM dashboard_participants
-                                              WHERE enrollment_date >= '$start_date' AND enrollment_date <= '$end_date' 
-                                              AND state IN (?)", [$region_states], [\Doctrine\DBAL\Connection::PARAM_STR_ARRAY]);
+                                              WHERE enrollment_date >= ? AND enrollment_date <= ? 
+                                              AND state IN (?)", [$start_date, $end_date, $region_states], [\PDO::PARAM_STR, \PDO::PARAM_STR, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]);
                 foreach($region_states as $state) {
                     array_push($states_by_region, $state);
                     array_push($registrations_by_state, count($rows));
@@ -349,13 +434,13 @@ class DashboardController extends AbstractController
             $i = 0;
             $recruitment_centers = $app['db']->fetchAll("SELECT * FROM recruitment_centers");
             foreach($recruitment_centers as $location) {
-                $count = $app['db']->fetchColumn("SELECT count(*) FROM dashboard_participants 
+                $count = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants 
                                                   WHERE enrollment_date >= ? AND enrollment_date <= ? 
-                                                  AND recruitment_center = ?", [$start_date, $end_date, $location["id"]]);
+                                                  AND recruitment_center = ?", [$start_date, $end_date, $location["id"]], [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_INT]);
                 if ($location["category"] == 'Misc') {
-                    $label = "{$location["label"]}: <b>{$count}</b>";
+                    $label = "{$location["label"]}: <b>{$this->getCount($count, "COUNT")}</b>";
                 } else {
-                    $label = "{$location["label"]} ({$location['category']}): <b>{$count}</b>";
+                    $label = "{$location["label"]} ({$location['category']}): <b>{$this->getCount($count, "COUNT")}</b>";
                 }
 
                 $map_data[] = array(
@@ -366,7 +451,7 @@ class DashboardController extends AbstractController
                     'hoverinfo' => 'text',
                     'text' => [$label],
                     'marker' => array(
-                        'size' => [$count],
+                        'size' => [$this->getCount($count, "COUNT")],
                         'color' => $this->getColorBrewerVal($i),
                         'line' => array(
                             'color' => 'black',
@@ -382,10 +467,15 @@ class DashboardController extends AbstractController
         return $app->json($map_data);
     }
 
-    public function demo_load_lifecycle_dataAction(Application $app, Request $request) {
+    public function demo_load_lifecycle_dataAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('demo', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         // request parameters
         $start_date = $request->get('start_date');
-        $end_date = $request->get('end_date');
+        $end_date = $this->sanitizeDate($request->get('end_date'));
         $raw_filters = explode(',', $request->get('centers'));
         $center_filters = [];
         foreach($raw_filters as $center) {
@@ -400,6 +490,9 @@ class DashboardController extends AbstractController
             $start_date = $app['db']->fetchColumn("SELECT min(enrollment_date) FROM dashboard_participants");
         }
 
+        // sanitize start date once set
+        $start_date = $this->sanitizeDate($start_date);
+
         $phases = [];
         $counts = [];
         $eligible = [];
@@ -409,10 +502,10 @@ class DashboardController extends AbstractController
         foreach($lifecyle_phases as $phase) {
             $completed_raw = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants WHERE enrollment_date <= ? 
                                               AND enrollment_date >= ? AND lifecycle_phase >= ? AND recruitment_center in (?)",
-                                            [$end_date, $start_date, $phase['id'], $center_filters], [null, null, \PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY]);
+                                            [$end_date, $start_date, $phase['id'], $center_filters], [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY]);
             $eligible_raw = $app['db']->fetchAll("SELECT count(*) as COUNT FROM dashboard_participants WHERE enrollment_date <= ? 
                                               AND enrollment_date >= ? AND lifecycle_phase >= ? AND recruitment_center in (?)",
-                                            [$end_date, $start_date, $phase['id'] - 1, $center_filters], [null, null, \PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY]);
+                                            [$end_date, $start_date, $phase['id'] - 1, $center_filters], [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY]);
             $completed_count = $this->getCount($completed_raw, "COUNT");
             $eligible_count = $this->getCount($eligible_raw, "COUNT");
 
@@ -458,6 +551,31 @@ class DashboardController extends AbstractController
         return $app->json($data);
     }
 
+    // Main method for retrieving metrics from API
+    // stores result in memcache as it only updates daily
+    // supports storing multiple entries for faceting
+    private function getMetricsObject(Application $app, $facet) {
+        $memcache = new \Memcache();
+        $memcacheKey = 'metrics_api_facet_' . $facet;
+        $metrics = $memcache->get($memcacheKey);
+        if (!$metrics) {
+            try {
+                $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+                $metrics = $metricsApi->metrics([$facet])->bucket;
+                // set expiration to four hours
+                $memcache->set($memcacheKey, $metrics, 0, 14400);
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                return false;
+            }
+        }
+        return $metrics;
+    }
+
+    // helper function to check date range cutoffs
+    private function checkDates($date, $start, $end) {
+        return strtotime($date) >= strtotime($start) && strtotime($date) <= strtotime($end);
+    }
+
     // helper function to return array of dates segmented by interval
     private function getDashboardDates($start_date, $end_date, $interval) {
         $dates = [$end_date];
@@ -493,5 +611,43 @@ class DashboardController extends AbstractController
     // helper function to return count values from fetchAll (due to DBAL in query type issues)
     private function getCount($result, $key) {
         return (int) $result[0][$key];
+    }
+
+    // helper to return either the keys or values for metrics
+    // keys are names returned by metrics API, values are for display
+    private function getMetricsKeyVals($kind) {
+        $metrics = array(
+            "Participant" => "Total Participants",
+            "Participant.membership_tier" => "Membership Tier",
+            "Participant.gender_identity" => "Gender Identity",
+            "Participant.age_range" => "Age Range"
+        );
+
+        if ($kind == 'keys') {
+            $return_val = array_keys($metrics);
+        } elseif ($kind == 'values') {
+            $return_val = array_values($metrics);
+        } else {
+            $return_val = $metrics;
+        }
+        return $return_val;
+    }
+
+    // function to filter metrics API response entries based on requested metric
+    private function searchEntries($array, $key, $value) {
+        $results = array();
+        if (is_array($array)) {
+            foreach ($array as $subarray) {
+                if ($subarray->$key == $value) {
+                    $results[] = $subarray->value;
+                }
+            }
+        }
+        return $results;
+    }
+
+    // sanitize url date parameter to prevent SQL injection
+    private function sanitizeDate($date_string) {
+        return date('Y-m-d', strtotime($date_string));
     }
 }

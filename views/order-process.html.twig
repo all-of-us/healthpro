@@ -2,24 +2,27 @@
 {% block title %}Process - Order {{ order.id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'process' } %}
-    {{ form_start(processForm) }}
-    {# {{ form_widget(processForm) }} #}
+    {{ form_start(processForm, { attr: { class: 'warn-unsaved' } }) }}
+        {{ form_errors(processForm) }}
 
-    <div class="form-group">
-        {{ form_label(processForm.processed_samples) }}
-        <span class="toggle-help-image" data-caption="Processed samples help text placeholder.">
-                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-            </span>
-        {{ form_widget(processForm.processed_samples) }}
-    </div>
+        <div class="form-group{% if not processForm.processed_samples.vars.valid %} has-error{% endif %}">
+            {{ form_label(processForm.processed_samples) }}
+            <span class="toggle-help-image" data-caption="Processed samples help text placeholder.">
+                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                </span>
+            {{ form_widget(processForm.processed_samples) }}
+            {{ form_errors(processForm.processed_samples) }}
+        </div>
 
-    <div class="form-group">
-        {{ form_label(processForm.processed_notes) }}
-        <span class="toggle-help-image" data-caption="Processed notes help text placeholder.">
-                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-            </span>
-        {{ form_widget(processForm.processed_notes) }}
-    </div>
+        <div class="form-group{% if not processForm.processed_notes.vars.valid %} has-error{% endif %}">
+            {{ form_label(processForm.processed_notes) }}
+            <span class="toggle-help-image" data-caption="Processed notes help text placeholder.">
+                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                </span>
+            {{ form_widget(processForm.processed_notes) }}
+            {{ form_errors(processForm.processed_notes) }}
+        </div>
+        {{ form_rest(processForm) }}
         <p>
             <button type="submit" class="btn btn-primary">
                 {% if order.processed_ts %}
@@ -49,7 +52,7 @@ $(document).ready(function () {
             .css('margin', '5px 0 15px 20px');
         $('#form_processed_samples_ts_' + sample)
             .addClass('input-sm')
-            .datetimepicker(PMI.datetimepickerDefaults);
+            .pmiDateTimePicker();
     });
     $('#form_processed_samples_ts').remove();
 

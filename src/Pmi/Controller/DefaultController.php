@@ -12,7 +12,6 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
-use Pmi\Mayolink\Order as MayoLinkOrder;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 
 class DefaultController extends AbstractController

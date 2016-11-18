@@ -361,7 +361,7 @@ class DeployCommand extends Command {
             throw new Exception("Couldn't find $dosDistFile");
         }
         
-        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
+        if (in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
             copy($dosDistFile, $dosFile);
         } else {
             // https://cloud.google.com/appengine/docs/php/config/dos#delete
@@ -374,7 +374,7 @@ class DeployCommand extends Command {
             throw new Exception("Couldn't find $whitelistDistFile");
         }
         
-        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
+        if (in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
             copy($whitelistDistFile, $whitelistFile);
         } else {
             // https://cloud.google.com/appengine/docs/php/config/dos#delete
@@ -399,7 +399,7 @@ class DeployCommand extends Command {
             if (strlen($line) === 0) {
                 continue;
             } elseif (preg_match('/^display_errors\s*=/i', $line)) {
-                $line = 'display_errors = ' . ($this->isProd() ? 0 : 1);
+                $line = 'display_errors = ' . (($this->isProd() || $this->isTest()) ? 0 : 1);
             } elseif (preg_match('/^error_reporting\s*=/i', $line)) {
                 $line = 'error_reporting = ' . ($this->isProd() ?
                     'E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED' : 'E_ALL');

@@ -3,47 +3,48 @@
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'collect' } %}
 
-    {{ form_start(collectForm) }}
+    {{ form_start(collectForm, { attr: { class: 'warn-unsaved' } }) }}
 
-    <div class="form-group">
-    {{ form_label(collectForm.collected_ts) }}
+        <div class="form-group{% if not collectForm.collected_ts.vars.valid %} has-error{% endif %}">
+            {{ form_label(collectForm.collected_ts) }}
             <span class="toggle-help-image" data-caption="Collection time help text placeholder.">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
             </span>
-    {{ form_widget(collectForm.collected_ts) }}
-    </div>
+            {{ form_widget(collectForm.collected_ts) }}
+            {{ form_errors(collectForm.collected_ts) }}
+        </div>
 
-    <div class="form-group{% if not collectForm.collected_samples.vars.valid %} has-error{% endif %}">
-        {{ form_label(collectForm.collected_samples) }}
-            <span class="toggle-help-image" data-caption="Collected samples help text placeholder.">
-                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-            </span>
-            <div class="checkbox">
-                <label><input type="checkbox" id="checkall"> <strong>Check all</strong></label>
-            </div>
-        {{ form_widget(collectForm.collected_samples) }}
-        {{ form_errors(collectForm.collected_samples) }}
-    </div>
-
-    <div class="form-group">
-        {{ form_label(collectForm.collected_notes) }}
-        <span class="toggle-help-image" data-caption="Collected notes help text placeholder.">
+        <div class="form-group{% if not collectForm.collected_samples.vars.valid %} has-error{% endif %}">
+            {{ form_label(collectForm.collected_samples) }}
+                <span class="toggle-help-image" data-caption="Collected samples help text placeholder.">
                     <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                 </span>
-        {{ form_widget(collectForm.collected_notes) }}
-        {{ form_errors(collectForm.collected_notes) }}
-    </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" id="checkall"> <strong>Check all</strong></label>
+                </div>
+            {{ form_widget(collectForm.collected_samples) }}
+            {{ form_errors(collectForm.collected_samples) }}
+        </div>
 
-    {{ form_rest(collectForm) }}
-    <p>
-        <button type="submit" class="btn btn-primary">
-            {% if order.collected_ts %}
-                Update
-            {% else %}
-                Save and mark as collected
-            {% endif %}
-        </button>
-    </p>
+        <div class="form-group{% if not collectForm.collected_notes.vars.valid %} has-error{% endif %}">
+            {{ form_label(collectForm.collected_notes) }}
+            <span class="toggle-help-image" data-caption="Collected notes help text placeholder.">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                    </span>
+            {{ form_widget(collectForm.collected_notes) }}
+            {{ form_errors(collectForm.collected_notes) }}
+        </div>
+
+        {{ form_rest(collectForm) }}
+        <p>
+            <button type="submit" class="btn btn-primary">
+                {% if order.collected_ts %}
+                    Update
+                {% else %}
+                    Save and mark as collected
+                {% endif %}
+            </button>
+        </p>
     {{ form_end(collectForm) }}
 {% endblock %}
 
@@ -53,13 +54,10 @@ $(document).ready(function() {
     $('#checkall').on('change', function() {
         $('#form_collected_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
     });
-    $('#form_collected_ts').datetimepicker(PMI.datetimepickerDefaults);
-
+    $('#form_collected_ts').pmiDateTimePicker();
     var orderView = new PMI.views['OrderSubPage']({
         el: $("body")
     });
 });
-
 </script>
-    <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
 {% endblock %}
