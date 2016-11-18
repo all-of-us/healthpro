@@ -190,21 +190,25 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             return;
         }
         if (this.warnings[field]) {
+            var modalDisplayed = false;
             _.each(this.warnings[field], function(warning) {
                 if ((warning.min && val < warning.min) ||
                     (warning.max && val > warning.max))
                 {
                     if (warning.alert) {
-                        new PmiConfirmModal({
-                            msg: warning.message,
-                            onFalse: function() {
-                                input.val('');
-                                input.focus();
-                                input.trigger('change');
-                            },
-                            btnTextTrue: 'Confirm value and seek medical attention',
-                            btnTextFalse: 'Clear value and reenter'
-                        });
+                        if (!modalDisplayed) {
+                            new PmiConfirmModal({
+                                msg: warning.message,
+                                onFalse: function() {
+                                    input.val('');
+                                    input.focus();
+                                    input.trigger('change');
+                                },
+                                btnTextTrue: 'Confirm value and take action',
+                                btnTextFalse: 'Clear value and reenter'
+                            });
+                            modalDisplayed = true;
+                        }
                     } else {
                         container.append($('<div class="metric-warnings text-danger">').text(warning.message));
                     }

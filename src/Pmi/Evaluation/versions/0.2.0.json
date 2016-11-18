@@ -28,13 +28,18 @@
             "max": 300,
             "warnings": [
                 {
+                    "max": 200,
+                    "message": "Participant could be in a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+                    "alert": true
+                },
+                {
                     "max": 180,
-                    "message": "Participant is in a hypertensive crisis. Seek emergency care.",
+                    "message": "Participant could be in a hypertensive crisis. Refer to your site's SOP for expedited referral.",
                     "alert": true
                 },
                 {
                     "min": 70,
-                    "message": "Participant is in a hypotensive crisis. Seek emergency care.",
+                    "message": "Participant could be in a hypotensive crisis. Refer to your site's SOP.",
                     "alert": true
                 }
             ],
@@ -50,13 +55,18 @@
             "max": 300,
             "warnings": [
                 {
+                    "max": 120,
+                    "message": "Participant could be in a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+                    "alert": true
+                },
+                {
                     "max": 110,
-                    "message": "Participant is in a hypertensive crisis. Seek emergency care.",
+                    "message": "Participant could be in a hypertensive crisis. Refer to your site's SOP for expedited referral.",
                     "alert": true
                 },
                 {
                     "min": 40,
-                    "message": "Participant is in a hypotensive crisis. Seek emergency care.",
+                    "message": "Participant could be in a hypotensive crisis. Refer to your site's SOP.",
                     "alert": true
                 }
             ],
@@ -73,12 +83,12 @@
             "warnings": [
                 {
                     "max": 120,
-                    "message": "Participant is tachycardic and at risk for hypertensive crisis. Seek emergency care.",
+                    "message": "Participant could be tachycardic and at risk for hypertensive crisis. Refer to your site's SOP.",
                     "alert": true
                 },
                 {
-                    "min": 50,
-                    "message": "Participant is bradycardic and at risk for hypotensive crisis. Seek emergency care.",
+                    "min": 40,
+                    "message": "Participant could be bradycardic and at risk for hypotensive crisis. Refer to your site's SOP.",
                     "alert": true
                 }
             ],
@@ -152,8 +162,11 @@
             "warnings": [
                 {
                     "min": 30,
-                    "max": 450,
                     "message": "Please verify that this weight is correct"
+                },
+                {
+                    "max": 199.5,
+                    "message": "Please verify that this weight is correct. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol."
                 }
             ],
             "convert": "lb",

@@ -28,7 +28,7 @@
                 </div>
             </div>
         </div>
-        <div class="row replicate">
+        <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
             <div class="col-sm-4">
                 <div class="panel panel-default">
@@ -180,7 +180,7 @@
         <h3 class="panel-title">Hip and Waist Circumference</h3>
     </div>
     <div class="panel-body">
-        <div class="row replicate">
+        <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
             <div class="col-sm-4">
                 <div class="panel panel-default">
@@ -208,15 +208,15 @@
             {% endfor %}
         </div>
         <div class="well">
-            <div data-field="waist-circumference-protocol-modification" class="field field-waist-circumference-protocol-modification form-group{% if not evaluationForm['waist-circumference-protocol-modification'].vars.valid %} has-error{% endif %}">
-                {{ form_label(evaluationForm['waist-circumference-protocol-modification']) }}
-                {{ form_widget(evaluationForm['waist-circumference-protocol-modification']) }}
-                {{ form_errors(evaluationForm['waist-circumference-protocol-modification']) }}
-            </div>
             <div data-field="waist-circumference-location" class="field field-waist-circumference-location form-group{% if not evaluationForm['waist-circumference-location'].vars.valid %} has-error{% endif %}">
                 {{ form_label(evaluationForm['waist-circumference-location']) }}
                 {{ form_widget(evaluationForm['waist-circumference-location']) }}
                 {{ form_errors(evaluationForm['waist-circumference-location']) }}
+            </div>
+            <div data-field="waist-circumference-protocol-modification" class="field field-waist-circumference-protocol-modification form-group{% if not evaluationForm['waist-circumference-protocol-modification'].vars.valid %} has-error{% endif %}">
+                {{ form_label(evaluationForm['waist-circumference-protocol-modification']) }}
+                {{ form_widget(evaluationForm['waist-circumference-protocol-modification']) }}
+                {{ form_errors(evaluationForm['waist-circumference-protocol-modification']) }}
             </div>
         </div>
 
