@@ -11,7 +11,8 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         "keyup #form_height, #form_weight": "calculateBmi",
         "change #form_height, #form_weight": "calculateBmi",
         "change #form_blood-pressure-arm-circumference": "calculateCuff",
-        "keyup #form_blood-pressure-arm-circumference": "calculateCuff"
+        "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
+        "change #form_pregnant, #form_wheelchair": "togglePregnantOrWheelchair"
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
@@ -83,6 +84,39 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             this.$('#cuff-size').text('Large adult (16×36 cm)');
         } else {
             this.$('#cuff-size').text('Adult thigh (16×42 cm)');
+        }
+    },
+    togglePregnantOrWheelchair: function() {
+        var isPregnant = (this.$('#form_pregnant').val() == 1);
+        var isWheelchairBound = (this.$('#form_wheelchair').val() == 1);
+        if (isPregnant || isWheelchairBound) {
+            this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
+                $(this).val('');
+                $(this).attr('disabled', true);
+            });
+            this.$('#hip-waist-skip').html('<span class="label label-danger">Skip</span>');
+        }
+        if (isPregnant) {
+            this.$('#form_weight-protocol-modification').val(3);
+            this.$('#pregnant-message').html('<p class="text-danger">Pregnant women should be measured for both height and weight. Do not measure the hip and waist of pregnant participants.</p>');
+        }
+        if (!isPregnant) {
+            if (this.$('#form_weight-protocol-modification').val() == 3) {
+                this.$('#form_weight-protocol-modification').val(0);
+            }
+            this.$('#pregnant-message').text('');
+        }
+        if (isWheelchairBound) {
+            this.$('#wheelchair-message').html('<p class="text-danger">Please record estimated participant height and weight in the "Height" and "Weight" fields. Do not measure the hip and waist of wheelchair bound participants.</p>');
+        }
+        if (!isWheelchairBound) {
+            this.$('#wheelchair-message').text('');
+        }
+        if (!isPregnant && !isWheelchairBound) {
+            this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
+                $(this).attr('disabled', false);
+            });
+            this.$('#hip-waist-skip').text('');
         }
     },
     clearServerErrors: function() {
@@ -197,6 +231,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         });
         self.calculateBmi();
         self.calculateCuff();
+        self.togglePregnantOrWheelchair();
         return this;
     }
 });
