@@ -82,17 +82,17 @@
             <div class="col-sm-4">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {{ metrics.form_row(evaluationForm, schema.fields['height']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['height-protocol-modification']) }}
+                        {{ metrics.form_row(evaluationForm, schema.fields['height']) }}
                     </div>
                 </div>
             </div>
             <div class="col-sm-4">
                 <div class="panel panel-default">
                     <div class="panel-body">
+                        {{ metrics.form_row(evaluationForm, schema.fields['weight-protocol-modification']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['weight']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-prepregnancy']) }}
-                        {{ metrics.form_row(evaluationForm, schema.fields['weight-protocol-modification']) }}
                     </div>
                 </div>
             </div>
@@ -120,6 +120,17 @@
         </h3>
     </div>
     <div class="panel-body">
+        <div class="well">
+            <div class="row">
+                <div class="col-sm-6">
+                    {{ metrics.form_row(evaluationForm, schema.fields['waist-circumference-location']) }}
+                </div>
+                <div class="col-sm-6">
+                    {{ metrics.form_row(evaluationForm, schema.fields['waist-circumference-protocol-modification']) }}
+                </div>
+            </div>
+        </div>
+
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
             <div class="col-sm-4">
@@ -132,10 +143,6 @@
                 </div>
             </div>
             {% endfor %}
-        </div>
-        <div class="well">
-            {{ metrics.form_row(evaluationForm, schema.fields['waist-circumference-location']) }}
-            {{ metrics.form_row(evaluationForm, schema.fields['waist-circumference-protocol-modification']) }}
         </div>
 
         <div class="panel panel-primary">
