@@ -114,7 +114,13 @@
             },
             "help": {
                 "caption": "Help text placeholder."
-            }
+            },
+            "warnings": [
+                {
+                    "val": true,
+                    "message": "Pregnant women should be measured for both height and weight. Do not measure the hip and waist of pregnant participants."
+                }
+            ]
         },
         {
             "name": "wheelchair",
@@ -125,7 +131,13 @@
             },
             "help": {
                 "caption": "Help text placeholder."
-            }
+            },
+            "warnings": [
+                {
+                    "val": true,
+                    "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields. Do not measure the hip and waist of wheelchair bound participants."
+                }
+            ]
         },
         {
             "name": "height",
@@ -151,7 +163,25 @@
             },
             "help": {
                 "caption": "Help text placeholder."
-            }
+            },
+            "warnings": [
+                {
+                    "val": 1,
+                    "message": "Deviation successfully captured. Please record the maximum value on the stadiometer in centimeters in the \"Height\" field."
+                },
+                {
+                    "val": 2,
+                    "message": "Deviation successfully captured. Height measurement may be innacurate due to hair style."
+                },
+                {
+                    "val": 3,
+                    "message": "Deviation successfully captured. Height measurement may be innacurate because the participant is unable to stand in a straight position."
+                },
+                {
+                    "val": 4,
+                    "message": "Deviation successfully captured."
+                }
+            ]
         },
         {
             "name": "weight",
@@ -198,7 +228,25 @@
             },
             "help": {
                 "caption": "Help text placeholder."
-            }
+            },
+            "warnings": [
+                {
+                    "val": 1,
+                    "message": "Deviation successfully captured. Please record the maximum value on the scale in the \"Weight\" field."
+                },
+                {
+                    "val": 2,
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": 3,
+                    "message": "Deviation successfully captured. Proceeed with weight measurement."
+                },
+                {
+                    "val": 4,
+                    "message": "Deviation successfully captured."
+                }
+            ]
         },
         {
             "name": "hip-circumference",

@@ -12,7 +12,10 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         "change #form_height, #form_weight": "calculateBmi",
         "change #form_blood-pressure-arm-circumference": "calculateCuff",
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
-        "change #form_pregnant, #form_wheelchair": "togglePregnantOrWheelchair"
+        "change #form_pregnant, #form_wheelchair": "handlePregnantOrWheelchair",
+        "change #form_height-protocol-modification": "handleHeightProtocol",
+        "change #form_weight-protocol-modification": "handleWeightProtocol",
+        "change #form_waist-circumference-protocol-modification": "handleWaistProtocol"
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
@@ -92,40 +95,57 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             this.$('#cuff-size').text('Adult thigh (16×42 cm)');
         }
     },
-    togglePregnantOrWheelchair: function() {
+    handlePregnantOrWheelchair: function() {
         var isPregnant = (this.$('#form_pregnant').val() == 1);
         var isWheelchairBound = (this.$('#form_wheelchair').val() == 1);
         if (isPregnant || isWheelchairBound) {
             this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
-                $(this).val('');
-                $(this).attr('disabled', true);
+                $(this).val('').change().attr('disabled', true);
             });
             this.$('#hip-waist-skip').html('<span class="label label-danger">Skip</span>');
         }
         if (isPregnant) {
             this.$('.field-weight-prepregnancy').show();
-            this.$('#form_weight-protocol-modification').val(3);
-            this.$('#pregnant-message').html('<p class="text-danger">Pregnant women should be measured for both height and weight. Do not measure the hip and waist of pregnant participants.</p>');
+            this.$('#form_weight-protocol-modification').val(3).change();
         }
         if (!isPregnant) {
-            this.$('#form_weight-prepregnancy').val('');
+            this.$('#form_weight-prepregnancy').val('').change();
             this.$('.field-weight-prepregnancy').hide();
             if (this.$('#form_weight-protocol-modification').val() == 3) {
-                this.$('#form_weight-protocol-modification').val(0);
+                this.$('#form_weight-protocol-modification').val(0).change();
             }
-            this.$('#pregnant-message').text('');
-        }
-        if (isWheelchairBound) {
-            this.$('#wheelchair-message').html('<p class="text-danger">Please record estimated participant height and weight in the "Height" and "Weight" fields. Do not measure the hip and waist of wheelchair bound participants.</p>');
-        }
-        if (!isWheelchairBound) {
-            this.$('#wheelchair-message').text('');
         }
         if (!isPregnant && !isWheelchairBound) {
             this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
                 $(this).attr('disabled', false);
             });
             this.$('#hip-waist-skip').text('');
+        }
+    },
+    handleHeightProtocol: function() {
+        if (this.$('#form_height-protocol-modification').val() == 4) {
+            this.$('#form_height').val('').change().attr('disabled', true);
+        } else {
+            this.$('#form_height').attr('disabled', false);
+        }
+    },
+    handleWeightProtocol: function() {
+        var selected = this.$('#form_weight-protocol-modification').val();
+        if (selected == 2 || selected == 4) {
+            this.$('#form_weight').val('').change().attr('disabled', true);
+        } else {
+            this.$('#form_weight').attr('disabled', false);
+        }
+    },
+    handleWaistProtocol: function() {
+        if (this.$('#form_waist-circumference-protocol-modification').val() == 1) {
+            this.$('.field-waist-circumference input').each(function() {
+                $(this).val('').change().attr('disabled', true);
+            });
+        } else {
+            this.$('.field-waist-circumference input').each(function() {
+                $(this).attr('disabled', false);
+            });
         }
     },
     clearServerErrors: function() {
@@ -193,7 +213,8 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                 }
                 $.each(warnings, function(key, warning) {
                     if ((warning.min && val < warning.min) ||
-                        (warning.max && val > warning.max))
+                        (warning.max && val > warning.max) ||
+                        (warning.val && val == warning.val))
                     {
                         container.append($('<div class="metric-warnings text-danger">').text(warning.message));
                         return false; // only show first (highest priority) warning
@@ -218,7 +239,8 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             var warned = false;
             $.each(this.warnings[field], function(key, warning) {
                 if ((warning.min && val < warning.min) ||
-                    (warning.max && val > warning.max))
+                    (warning.max && val > warning.max) ||
+                    (warning.val && val == warning.val))
                 {
                     if (warning.alert) {
                         new PmiConfirmModal({
@@ -267,7 +289,10 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         self.displayWarnings();
         self.calculateBmi();
         self.calculateCuff();
-        self.togglePregnantOrWheelchair();
+        self.handlePregnantOrWheelchair();
+        self.handleHeightProtocol();
+        self.handleWeightProtocol();
+        self.handleWaistProtocol();
         self.triggerEqualize();
         return this;
     }
