@@ -12,6 +12,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         "change #form_height, #form_weight": "calculateBmi",
         "change #form_blood-pressure-arm-circumference": "calculateCuff",
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
+        "change .field-irregular-heart-rate input": "calculateIrregularHeartRate",
         "change #form_pregnant, #form_wheelchair": "handlePregnantOrWheelchair",
         "change #form_height-protocol-modification": "handleHeightProtocol",
         "change #form_weight-protocol-modification": "handleWeightProtocol",
@@ -163,6 +164,31 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             }
         }
     },
+    calculateIrregularHeartRate: function(init) {
+        var allIrregular = true;
+        this.$('.field-irregular-heart-rate input').each(function() {
+            if (!$(this).prop('checked')) {
+                allIrregular = false;
+            }
+        });
+        if (allIrregular) {
+            $('#irregular-heart-rate-warning').html("<br />Refer to your site's SOP for irregular heart rhythm detection.");
+            if (init !== true) {
+                console.log('modal');
+                new PmiAlertModal({
+                    msg: "Refer to your site's SOP for irregular heart rhythm detection.",
+                    onFalse: function() {
+                        input.val('');
+                        input.focus();
+                        input.trigger('change');
+                    },
+                    btnTextTrue: 'Confirm and take action'
+                });
+            }
+        } else {
+            $('#irregular-heart-rate-warning').text('');
+        }
+    },
     clearServerErrors: function() {
         this.$('span.help-block ul li').remove();
     },
@@ -308,6 +334,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         self.displayWarnings();
         self.calculateBmi();
         self.calculateCuff();
+        self.calculateIrregularHeartRate(true);
         self.handlePregnantOrWheelchair();
         self.handleHeightProtocol();
         self.handleWeightProtocol();
