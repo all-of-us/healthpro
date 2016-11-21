@@ -148,7 +148,21 @@
             "convert": "ftin",
             "help": {
                 "image": "height.png"
-            }
+            },
+            "warnings": [
+                {
+                    "min": 2.3,
+                    "message": "Please verify that this height has been entered in centimeters, and not meters (1m = 100cm)"
+                },
+                {
+                    "between": [3, 7.5],
+                    "message": "Please verify that this height has been entered in centimeters, and not feet (1ft = 30.48cm)"
+                },
+                {
+                    "between": [36, 89.9],
+                    "message": "Please verify that this height has been entered in centimeters, and not inches (1in = 2.54cm)"
+                }
+            ]
         },
         {
             "name": "height-protocol-modification",

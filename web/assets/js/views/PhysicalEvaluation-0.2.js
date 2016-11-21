@@ -197,7 +197,16 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             }
         }
     },
+    warningConditionMet: function(warning, val) {
+        return (
+            (warning.min && val < warning.min) ||
+            (warning.max && val > warning.max) ||
+            (warning.val && val == warning.val) ||
+            (warning.between && val > warning.between[0] && val < warning.between[1])
+        );
+    },
     displayWarnings: function() {
+        var self = this;
         _.each(this.warnings, function (warnings, field) {
             this.$('.field-' + field).find('input, select').each(function() {
                 var input = $(this);
@@ -212,10 +221,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                     return;
                 }
                 $.each(warnings, function(key, warning) {
-                    if ((warning.min && val < warning.min) ||
-                        (warning.max && val > warning.max) ||
-                        (warning.val && val == warning.val))
-                    {
+                    if (self.warningConditionMet(warning, val)) {
                         container.append($('<div class="metric-warnings text-danger">').text(warning.message));
                         return false; // only show first (highest priority) warning
                     }
@@ -224,6 +230,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         });
     },
     displayWarning: function(e) {
+        var self = this;
         var input = $(e.currentTarget);
         var field = input.closest('.field').data('field');
         var container = input.closest('.form-group');
@@ -238,10 +245,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         if (this.warnings[field]) {
             var warned = false;
             $.each(this.warnings[field], function(key, warning) {
-                if ((warning.min && val < warning.min) ||
-                    (warning.max && val > warning.max) ||
-                    (warning.val && val == warning.val))
-                {
+                if (self.warningConditionMet(warning, val)) {
                     if (warning.alert) {
                         new PmiConfirmModal({
                             msg: warning.message,
