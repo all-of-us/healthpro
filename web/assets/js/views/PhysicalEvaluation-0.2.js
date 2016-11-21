@@ -16,7 +16,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
-        this.displayWarnings(e);
+        this.displayWarning(e);
         this.updateConversion(e);
         this.triggerEqualize();
     },
@@ -177,7 +177,32 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             }
         }
     },
-    displayWarnings: function(e) {
+    displayWarnings: function() {
+        _.each(this.warnings, function (warnings, field) {
+            this.$('.field-' + field).find('input, select').each(function() {
+                var input = $(this);
+                var field = input.closest('.field').data('field');
+                var container = input.closest('.form-group');
+                container.find('.metric-warnings').remove();
+                if (container.find('.metric-errors div').length > 0) {
+                    return;
+                }
+                var val = parseFloat(input.val());
+                if (!val) {
+                    return;
+                }
+                $.each(warnings, function(key, warning) {
+                    if ((warning.min && val < warning.min) ||
+                        (warning.max && val > warning.max))
+                    {
+                        container.append($('<div class="metric-warnings text-danger">').text(warning.message));
+                        return false; // only show first (highest priority) warning
+                    }
+                });
+            });
+        });
+    },
+    displayWarning: function(e) {
         var input = $(e.currentTarget);
         var field = input.closest('.field').data('field');
         var container = input.closest('.form-group');
@@ -190,28 +215,25 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             return;
         }
         if (this.warnings[field]) {
-            var modalDisplayed = false;
-            _.each(this.warnings[field], function(warning) {
+            var warned = false;
+            $.each(this.warnings[field], function(key, warning) {
                 if ((warning.min && val < warning.min) ||
                     (warning.max && val > warning.max))
                 {
                     if (warning.alert) {
-                        if (!modalDisplayed) {
-                            new PmiConfirmModal({
-                                msg: warning.message,
-                                onFalse: function() {
-                                    input.val('');
-                                    input.focus();
-                                    input.trigger('change');
-                                },
-                                btnTextTrue: 'Confirm value and take action',
-                                btnTextFalse: 'Clear value and reenter'
-                            });
-                            modalDisplayed = true;
-                        }
-                    } else {
-                        container.append($('<div class="metric-warnings text-danger">').text(warning.message));
+                        new PmiConfirmModal({
+                            msg: warning.message,
+                            onFalse: function() {
+                                input.val('');
+                                input.focus();
+                                input.trigger('change');
+                            },
+                            btnTextTrue: 'Confirm value and take action',
+                            btnTextFalse: 'Clear value and reenter'
+                        });
                     }
+                    container.append($('<div class="metric-warnings text-danger">').text(warning.message));
+                    return false; // only show first (highest priority) warning
                 }
             });
         }
@@ -242,6 +264,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         _.each(_.keys(this.conversions), function(field) {
             self.calculateConversion(field);
         });
+        self.displayWarnings();
         self.calculateBmi();
         self.calculateCuff();
         self.togglePregnantOrWheelchair();
