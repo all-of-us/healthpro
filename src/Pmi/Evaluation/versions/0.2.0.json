@@ -108,7 +108,7 @@
         },
         {
             "name": "pregnant",
-            "label": "Is individual pregnant?",
+            "label": "Is participant pregnant?",
             "options": {
                 "No": false,
                 "Yes": true
@@ -125,7 +125,7 @@
         },
         {
             "name": "wheelchair",
-            "label": "Is individual wheelchair bound?",
+            "label": "Is participant wheelchair bound?",
             "options": {
                 "No": false,
                 "Yes": true
