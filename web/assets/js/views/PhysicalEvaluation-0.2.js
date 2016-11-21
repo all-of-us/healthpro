@@ -100,19 +100,31 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         var isWheelchairBound = (this.$('#form_wheelchair').val() == 1);
         if (isPregnant || isWheelchairBound) {
             this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
-                $(this).val('').change().attr('disabled', true);
+                $(this).valChange('').attr('disabled', true);
             });
             this.$('#hip-waist-skip').html('<span class="label label-danger">Skip</span>');
         }
         if (isPregnant) {
             this.$('.field-weight-prepregnancy').show();
-            this.$('#form_weight-protocol-modification').val(3).change();
+            this.$('#form_weight-protocol-modification').valChange(4);
         }
         if (!isPregnant) {
-            this.$('#form_weight-prepregnancy').val('').change();
+            this.$('#form_weight-prepregnancy').valChange('');
             this.$('.field-weight-prepregnancy').hide();
+            if (this.$('#form_weight-protocol-modification').val() == 4) {
+                this.$('#form_weight-protocol-modification').valChange(0);
+            }
+        }
+        if (isWheelchairBound) {
+            this.$('#form_height-protocol-modification').valChange(3);
+            this.$('#form_weight-protocol-modification').valChange(3);
+        }
+        if (!isWheelchairBound) {
+            if (this.$('#form_height-protocol-modification').val() == 3) {
+                this.$('#form_height-protocol-modification').valChange(0);
+            }
             if (this.$('#form_weight-protocol-modification').val() == 3) {
-                this.$('#form_weight-protocol-modification').val(0).change();
+                this.$('#form_weight-protocol-modification').valChange(0);
             }
         }
         if (!isPregnant && !isWheelchairBound) {
@@ -123,16 +135,16 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         }
     },
     handleHeightProtocol: function() {
-        if (this.$('#form_height-protocol-modification').val() == 4) {
-            this.$('#form_height').val('').change().attr('disabled', true);
+        if (this.$('#form_height-protocol-modification').val() == 5) {
+            this.$('#form_height').valChange('').attr('disabled', true);
         } else {
             this.$('#form_height').attr('disabled', false);
         }
     },
     handleWeightProtocol: function() {
         var selected = this.$('#form_weight-protocol-modification').val();
-        if (selected == 2 || selected == 4) {
-            this.$('#form_weight').val('').change().attr('disabled', true);
+        if (selected == 2 || selected == 5) {
+            this.$('#form_weight').valChange('').attr('disabled', true);
         } else {
             this.$('#form_weight').attr('disabled', false);
         }
@@ -140,12 +152,15 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
     handleWaistProtocol: function() {
         if (this.$('#form_waist-circumference-protocol-modification').val() == 1) {
             this.$('.field-waist-circumference input').each(function() {
-                $(this).val('').change().attr('disabled', true);
+                $(this).valChange('').attr('disabled', true);
             });
         } else {
-            this.$('.field-waist-circumference input').each(function() {
-                $(this).attr('disabled', false);
-            });
+            var isPregnant = (this.$('#form_pregnant').val() == 1);
+            if (!isPregnant) {
+                this.$('.field-waist-circumference input').each(function() {
+                    $(this).attr('disabled', false);
+                });
+            }
         }
     },
     clearServerErrors: function() {
@@ -222,7 +237,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                 }
                 $.each(warnings, function(key, warning) {
                     if (self.warningConditionMet(warning, val)) {
-                        container.append($('<div class="metric-warnings text-danger">').text(warning.message));
+                        container.append($('<div class="metric-warnings text-warning">').text(warning.message));
                         return false; // only show first (highest priority) warning
                     }
                 });
@@ -258,7 +273,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                             btnTextFalse: 'Clear value and reenter'
                         });
                     }
-                    container.append($('<div class="metric-warnings text-danger">').text(warning.message));
+                    container.append($('<div class="metric-warnings text-warning">').text(warning.message));
                     return false; // only show first (highest priority) warning
                 }
             });

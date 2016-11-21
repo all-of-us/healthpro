@@ -16,6 +16,7 @@
             "help": {
                 "caption": "Help text placeholder."
             },
+            "convert": "in",
             "unit": "cm",
             "decimals": 1,
             "max": 100
@@ -171,9 +172,10 @@
                 "None": null,
                 "Height is more than measuring device range": 1,
                 "Hair style": 2,
-                "Unable to stand in a straight position": 3,
-                "Refusal": 4,
-                "Other": 5
+                "Wheelchair-bound": 3,
+                "Unable to stand in a straight position": 4,
+                "Refusal": 5,
+                "Other": 6
             },
             "help": {
                 "caption": "Help text placeholder."
@@ -189,10 +191,14 @@
                 },
                 {
                     "val": 3,
-                    "message": "Deviation successfully captured. Height measurement may be innacurate because the participant is unable to stand in a straight position."
+                    "message": "Deviation successfully captured. Please record estimated participant height in the \"Height\" field. "
                 },
                 {
                     "val": 4,
+                    "message": "Deviation successfully captured. Height measurement may be innacurate because the participant is unable to stand in a straight position."
+                },
+                {
+                    "val": 5,
                     "message": "Deviation successfully captured."
                 }
             ]
@@ -224,6 +230,16 @@
             "unit": "kg",
             "decimals": 1,
             "max": 1000,
+            "warnings": [
+                {
+                    "min": 30,
+                    "message": "Please verify that this weight is correct"
+                },
+                {
+                    "max": 199.5,
+                    "message": "Please verify that this weight is correct."
+                }
+            ],
             "convert": "lb",
             "help": {
                 "caption": "Help text placeholder."
@@ -236,9 +252,10 @@
                 "None": null,
                 "Weight is more than weight measuring range": 1,
                 "Can't balance on scale": 2,
-                "Pregnancy": 3,
-                "Refusal": 4,
-                "Other": 5
+                "Wheelchair-bound": 3,
+                "Pregnancy": 4,
+                "Refusal": 5,
+                "Other": 6
             },
             "help": {
                 "caption": "Help text placeholder."
@@ -254,10 +271,14 @@
                 },
                 {
                     "val": 3,
-                    "message": "Deviation successfully captured. Proceeed with weight measurement."
+                    "message": "Deviation successfully captured. Please record estimated participant weight in the \"Weight\" field. "
                 },
                 {
                     "val": 4,
+                    "message": "Deviation successfully captured. Proceeed with weight measurement."
+                },
+                {
+                    "val": 5,
                     "message": "Deviation successfully captured."
                 }
             ]

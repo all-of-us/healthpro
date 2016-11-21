@@ -138,6 +138,18 @@ $(document).ready(function()
     };
 
     /*************************************************************************
+     * Plugin to set value and trigger change event if changed
+     ************************************************************************/
+    $.fn.valChange = function(val) {
+        var triggerChange = (this.val() != val);
+        this.val(val);
+        if (triggerChange) {
+            this.change();
+        }
+        return this;
+    };
+
+    /*************************************************************************
      * Unsaved changes prompter
      ************************************************************************/
     PMI.hasChanges = false;
