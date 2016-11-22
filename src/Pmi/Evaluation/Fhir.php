@@ -220,7 +220,12 @@ class Fhir
 
     protected function getBpBodySite($replicate)
     {
-        switch ($this->data->{'blood-pressure-location'}[$replicate - 1]) {
+        if (is_array($this->data->{'blood-pressure-location'})) {
+            $location = $this->data->{'blood-pressure-location'}[$replicate - 1];
+        } else {
+            $location = $this->data->{'blood-pressure-location'};
+        }
+        switch ($location) {
             case 'Left arm':
                 $locationSnomed = '368208006';
                 $locationDisplay = 'Left arm';

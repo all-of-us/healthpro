@@ -5,13 +5,14 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
 
 class Evaluation
 {
-    const CURRENT_VERSION = '0.1.3';
+    const CURRENT_VERSION = '0.2.0';
     protected $version;
     protected $data;
     protected $schema;
@@ -64,6 +65,17 @@ class Evaluation
         return $this->schema;
     }
 
+    public function getAssociativeSchema()
+    {
+        $schema = clone $this->schema;
+        $associativeFields = [];
+        foreach ($schema->fields as $field) {
+            $associativeFields[$field->name] = $field;
+        }
+        $schema->fields = $associativeFields;
+        return $schema;
+    }
+
     public function getWarnings()
     {
         $warnings = [];
@@ -90,6 +102,11 @@ class Evaluation
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
         foreach ($this->schema->fields as $field) {
+            if (isset($field->type)) {
+                $type = $field->type;
+            } else {
+                $type = null;
+            }
             $constraints = [];
             $attributes = [];
             $options = [
@@ -112,7 +129,7 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } elseif (!isset($field->options)) {
+            } elseif (!isset($field->options) && $type != 'checkbox') {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
@@ -122,8 +139,15 @@ class Evaluation
             if (isset($field->options)) {
                 $class = ChoiceType::class;
                 unset($options['scale']);
-                $options['choices'] = array_combine($field->options, $field->options);
+                if (is_array($field->options)) {
+                    $options['choices'] = array_combine($field->options, $field->options);
+                } else {
+                    $options['choices'] = (array)$field->options;
+                }
                 $options['placeholder'] = false;
+            } elseif ($type == 'checkbox') {
+                unset($options['scale']);
+                $class = CheckboxType::class;
             } else {
                 $class = NumberType::class;
             }
@@ -167,8 +191,8 @@ class Evaluation
     protected function normalizeData()
     {
         foreach ($this->data as $key => $value) {
-            if (!is_array($value)) {
-                $this->data->$key = floatval($value) ?: null;
+            if ($value === 0) {
+                $this->data->$key = null;
             }
         }
         foreach ($this->schema->fields as $field) {

@@ -112,6 +112,9 @@ $(document).ready(function()
         $(window).on('resize', _.debounce(function() {
             equalize(selector);
         }, 250));
+        $(window).on('pmi.equalize', function() {
+            equalize(selector);
+        });
     };
     $('.row-equal-height').equalizePanelHeight();
 
@@ -132,6 +135,18 @@ $(document).ready(function()
         $(selector).on('dp.change', function() {
             PMI.markUnsaved();
         });
+    };
+
+    /*************************************************************************
+     * Plugin to set value and trigger change event if changed
+     ************************************************************************/
+    $.fn.valChange = function(val) {
+        var triggerChange = (this.val() != val);
+        this.val(val);
+        if (triggerChange) {
+            this.change();
+        }
+        return this;
     };
 
     /*************************************************************************
