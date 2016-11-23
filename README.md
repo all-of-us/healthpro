@@ -4,7 +4,10 @@
 
 ## Developer Quick Start
 
-Install the [Google App Engine SDK for PHP](https://cloud.google.com/appengine/downloads).
+Prerequisites:
+
+* Install the [Google App Engine SDK for PHP](https://cloud.google.com/appengine/downloads).
+* Install NodeJS
 
 Make GAE SDK not watch too many files:
 
@@ -16,7 +19,7 @@ Install PHP dependencies via [Composer](https://getcomposer.org/doc/00-intro.md#
 
 Install Gulp dependencies via NPM:
 
-`./bin/npm install`
+`npm install`
 
 Install asset dependencies via Bower:
 
