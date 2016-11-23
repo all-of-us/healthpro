@@ -28,12 +28,12 @@ Initialize assets and recompile on the fly as assets change:
 
 Run local App Engine dev server:
 
-`./bin/console pmi:deploy --local`
+`./bin/deploy --local`
  
 ### Datastore persistence
 By default, the local server stores Datastore data in a temporary location that can be wiped out at any time.  In order to maintain persistent Datastore locally, create a directory to store the data in, and specify the `datastoreDir` parameter:
 
-`./bin/console pmi:deploy --local --datastoreDir=~/datastore`
+`./bin/deploy --local --datastoreDir=~/datastore`
 
 
 ## Credentials and configuration

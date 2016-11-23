@@ -240,6 +240,11 @@ class DeployCommand extends Command {
             }
             $output->writeln('');
             $output->writeln('All done 👍'); // emoji :thumbsup:
+            // taggable implies we are tracking/auditing
+            if ($this->isTaggable()) {
+                $output->writeln('');
+                $output->writeln('<error>Remember to attach deploy output to Jira ticket!</error>');
+            }
         }
         else {
             $output->writeln('');
