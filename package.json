@@ -8,7 +8,7 @@
     },
     "license": "SEE LICENSE IN LICENSE",
     "dependencies": {
-        "bower": "1.7.x",
+        "bower": "1.8.x",
         "gulp": "3.9.x",
         "gulp-concat": "2.6.x",
         "gulp-concat-css": "2.2.x",
