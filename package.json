@@ -1,7 +1,7 @@
 {
     "name": "pmi-drc-hpo",
     "version": "1.0.0",
-    "description": "Used to install Gulp and its task dependencies",
+    "description": "Installs packages for asset management/compilation",
     "repository": {
         "type": "git",
         "url": "https://github.com/vanderbilt/pmi-drc-hpo.git"
@@ -16,6 +16,7 @@
         "gulp-rename": "1.2.x",
         "gulp-sourcemaps": "1.6.x",
         "gulp-uglify": "1.5.x",
-        "merge-stream": "^1.0.0"
+        "merge-stream": "^1.0.0",
+        "retire": "^1.2.10"
     }
 }
