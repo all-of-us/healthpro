@@ -169,6 +169,8 @@ class DeployCommand extends Command {
         $this->generateCronConfig();
 
         $this->runSecurityCheck();
+        $this->out->writeln('');
+        $this->runJsSecurityCheck();
 
         // If not local, compile assets. Run ./bin/gulp when developing locally.
         if (!$this->local && !$this->index) {
@@ -562,6 +564,25 @@ class DeployCommand extends Command {
                 $helper = $this->getHelper('question');
                 if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
                     throw new \Exception('Aborting due to security vulnerability');
+                }
+            }
+        }
+    }
+    
+    private function runJsSecurityCheck()
+    {
+        $this->out->writeln("Running RetireJS scanner...");
+        $process = $this->exec("{$this->appDir}/node_modules/retire/bin/retire --nocache --nodepath {$this->appDir}/node_modules --jspath {$this->appDir}/web/assets/dist/js", false);
+        if ($process->getExitCode() == 0) {
+            $this->out->writeln('No JS files or node modules have known vulnerabilities');
+        } else {            
+            if (!$this->local && !$this->index) {
+                throw new \Exception('Fix JS security vulnerablities before deploying');
+            } else {
+                $this->out->writeln('');
+                $helper = $this->getHelper('question');
+                if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<question>Continue despite JS security vulnerablities?</question> '))) {
+                    throw new \Exception('Aborting due to JS security vulnerability');
                 }
             }
         }
