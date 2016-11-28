@@ -23,6 +23,7 @@
 <ul class="nav nav-tabs">
     <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
     {% set nextEnabled = true %}
+    {% set previousStep = false %}
     {% for step, column in steps %}
         {% if nextEnabled %}
             <li role="presentation"{% if active == step %} class="active"{% endif %}>
@@ -36,8 +37,9 @@
                 </a>
             </li>
         {% else %}
-            <li role="presentation" class="disabled"><a href="#">{{ step|capitalize }}</a></li>
+            <li role="presentation" class="disabled"><a href="#" title="{{ previousStep|capitalize }} time must be set to continue" data-toggle="tooltip" data-placement="bottom">{{ step|capitalize }}</a></li>
         {% endif %}
+        {% set previousStep = column %}
     {% endfor %}
 </ul>
 <br />
