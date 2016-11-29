@@ -168,14 +168,12 @@ class DeployCommand extends Command {
         $this->generatePhpConfig();
         $this->generateCronConfig();
 
-        $this->runSecurityCheck();
-
         // If not local, compile assets. Run ./bin/gulp when developing locally.
         if (!$this->local && !$this->index) {
             // ensure that we are up-to-date with the latest NPM dependencies
             $output->writeln('');
             $output->writeln("Checking NPM dependencies...");
-            $this->exec("{$this->appDir}/bin/npm install");
+            $this->exec("npm install");
 
             // ensure that we are up-to-date with the latest Bower dependencies
             $output->writeln('');
@@ -194,6 +192,11 @@ class DeployCommand extends Command {
             $twigInput = new ArrayInput(['command' => 'pmi:twig']);
             $command->run($twigInput, $output);
         }
+        
+        // security checks
+        $this->runSecurityCheck();
+        $this->out->writeln('');
+        $this->runJsSecurityCheck(); // must occur after asset compilation
 
         // unit tests should pass before deploying to testers or production
         if ($this->isTest() || $this->isProd()) {
@@ -568,6 +571,21 @@ class DeployCommand extends Command {
                 if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
                     throw new \Exception('Aborting due to security vulnerability');
                 }
+            }
+        }
+    }
+    
+    private function runJsSecurityCheck()
+    {
+        $this->out->writeln("Running RetireJS scanner...");
+        $process = $this->exec("{$this->appDir}/node_modules/retire/bin/retire --nocache --nodepath {$this->appDir}/node_modules --jspath {$this->appDir}/web/assets/dist/js", false);
+        if ($process->getExitCode() == 0) {
+            $this->out->writeln('No JS files or node modules have known vulnerabilities');
+        } else {            
+            $this->out->writeln('');
+            $helper = $this->getHelper('question');
+            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerablities?</error> '))) {
+                throw new \Exception('Aborting due to JS security vulnerability');
             }
         }
     }
