@@ -159,7 +159,7 @@ class EvaluationController extends AbstractController
             'participant' => $participant,
             'evaluation' => $evaluation,
             'evaluationForm' => $evaluationForm->createView(),
-            'schema' => $evaluationService->getSchema(),
+            'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
             'latestVersion' => $evaluationService::CURRENT_VERSION
