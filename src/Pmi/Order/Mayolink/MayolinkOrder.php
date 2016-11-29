@@ -62,7 +62,11 @@ class MayolinkOrder
         'walgreens' => '7035735', // sdbb and walgreens use the same account
         'vabostonhc' => '7035759',
         'vapaloalto' => '7035758',
-        'jeanettephillips' => '7035760'
+        'jeanettephillips' => '7035760',
+        'monroeville' => '7035769',
+        'aikenmed' => '7035770',
+        'upmc' => '7035771',
+        'montefiorectrc' => '7035772'
     ];
 
     private $client;
