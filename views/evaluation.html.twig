@@ -35,6 +35,11 @@
 
     <div id="physicalEvaluation">
         {{ form_start(evaluationForm, { attr: { class: 'warn-unsaved' } }) }}
+
+            <div id="evaluationAffixSave">
+                <button type="submit" class="btn btn-primary btn-xs" name="save">Save</button>
+            </div>
+
             {% if schema.template is defined %}
                 {% include 'evaluationform/' ~ schema.template ~ '.html.twig' %}
             {% else %}
@@ -67,6 +72,14 @@ $(document).ready(function() {
         warnings: {{ warnings|json_encode|raw }},
         conversions: {{ conversions|json_encode|raw }}
     });
+    $('#evaluationAffixSave')
+        .affix({
+            offset: {
+                top: 100,
+                bottom: $(window).height()
+            }
+        })
+        .width($('#physicalEvaluation').width());
 });
 </script>
 {% endblock %}
