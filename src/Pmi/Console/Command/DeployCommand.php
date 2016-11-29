@@ -577,14 +577,10 @@ class DeployCommand extends Command {
         if ($process->getExitCode() == 0) {
             $this->out->writeln('No JS files or node modules have known vulnerabilities');
         } else {            
-            if (!$this->local && !$this->index) {
-                throw new \Exception('Fix JS security vulnerablities before deploying');
-            } else {
-                $this->out->writeln('');
-                $helper = $this->getHelper('question');
-                if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<question>Continue despite JS security vulnerablities?</question> '))) {
-                    throw new \Exception('Aborting due to JS security vulnerability');
-                }
+            $this->out->writeln('');
+            $helper = $this->getHelper('question');
+            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerablities?</error> '))) {
+                throw new \Exception('Aborting due to JS security vulnerability');
             }
         }
     }
