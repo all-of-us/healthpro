@@ -173,7 +173,7 @@ class DeployCommand extends Command {
             // ensure that we are up-to-date with the latest NPM dependencies
             $output->writeln('');
             $output->writeln("Checking NPM dependencies...");
-            $this->exec("{$this->appDir}/bin/npm install");
+            $this->exec("npm install");
 
             // ensure that we are up-to-date with the latest Bower dependencies
             $output->writeln('');
