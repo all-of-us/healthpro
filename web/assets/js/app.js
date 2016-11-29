@@ -4,6 +4,16 @@
 $(document).ready(function()
 {
     /*************************************************************************
+     * Security fix: https://github.com/jquery/jquery/issues/2432#issuecomment-140038536
+     * Can be removed after upgrading to jQuery 3.x
+     ************************************************************************/
+    $.ajaxSetup({
+        contents: {
+            javascript: false
+        }
+    });
+    
+    /*************************************************************************
      * Supplement Underscore with a truthy function
      ************************************************************************/
     _["truthy"] = function(val) {
