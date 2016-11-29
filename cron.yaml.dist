@@ -1,0 +1,15 @@
+cron:
+- description: "Used to verify cron functionality in test sites"
+  url: /cron/ping-test
+  schedule: 29 of feb 00:00
+  timezone: America/Chicago
+- description: "Datastore normal-Kind backup"
+  url: /_ah/datastore_admin/backup.create?name=dsNormalBackup&filesystem=gs&gs_bucket_name={BUCKET_PREFIX}-ds-backups&kind=Configuration&kind=Participant
+  schedule: every day 04:00
+  target: ah-builtin-python-bundle
+  timezone: America/Chicago
+- description: "Datastore log-Kind backup"
+  url: /_ah/datastore_admin/backup.create?name=dsLogBackup&filesystem=gs&gs_bucket_name={BUCKET_PREFIX}-ds-backups&kind=AuditLog
+  schedule: every sat 04:00
+  target: ah-builtin-python-bundle
+  timezone: America/Chicago

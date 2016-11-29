@@ -29,6 +29,10 @@ handlers:
 - url: /assets
   static_dir: web/assets
   secure: always
+- url: /cron/.*
+  script: web/index.php
+  secure: always
+  login: admin
 - url: /timeout
   script: web/index.php
   secure: always
