@@ -42,7 +42,7 @@ class MayolinkOrder
             'specimen' => 'Saliva'
         ]
     ];
-    protected static $siteAccounts = [
+    public static $siteAccounts = [
         'a' => '7035588',
         'b' => '7035500',
         'uofacats' => '7035650',
