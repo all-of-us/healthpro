@@ -23,7 +23,8 @@ class OrderController extends AbstractController
         ['orderCollect', '/participant/{participantId}/order/{orderId}/collect', ['method' => 'GET|POST']],
         ['orderProcess', '/participant/{participantId}/order/{orderId}/process', ['method' => 'GET|POST']],
         ['orderFinalize', '/participant/{participantId}/order/{orderId}/finalize', ['method' => 'GET|POST']],
-        ['orderJson', '/participant/{participantId}/order/{orderId}/order.json']
+        ['orderJson', '/participant/{participantId}/order/{orderId}/order.json'],
+        ['orderExport', '/orders/export.csv']
     ];
 
     protected function loadOrder($participantId, $orderId, Application $app)
@@ -316,5 +317,41 @@ class OrderController extends AbstractController
         }
 
         return $app->json($object);
+    }
+
+    /* For dry-run testing reconciliation  */
+    public function orderExportAction(Application $app)
+    {
+        if ($app->isProd()) {
+            $app->abort(404);
+        }
+        $orders = $app['db']->fetchAll("SELECT finalized_ts, site, biobank_id, mayo_id FROM orders WHERE finalized_ts is not null and site != '' and biobank_id !=''");
+
+        $stream = function() use ($orders) {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, array('Biobank ID', 'ML Order ID', 'ML Client ID', 'Finalized'));
+            foreach ($orders as $order) {
+                $finalized = date('Y-m-d H:i:s', strtotime($order['finalized_ts']));
+                if (in_array($order['site'], ['a', 'b'])) {
+                    continue;
+                }
+                if (!array_key_exists($order['site'], MayolinkOrder::$siteAccounts)) {
+                    continue;
+                }
+                fputcsv($output, [
+                    $order['biobank_id'],
+                    $order['mayo_id'],
+                    MayolinkOrder::$siteAccounts[$order['site']],
+                    $finalized
+                ]);
+            }
+            fclose($output);
+        };
+
+        $filename = 'orders_' . date('Ymd-His') . '.csv';
+        return $app->stream($stream, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+        ]);
     }
 }
