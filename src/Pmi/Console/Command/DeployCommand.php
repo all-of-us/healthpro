@@ -168,10 +168,6 @@ class DeployCommand extends Command {
         $this->generatePhpConfig();
         $this->generateCronConfig();
 
-        $this->runSecurityCheck();
-        $this->out->writeln('');
-        $this->runJsSecurityCheck();
-
         // If not local, compile assets. Run ./bin/gulp when developing locally.
         if (!$this->local && !$this->index) {
             // ensure that we are up-to-date with the latest NPM dependencies
@@ -196,6 +192,11 @@ class DeployCommand extends Command {
             $twigInput = new ArrayInput(['command' => 'pmi:twig']);
             $command->run($twigInput, $output);
         }
+        
+        // security checks
+        $this->runSecurityCheck();
+        $this->out->writeln('');
+        $this->runJsSecurityCheck(); // must occur after asset compilation
 
         // unit tests should pass before deploying to testers or production
         if ($this->isTest() || $this->isProd()) {
