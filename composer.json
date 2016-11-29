@@ -26,16 +26,7 @@
         "tomwalder/php-gds": "^2.1",
         "twig/twig": "^1.24"
     },
-    "extra": {
-        "mouf": {
-            "nodejs": {
-                "version": "~5.10",
-                "forceLocal": true
-            }
-        }
-    },
     "require-dev": {
-        "mouf/nodejs-installer": "^1.0",
         "phpunit/phpunit": "4.8.*"
     },
     "scripts": {

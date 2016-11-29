@@ -5,7 +5,6 @@
 #
 
 APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
-NODE="${APP_DIR}/vendor/bin/node"
 BOWER="${APP_DIR}/node_modules/bower/bin/bower"
 
-$NODE $BOWER "$@"
+node $BOWER "$@"

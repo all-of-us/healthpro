@@ -1,14 +1,14 @@
-var ASSETS_DIR = './web/assets';
+var ASSETS_DIR = './web/assets'; // adjust DeployCommand's RetireJS check if this changes
 var BOWER_DIR = './bower_components';
 var ASSETS = {
     'js': [
-        BOWER_DIR + '/jquery/dist/jquery.min.js',
-        BOWER_DIR + '/moment/min/moment.min.js',
-        BOWER_DIR + '/bootstrap/dist/js/bootstrap.min.js',
-        BOWER_DIR + '/underscore/underscore-min.js',
-        BOWER_DIR + '/backbone/backbone-min.js',
+        BOWER_DIR + '/jquery/dist/jquery.js',
+        BOWER_DIR + '/moment/moment.js',
+        BOWER_DIR + '/bootstrap/dist/js/bootstrap.js',
+        BOWER_DIR + '/underscore/underscore.js',
+        BOWER_DIR + '/backbone/backbone.js',
         BOWER_DIR + '/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
-        BOWER_DIR + '/parsleyjs/dist/parsley.min.js',
+        BOWER_DIR + '/parsleyjs/dist/parsley.js',
         ASSETS_DIR + '/js/parsley-comparison.js',
         ASSETS_DIR + '/js/bootstrap-session-timeout.js',
         ASSETS_DIR + '/js/app.js',
