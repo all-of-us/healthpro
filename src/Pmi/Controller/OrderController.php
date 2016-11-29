@@ -326,23 +326,26 @@ class OrderController extends AbstractController
             $app->abort(404);
         }
         $orders = $app['db']->fetchAll("SELECT finalized_ts, site, biobank_id, mayo_id FROM orders WHERE finalized_ts is not null and site != '' and biobank_id !=''");
-
-        $stream = function() use ($orders) {
+        $skipSites = ['a', 'b'];
+        $noteSites = ['7035702', '7035703', '7035704', '7035705', '7035707'];
+        $stream = function() use ($orders, $skipSites, $noteSites) {
             $output = fopen('php://output', 'w');
-            fputcsv($output, array('Biobank ID', 'ML Order ID', 'ML Client ID', 'Finalized'));
+            fputcsv($output, array('Biobank ID', 'ML Order ID', 'ML Client ID', 'Finalized (CT)', 'Notes'));
             foreach ($orders as $order) {
                 $finalized = date('Y-m-d H:i:s', strtotime($order['finalized_ts']));
-                if (in_array($order['site'], ['a', 'b'])) {
+                if (in_array($order['site'], $skipSites)) {
                     continue;
                 }
                 if (!array_key_exists($order['site'], MayolinkOrder::$siteAccounts)) {
                     continue;
                 }
+                $clientId = MayolinkOrder::$siteAccounts[$order['site']];
                 fputcsv($output, [
                     $order['biobank_id'],
                     $order['mayo_id'],
-                    MayolinkOrder::$siteAccounts[$order['site']],
-                    $finalized
+                    $clientId,
+                    $finalized,
+                    in_array($clientId, $noteSites) ? 'Client account was not added to our account which resulted in the client id 7035500 being used (will be fixed some time after 11/29)' : ''
                 ]);
             }
             fclose($output);
