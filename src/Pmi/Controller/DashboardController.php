@@ -124,7 +124,7 @@ class DashboardController extends AbstractController
                         $values[$entry][] = $val;
 
                         if ($filter_by != 'Participant') {
-                            $hover_text[$entry][] = $this->calculatePercentText($val, $totals[$i]);
+                            $hover_text[$entry][] = $this->calculatePercentText($val, $totals[$i]). '<br />'. $date;
                         }
                     }
                     $i++;
@@ -663,7 +663,7 @@ class DashboardController extends AbstractController
             return "0 (0%)";
         } else {
             $percentage = $value / $total;
-            return "{$value} (".number_format( $percentage * 100, 2 ) . '%'.")";
+            return "<b>{$value}</b> (".number_format( $percentage * 100, 2 ) . '%'.")";
         }
 
     }
