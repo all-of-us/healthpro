@@ -200,6 +200,10 @@
                 {
                     "val": 5,
                     "message": "Deviation successfully captured."
+                },
+                {
+                    "val": 6,
+                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
                 }
             ]
         },
@@ -280,6 +284,10 @@
                 {
                     "val": 5,
                     "message": "Deviation successfully captured."
+                },
+                {
+                    "val": 6,
+                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
                 }
             ]
         },
@@ -342,7 +350,22 @@
             },
             "help": {
                 "caption": "Help text placeholder."
-            }
+            },
+            "warnings": [
+                {
+                    "val": 1,
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": 2,
+                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                }
+            ]
+        },
+        {
+            "name": "notes",
+            "label": "Additional Notes",
+            "type": "textarea"
         }
     ]
 }
