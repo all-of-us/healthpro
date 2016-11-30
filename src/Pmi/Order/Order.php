@@ -111,7 +111,7 @@ class Order
         if ($set != 'processed') {
             if ($formData["{$set}_ts"]) {
                 // TODO: system setting for db timezone
-                $formData["{$set}_ts"]->setTimezone(new \DateTimeZone('America/Chicago'));
+                $formData["{$set}_ts"]->setTimezone(new \DateTimeZone($this->app->getUser()->getInfo()['timezone']));
                 $updateArray["{$set}_ts"] = $formData["{$set}_ts"]->format('Y-m-d H:i:s');
             } else {
                 $updateArray["{$set}_ts"] = null;
@@ -297,6 +297,7 @@ class Order
 
     protected function getSampleTime($set, $sample)
     {
+        var_dump('hi!'); die;
         $samples = json_decode($this->order["{$set}_samples"]);
         if (!is_array($samples) || !in_array($sample, $samples)) {
             return false;
@@ -307,7 +308,7 @@ class Order
                 try {
                     $time = new \DateTime();
                     $time->setTimestamp($processedSampleTimes[$sample]);
-                    $time->setTimezone(new \DateTimeZone('UTC'));
+                    $time->setTimezone(new \DateTimeZone($this->app->getUser()->getInfo()['timezone']));
                     return $time->format('Y-m-d\TH:i:s\Z');
                 } catch (\Exception $e) {
                 }
@@ -315,7 +316,7 @@ class Order
         } else {
             if ($this->order["{$set}_ts"]) {
                 $time = new \DateTime($this->order["{$set}_ts"]);
-                $time->setTimezone(new \DateTimeZone('UTC'));
+                $time->setTimezone(new \DateTimeZone($this->app->getUser()->getInfo()['timezone']));
                 return $time->format('Y-m-d\TH:i:s\Z');
             }
         }
@@ -374,6 +375,7 @@ class Order
                     try {
                         $sampleTs = new \DateTime();
                         $sampleTs->setTimestamp($processedSampleTimes[$sample]);
+                        $sampleTs->setTimezone(new \DateTimeZone($this->app->getUser()->getInfo()['timezone']))
                         $formData['processed_samples_ts'][$sample] = $sampleTs;
                     } catch (\Exception $e) {
                         $formData['processed_samples_ts'][$sample] = null;
