@@ -169,40 +169,40 @@
             "name": "height-protocol-modification",
             "label": "Modification to Height Protocol",
             "options": {
-                "None": null,
-                "Height is more than measuring device range": 1,
-                "Hair style": 2,
-                "Wheelchair-bound": 3,
-                "Unable to stand in a straight position": 4,
-                "Refusal": 5,
-                "Other": 6
+                "None": "",
+                "Height is more than measuring device range": "height-out-of-range",
+                "Hair style": "hair-style",
+                "Wheelchair-bound": "wheelchair-bound",
+                "Unable to stand in a straight position": "unable-to-stand-straight",
+                "Refusal": "refusal",
+                "Other": "other"
             },
             "help": {
                 "caption": "Help text placeholder."
             },
             "warnings": [
                 {
-                    "val": 1,
+                    "val": "height-out-of-range",
                     "message": "Deviation successfully captured. Please record the maximum value on the stadiometer in centimeters in the \"Height\" field."
                 },
                 {
-                    "val": 2,
+                    "val": "hair-style",
                     "message": "Deviation successfully captured. Height measurement may be innacurate due to hair style."
                 },
                 {
-                    "val": 3,
+                    "val": "wheelchair-bound",
                     "message": "Deviation successfully captured. Please record estimated participant height in the \"Height\" field. "
                 },
                 {
-                    "val": 4,
+                    "val": "unable-to-stand-straight",
                     "message": "Deviation successfully captured. Height measurement may be innacurate because the participant is unable to stand in a straight position."
                 },
                 {
-                    "val": 5,
+                    "val": "refusal",
                     "message": "Deviation successfully captured."
                 },
                 {
-                    "val": 6,
+                    "val": "other",
                     "message": "Please specify reason for protocol deviation in the Additional Notes section."
                 }
             ]
@@ -253,40 +253,40 @@
             "name": "weight-protocol-modification",
             "label": "Modification to Weight Protocol",
             "options": {
-                "None": null,
-                "Weight is more than weight measuring range": 1,
-                "Can't balance on scale": 2,
-                "Wheelchair-bound": 3,
-                "Pregnancy": 4,
-                "Refusal": 5,
-                "Other": 6
+                "None": "",
+                "Weight is more than weight measuring range": "weight-out-of-range",
+                "Can't balance on scale": "cannot-balance-on-scale",
+                "Wheelchair-bound": "wheelchair-bound",
+                "Pregnancy": "pregnancy",
+                "Refusal": "refusal",
+                "Other": "other"
             },
             "help": {
                 "caption": "Help text placeholder."
             },
             "warnings": [
                 {
-                    "val": 1,
+                    "val": "weight-out-of-range",
                     "message": "Deviation successfully captured. Please record the maximum value on the scale in the \"Weight\" field."
                 },
                 {
-                    "val": 2,
+                    "val": "cannot-balance-on-scale",
                     "message": "Deviation successfully captured."
                 },
                 {
-                    "val": 3,
+                    "val": "wheelchair-bound",
                     "message": "Deviation successfully captured. Please record estimated participant weight in the \"Weight\" field. "
                 },
                 {
-                    "val": 4,
+                    "val": "pregnancy",
                     "message": "Deviation successfully captured. Proceeed with weight measurement."
                 },
                 {
-                    "val": 5,
+                    "val": "refusal",
                     "message": "Deviation successfully captured."
                 },
                 {
-                    "val": 6,
+                    "val": "other",
                     "message": "Please specify reason for protocol deviation in the Additional Notes section."
                 }
             ]
@@ -333,8 +333,8 @@
             "name": "waist-circumference-location",
             "label": "Waist Circumference Location",
             "options": {
-                "Smallest part (Natural indent) of the trunk": 1,
-                "Umbilicus": 2
+                "Smallest part (Natural indent) of the trunk": "smallest-part-of-trunk",
+                "Umbilicus": "umbilicus"
             },
             "help": {
                 "caption": "Help text placeholder."
@@ -344,20 +344,20 @@
             "name": "waist-circumference-protocol-modification",
             "label": "Modification to Waist Circumference Protocol",
             "options": {
-                "None": null,
-                "Colostomy bag": 1,
-                "Other": 2
+                "None": "",
+                "Colostomy bag": "colostomy-bag",
+                "Other": "other"
             },
             "help": {
                 "caption": "Help text placeholder."
             },
             "warnings": [
                 {
-                    "val": 1,
+                    "val": "colostomy-bag",
                     "message": "Deviation successfully captured."
                 },
                 {
-                    "val": 2,
+                    "val": "other",
                     "message": "Please specify reason for protocol deviation in the Additional Notes section."
                 }
             ]
