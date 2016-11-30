@@ -100,31 +100,38 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         var isPregnant = (this.$('#form_pregnant').val() == 1);
         var isWheelchairBound = (this.$('#form_wheelchair').val() == 1);
         if (isPregnant || isWheelchairBound) {
+            this.$('#panel-hip-waist input').each(function() {
+                $(this).valChange('');
+            });
             this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
-                $(this).valChange('').attr('disabled', true);
+                $(this).attr('disabled', true);
             });
             this.$('#hip-waist-skip').html('<span class="label label-danger">Skip</span>');
         }
         if (isPregnant) {
             this.$('.field-weight-prepregnancy').show();
-            this.$('#form_weight-protocol-modification').valChange('pregnancy');
+            if (this.rendered) {
+                this.$('#form_weight-protocol-modification').valChange('pregnancy');
+            }
         }
         if (!isPregnant) {
             this.$('#form_weight-prepregnancy').valChange('');
             this.$('.field-weight-prepregnancy').hide();
-            if (this.$('#form_weight-protocol-modification').val() == 'pregnancy') {
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'pregnancy') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
         if (isWheelchairBound) {
-            this.$('#form_height-protocol-modification').valChange('wheelchair-bound');
-            this.$('#form_weight-protocol-modification').valChange('wheelchair-bound');
+            if (this.rendered) {
+                this.$('#form_height-protocol-modification').valChange('wheelchair-bound');
+                this.$('#form_weight-protocol-modification').valChange('wheelchair-bound');
+            }
         }
         if (!isWheelchairBound) {
-            if (this.$('#form_height-protocol-modification').val() == 'wheelchair-bound') {
+            if (this.rendered && this.$('#form_height-protocol-modification').val() == 'wheelchair-bound') {
                 this.$('#form_height-protocol-modification').valChange('');
             }
-            if (this.$('#form_weight-protocol-modification').val() == 'wheelchair-bound') {
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-bound') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
@@ -164,7 +171,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             }
         }
     },
-    calculateIrregularHeartRate: function(init) {
+    calculateIrregularHeartRate: function() {
         var allIrregular = true;
         this.$('.field-irregular-heart-rate input').each(function() {
             if (!$(this).prop('checked')) {
@@ -173,7 +180,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         });
         if (allIrregular) {
             $('#irregular-heart-rate-warning').html("<br />Refer to your site's SOP for irregular heart rhythm detection.");
-            if (init !== true) {
+            if (this.rendered) {
                 new PmiAlertModal({
                     msg: "Refer to your site's SOP for irregular heart rhythm detection.",
                     onFalse: function() {
@@ -307,7 +314,9 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
     initialize: function(obj) {
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
+        this.rendered = false;
         this.render();
+        this.rendered = true;
     },
     render: function() {
         var self = this;
@@ -333,7 +342,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         self.displayWarnings();
         self.calculateBmi();
         self.calculateCuff();
-        self.calculateIrregularHeartRate(true);
+        self.calculateIrregularHeartRate();
         self.handlePregnantOrWheelchair();
         self.handleHeightProtocol();
         self.handleWeightProtocol();
