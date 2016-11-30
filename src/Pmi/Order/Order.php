@@ -375,7 +375,7 @@ class Order
                     try {
                         $sampleTs = new \DateTime();
                         $sampleTs->setTimestamp($processedSampleTimes[$sample]);
-                        $sampleTs->setTimezone(new \DateTimeZone($this->app->getUser()->getInfo()['timezone']))
+                        $sampleTs->setTimezone(new \DateTimeZone($this->app->getUser()->getInfo()['timezone']));
                         $formData['processed_samples_ts'][$sample] = $sampleTs;
                     } catch (\Exception $e) {
                         $formData['processed_samples_ts'][$sample] = null;
