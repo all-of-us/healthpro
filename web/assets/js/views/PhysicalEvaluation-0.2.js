@@ -100,32 +100,39 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         var isPregnant = (this.$('#form_pregnant').val() == 1);
         var isWheelchairBound = (this.$('#form_wheelchair').val() == 1);
         if (isPregnant || isWheelchairBound) {
+            this.$('#panel-hip-waist input').each(function() {
+                $(this).valChange('');
+            });
             this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
-                $(this).valChange('').attr('disabled', true);
+                $(this).attr('disabled', true);
             });
             this.$('#hip-waist-skip').html('<span class="label label-danger">Skip</span>');
         }
         if (isPregnant) {
             this.$('.field-weight-prepregnancy').show();
-            this.$('#form_weight-protocol-modification').valChange(4);
+            if (this.rendered) {
+                this.$('#form_weight-protocol-modification').valChange('pregnancy');
+            }
         }
         if (!isPregnant) {
             this.$('#form_weight-prepregnancy').valChange('');
             this.$('.field-weight-prepregnancy').hide();
-            if (this.$('#form_weight-protocol-modification').val() == 4) {
-                this.$('#form_weight-protocol-modification').valChange(0);
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'pregnancy') {
+                this.$('#form_weight-protocol-modification').valChange('');
             }
         }
         if (isWheelchairBound) {
-            this.$('#form_height-protocol-modification').valChange(3);
-            this.$('#form_weight-protocol-modification').valChange(3);
+            if (this.rendered) {
+                this.$('#form_height-protocol-modification').valChange('wheelchair-bound');
+                this.$('#form_weight-protocol-modification').valChange('wheelchair-bound');
+            }
         }
         if (!isWheelchairBound) {
-            if (this.$('#form_height-protocol-modification').val() == 3) {
-                this.$('#form_height-protocol-modification').valChange(0);
+            if (this.rendered && this.$('#form_height-protocol-modification').val() == 'wheelchair-bound') {
+                this.$('#form_height-protocol-modification').valChange('');
             }
-            if (this.$('#form_weight-protocol-modification').val() == 3) {
-                this.$('#form_weight-protocol-modification').valChange(0);
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-bound') {
+                this.$('#form_weight-protocol-modification').valChange('');
             }
         }
         if (!isPregnant && !isWheelchairBound) {
@@ -136,7 +143,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         }
     },
     handleHeightProtocol: function() {
-        if (this.$('#form_height-protocol-modification').val() == 5) {
+        if (this.$('#form_height-protocol-modification').val() == 'refusal') {
             this.$('#form_height').valChange('').attr('disabled', true);
         } else {
             this.$('#form_height').attr('disabled', false);
@@ -144,14 +151,14 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
     },
     handleWeightProtocol: function() {
         var selected = this.$('#form_weight-protocol-modification').val();
-        if (selected == 2 || selected == 5) {
+        if (selected == 'cannot-balance-on-scale' || selected == 'refusal') {
             this.$('#form_weight').valChange('').attr('disabled', true);
         } else {
             this.$('#form_weight').attr('disabled', false);
         }
     },
     handleWaistProtocol: function() {
-        if (this.$('#form_waist-circumference-protocol-modification').val() == 1) {
+        if (this.$('#form_waist-circumference-protocol-modification').val() == 'colostomy-bag') {
             this.$('.field-waist-circumference input').each(function() {
                 $(this).valChange('').attr('disabled', true);
             });
@@ -164,7 +171,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             }
         }
     },
-    calculateIrregularHeartRate: function(init) {
+    calculateIrregularHeartRate: function() {
         var allIrregular = true;
         this.$('.field-irregular-heart-rate input').each(function() {
             if (!$(this).prop('checked')) {
@@ -173,8 +180,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         });
         if (allIrregular) {
             $('#irregular-heart-rate-warning').html("<br />Refer to your site's SOP for irregular heart rhythm detection.");
-            if (init !== true) {
-                console.log('modal');
+            if (this.rendered) {
                 new PmiAlertModal({
                     msg: "Refer to your site's SOP for irregular heart rhythm detection.",
                     onFalse: function() {
@@ -308,6 +314,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
     initialize: function(obj) {
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
+        this.rendered = false;
         this.render();
     },
     render: function() {
@@ -331,15 +338,16 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         _.each(_.keys(this.conversions), function(field) {
             self.calculateConversion(field);
         });
-        self.displayWarnings();
-        self.calculateBmi();
-        self.calculateCuff();
-        self.calculateIrregularHeartRate(true);
-        self.handlePregnantOrWheelchair();
-        self.handleHeightProtocol();
-        self.handleWeightProtocol();
-        self.handleWaistProtocol();
-        self.triggerEqualize();
+        this.displayWarnings();
+        this.calculateBmi();
+        this.calculateCuff();
+        this.calculateIrregularHeartRate();
+        this.handlePregnantOrWheelchair();
+        this.handleHeightProtocol();
+        this.handleWeightProtocol();
+        this.handleWaistProtocol();
+        this.triggerEqualize();
+        this.rendered = true;
         return this;
     }
 });
