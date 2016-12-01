@@ -72,7 +72,12 @@ $(document).ready(function()
             redirUrl: PMI.path.clientTimeout,
             redirAfter: PMI.sessionTimeout * 1000,
             warnAfter: PMI.sessionTimeout * 1000 - (PMI.sessionWarning * 1000),
-            warnAutoClose: false
+            warnAutoClose: false,
+            onRedir: function(opt) {
+                // suppress unsaved warning when user is being logged out
+                PMI.markSaved();
+                window.location = opt.redirUrl;
+            }
         });
     }
 

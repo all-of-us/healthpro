@@ -16,7 +16,9 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         "change #form_pregnant, #form_wheelchair": "handlePregnantOrWheelchair",
         "change #form_height-protocol-modification": "handleHeightProtocol",
         "change #form_weight-protocol-modification": "handleWeightProtocol",
-        "change #form_waist-circumference-protocol-modification": "handleWaistProtocol"
+        "change #form_waist-circumference-protocol-modification": "handleWaistProtocol",
+        "change .field-hip-circumference input": "toggleThirdHipCircumference",
+        "change .field-waist-circumference input": "toggleThirdWaistCircumference"
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
@@ -171,6 +173,24 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             }
         }
     },
+    toggleThirdReading: function(field) {
+        var first = parseFloat(this.$('#form_' + field + '_0').val());
+        var second = parseFloat(this.$('#form_' + field + '_1').val());
+        if (first > 0 && second > 0 && Math.abs(first - second) > 1) {
+            this.$('.panel-' + field + '-3').show();
+        } else {
+            this.$('.panel-' + field + '-3').hide();
+            this.$('.panel-' + field + '-3 input, .panel-' + field + '-3 select').each(function() {
+                $(this).valChange('');
+            });
+        }
+    },
+    toggleThirdHipCircumference: function() {
+        this.toggleThirdReading('hip-circumference');
+    },
+    toggleThirdWaistCircumference: function() {
+        this.toggleThirdReading('waist-circumference');
+    },
     calculateIrregularHeartRate: function() {
         var allIrregular = true;
         this.$('.field-irregular-heart-rate input').each(function() {
@@ -245,10 +265,16 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         }
     },
     warningConditionMet: function(warning, val) {
+        if (warning.val && val == warning.val) {
+            return true;
+        }
+        val = parseFloat(val);
+        if (!val) {
+            return false;
+        }
         return (
             (warning.min && val < warning.min) ||
             (warning.max && val > warning.max) ||
-            (warning.val && val == warning.val) ||
             (warning.between && val > warning.between[0] && val < warning.between[1])
         );
     },
@@ -263,10 +289,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                 if (container.find('.metric-errors div').length > 0) {
                     return;
                 }
-                var val = parseFloat(input.val());
-                if (!val) {
-                    return;
-                }
+                var val = input.val();
                 $.each(warnings, function(key, warning) {
                     if (self.warningConditionMet(warning, val)) {
                         container.append($('<div class="metric-warnings text-warning">').text(warning.message));
@@ -285,10 +308,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         if (container.find('.metric-errors div').length > 0) {
             return;
         }
-        var val = parseFloat(input.val());
-        if (!val) {
-            return;
-        }
+        var val = input.val();
         if (this.warnings[field]) {
             var warned = false;
             $.each(this.warnings[field], function(key, warning) {
@@ -346,6 +366,8 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         this.handleHeightProtocol();
         this.handleWeightProtocol();
         this.handleWaistProtocol();
+        this.toggleThirdHipCircumference();
+        this.toggleThirdWaistCircumference();
         this.triggerEqualize();
         this.rendered = true;
         return this;
