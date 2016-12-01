@@ -265,10 +265,16 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         }
     },
     warningConditionMet: function(warning, val) {
+        if (warning.val && val == warning.val) {
+            return true;
+        }
+        val = parseFloat(val);
+        if (!val) {
+            return false;
+        }
         return (
             (warning.min && val < warning.min) ||
             (warning.max && val > warning.max) ||
-            (warning.val && val == warning.val) ||
             (warning.between && val > warning.between[0] && val < warning.between[1])
         );
     },
@@ -283,10 +289,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                 if (container.find('.metric-errors div').length > 0) {
                     return;
                 }
-                var val = parseFloat(input.val());
-                if (!val) {
-                    return;
-                }
+                var val = input.val();
                 $.each(warnings, function(key, warning) {
                     if (self.warningConditionMet(warning, val)) {
                         container.append($('<div class="metric-warnings text-warning">').text(warning.message));
@@ -305,10 +308,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         if (container.find('.metric-errors div').length > 0) {
             return;
         }
-        var val = parseFloat(input.val());
-        if (!val) {
-            return;
-        }
+        var val = input.val();
         if (this.warnings[field]) {
             var warned = false;
             $.each(this.warnings[field], function(key, warning) {
