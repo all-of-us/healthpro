@@ -6,6 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
@@ -129,12 +130,10 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } elseif (!isset($field->options) && $type != 'checkbox') {
+            } elseif (!isset($field->options) && $type != 'checkbox' && $type != 'textarea') {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
-            $options['constraints'] = $constraints;
-            $options['attr'] = $attributes;
 
             if (isset($field->options)) {
                 $class = ChoiceType::class;
@@ -148,9 +147,17 @@ class Evaluation
             } elseif ($type == 'checkbox') {
                 unset($options['scale']);
                 $class = CheckboxType::class;
+            } elseif ($type == 'textarea') {
+                unset($options['scale']);
+                $class = TextareaType::class;
+                $attributes['rows'] = 4;
             } else {
                 $class = NumberType::class;
             }
+
+            $options['constraints'] = $constraints;
+            $options['attr'] = $attributes;
+
             if (isset($field->replicates)) {
                 $formBuilder->add($field->name, CollectionType::class, [
                     'entry_type' => $class,
