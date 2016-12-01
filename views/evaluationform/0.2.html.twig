@@ -124,10 +124,13 @@
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
             <div class="col-sm-4">
-                <div class="panel panel-default">
+                <div class="panel panel-default panel-hip-circumference-{{ i + 1 }}">
                     <div class="panel-body">
                         <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
                         {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference'], i) }}
+                        {% if i == 2 %}
+                            <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -148,10 +151,13 @@
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
             <div class="col-sm-4">
-                <div class="panel panel-default">
+                <div class="panel panel-default panel-waist-circumference-{{ i + 1 }}">
                     <div class="panel-body">
                         <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
                         {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference'], i) }}
+                        {% if i == 2 %}
+                            <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
