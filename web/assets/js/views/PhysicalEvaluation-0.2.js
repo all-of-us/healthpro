@@ -316,7 +316,6 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         this.conversions = obj.conversions;
         this.rendered = false;
         this.render();
-        this.rendered = true;
     },
     render: function() {
         var self = this;
@@ -339,15 +338,16 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         _.each(_.keys(this.conversions), function(field) {
             self.calculateConversion(field);
         });
-        self.displayWarnings();
-        self.calculateBmi();
-        self.calculateCuff();
-        self.calculateIrregularHeartRate();
-        self.handlePregnantOrWheelchair();
-        self.handleHeightProtocol();
-        self.handleWeightProtocol();
-        self.handleWaistProtocol();
-        self.triggerEqualize();
+        this.displayWarnings();
+        this.calculateBmi();
+        this.calculateCuff();
+        this.calculateIrregularHeartRate();
+        this.handlePregnantOrWheelchair();
+        this.handleHeightProtocol();
+        this.handleWeightProtocol();
+        this.handleWaistProtocol();
+        this.triggerEqualize();
+        this.rendered = true;
         return this;
     }
 });
