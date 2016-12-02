@@ -66,7 +66,10 @@ class MayolinkOrder
         'monroeville' => '7035769',
         'aikenmed' => '7035770',
         'upmc' => '7035771',
-        'montefiorectrc' => '7035772'
+        'montefiorectrc' => '7035772',
+        'pelionfp' => '7035779',
+        'waverlyfp' => '7035780',
+        'eauclairewi' => '7035781'
     ];
 
     private $client;
