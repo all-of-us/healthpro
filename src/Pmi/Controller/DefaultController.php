@@ -263,13 +263,14 @@ class DefaultController extends AbstractController
         $userInfo = $app->getUser()->getInfo();
         if ($settingsForm->isValid()) {
             $user = $app->getUser();
-            $user->setTimezone($settingsForm['timezone']->getData());
-            $app['em']->getRepository('users')->update($user->getId(), ['timezone' => $settingsForm['timezone']->getData()]);
-            $userInfo['timezone'] = $settingsForm['timezone']->getData();
-
-            return $app->redirectToRoute('settings', [
-                'timezone' => $userInfo['timezone']
-            ]);
+            if($settingsForm['timezone']->getData() != 'None') {
+                $user->setTimezone($settingsForm['timezone']->getData());
+                $app['em']->getRepository('users')->update($user->getId(), ['timezone' => $settingsForm['timezone']->getData()]);
+                $userInfo['timezone'] = $settingsForm['timezone']->getData();
+                return $app->redirectToRoute('settings', [
+                    'timezone' => $userInfo['timezone']
+                ]);
+            }
         }
 
         return $app['twig']->render('settings.html.twig', [
@@ -286,6 +287,7 @@ class DefaultController extends AbstractController
         $formBuilder->add("timezone", Type\ChoiceType::class, [
             'label' => 'Timezone',
             'choices' => array(
+                'Select Timezone' => 'None',
                 'Hawaii Time' => 'Pacific/Honolulu',
                 'Alaska Time' => 'America/Anchorage',
                 'Pacific Time' => 'America/Los_Angeles',

@@ -26,6 +26,7 @@ abstract class AbstractApplication extends Application
     const ENV_DEV   = 'dev';   // development environment (deployed to GAE)
     const ENV_TEST  = 'test';  // user/security testing environment
     const ENV_PROD  = 'prod';  // production environment
+    const DEFAULT_TIMEZONE = 'CST';
     
     protected $name;
     protected $configuration = [];
@@ -231,6 +232,16 @@ abstract class AbstractApplication extends Application
     {
         $token = $this['security.token_storage']->getToken();
         return $token ? $token->getUser() : null;
+    }
+
+    public function getUserTimezone()
+    {
+        if ($user = $this->getUser()) {
+            if ($user->getInfo()['timezone'] != NULL) {
+                return $user->getInfo()['timezone'];
+            }
+        }
+        return DEFAULT_TIMEZONE;
     }
     
     public function hasRole($role)

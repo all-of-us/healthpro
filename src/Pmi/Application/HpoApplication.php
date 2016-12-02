@@ -237,7 +237,7 @@ class HpoApplication extends AbstractApplication
 
         if($this->isLoggedIn()) {
             $user = $this->getUser();
-            $this['em']->setTimezone($user->getInfo()['timezone']);
+            $this['em']->setTimezone($this->getUserTimezone());
         }
 
         // HPO users must select their site first
