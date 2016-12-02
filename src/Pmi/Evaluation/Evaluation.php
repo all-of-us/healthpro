@@ -159,13 +159,6 @@ class Evaluation
             $options['attr'] = $attributes;
 
             if (isset($field->replicates)) {
-                $collectionOptions = [
-                    'entry_type' => $class,
-                    'entry_options' => $options,
-                    'required' => false,
-                    'label' => isset($options['label']) ? $options['label'] : null
-                ];
-
                 if (isset($field->compare)) {
                     $compareType = $field->compare->type;
                     $compareField = $field->compare->field;
@@ -189,6 +182,12 @@ class Evaluation
                     $compareConstraint = new Constraints\Collection($collectionConstraintFields);
                     $collectionOptions['constraints'] = [$compareConstraint];
                 }
+                $collectionOptions = [
+                    'entry_type' => $class,
+                    'entry_options' => $options,
+                    'required' => false,
+                    'label' => isset($options['label']) ? $options['label'] : null
+                ];
                 $formBuilder->add($field->name, CollectionType::class, $collectionOptions);
             } else {
                 $formBuilder->add($field->name, $class, $options);

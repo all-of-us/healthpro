@@ -18,7 +18,8 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         "change #form_weight-protocol-modification": "handleWeightProtocol",
         "change #form_waist-circumference-protocol-modification": "handleWaistProtocol",
         "change .field-hip-circumference input": "toggleThirdHipCircumference",
-        "change .field-waist-circumference input": "toggleThirdWaistCircumference"
+        "change .field-waist-circumference input": "toggleThirdWaistCircumference",
+        "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic"
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
@@ -213,6 +214,16 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             }
         } else {
             $('#irregular-heart-rate-warning').text('');
+        }
+    },
+    checkDiastolic: function(e) {
+        var replicate = $(e.currentTarget).closest('.form-group').data('replicate');
+        var systolic = parseFloat(this.$('.field-blood-pressure-systolic[data-replicate=' + replicate + '] input').val());
+        var diastolic = parseFloat(this.$('.field-blood-pressure-diastolic[data-replicate=' + replicate + '] input').val());
+        var container = this.$('.field-blood-pressure-diastolic[data-replicate=' + replicate + ']').closest('.form-group');
+        container.find('.diastolic-warning').remove();
+        if (systolic && diastolic && diastolic >= systolic) {
+            container.append($('<div class="diastolic-warning text-warning">').text('Diastolic pressure must be less than systolic pressure'));
         }
     },
     clearServerErrors: function() {
