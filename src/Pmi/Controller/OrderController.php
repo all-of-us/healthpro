@@ -109,7 +109,7 @@ class OrderController extends AbstractController
                         'type' => $orderData['type'],
                         'patient_id' => $participant->biobankId,
                         'gender' => $participant->gender,
-                        'birth_date' => $participant->dob,
+                        'birth_date' => $participant->getMayolinkDob($orderData['type']),
                         'order_id' => $orderData['order_id'],
                         'collected_at' => new \DateTime('today') // set to today at midnight since time won't be accurate
                     ];
