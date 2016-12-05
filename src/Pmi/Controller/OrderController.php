@@ -63,6 +63,12 @@ class OrderController extends AbstractController
                 'required' => false,
                 'error_mapping' => [
                     '.' => 'second' // target the second (repeated) field for non-matching error
+                ],
+                'constraints' => [
+                    new Constraints\Regex([
+                        'pattern' => '/^KIT-\d{8}$/',
+                        'message' => 'Must be in the format of KIT-12345678 ("KIT-" followed by 8 digits)'
+                    ])
                 ]
             ])
             ->add('samples', Type\ChoiceType::class, [
