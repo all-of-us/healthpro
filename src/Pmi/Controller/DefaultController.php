@@ -207,7 +207,7 @@ class DefaultController extends AbstractController
         if ($idForm->isValid()) {
             $id = $idForm->get('mayoId')->getData();
             $order = $app['em']->getRepository('orders')->fetchOneBy([
-                'mayo_id' => $id
+                'order_id' => $id
             ]);
             if ($order) {
                 return $app->redirectToRoute('order', [
