@@ -215,7 +215,7 @@ class DefaultController extends AbstractController
                     'orderId' => $order['id']
                 ]);
             }
-            $app->addFlashError('Participant ID not found');
+            $app->addFlashError('Order ID not found');
         }
 
         $recentOrders = $app['em']->getRepository('orders')->fetchBy(
