@@ -63,6 +63,12 @@ class OrderController extends AbstractController
                 'required' => false,
                 'error_mapping' => [
                     '.' => 'second' // target the second (repeated) field for non-matching error
+                ],
+                'constraints' => [
+                    new Constraints\Regex([
+                        'pattern' => '/^KIT-\d{8}$/',
+                        'message' => 'Must be in the format of KIT-12345678 ("KIT-" followed by 8 digits)'
+                    ])
                 ]
             ])
             ->add('samples', Type\ChoiceType::class, [
@@ -80,15 +86,11 @@ class OrderController extends AbstractController
             if ($request->request->has('existing')) {
                 if (empty($confirmForm['kitId']->getData())) {
                     $confirmForm['kitId']['first']->addError(new FormError('Please enter a kit order ID'));
+                } elseif ($app['em']->getRepository('orders')->fetchOneBy(['order_id' => $confirmForm['kitId']->getData()])) {
+                    $confirmForm['kitId']['first']->addError(new FormError('This order ID already exists'));
                 } else {
-                    $existing = $app['em']->getRepository('orders')->fetchOneBy(['order_id' => $confirmForm['kitId']->getData()]);
-                    if ($existing) {
-                        $confirmForm['kitId']['first']->addError(new FormError('This order ID already exists'));
-                    } else {
-                        $orderData['order_id'] = $confirmForm['kitId']->getData();
-                        $orderData['mayo_id'] = $confirmForm['kitId']->getData();
-                        $orderData['type'] = 'kit';
-                    }
+                    $orderData['order_id'] = $confirmForm['kitId']->getData();
+                    $orderData['type'] = 'kit';
                 }
             } else {
                 $orderData['order_id'] = Util::generateShortUuid(12);
@@ -103,34 +105,32 @@ class OrderController extends AbstractController
                 } elseif ($request->request->has('saliva')) {
                     $orderData['type'] = 'saliva';
                 }
-                if ($confirmForm->isValid()) {
-                    if ($app->getConfig('ml_mock_order')) {
-                        $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
-                    } else {
-                        $order = new MayolinkOrder();
-                        $options = [
-                            'type' => $orderData['type'],
-                            'patient_id' => $participant->biobankId,
-                            'gender' => $participant->gender,
-                            'birth_date' => $participant->dob,
-                            'order_id' => $orderData['order_id'],
-                            'collected_at' => new \DateTime('today') // set to today at midnight since time won't be accurate
-                        ];
-                        if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
-                            $options['site'] = $app['session']->get('site')->id;
-                        }
-                        if (isset($requestedSamples) && is_array($requestedSamples)) {
-                            $options['tests'] = $requestedSamples;
-                        }
-                        $orderData['mayo_id'] = $order->loginAndCreateOrder(
-                            $app->getConfig('ml_username'),
-                            $app->getConfig('ml_password'),
-                            $options
-                        );
-                    }
-                }
             }
             if ($confirmForm->isValid()) {
+                if ($app->getConfig('ml_mock_order')) {
+                    $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
+                } else {
+                    $order = new MayolinkOrder();
+                    $options = [
+                        'type' => $orderData['type'],
+                        'patient_id' => $participant->biobankId,
+                        'gender' => $participant->gender,
+                        'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob($orderData['type']),
+                        'order_id' => $orderData['order_id'],
+                        'collected_at' => new \DateTime('today') // set to today at midnight since time won't be accurate
+                    ];
+                    if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
+                        $options['site'] = $app['session']->get('site')->id;
+                    }
+                    if (isset($requestedSamples) && is_array($requestedSamples)) {
+                        $options['tests'] = $requestedSamples;
+                    }
+                    $orderData['mayo_id'] = $order->loginAndCreateOrder(
+                        $app->getConfig('ml_username'),
+                        $app->getConfig('ml_password'),
+                        $options
+                    );
+                }
                 if ($orderData['mayo_id']) {
                     $orderData['user_id'] = $app->getUser()->getId();
                     $orderData['site'] = $app->getSiteId();
