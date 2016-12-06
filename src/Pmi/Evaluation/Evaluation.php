@@ -159,12 +159,36 @@ class Evaluation
             $options['attr'] = $attributes;
 
             if (isset($field->replicates)) {
-                $formBuilder->add($field->name, CollectionType::class, [
+                if (isset($field->compare)) {
+                    $compareType = $field->compare->type;
+                    $compareField = $field->compare->field;
+                    $compareMessage = $field->compare->message;
+                    $form = $formBuilder->getForm();
+                    $callback = function($value, $context, $replicate) use ($form, $compareField, $compareType, $compareMessage) {
+                        $compareTo = $form->getData()->$compareField;
+                        if (!isset($compareTo[$replicate])) {
+                            return;
+                        }
+                        if ($compareType == 'greater-than' && $value <= $compareTo[$replicate]) {
+                            $context->buildViolation($compareMessage)->addViolation();
+                        } elseif ($compareType == 'less-than' && $value >= $compareTo[$replicate]) {
+                            $context->buildViolation($compareMessage)->addViolation();
+                        }
+                    };
+                    $collectionConstraintFields = [];
+                    for ($i = 0; $i < $field->replicates; $i++) {
+                        $collectionConstraintFields[] = new Constraints\Callback(['callback' => $callback, 'payload' => $i]);
+                    }
+                    $compareConstraint = new Constraints\Collection($collectionConstraintFields);
+                    $collectionOptions['constraints'] = [$compareConstraint];
+                }
+                $collectionOptions = [
                     'entry_type' => $class,
                     'entry_options' => $options,
                     'required' => false,
                     'label' => isset($options['label']) ? $options['label'] : null
-                ]);
+                ];
+                $formBuilder->add($field->name, CollectionType::class, $collectionOptions);
             } else {
                 $formBuilder->add($field->name, $class, $options);
             }

@@ -54,6 +54,11 @@
             "unit": "mmHg",
             "replicates": 3,
             "max": 300,
+            "compare": {
+                "type": "less-than",
+                "field": "blood-pressure-systolic",
+                "message": "Diastolic pressure must be less than systolic pressure"
+            },
             "warnings": [
                 {
                     "max": 120,
