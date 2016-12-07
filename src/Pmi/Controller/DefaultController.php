@@ -199,7 +199,7 @@ class DefaultController extends AbstractController
     public function ordersAction(Application $app, Request $request)
     {
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
-            ->add('mayoId', TextType::class, ['label' => 'MayoLINK order ID', 'attr' => ['placeholder' => 'Scan barcode']])
+            ->add('mayoId', TextType::class, ['label' => 'Order ID', 'attr' => ['placeholder' => 'Scan barcode']])
             ->getForm();
 
         $idForm->handleRequest($request);
@@ -207,7 +207,7 @@ class DefaultController extends AbstractController
         if ($idForm->isValid()) {
             $id = $idForm->get('mayoId')->getData();
             $order = $app['em']->getRepository('orders')->fetchOneBy([
-                'mayo_id' => $id
+                'order_id' => $id
             ]);
             if ($order) {
                 return $app->redirectToRoute('order', [
@@ -215,7 +215,7 @@ class DefaultController extends AbstractController
                     'orderId' => $order['id']
                 ]);
             }
-            $app->addFlashError('Participant ID not found');
+            $app->addFlashError('Order ID not found');
         }
 
         $recentOrders = $app['em']->getRepository('orders')->fetchBy(
