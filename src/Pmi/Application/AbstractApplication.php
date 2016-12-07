@@ -26,7 +26,7 @@ abstract class AbstractApplication extends Application
     const ENV_DEV   = 'dev';   // development environment (deployed to GAE)
     const ENV_TEST  = 'test';  // user/security testing environment
     const ENV_PROD  = 'prod';  // production environment
-    const DEFAULT_TIMEZONE = 'CST';
+    const DEFAULT_TIMEZONE = 'America/Chicago';
     
     protected $name;
     protected $configuration = [];

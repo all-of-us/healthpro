@@ -261,16 +261,15 @@ class DefaultController extends AbstractController
         $settingsForm = $this->createSettingsForm('settings', $app['form.factory']);
         $settingsForm->handleRequest($request);
         $userInfo = $app->getUser()->getInfo();
-        if ($settingsForm->isValid()) {
+        if ($settingsForm->isValid() && $settingsForm['timezone']->getData() != 'None') {
             $user = $app->getUser();
-            if($settingsForm['timezone']->getData() != 'None') {
-                $user->setTimezone($settingsForm['timezone']->getData());
-                $app['em']->getRepository('users')->update($user->getId(), ['timezone' => $settingsForm['timezone']->getData()]);
-                $userInfo['timezone'] = $settingsForm['timezone']->getData();
-                return $app->redirectToRoute('settings', [
-                    'timezone' => $userInfo['timezone']
-                ]);
-            }
+            $user->setTimezone($settingsForm['timezone']->getData());
+            $app['em']->getRepository('users')->update($user->getId(), ['timezone' => $settingsForm['timezone']->getData()]);
+            $userInfo['timezone'] = $settingsForm['timezone']->getData();
+
+            return $app->redirectToRoute('settings', [
+                'timezone' => $userInfo['timezone']
+            ]);
         }
 
         return $app['twig']->render('settings.html.twig', [

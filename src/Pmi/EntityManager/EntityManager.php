@@ -37,7 +37,6 @@ class EntityManager
     public function setTimezone($timezone)
     {
         $this->timezone = $timezone;
-
     }
 
     public function getTimezone()

@@ -111,7 +111,7 @@ class Order
         if ($set != 'processed') {
             if ($formData["{$set}_ts"]) {
                 // TODO: system setting for db timezone
-                $formData["{$set}_ts"]->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                $updateArray["{$set}_ts"] = $formData["{$set}_ts"]->format('Y-m-d H:i:s');
             } else {
                 $updateArray["{$set}_ts"] = null;
             }
@@ -183,6 +183,8 @@ class Order
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'required' => false,
+                'view_timezone' => $this->app->getUserTimezone(),
+                'model_timezone' => 'UTC',
                 'constraints' => [
                     new Constraints\LessThanOrEqual([
                         'value' => new \DateTime('+1 hour'),
@@ -235,7 +237,7 @@ class Order
 
     public function getRdrObject()
     {
-        $created = new \DateTime($this->order['created_ts']);
+        $created = $this->order['created_ts'];
         $created->setTimezone(new \DateTimeZone('UTC'));
 
         $obj = new \StdClass();
@@ -296,7 +298,7 @@ class Order
 
     protected function getSampleTime($set, $sample)
     {
-        var_dump('hi!'); die;
+
         $samples = json_decode($this->order["{$set}_samples"]);
         if (!is_array($samples) || !in_array($sample, $samples)) {
             return false;
@@ -355,7 +357,7 @@ class Order
         };
         if ($set != 'processed') {
             if ($this->order["{$set}_ts"]) {
-                $formData["{$set}_ts"] = new \DateTime($this->order["{$set}_ts"]);
+                $formData["{$set}_ts"] = $this->order["{$set}_ts"];
             }
         }
         if ($this->order["{$set}_samples"]) {
