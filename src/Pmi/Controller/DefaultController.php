@@ -218,10 +218,10 @@ class DefaultController extends AbstractController
             $app->addFlashError('Order ID not found');
         }
 
-        $recentOrders = $app['em']->getRepository('orders')->fetchBy(
-            [],
-            ['created_ts' => 'DESC', 'id' => 'DESC'],
-            5
+        $recentOrders = $app['em']->getRepository('orders')->fetchBySql(
+            'site = ? AND created_ts >= ?',
+            [$app->getSiteId(), (new \DateTime('-1 day'))->format('Y-m-d H:i:s')],
+            ['created_ts' => 'DESC', 'id' => 'DESC']
         );
         foreach ($recentOrders as &$order) {
             $order['participant'] = $app['pmi.drc.participants']->getById($order['participant_id']);

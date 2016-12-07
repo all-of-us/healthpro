@@ -117,11 +117,9 @@ class OrderController extends AbstractController
                         'gender' => $participant->gender,
                         'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob($orderData['type']),
                         'order_id' => $orderData['order_id'],
-                        'collected_at' => new \DateTime('today') // set to today at midnight since time won't be accurate
+                        'collected_at' => new \DateTime('today'), // set to today at midnight since time won't be accurate,
+                        'site' => $app->getSiteId()
                     ];
-                    if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
-                        $options['site'] = $app['session']->get('site')->id;
-                    }
                     if (isset($requestedSamples) && is_array($requestedSamples)) {
                         $options['tests'] = $requestedSamples;
                     }
