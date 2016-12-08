@@ -50,10 +50,14 @@
                     /
                     <span id="mean-blood-pressure-diastolic"></span>
                     {{ schema.fields['blood-pressure-systolic'].unit }}
+                    <small class="text-muted">(average of 2nd and 3rd measures)</small>
                     <br />
+
                     Heart rate:
                     <span id="mean-heart-rate"></span>
                     {{ schema.fields['heart-rate'].unit }}
+                    <small class="text-muted">(average of 2nd and 3rd measures)</small>
+
                     <span id="irregular-heart-rate-warning" class="text-danger"></span>
                 </p>
             </div>

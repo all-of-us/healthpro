@@ -56,7 +56,16 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
     calculateMean: function(field) {
         var sum = 0;
         var count = 0;
-        this.$('.field-' + field).find('input').each(function() {
+        var fieldSelector = '.field-' + field;
+        var secondThirdFields = [
+            'blood-pressure-systolic',
+            'blood-pressure-diastolic',
+            'heart-rate'
+        ];
+        if ($.inArray(field, secondThirdFields) !== -1) {
+            fieldSelector = '.field-' + field + '[data-replicate=2], .field-' + field + '[data-replicate=3]';
+        }
+        this.$(fieldSelector).find('input').each(function() {
             if (parseFloat($(this).val())) {
                 sum += parseFloat($(this).val());
                 count++;
