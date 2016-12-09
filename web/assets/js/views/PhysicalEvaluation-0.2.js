@@ -54,16 +54,36 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         }, 50);
     },
     calculateMean: function(field) {
-        var sum = 0;
-        var count = 0;
-        this.$('.field-' + field).find('input').each(function() {
+        var fieldSelector = '.field-' + field;
+        var secondThirdFields = [
+            'blood-pressure-systolic',
+            'blood-pressure-diastolic',
+            'heart-rate'
+        ];
+        var twoClosestFields = [
+            'hip-circumference',
+            'waist-circumference'
+        ];
+        if ($.inArray(field, secondThirdFields) !== -1) {
+            fieldSelector = '.field-' + field + '[data-replicate=2], .field-' + field + '[data-replicate=3]';
+        }
+        var values = [];
+        this.$(fieldSelector).find('input').each(function() {
             if (parseFloat($(this).val())) {
-                sum += parseFloat($(this).val());
-                count++;
+                values.push(parseFloat($(this).val()));
             }
         });
-        if (count > 0) {
-            var mean = (sum / count).toFixed(1);
+        if (values.length > 0) {
+            if (values.length == 3 && $.inArray(field, twoClosestFields) !== -1) {
+                values.sort(function(a, b) { return a - b; });
+                if (values[1] - values[0] < values[2] - values[1]) {
+                    values.pop();
+                } else if (values[2] - values[1] < values[1] - values[0]) {
+                    values.shift();
+                }
+            }
+            var sum = _.reduce(values, function(a, b) { return a + b; }, 0);
+            var mean = (sum / values.length).toFixed(1);
             this.$('#mean-' + field).html('<strong>' + mean + '</strong>');
             if (this.conversions[field]) {
                 var converted = this.convert(this.conversions[field], mean);
