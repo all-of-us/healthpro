@@ -78,7 +78,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                 values.sort(function(a, b) { return a - b; });
                 if (values[1] - values[0] < values[2] - values[1]) {
                     values.pop();
-                } else {
+                } else if (values[2] - values[1] < values[1] - values[0]) {
                     values.shift();
                 }
             }
