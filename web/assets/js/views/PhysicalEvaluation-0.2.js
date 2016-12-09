@@ -24,6 +24,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
     inputChange: function(e) {
         this.clearServerErrors(e);
         this.displayWarning(e);
+        this.displayConsecutiveWarning(e);
         this.updateConversion(e);
         this.triggerEqualize();
     },
@@ -302,12 +303,61 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                 }
                 var val = input.val();
                 $.each(warnings, function(key, warning) {
-                    if (self.warningConditionMet(warning, val)) {
+                    if (!warning.consecutive && self.warningConditionMet(warning, val)) {
                         container.append($('<div class="metric-warnings text-warning">').text(warning.message));
                         return false; // only show first (highest priority) warning
                     }
                 });
             });
+        });
+    },
+    displayConsecutiveWarning: function(e) {
+        var self = this;
+        var input = $(e.currentTarget);
+        if (!input.closest('.field').data('replicate')) {
+            // ignore non-replicate fields
+            return;
+        }
+        var field = input.closest('.field').data('field');
+        if (!this.warnings[field]) {
+            // ignore if no warnings on this field
+            return;
+        }
+        // get all replicate field values
+        var values = [];
+        this.$('.field-' + field + ' input').each(function() {
+            values.push($(this).val());
+        });
+        var warned = false;
+        $.each(this.warnings[field], function(key, warning) {
+            if (!warning.consecutive) {
+                return false;
+            }
+            var consecutiveConditionsMet = 0;
+            var isConsecutive = false;
+            $.each(values, function(k, val) {
+                if (self.warningConditionMet(warning, val)) {
+                    consecutiveConditionMet++;
+                    if (consecutiveConditionMet >= 2) {
+                        isConsecutive = true;
+                    }
+                } else {
+                    consecutiveConditionMet = 0;
+                }
+            });
+            if (isConsecutive) {
+                new PmiConfirmModal({
+                    msg: warning.message,
+                    onFalse: function() {
+                        input.val('');
+                        input.focus();
+                        input.trigger('change');
+                    },
+                    btnTextTrue: 'Confirm value and take action',
+                    btnTextFalse: 'Clear value and reenter'
+                });
+                return false; // only show first (highest priority) warning
+            }
         });
     },
     displayWarning: function(e) {
@@ -323,7 +373,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         if (this.warnings[field]) {
             var warned = false;
             $.each(this.warnings[field], function(key, warning) {
-                if (self.warningConditionMet(warning, val)) {
+                if (!warning.consecutive && self.warningConditionMet(warning, val)) {
                     if (warning.alert) {
                         new PmiConfirmModal({
                             msg: warning.message,
