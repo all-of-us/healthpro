@@ -69,7 +69,13 @@ class MayolinkOrder
         'montefiorectrc' => '7035772',
         'pelionfp' => '7035779',
         'waverlyfp' => '7035780',
-        'eauclairewi' => '7035781'
+        'eauclairewi' => '7035781',
+        'morristown' => '7035777',
+        'knoxville' => '7035778',
+        'jamesanderson' => '7035782',
+        'copiah' => '7035783',
+        'otay' => '7035784',
+        'chcoceanview' => '7035785'
     ];
 
     private $client;
