@@ -261,7 +261,6 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             // replicate conversions are handled in calculateMean method
             return;
         }
-        var field = input.closest('.field').data('field');
         if (this.conversions[field]) {
             var val = parseFloat(input.val());
             if (val) {
