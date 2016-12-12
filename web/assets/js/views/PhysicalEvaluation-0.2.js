@@ -24,8 +24,11 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
     inputChange: function(e) {
         this.clearServerErrors(e);
         this.displayWarning(e);
-        this.displayConsecutiveWarning(e);
         this.updateConversion(e);
+
+        var field = $(e.currentTarget).closest('.field').data('field');
+        this.displayConsecutiveWarning(field);
+
         this.triggerEqualize();
     },
     inputKeyup: function(e) {
@@ -330,14 +333,12 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             });
         });
     },
-    displayConsecutiveWarning: function(e) {
+    displayConsecutiveWarning: function(field) {
         var self = this;
-        var input = $(e.currentTarget);
-        if (!input.closest('.field').data('replicate')) {
+        if (this.$('.field-' + field).closest('.replicate').length === 0) {
             // ignore non-replicate fields
             return;
         }
-        var field = input.closest('.field').data('field');
         if (!this.warnings[field]) {
             // ignore if no warnings on this field
             return;
@@ -356,25 +357,28 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             var isConsecutive = false;
             $.each(values, function(k, val) {
                 if (self.warningConditionMet(warning, val)) {
-                    consecutiveConditionMet++;
-                    if (consecutiveConditionMet >= 2) {
+                    consecutiveConditionsMet++;
+                    if (consecutiveConditionsMet >= 2) {
                         isConsecutive = true;
                     }
                 } else {
-                    consecutiveConditionMet = 0;
+                    consecutiveConditionsMet = 0;
                 }
             });
             if (isConsecutive) {
-                new PmiConfirmModal({
-                    msg: warning.message,
-                    onFalse: function() {
-                        input.val('');
-                        input.focus();
-                        input.trigger('change');
-                    },
-                    btnTextTrue: 'Confirm value and take action',
-                    btnTextFalse: 'Clear value and reenter'
-                });
+                if (self.rendered) {
+                    new PmiConfirmModal({
+                        msg: warning.message,
+                        onFalse: function() {
+                            input.val('');
+                            input.focus();
+                            input.trigger('change');
+                        },
+                        btnTextTrue: 'Confirm value and take action',
+                        btnTextFalse: 'Clear value and reenter'
+                    });
+                }
+                self.$('#' + field + '-warning').html('<br />' + warning.message);
                 return false; // only show first (highest priority) warning
             }
         });
@@ -431,10 +435,17 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             errorTemplate: '<div></div>',
             trigger: "keyup change"
         });
+
+        var processedReplicates = {};
         this.$('.replicate .field').each(function() {
             var field = $(this).data('field');
-            self.calculateMean(field);
+            if (!processedReplicates[field]) {
+                self.calculateMean(field);
+                self.displayConsecutiveWarning(field);
+                processedReplicates[field] = true;
+            }
         });
+
         _.each(_.keys(this.conversions), function(field) {
             self.calculateConversion(field);
         });
