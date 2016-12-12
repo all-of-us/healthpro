@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Finalize - Order {{ order.id }} - {% endblock %}
+{% block title %}Finalize - Order {{ order.order_id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'finalize' } %}
     {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved' } }) }}
