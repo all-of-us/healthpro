@@ -27,7 +27,7 @@ class DoctrineRepository
 
         // Convert timestamp fields into user's timezone since they're stored as UTC in the database
         foreach($result as $field => $value) {
-            if(substr($field, -3, 3) == '_ts' && $value !== NULL && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
+            if(NULL !== $value && substr($field, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
                 $result[$field] = \DateTime::createFromFormat('Y-m-d H:i:s', $value)->setTimezone(new \DateTimeZone($this->timezone));
             }
         }

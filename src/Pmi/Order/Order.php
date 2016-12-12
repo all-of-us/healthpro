@@ -220,6 +220,8 @@ class Order
                     'time_widget' => 'single_text',
                     'widget' => 'single_text',
                     'format' => 'M/d/yyyy h:mm a',
+                    'view_timezone' => $this->app->getUserTimezone(),
+                    'model_timezone' => 'UTC',
                     'label' => false,
                     'constraints' => [
                         new Constraints\LessThanOrEqual([
