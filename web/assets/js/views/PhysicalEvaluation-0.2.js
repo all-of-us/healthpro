@@ -25,6 +25,10 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         this.clearServerErrors(e);
         this.displayWarning(e);
         this.updateConversion(e);
+
+        var field = $(e.currentTarget).closest('.field').data('field');
+        this.displayConsecutiveWarning(field);
+
         this.triggerEqualize();
     },
     inputKeyup: function(e) {
@@ -220,7 +224,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             }
         });
         if (allIrregular) {
-            $('#irregular-heart-rate-warning').html("<br />Refer to your site's SOP for irregular heart rhythm detection.");
+            $('#irregular-heart-rate-warning').html('<div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Refer to your site\'s SOP for irregular heart rhythm detection.</div>');
             if (this.rendered) {
                 new PmiAlertModal({
                     msg: "Refer to your site's SOP for irregular heart rhythm detection.",
@@ -280,7 +284,6 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             // replicate conversions are handled in calculateMean method
             return;
         }
-        var field = input.closest('.field').data('field');
         if (this.conversions[field]) {
             var val = parseFloat(input.val());
             if (val) {
@@ -322,12 +325,62 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                 }
                 var val = input.val();
                 $.each(warnings, function(key, warning) {
-                    if (self.warningConditionMet(warning, val)) {
+                    if (!warning.consecutive && self.warningConditionMet(warning, val)) {
                         container.append($('<div class="metric-warnings text-warning">').text(warning.message));
                         return false; // only show first (highest priority) warning
                     }
                 });
             });
+        });
+    },
+    displayConsecutiveWarning: function(field) {
+        var self = this;
+        if (this.$('.field-' + field).closest('.replicate').length === 0) {
+            // ignore non-replicate fields
+            return;
+        }
+        if (!this.warnings[field]) {
+            // ignore if no warnings on this field
+            return;
+        }
+        // get all replicate field values
+        var values = [];
+        this.$('.field-' + field + ' input').each(function() {
+            values.push($(this).val());
+        });
+        var warned = false;
+        $.each(this.warnings[field], function(key, warning) {
+            if (!warning.consecutive) {
+                return false;
+            }
+            var consecutiveConditionsMet = 0;
+            var isConsecutive = false;
+            $.each(values, function(k, val) {
+                if (self.warningConditionMet(warning, val)) {
+                    consecutiveConditionsMet++;
+                    if (consecutiveConditionsMet >= 2) {
+                        isConsecutive = true;
+                    }
+                } else {
+                    consecutiveConditionsMet = 0;
+                }
+            });
+            if (isConsecutive) {
+                if (self.rendered) {
+                    new PmiConfirmModal({
+                        msg: warning.message,
+                        onFalse: function() {
+                            input.val('');
+                            input.focus();
+                            input.trigger('change');
+                        },
+                        btnTextTrue: 'Confirm value and take action',
+                        btnTextFalse: 'Clear value and reenter'
+                    });
+                }
+                self.$('#' + field + '-warning').html('<div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> ' + warning.message + '</div>');
+                return false; // only show first (highest priority) warning
+            }
         });
     },
     displayWarning: function(e) {
@@ -343,7 +396,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         if (this.warnings[field]) {
             var warned = false;
             $.each(this.warnings[field], function(key, warning) {
-                if (self.warningConditionMet(warning, val)) {
+                if (!warning.consecutive && self.warningConditionMet(warning, val)) {
                     if (warning.alert) {
                         new PmiConfirmModal({
                             msg: warning.message,
@@ -382,10 +435,17 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             errorTemplate: '<div></div>',
             trigger: "keyup change"
         });
+
+        var processedReplicates = {};
         this.$('.replicate .field').each(function() {
             var field = $(this).data('field');
-            self.calculateMean(field);
+            if (!processedReplicates[field]) {
+                self.calculateMean(field);
+                self.displayConsecutiveWarning(field);
+                processedReplicates[field] = true;
+            }
         });
+
         _.each(_.keys(this.conversions), function(field) {
             self.calculateConversion(field);
         });

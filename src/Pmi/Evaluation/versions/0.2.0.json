@@ -30,18 +30,33 @@
             "warnings": [
                 {
                     "max": 200,
-                    "message": "Participant could be in a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
-                    "alert": true
+                    "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+                    "alert": true,
+                    "consecutive": 2
                 },
                 {
                     "max": 180,
-                    "message": "Participant could be in a hypertensive crisis. Refer to your site's SOP for expedited referral.",
-                    "alert": true
+                    "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
+                    "alert": true,
+                    "consecutive": 2
                 },
                 {
                     "min": 70,
                     "message": "Participant could be in a hypotensive crisis. Refer to your site's SOP.",
-                    "alert": true
+                    "alert": true,
+                    "consecutive": 2
+                },
+                {
+                    "max": 200,
+                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                },
+                {
+                    "max": 180,
+                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                },
+                {
+                    "min": 70,
+                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure."
                 }
             ],
             "help": {
@@ -62,18 +77,33 @@
             "warnings": [
                 {
                     "max": 120,
-                    "message": "Participant could be in a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
-                    "alert": true
+                    "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+                    "alert": true,
+                    "consecutive": 2
                 },
                 {
                     "max": 110,
-                    "message": "Participant could be in a hypertensive crisis. Refer to your site's SOP for expedited referral.",
-                    "alert": true
+                    "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
+                    "alert": true,
+                    "consecutive": 2
                 },
                 {
                     "min": 40,
                     "message": "Participant could be in a hypotensive crisis. Refer to your site's SOP.",
-                    "alert": true
+                    "alert": true,
+                    "consecutive": 2
+                },
+                {
+                    "max": 120,
+                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                },
+                {
+                    "max": 110,
+                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                },
+                {
+                    "min": 40,
+                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure."
                 }
             ],
             "help": {
@@ -88,14 +118,24 @@
             "max": 300,
             "warnings": [
                 {
-                    "max": 120,
-                    "message": "Participant could be tachycardic and at risk for hypertensive crisis. Refer to your site's SOP.",
-                    "alert": true
+                    "max": 100,
+                    "message": "Participant could be tachycardic and at risk for hypertensive crisis. Refer to your site's SOP for Immediate referral.",
+                    "alert": true,
+                    "consecutive": 2
                 },
                 {
                     "min": 40,
                     "message": "Participant could be bradycardic and at risk for hypotensive crisis. Refer to your site's SOP.",
-                    "alert": true
+                    "alert": true,
+                    "consecutive": 2
+                },
+                {
+                    "max": 100,
+                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                },
+                {
+                    "min": 40,
+                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure."
                 }
             ],
             "help": {
