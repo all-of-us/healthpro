@@ -224,7 +224,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             }
         });
         if (allIrregular) {
-            $('#irregular-heart-rate-warning').html("<br />Refer to your site's SOP for irregular heart rhythm detection.");
+            $('#irregular-heart-rate-warning').html('<div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Refer to your site\'s SOP for irregular heart rhythm detection.</div>');
             if (this.rendered) {
                 new PmiAlertModal({
                     msg: "Refer to your site's SOP for irregular heart rhythm detection.",
@@ -378,7 +378,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                         btnTextFalse: 'Clear value and reenter'
                     });
                 }
-                self.$('#' + field + '-warning').html('<br />' + warning.message);
+                self.$('#' + field + '-warning').html('<div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> ' + warning.message + '</div>');
                 return false; // only show first (highest priority) warning
             }
         });
