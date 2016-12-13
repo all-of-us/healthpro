@@ -237,8 +237,8 @@ abstract class AbstractApplication extends Application
     public function getUserTimezone()
     {
         if ($user = $this->getUser()) {
-            if ($user->getInfo()['timezone'] != NULL) {
-                return $user->getInfo()['timezone'];
+            if (($info = $user->getInfo()) && isset($info['timezone'])) {
+                return $info['timezone'];
             }
         }
         return self::DEFAULT_TIMEZONE;
