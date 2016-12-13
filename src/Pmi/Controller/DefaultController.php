@@ -286,7 +286,6 @@ class DefaultController extends AbstractController
         $formBuilder->add("timezone", Type\ChoiceType::class, [
             'label' => 'Timezone',
             'choices' => array(
-                'Select Timezone' => 'None',
                 'Hawaii Time' => 'Pacific/Honolulu',
                 'Alaska Time' => 'America/Anchorage',
                 'Pacific Time' => 'America/Los_Angeles',
@@ -295,6 +294,7 @@ class DefaultController extends AbstractController
                 'Central Time' => 'America/Chicago',
                 'Eastern Time' => 'America/New_York'
             ),
+            'placeholder' => 'Select your timezone',
             'required' => true
         ]);
         $form = $formBuilder->getForm();

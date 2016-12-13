@@ -311,7 +311,6 @@ class Order
                 try {
                     $time = new \DateTime();
                     $time->setTimestamp($processedSampleTimes[$sample]);
-                    $time->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
                     return $time->format('Y-m-d\TH:i:s\Z');
                 } catch (\Exception $e) {
                 }
@@ -319,7 +318,6 @@ class Order
         } else {
             if ($this->order["{$set}_ts"]) {
                 $time = new \DateTime($this->order["{$set}_ts"]);
-                $time->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
                 return $time->format('Y-m-d\TH:i:s\Z');
             }
         }
@@ -378,7 +376,6 @@ class Order
                     try {
                         $sampleTs = new \DateTime();
                         $sampleTs->setTimestamp($processedSampleTimes[$sample]);
-                        $sampleTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
                         $formData['processed_samples_ts'][$sample] = $sampleTs;
                     } catch (\Exception $e) {
                         $formData['processed_samples_ts'][$sample] = null;
