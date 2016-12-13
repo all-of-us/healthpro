@@ -241,7 +241,7 @@ abstract class AbstractApplication extends Application
                 return $user->getInfo()['timezone'];
             }
         }
-        return selft::DEFAULT_TIMEZONE;
+        return self::DEFAULT_TIMEZONE;
     }
     
     public function hasRole($role)
