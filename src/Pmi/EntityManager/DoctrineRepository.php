@@ -56,28 +56,28 @@ class DoctrineRepository
             $query .= ' LIMIT ' . (int)$limit;
         }
         $result = $this->dbal->fetchAll($query, $parameters);
-        $result = $this->parseTimestamps($result);
+        $result = $this->parseMultipleTimestamps($result);
         return $result;
+    }
+
+    protected function parseMultipleTimestamps($result)
+    {
+        if(is_array($result))
+        {
+            foreach($result as $key => $value) {
+                $result[$key] = $this->parseTimestamps($value);
+            }
+        }
+        return $result;
+
     }
 
     protected function parseTimestamps($result)
     {
         if(is_array($result)) {
             foreach($result as $key => $value) {
-                if(is_array($value)) {
-                    // Nested array sent by fetchBy
-                    foreach($value as $field => $colValue) {
-
-                        if(NULL != $colValue && substr($field, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $colValue)) {
-                            $result[$key][$field] = \DateTime::createFromFormat('Y-m-d H:i:s', $colValue)->setTimezone(new \DateTimeZone($this->timezone));
-                        }
-                    }
-
-                }
-                else {
-                    if(NULL !== $value && substr($key, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
-                        $result[$key] = \DateTime::createFromFormat('Y-m-d H:i:s', $value)->setTimezone(new \DateTimeZone($this->timezone));
-                    }
+                if(NULL !== $value && substr($key, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
+                    $result[$key] = \DateTime::createFromFormat('Y-m-d H:i:s', $value)->setTimezone(new \DateTimeZone($this->timezone));
                 }
             }
         }
