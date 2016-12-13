@@ -24,13 +24,7 @@ class DoctrineRepository
         }
         $query = "SELECT * FROM `{$this->entity}` WHERE " . join(' AND ', $columns);
         $result = $this->dbal->fetchAssoc($query, $parameters);
-
-        // Convert timestamp fields into user's timezone since they're stored as UTC in the database
-        foreach($result as $field => $value) {
-            if(NULL !== $value && substr($field, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
-                $result[$field] = \DateTime::createFromFormat('Y-m-d H:i:s', $value)->setTimezone(new \DateTimeZone($this->timezone));
-            }
-        }
+        $result = $this->parseTimestamps($result);
         return $result;
 
     }
@@ -57,7 +51,33 @@ class DoctrineRepository
         if ($limit) {
             $query .= ' LIMIT ' . (int)$limit;
         }
-        return $this->dbal->fetchAll($query, $parameters);
+        $result = $this->dbal->fetchAll($query, $parameters);
+        $result = $this->parseTimestamps($result);
+        return $result;
+    }
+
+    protected function parseTimestamps($result)
+    {
+        if(is_array($result)) {
+            foreach($result as $key => $value) {
+                if(is_array($value)) {
+                    // Nested array sent by fetchBy
+                    foreach($value as $field => $colValue) {
+
+                        if(NULL != $colValue && substr($field, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $colValue)) {
+                            $result[$key][$field] = \DateTime::createFromFormat('Y-m-d H:i:s', $colValue)->setTimezone(new \DateTimeZone($this->timezone));
+                        }
+                    }
+
+                }
+                else {
+                    if(NULL !== $value && substr($key, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
+                        $result[$key] = \DateTime::createFromFormat('Y-m-d H:i:s', $value)->setTimezone(new \DateTimeZone($this->timezone));
+                    }
+                }
+            }
+        }
+        return $result;
     }
 
     public function insert($data)
