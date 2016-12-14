@@ -81,8 +81,21 @@ class DoctrineRepository
         return $result;
     }
 
+    protected function dateTimesToStrings(array $data)
+    {
+        foreach($data as $key => $value)
+        {
+            if($value instanceof \DateTime) {
+                $value->setTimezone(new \DateTimezone('UTC'));
+                $data[$key] = $value->format('Y-m-d H:i:s');
+            }
+        }
+        return $data;
+    }
+
     public function insert($data)
     {
+        $data = $this->dateTimesToStrings($data);
         $success = $this->dbal->insert($this->entity, $data);
         if ($success) {
             return $this->dbal->lastInsertId();
@@ -93,6 +106,7 @@ class DoctrineRepository
 
     public function update($id, $data)
     {
+        $data = $this->dateTimesToStrings($data);
         return $this->dbal->update(
             $this->entity,
             $data,

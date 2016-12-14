@@ -110,8 +110,7 @@ class Order
         }
         if ($set != 'processed') {
             if ($formData["{$set}_ts"]) {
-                // TODO: system setting for db timezone
-                $updateArray["{$set}_ts"] = $formData["{$set}_ts"]->format('Y-m-d H:i:s');
+                $updateArray["{$set}_ts"] = $formData["{$set}_ts"];
             } else {
                 $updateArray["{$set}_ts"] = null;
             }
@@ -177,6 +176,8 @@ class Order
         }
         $enabledSamples = $this->getEnabledSamples($set);
         $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
+        $constraintDateTime = new \DateTime('+1 hour');
+        $constraintDateTime->setTimezone(new \DateTimeZone('UTC'));
         if ($set != 'processed') {
             $formBuilder->add("{$set}_ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
@@ -187,7 +188,7 @@ class Order
                 'model_timezone' => 'UTC',
                 'constraints' => [
                     new Constraints\LessThanOrEqual([
-                        'value' => new \DateTime('+1 hour'),
+                        'value' => $constraintDateTime,
                         'message' => 'Timestamp cannot be in the future'
                     ])
                 ]
@@ -225,7 +226,7 @@ class Order
                     'label' => false,
                     'constraints' => [
                         new Constraints\LessThanOrEqual([
-                            'value' => new \DateTime('+1 hour'),
+                            'value' => $constraintDateTime,
                             'message' => 'Timestamp cannot be in the future'
                         ])
                     ]
