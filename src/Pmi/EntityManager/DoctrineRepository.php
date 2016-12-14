@@ -60,25 +60,20 @@ class DoctrineRepository
         return $result;
     }
 
-    protected function parseMultipleTimestamps($result)
+    protected function parseMultipleTimestamps(array $result)
     {
-        if(is_array($result))
-        {
-            foreach($result as $key => $value) {
-                $result[$key] = $this->parseTimestamps($value);
-            }
+        foreach($result as $key => $value) {
+            $result[$key] = $this->parseTimestamps($value);
         }
         return $result;
 
     }
 
-    protected function parseTimestamps($result)
+    protected function parseTimestamps(array $result)
     {
-        if(is_array($result)) {
-            foreach($result as $key => $value) {
-                if(NULL !== $value && substr($key, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
-                    $result[$key] = \DateTime::createFromFormat('Y-m-d H:i:s', $value)->setTimezone(new \DateTimeZone($this->timezone));
-                }
+        foreach($result as $key => $value) {
+            if(NULL !== $value && substr($key, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
+                $result[$key] = \DateTime::createFromFormat('Y-m-d H:i:s', $value)->setTimezone(new \DateTimeZone($this->timezone));
             }
         }
         return $result;
