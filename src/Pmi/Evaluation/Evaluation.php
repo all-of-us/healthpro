@@ -6,6 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
@@ -129,12 +130,10 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } elseif (!isset($field->options) && $type != 'checkbox') {
+            } elseif (!isset($field->options) && $type != 'checkbox' && $type != 'textarea') {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
-            $options['constraints'] = $constraints;
-            $options['attr'] = $attributes;
 
             if (isset($field->options)) {
                 $class = ChoiceType::class;
@@ -148,16 +147,48 @@ class Evaluation
             } elseif ($type == 'checkbox') {
                 unset($options['scale']);
                 $class = CheckboxType::class;
+            } elseif ($type == 'textarea') {
+                unset($options['scale']);
+                $class = TextareaType::class;
+                $attributes['rows'] = 4;
             } else {
                 $class = NumberType::class;
             }
+
+            $options['constraints'] = $constraints;
+            $options['attr'] = $attributes;
+
             if (isset($field->replicates)) {
-                $formBuilder->add($field->name, CollectionType::class, [
+                $collectionOptions = [
                     'entry_type' => $class,
                     'entry_options' => $options,
                     'required' => false,
                     'label' => isset($options['label']) ? $options['label'] : null
-                ]);
+                ];
+                if (isset($field->compare)) {
+                    $compareType = $field->compare->type;
+                    $compareField = $field->compare->field;
+                    $compareMessage = $field->compare->message;
+                    $form = $formBuilder->getForm();
+                    $callback = function($value, $context, $replicate) use ($form, $compareField, $compareType, $compareMessage) {
+                        $compareTo = $form->getData()->$compareField;
+                        if (!isset($compareTo[$replicate])) {
+                            return;
+                        }
+                        if ($compareType == 'greater-than' && $value <= $compareTo[$replicate]) {
+                            $context->buildViolation($compareMessage)->addViolation();
+                        } elseif ($compareType == 'less-than' && $value >= $compareTo[$replicate]) {
+                            $context->buildViolation($compareMessage)->addViolation();
+                        }
+                    };
+                    $collectionConstraintFields = [];
+                    for ($i = 0; $i < $field->replicates; $i++) {
+                        $collectionConstraintFields[] = new Constraints\Callback(['callback' => $callback, 'payload' => $i]);
+                    }
+                    $compareConstraint = new Constraints\Collection($collectionConstraintFields);
+                    $collectionOptions['constraints'] = [$compareConstraint];
+                }
+                $formBuilder->add($field->name, CollectionType::class, $collectionOptions);
             } else {
                 $formBuilder->add($field->name, $class, $options);
             }

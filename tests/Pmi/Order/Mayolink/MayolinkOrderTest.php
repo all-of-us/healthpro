@@ -3,7 +3,18 @@ use Pmi\Order\Mayolink\MayolinkOrder;
 
 class MayolinkOrderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testLogin()
+    public function testCheckSites()
+    {
+        $siteAccounts = MayolinkOrder::$siteAccounts;
+        $groups = array_keys($siteAccounts);
+        $siteIds = array_values($siteAccounts);
+        // Check that all site groups are unique
+        $this->assertSame(count($siteAccounts), count(array_unique($groups)));
+        // Check that all site ids are unique (except for 1 - sdbb and walgreens share the same id)
+        $this->assertSame(count($siteAccounts), count(array_unique($siteIds)) + 1);
+    }
+
+    public function skipTestLogin()
     {
         $order = new MayolinkOrder();
         // TODO: retrieve test credentials from... datastore?
@@ -15,7 +26,7 @@ class MayolinkOrderTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testLogin
      */
-    public function testOrder($order)
+    public function skipTestOrder($order)
     {
         $options = [
             'test_code' => 'ACE',
