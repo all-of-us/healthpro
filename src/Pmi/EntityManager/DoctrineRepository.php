@@ -49,6 +49,23 @@ class DoctrineRepository
         return $this->dbal->fetchAll($query, $parameters);
     }
 
+    public function fetchBySql($where, array $parameters = [], array $order = [], $limit = null)
+    {
+        $query = "SELECT * FROM `{$this->entity}`";
+        $query .= ' WHERE ' . $where;
+        if (!empty($order)) {
+            $sorts = [];
+            foreach ($order as $column => $direction) {
+                $sorts[] = "`{$column}` {$direction}";
+            }
+            $query .= ' ORDER BY ' . join(', ', $sorts);
+        }
+        if ($limit) {
+            $query .= ' LIMIT ' . (int)$limit;
+        }
+        return $this->dbal->fetchAll($query, $parameters);
+    }
+
     public function insert($data)
     {
         $success = $this->dbal->insert($this->entity, $data);

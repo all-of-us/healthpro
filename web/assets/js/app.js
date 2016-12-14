@@ -46,9 +46,21 @@ $(document).ready(function()
     /*************************************************************************
      * Disable click on disabled tabs (prevents unnecessary navigation to #)
      ************************************************************************/
-     $('.nav-tabs li.disabled a').on('click', function(e) {
+    $('.nav-tabs li.disabled a').on('click', function(e) {
         e.preventDefault();
-     });
+    });
+
+    /*************************************************************************
+     * Disable forms being submitted via enter/return key on any text input
+     * inside an element with the .form-disable-enter class
+     ************************************************************************/
+    $('.form-disable-enter input:text').on('keypress keyup', function(e) {
+        if (e.which == 13) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
 
     /*************************************************************************
      * Auto-enable bootstrap tooltips
@@ -72,7 +84,12 @@ $(document).ready(function()
             redirUrl: PMI.path.clientTimeout,
             redirAfter: PMI.sessionTimeout * 1000,
             warnAfter: PMI.sessionTimeout * 1000 - (PMI.sessionWarning * 1000),
-            warnAutoClose: false
+            warnAutoClose: false,
+            onRedir: function(opt) {
+                // suppress unsaved warning when user is being logged out
+                PMI.markSaved();
+                window.location = opt.redirUrl;
+            }
         });
     }
 

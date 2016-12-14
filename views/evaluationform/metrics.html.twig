@@ -19,7 +19,7 @@
 
 {% macro form_row_replicate(form, definition, i) %}
     {% set name = definition.name %}
-    <div data-field="{{ name }}" class="field field-{{ name }} form-group{% if not form[name][i].vars.valid %} has-error{% endif %}">
+    <div data-field="{{ name }}" data-replicate="{{ i + 1 }}" class="field field-{{ name }} form-group{% if not form[name][i].vars.valid %} has-error{% endif %}">
         {{ form_label(form[name][i]) }}
         {% if definition.unit is defined %}
             <div class="input-group">
