@@ -343,6 +343,9 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             // ignore if no warnings on this field
             return;
         }
+        // clear out previous warning
+        this.$('#' + field + '-warning').text('');
+
         // get all replicate field values
         var values = [];
         this.$('.field-' + field + ' input').each(function() {
