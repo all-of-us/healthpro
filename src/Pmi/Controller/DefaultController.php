@@ -231,7 +231,8 @@ class DefaultController extends AbstractController
         }
         return $app['twig']->render('orders.html.twig', [
             'idForm' => $idForm->createView(),
-            'recentOrders' => $recentOrders
+            'recentOrders' => $recentOrders,
+            'tz' => $app->getUserTimezone()
         ]);
     }
 

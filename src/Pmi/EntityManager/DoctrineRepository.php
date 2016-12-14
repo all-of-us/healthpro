@@ -56,7 +56,9 @@ class DoctrineRepository
             $query .= ' LIMIT ' . (int)$limit;
         }
         $result = $this->dbal->fetchAll($query, $parameters);
-        $result = $this->parseMultipleTimestamps($result);
+        if($result) {
+            $result = $this->parseMultipleTimestamps($result);
+        }
         return $result;
     }
 
