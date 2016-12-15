@@ -26,8 +26,10 @@
                     {% if is_granted('ROLE_DASHBOARD') %}
                         <li><a href="{{ path('dashboard_home') }}">Dashboard</a></li>
                     {% endif %}
+
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{{ path('settings') }}">Timezone: {{ app.getUserTimezone() }}</a></li>
                     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         {% if app.session.get('site') %}
                             <li>
