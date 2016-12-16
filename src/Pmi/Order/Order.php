@@ -176,8 +176,7 @@ class Order
         }
         $enabledSamples = $this->getEnabledSamples($set);
         $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
-        $constraintDateTime = new \DateTime('+1 hour');
-        $constraintDateTime->setTimezone(new \DateTimeZone('UTC'));
+        $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
         if ($set != 'processed') {
             $formBuilder->add("{$set}_ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
