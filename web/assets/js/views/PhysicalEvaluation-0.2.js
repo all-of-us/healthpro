@@ -369,7 +369,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                 }
             });
             if (isConsecutive) {
-                if (self.rendered) {
+                if (e && self.rendered) {
                     var input = $(e.currentTarget);
                     new PmiConfirmModal({
                         msg: warning.message,
