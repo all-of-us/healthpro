@@ -239,9 +239,6 @@ class Order
 
     public function getRdrObject()
     {
-        $created = $this->order['created_ts'];
-        $created->setTimezone(new \DateTimeZone('UTC'));
-
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $this->order['participant_id'];
         $identifiers = [];
@@ -256,6 +253,9 @@ class Order
             ];
         }
         $obj->identifier = $identifiers;
+
+        $created = clone $this->order['created_ts'];
+        $created->setTimezone(new \DateTimeZone('UTC'));
         $obj->created = $created->format('Y-m-d\TH:i:s\Z');
 
         $obj->samples = $this->getRdrSamples();
@@ -300,7 +300,6 @@ class Order
 
     protected function getSampleTime($set, $sample)
     {
-
         $samples = json_decode($this->order["{$set}_samples"]);
         if (!is_array($samples) || !in_array($sample, $samples)) {
             return false;
@@ -317,7 +316,8 @@ class Order
             }
         } else {
             if ($this->order["{$set}_ts"]) {
-                $time = new \DateTime($this->order["{$set}_ts"]);
+                $time = clone $this->order["{$set}_ts"];
+                $time->setTimezone(new \DateTimeZone('UTC'));
                 return $time->format('Y-m-d\TH:i:s\Z');
             }
         }
