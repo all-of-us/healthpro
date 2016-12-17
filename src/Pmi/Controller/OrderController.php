@@ -106,6 +106,8 @@ class OrderController extends AbstractController
                     if ($app->getConfig('ml_mock_order')) {
                         $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
                     } else {
+                        // set collected time to today at midnight local time
+                        $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
                         $order = new MayolinkOrder();
                         $options = [
                             'type' => $orderData['type'],
@@ -113,7 +115,7 @@ class OrderController extends AbstractController
                             'gender' => $participant->gender,
                             'birth_date' => $participant->dob,
                             'order_id' => $orderData['order_id'],
-                            'collected_at' => new \DateTime('today') // set to today at midnight since time won't be accurate
+                            'collected_at' => $collectedAt
                         ];
                         if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
                             $options['site'] = $app['session']->get('site')->id;
