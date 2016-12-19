@@ -65,48 +65,22 @@ class DashboardController extends AbstractController
 
             $control_dates = array_reverse($this->getDashboardDates($start_date, $end_date, $interval));
             $dates = [];
-            $entries = [];
             $values = [];
-            $totals = [];
             $hover_text = [];
 
-            // grab all entries and dates to use for plotly
-            foreach($results as $row) {
-                $date = explode('T', $row->date)[0];
-                if ($this->checkDates($date, $start_date, $end_date, $control_dates)) {
-                    array_push($dates, $date);
-                    foreach($row->entries as $entry) {
-                        if (strpos($entry->name, '.') !== false) {
-                            $parts = explode('.', $entry->name);
-                            $filter_key = $parts[0] . "." . $parts[1];
-                            $entry_name = $parts[2];
-                        } else {
-                            $filter_key = $entry->name;
-                            $entry_name = 'Total Participants';
-                        }
-
-                        if ($filter_key === $filter_by) {
-                            if (!in_array($entry_name, $entries)) {
-                                array_push($entries, $entry_name);
-                            }
-                        }
-
-                        // if not performing total participant count, grab total to use for
-                        // percentage text
-                        if ($filter_by != 'Participant' && $filter_key == 'Participant') {
-                            array_push($totals, $entry->value);
-                        }
-                    }
-                }
-
+            // retrieve controlled vocab for entries from metrics cache
+            if ($filter_by != 'Participant') {
+                $entries = $this->getMetricsFieldDefinitions($app, $filter_by);
+            } else {
+                $entries = ['Total Participants'];
             }
-            // set counter to keep track of how many rows have been processed (for totals array)
-            $i = 0;
 
             // iterate again to grab values now that we have all possible entries
             foreach($results as $row) {
                 $date = explode('T', $row->date)[0];
                 if ($this->checkDates($date, $start_date, $end_date, $control_dates)) {
+                    // grab date for x axis
+                    array_push($dates, $date);
                     foreach ($entries as $entry) {
                         if ($filter_by == 'Participant') {
                             $lookup = $filter_by;
@@ -115,6 +89,7 @@ class DashboardController extends AbstractController
                         }
                         $row_entries = $row->entries;
                         $match = $this->searchEntries($row_entries, 'name', $lookup);
+
                         if (empty($match)) {
                             $val = 0;
                         } else {
@@ -123,11 +98,14 @@ class DashboardController extends AbstractController
 
                         $values[$entry][] = $val;
 
+                        // generate hover text if not doing total participant count
                         if ($filter_by != 'Participant') {
-                            $hover_text[$entry][] = $this->calculatePercentText($val, $totals[$i]). '<br />'. $date;
+                            // grab total (since searchEntries returns array and there is only one val
+                            // it's safe to always grab the first value
+                            $total = $this->searchEntries($row_entries, 'name', 'Participant')[0];
+                            $hover_text[$entry][] = $this->calculatePercentText($val, $total). '<br />'. $date;
                         }
                     }
-                    $i++;
                 }
             }
 
@@ -622,6 +600,7 @@ class DashboardController extends AbstractController
     // Main method for retrieving metrics from API
     // stores result in memcache as it only updates daily
     // supports storing multiple entries for faceting
+    // also
     private function getMetricsObject(Application $app, $facet) {
         $memcache = new \Memcache();
         $memcacheKey = 'metrics_api_facet_' . $facet;
@@ -637,6 +616,29 @@ class DashboardController extends AbstractController
             }
         }
         return $metrics;
+    }
+
+    // stores and returns field definitions as controlled vocabulary
+    private function getMetricsFieldDefinitions(Application $app, $field_key) {
+        $memcache = new \Memcache();
+        $memcacheKey = 'metrics_api_field_definitions';
+        $definitions = $memcache->get($memcacheKey);
+        if (!$definitions) {
+            try {
+                $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+                $definitions = $metricsApi->metrics(['NONE'])->field_definition;
+                // set expiration to four hours
+                $memcache->set($memcacheKey, $definitions, 0, 14400);
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                return false;
+            }
+        }
+        foreach($definitions as $entry) {
+            if ($entry->name == $field_key) {
+                $keys = $entry->values;
+            }
+        }
+        return $keys;
     }
 
     // helper function to check date range cutoffs
