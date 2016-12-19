@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Physical Evaluation - {% endblock %}
+{% block title %}Physical Measurements - {% endblock %}
 {% block body %}
     {{ form_errors(evaluationForm) }}
 
@@ -9,7 +9,7 @@
             {% if evaluation %}
                 {{ evaluation.created_ts|date('n/j/Y') }}
             {% else %}
-                New Evaluation
+                New Physical Measurements
             {% endif %}
             <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
         </h2>
@@ -17,8 +17,8 @@
     <dl class="dl-horizontal">
         <dt>Name</dt>
         <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-        <dt>ID</dt>
-        <dd>{{ participant.shortId }}</dd>
+        <dt>Participant ID</dt>
+        <dd>{{ participant.id }}</dd>
         <dt>DOB</dt>
         <dd>{{ participant.dob|date('n/j/Y') }}</dd>
         <dt>Gender Identity</dt>
@@ -33,7 +33,7 @@
         {% endif %}
     </dl>
 
-    <div id="physicalEvaluation">
+    <div id="physicalEvaluation" class="form-disable-enter">
         {{ form_start(evaluationForm, { attr: { class: 'warn-unsaved' } }) }}
 
             <div id="evaluationAffixSave">
@@ -57,7 +57,7 @@
                 <p>
                     <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
                     <button type="submit" class="btn btn-primary" name="save">Save</button>
-                    <button type="submit" class="btn btn-success pull-right" name="finalize" onclick="return confirm('Are you sure you want to finalize this evaluation?');">Save and Finalize</button>
+                    <button type="submit" class="btn btn-success pull-right" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Save and Finalize</button>
                 </p>
             {% endif %}
         {{ form_end(evaluationForm) }}

@@ -27,7 +27,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
         this.updateConversion(e);
 
         var field = $(e.currentTarget).closest('.field').data('field');
-        this.displayConsecutiveWarning(field);
+        this.displayConsecutiveWarning(field, e);
 
         this.triggerEqualize();
     },
@@ -333,7 +333,7 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             });
         });
     },
-    displayConsecutiveWarning: function(field) {
+    displayConsecutiveWarning: function(field, e) {
         var self = this;
         if (this.$('.field-' + field).closest('.replicate').length === 0) {
             // ignore non-replicate fields
@@ -343,6 +343,9 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             // ignore if no warnings on this field
             return;
         }
+        // clear out previous warning
+        this.$('#' + field + '-warning').text('');
+
         // get all replicate field values
         var values = [];
         this.$('.field-' + field + ' input').each(function() {
@@ -366,7 +369,8 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
                 }
             });
             if (isConsecutive) {
-                if (self.rendered) {
+                if (e && self.rendered) {
+                    var input = $(e.currentTarget);
                     new PmiConfirmModal({
                         msg: warning.message,
                         onFalse: function() {
