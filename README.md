@@ -4,7 +4,10 @@
 
 ## Developer Quick Start
 
-Install the [Google App Engine SDK for PHP](https://cloud.google.com/appengine/downloads).
+Prerequisites:
+
+* Install the [Google App Engine SDK for PHP](https://cloud.google.com/appengine/downloads).
+* Install NodeJS
 
 Make GAE SDK not watch too many files:
 
@@ -16,7 +19,7 @@ Install PHP dependencies via [Composer](https://getcomposer.org/doc/00-intro.md#
 
 Install Gulp dependencies via NPM:
 
-`./bin/npm install`
+`npm install`
 
 Install asset dependencies via Bower:
 
@@ -28,12 +31,12 @@ Initialize assets and recompile on the fly as assets change:
 
 Run local App Engine dev server:
 
-`./bin/console pmi:deploy --local`
+`./bin/deploy --local`
  
 ### Datastore persistence
 By default, the local server stores Datastore data in a temporary location that can be wiped out at any time.  In order to maintain persistent Datastore locally, create a directory to store the data in, and specify the `datastoreDir` parameter:
 
-`./bin/console pmi:deploy --local --datastoreDir=~/datastore`
+`./bin/deploy --local --datastoreDir=~/datastore`
 
 
 ## Credentials and configuration

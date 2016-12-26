@@ -166,15 +166,14 @@ class DeployCommand extends Command {
         $this->generateAppConfig();
         $this->generateIpWhitelistConfig();
         $this->generatePhpConfig();
-
-        $this->runSecurityCheck();
+        $this->generateCronConfig();
 
         // If not local, compile assets. Run ./bin/gulp when developing locally.
         if (!$this->local && !$this->index) {
             // ensure that we are up-to-date with the latest NPM dependencies
             $output->writeln('');
             $output->writeln("Checking NPM dependencies...");
-            $this->exec("{$this->appDir}/bin/npm install");
+            $this->exec("npm install");
 
             // ensure that we are up-to-date with the latest Bower dependencies
             $output->writeln('');
@@ -193,6 +192,11 @@ class DeployCommand extends Command {
             $twigInput = new ArrayInput(['command' => 'pmi:twig']);
             $command->run($twigInput, $output);
         }
+        
+        // security checks
+        $this->runSecurityCheck();
+        $this->out->writeln('');
+        $this->runJsSecurityCheck(); // must occur after asset compilation
 
         // unit tests should pass before deploying to testers or production
         if ($this->isTest() || $this->isProd()) {
@@ -239,6 +243,11 @@ class DeployCommand extends Command {
             }
             $output->writeln('');
             $output->writeln('All done 👍'); // emoji :thumbsup:
+            // taggable implies we are tracking/auditing
+            if ($this->isTaggable()) {
+                $output->writeln('');
+                $output->writeln('<error>Remember to attach deploy output to Jira ticket!</error>');
+            }
         }
         else {
             $output->writeln('');
@@ -411,6 +420,82 @@ class DeployCommand extends Command {
 
         file_put_contents($configFile, $ini);
     }
+    
+    /** Generate cron configuration. */
+    private function generateCronConfig()
+    {
+        $configFile = $this->appDir . DIRECTORY_SEPARATOR . 'cron.yaml';
+        $distFile = "{$configFile}.dist";
+        if (!file_exists($distFile)) {
+            throw new Exception("Couldn't find $distFile");
+        }
+        
+        $yaml = new Parser();
+        $config = $yaml->parse(file_get_contents($distFile));
+        
+        // do this prior to excluding crons so developers are notified about
+        // missing backups well in advance of to deploying to production
+        $this->checkCronBackups($config);
+        
+        // adjust crons depending on environment
+        $crons = [];
+        foreach ($config['cron'] as $c) {
+            if (stristr($c['url'], '/ping-test') !== false && $this->isProd()) {
+                continue;
+            } elseif (stristr($c['url'], '/_ah/datastore_admin/backup.create') !== false) {
+                // enable DS backup only in production and test sites
+                if (!$this->isProd() && !$this->isTest()) {
+                    continue;
+                } else {
+                    $c['url'] = str_replace('{BUCKET_PREFIX}', $this->appId, $c['url']);
+                }
+            }
+            $crons[] = $c;
+        }
+        $config['cron'] = $crons;
+        
+        $dumper = new Dumper();
+        file_put_contents($configFile, count($crons) ? $dumper->dump($config, PHP_INT_MAX) : 'cron:');
+    }
+    
+    private function checkCronBackups($config)
+    {
+        $cronKinds = [];
+        foreach ($config['cron'] as $c) {
+            if (stripos($c['url'], '/_ah/datastore_admin/backup.create') === 0) {
+                if (strlen($c['url']) > 2000) {
+                    throw new \Exception("URL character limit exceeded: {$c['url']}");
+                }
+                if (preg_match_all('/kind=(\w+)/', $c['url'], $m) > 0) {
+                    foreach ($m[1] as $kind) {
+                        $cronKinds[$kind] = $kind;
+                    }
+                }
+            }
+        }
+        
+        $pmiKinds = [];
+        $files = glob("{$this->appDir}/src/Pmi/Entities/*.php");
+        if (count($files) === 0) {
+            throw new \Exception("No Datastore entity classes were found!");
+        }
+        foreach ($files as $file) {
+            $entity = basename($file, '.php');
+            $pmiKinds[$entity] = $entity;
+        }
+        
+        foreach ($pmiKinds as $kind) {
+            if (empty($cronKinds[$kind]) && $kind !== 'Session') {
+                throw new \Exception("Datastore kind {$kind} is not being backed up!");
+            }
+        }
+        
+        foreach ($cronKinds as $kind) {
+            if (empty($pmiKinds[$kind])) {
+                throw new \Exception("No entity exists for datastore backup of kind {$kind}!");
+            }
+        }
+    }
 
     /** Tell all handlers to require admin login. */
     private function requireAdminLogin(&$config)
@@ -486,6 +571,21 @@ class DeployCommand extends Command {
                 if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
                     throw new \Exception('Aborting due to security vulnerability');
                 }
+            }
+        }
+    }
+    
+    private function runJsSecurityCheck()
+    {
+        $this->out->writeln("Running RetireJS scanner...");
+        $process = $this->exec("{$this->appDir}/node_modules/retire/bin/retire --nocache --nodepath {$this->appDir}/node_modules --jspath {$this->appDir}/web/assets/dist/js", false);
+        if ($process->getExitCode() == 0) {
+            $this->out->writeln('No JS files or node modules have known vulnerabilities');
+        } else {            
+            $this->out->writeln('');
+            $helper = $this->getHelper('question');
+            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerablities?</error> '))) {
+                throw new \Exception('Aborting due to JS security vulnerability');
             }
         }
     }

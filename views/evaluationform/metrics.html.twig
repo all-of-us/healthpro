@@ -1,0 +1,34 @@
+{% macro form_row(form, definition) %}
+    {% set name = definition.name %}
+    <div data-field="{{ name }}" class="field field-{{ name }} form-group{% if not form[name].vars.valid %} has-error{% endif %}">
+        {{ form_label(form[name]) }}
+        {% if definition.convert is defined %}
+            <span id="convert-{{ name }}" class="pull-right convert"></span>
+        {% endif %}
+        {% if definition.unit is defined %}
+            <div class="input-group">
+                {{ form_widget(form[name]) }}
+                <div class="input-group-addon">{{ definition.unit }}</div>
+            </div>
+        {% else %}
+            {{ form_widget(form[name]) }}
+        {% endif %}
+        {{ form_errors(form[name]) }}
+    </div>
+{% endmacro %}
+
+{% macro form_row_replicate(form, definition, i) %}
+    {% set name = definition.name %}
+    <div data-field="{{ name }}" data-replicate="{{ i + 1 }}" class="field field-{{ name }} form-group{% if not form[name][i].vars.valid %} has-error{% endif %}">
+        {{ form_label(form[name][i]) }}
+        {% if definition.unit is defined %}
+            <div class="input-group">
+                {{ form_widget(form[name][i]) }}
+                <div class="input-group-addon">{{ definition.unit }}</div>
+            </div>
+        {% else %}
+            {{ form_widget(form[name][i]) }}
+        {% endif %}
+        {{ form_errors(form[name][i]) }}
+    </div>
+{% endmacro %}

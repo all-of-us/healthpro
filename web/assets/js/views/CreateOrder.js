@@ -13,13 +13,13 @@ var CreateOrder = Backbone.View.extend({
     enableCustomize: function(e) {
         this.$('#customize-on').show();
         this.$('#customize-off').hide();
-        window.equalizePanelHeight('.row-equal-height');
+        $(window).trigger('pmi.equalize');
         e.preventDefault();
     },
     disableCustomize: function(e) {
         this.$('#customize-off').show();
         this.$('#customize-on').hide();
-        window.equalizePanelHeight('.row-equal-height');
+        $(window).trigger('pmi.equalize');
         e.preventDefault();
     },
     displayHelpModal: function(e) {

@@ -10,12 +10,12 @@ use Pmi\Evaluation\Evaluation;
 class EvaluationController extends AbstractController
 {
     protected static $routes = [
-        ['evaluation', '/participant/{participantId}/eval/{evalId}', [
+        ['evaluation', '/participant/{participantId}/measurements/{evalId}', [
             'method' => 'GET|POST',
             'defaults' => ['evalId' => null]
         ]],
-        ['evaluationFhir', '/participant/{participantId}/eval/{evalId}/fhir.json'],
-        ['evaluationRdr', '/participant/{participantId}/eval/{evalId}/rdr.json']
+        ['evaluationFhir', '/participant/{participantId}/measurements/{evalId}/fhir.json'],
+        ['evaluationRdr', '/participant/{participantId}/measurements/{evalId}/rdr.json']
     ];
 
     /* For debugging generated FHIR bundle - only allowed in dev */
@@ -99,7 +99,7 @@ class EvaluationController extends AbstractController
                 $app['em']->getRepository('evaluations')->update($evalId, [
                     'finalized_ts' => null
                 ]);
-                $app->addFlashNotice('Evaluation reopened');
+                $app->addFlashNotice('Physical measurements reopened');
                 return $app->redirectToRoute('evaluation', [
                     'participantId' => $participant->id,
                     'evalId' => $evalId
@@ -127,24 +127,24 @@ class EvaluationController extends AbstractController
                         $dbArray['created_ts'] = $dbArray['updated_ts'];
                         if ($evalId = $app['em']->getRepository('evaluations')->insert($dbArray)) {
                             $app->log(Log::EVALUATION_CREATE, $evalId);
-                            $app->addFlashNotice('Evaluation saved');
+                            $app->addFlashNotice('Physical measurements saved');
                             return $app->redirectToRoute('evaluation', [
                                 'participantId' => $participant->id,
                                 'evalId' => $evalId
                             ]);
                         } else {
-                            $app->addFlashError('Failed to create new evaluation');
+                            $app->addFlashError('Failed to create new physical measurements');
                         }
                     } else {
                         if ($app['em']->getRepository('evaluations')->update($evalId, $dbArray)) {
                             $app->log(Log::EVALUATION_EDIT, $evalId);
-                            $app->addFlashNotice('Evaluation saved');
+                            $app->addFlashNotice('Physical measurements saved');
                             return $app->redirectToRoute('evaluation', [
                                 'participantId' => $participant->id,
                                 'evalId' => $evalId
                             ]);
                         } else {
-                            $app->addFlashError('Failed to update evaluation');
+                            $app->addFlashError('Failed to update physical measurements');
                         }
                     }
                 } else {
@@ -159,7 +159,7 @@ class EvaluationController extends AbstractController
             'participant' => $participant,
             'evaluation' => $evaluation,
             'evaluationForm' => $evaluationForm->createView(),
-            'schema' => $evaluationService->getSchema(),
+            'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
             'latestVersion' => $evaluationService::CURRENT_VERSION

@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Participant {{ participant.shortId }} - {% endblock %}
+{% block title %}Participant {{ participant.id }} - {% endblock %}
 {% block body %}
     <div class="page-header">
         <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>{{ participant.shortId }}</small></h2>
@@ -8,8 +8,10 @@
     <dl class="dl-horizontal">
         <dt>Name</dt>
         <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-        <dt>ID</dt>
-        <dd>{{ participant.shortId }}</dd>
+        <dt>Participant ID</dt>
+        <dd>{{ participant.id }}</dd>
+        <dt>Biobank ID</dt>
+        <dd>{{ participant.biobankId }}</dd>
         <dt>DOB</dt>
         <dd>{{ participant.dob|date('n/j/Y') }}</dd>
         <dt>Gender Identity</dt>
@@ -20,7 +22,7 @@
             <div class="col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Evaluation</h3>
+                        <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h3>
                     </div>
                     <div class="panel-body">
                         {% for evaluation in evaluations %}
@@ -51,7 +53,7 @@
                             {% else %}
                                 Start
                             {% endif %}
-                            Evaluation
+                            Physical Measurements
                         </a>
                     </div>
                 </div>

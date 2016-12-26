@@ -4,6 +4,16 @@
 $(document).ready(function()
 {
     /*************************************************************************
+     * Security fix: https://github.com/jquery/jquery/issues/2432#issuecomment-140038536
+     * Can be removed after upgrading to jQuery 3.x
+     ************************************************************************/
+    $.ajaxSetup({
+        contents: {
+            javascript: false
+        }
+    });
+    
+    /*************************************************************************
      * Supplement Underscore with a truthy function
      ************************************************************************/
     _["truthy"] = function(val) {
@@ -36,9 +46,26 @@ $(document).ready(function()
     /*************************************************************************
      * Disable click on disabled tabs (prevents unnecessary navigation to #)
      ************************************************************************/
-     $('.nav-tabs li.disabled a').on('click', function(e) {
+    $('.nav-tabs li.disabled a').on('click', function(e) {
         e.preventDefault();
-     });
+    });
+
+    /*************************************************************************
+     * Disable forms being submitted via enter/return key on any text input
+     * inside an element with the .form-disable-enter class
+     ************************************************************************/
+    $('.form-disable-enter input:text').on('keypress keyup', function(e) {
+        if (e.which == 13) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+
+    /*************************************************************************
+     * Auto-enable bootstrap tooltips
+     ************************************************************************/
+    $('[data-toggle="tooltip"]').tooltip();
      
     /*************************************************************************
      * Handle session timeout
@@ -57,7 +84,12 @@ $(document).ready(function()
             redirUrl: PMI.path.clientTimeout,
             redirAfter: PMI.sessionTimeout * 1000,
             warnAfter: PMI.sessionTimeout * 1000 - (PMI.sessionWarning * 1000),
-            warnAutoClose: false
+            warnAutoClose: false,
+            onRedir: function(opt) {
+                // suppress unsaved warning when user is being logged out
+                PMI.markSaved();
+                window.location = opt.redirUrl;
+            }
         });
     }
 
@@ -112,6 +144,9 @@ $(document).ready(function()
         $(window).on('resize', _.debounce(function() {
             equalize(selector);
         }, 250));
+        $(window).on('pmi.equalize', function() {
+            equalize(selector);
+        });
     };
     $('.row-equal-height').equalizePanelHeight();
 
@@ -132,6 +167,18 @@ $(document).ready(function()
         $(selector).on('dp.change', function() {
             PMI.markUnsaved();
         });
+    };
+
+    /*************************************************************************
+     * Plugin to set value and trigger change event if changed
+     ************************************************************************/
+    $.fn.valChange = function(val) {
+        var triggerChange = (this.val() != val);
+        this.val(val);
+        if (triggerChange) {
+            this.change();
+        }
+        return this;
     };
 
     /*************************************************************************

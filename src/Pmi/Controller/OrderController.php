@@ -23,7 +23,8 @@ class OrderController extends AbstractController
         ['orderCollect', '/participant/{participantId}/order/{orderId}/collect', ['method' => 'GET|POST']],
         ['orderProcess', '/participant/{participantId}/order/{orderId}/process', ['method' => 'GET|POST']],
         ['orderFinalize', '/participant/{participantId}/order/{orderId}/finalize', ['method' => 'GET|POST']],
-        ['orderJson', '/participant/{participantId}/order/{orderId}/order.json']
+        ['orderJson', '/participant/{participantId}/order/{orderId}/order.json'],
+        ['orderExport', '/orders/export.csv']
     ];
 
     protected function loadOrder($participantId, $orderId, Application $app)
@@ -62,6 +63,12 @@ class OrderController extends AbstractController
                 'required' => false,
                 'error_mapping' => [
                     '.' => 'second' // target the second (repeated) field for non-matching error
+                ],
+                'constraints' => [
+                    new Constraints\Regex([
+                        'pattern' => '/^KIT-\d{8}$/',
+                        'message' => 'Must be in the format of KIT-12345678 ("KIT-" followed by 8 digits)'
+                    ])
                 ]
             ])
             ->add('samples', Type\ChoiceType::class, [
@@ -79,15 +86,11 @@ class OrderController extends AbstractController
             if ($request->request->has('existing')) {
                 if (empty($confirmForm['kitId']->getData())) {
                     $confirmForm['kitId']['first']->addError(new FormError('Please enter a kit order ID'));
+                } elseif ($app['em']->getRepository('orders')->fetchOneBy(['order_id' => $confirmForm['kitId']->getData()])) {
+                    $confirmForm['kitId']['first']->addError(new FormError('This order ID already exists'));
                 } else {
-                    $existing = $app['em']->getRepository('orders')->fetchOneBy(['order_id' => $confirmForm['kitId']->getData()]);
-                    if ($existing) {
-                        $confirmForm['kitId']['first']->addError(new FormError('This order ID already exists'));
-                    } else {
-                        $orderData['order_id'] = $confirmForm['kitId']->getData();
-                        $orderData['mayo_id'] = $confirmForm['kitId']->getData();
-                        $orderData['type'] = 'kit';
-                    }
+                    $orderData['order_id'] = $confirmForm['kitId']->getData();
+                    $orderData['type'] = 'kit';
                 }
             } else {
                 $orderData['order_id'] = Util::generateShortUuid(12);
@@ -102,36 +105,32 @@ class OrderController extends AbstractController
                 } elseif ($request->request->has('saliva')) {
                     $orderData['type'] = 'saliva';
                 }
-                if ($confirmForm->isValid()) {
-                    if ($app->getConfig('ml_mock_order')) {
-                        $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
-                    } else {
-                        // set collected time to today at midnight local time
-                        $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
-                        $order = new MayolinkOrder();
-                        $options = [
-                            'type' => $orderData['type'],
-                            'patient_id' => $participant->biobankId,
-                            'gender' => $participant->gender,
-                            'birth_date' => $participant->dob,
-                            'order_id' => $orderData['order_id'],
-                            'collected_at' => $collectedAt
-                        ];
-                        if ($app['session']->get('site') && !empty($app['session']->get('site')->id)) {
-                            $options['site'] = $app['session']->get('site')->id;
-                        }
-                        if (isset($requestedSamples) && is_array($requestedSamples)) {
-                            $options['tests'] = $requestedSamples;
-                        }
-                        $orderData['mayo_id'] = $order->loginAndCreateOrder(
-                            $app->getConfig('ml_username'),
-                            $app->getConfig('ml_password'),
-                            $options
-                        );
-                    }
-                }
             }
             if ($confirmForm->isValid()) {
+                if ($app->getConfig('ml_mock_order')) {
+                    $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
+                } else {
+                    // set collected time to today at midnight local time
+                    $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
+                    $order = new MayolinkOrder();
+                    $options = [
+                        'type' => $orderData['type'],
+                        'patient_id' => $participant->biobankId,
+                        'gender' => $participant->gender,
+                        'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob($orderData['type']),
+                        'order_id' => $orderData['order_id'],
+                        'collected_at' => $collectedAt,
+                        'site' => $app->getSiteId()
+                    ];
+                    if (isset($requestedSamples) && is_array($requestedSamples)) {
+                        $options['tests'] = $requestedSamples;
+                    }
+                    $orderData['mayo_id'] = $order->loginAndCreateOrder(
+                        $app->getConfig('ml_username'),
+                        $app->getConfig('ml_password'),
+                        $options
+                    );
+                }
                 if ($orderData['mayo_id']) {
                     $orderData['user_id'] = $app->getUser()->getId();
                     $orderData['site'] = $app->getSiteId();
@@ -318,5 +317,44 @@ class OrderController extends AbstractController
         }
 
         return $app->json($object);
+    }
+
+    /* For dry-run testing reconciliation  */
+    public function orderExportAction(Application $app)
+    {
+        if ($app->isProd()) {
+            $app->abort(404);
+        }
+        $orders = $app['db']->fetchAll("SELECT finalized_ts, site, biobank_id, mayo_id FROM orders WHERE finalized_ts is not null and site != '' and biobank_id !=''");
+        $skipSites = ['a', 'b'];
+        $noteSites = ['7035702', '7035703', '7035704', '7035705', '7035707'];
+        $stream = function() use ($orders, $skipSites, $noteSites) {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, array('Biobank ID', 'ML Order ID', 'ML Client ID', 'Finalized (CT)', 'Notes'));
+            foreach ($orders as $order) {
+                $finalized = date('Y-m-d H:i:s', strtotime($order['finalized_ts']));
+                if (in_array($order['site'], $skipSites)) {
+                    continue;
+                }
+                if (!array_key_exists($order['site'], MayolinkOrder::$siteAccounts)) {
+                    continue;
+                }
+                $clientId = MayolinkOrder::$siteAccounts[$order['site']];
+                fputcsv($output, [
+                    $order['biobank_id'],
+                    $order['mayo_id'],
+                    $clientId,
+                    $finalized,
+                    in_array($clientId, $noteSites) ? 'Client account was not added to our account which resulted in the client id 7035500 being used (will be fixed some time after 11/29)' : ''
+                ]);
+            }
+            fclose($output);
+        };
+
+        $filename = 'orders_' . date('Ymd-His') . '.csv';
+        return $app->stream($stream, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+        ]);
     }
 }
