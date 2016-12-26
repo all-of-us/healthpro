@@ -1,6 +1,6 @@
 <h2>
     <i class="fa fa-medkit" aria-hidden="true"></i>
-    {{ order.created_ts|date('n/j/Y') }}
+    {{ order.created_ts|date('n/j/Y', app.userTimezone) }}
     <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
 </h2>
 <p class="lead">Order ID: <strong>{{ order.order_id }}</strong></p>
