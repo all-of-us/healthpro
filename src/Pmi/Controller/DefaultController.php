@@ -259,47 +259,34 @@ class DefaultController extends AbstractController
 
     public function settingsAction(Application $app, Request $request)
     {
-        $settingsForm = $this->createSettingsForm('settings', $app['form.factory']);
-        $settingsForm->handleRequest($request);
-        $userInfo = $app->getUser()->getInfo();
-        if ($settingsForm->isValid() && $settingsForm['timezone']->getData() != 'None') {
-            $user = $app->getUser();
-            $user->setTimezone($settingsForm['timezone']->getData());
-            $app['em']->getRepository('users')->update($user->getId(), ['timezone' => $settingsForm['timezone']->getData()]);
-            $userInfo['timezone'] = $settingsForm['timezone']->getData();
+        $settingsData = ['timezone' => $app->getUserTimezone()];
+        $settingsForm = $app['form.factory']->createBuilder(FormType::class, $settingsData)
+            ->add('timezone', Type\ChoiceType::class, [
+                'label' => 'Timezone',
+                'choices' => array(
+                    'Hawaii Time' => 'Pacific/Honolulu',
+                    'Alaska Time' => 'America/Anchorage',
+                    'Pacific Time' => 'America/Los_Angeles',
+                    'Mountain Time' => 'America/Denver',
+                    'Mountain Time - Arizona' => 'America/Phoenix',
+                    'Central Time' => 'America/Chicago',
+                    'Eastern Time' => 'America/New_York'
+                ),
+                'placeholder' => 'Select your timezone',
+                'required' => true
+            ])
+            ->getForm();
 
-            return $app->redirectToRoute('settings', [
-                'timezone' => $userInfo['timezone']
+        $settingsForm->handleRequest($request);
+        if ($settingsForm->isValid()) {
+            $app['em']->getRepository('users')->update($app->getUserId(), [
+                'timezone' => $settingsForm['timezone']->getData()
             ]);
+            return $app->redirectToRoute('settings');
         }
 
         return $app['twig']->render('settings.html.twig', [
-            'settingsForm' => $settingsForm->createView(),
-            'timezone' => $userInfo["timezone"],
-            'current' => new \DateTime()
+            'settingsForm' => $settingsForm->createView()
         ]);
     }
-
-    protected function createSettingsForm($set, $formFactory)
-    {
-
-        $formBuilder = $formFactory->createBuilder(FormType::class);
-        $formBuilder->add("timezone", Type\ChoiceType::class, [
-            'label' => 'Timezone',
-            'choices' => array(
-                'Hawaii Time' => 'Pacific/Honolulu',
-                'Alaska Time' => 'America/Anchorage',
-                'Pacific Time' => 'America/Los_Angeles',
-                'Mountain Time' => 'America/Denver',
-                'Mountain Time - Arizona' => 'America/Phoenix',
-                'Central Time' => 'America/Chicago',
-                'Eastern Time' => 'America/New_York'
-            ),
-            'placeholder' => 'Select your timezone',
-            'required' => true
-        ]);
-        $form = $formBuilder->getForm();
-        return $form;
-    }
-
 }

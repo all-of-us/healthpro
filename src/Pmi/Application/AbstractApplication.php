@@ -234,6 +234,15 @@ abstract class AbstractApplication extends Application
         return $token ? $token->getUser() : null;
     }
 
+    public function getUserId()
+    {
+        if ($user = $this->getUser()) {
+            return $user->getId();
+        } else {
+            return null;
+        }
+    }
+
     public function getUserTimezone()
     {
         if ($user = $this->getUser()) {
@@ -243,7 +252,7 @@ abstract class AbstractApplication extends Application
         }
         return self::DEFAULT_TIMEZONE;
     }
-    
+
     public function hasRole($role)
     {
         return $this->isLoggedIn() && $this['security.authorization_checker']->isGranted($role);
