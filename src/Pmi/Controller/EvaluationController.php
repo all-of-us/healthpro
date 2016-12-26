@@ -38,7 +38,7 @@ class EvaluationController extends AbstractController
         }
         $evaluationService->loadFromArray($evaluation);
         if ($evaluation['finalized_ts']) {
-            $date = new \DateTime($evaluation['finalized_ts']);
+            $date = $evaluation['finalized_ts'];
         } else {
             $date = new \DateTime();
         }
@@ -111,9 +111,9 @@ class EvaluationController extends AbstractController
                     $evaluationService->setData($evaluationForm->getData());
                     $dbArray = $evaluationService->toArray();
                     $now = new \DateTime();
-                    $dbArray['updated_ts'] = $now->format('Y-m-d H:i:s');
+                    $dbArray['updated_ts'] = $now;
                     if ($request->request->has('finalize')) {
-                        $dbArray['finalized_ts'] = $now->format('Y-m-d H:i:s');
+                        $dbArray['finalized_ts'] = $now;
                         // Send final evaluation to RDR and store resulting id
                         $fhir = $evaluationService->getFhir($now);
                         if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($participant->id, $fhir)) {
