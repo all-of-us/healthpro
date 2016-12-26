@@ -51,3 +51,7 @@
     <dt>Gender Identity</dt>
     <dd>{{ participant.genderIdentity }}</dd>
 </dl>
+
+{% if active in ['collect', 'process', 'finalize'] %}
+    <p><strong>Your timezone</strong>: {{ app.userTimezone }} <a href="{{ path('settings') }}" class="small">change</a></p>
+{% endif %}
