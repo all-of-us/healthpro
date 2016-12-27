@@ -30,7 +30,6 @@ class DoctrineRepository
             $result = $this->parseTimestamps($result);
         }
         return $result;
-
     }
 
     public function fetchBy(array $where, array $order = [], $limit = null)
@@ -56,7 +55,7 @@ class DoctrineRepository
             $query .= ' LIMIT ' . (int)$limit;
         }
         $result = $this->dbal->fetchAll($query, $parameters);
-        if($result) {
+        if ($result) {
             $result = $this->parseMultipleTimestamps($result);
         }
         return $result;
@@ -64,17 +63,16 @@ class DoctrineRepository
 
     protected function parseMultipleTimestamps(array $result)
     {
-        foreach($result as $key => $value) {
+        foreach ($result as $key => $value) {
             $result[$key] = $this->parseTimestamps($value);
         }
         return $result;
-
     }
 
     protected function parseTimestamps(array $result)
     {
-        foreach($result as $key => $value) {
-            if(NULL !== $value && substr($key, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
+        foreach ($result as $key => $value) {
+            if (null !== $value && substr($key, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
                 $result[$key] = \DateTime::createFromFormat('Y-m-d H:i:s', $value)->setTimezone(new \DateTimeZone($this->timezone));
             }
         }
@@ -83,9 +81,8 @@ class DoctrineRepository
 
     protected function dateTimesToStrings(array $data)
     {
-        foreach($data as $key => $value)
-        {
-            if($value instanceof \DateTime) {
+        foreach ($data as $key => $value) {
+            if ($value instanceof \DateTime) {
                 $value->setTimezone(new \DateTimezone('UTC'));
                 $data[$key] = $value->format('Y-m-d H:i:s');
             }

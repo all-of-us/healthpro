@@ -235,7 +235,7 @@ class HpoApplication extends AbstractApplication
             return $this->forwardToRoute('dashSplash', $request);
         }
 
-        if($this->isLoggedIn()) {
+        if ($this->isLoggedIn()) {
             $user = $this->getUser();
             $this['em']->setTimezone($this->getUserTimezone());
         }
