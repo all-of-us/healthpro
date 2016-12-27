@@ -55,7 +55,8 @@
     <dt>Gender Identity</dt>
     <dd>{{ participant.genderIdentity }}</dd>
 </dl>
-
 {% if active in ['collect', 'process', 'finalize'] %}
-    <p><strong>Your timezone</strong>: {{ app.userTimezone }} <a href="{{ path('settings') }}" class="small">change</a></p>
+    {% set route = app.request_stack.currentRequest.attributes.get('_route') %}
+    {% set return = path(route, params) %}
+    <p><strong>Your timezone</strong>: {{ app.userTimezoneDisplay }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
 {% endif %}

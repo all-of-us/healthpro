@@ -278,7 +278,11 @@ class DefaultController extends AbstractController
             $app['em']->getRepository('users')->update($app->getUserId(), [
                 'timezone' => $settingsForm['timezone']->getData()
             ]);
-            return $app->redirectToRoute('settings');
+            if ($request->query->has('return')) {
+                return $app->redirect($request->query->get('return'));
+            } else {
+                return $app->redirectToRoute('settings');
+            }
         }
 
         return $app['twig']->render('settings.html.twig', [
