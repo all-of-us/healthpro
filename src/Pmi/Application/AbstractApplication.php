@@ -65,7 +65,7 @@ abstract class AbstractApplication extends Application
         }
         $values['assetVer'] = $values['env'] === self::ENV_LOCAL ?
             date('YmdHis') : $values['release'];
-        date_default_timezone_set('UTC');
+
         parent::__construct($values);
     }
     

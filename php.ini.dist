@@ -1,5 +1,5 @@
 google_app_engine.enable_functions = "php_sapi_name"
-date.timezone = America/Chicago
+date.timezone = UTC
 ; note that GAE forces to 1 for app admins
 ; http://stackoverflow.com/a/23026196/1402028
 display_errors = 0
