@@ -152,6 +152,26 @@
             }
         },
         {
+            "name": "blood-pressure-protocol-modification",
+            "label": "Modification to Protocol",
+            "replicates": 3,
+            "options": {
+                "None": "",
+                "Refusal": "refusal",
+                "Other": "other"
+            },
+            "warnings": [
+                {
+                    "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "other",
+                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                }
+            ]
+        },
+        {
             "name": "pregnant",
             "label": "Is participant pregnant?",
             "options": {
@@ -356,6 +376,26 @@
             }
         },
         {
+            "name": "hip-circumference-protocol-modification",
+            "label": "Modification to Hip Circumference Protocol",
+            "replicates": 3,
+            "options": {
+                "None": "",
+                "Refusal": "refusal",
+                "Other": "other"
+            },
+            "warnings": [
+                {
+                    "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "other",
+                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                }
+            ]
+        },
+        {
             "name": "waist-circumference",
             "label": "Waist Circumference",
             "unit": "cm",
@@ -388,9 +428,11 @@
         {
             "name": "waist-circumference-protocol-modification",
             "label": "Modification to Waist Circumference Protocol",
+            "replicates": 3,
             "options": {
                 "None": "",
                 "Colostomy bag": "colostomy-bag",
+                "Refusal": "refusal",
                 "Other": "other"
             },
             "help": {
@@ -399,6 +441,10 @@
             "warnings": [
                 {
                     "val": "colostomy-bag",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "refusal",
                     "message": "Deviation successfully captured."
                 },
                 {
