@@ -38,7 +38,12 @@ class DefaultController extends AbstractController
     public function homeAction(Application $app, Request $request)
     {
         if ($app->hasRole('ROLE_USER')) {
-            return $app['twig']->render('index.html.twig');
+            if (!$app->getUserTimezone(false)) {
+                $app->addFlashNotice('Please select your current timezone');
+                return $app->redirectToRoute('settings');
+            } else {
+                return $app['twig']->render('index.html.twig');
+            }
         } elseif ($app->hasRole('ROLE_DASHBOARD')) {
             return $app->redirectToRoute('dashboard_home');
         } else {
@@ -258,20 +263,12 @@ class DefaultController extends AbstractController
 
     public function settingsAction(Application $app, Request $request)
     {
-        $settingsData = ['timezone' => $app->getUserTimezone()];
+        $settingsData = ['timezone' => $app->getUserTimezone(false)];
         $settingsForm = $app['form.factory']->createBuilder(FormType::class, $settingsData)
             ->add('timezone', Type\ChoiceType::class, [
                 'label' => 'Timezone',
-                'choices' => array(
-                    'Hawaii Time' => 'Pacific/Honolulu',
-                    'Alaska Time' => 'America/Anchorage',
-                    'Pacific Time' => 'America/Los_Angeles',
-                    'Mountain Time' => 'America/Denver',
-                    'Mountain Time - Arizona' => 'America/Phoenix',
-                    'Central Time' => 'America/Chicago',
-                    'Eastern Time' => 'America/New_York'
-                ),
-                'placeholder' => 'Select your timezone',
+                'choices' => array_flip($app::$timezoneOptions),
+                'placeholder' => '-- Select your timezone --',
                 'required' => true
             ])
             ->getForm();

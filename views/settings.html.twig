@@ -1,11 +1,15 @@
 {% extends 'base.html.twig' %}
 {% block body %}
-    <div class="page-header">
-        <h2>Settings</h2>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="page-header">
+                <h2>Settings</h2>
+            </div>
+            {{ form_start(settingsForm) }}
+                {{ form_errors(settingsForm) }}
+                {{ form_widget(settingsForm) }}
+                <p><button type="submit" class="btn btn-primary">Update Settings</button></p>
+            {{ form_end(settingsForm) }}
+        </div>
     </div>
-    {{ form_start(settingsForm) }}
-        {{ form_errors(settingsForm) }}
-        {{ form_widget(settingsForm) }}
-        <p><button type="submit" class="btn btn-primary">Update Settings</button></p>
-    {{ form_end(settingsForm) }}
 {% endblock %}
