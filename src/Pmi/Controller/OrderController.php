@@ -136,8 +136,7 @@ class OrderController extends AbstractController
                     $orderData['site'] = $app->getSiteId();
                     $orderData['participant_id'] = $participant->id;
                     $orderData['biobank_id'] = $participant->biobankId;
-                    $orderData['created_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
-
+                    $orderData['created_ts'] = new \DateTime();
                     $orderId = $app['em']->getRepository('orders')->insert($orderData);
                     if ($orderId) {
                         $app->log(Log::ORDER_CREATE, $orderId);
@@ -204,7 +203,7 @@ class OrderController extends AbstractController
         if (!$order->get('printed_ts')) {
             $app->log(Log::ORDER_EDIT, $orderId);
             $app['em']->getRepository('orders')->update($orderId, [
-                'printed_ts' => (new \DateTime())->format('Y-m-d H:i:s')
+                'printed_ts' => new \DateTime()
             ]);
         }
         return $app['twig']->render('order-print.html.twig', [
@@ -253,7 +252,7 @@ class OrderController extends AbstractController
             if ($processForm->isValid()) {
                 $updateArray = $order->getOrderUpdateFromForm('processed', $processForm);
                 if (!$order->get('processed_ts')) {
-                    $updateArray['processed_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $updateArray['processed_ts'] = new \DateTime();
                 }
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
