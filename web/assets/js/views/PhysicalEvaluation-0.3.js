@@ -19,7 +19,8 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         "change #form_waist-circumference-protocol-modification": "handleWaistProtocol",
         "change .field-hip-circumference input": "toggleThirdHipCircumference",
         "change .field-waist-circumference input": "toggleThirdWaistCircumference",
-        "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic"
+        "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic",
+        "click .modification-toggle a": "toggleModification"
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
@@ -419,6 +420,20 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             });
         }
     },
+    toggleModification: function(e) {
+        var block = $(e.currentTarget).closest('.modification-block');
+        block.find('.modification-toggle').hide();
+        block.find('.modification-select').show();
+        this.triggerEqualize();
+    },
+    showModifications: function() {
+        this.$('.modification-block').each(function() {
+            if ($(this).find('.modification-select select').val() != '') {
+                $(this).find('.modification-toggle').hide();
+                $(this).find('.modification-select').show();
+            }
+        });
+    },
     initialize: function(obj) {
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
@@ -453,6 +468,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         _.each(_.keys(this.conversions), function(field) {
             self.calculateConversion(field);
         });
+        this.showModifications();
         this.displayWarnings();
         this.calculateBmi();
         this.calculateCuff();

@@ -34,7 +34,14 @@
                         {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-diastolic'], i) }}
                         {{ metrics.form_row_replicate(evaluationForm, schema.fields['heart-rate'], i) }}
                         {{ metrics.form_row_replicate(evaluationForm, schema.fields['irregular-heart-rate'], i) }}
-                        {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-protocol-modification'], i) }}
+                        <div class="modification-block">
+                            <div class="modification-toggle text-right">
+                                <a class="small">Add protocol modification</a>
+                            </div>
+                            <div class="modification-select" style="display:none">
+                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-protocol-modification'], i) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -139,7 +146,14 @@
                         {% if i == 2 %}
                             <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
                         {% endif %}
-                        {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference-protocol-modification'], i) }}
+                        <div class="modification-block">
+                            <div class="modification-toggle text-right">
+                                <a class="small">Add protocol modification</a>
+                            </div>
+                            <div class="modification-select" style="display:none">
+                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference-protocol-modification'], i) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -164,7 +178,14 @@
                         {% if i == 2 %}
                             <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
                         {% endif %}
-                        {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference-protocol-modification'], i) }}
+                        <div class="modification-block">
+                            <div class="modification-toggle text-right">
+                                <a class="small">Add protocol modification</a>
+                            </div>
+                            <div class="modification-select" style="display:none">
+                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference-protocol-modification'], i) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
