@@ -19,7 +19,7 @@ class AdminController extends AbstractController
 
     public function siteIndexAction(Application $app, Request $request)
     {
-        if ($app->hasRole('ROLE_USER')) {
+        if ($app->hasRole('ROLE_SITE_ADMIN')) {
             $sites = $app['db']->fetchAll("SELECT * FROM sites");
             return $app['twig']->render('site-index.html.twig', ['sites' => $sites]);
         } else {
