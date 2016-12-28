@@ -8,7 +8,8 @@ class EntityManager
     protected $entities = [
         'users' => 'doctrine',
         'orders' => 'doctrine',
-        'evaluations' => 'doctrine'
+        'evaluations' => 'doctrine',
+        'sites' => 'doctrine'
     ];
 
     public function setDbal($dbal)

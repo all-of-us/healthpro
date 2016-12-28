@@ -1,0 +1,101 @@
+<?php
+namespace Pmi\Controller;
+
+use Silex\Application;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormError;
+use Pmi\Audit\Log;
+use Pmi\Site\Site;
+use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
+
+class AdminController extends AbstractController
+{
+    protected static $routes = [
+        ['sitesIndex', '/sites'],
+        ['editSite', '/site/edit/{siteId}', ['method' => 'GET|POST']],
+        ['addSite', '/site/add', ['method' => 'GET|POST']]
+    ];
+
+    public function adminAction(Application $app, Request $request)
+    {
+        if ($app->hasRole('ROLE_USER')) {
+            return $app['twig']->render('admin.html.twig');
+        } else {
+            return $app->abort(403);
+        }
+    }
+
+    public function sitesIndexAction(Application $app, Request $request)
+    {
+        $sites = $app['db']->fetchAll("SELECT * FROM sites");
+        return $app['twig']->render('sites-index.html.twig', ['sites' => $sites]);
+    }
+
+    protected function loadSite($siteId, Application $app)
+    {
+        $site = new Site();
+        $site->loadSite($siteId, $app);
+        return $site;
+    }
+
+    public function editSiteAction($siteId, Application $app, Request $request)
+    {
+
+        $site = $this->loadSite($siteId, $app);
+        $siteEditForm = $site->createEditForm($app['form.factory']);
+
+        $siteEditForm->handleRequest($request);
+        if ($siteEditForm->isValid()) {
+            if ($app['em']->getRepository('sites')->update($siteId, [
+                'name' => $siteEditForm['name']->getData(),
+                'google_group' => $siteEditForm['google_group']->getData(),
+                'mayolink_account' => $siteEditForm['mayolink_account']->getData()
+            ])) {
+                $app->log(Log::SITE_EDIT, $siteId);
+                $app->addFlashNotice('Site updated');
+
+                return $app->redirectToRoute('editSite', ['siteId' => $siteId]);
+            }
+        }
+
+        return $app['twig']->render('site-edit.html.twig', [
+            'site' => $site,
+            'siteForm' => $siteEditForm->createView()
+        ]);
+    }
+
+    public function addSiteAction(Application $app, Request $request)
+    {
+
+        $site = new Site;
+        $siteAddForm = $site->createEditForm($app['form.factory']);
+
+        $siteAddForm->handleRequest($request);
+        if ($siteAddForm->isValid()) {
+
+            if ($siteId = $app['em']->getRepository('sites')->insert([
+                'name' => $siteAddForm['name']->getData(),
+                'google_group' => $siteAddForm['google_group']->getData(),
+                'mayolink_account' => $siteAddForm['mayolink_account']->getData()
+            ])) {
+                $app->log(Log::SITE_ADD, $siteId);
+                $app->addFlashNotice('Site added');
+
+                return $app->redirectToRoute('editSite', ['siteId' => $siteId]);
+            }
+        }
+        if(!$site) {
+            $site = new Site;
+        }
+        return $app['twig']->render('site-edit.html.twig', [
+            'site' => $site,
+            'siteForm' => $siteAddForm->createView()
+        ]);
+    }
+}
+
