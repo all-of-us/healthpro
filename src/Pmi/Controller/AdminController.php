@@ -17,19 +17,14 @@ class AdminController extends AbstractController
         ['addSite', '/site/add', ['method' => 'GET|POST']]
     ];
 
-    public function adminAction(Application $app, Request $request)
+    public function siteIndexAction(Application $app, Request $request)
     {
         if ($app->hasRole('ROLE_USER')) {
-            return $app['twig']->render('admin.html.twig');
+            $sites = $app['db']->fetchAll("SELECT * FROM sites");
+            return $app['twig']->render('site-index.html.twig', ['sites' => $sites]);
         } else {
             return $app->abort(403);
         }
-    }
-
-    public function siteIndexAction(Application $app, Request $request)
-    {
-        $sites = $app['db']->fetchAll("SELECT * FROM sites");
-        return $app['twig']->render('site-index.html.twig', ['sites' => $sites]);
     }
 
     protected function loadSite($siteId, Application $app)
