@@ -16,7 +16,7 @@ use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 class AdminController extends AbstractController
 {
     protected static $routes = [
-        ['sitesIndex', '/sites'],
+        ['siteIndex', '/sites'],
         ['editSite', '/site/edit/{siteId}', ['method' => 'GET|POST']],
         ['addSite', '/site/add', ['method' => 'GET|POST']]
     ];
@@ -30,10 +30,10 @@ class AdminController extends AbstractController
         }
     }
 
-    public function sitesIndexAction(Application $app, Request $request)
+    public function siteIndexAction(Application $app, Request $request)
     {
         $sites = $app['db']->fetchAll("SELECT * FROM sites");
-        return $app['twig']->render('sites-index.html.twig', ['sites' => $sites]);
+        return $app['twig']->render('site-index.html.twig', ['sites' => $sites]);
     }
 
     protected function loadSite($siteId, Application $app)
