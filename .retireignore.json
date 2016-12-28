@@ -1,0 +1,7 @@
+[
+    { 
+        "component": "jquery",
+        "identifiers" : { "issue": "2432"},
+        "justification" : "We have disabled jQuery's AJAX execution of remote javascript (https://github.com/vanderbilt/pmi-drc-hpo/commit/95a5b44c)"
+    }
+]
