@@ -2,16 +2,12 @@
 namespace Pmi\Controller;
 
 use Silex\Application;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
 use Pmi\Site\Site;
-use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
+
 
 class AdminController extends AbstractController
 {
