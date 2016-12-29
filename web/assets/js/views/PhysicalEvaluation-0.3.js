@@ -16,11 +16,11 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         "change #form_pregnant, #form_wheelchair": "handlePregnantOrWheelchair",
         "change #form_height-protocol-modification": "handleHeightProtocol",
         "change #form_weight-protocol-modification": "handleWeightProtocol",
-        "change #form_waist-circumference-protocol-modification": "handleWaistProtocol",
         "change .field-hip-circumference input": "toggleThirdHipCircumference",
         "change .field-waist-circumference input": "toggleThirdWaistCircumference",
         "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic",
-        "click .modification-toggle a": "toggleModification"
+        "click .modification-toggle a": "showModification",
+        "change .modification-select select": "handleProtocolModification"
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
@@ -127,6 +127,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     handlePregnantOrWheelchair: function() {
         var isPregnant = (this.$('#form_pregnant').val() == 1);
         var isWheelchairBound = (this.$('#form_wheelchair').val() == 1);
+        var self = this;
         if (isPregnant || isWheelchairBound) {
             this.$('#panel-hip-waist input').each(function() {
                 $(this).valChange('');
@@ -135,6 +136,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 $(this).attr('disabled', true);
             });
             this.$('#hip-waist-skip').html('<span class="label label-danger">Skip</span>');
+            this.$('#panel-hip-waist>.panel-body').hide();
         }
         if (isPregnant) {
             this.$('.field-weight-prepregnancy').show();
@@ -166,8 +168,12 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         if (!isPregnant && !isWheelchairBound) {
             this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
                 $(this).attr('disabled', false);
+                if ($(this).closest('.modification-block').length > 0) {
+                    self.handleProtocolModificationBlock($(this).closest('.modification-block'));
+                }
             });
             this.$('#hip-waist-skip').text('');
+            this.$('#panel-hip-waist>.panel-body').show();
         }
     },
     handleHeightProtocol: function() {
@@ -183,20 +189,6 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             this.$('#form_weight').valChange('').attr('disabled', true);
         } else {
             this.$('#form_weight').attr('disabled', false);
-        }
-    },
-    handleWaistProtocol: function() {
-        if (this.$('#form_waist-circumference-protocol-modification').val() == 'colostomy-bag') {
-            this.$('.field-waist-circumference input').each(function() {
-                $(this).valChange('').attr('disabled', true);
-            });
-        } else {
-            var isPregnant = (this.$('#form_pregnant').val() == 1);
-            if (!isPregnant) {
-                this.$('.field-waist-circumference input').each(function() {
-                    $(this).attr('disabled', false);
-                });
-            }
         }
     },
     toggleThirdReading: function(field) {
@@ -420,18 +412,42 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             });
         }
     },
-    toggleModification: function(e) {
+    handleProtocolModification: function(e) {
         var block = $(e.currentTarget).closest('.modification-block');
+        this.handleProtocolModificationBlock(block);
+    },
+    handleProtocolModificationBlock: function(block) {
+        var modification = block.find('.modification-select select').val();
+        if (modification === '') {
+            block.find('.modification-select').hide();
+            block.find('.modification-toggle').show();
+        } else {
+            block.find('.modification-toggle').hide();
+            block.find('.modification-select').show();
+        }
+        if (modification === 'refusal' || modification === 'colostomy-bag') {
+            block.find('.modification-affected input, .modification-affected select').each(function() {
+                $(this).attr('disabled', true);
+            });
+        } else {
+            block.find('.modification-affected input, .modification-affected select').each(function() {
+                $(this).attr('disabled', false);
+            });
+        }
+    },
+    showModificationBlock: function(block) {
         block.find('.modification-toggle').hide();
         block.find('.modification-select').show();
+    },
+    showModification: function(e) {
+        var block = $(e.currentTarget).closest('.modification-block');
+        this.showModificationBlock(block);
         this.triggerEqualize();
     },
     showModifications: function() {
-        this.$('.modification-block').each(function() {
-            if ($(this).find('.modification-select select').val() != '') {
-                $(this).find('.modification-toggle').hide();
-                $(this).find('.modification-select').show();
-            }
+        var self = this;
+        $('.modification-block').each(function() {
+            self.handleProtocolModificationBlock($(this));
         });
     },
     initialize: function(obj) {
@@ -476,7 +492,6 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         this.handlePregnantOrWheelchair();
         this.handleHeightProtocol();
         this.handleWeightProtocol();
-        this.handleWaistProtocol();
         this.toggleThirdHipCircumference();
         this.toggleThirdWaistCircumference();
         this.triggerEqualize();
