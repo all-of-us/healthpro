@@ -46,7 +46,7 @@ class AdminController extends AbstractController
                 $app->log(Log::SITE_EDIT, $siteId);
                 $app->addFlashNotice('Site updated');
 
-                return $app->redirectToRoute('editSite', ['siteId' => $siteId]);
+                return $app->redirectToRoute('siteIndex');
             }
         }
 
@@ -73,7 +73,7 @@ class AdminController extends AbstractController
                 $app->log(Log::SITE_ADD, $siteId);
                 $app->addFlashNotice('Site added');
 
-                return $app->redirectToRoute('editSite', ['siteId' => $siteId]);
+                return $app->redirectToRoute('siteIndex');
             }
         }
         if(!$site) {
