@@ -30,12 +30,12 @@
                                 <div id="evaluation-overflow">
                             {% endif %}
                             <a href="{{ path('evaluation', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg btn-default">
-                                {{ evaluation.created_ts|date('D n/j/Y') }}<br />
+                                {{ evaluation.created_ts|date('D n/j/Y', app.userTimezone) }}<br />
                                 <small class="text-muted">
                                     {% if evaluation.finalized_ts %}
-                                        <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia') }}</small>
+                                        <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
                                     {% else %}
-                                        <span class="label label-default">Updated</span> {{ evaluation.updated_ts|date('n/j/Y g:ia') }}
+                                        <span class="label label-default">Updated</span> {{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                     {% endif %}
                                 </small>
                             </a>
@@ -70,14 +70,14 @@
                                 <div id="order-overflow">
                             {% endif %}
                             <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
-                                {{ order.created_ts|date('D n/j/Y') }} <small class="text-muted"><strong>{{ order.order_id }}</strong></small><br />
+                                {{ order.created_ts|date('D n/j/Y', app.userTimezone) }} <small class="text-muted"><strong>{{ order.order_id }}</strong></small><br />
                                 <small class="text-muted">
                                     {% if order.finalized_ts %}
-                                        <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia') }}</small>
+                                        <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
                                     {% elseif order.processed_ts %}
-                                        <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia') }}</small>
+                                        <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
                                     {% elseif order.collected_ts %}
-                                        <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia') }}</small>
+                                        <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
                                     {% else %}
                                     {% endif %}                                    
                                 </small>

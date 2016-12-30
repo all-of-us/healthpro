@@ -110,6 +110,8 @@ class OrderController extends AbstractController
                 if ($app->getConfig('ml_mock_order')) {
                     $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
                 } else {
+                    // set collected time to today at midnight local time
+                    $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
                     $order = new MayolinkOrder();
                     $options = [
                         'type' => $orderData['type'],
@@ -117,7 +119,7 @@ class OrderController extends AbstractController
                         'gender' => $participant->gender,
                         'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob($orderData['type']),
                         'order_id' => $orderData['order_id'],
-                        'collected_at' => new \DateTime('today'), // set to today at midnight since time won't be accurate,
+                        'collected_at' => $collectedAt,
                         'site' => $app->getSiteId()
                     ];
                     if (isset($requestedSamples) && is_array($requestedSamples)) {
@@ -134,8 +136,7 @@ class OrderController extends AbstractController
                     $orderData['site'] = $app->getSiteId();
                     $orderData['participant_id'] = $participant->id;
                     $orderData['biobank_id'] = $participant->biobankId;
-                    $orderData['created_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
-
+                    $orderData['created_ts'] = new \DateTime();
                     $orderId = $app['em']->getRepository('orders')->insert($orderData);
                     if ($orderId) {
                         $app->log(Log::ORDER_CREATE, $orderId);
@@ -202,7 +203,7 @@ class OrderController extends AbstractController
         if (!$order->get('printed_ts')) {
             $app->log(Log::ORDER_EDIT, $orderId);
             $app['em']->getRepository('orders')->update($orderId, [
-                'printed_ts' => (new \DateTime())->format('Y-m-d H:i:s')
+                'printed_ts' => new \DateTime()
             ]);
         }
         return $app['twig']->render('order-print.html.twig', [
@@ -251,7 +252,7 @@ class OrderController extends AbstractController
             if ($processForm->isValid()) {
                 $updateArray = $order->getOrderUpdateFromForm('processed', $processForm);
                 if (!$order->get('processed_ts')) {
-                    $updateArray['processed_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $updateArray['processed_ts'] = new \DateTime();
                 }
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);

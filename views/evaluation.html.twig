@@ -7,7 +7,7 @@
         <h2>
             <i class="fa fa-clipboard" aria-hidden="true"></i>
             {% if evaluation %}
-                {{ evaluation.created_ts|date('n/j/Y') }}
+                {{ evaluation.created_ts|date('n/j/Y', app.userTimezone) }}
             {% else %}
                 New Physical Measurements
             {% endif %}
@@ -25,7 +25,7 @@
         <dd>{{ participant.genderIdentity }}</dd>
         {% if evaluation %}
             <dt>Updated</dt>
-            <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia') }}</dd>
+            <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
             {% if evaluation.version != latestVersion %}
                 <dt>Version</dt>
                 <dd>{{ evaluation.version }} <small class="text-muted">(latest version is {{ latestVersion }})</small></dd>

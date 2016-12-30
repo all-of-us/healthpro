@@ -15,12 +15,14 @@ class User implements UserInterface
     private $sites;
     private $dashboardAccess;
     private $info;
+    private $timezone;
     
-    public function __construct($googleUser, array $groups, $info = null)
+    public function __construct($googleUser, array $groups, $info = null, $timezone = null)
     {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
         $this->info = $info;
+        $this->timezone = $timezone;
         $this->sites = $this->computeSites();
         $this->dashboardAccess = $this->computeDashboardAccess();
     }
@@ -149,6 +151,16 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         // we don't actually store any credentials
+    }
+
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    public function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
     }
 
     public function getId()

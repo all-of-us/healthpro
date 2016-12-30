@@ -110,9 +110,7 @@ class Order
         }
         if ($set != 'processed') {
             if ($formData["{$set}_ts"]) {
-                // TODO: system setting for db timezone
-                $formData["{$set}_ts"]->setTimezone(new \DateTimeZone('America/Chicago'));
-                $updateArray["{$set}_ts"] = $formData["{$set}_ts"]->format('Y-m-d H:i:s');
+                $updateArray["{$set}_ts"] = $formData["{$set}_ts"];
             } else {
                 $updateArray["{$set}_ts"] = null;
             }
@@ -178,15 +176,18 @@ class Order
         }
         $enabledSamples = $this->getEnabledSamples($set);
         $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
+        $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
         if ($set != 'processed') {
             $formBuilder->add("{$set}_ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'required' => false,
+                'view_timezone' => $this->app->getUserTimezone(),
+                'model_timezone' => 'UTC',
                 'constraints' => [
                     new Constraints\LessThanOrEqual([
-                        'value' => new \DateTime('+1 hour'),
+                        'value' => $constraintDateTime,
                         'message' => 'Timestamp cannot be in the future'
                     ])
                 ]
@@ -219,10 +220,12 @@ class Order
                     'time_widget' => 'single_text',
                     'widget' => 'single_text',
                     'format' => 'M/d/yyyy h:mm a',
+                    'view_timezone' => $this->app->getUserTimezone(),
+                    'model_timezone' => 'UTC',
                     'label' => false,
                     'constraints' => [
                         new Constraints\LessThanOrEqual([
-                            'value' => new \DateTime('+1 hour'),
+                            'value' => $constraintDateTime,
                             'message' => 'Timestamp cannot be in the future'
                         ])
                     ]
@@ -236,9 +239,6 @@ class Order
 
     public function getRdrObject()
     {
-        $created = new \DateTime($this->order['created_ts']);
-        $created->setTimezone(new \DateTimeZone('UTC'));
-
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $this->order['participant_id'];
         $identifiers = [];
@@ -253,6 +253,9 @@ class Order
             ];
         }
         $obj->identifier = $identifiers;
+
+        $created = clone $this->order['created_ts'];
+        $created->setTimezone(new \DateTimeZone('UTC'));
         $obj->created = $created->format('Y-m-d\TH:i:s\Z');
 
         $obj->samples = $this->getRdrSamples();
@@ -307,14 +310,13 @@ class Order
                 try {
                     $time = new \DateTime();
                     $time->setTimestamp($processedSampleTimes[$sample]);
-                    $time->setTimezone(new \DateTimeZone('UTC'));
                     return $time->format('Y-m-d\TH:i:s\Z');
                 } catch (\Exception $e) {
                 }
             }
         } else {
             if ($this->order["{$set}_ts"]) {
-                $time = new \DateTime($this->order["{$set}_ts"]);
+                $time = clone $this->order["{$set}_ts"];
                 $time->setTimezone(new \DateTimeZone('UTC'));
                 return $time->format('Y-m-d\TH:i:s\Z');
             }
@@ -355,7 +357,7 @@ class Order
         };
         if ($set != 'processed') {
             if ($this->order["{$set}_ts"]) {
-                $formData["{$set}_ts"] = new \DateTime($this->order["{$set}_ts"]);
+                $formData["{$set}_ts"] = $this->order["{$set}_ts"];
             }
         }
         if ($this->order["{$set}_samples"]) {
@@ -374,6 +376,7 @@ class Order
                     try {
                         $sampleTs = new \DateTime();
                         $sampleTs->setTimestamp($processedSampleTimes[$sample]);
+                        $sampleTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
                         $formData['processed_samples_ts'][$sample] = $sampleTs;
                     } catch (\Exception $e) {
                         $formData['processed_samples_ts'][$sample] = null;

@@ -1,6 +1,6 @@
 <h2>
     <i class="fa fa-medkit" aria-hidden="true"></i>
-    {{ order.created_ts|date('n/j/Y') }}
+    {{ order.created_ts|date('n/j/Y', app.userTimezone) }}
     <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
 </h2>
 <p class="lead">Order ID: <strong>{{ order.order_id }}</strong></p>
@@ -55,3 +55,8 @@
     <dt>Gender Identity</dt>
     <dd>{{ participant.genderIdentity }}</dd>
 </dl>
+{% if active in ['collect', 'process', 'finalize'] %}
+    {% set route = app.request_stack.currentRequest.attributes.get('_route') %}
+    {% set return = path(route, params) %}
+    <p><strong>Your timezone</strong>: {{ app.userTimezoneDisplay }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
+{% endif %}

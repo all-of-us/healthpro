@@ -5,9 +5,11 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
@@ -30,12 +32,18 @@ class DefaultController extends AbstractController
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
+        ['settings', '/settings', ['method' => 'GET|POST']],
     ];
 
     public function homeAction(Application $app, Request $request)
     {
         if ($app->hasRole('ROLE_USER')) {
-            return $app['twig']->render('index.html.twig');
+            if (!$app->getUserTimezone(false)) {
+                $app->addFlashNotice('Please select your current timezone');
+                return $app->redirectToRoute('settings');
+            } else {
+                return $app['twig']->render('index.html.twig');
+            }
         } elseif ($app->hasRole('ROLE_DASHBOARD')) {
             return $app->redirectToRoute('dashboard_home');
         } else {
@@ -250,6 +258,35 @@ class DefaultController extends AbstractController
             'participant' => $participant,
             'orders' => $orders,
             'evaluations' => $evaluations
+        ]);
+    }
+
+    public function settingsAction(Application $app, Request $request)
+    {
+        $settingsData = ['timezone' => $app->getUserTimezone(false)];
+        $settingsForm = $app['form.factory']->createBuilder(FormType::class, $settingsData)
+            ->add('timezone', Type\ChoiceType::class, [
+                'label' => 'Timezone',
+                'choices' => array_flip($app::$timezoneOptions),
+                'placeholder' => '-- Select your timezone --',
+                'required' => true
+            ])
+            ->getForm();
+
+        $settingsForm->handleRequest($request);
+        if ($settingsForm->isValid()) {
+            $app['em']->getRepository('users')->update($app->getUserId(), [
+                'timezone' => $settingsForm['timezone']->getData()
+            ]);
+            if ($request->query->has('return')) {
+                return $app->redirect($request->query->get('return'));
+            } else {
+                return $app->redirectToRoute('settings');
+            }
+        }
+
+        return $app['twig']->render('settings.html.twig', [
+            'settingsForm' => $settingsForm->createView()
         ]);
     }
 }
