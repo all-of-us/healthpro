@@ -11,19 +11,6 @@ class Site
     protected $app;
     protected $site;
 
-    public function loadSite($siteId, Application $app)
-    {
-        $site = $app['em']->getRepository('sites')->fetchOneBy([
-            'id' => $siteId
-        ]);
-        if (!$site) {
-            return;
-        }
-        $this->app = $app;
-        $this->site = $site;
-
-    }
-
     public function createEditForm($formFactory)
     {
         if(!$this->site) {

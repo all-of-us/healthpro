@@ -23,17 +23,17 @@ class AdminController extends AbstractController
         return $app['twig']->render('site-index.html.twig', ['sites' => $sites]);
     }
 
-    protected function loadSite($siteId, Application $app)
-    {
-        $site = new Site();
-        $site->loadSite($siteId, $app);
-        return $site;
-    }
 
     public function editSiteAction($siteId, Application $app, Request $request)
     {
 
-        $site = $this->loadSite($siteId, $app);
+        $site = $app['em']->getRepository('sites')->fetchOneBy([
+            'id' => $siteId
+        ]);
+        if (!$site) {
+            $app->abort(404);;
+        }
+
         $siteEditForm = $site->createEditForm($app['form.factory']);
 
         $siteEditForm->handleRequest($request);
