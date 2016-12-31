@@ -13,7 +13,7 @@ use Pmi\Util;
 
 class Evaluation
 {
-    const CURRENT_VERSION = '0.2.0';
+    const CURRENT_VERSION = '0.3.0';
     protected $version;
     protected $data;
     protected $schema;
@@ -252,5 +252,46 @@ class Evaluation
             'datetime' => $datetime
         ]);
         return $fhir->toObject();
+    }
+
+    protected function isMinVersion($minVersion)
+    {
+        return Util::versionIsAtLeast($this->version, $minVersion);
+    }
+
+    public function canFinalize()
+    {
+        if (!$this->isMinVersion('0.3.0')) {
+            // prior to version 0.3.0, any state is valid
+            return true;
+        }
+
+        foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
+            foreach ($this->data->$field as $k => $value) {
+                if (!$this->data->{'blood-pressure-protocol-modification'}[$k] && !$value) {
+                    return false;
+                }
+            }
+        }
+        foreach (['height', 'weight'] as $field) {
+            if (!$this->data->{$field . '-protocol-modification'} && !$this->data->$field) {
+                return false;
+            }
+        }
+        if (!$this->data->pregnant && !$this->data->wheelchair) {
+            foreach (['hip-circumference', 'waist-circumference'] as $field) {
+                foreach ($this->data->$field as $k => $value) {
+                    if ($k == 2 && abs($this->data->{$field}[0] - $this->data->{$field}[1]) <= 1) {
+                        // not required if first two are within 1 cm
+                        continue;
+                    }
+                    if (!$this->data->{$field . '-protocol-modification'}[$k] && !$value) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }

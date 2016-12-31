@@ -113,11 +113,15 @@ class EvaluationController extends AbstractController
                     $now = new \DateTime();
                     $dbArray['updated_ts'] = $now;
                     if ($request->request->has('finalize')) {
-                        $dbArray['finalized_ts'] = $now;
-                        // Send final evaluation to RDR and store resulting id
-                        $fhir = $evaluationService->getFhir($now);
-                        if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($participant->id, $fhir)) {
-                            $dbArray['rdr_id'] = $rdrEvalId;
+                        if ($evaluationService->canFinalize()) {
+                            $dbArray['finalized_ts'] = $now;
+                            // Send final evaluation to RDR and store resulting id
+                            $fhir = $evaluationService->getFhir($now);
+                            if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($participant->id, $fhir)) {
+                                $dbArray['rdr_id'] = $rdrEvalId;
+                            }
+                        } else {
+                            $app->addFlashError('Physical measurements were not finalized due to being incomplete');
                         }
                     }
                     if (!$evaluation) {
