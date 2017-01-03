@@ -70,6 +70,53 @@ class RdrParticipants
         ]);
     }
 
+    protected function participantSummaryToResult($participant)
+    {
+        if (!is_object($participant)) {
+            return false;
+        }
+        if (isset($participant->participantId)) {
+            $id = $participant->participantId;
+        } else {
+            return false;
+        }
+        if (!empty($participant->biobankId)) {
+            $biobankId = $participant->biobankId;
+        } else {
+            return false;
+        }
+        if (isset($participant->membershipTier) && in_array($participant->membershipTier, ['VOLUNTEER', 'ENROLLEE', 'FULL_PARTICIPANT'])) {
+            $consentStatus = true;
+        } else {
+            $consentStatus = false;
+        }
+        switch ($participant->genderIdentity) {
+            case 'FEMALE':
+                $gender = 'F';
+                break;
+            case 'MALE':
+                $gender = 'M';
+                break;
+            default:
+                $gender = 'U';
+                break;
+        }
+        $genderIdentity = str_replace('_', ' ', $participant->genderIdentity);
+        $genderIdentity = ucfirst(strtolower($genderIdentity));
+        return new Participant([
+            'id' => $id,
+            'biobankId' => $biobankId,
+            'firstName' => $participant->firstName,
+            'middleName' => $participant->middleName,
+            'lastName' => $participant->lastName,
+            'dob' => new \DateTime($participant->dateOfBirth),
+            'genderIdentity' => $genderIdentity,
+            'gender' => $gender,
+            'zip' => $participant->zipCode,
+            'consentComplete' => $consentStatus
+        ]);
+    }
+
     protected function paramsToQuery($params)
     {
         $query = [];
@@ -83,6 +130,27 @@ class RdrParticipants
             try {
                 $date = new \DateTime($params['dob']);
                 $query['date_of_birth'] = $date->format('Y-m-d');
+            } catch (\Exception $e) {
+                throw new Exception\InvalidDobException();
+            }
+        }
+
+        return $query;
+    }
+
+    protected function paramsToSummaryQuery($params)
+    {
+        $query = [];
+        if (isset($params['lastName'])) {
+            $query['lastName'] = ucfirst($params['lastName']);
+        }
+        if (isset($params['firstName'])) {
+            $query['firstName'] = ucfirst($params['firstName']);
+        }
+        if (isset($params['dob'])) {
+            try {
+                $date = new \DateTime($params['dob']);
+                $query['dateOfBirth'] = $date->format('Y-m-d');
             } catch (\Exception $e) {
                 throw new Exception\InvalidDobException();
             }
@@ -119,6 +187,34 @@ class RdrParticipants
         return $results;
     }
 
+    public function summarySearch($params)
+    {
+        $query = $this->paramsToSummaryQuery($params);
+        try {
+            $response = $this->getClient()->request('GET', 'ParticipantSummary', [
+                'query' => $query
+            ]);
+        } catch (\Exception $e) {
+            throw new Exception\FailedRequestException();
+        }
+        $responseObject = json_decode($response->getBody()->getContents());
+        if (!is_object($responseObject)) {
+            throw new Exception\InvalidResponseException();
+        }
+        if (!isset($responseObject->items) || !is_array($responseObject->items)) {
+            return [];
+        }
+        $results = [];
+        foreach ($responseObject->items as $participant) {
+            $result = $this->participantSummaryToResult($participant);
+            if ($result) {
+                $results[] = $result;
+            }
+        }
+
+        return $results;
+    }
+
     public function getById($id)
     {
         $memcache = new \Memcache();
@@ -126,14 +222,15 @@ class RdrParticipants
         $participant = $memcache->get($memcacheKey);
         if (!$participant) {
             try {
-                $response = $this->getClient()->request('GET', "Participant/{$id}");
+                $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
                 $participant = json_decode($response->getBody()->getContents());
                 $memcache->set($memcacheKey, $participant, 0, 300);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
+                throw $e;
                 return false;
             }
         }
-        return $this->participantToResult($participant);
+        return $this->participantSummaryToResult($participant);
     }
 
     public function createParticipant($participant)
