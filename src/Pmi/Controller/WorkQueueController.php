@@ -35,12 +35,32 @@ class WorkQueueController extends AbstractController
             $count = round($count * 0.5);
         }
         if (isset($params['race'])) {
-            $count = round($count * 0.7);
+            $count = round($count * 0.5);
+        }
+        if (isset($params['biobank'])) {
+            $count = round($count * 0.3);
+        }
+        if (isset($params['ppi'])) {
+            $count = round($count * 0.3);
         }
         for ($i = 0; $i < $count + rand(0,10); $i++) {
             $enrollment = $faker->boolean(70) ? 'SUBMITTED' : 'UNSET';
-            $physicalStatus = (($enrollment === 'SUBMITTED') & $faker->boolean(50)) ? 'SUBMITTED' : 'UNSET';
             $biobankStatus = ($enrollment === 'SUBMITTED') ? $faker->randomElement([0,1,2,3,4,5,6,7,7,7,7,7]) : 0;
+            if (isset($params['biobank'])) {
+                switch ($params['biobank']) {
+                    case 'ALL':
+                        $enrollment = 'SUBMITTED';
+                        $biobankStatus = 7;
+                        break;
+                    case 'SOME':
+                        $enrollment = 'SUBMITTED';
+                        $biobankStatus = $faker->numberBetween(1,6);
+                        break;
+                    default:
+                        $biobankStatus = 0;
+                }
+            }
+            $physicalStatus = (($enrollment === 'SUBMITTED') & $faker->boolean(50)) ? 'SUBMITTED' : 'UNSET';
             if (isset($params['gender'])) {
                 if ($params['gender'] === 'MALE') {
                     $firstName = $faker->firstNameMale;
@@ -122,6 +142,22 @@ class WorkQueueController extends AbstractController
                     'Native Hawaiian or other Pacific Islander' => 'NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER',
                     'White' => 'WHITE',
                     'Other race' => 'OTHER_RACE'
+                ]
+            ],
+            'ppi' => [
+                'label' => 'PPI Modules Completed',
+                'options' => [
+                    'None' => 'NONE',
+                    'Some' => 'SOME',
+                    'All' => 'ALL'
+                ]
+            ],
+            'biobank' => [
+                'label' => 'Biospecimens banked',
+                'options' => [
+                    'None' => 'NONE',
+                    'Some' => 'SOME',
+                    'All' => 'ALL'
                 ]
             ]
         ];
