@@ -23,7 +23,7 @@ class WorkQueueController extends AbstractController
         $results = [];
         $faker = \Faker\Factory::create();
         $faker->addProvider(new PhoneNumber($faker));
-        $count = 90 + rand(0,20);
+        $count = 100 + rand(0,20);
         $params = array_filter($params);
         if (isset($params['age'])) {
             $count = round($count * 0.3);
@@ -43,7 +43,7 @@ class WorkQueueController extends AbstractController
         if (isset($params['ppi'])) {
             $count = round($count * 0.3);
         }
-        for ($i = 0; $i < $count + rand(0,10); $i++) {
+        for ($i = 0; $i < $count; $i++) {
             $enrollment = $faker->boolean(70) ? 'SUBMITTED' : 'UNSET';
             $biobankStatus = ($enrollment === 'SUBMITTED') ? $faker->randomElement([0,1,2,3,4,5,6,7,7,7,7,7]) : 0;
             if (isset($params['biobank'])) {
