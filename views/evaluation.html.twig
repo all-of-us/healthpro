@@ -70,7 +70,8 @@ $(document).ready(function() {
     var evalView = new PMI.views['PhysicalEvaluation{% if schema.template is defined %}-{{ schema.template }}{% else %}-0.1{% endif %}']({
         el: $("#physicalEvaluation"),
         warnings: {{ warnings|json_encode|raw }},
-        conversions: {{ conversions|json_encode|raw }}
+        conversions: {{ conversions|json_encode|raw }},
+        finalized: {{ (evaluation and evaluation.finalized_ts)|json_encode|raw }}
     });
     $('#evaluationAffixSave')
         .affix({

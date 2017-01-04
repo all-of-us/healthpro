@@ -167,7 +167,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         }
         if (!isPregnant && !isWheelchairBound) {
             this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
-                $(this).attr('disabled', false);
+                if (!self.finalized) {
+                    $(this).attr('disabled', false);
+                }
                 if ($(this).closest('.modification-block').length > 0) {
                     self.handleProtocolModificationBlock($(this).closest('.modification-block'));
                 }
@@ -180,7 +182,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         if (this.$('#form_height-protocol-modification').val() == 'refusal') {
             this.$('#form_height').valChange('').attr('disabled', true);
         } else {
-            this.$('#form_height').attr('disabled', false);
+            if (!this.finalized) {
+                this.$('#form_height').attr('disabled', false);
+            }
         }
     },
     handleWeightProtocol: function() {
@@ -188,7 +192,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         if (selected == 'cannot-balance-on-scale' || selected == 'refusal') {
             this.$('#form_weight').valChange('').attr('disabled', true);
         } else {
-            this.$('#form_weight').attr('disabled', false);
+            if (!this.finalized) {
+                this.$('#form_weight').attr('disabled', false);
+            }
         }
     },
     toggleThirdReading: function(field) {
@@ -418,6 +424,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     },
     handleProtocolModificationBlock: function(block) {
         var modification = block.find('.modification-select select').val();
+        var self = this;
         if (modification === '') {
             block.find('.modification-select').hide();
             block.find('.modification-toggle').show();
@@ -431,7 +438,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             });
         } else {
             block.find('.modification-affected input, .modification-affected select').each(function() {
-                $(this).attr('disabled', false);
+                if (!self.finalized) {
+                    $(this).attr('disabled', false);
+                }
             });
         }
     },
@@ -453,6 +462,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     initialize: function(obj) {
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
+        this.finalized = obj.finalized;
         this.rendered = false;
         this.render();
     },
@@ -494,6 +504,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         this.handleWeightProtocol();
         this.toggleThirdHipCircumference();
         this.toggleThirdWaistCircumference();
+        if (this.finalized) {
+            this.$('.modification-toggle').hide();
+        }
         this.triggerEqualize();
         this.rendered = true;
         return this;
