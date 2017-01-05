@@ -24,7 +24,6 @@ class WorkQueueController extends AbstractController
         $faker = \Faker\Factory::create();
         $faker->addProvider(new PhoneNumber($faker));
         $count = 100 + rand(0,20);
-        $params = array_filter($params);
         if (isset($params['age'])) {
             $count = round($count * 0.3);
         }
@@ -98,7 +97,7 @@ class WorkQueueController extends AbstractController
 
     public function indexAction(Application $app, Request $request)
     {
-        $params = $request->query->all();
+        $params = array_filter($request->query->all());
         $participants = $this->participantSummarySearch($params);
         $filters = [
             'age' => [
