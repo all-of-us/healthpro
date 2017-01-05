@@ -24,15 +24,15 @@ iframe.pdf {
     font-weight: bold;
     margin: 0;
 }
+.btn-block {
+    margin-bottom: 10px;
+}
 @media(max-width:767px) {
     h2 {
         font-size: 24px;
     }
     h3 {
         font-size: 20px;
-    }
-    .btn-block {
-        margin-bottom: 10px;
     }
 }
 label.required::after {

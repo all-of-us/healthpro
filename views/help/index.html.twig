@@ -1,17 +1,22 @@
 {% extends 'base.html.twig' %}
 {% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li class="active">Help</li>
+    </ol>
+
     <div class="page-header">
         <h2><i class="fa fa-question-circle" aria-hidden="true"></i> Help</h2>
     </div>
     <p class="lead">What would you like to do today?</p>
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-6 col-md-4">
             <a href="{{ path('help_videos') }}" class="btn btn-default btn-block btn-lg"><i class="fa fa-film" aria-hidden="true"></i> Watch a Training Video</a>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-6 col-md-4">
             <a href="{{ path('help_faq') }}" class="btn btn-default btn-block btn-lg"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Common Technical FAQs</a>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-6 col-md-4">
             <a href="{{ path('help_sop') }}" class="btn btn-default btn-block btn-lg"><i class="fa fa-file-text-o" aria-hidden="true"></i> Reference All of Us℠ SOPs</a>
         </div>
     </div>
