@@ -51,7 +51,7 @@
         </div>
     </nav>
 
-    <div class="container">
+    <div class="{% block bodycontainer %}container{% endblock %}">
         <div id="flash-notices">
             {% for flashMessage in app.session.flashbag.get('error') %}
                 <div class="alert alert-danger">{{ flashMessage }}</div>
