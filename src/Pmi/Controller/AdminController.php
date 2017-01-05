@@ -53,6 +53,7 @@ class AdminController extends AbstractController
 
         return $app['twig']->render('site-edit.html.twig', [
             'site' => $site,
+            'verb' => 'Edit',
             'siteForm' => $siteEditForm->createView()
         ]);
     }
@@ -79,6 +80,7 @@ class AdminController extends AbstractController
 
         return $app['twig']->render('site-edit.html.twig', [
             'site' => $site,
+            'verb' => 'Add',
             'siteForm' => $siteAddForm->createView()
         ]);
     }
