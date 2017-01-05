@@ -71,8 +71,10 @@ class WorkQueueController extends AbstractController
             $results[] = [
                 'firstName' => $firstName,
                 'lastName' => $faker->unique()->lastName,
+                'preferredContact' => $faker->randomElement(['EMAIL', 'EMAIL', 'EMAIL', 'PHONE', 'PHONE', 'MAIL', 'NO_CONTACT']),
                 'phoneNumber' => $faker->phoneNumber,
                 'emailAddress' => $faker->safeEmail,
+                'mailingAddress' => $faker->address,
                 'physicalEvaluationStatus' => $physicalStatus,
                 'biobankStatus' => $biobankStatus,
                 'questionnaireOnFamilyHealth' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',

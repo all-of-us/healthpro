@@ -34,8 +34,7 @@
             <tr>
                 <th rowspan="2">Last Name</th>
                 <th rowspan="2">First Name</th>
-                <th rowspan="2">Phone Number</th>
-                <th rowspan="2">Email Address</th>
+                <th rowspan="2">Preferred Contact</th>
                 <th colspan="{{ surveys|length }}" class="topheader multiheader-survey">Research Survey Completion Status</th>
                 <th colspan="2" class="topheader multiheader-status">Status</th>
             </tr>
@@ -52,8 +51,19 @@
                 <tr>
                     <td>{{ participant.lastName }}</td>
                     <td>{{ participant.firstName }}</td>
-                    <td><nobr>{{ participant.phoneNumber }}</nobr></td>
-                    <td><a href="mailto:{{ participant.emailAddress }}">{{ participant.emailAddress }}</a></td>
+                    <td>
+                        <nobr>
+                        {% if participant.preferredContact == 'EMAIL' %}
+                            <i class="fa fa-envelope" aria-hidden="true"></i> <a href="mailto:{{ participant.emailAddress }}">{{ participant.emailAddress }}</a>
+                        {% elseif participant.preferredContact == 'PHONE' %}
+                            <i class="fa fa-phone" aria-hidden="true"></i> {{ participant.phoneNumber }}
+                        {% elseif participant.preferredContact == 'MAIL' %}
+                            <i class="fa fa-home" aria-hidden="true"></i> {{ participant.mailingAddress|nl2br }}
+                        {% elseif participant.preferredContact == 'NO_CONTACT' %}
+                            <i class="fa fa-minus-circle text-danger" aria-hidden="true"></i> No contact
+                        {% endif %}
+                        </nobr>
+                    </td>
                     {% for field, label in surveys %}
                         <td class="text-center">
                             {% if participant['questionnaireOn' ~ field]|default('') == 'SUBMITTED' %}
