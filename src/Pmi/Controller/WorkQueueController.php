@@ -14,7 +14,8 @@ class WorkQueueController extends AbstractController
     protected static $name = 'workqueue';
 
     protected static $routes = [
-        ['index', '/']
+        ['index', '/'],
+        ['export', '/export.csv']
     ];
 
     // This will be replaced with an RDR Participant Summary API call when available
@@ -162,6 +163,40 @@ class WorkQueueController extends AbstractController
             'filters' => $filters,
             'participants' => $participants,
             'params' => $params
+        ]);
+    }
+
+    public function exportAction(Application $app, Request $request)
+    {
+        $params = array_filter($request->query->all());
+        $participants = $this->participantSummarySearch($params);
+        $stream = function() use ($participants) {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, [
+                'Last Name',
+                'First Name',
+                'Preferred Contact Method',
+                'Phone Number',
+                'Email Address',
+                'Mailing Address'
+            ]);
+            foreach ($participants as $participant) {
+                fputcsv($output, [
+                    $participant['lastName'],
+                    $participant['firstName'],
+                    $participant['preferredContact'],
+                    $participant['phoneNumber'],
+                    $participant['emailAddress'],
+                    $participant['mailingAddress']
+                ]);
+            }
+            fclose($output);
+        };
+
+        $filename = 'workqueue_' . date('Ymd-His') . '.csv';
+        return $app->stream($stream, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
     }
 }
