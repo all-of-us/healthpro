@@ -61,7 +61,7 @@ class WorkQueueController extends AbstractController
             ]
         ],
         'ppi' => [
-            'label' => 'PPI Modules Completed',
+            'label' => 'PPI Surveys Completed',
             'options' => [
                 'None' => 'NONE',
                 'Some' => 'SOME',
@@ -191,7 +191,7 @@ class WorkQueueController extends AbstractController
                 'Mailing Address'
             ];
             foreach (self::$surveys as $survey => $label) {
-                $headers[] = $label . ' PPI Status';
+                $headers[] = $label . ' PPI Survey Completion';
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Biobank Samples';
