@@ -12,10 +12,80 @@ class PhoneNumber extends \Faker\Provider\en_US\PhoneNumber
 class WorkQueueController extends AbstractController
 {
     protected static $name = 'workqueue';
-
     protected static $routes = [
         ['index', '/'],
         ['export', '/export.csv']
+    ];
+    protected static $filters = [
+        'age' => [
+            'label' => 'Age',
+            'options' => [
+                '0-17' => '0-17',
+                '18-25' => '18-25',
+                '26-35' => '26-35',
+                '36-45' => '36-45',
+                '46-55' => '46-55',
+                '56-65' => '56-65',
+                '66-75' => '66-75',
+                '76-85' => '76-85',
+                '86+' => '86+'
+            ]
+        ],
+        'gender' => [
+            'label' => 'Gender identity',
+            'options' => [
+                'Female' => 'FEMALE',
+                'Male' => 'MALE',
+                'Female to male transgender' => 'FEMALE_TO_MALE_TRANSGENDER',
+                'Male to female transgender' => 'MALE_TO_FEMALE_TRANSGENDER',
+                'Intersex' => 'INTERSEX',
+                'Other' => 'OTHER'
+            ]
+        ],
+        'ethnicity' => [
+            'label' => 'Ethnicity',
+            'options' => [
+                'Hispanic' => 'HISPANIC',
+                'Non Hispanic' => 'NON_HISPANIC'
+            ]
+        ],
+        'race' => [
+            'label' => 'Race',
+            'options' => [
+                'American Indian or Alaska Native' => 'AMERICAN_INDIAN_OR_ALASKA_NATIVE',
+                'Black or African American' => 'BLACK_OR_AFRICAN_AMERICAN',
+                'Asian' => 'ASIAN',
+                'Native Hawaiian or other Pacific Islander' => 'NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER',
+                'White' => 'WHITE',
+                'Other race' => 'OTHER_RACE'
+            ]
+        ],
+        'ppi' => [
+            'label' => 'PPI Modules Completed',
+            'options' => [
+                'None' => 'NONE',
+                'Some' => 'SOME',
+                'All' => 'ALL'
+            ]
+        ],
+        'biobank' => [
+            'label' => 'Biospecimens banked',
+            'options' => [
+                'None' => 'NONE',
+                'Some' => 'SOME',
+                'All' => 'ALL'
+            ]
+        ]
+    ];
+    protected static $surveys = [
+        'Sociodemographics' => 'Demo',
+        'MedicalHistory' => 'Hist',
+        'Medications' => 'Meds',
+        'OverallHealth' => 'Health',
+        'PersonalHabits' => 'Habits',
+        'FamilyHealth' => 'Family',
+        'HealthcareAccess' => 'Access',
+        'Sleep' => 'Sleep'
     ];
 
     // This will be replaced with an RDR Participant Summary API call when available
@@ -98,69 +168,9 @@ class WorkQueueController extends AbstractController
     {
         $params = array_filter($request->query->all());
         $participants = $this->participantSummarySearch($params);
-        $filters = [
-            'age' => [
-                'label' => 'Age',
-                'options' => [
-                    '0-17' => '0-17',
-                    '18-25' => '18-25',
-                    '26-35' => '26-35',
-                    '36-45' => '36-45',
-                    '46-55' => '46-55',
-                    '56-65' => '56-65',
-                    '66-75' => '66-75',
-                    '76-85' => '76-85',
-                    '86+' => '86+'
-                ]
-            ],
-            'gender' => [
-                'label' => 'Gender identity',
-                'options' => [
-                    'Female' => 'FEMALE',
-                    'Male' => 'MALE',
-                    'Female to male transgender' => 'FEMALE_TO_MALE_TRANSGENDER',
-                    'Male to female transgender' => 'MALE_TO_FEMALE_TRANSGENDER',
-                    'Intersex' => 'INTERSEX',
-                    'Other' => 'OTHER'
-                ]
-            ],
-            'ethnicity' => [
-                'label' => 'Ethnicity',
-                'options' => [
-                    'Hispanic' => 'HISPANIC',
-                    'Non Hispanic' => 'NON_HISPANIC'
-                ]
-            ],
-            'race' => [
-                'label' => 'Race',
-                'options' => [
-                    'American Indian or Alaska Native' => 'AMERICAN_INDIAN_OR_ALASKA_NATIVE',
-                    'Black or African American' => 'BLACK_OR_AFRICAN_AMERICAN',
-                    'Asian' => 'ASIAN',
-                    'Native Hawaiian or other Pacific Islander' => 'NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER',
-                    'White' => 'WHITE',
-                    'Other race' => 'OTHER_RACE'
-                ]
-            ],
-            'ppi' => [
-                'label' => 'PPI Modules Completed',
-                'options' => [
-                    'None' => 'NONE',
-                    'Some' => 'SOME',
-                    'All' => 'ALL'
-                ]
-            ],
-            'biobank' => [
-                'label' => 'Biospecimens banked',
-                'options' => [
-                    'None' => 'NONE',
-                    'Some' => 'SOME',
-                    'All' => 'ALL'
-                ]
-            ]
-        ];
         return $app['twig']->render('workqueue/index.html.twig', [
-            'filters' => $filters,
+            'filters' => self::$filters,
+            'surveys' => self::$surveys,
             'participants' => $participants,
             'params' => $params
         ]);
@@ -172,23 +182,35 @@ class WorkQueueController extends AbstractController
         $participants = $this->participantSummarySearch($params);
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
-            fputcsv($output, [
+            $headers = [
                 'Last Name',
                 'First Name',
                 'Preferred Contact Method',
                 'Phone Number',
                 'Email Address',
                 'Mailing Address'
-            ]);
+            ];
+            foreach (self::$surveys as $survey => $label) {
+                $headers[] = $label . ' PPI Status';
+            }
+            $headers[] = 'Physical Measurements Status';
+            $headers[] = 'Biobank Samples';
+            fputcsv($output, $headers);
             foreach ($participants as $participant) {
-                fputcsv($output, [
+                $row = [
                     $participant['lastName'],
                     $participant['firstName'],
                     $participant['preferredContact'],
                     $participant['phoneNumber'],
                     $participant['emailAddress'],
-                    $participant['mailingAddress']
-                ]);
+                    str_replace("\n", ', ', trim($participant['mailingAddress']))
+                ];
+                foreach (self::$surveys as $survey => $label) {
+                    $row[] = $participant["questionnaireOn{$survey}"] === 'SUBMITTED' ? 1 : 0;
+                }
+                $row[] = $participant['physicalEvaluationStatus'] === 'SUBMITTED' ? 1 : 0;
+                $row[] = $participant['biobankStatus'];
+                fputcsv($output, $row);
             }
             fclose($output);
         };
