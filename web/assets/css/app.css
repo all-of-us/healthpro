@@ -14,9 +14,6 @@ iframe.pdf {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.inline-buttons .btn {
-    margin-bottom: 10px;
-}
 #flash-notices {
     margin-top: -15px;
     margin-bottom: 15px;
@@ -33,6 +30,9 @@ iframe.pdf {
     }
     h3 {
         font-size: 20px;
+    }
+    .btn-block {
+        margin-bottom: 10px;
     }
 }
 label.required::after {
