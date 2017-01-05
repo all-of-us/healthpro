@@ -43,23 +43,20 @@ class WorkQueueController extends AbstractController
             $count = round($count * 0.3);
         }
         for ($i = 0; $i < $count; $i++) {
-            $enrollment = $faker->boolean(70) ? 'SUBMITTED' : 'UNSET';
-            $biobankStatus = ($enrollment === 'SUBMITTED') ? $faker->randomElement([0,1,2,3,4,5,6,7,7,7,7,7]) : 0;
+            $biobankStatus = $faker->randomElement([0,0,0,0,1,2,3,4,5,6,7,7,7,7,7,7]);
             if (isset($params['biobank'])) {
                 switch ($params['biobank']) {
                     case 'ALL':
-                        $enrollment = 'SUBMITTED';
                         $biobankStatus = 7;
                         break;
                     case 'SOME':
-                        $enrollment = 'SUBMITTED';
                         $biobankStatus = $faker->numberBetween(1,6);
                         break;
                     default:
                         $biobankStatus = 0;
                 }
             }
-            $physicalStatus = (($enrollment === 'SUBMITTED') & $faker->boolean(50)) ? 'SUBMITTED' : 'UNSET';
+            $physicalStatus = $faker->boolean(50) ? 'SUBMITTED' : 'UNSET';
             if (isset($params['gender'])) {
                 if ($params['gender'] === 'MALE') {
                     $firstName = $faker->firstNameMale;
@@ -76,7 +73,6 @@ class WorkQueueController extends AbstractController
                 'lastName' => $faker->unique()->lastName,
                 'phoneNumber' => $faker->phoneNumber,
                 'emailAddress' => $faker->safeEmail,
-                'consentForStudyEnrollment' => $enrollment,
                 'physicalEvaluationStatus' => $physicalStatus,
                 'biobankStatus' => $biobankStatus,
                 'questionnaireOnFamilyHealth' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
