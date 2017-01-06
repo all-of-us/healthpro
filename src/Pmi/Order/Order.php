@@ -140,6 +140,8 @@ class Order
 
     public function createOrderForm($set, $formFactory)
     {
+        $disabled = $this->order['finalized_ts'] ? true : false;
+
         switch ($set) {
             case 'collected':
                 $verb = 'collected';
@@ -183,6 +185,7 @@ class Order
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'required' => false,
+                'disabled' => $disabled,
                 'view_timezone' => $this->app->getUserTimezone(),
                 'model_timezone' => 'UTC',
                 'constraints' => [
@@ -199,6 +202,7 @@ class Order
                 'label' => $samplesLabel,
                 'choices' => $samples,
                 'required' => false,
+                'disabled' => $disabled,
                 'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
                     if (in_array($val, $enabledSamples)) {
                         return [];
@@ -209,12 +213,14 @@ class Order
             ])
             ->add("{$set}_notes", Type\TextareaType::class, [
                 'label' => $notesLabel,
+                'disabled' => $disabled,
                 'required' => false
             ]);
         if ($set == 'processed') {
             $formBuilder->add('processed_samples_ts', Type\CollectionType::class, [
                 'entry_type' => Type\DateTimeType::class,
                 'label' => false,
+                'disabled' => $disabled,
                 'entry_options' => [
                     'date_widget' => 'single_text',
                     'time_widget' => 'single_text',

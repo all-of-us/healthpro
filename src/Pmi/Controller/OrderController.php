@@ -173,7 +173,9 @@ class OrderController extends AbstractController
             $app->abort(404);
         }
         $order = $this->loadOrder($participantId, $orderId, $app);
-
+        if ($order->get('finalized_ts')) {
+            $app->abort(403);
+        }
         if ($app->getConfig('ml_mock_order')) {
             if ($type == 'labels') {
                 return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
@@ -200,6 +202,9 @@ class OrderController extends AbstractController
     public function orderPrintAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if ($order->get('finalized_ts')) {
+            $app->abort(403);
+        }
         if (!$order->get('printed_ts')) {
             $app->log(Log::ORDER_EDIT, $orderId);
             $app['em']->getRepository('orders')->update($orderId, [
@@ -217,7 +222,7 @@ class OrderController extends AbstractController
         $order = $this->loadOrder($participantId, $orderId, $app);
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
-        if ($collectForm->isValid()) {
+        if ($collectForm->isValid() && !$order->get('finalized_ts')) {
             $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
             if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
@@ -241,7 +246,7 @@ class OrderController extends AbstractController
         $order = $this->loadOrder($participantId, $orderId, $app);
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
-        if ($processForm->isValid()) {
+        if ($processForm->isValid() && !$order->get('finalized_ts')) {
             $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
             foreach ($processForm->get('processed_samples')->getData() as $sample) {
                 if (empty($processedSampleTimes[$sample])) {

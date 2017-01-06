@@ -23,15 +23,18 @@
             {{ form_errors(processForm.processed_notes) }}
         </div>
         {{ form_rest(processForm) }}
-        <p>
-            <button type="submit" class="btn btn-primary">
-                {% if order.processed_ts %}
-                    Update
-                {% else %}
-                    Save and mark as processed
-                {% endif %}
-            </button>
-        </p>
+
+        {% if not order.finalized_ts %}
+            <p>
+                <button type="submit" class="btn btn-primary">
+                    {% if order.processed_ts %}
+                        Update
+                    {% else %}
+                        Save and mark as processed
+                    {% endif %}
+                </button>
+            </p>
+        {% endif %}
     {{ form_end(processForm) }}
 {% endblock %}
 
