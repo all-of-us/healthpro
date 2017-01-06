@@ -162,7 +162,7 @@ class Order
         $samplesLabel = "Which samples were successfully {$verb}?";
         $notesLabel = "Additional notes on {$noun}";
         if ($set == 'finalized') {
-            $samplesLabel = "Which samples are being shipped to the PMI Biobank?";
+            $samplesLabel = "Which samples are being shipped to the All of Us℠ Biobank?";
         }
         if ($set == 'processed') {
             $tsLabel = 'Time of blood processing completion';
@@ -275,7 +275,7 @@ class Order
     public function sendToRdr()
     {
         if (!$this->order['finalized_ts']) {
-            return false;;
+            return false;
         }
         $order = $this->getRdrObject();
         if ($this->order['rdr_id']) {
