@@ -14,9 +14,6 @@ iframe.pdf {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.inline-buttons .btn {
-    margin-bottom: 10px;
-}
 #flash-notices {
     margin-top: -15px;
     margin-bottom: 15px;
@@ -26,6 +23,9 @@ iframe.pdf {
     text-align: center;
     font-weight: bold;
     margin: 0;
+}
+.btn-block {
+    margin-bottom: 10px;
 }
 @media(max-width:767px) {
     h2 {

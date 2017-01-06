@@ -31,6 +31,7 @@ $app
     ->mount('/_dev', new Controller\DevController())
     ->mount('/cron', new Controller\CronController())
     ->mount('/dashboard', new Controller\DashboardController())
+    ->mount('/help', new Controller\HelpController())
     ->mount('/admin', new Controller\AdminController())
     ->run()
 ;
