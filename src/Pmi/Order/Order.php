@@ -162,7 +162,7 @@ class Order
         $samplesLabel = "Which samples were successfully {$verb}?";
         $notesLabel = "Additional notes on {$noun}";
         if ($set == 'finalized') {
-            $samplesLabel = "Which samples are being shipped to the PMI Biobank?";
+            $samplesLabel = "Which samples are being shipped to the All of Us&#8480; Biobank?";
         }
         if ($set == 'processed') {
             $tsLabel = 'Time of blood processing completion';

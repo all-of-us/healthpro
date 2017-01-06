@@ -101,14 +101,14 @@ class Fhir
                 'subject' => [
                     'reference' => "Patient/{$this->patient}"
                 ],
-                'title' => 'PMI Intake Evaluation',
+                'title' => 'All of Us&#8480; Intake Evaluation',
                 'type' => [
                     'coding' => [[
                         'code' => "intake-exam-v{$this->version}",
-                        'display' => "PMI Intake Evaluation v{$this->version}",
+                        'display' => "All of Us&#8480; Intake Evaluation v{$this->version}",
                         'system' => 'http://terminology.pmi-ops.org/CodeSystem/document-type'
                     ]],
-                    'text' => "PMI Intake Evaluation v{$this->version}"
+                    'text' => "All of Us&#8480; Intake Evaluation v{$this->version}"
                 ]
             ]
         ];
