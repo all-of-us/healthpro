@@ -16,6 +16,7 @@ use Pmi\Util;
 class OrderController extends AbstractController
 {
     protected static $routes = [
+        ['orderCheck', '/participant/{participantId}/order/check'],
         ['orderCreate', '/participant/{participantId}/order/create', ['method' => 'GET|POST']],
         ['orderPdf', '/participant/{participantId}/order/{orderId}-{type}.pdf'],
         ['order', '/participant/{participantId}/order/{orderId}'],
@@ -36,6 +37,20 @@ class OrderController extends AbstractController
         } else {
             $app->abort(404);
         }
+    }
+
+    public function orderCheckAction($participantId, Application $app)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->consentComplete) {
+            $app->abort(403);
+        }
+        return $app['twig']->render('order-check.html.twig', [
+            'participant' => $participant
+        ]);
     }
 
     public function orderCreateAction($participantId, Application $app, Request $request)
