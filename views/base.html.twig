@@ -26,7 +26,9 @@
                     {% if is_granted('ROLE_DASHBOARD') %}
                         <li><a href="{{ path('dashboard_home') }}">Dashboard</a></li>
                     {% endif %}
-
+                    {% if is_granted('ROLE_SITE_ADMIN') %}
+                        <li><a href="{{ path('siteIndex') }}">Site Admin</a></li>
+                    {% endif %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if is_granted('IS_AUTHENTICATED_FULLY') %}

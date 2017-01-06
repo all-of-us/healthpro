@@ -7,6 +7,7 @@ class User implements UserInterface
 {
     const SITE_PREFIX = 'hpo-site-';
     const DASHBOARD_GROUP = 'admin-dashboard';
+    const ADMIN_GROUP = 'site-admin';
     const TWOFACTOR_GROUP = 'mfa_exception';
     const TWOFACTOR_PREFIX = 'x-site-';
     
@@ -14,6 +15,7 @@ class User implements UserInterface
     private $groups;
     private $sites;
     private $dashboardAccess;
+    private $siteAdminAccess;
     private $info;
     private $timezone;
     
@@ -25,6 +27,7 @@ class User implements UserInterface
         $this->timezone = $timezone;
         $this->sites = $this->computeSites();
         $this->dashboardAccess = $this->computeDashboardAccess();
+        $this->siteAdminAccess = $this->computeSiteAdminAccess();
     }
     
     public function getGroups()
@@ -65,6 +68,19 @@ class User implements UserInterface
         }
         return $hasAccess;
     }
+
+    private function computeSiteAdminAccess()
+    {
+        $hasAccess = false;
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::ADMIN_GROUP . '@') === 0) {
+                $hasAccess = true;
+            }
+        }
+        return $hasAccess;
+    }
+
+
     
     public function hasTwoFactorAuth()
     {
@@ -124,6 +140,9 @@ class User implements UserInterface
         }
         if ($this->dashboardAccess) {
             $roles[] = 'ROLE_DASHBOARD';
+        }
+        if ($this->siteAdminAccess) {
+            $roles[] = 'ROLE_SITE_ADMIN';
         }
         return $roles;
     }
