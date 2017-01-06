@@ -2,16 +2,12 @@
 {% block title %}Edit Site{% endblock %}
 {% block body %}
     <div class="page-header">
-        <h2>Edit Site</h2>
+        <h2>{{  verb }} Site</h2>
     </div>
     <div class="row">
-
         <div class="col-sm-7">
-            <hr class="visible-xs" />
             {{ form_start(siteForm) }}
-
             {{ form_rest(siteForm) }}
-
             <p><button type="submit" class="btn btn-primary">Save Site</button></p>
             {{ form_end(siteForm) }}
         </div>

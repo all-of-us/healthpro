@@ -5,8 +5,9 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Pmi\Audit\Log;
-use Pmi\Site\Site;
 
 
 class AdminController extends AbstractController
@@ -23,18 +24,18 @@ class AdminController extends AbstractController
         return $app['twig']->render('site-index.html.twig', ['sites' => $sites]);
     }
 
-    protected function loadSite($siteId, Application $app)
-    {
-        $site = new Site();
-        $site->loadSite($siteId, $app);
-        return $site;
-    }
 
     public function editSiteAction($siteId, Application $app, Request $request)
     {
 
-        $site = $this->loadSite($siteId, $app);
-        $siteEditForm = $site->createEditForm($app['form.factory']);
+        $site = $app['em']->getRepository('sites')->fetchOneBy([
+            'id' => $siteId
+        ]);
+        if (!$site) {
+            $app->abort(404);;
+        }
+
+        $siteEditForm = $this->getSiteEditForm($app, $site);
 
         $siteEditForm->handleRequest($request);
         if ($siteEditForm->isValid()) {
@@ -52,15 +53,15 @@ class AdminController extends AbstractController
 
         return $app['twig']->render('site-edit.html.twig', [
             'site' => $site,
+            'verb' => 'Edit',
             'siteForm' => $siteEditForm->createView()
         ]);
     }
 
     public function addSiteAction(Application $app, Request $request)
     {
-
-        $site = new Site;
-        $siteAddForm = $site->createEditForm($app['form.factory']);
+        $site = array();
+        $siteAddForm = $this->getSiteEditForm($app);
 
         $siteAddForm->handleRequest($request);
         if ($siteAddForm->isValid()) {
@@ -76,13 +77,31 @@ class AdminController extends AbstractController
                 return $app->redirectToRoute('siteIndex');
             }
         }
-        if(!$site) {
-            $site = new Site;
-        }
+
         return $app['twig']->render('site-edit.html.twig', [
             'site' => $site,
+            'verb' => 'Add',
             'siteForm' => $siteAddForm->createView()
         ]);
+    }
+
+    protected function getSiteEditForm(Application $app, $site = null)
+    {
+        $form = $app['form.factory']->createBuilder(FormType::class, $site)
+            ->add('name', Type\TextType::class, [
+                'label' => 'Name',
+                'required' => true
+            ])
+            ->add('google_group', Type\TextType::class, [
+                'label' => 'Google Group',
+                'required' => true
+            ])
+            ->add('mayolink_account', Type\TextType::class, [
+                'label' => 'MayLink Account',
+                'required' => true
+            ])
+            ->getForm();
+        return $form;
     }
 }
 
