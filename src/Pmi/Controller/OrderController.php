@@ -173,7 +173,7 @@ class OrderController extends AbstractController
             $app->abort(404);
         }
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if($order->get('finalized_ts')) {
+        if ($order->get('finalized_ts')) {
             $app->abort(403);
         }
         if ($app->getConfig('ml_mock_order')) {
@@ -202,7 +202,7 @@ class OrderController extends AbstractController
     public function orderPrintAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if($order->get('finalized_ts')) {
+        if ($order->get('finalized_ts')) {
             $app->abort(403);
         }
         if (!$order->get('printed_ts')) {
