@@ -7,7 +7,18 @@
         <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
     </h2>
 
-    <br />
+    <dl class="dl-horizontal">
+        <dt>Name</dt>
+        <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
+        <dt>Participant ID</dt>
+        <dd>{{ participant.id }}</dd>
+        <dt>Biobank ID</dt>
+        <dd>{{ participant.biobankId }}</dd>
+        <dt>DOB</dt>
+        <dd>{{ participant.dob|date('n/j/Y') }}</dd>
+        <dt>Gender Identity</dt>
+        <dd>{{ participant.genderIdentity }}</dd>
+    </dl>
     <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#">Create</a></li>
         {% for step in ['printed', 'collected', 'processed', 'finalized'] %}
@@ -17,18 +28,6 @@
     <br />
 
     <div id="createOrder">
-        <dl class="dl-horizontal">
-            <dt>Name</dt>
-            <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-            <dt>Participant ID</dt>
-            <dd>{{ participant.id }}</dd>
-            <dt>Biobank ID</dt>
-            <dd>{{ participant.biobankId }}</dd>
-            <dt>DOB</dt>
-            <dd>{{ participant.dob|date('n/j/Y') }}</dd>
-            <dt>Gender Identity</dt>
-            <dd>{{ participant.genderIdentity }}</dd>
-        </dl>
         {{ form_start(confirmForm) }}
             {{ form_errors(confirmForm) }}
             <div class="row row-equal-height form-disable-enter">

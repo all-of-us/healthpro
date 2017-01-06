@@ -13,12 +13,12 @@ class Order
     protected $participant;
 
     public static $samples = [
-        '(1) Whole Blood EDTA 4 mL [1ED04]' => '1ED04',
-        '(2) Whole Blood EDTA 10 mL [1ED10]' => '1ED10',
-        '(3) Serum SST 8.5 mL [1SST8]' => '1SST8',
-        '(4) Plasma PST 8 mL [1PST8]' => '1PST8',
-        '(5) Whole Blood EDTA 10 mL [2ED10]' => '2ED10',
-        '(6) WB Sodium Heparin 4 mL [1HEP4]' => '1HEP4',
+        '(1) 8 mL SST [1SST8]' => '1SST8',
+        '(2) 8 mL PST [1PST8]' => '1PST8',
+        '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
+        '(4) 4 mL EDTA [1ED04]' => '1ED04',
+        '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
+        '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
         '(7) Urine 10 mL [1UR10]' => '1UR10'
     ];
     public static $salivaSamples = [
