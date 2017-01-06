@@ -7,7 +7,18 @@
         <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
     </h2>
 
-    <br />
+    <dl class="dl-horizontal">
+        <dt>Name</dt>
+        <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
+        <dt>Participant ID</dt>
+        <dd>{{ participant.id }}</dd>
+        <dt>Biobank ID</dt>
+        <dd>{{ participant.biobankId }}</dd>
+        <dt>DOB</dt>
+        <dd>{{ participant.dob|date('n/j/Y') }}</dd>
+        <dt>Gender Identity</dt>
+        <dd>{{ participant.genderIdentity }}</dd>
+    </dl>
     <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#">Create</a></li>
         {% for step in ['printed', 'collected', 'processed', 'finalized'] %}
@@ -17,18 +28,6 @@
     <br />
 
     <div id="createOrder">
-        <dl class="dl-horizontal">
-            <dt>Name</dt>
-            <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-            <dt>Participant ID</dt>
-            <dd>{{ participant.id }}</dd>
-            <dt>Biobank ID</dt>
-            <dd>{{ participant.biobankId }}</dd>
-            <dt>DOB</dt>
-            <dd>{{ participant.dob|date('n/j/Y') }}</dd>
-            <dt>Gender Identity</dt>
-            <dd>{{ participant.genderIdentity }}</dd>
-        </dl>
         {{ form_start(confirmForm) }}
             {{ form_errors(confirmForm) }}
             <div class="row row-equal-height form-disable-enter">
@@ -40,7 +39,7 @@
                         <div class="panel-body">
                             <div class="text-center">
                                 <div id="customize-off" {% if showCustom %} style="display:none"{% endif %}>
-                                    <p>Create an order for all 7 PMI biospecimens</p>
+                                    <p>Create an order for all 7 All of Us℠ biospecimens</p>
                                     <p>
                                         <button type="submit" name="standard" class="btn btn-primary">Create</button>
                                     </p>
@@ -50,7 +49,7 @@
                                 </div>
                             </div>
                             <div{% if not showCustom %} style="display:none"{% endif %} id="customize-on">
-                                <p class="text-center">Customize your PMI biobank order</p>
+                                <p class="text-center">Customize your All of Us℠ biobank order</p>
                                 {{ form_row(confirmForm.samples) }}
                                 <div class="text-center">
                                     <p>
@@ -70,7 +69,7 @@
                             <h3 class="panel-title text-center">DV Biobank Order</h3>
                         </div>
                         <div class="panel-body">
-                            <p class="text-center">Register a PMI Biospecimen Kit</p>
+                            <p class="text-center">Register an All of Us℠ Biospecimen Kit</p>
                                 <br />
                                 {{ form_row(confirmForm.kitId) }}
                             <p class="text-center">

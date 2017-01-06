@@ -116,3 +116,26 @@ label.required::after {
     cursor: pointer;
     color: #337ab7;
 }
+
+/* Participant work queue */
+.table-small>tbody>tr>td, .table-small>tbody>tr>th, .table-small>tfoot>tr>td, .table-small>tfoot>tr>th, .table-small>thead>tr>td, .table-small>thead>tr>th {
+    padding: 5px;
+}
+.table-small {
+    font-size: 12px;
+}
+.topheader {
+    border-bottom: 0 !important;
+    text-align: center;
+}
+.secondaryheader {
+    border-top: 0 !important;
+    font-weight: normal;
+    text-align: center;
+}
+.multiheader-survey {
+    background-color: #dde;
+}
+.multiheader-status {
+    background-color: #eec;
+}
