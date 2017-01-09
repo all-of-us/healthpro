@@ -130,7 +130,7 @@ $(document).ready(function()
                     height = 'auto';
                 } else {
                     $(this).find('.panel').each(function() {
-                        if ($(this).height() > height) {
+                        if ($(this).is(':visible') && $(this).height() > height) {
                             height = $(this).height();
                         }
                     });

@@ -92,6 +92,9 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/dashboard/.*$', 'ips' => $ips], 'ROLE_DASHBOARD'],
                 [['path' => '^/dashboard/.*$'], 'ROLE_NO_ACCESS'],
 
+                [['path' => '^/admin/.*$', 'ips' => $ips], 'ROLE_SITE_ADMIN'],
+                [['path' => '^/admin/.*$'], 'ROLE_NO_ACCESS'],
+
                 [['path' => '^/.*$', 'ips' => $ips], 'ROLE_USER'],
                 [['path' => '^/.*$'], 'ROLE_NO_ACCESS']
             ]
@@ -234,11 +237,15 @@ class HpoApplication extends AbstractApplication
         if ($this['session']->get('isLoginReturn') && $this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD') && !$this->isUpkeepRoute($request)) {
             return $this->forwardToRoute('dashSplash', $request);
         }
-        
+
+        if ($this->isLoggedIn()) {
+            $user = $this->getUser();
+            $this['em']->setTimezone($this->getUserTimezone());
+        }
+
         // HPO users must select their site first
         if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER'))
         {
-            $user = $this->getUser();
             // auto-select since they only have one site
             if (count($user->getSites()) === 1) {
                 $this->switchSite($user->getSites()[0]->email);

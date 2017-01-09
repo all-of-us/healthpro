@@ -26,4 +26,24 @@ class Util
         $id = substr($id, 0, $length);
         return $id;
     }
+
+    public static function versionIsAtLeast($version, $minVersion)
+    {
+        $min = explode('.', $minVersion);
+        $current = explode('.', $version);
+        foreach ($current as $k => $val) {
+            if (isset($min[$k])) {
+                $compare = $min[$k];
+            } else {
+                $compare = 0;
+            }
+            if ($val < $compare) {
+                return false;
+            }
+            if ($val > $compare) {
+                return true;
+            }
+        }
+        return true;
+    }
 }

@@ -22,6 +22,8 @@ class Log
     const ORDER_EDIT = 'ORDER_EDIT';
     const EVALUATION_CREATE = 'EVALUATION_CREATE';
     const EVALUATION_EDIT = 'EVALUATION_EDIT';
+    const SITE_EDIT = 'SITE_EDIT';
+    const SITE_ADD = 'SITE_ADD';
 
     public function __construct($app, $action, $data)
     {
