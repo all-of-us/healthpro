@@ -117,3 +117,10 @@ function loadRecruitmentFilters(id) {
     });
     return centers;
 }
+
+// generic error handler for when metrics API doesn't respond with valid results
+function setMetricsError(div) {
+    stopSpinner(div);
+    alert('Error: cannot retrieve metrics');
+    $("#" + div).html("<p class='lead text-danger text-center'>Metrics currently unavailable; please try again later.</p>");
+}

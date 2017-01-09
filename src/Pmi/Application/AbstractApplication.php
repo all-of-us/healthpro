@@ -26,9 +26,20 @@ abstract class AbstractApplication extends Application
     const ENV_DEV   = 'dev';   // development environment (deployed to GAE)
     const ENV_TEST  = 'test';  // user/security testing environment
     const ENV_PROD  = 'prod';  // production environment
-    
+    const DEFAULT_TIMEZONE = 'America/New_York';
+
     protected $name;
     protected $configuration = [];
+
+    public static $timezoneOptions = [
+        'America/New_York' => 'Eastern Time',
+        'America/Chicago' => 'Central Time',
+        'America/Denver' => 'Mountain Time',
+        'America/Phoenix' => 'Mountain Time - Arizona',
+        'America/Los_Angeles' => 'Pacific Time',
+        'America/Anchorage' => 'Alaska Time',
+        'Pacific/Honolulu' => 'Hawaii Time'
+    ];
 
     /** Determines the environment under which the code is running. */
     private static function determineEnv()
@@ -64,7 +75,7 @@ abstract class AbstractApplication extends Application
         }
         $values['assetVer'] = $values['env'] === self::ENV_LOCAL ?
             date('YmdHis') : $values['release'];
-        
+
         parent::__construct($values);
     }
     
@@ -232,7 +243,40 @@ abstract class AbstractApplication extends Application
         $token = $this['security.token_storage']->getToken();
         return $token ? $token->getUser() : null;
     }
-    
+
+    public function getUserId()
+    {
+        if ($user = $this->getUser()) {
+            return $user->getId();
+        } else {
+            return null;
+        }
+    }
+
+    public function getUserTimezone($useDefault = true)
+    {
+        if ($user = $this->getUser()) {
+            if (($info = $user->getInfo()) && isset($info['timezone'])) {
+                return $info['timezone'];
+            }
+        }
+        if ($useDefault) {
+            return self::DEFAULT_TIMEZONE;
+        } else {
+            return null;
+        }
+    }
+
+    public function getUserTimezoneDisplay()
+    {
+        $timezone = $this->getUserTimezone();
+        if (array_key_exists($timezone, static::$timezoneOptions)) {
+            return static::$timezoneOptions[$timezone];
+        } else {
+            return $timezone;
+        }
+    }
+
     public function hasRole($role)
     {
         return $this->isLoggedIn() && $this['security.authorization_checker']->isGranted($role);

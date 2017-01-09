@@ -19,9 +19,11 @@
                 <span class="toggle-help-image" data-caption="Collected samples help text placeholder.">
                     <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                 </span>
-                <div class="checkbox">
-                    <label><input type="checkbox" id="checkall"> <strong>Check all</strong></label>
-                </div>
+                {% if not order.finalized_ts %}
+                    <div class="checkbox">
+                        <label><input type="checkbox" id="checkall"> <strong>Check all</strong></label>
+                    </div>
+                {% endif %}
             {{ form_widget(collectForm.collected_samples) }}
             {{ form_errors(collectForm.collected_samples) }}
         </div>
@@ -36,15 +38,17 @@
         </div>
 
         {{ form_rest(collectForm) }}
-        <p>
-            <button type="submit" class="btn btn-primary">
-                {% if order.collected_ts %}
-                    Update
-                {% else %}
-                    Save and mark as collected
-                {% endif %}
-            </button>
-        </p>
+        {% if not order.finalized_ts %}
+            <p>
+                <button type="submit" class="btn btn-primary">
+                    {% if order.collected_ts %}
+                        Update
+                    {% else %}
+                        Save and mark as collected
+                    {% endif %}
+                </button>
+            </p>
+        {% endif %}
     {{ form_end(collectForm) }}
 {% endblock %}
 

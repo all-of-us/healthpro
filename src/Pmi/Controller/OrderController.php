@@ -16,6 +16,7 @@ use Pmi\Util;
 class OrderController extends AbstractController
 {
     protected static $routes = [
+        ['orderCheck', '/participant/{participantId}/order/check'],
         ['orderCreate', '/participant/{participantId}/order/create', ['method' => 'GET|POST']],
         ['orderPdf', '/participant/{participantId}/order/{orderId}-{type}.pdf'],
         ['order', '/participant/{participantId}/order/{orderId}'],
@@ -36,6 +37,20 @@ class OrderController extends AbstractController
         } else {
             $app->abort(404);
         }
+    }
+
+    public function orderCheckAction($participantId, Application $app)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->consentComplete) {
+            $app->abort(403);
+        }
+        return $app['twig']->render('order-check.html.twig', [
+            'participant' => $participant
+        ]);
     }
 
     public function orderCreateAction($participantId, Application $app, Request $request)
@@ -110,6 +125,8 @@ class OrderController extends AbstractController
                 if ($app->getConfig('ml_mock_order')) {
                     $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
                 } else {
+                    // set collected time to today at midnight local time
+                    $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
                     $order = new MayolinkOrder();
                     $options = [
                         'type' => $orderData['type'],
@@ -117,7 +134,7 @@ class OrderController extends AbstractController
                         'gender' => $participant->gender,
                         'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob($orderData['type']),
                         'order_id' => $orderData['order_id'],
-                        'collected_at' => new \DateTime('today'), // set to today at midnight since time won't be accurate,
+                        'collected_at' => $collectedAt,
                         'site' => $app->getSiteId()
                     ];
                     if (isset($requestedSamples) && is_array($requestedSamples)) {
@@ -134,8 +151,7 @@ class OrderController extends AbstractController
                     $orderData['site'] = $app->getSiteId();
                     $orderData['participant_id'] = $participant->id;
                     $orderData['biobank_id'] = $participant->biobankId;
-                    $orderData['created_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
-
+                    $orderData['created_ts'] = new \DateTime();
                     $orderId = $app['em']->getRepository('orders')->insert($orderData);
                     if ($orderId) {
                         $app->log(Log::ORDER_CREATE, $orderId);
@@ -172,7 +188,9 @@ class OrderController extends AbstractController
             $app->abort(404);
         }
         $order = $this->loadOrder($participantId, $orderId, $app);
-
+        if ($order->get('finalized_ts')) {
+            $app->abort(403);
+        }
         if ($app->getConfig('ml_mock_order')) {
             if ($type == 'labels') {
                 return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
@@ -199,10 +217,13 @@ class OrderController extends AbstractController
     public function orderPrintAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if ($order->get('finalized_ts')) {
+            $app->abort(403);
+        }
         if (!$order->get('printed_ts')) {
             $app->log(Log::ORDER_EDIT, $orderId);
             $app['em']->getRepository('orders')->update($orderId, [
-                'printed_ts' => (new \DateTime())->format('Y-m-d H:i:s')
+                'printed_ts' => new \DateTime()
             ]);
         }
         return $app['twig']->render('order-print.html.twig', [
@@ -216,7 +237,7 @@ class OrderController extends AbstractController
         $order = $this->loadOrder($participantId, $orderId, $app);
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
-        if ($collectForm->isValid()) {
+        if ($collectForm->isValid() && !$order->get('finalized_ts')) {
             $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
             if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
@@ -240,7 +261,7 @@ class OrderController extends AbstractController
         $order = $this->loadOrder($participantId, $orderId, $app);
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
-        if ($processForm->isValid()) {
+        if ($processForm->isValid() && !$order->get('finalized_ts')) {
             $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
             foreach ($processForm->get('processed_samples')->getData() as $sample) {
                 if (empty($processedSampleTimes[$sample])) {
@@ -251,7 +272,7 @@ class OrderController extends AbstractController
             if ($processForm->isValid()) {
                 $updateArray = $order->getOrderUpdateFromForm('processed', $processForm);
                 if (!$order->get('processed_ts')) {
-                    $updateArray['processed_ts'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $updateArray['processed_ts'] = new \DateTime();
                 }
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);

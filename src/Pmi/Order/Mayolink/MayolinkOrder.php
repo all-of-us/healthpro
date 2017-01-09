@@ -7,14 +7,6 @@ class MayolinkOrder
     protected $authEndpoint = 'https://profile.mayomedicallaboratories.com/authn';
     protected $providerName = 'www.mayomedicallaboratories.com';
     protected static $tests = [
-        '1ED04' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
-        '1ED10' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
         '1SST8' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'Serum SST'
@@ -23,13 +15,21 @@ class MayolinkOrder
             'temperature' => 'Refrigerated',
             'specimen' => 'Plasma PST'
         ],
-        '2ED10' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
         '1HEP4' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'WB Sodium Heparin'
+        ],
+        '1ED04' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '1ED10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '2ED10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
         ],
         '1UR10' => [
             'temperature' => 'Refrigerated',
