@@ -1,4 +1,6 @@
 {% extends 'base.html.twig' %}
+{% import 'order-samples.html.twig' as samples %}
+{% form_theme finalizeForm 'form/simple_checkbox.html.twig' %}
 {% block title %}Finalize - Order {{ order.order_id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'finalize' } %}
@@ -20,12 +22,7 @@
             <span class="toggle-help-image" data-caption="Finalized samples help text placeholder.">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
             </span>
-            {% if not order.finalized_ts %}
-                <div class="checkbox">
-                    <label><input type="checkbox" id="checkall"> <strong>Check all</strong></label>
-                </div>
-            {% endif %}
-            {{ form_widget(finalizeForm.finalized_samples) }}
+            {{ samples.form_widget(finalizeForm.finalized_samples, order.finalized_ts ? false : true, samplesInfo) }}
             {{ form_errors(finalizeForm.finalized_samples) }}
         </div>
 

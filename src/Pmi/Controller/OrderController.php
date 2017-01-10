@@ -168,7 +168,8 @@ class OrderController extends AbstractController
         return $app['twig']->render('order-create.html.twig', [
             'participant' => $participant,
             'confirmForm' => $confirmForm->createView(),
-            'showCustom' => $showCustom
+            'showCustom' => $showCustom,
+            'samplesInfo' => Order::$samplesInformation
         ]);
     }
 
@@ -252,7 +253,8 @@ class OrderController extends AbstractController
         return $app['twig']->render('order-collect.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
-            'collectForm' => $collectForm->createView()
+            'collectForm' => $collectForm->createView(),
+            'samplesInfo' => Order::$samplesInformation
         ]);
     }
 
@@ -288,7 +290,8 @@ class OrderController extends AbstractController
         return $app['twig']->render('order-process.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
-            'processForm' => $processForm->createView()
+            'processForm' => $processForm->createView(),
+            'samplesInfo' => Order::$samplesInformation
         ]);
     }
 
@@ -314,7 +317,8 @@ class OrderController extends AbstractController
         return $app['twig']->render('order-finalize.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
-            'finalizeForm' => $finalizeForm->createView()
+            'finalizeForm' => $finalizeForm->createView(),
+            'samplesInfo' => Order::$samplesInformation
         ]);
     }
 

@@ -1,4 +1,6 @@
 {% extends 'base.html.twig' %}
+{% import 'order-samples.html.twig' as samples %}
+{% form_theme confirmForm 'form/simple_checkbox.html.twig' %}
 {% block title %}Order - {% endblock %}
 {% block body %}
     <h2>
@@ -32,7 +34,7 @@
         {{ form_start(confirmForm) }}
             {{ form_errors(confirmForm) }}
             <div class="row row-equal-height form-disable-enter">
-                <div class="col-sm-6 col-md-4">
+                <div class="col-sm-6 col-md-5">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title text-center">HPO Biobank Order</h3>
@@ -51,7 +53,11 @@
                             </div>
                             <div{% if not showCustom %} style="display:none"{% endif %} id="customize-on">
                                 <p class="text-center">Customize your All of Us℠ biobank order</p>
-                                {{ form_row(confirmForm.samples) }}
+                                <div class="form-group{% if not confirmForm.samples.vars.valid %} has-error{% endif %}">
+                                    {{ form_label(confirmForm.samples) }}
+                                    {{ samples.form_widget(confirmForm.samples, false, samplesInfo) }}
+                                    {{ form_errors(confirmForm.samples) }}
+                                </div>
                                 <div class="text-center">
                                     <p>
                                         <button type="submit" name="custom" class="btn btn-primary">Create custom order</button>
@@ -79,7 +85,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-0">
+                <div class="col-sm-6 col-sm-offset-3 col-md-3 col-md-offset-0">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title text-center">Saliva Biobank Order</h3>
