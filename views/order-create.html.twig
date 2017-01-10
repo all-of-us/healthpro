@@ -55,9 +55,6 @@
                                 <p class="text-center">Customize your All of Us℠ biobank order</p>
                                 <div class="form-group{% if not confirmForm.samples.vars.valid %} has-error{% endif %}">
                                     {{ form_label(confirmForm.samples) }}
-                                    <span class="toggle-help-image" data-caption="Processed samples help text placeholder.">
-                                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                                    </span>
                                     {{ samples.form_widget(confirmForm.samples, false, samplesInfo) }}
                                     {{ form_errors(confirmForm.samples) }}
                                 </div>
