@@ -47,6 +47,20 @@ label.required::after {
     margin-left: auto;
     margin-right: auto;
 }
+.table-small>tbody>tr>td, .table-small>tbody>tr>th, .table-small>tfoot>tr>td, .table-small>tfoot>tr>th, .table-small>thead>tr>td, .table-small>thead>tr>th {
+    padding: 5px;
+}
+.table-small {
+    font-size: 12px;
+}
+.table-auto-width {
+    width: auto;
+}
+label.label-normal {
+    display: inline;
+    margin: 0;
+    font-weight: normal;
+}
 /* for bootstrap date picker */
 .form-group {
     position: relative;
@@ -118,12 +132,6 @@ label.required::after {
 }
 
 /* Participant work queue */
-.table-small>tbody>tr>td, .table-small>tbody>tr>th, .table-small>tfoot>tr>td, .table-small>tfoot>tr>th, .table-small>thead>tr>td, .table-small>thead>tr>th {
-    padding: 5px;
-}
-.table-small {
-    font-size: 12px;
-}
 .topheader {
     border-bottom: 0 !important;
     text-align: center;
@@ -138,4 +146,9 @@ label.required::after {
 }
 .multiheader-status {
     background-color: #eec;
+}
+
+/* Orders */
+table.table-samples td {
+    border-top: 0 !important;
 }

@@ -12,6 +12,8 @@ class Order
     protected $order;
     protected $participant;
 
+    // These labels are a fallback - when displayed, they should be using the
+    // sample information below to render a table with more information
     public static $samples = [
         '(1) 8 mL SST [1SST8]' => '1SST8',
         '(2) 8 mL PST [1PST8]' => '1PST8',
@@ -21,9 +23,49 @@ class Order
         '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
         '(7) Urine 10 mL [1UR10]' => '1UR10'
     ];
+
+    public static $samplesInformation = [
+        '1SST8' => [
+            'number' => 1,
+            'label' => '8 mL SST',
+            'color' => 'Red and gray'
+        ],
+        '1PST8' => [
+            'number' => 2,
+            'label' => '8 mL PST',
+            'color' => 'Green and gray'
+        ],
+        '1HEP4' => [
+            'number' => 3,
+            'label' => '4 mL Na-Hep',
+            'color' => 'Green'
+        ],
+        '1ED04' => [
+            'number' => 4,
+            'label' => '4 mL EDTA',
+            'color' => 'Lavender'
+        ],
+        '1ED10' => [
+            'number' => 5,
+            'label' => '1st 10 mL EDTA',
+            'color' => 'Lavender'
+        ],
+        '2ED10' => [
+            'number' => 6,
+            'label' => '2nd 10 mL EDTA',
+            'color' => 'Lavender'
+        ],
+        '1UR10' => [
+            'number' => 7,
+            'label' => 'Urine 10 mL',
+            'color' => 'Yellow'
+        ]
+    ];
+
     public static $salivaSamples = [
         'Saliva [1SAL]' => '1SAL'
     ];
+
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SAL'];
 
     public function loadOrder($participantId, $orderId, Application $app)
