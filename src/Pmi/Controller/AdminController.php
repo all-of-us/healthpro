@@ -15,7 +15,8 @@ class AdminController extends AbstractController
     protected static $routes = [
         ['siteIndex', '/sites'],
         ['editSite', '/site/edit/{siteId}', ['method' => 'GET|POST']],
-        ['addSite', '/site/add', ['method' => 'GET|POST']]
+        ['addSite', '/site/add', ['method' => 'GET|POST']],
+        ['deleteSite', '/site/delete/{siteId}', ['method' => 'GET|POST']]
     ];
 
     public function siteIndexAction(Application $app, Request $request)
@@ -102,6 +103,24 @@ class AdminController extends AbstractController
             ])
             ->getForm();
         return $form;
+    }
+
+    public function deleteSiteAction($siteId, Application $app)
+    {
+        $site = $app['em']->getRepository('sites')->fetchOneBy([
+            'id' => $siteId
+        ]);
+        if (!$site) {
+            $app->abort(404);;
+        }
+        
+        $app['em']->getRepository('sites')->delete($siteId);
+
+        $app->log(Log::SITE_DELETE, $siteId);
+        $app->addFlashNotice('Site removed.');
+
+        return $app->redirectToRoute('siteIndex');
+
     }
 }
 
