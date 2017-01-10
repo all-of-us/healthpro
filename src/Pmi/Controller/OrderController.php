@@ -168,7 +168,8 @@ class OrderController extends AbstractController
         return $app['twig']->render('order-create.html.twig', [
             'participant' => $participant,
             'confirmForm' => $confirmForm->createView(),
-            'showCustom' => $showCustom
+            'showCustom' => $showCustom,
+            'samplesInfo' => Order::$samplesInformation
         ]);
     }
 

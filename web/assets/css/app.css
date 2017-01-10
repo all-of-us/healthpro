@@ -149,6 +149,9 @@ label.label-normal {
 }
 
 /* Orders */
+table.table-samples {
+    margin-bottom: 5px;
+}
 table.table-samples td {
     border-top: 0 !important;
 }
