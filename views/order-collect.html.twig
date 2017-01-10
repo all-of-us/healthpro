@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 {% import 'order-samples.html.twig' as samples %}
-{% form_theme collectForm 'form/simple_checkbox.html.twig' %}
+{% if order.type != 'saliva' %}
+    {% form_theme collectForm 'form/simple_checkbox.html.twig' %}
+{% endif %}
 {% block title %}Collect - Order {{ order.order_id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'collect' } %}
@@ -21,7 +23,11 @@
             <span class="toggle-help-image" data-caption="Collected samples help text placeholder.">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
             </span>
-            {{ samples.form_widget(collectForm.collected_samples, order.finalized_ts ? false : true, samplesInfo) }}
+            {% if order.type == 'saliva' %}
+                {{ form_widget(collectForm.collected_samples) }}
+            {% else %}
+                {{ samples.form_widget(collectForm.collected_samples, order.finalized_ts ? false : true, samplesInfo) }}
+            {% endif %}
             {{ form_errors(collectForm.collected_samples) }}
         </div>
 
