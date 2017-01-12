@@ -28,53 +28,6 @@ class RdrParticipants
         if (!is_object($participant)) {
             return false;
         }
-        if (isset($participant->participant_id)) {
-            $id = $participant->participant_id;
-        } else {
-            return false;
-        }
-        if (!empty($participant->biobank_id)) {
-            $biobankId = $participant->biobank_id;
-        } else {
-            $biobankId = $participant->participant_id; // for older participants without biobank ids
-        }
-        if (isset($participant->membership_tier) && in_array($participant->membership_tier, ['VOLUNTEER', 'ENROLLEE', 'FULL_PARTICIPANT'])) {
-            $consentStatus = true;
-        } else {
-            $consentStatus = false;
-        }
-        switch ($participant->gender_identity) {
-            case 'FEMALE':
-                $gender = 'F';
-                break;
-            case 'MALE':
-                $gender = 'M';
-                break;
-            default:
-                $gender = 'U';
-                break;
-        }
-        $genderIdentity = str_replace('_', ' ', $participant->gender_identity);
-        $genderIdentity = ucfirst(strtolower($genderIdentity));
-        return new Participant([
-            'id' => $id,
-            'biobankId' => $biobankId,
-            'firstName' => $participant->first_name,
-            'middleName' => $participant->middle_name,
-            'lastName' => $participant->last_name,
-            'dob' => new \DateTime($participant->date_of_birth),
-            'genderIdentity' => $genderIdentity,
-            'gender' => $gender,
-            'zip' => $participant->zip_code,
-            'consentComplete' => $consentStatus
-        ]);
-    }
-
-    protected function participantSummaryToResult($participant)
-    {
-        if (!is_object($participant)) {
-            return false;
-        }
         if (isset($participant->participantId)) {
             $id = $participant->participantId;
         } else {
@@ -88,7 +41,7 @@ class RdrParticipants
         if (isset($participant->membershipTier) && in_array($participant->membershipTier, ['VOLUNTEER', 'ENROLLEE', 'FULL_PARTICIPANT'])) {
             $consentStatus = true;
         } else {
-            $consentStatus = false;
+            $consentStatus = true; // TODO - not sure where we will end up with membership tier. For now, treat all as consented
         }
         switch ($participant->genderIdentity) {
             case 'FEMALE':
@@ -121,27 +74,6 @@ class RdrParticipants
     {
         $query = [];
         if (isset($params['lastName'])) {
-            $query['last_name'] = ucfirst($params['lastName']);
-        }
-        if (isset($params['firstName'])) {
-            $query['first_name'] = ucfirst($params['firstName']);
-        }
-        if (isset($params['dob'])) {
-            try {
-                $date = new \DateTime($params['dob']);
-                $query['date_of_birth'] = $date->format('Y-m-d');
-            } catch (\Exception $e) {
-                throw new Exception\InvalidDobException();
-            }
-        }
-
-        return $query;
-    }
-
-    protected function paramsToSummaryQuery($params)
-    {
-        $query = [];
-        if (isset($params['lastName'])) {
             $query['lastName'] = ucfirst($params['lastName']);
         }
         if (isset($params['firstName'])) {
@@ -163,34 +95,6 @@ class RdrParticipants
     {
         $query = $this->paramsToQuery($params);
         try {
-            $response = $this->getClient()->request('GET', 'Participant', [
-                'query' => $query
-            ]);
-        } catch (\Exception $e) {
-            throw new Exception\FailedRequestException();
-        }
-        $responseObject = json_decode($response->getBody()->getContents());
-        if (!is_object($responseObject)) {
-            throw new Exception\InvalidResponseException();
-        }
-        if (!isset($responseObject->items) || !is_array($responseObject->items)) {
-            return [];
-        }
-        $results = [];
-        foreach ($responseObject->items as $participant) {
-            $result = $this->participantToResult($participant);
-            if ($result) {
-                $results[] = $result;
-            }
-        }
-
-        return $results;
-    }
-
-    public function summarySearch($params)
-    {
-        $query = $this->paramsToSummaryQuery($params);
-        try {
             $response = $this->getClient()->request('GET', 'ParticipantSummary', [
                 'query' => $query
             ]);
@@ -198,15 +102,16 @@ class RdrParticipants
             throw new Exception\FailedRequestException();
         }
         $responseObject = json_decode($response->getBody()->getContents());
+
         if (!is_object($responseObject)) {
             throw new Exception\InvalidResponseException();
         }
-        if (!isset($responseObject->items) || !is_array($responseObject->items)) {
+        if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
             return [];
         }
         $results = [];
-        foreach ($responseObject->items as $participant) {
-            $result = $this->participantSummaryToResult($participant);
+        foreach ($responseObject->entry as $participant) {
+            $result = $this->participantToResult($participant);
             if ($result) {
                 $results[] = $result;
             }
@@ -226,11 +131,10 @@ class RdrParticipants
                 $participant = json_decode($response->getBody()->getContents());
                 $memcache->set($memcacheKey, $participant, 0, 300);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
-                throw $e;
                 return false;
             }
         }
-        return $this->participantSummaryToResult($participant);
+        return $this->participantToResult($participant);
     }
 
     public function createParticipant($participant)
