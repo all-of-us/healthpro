@@ -16,6 +16,7 @@ use Pmi\Util;
 class OrderController extends AbstractController
 {
     protected static $routes = [
+        ['orderCheck', '/participant/{participantId}/order/check'],
         ['orderCreate', '/participant/{participantId}/order/create', ['method' => 'GET|POST']],
         ['orderPdf', '/participant/{participantId}/order/{orderId}-{type}.pdf'],
         ['order', '/participant/{participantId}/order/{orderId}'],
@@ -36,6 +37,20 @@ class OrderController extends AbstractController
         } else {
             $app->abort(404);
         }
+    }
+
+    public function orderCheckAction($participantId, Application $app)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->consentComplete) {
+            $app->abort(403);
+        }
+        return $app['twig']->render('order-check.html.twig', [
+            'participant' => $participant
+        ]);
     }
 
     public function orderCreateAction($participantId, Application $app, Request $request)
@@ -153,7 +168,8 @@ class OrderController extends AbstractController
         return $app['twig']->render('order-create.html.twig', [
             'participant' => $participant,
             'confirmForm' => $confirmForm->createView(),
-            'showCustom' => $showCustom
+            'showCustom' => $showCustom,
+            'samplesInfo' => Order::$samplesInformation
         ]);
     }
 
@@ -173,7 +189,9 @@ class OrderController extends AbstractController
             $app->abort(404);
         }
         $order = $this->loadOrder($participantId, $orderId, $app);
-
+        if ($order->get('finalized_ts')) {
+            $app->abort(403);
+        }
         if ($app->getConfig('ml_mock_order')) {
             if ($type == 'labels') {
                 return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
@@ -200,6 +218,9 @@ class OrderController extends AbstractController
     public function orderPrintAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if ($order->get('finalized_ts')) {
+            $app->abort(403);
+        }
         if (!$order->get('printed_ts')) {
             $app->log(Log::ORDER_EDIT, $orderId);
             $app['em']->getRepository('orders')->update($orderId, [
@@ -217,7 +238,7 @@ class OrderController extends AbstractController
         $order = $this->loadOrder($participantId, $orderId, $app);
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
-        if ($collectForm->isValid()) {
+        if ($collectForm->isValid() && !$order->get('finalized_ts')) {
             $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
             if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
@@ -232,7 +253,8 @@ class OrderController extends AbstractController
         return $app['twig']->render('order-collect.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
-            'collectForm' => $collectForm->createView()
+            'collectForm' => $collectForm->createView(),
+            'samplesInfo' => Order::$samplesInformation
         ]);
     }
 
@@ -241,7 +263,7 @@ class OrderController extends AbstractController
         $order = $this->loadOrder($participantId, $orderId, $app);
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
-        if ($processForm->isValid()) {
+        if ($processForm->isValid() && !$order->get('finalized_ts')) {
             $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
             foreach ($processForm->get('processed_samples')->getData() as $sample) {
                 if (empty($processedSampleTimes[$sample])) {
@@ -268,7 +290,8 @@ class OrderController extends AbstractController
         return $app['twig']->render('order-process.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
-            'processForm' => $processForm->createView()
+            'processForm' => $processForm->createView(),
+            'samplesInfo' => Order::$samplesInformation
         ]);
     }
 
@@ -294,7 +317,8 @@ class OrderController extends AbstractController
         return $app['twig']->render('order-finalize.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
-            'finalizeForm' => $finalizeForm->createView()
+            'finalizeForm' => $finalizeForm->createView(),
+            'samplesInfo' => Order::$samplesInformation
         ]);
     }
 

@@ -14,9 +14,6 @@ iframe.pdf {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.inline-buttons .btn {
-    margin-bottom: 10px;
-}
 #flash-notices {
     margin-top: -15px;
     margin-bottom: 15px;
@@ -26,6 +23,9 @@ iframe.pdf {
     text-align: center;
     font-weight: bold;
     margin: 0;
+}
+.btn-block {
+    margin-bottom: 10px;
 }
 @media(max-width:767px) {
     h2 {
@@ -46,6 +46,20 @@ label.required::after {
 .text-center img.img-responsive {
     margin-left: auto;
     margin-right: auto;
+}
+.table-small>tbody>tr>td, .table-small>tbody>tr>th, .table-small>tfoot>tr>td, .table-small>tfoot>tr>th, .table-small>thead>tr>td, .table-small>thead>tr>th {
+    padding: 5px;
+}
+.table-small {
+    font-size: 12px;
+}
+.table-auto-width {
+    width: auto;
+}
+label.label-normal {
+    display: inline;
+    margin: 0;
+    font-weight: normal;
 }
 /* for bootstrap date picker */
 .form-group {
@@ -115,4 +129,29 @@ label.required::after {
 .toggle-help-image {
     cursor: pointer;
     color: #337ab7;
+}
+
+/* Participant work queue */
+.topheader {
+    border-bottom: 0 !important;
+    text-align: center;
+}
+.secondaryheader {
+    border-top: 0 !important;
+    font-weight: normal;
+    text-align: center;
+}
+.multiheader-survey {
+    background-color: #dde;
+}
+.multiheader-status {
+    background-color: #eec;
+}
+
+/* Orders */
+table.table-samples {
+    margin-bottom: 5px;
+}
+table.table-samples td {
+    border-top: 0 !important;
 }

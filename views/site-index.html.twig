@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block title %}Sites{% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2>Sites</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-7">
+            <a href="{{ path('addSite') }}" class="btn btn-primary">Add Site</a>
+            {% if sites|length > 0 %}
+                <table class="table table-striped">
+                    <thead><tr><th>ID</th><th>Name</th><th>Google Group</th><th>MayoLink Account</th></tr></thead>
+                    <tbody>
+                    {% for site in sites %}
+                        <tr>
+                            <td>{{ site.id }}</td>
+                            <td><a href="{{ path('editSite', { siteId: site.id }) }}">{{ site.name }}</a></td>
+                            <td>{{ site.google_group }}</td>
+                            <td>{{ site.mayolink_account }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-warning">No sites to list.</div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

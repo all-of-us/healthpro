@@ -12,18 +12,60 @@ class Order
     protected $order;
     protected $participant;
 
+    // These labels are a fallback - when displayed, they should be using the
+    // sample information below to render a table with more information
     public static $samples = [
-        '(1) Whole Blood EDTA 4 mL [1ED04]' => '1ED04',
-        '(2) Whole Blood EDTA 10 mL [1ED10]' => '1ED10',
-        '(3) Serum SST 8.5 mL [1SST8]' => '1SST8',
-        '(4) Plasma PST 8 mL [1PST8]' => '1PST8',
-        '(5) Whole Blood EDTA 10 mL [2ED10]' => '2ED10',
-        '(6) WB Sodium Heparin 4 mL [1HEP4]' => '1HEP4',
+        '(1) 8 mL SST [1SST8]' => '1SST8',
+        '(2) 8 mL PST [1PST8]' => '1PST8',
+        '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
+        '(4) 4 mL EDTA [1ED04]' => '1ED04',
+        '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
+        '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
         '(7) Urine 10 mL [1UR10]' => '1UR10'
     ];
+
+    public static $samplesInformation = [
+        '1SST8' => [
+            'number' => 1,
+            'label' => '8 mL SST',
+            'color' => 'Red and gray'
+        ],
+        '1PST8' => [
+            'number' => 2,
+            'label' => '8 mL PST',
+            'color' => 'Green and gray'
+        ],
+        '1HEP4' => [
+            'number' => 3,
+            'label' => '4 mL Na-Hep',
+            'color' => 'Green'
+        ],
+        '1ED04' => [
+            'number' => 4,
+            'label' => '4 mL EDTA',
+            'color' => 'Lavender'
+        ],
+        '1ED10' => [
+            'number' => 5,
+            'label' => '1st 10 mL EDTA',
+            'color' => 'Lavender'
+        ],
+        '2ED10' => [
+            'number' => 6,
+            'label' => '2nd 10 mL EDTA',
+            'color' => 'Lavender'
+        ],
+        '1UR10' => [
+            'number' => 7,
+            'label' => 'Urine 10 mL',
+            'color' => 'Yellow'
+        ]
+    ];
+
     public static $salivaSamples = [
         'Saliva [1SAL]' => '1SAL'
     ];
+
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SAL'];
 
     public function loadOrder($participantId, $orderId, Application $app)
@@ -140,6 +182,8 @@ class Order
 
     public function createOrderForm($set, $formFactory)
     {
+        $disabled = $this->order['finalized_ts'] ? true : false;
+
         switch ($set) {
             case 'collected':
                 $verb = 'collected';
@@ -162,7 +206,7 @@ class Order
         $samplesLabel = "Which samples were successfully {$verb}?";
         $notesLabel = "Additional notes on {$noun}";
         if ($set == 'finalized') {
-            $samplesLabel = "Which samples are being shipped to the PMI Biobank?";
+            $samplesLabel = "Which samples are being shipped to the All of Us℠ Biobank?";
         }
         if ($set == 'processed') {
             $tsLabel = 'Time of blood processing completion';
@@ -183,6 +227,7 @@ class Order
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'required' => false,
+                'disabled' => $disabled,
                 'view_timezone' => $this->app->getUserTimezone(),
                 'model_timezone' => 'UTC',
                 'constraints' => [
@@ -199,6 +244,7 @@ class Order
                 'label' => $samplesLabel,
                 'choices' => $samples,
                 'required' => false,
+                'disabled' => $disabled,
                 'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
                     if (in_array($val, $enabledSamples)) {
                         return [];
@@ -209,12 +255,14 @@ class Order
             ])
             ->add("{$set}_notes", Type\TextareaType::class, [
                 'label' => $notesLabel,
+                'disabled' => $disabled,
                 'required' => false
             ]);
         if ($set == 'processed') {
             $formBuilder->add('processed_samples_ts', Type\CollectionType::class, [
                 'entry_type' => Type\DateTimeType::class,
                 'label' => false,
+                'disabled' => $disabled,
                 'entry_options' => [
                     'date_widget' => 'single_text',
                     'time_widget' => 'single_text',
@@ -275,7 +323,7 @@ class Order
     public function sendToRdr()
     {
         if (!$this->order['finalized_ts']) {
-            return false;;
+            return false;
         }
         $order = $this->getRdrObject();
         if ($this->order['rdr_id']) {

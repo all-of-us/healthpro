@@ -1,4 +1,8 @@
 {% extends 'base.html.twig' %}
+{% import 'order-samples.html.twig' as samples %}
+{% if order.type != 'saliva' %}
+    {% form_theme finalizeForm 'form/simple_checkbox.html.twig' %}
+{% endif %}
 {% block title %}Finalize - Order {{ order.order_id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'finalize' } %}
@@ -20,10 +24,11 @@
             <span class="toggle-help-image" data-caption="Finalized samples help text placeholder.">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
             </span>
-                <div class="checkbox">
-                    <label><input type="checkbox" id="checkall"> <strong>Check all</strong></label>
-                </div>
-            {{ form_widget(finalizeForm.finalized_samples) }}
+            {% if order.type == 'saliva' %}
+                {{ form_widget(finalizeForm.finalized_samples) }}
+            {% else %}
+                {{ samples.form_widget(finalizeForm.finalized_samples, order.finalized_ts ? false : true, samplesInfo) }}
+            {% endif %}
             {{ form_errors(finalizeForm.finalized_samples) }}
         </div>
 
@@ -36,15 +41,13 @@
             {{ form_errors(finalizeForm.finalized_notes) }}
         </div>
         {{ form_rest(finalizeForm) }}
-        <p>
-            <button type="submit" class="btn btn-primary">
-                {% if order.finalized_ts %}
-                    Update
-                {% else %}
+        {% if not order.finalized_ts %}
+            <p>
+                <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to finalize this order?');">
                     Save and mark as finalized
-                {% endif %}
-            </button>
-        </p>
+                </button>
+            </p>
+        {% endif %}
     {{ form_end(finalizeForm) }}
 
 {% endblock %}
@@ -52,8 +55,14 @@
 {% block pagejs %}
 <script>
 $(document).ready(function () {
+{% if order.type == 'saliva' %}
     $('input.sample-disabled').closest('label').addClass('text-danger');
     $('input.sample-disabled').closest('div.checkbox').append('<small class="text-muted">was not collected/processed</small>');
+{% else %}
+    $('.sample-disabled label').addClass('text-danger');
+    $('.sample-disabled').find('td:last').append('<small style="margin-left:15px" class="text-muted">was not collected/processed</small>');
+{% endif %}
+
     $('#checkall').on('change', function() {
         $('#form_finalized_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
     });
