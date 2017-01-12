@@ -42,41 +42,6 @@ class MayolinkOrder
             'specimen' => 'Saliva'
         ]
     ];
-    public static $siteAccounts = [
-        'a' => '7035588',
-        'b' => '7035500',
-        'uofacats' => '7035650',
-        'bannerscampus' => '7035651',
-        'bannerphoenix' => '7035652',
-        'bannerestrella' => '7035653',
-        'bannerdesert' => '7035654',
-        'uicresearch' => '7035707',
-        'nwfeinberggalter' => '7035702',
-        'uofchicago' => '7035703',
-        'rushuniv' => '7035704',
-        'northshoree' => '7035705',
-        'irvingcolumbia' => '7035709',
-        'harlem' => '7035710',
-        'weillcornell' => '7035711',
-        'sdbb' => '7035735', // sdbb and walgreens use the same account
-        'walgreens' => '7035735', // sdbb and walgreens use the same account
-        'vabostonhc' => '7035759',
-        'vapaloalto' => '7035758',
-        'jeanettephillips' => '7035760',
-        'monroeville' => '7035769',
-        'aikenmed' => '7035770',
-        'upmc' => '7035771',
-        'montefiorectrc' => '7035772',
-        'pelionfp' => '7035779',
-        'waverlyfp' => '7035780',
-        'eauclairewi' => '7035781',
-        'morristown' => '7035777',
-        'knoxville' => '7035778',
-        'jamesanderson' => '7035782',
-        'copiah' => '7035783',
-        'otay' => '7035784',
-        'chcoceanview' => '7035785'
-    ];
 
     private $client;
     private $csrfToken;
@@ -147,8 +112,8 @@ class MayolinkOrder
             $body["temperatures[{$test}][{$testOptions['specimen']}]"] = $testOptions['temperature'];
             $i++;
         }
-        if (isset($options['site']) && isset(self::$siteAccounts[$options['site']])) {
-            $body['account'] = self::$siteAccounts[$options['site']];
+        if (isset($options['mayoClientId'])) {
+            $body['account'] = $options['mayoClientId'];
         }
         $response = $this->client->request('POST', "{$this->ordersEndpoint}/en/orders", [
             'form_params' => $body,

@@ -128,6 +128,11 @@ class OrderController extends AbstractController
                     // set collected time to today at midnight local time
                     $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
                     $order = new MayolinkOrder();
+
+                    if(!$site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                        $site['mayolink_account'] = null;
+                    }
+
                     $options = [
                         'type' => $orderData['type'],
                         'patient_id' => $participant->biobankId,
@@ -135,8 +140,9 @@ class OrderController extends AbstractController
                         'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob($orderData['type']),
                         'order_id' => $orderData['order_id'],
                         'collected_at' => $collectedAt,
-                        'site' => $app->getSiteId()
+                        'mayoClientId' => $site['mayolink_account']
                     ];
+
                     if (isset($requestedSamples) && is_array($requestedSamples)) {
                         $options['tests'] = $requestedSamples;
                     }
