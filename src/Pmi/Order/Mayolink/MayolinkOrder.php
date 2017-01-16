@@ -112,7 +112,7 @@ class MayolinkOrder
             $body["temperatures[{$test}][{$testOptions['specimen']}]"] = $testOptions['temperature'];
             $i++;
         }
-        if (isset($options['mayoClientId'])) {
+        if (!empty($options['mayoClientId'])) {
             $body['account'] = $options['mayoClientId'];
         }
         $response = $this->client->request('POST', "{$this->ordersEndpoint}/en/orders", [
