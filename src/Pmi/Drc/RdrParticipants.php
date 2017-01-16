@@ -111,9 +111,10 @@ class RdrParticipants
         }
         $results = [];
         foreach ($responseObject->entry as $participant) {
-            $result = $this->participantToResult($participant);
-            if ($result) {
-                $results[] = $result;
+            if (isset($participant->resource) && is_object($participant->resource)) {
+                if ($result = $this->participantToResult($participant->resource)) {
+                    $results[] = $result;
+                }
             }
         }
 
