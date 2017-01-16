@@ -128,6 +128,12 @@ class OrderController extends AbstractController
                     // set collected time to today at midnight local time
                     $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
                     $order = new MayolinkOrder();
+
+                    if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                        $mayoClientId = $site['mayolink_account'];
+                    } else {
+                        $mayoClientId = null;
+                    }
                     $options = [
                         'type' => $orderData['type'],
                         'patient_id' => $participant->biobankId,
@@ -135,8 +141,9 @@ class OrderController extends AbstractController
                         'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob($orderData['type']),
                         'order_id' => $orderData['order_id'],
                         'collected_at' => $collectedAt,
-                        'site' => $app->getSiteId()
+                        'mayoClientId' => $mayoClientId
                     ];
+
                     if (isset($requestedSamples) && is_array($requestedSamples)) {
                         $options['tests'] = $requestedSamples;
                     }
@@ -348,10 +355,14 @@ class OrderController extends AbstractController
         if ($app->isProd()) {
             $app->abort(404);
         }
+        $siteAccounts = [];
+        foreach ($app['em']->getRepository('sites')->fetchBy([]) as $site) {
+            $siteAccounts[$site['google_group']] = $site['mayolink_account'];
+        }
         $orders = $app['db']->fetchAll("SELECT finalized_ts, site, biobank_id, mayo_id FROM orders WHERE finalized_ts is not null and site != '' and biobank_id !=''");
         $skipSites = ['a', 'b'];
         $noteSites = ['7035702', '7035703', '7035704', '7035705', '7035707'];
-        $stream = function() use ($orders, $skipSites, $noteSites) {
+        $stream = function() use ($orders, $skipSites, $noteSites, $siteAccounts) {
             $output = fopen('php://output', 'w');
             fputcsv($output, array('Biobank ID', 'ML Order ID', 'ML Client ID', 'Finalized (CT)', 'Notes'));
             foreach ($orders as $order) {
@@ -359,10 +370,10 @@ class OrderController extends AbstractController
                 if (in_array($order['site'], $skipSites)) {
                     continue;
                 }
-                if (!array_key_exists($order['site'], MayolinkOrder::$siteAccounts)) {
+                if (!array_key_exists($order['site'], $siteAccounts)) {
                     continue;
                 }
-                $clientId = MayolinkOrder::$siteAccounts[$order['site']];
+                $clientId = $siteAccounts[$order['site']];
                 fputcsv($output, [
                     $order['biobank_id'],
                     $order['mayo_id'],
