@@ -8,11 +8,8 @@ CREATE TABLE `sites` (
 ) DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `sites` (name, google_group, mayolink_account) VALUES 
-('Hogwarts', 'hogwarts-google-group', 'hogwarts-mayo'),
-('Durmstrang', 'durmstrang-google-group','durmstrang-mayo'),
-('Beauxbatons', 'beauxbatons-google-group','beauxbatons-mayo'),
-('A', 'a', '7035588'),
-('B', 'b', '7035500'),
+('Test Site A', 'a', '7035588'),
+('Test Site B', 'b', '7035500'),
 ('University of Arizona CATS','uofacats', '7035650'),
 ('Banner Health Campus','bannerscampus', '7035651'),
 ('Banner Health Phoenix','bannerphoenix', '7035652'),
@@ -26,6 +23,7 @@ INSERT INTO `sites` (name, google_group, mayolink_account) VALUES
 ('Columbia University Irving Institute','irvingcolumbia', '7035709'),
 ('Harlem','harlem', '7035710'),
 ('Weill Cornell Medical Center','weillcornell', '7035711'),
+# Note - SDBB and Walgreens share the same account
 ('San Diego Blood Bank','sdbb', '7035735'),
 ('Walgreens','walgreens', '7035735'),
 ('VA Boston HC','vabostonhc', '7035759'),
@@ -45,4 +43,3 @@ INSERT INTO `sites` (name, google_group, mayolink_account) VALUES
 ('Otay Mesa Medical Offices','otay', '7035784'),
 ('Comprehensive Health Center Ocean View','chcoceanview', '7035785');
 
-# SDBB and Walgreens share the same account
