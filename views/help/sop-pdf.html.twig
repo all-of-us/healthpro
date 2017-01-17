@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li><a href="{{ path('help_home') }}">Help</a></li>
+        <li><a href="{{ path('help_sop') }}">All of Us℠ Research Program SOPs</a></li>
+        <li class="active">{{ sop }}</li>
+    </ol>
+    <div class="page-header">
+        <h2><i class="fa fa-file-text-o" aria-hidden="true"></i> {{ sop }} <small>{{ title }}</small></h2>
+    </div>
+    <iframe class="pdf" name="pdf" src="https://storage.googleapis.com/pmi-hpo-staging.appspot.com/{{ filename|url_encode }}#view=FitH"></iframe>
+{% endblock %}

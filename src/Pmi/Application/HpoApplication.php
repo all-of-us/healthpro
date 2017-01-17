@@ -184,6 +184,7 @@ class HpoApplication extends AbstractApplication
         $whitelist =  "default-src 'self'"
             . " 'unsafe-eval'" // required for setTimeout and setInterval
             . " 'unsafe-inline'" // for the places we are using inline JS
+            . " storage.googleapis.com" // for SOP PDFs stored in a Google Storage bucket
             . " cdn.plot.ly;" // allow plot.ly remote requests
             . " img-src 'self' data:"; // allow self and data: urls for img src
 
