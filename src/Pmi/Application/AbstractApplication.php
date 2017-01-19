@@ -24,7 +24,8 @@ abstract class AbstractApplication extends Application
 {
     const ENV_LOCAL = 'local'; // development environment (local GAE SDK)
     const ENV_DEV   = 'dev';   // development environment (deployed to GAE)
-    const ENV_TEST  = 'test';  // user/security testing environment
+    const ENV_TEST  = 'test';  // security testing environment
+    const ENV_DEMO  = 'demo';  // demo environment
     const ENV_PROD  = 'prod';  // production environment
     const DEFAULT_TIMEZONE = 'America/New_York';
 
@@ -51,6 +52,8 @@ abstract class AbstractApplication extends Application
             return self::ENV_DEV;
         } elseif ($env == self::ENV_TEST) {
             return self::ENV_TEST;
+        } elseif ($env == self::ENV_DEMO) {
+            return self::ENV_DEMO;
         } elseif ($env == self::ENV_PROD) {
             return self::ENV_PROD;
         } else {
@@ -71,29 +74,34 @@ abstract class AbstractApplication extends Application
             $values['isUnitTest'] = false;
         }
         if (!array_key_exists('debug', $values)) {
-            $values['debug'] = ($values['env'] === self::ENV_PROD || $values['env'] === self::ENV_TEST || $values['isUnitTest']) ? false : true;
+            $values['debug'] = ($values['env'] === self::ENV_PROD || $values['env'] === self::ENV_DEMO || $values['env'] === self::ENV_TEST || $values['isUnitTest']) ? false : true;
         }
         $values['assetVer'] = $values['env'] === self::ENV_LOCAL ?
             date('YmdHis') : $values['release'];
 
         parent::__construct($values);
     }
-    
+
     public function isLocal()
     {
         return $this['env'] === self::ENV_LOCAL;
     }
-    
+
     public function isDev()
     {
         return $this['env'] === self::ENV_DEV;
     }
-    
+
     public function isTest()
     {
         return $this['env'] === self::ENV_TEST;
     }
-    
+
+    public function isDemo()
+    {
+        return $this['env'] === self::ENV_DEMO;
+    }
+
     public function isProd()
     {
         return $this['env'] === self::ENV_PROD;
