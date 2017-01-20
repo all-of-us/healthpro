@@ -197,7 +197,9 @@ class WorkQueueController extends AbstractController
                 'Phone Number',
                 'Email Address',
                 'Mailing Address',
-                'PMI ID'
+                'PMI ID',
+                'Consent Date',
+                'Withdrawal Status'
             ];
             foreach (self::$surveys as $survey => $label) {
                 $headers[] = $label . ' PPI Survey Completion';
@@ -213,7 +215,9 @@ class WorkQueueController extends AbstractController
                     $participant['phoneNumber'],
                     $participant['emailAddress'],
                     str_replace("\n", ', ', trim($participant['mailingAddress'])),
-                    $participant['pmiId']
+                    $participant['pmiId'],
+                    $participant['consentDate']->format('m/d/Y'),
+                    $participant['withdrawalStatus']
                 ];
                 foreach (self::$surveys as $survey => $label) {
                     $row[] = $participant["questionnaireOn{$survey}"] === 'SUBMITTED' ? 1 : 0;
