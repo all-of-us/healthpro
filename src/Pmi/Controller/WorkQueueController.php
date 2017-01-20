@@ -193,6 +193,8 @@ class WorkQueueController extends AbstractController
         $participants = $this->participantSummarySearch($params);
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
+            fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
+            fwrite($output, "\"\"\n");
             $headers = [
                 'PMI ID',
                 'Last Name',
@@ -229,6 +231,8 @@ class WorkQueueController extends AbstractController
                 $row[] = $participant['withdrawalStatus'];
                 fputcsv($output, $row);
             }
+            fwrite($output, "\"\"\n");
+            fputcsv($output, ['Confidential Information']);
             fclose($output);
         };
 
