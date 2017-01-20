@@ -155,7 +155,15 @@ class WorkQueueController extends AbstractController
                 'questionnaireOnOverallHealth' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
                 'questionnaireOnPersonalHabits' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
                 'questionnaireOnSociodemographics' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnSleep' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET'
+                'questionnaireOnSleep' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
+                'withdrawalStatus' => $faker->randomElement([
+                    'Suspension -- No Contact',
+                    'Suspension -- No Access',
+                    'Withdrawal -- No Use',
+                    'Withdrawal -- No Use After Death',
+                    'Enrolled']),
+                'pmiId' => 'P' . $faker->randomNumber(9),
+                'consentDate' => $faker->dateTimeBetween('-1 year', 'now')
             ];
         }
         usort($results, function($a, $b) {
@@ -188,7 +196,8 @@ class WorkQueueController extends AbstractController
                 'Preferred Contact Method',
                 'Phone Number',
                 'Email Address',
-                'Mailing Address'
+                'Mailing Address',
+                'PMI ID'
             ];
             foreach (self::$surveys as $survey => $label) {
                 $headers[] = $label . ' PPI Survey Completion';
@@ -203,7 +212,8 @@ class WorkQueueController extends AbstractController
                     $participant['preferredContact'],
                     $participant['phoneNumber'],
                     $participant['emailAddress'],
-                    str_replace("\n", ', ', trim($participant['mailingAddress']))
+                    str_replace("\n", ', ', trim($participant['mailingAddress'])),
+                    $participant['pmiId']
                 ];
                 foreach (self::$surveys as $survey => $label) {
                     $row[] = $participant["questionnaireOn{$survey}"] === 'SUBMITTED' ? 1 : 0;
