@@ -156,12 +156,15 @@ class WorkQueueController extends AbstractController
                 'questionnaireOnPersonalHabits' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
                 'questionnaireOnSociodemographics' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
                 'questionnaireOnSleep' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'withdrawalStatus' => $faker->randomElement([
-                    'Suspension -- No Contact',
-                    'Suspension -- No Access',
-                    'Withdrawal -- No Use',
-                    'Withdrawal -- No Use After Death',
-                    'Enrolled']),
+                'withdrawalStatus' => $faker->randomElement(array_merge(
+                    array_fill(0, 16, 'Enrolled'),
+                    [
+                        'Suspension - No Contact',
+                        'Suspension - No Access',
+                        'Withdrawal - No Use',
+                        'Withdrawal - No Use After Death'
+                    ]
+                )),
                 'pmiId' => 'P' . $faker->randomNumber(9),
                 'consentDate' => $faker->dateTimeBetween('-1 year', 'now')
             ];
