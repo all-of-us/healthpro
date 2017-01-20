@@ -33,7 +33,7 @@ $app
     ->mount('/admin', new Controller\AdminController())
 ;
 
-if ($app->isLocal() || $app->isDev() || $app->isDemo()) {
+if (!$app->isProd() && !$app->isStable()) {
     $app->mount('/workqueue', new Controller\WorkQueueController());
     $app->mount('/help', new Controller\HelpController());
 }

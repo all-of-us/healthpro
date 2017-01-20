@@ -29,8 +29,8 @@ class DeployCommand extends Command {
         'pmi-hpo-test'
     ];
 
-    /** GAE application IDs for demos. */
-    private static $DEMO_APP_IDS = [
+    /** GAE application IDs for staging. */
+    private static $STAGING_APP_IDS = [
         'pmi-hpo-staging'
     ];
 
@@ -203,7 +203,7 @@ class DeployCommand extends Command {
         $this->runJsSecurityCheck(); // must occur after asset compilation
 
         // unit tests should pass before deploying to testers or production
-        if ($this->isDemo() || $this->isStable() || $this->isProd()) {
+        if ($this->isStaging() || $this->isStable() || $this->isProd()) {
             $this->runUnitTests();
         }
 
@@ -267,8 +267,8 @@ class DeployCommand extends Command {
             return AbstractApplication::ENV_DEV;
         } elseif ($this->isStable()) {
             return AbstractApplication::ENV_STABLE;
-        } elseif ($this->isDemo()) {
-            return AbstractApplication::ENV_DEMO;
+        } elseif ($this->isStaging()) {
+            return AbstractApplication::ENV_STAGING;
         } elseif ($this->isProd()) {
             return AbstractApplication::ENV_PROD;
         } else {
@@ -278,7 +278,7 @@ class DeployCommand extends Command {
 
     private function isDev()
     {
-        return !$this->local && !$this->isStable() && !$this->isDemo() && !$this->isProd();
+        return !$this->local && !$this->isStable() && !$this->isStaging() && !$this->isProd();
     }
 
     private function isStable()
@@ -286,9 +286,9 @@ class DeployCommand extends Command {
         return !$this->local && in_array($this->appId, self::$STABLE_APP_IDS);
     }
     
-    private function isDemo()
+    private function isStaging()
     {
-        return !$this->local && in_array($this->appId, self::$DEMO_APP_IDS);
+        return !$this->local && in_array($this->appId, self::$STAGING_APP_IDS);
     }
 
     private function isProd()
@@ -419,7 +419,7 @@ class DeployCommand extends Command {
             if (strlen($line) === 0) {
                 continue;
             } elseif (preg_match('/^display_errors\s*=/i', $line)) {
-                $line = 'display_errors = ' . (($this->isProd() || $this->isStable() || $this->isDemo()) ? 0 : 1);
+                $line = 'display_errors = ' . (($this->isProd() || $this->isStable() || $this->isStaging()) ? 0 : 1);
             } elseif (preg_match('/^error_reporting\s*=/i', $line)) {
                 $line = 'error_reporting = ' . ($this->isProd() ?
                     'E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED' : 'E_ALL');
@@ -455,7 +455,7 @@ class DeployCommand extends Command {
                 continue;
             } elseif (stristr($c['url'], '/_ah/datastore_admin/backup.create') !== false) {
                 // enable DS backup only in production and test sites
-                if (!$this->isProd() && !$this->isStable() && !$this->isDemo()) {
+                if (!$this->isProd() && !$this->isStable() && !$this->isStaging()) {
                     continue;
                 } else {
                     $c['url'] = str_replace('{BUCKET_PREFIX}', $this->appId, $c['url']);

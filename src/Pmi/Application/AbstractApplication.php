@@ -24,8 +24,8 @@ abstract class AbstractApplication extends Application
 {
     const ENV_LOCAL = 'local'; // development environment (local GAE SDK)
     const ENV_DEV   = 'dev';   // development environment (deployed to GAE)
+    const ENV_STAGING  = 'staging';  // staging environment
     const ENV_STABLE  = 'stable';  // security testing / training environment
-    const ENV_DEMO  = 'demo';  // demo environment
     const ENV_PROD  = 'prod';  // production environment
     const DEFAULT_TIMEZONE = 'America/New_York';
 
@@ -52,8 +52,8 @@ abstract class AbstractApplication extends Application
             return self::ENV_DEV;
         } elseif ($env == self::ENV_STABLE) {
             return self::ENV_STABLE;
-        } elseif ($env == self::ENV_DEMO) {
-            return self::ENV_DEMO;
+        } elseif ($env == self::ENV_STAGING) {
+            return self::ENV_STAGING;
         } elseif ($env == self::ENV_PROD) {
             return self::ENV_PROD;
         } else {
@@ -74,7 +74,7 @@ abstract class AbstractApplication extends Application
             $values['isUnitTest'] = false;
         }
         if (!array_key_exists('debug', $values)) {
-            $values['debug'] = ($values['env'] === self::ENV_PROD || $values['env'] === self::ENV_DEMO || $values['env'] === self::ENV_STABLE || $values['isUnitTest']) ? false : true;
+            $values['debug'] = ($values['env'] === self::ENV_PROD || $values['env'] === self::ENV_STAGING || $values['env'] === self::ENV_STABLE || $values['isUnitTest']) ? false : true;
         }
         $values['assetVer'] = $values['env'] === self::ENV_LOCAL ?
             date('YmdHis') : $values['release'];
@@ -97,9 +97,9 @@ abstract class AbstractApplication extends Application
         return $this['env'] === self::ENV_STABLE;
     }
 
-    public function isDemo()
+    public function isStaging()
     {
-        return $this['env'] === self::ENV_DEMO;
+        return $this['env'] === self::ENV_STAGING;
     }
 
     public function isProd()
