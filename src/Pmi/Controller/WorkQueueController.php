@@ -194,39 +194,39 @@ class WorkQueueController extends AbstractController
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
             $headers = [
+                'PMI ID',
                 'Last Name',
                 'First Name',
                 'Preferred Contact Method',
                 'Phone Number',
                 'Email Address',
                 'Mailing Address',
-                'PMI ID',
-                'Consent Date',
-                'Withdrawal Status'
+                'Consent Date'
             ];
             foreach (self::$surveys as $survey => $label) {
                 $headers[] = $label . ' PPI Survey Completion';
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Biobank Samples';
+            $headers[] = 'Withdrawal Status';
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
                 $row = [
+                    $participant['pmiId'],
                     $participant['lastName'],
                     $participant['firstName'],
                     $participant['preferredContact'],
                     $participant['phoneNumber'],
                     $participant['emailAddress'],
                     str_replace("\n", ', ', trim($participant['mailingAddress'])),
-                    $participant['pmiId'],
-                    $participant['consentDate']->format('m/d/Y'),
-                    $participant['withdrawalStatus']
+                    $participant['consentDate']->format('m/d/Y')
                 ];
                 foreach (self::$surveys as $survey => $label) {
                     $row[] = $participant["questionnaireOn{$survey}"] === 'SUBMITTED' ? 1 : 0;
                 }
                 $row[] = $participant['physicalEvaluationStatus'] === 'SUBMITTED' ? 1 : 0;
                 $row[] = $participant['biobankStatus'];
+                $row[] = $participant['withdrawalStatus'];
                 fputcsv($output, $row);
             }
             fclose($output);
