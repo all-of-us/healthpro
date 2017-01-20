@@ -155,7 +155,18 @@ class WorkQueueController extends AbstractController
                 'questionnaireOnOverallHealth' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
                 'questionnaireOnPersonalHabits' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
                 'questionnaireOnSociodemographics' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnSleep' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET'
+                'questionnaireOnSleep' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
+                'withdrawalStatus' => $faker->randomElement(array_merge(
+                    array_fill(0, 16, 'Enrolled'),
+                    [
+                        'Suspension - No Contact',
+                        'Suspension - No Access',
+                        'Withdrawal - No Use',
+                        'Withdrawal - No Use After Death'
+                    ]
+                )),
+                'pmiId' => 'P' . $faker->randomNumber(9),
+                'consentDate' => $faker->dateTimeBetween('-1 year', 'now')
             ];
         }
         usort($results, function($a, $b) {
@@ -183,33 +194,39 @@ class WorkQueueController extends AbstractController
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
             $headers = [
+                'PMI ID',
                 'Last Name',
                 'First Name',
                 'Preferred Contact Method',
                 'Phone Number',
                 'Email Address',
-                'Mailing Address'
+                'Mailing Address',
+                'Consent Date'
             ];
             foreach (self::$surveys as $survey => $label) {
                 $headers[] = $label . ' PPI Survey Completion';
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Biobank Samples';
+            $headers[] = 'Withdrawal Status';
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
                 $row = [
+                    $participant['pmiId'],
                     $participant['lastName'],
                     $participant['firstName'],
                     $participant['preferredContact'],
                     $participant['phoneNumber'],
                     $participant['emailAddress'],
-                    str_replace("\n", ', ', trim($participant['mailingAddress']))
+                    str_replace("\n", ', ', trim($participant['mailingAddress'])),
+                    $participant['consentDate']->format('m/d/Y')
                 ];
                 foreach (self::$surveys as $survey => $label) {
                     $row[] = $participant["questionnaireOn{$survey}"] === 'SUBMITTED' ? 1 : 0;
                 }
                 $row[] = $participant['physicalEvaluationStatus'] === 'SUBMITTED' ? 1 : 0;
                 $row[] = $participant['biobankStatus'];
+                $row[] = $participant['withdrawalStatus'];
                 fputcsv($output, $row);
             }
             fclose($output);
