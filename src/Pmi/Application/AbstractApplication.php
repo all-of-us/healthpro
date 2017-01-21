@@ -24,11 +24,23 @@ abstract class AbstractApplication extends Application
 {
     const ENV_LOCAL = 'local'; // development environment (local GAE SDK)
     const ENV_DEV   = 'dev';   // development environment (deployed to GAE)
-    const ENV_TEST  = 'test';  // user/security testing environment
+    const ENV_STAGING  = 'staging';  // staging environment
+    const ENV_STABLE  = 'stable';  // security testing / training environment
     const ENV_PROD  = 'prod';  // production environment
-    
+    const DEFAULT_TIMEZONE = 'America/New_York';
+
     protected $name;
     protected $configuration = [];
+
+    public static $timezoneOptions = [
+        'America/New_York' => 'Eastern Time',
+        'America/Chicago' => 'Central Time',
+        'America/Denver' => 'Mountain Time',
+        'America/Phoenix' => 'Mountain Time - Arizona',
+        'America/Los_Angeles' => 'Pacific Time',
+        'America/Anchorage' => 'Alaska Time',
+        'Pacific/Honolulu' => 'Hawaii Time'
+    ];
 
     /** Determines the environment under which the code is running. */
     private static function determineEnv()
@@ -38,8 +50,10 @@ abstract class AbstractApplication extends Application
             return self::ENV_LOCAL;
         } elseif ($env == self::ENV_DEV) {
             return self::ENV_DEV;
-        } elseif ($env == self::ENV_TEST) {
-            return self::ENV_TEST;
+        } elseif ($env == self::ENV_STABLE) {
+            return self::ENV_STABLE;
+        } elseif ($env == self::ENV_STAGING) {
+            return self::ENV_STAGING;
         } elseif ($env == self::ENV_PROD) {
             return self::ENV_PROD;
         } else {
@@ -60,29 +74,34 @@ abstract class AbstractApplication extends Application
             $values['isUnitTest'] = false;
         }
         if (!array_key_exists('debug', $values)) {
-            $values['debug'] = ($values['env'] === self::ENV_PROD || $values['env'] === self::ENV_TEST || $values['isUnitTest']) ? false : true;
+            $values['debug'] = ($values['env'] === self::ENV_PROD || $values['env'] === self::ENV_STAGING || $values['env'] === self::ENV_STABLE || $values['isUnitTest']) ? false : true;
         }
         $values['assetVer'] = $values['env'] === self::ENV_LOCAL ?
             date('YmdHis') : $values['release'];
-        
+
         parent::__construct($values);
     }
-    
+
     public function isLocal()
     {
         return $this['env'] === self::ENV_LOCAL;
     }
-    
+
     public function isDev()
     {
         return $this['env'] === self::ENV_DEV;
     }
-    
-    public function isTest()
+
+    public function isStable()
     {
-        return $this['env'] === self::ENV_TEST;
+        return $this['env'] === self::ENV_STABLE;
     }
-    
+
+    public function isStaging()
+    {
+        return $this['env'] === self::ENV_STAGING;
+    }
+
     public function isProd()
     {
         return $this['env'] === self::ENV_PROD;
@@ -232,7 +251,40 @@ abstract class AbstractApplication extends Application
         $token = $this['security.token_storage']->getToken();
         return $token ? $token->getUser() : null;
     }
-    
+
+    public function getUserId()
+    {
+        if ($user = $this->getUser()) {
+            return $user->getId();
+        } else {
+            return null;
+        }
+    }
+
+    public function getUserTimezone($useDefault = true)
+    {
+        if ($user = $this->getUser()) {
+            if (($info = $user->getInfo()) && isset($info['timezone'])) {
+                return $info['timezone'];
+            }
+        }
+        if ($useDefault) {
+            return self::DEFAULT_TIMEZONE;
+        } else {
+            return null;
+        }
+    }
+
+    public function getUserTimezoneDisplay()
+    {
+        $timezone = $this->getUserTimezone();
+        if (array_key_exists($timezone, static::$timezoneOptions)) {
+            return static::$timezoneOptions[$timezone];
+        } else {
+            return $timezone;
+        }
+    }
+
     public function hasRole($role)
     {
         return $this->isLoggedIn() && $this['security.authorization_checker']->isGranted($role);
@@ -307,11 +359,17 @@ abstract class AbstractApplication extends Application
                 return;
             }
         });
+
         // Register custom Twig asset function
         $this['twig']->addFunction(new Twig_SimpleFunction('asset', function($asset) {
             $basePath = $this['request_stack']->getCurrentRequest()->getBasepath();
             $basePath .= '/assets/';
             return $basePath . ltrim($asset, '/');
+        }));
+
+        // Register custom Twig path_exists function
+        $this['twig']->addFunction(new Twig_SimpleFunction('path_exists', function($name) {
+            return !is_null($this['routes']->get($name));
         }));
 
         // Register custom Twig cache

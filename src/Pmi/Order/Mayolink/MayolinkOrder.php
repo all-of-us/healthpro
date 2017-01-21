@@ -7,14 +7,6 @@ class MayolinkOrder
     protected $authEndpoint = 'https://profile.mayomedicallaboratories.com/authn';
     protected $providerName = 'www.mayomedicallaboratories.com';
     protected static $tests = [
-        '1ED04' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
-        '1ED10' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
         '1SST8' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'Serum SST'
@@ -23,13 +15,21 @@ class MayolinkOrder
             'temperature' => 'Refrigerated',
             'specimen' => 'Plasma PST'
         ],
-        '2ED10' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
         '1HEP4' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'WB Sodium Heparin'
+        ],
+        '1ED04' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '1ED10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '2ED10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
         ],
         '1UR10' => [
             'temperature' => 'Refrigerated',
@@ -41,15 +41,6 @@ class MayolinkOrder
             'temperature' => 'Refrigerated',
             'specimen' => 'Saliva'
         ]
-    ];
-    protected static $siteAccounts = [
-        'a' => '7035588',
-        'b' => '7035500',
-        'uofacats' => '7035650',
-        'bannerscampus' => '7035651',
-        'bannerphoenix' => '7035652',
-        'bannerestrella' => '7035653',
-        'bannerdesert' => '7035654'
     ];
 
     private $client;
@@ -121,8 +112,8 @@ class MayolinkOrder
             $body["temperatures[{$test}][{$testOptions['specimen']}]"] = $testOptions['temperature'];
             $i++;
         }
-        if (isset($options['site']) && isset(self::$siteAccounts[$options['site']])) {
-            $body['account'] = self::$siteAccounts[$options['site']];
+        if (!empty($options['mayoClientId'])) {
+            $body['account'] = $options['mayoClientId'];
         }
         $response = $this->client->request('POST', "{$this->ordersEndpoint}/en/orders", [
             'form_params' => $body,

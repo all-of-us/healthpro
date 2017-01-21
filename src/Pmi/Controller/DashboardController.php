@@ -11,7 +11,7 @@ class DashboardController extends AbstractController
     protected static $name = 'dashboard';
 
     const PARTICIPANT_GOAL = 1000000;
-
+    
     protected static $routes = [
         ['home', '/'],
         ['demo', '/demo'],
@@ -42,7 +42,7 @@ class DashboardController extends AbstractController
 
         // get request attributes
         $filter_by = $request->get('metrics_attribute');
-        //$bucket_by = $request->get('bucket_by');
+        $interval = $request->get('interval');
         $start_date = $request->get('start_date');
         $end_date = $request->get('end_date');
 
@@ -56,96 +56,85 @@ class DashboardController extends AbstractController
 
         $data = [];
 
-        $dates = [];
-        $entries = [];
-        $values = [];
-        $totals = [];
-        $hover_text = [];
+        if (!empty($results)) {
+            if (empty($start_date)) {
+                $start_date = $results[0]->date;
+            } else {
+                $start_date = $this->sanitizeDate($start_date);
+            }
 
-        // grab all entries and dates to use for plotly
-        foreach($results as $row) {
-            $date = explode('T', $row->date)[0];
-            if ($this->checkDates($date, $start_date, $end_date)) {
-                array_push($dates, $date);
-                foreach($row->entries as $entry) {
-                    if (strpos($entry->name, '.') !== false) {
-                        $parts = explode('.', $entry->name);
-                        $filter_key = $parts[0] . "." . $parts[1];
-                        $entry_name = $parts[2];
-                    } else {
-                        $filter_key = $entry->name;
-                        $entry_name = 'Total Participants';
-                    }
+            $control_dates = array_reverse($this->getDashboardDates($start_date, $end_date, $interval));
+            $dates = [];
+            $values = [];
+            $hover_text = [];
 
-                    if ($filter_key === $filter_by) {
-                        if (!in_array($entry_name, $entries)) {
-                            array_push($entries, $entry_name);
+            // retrieve controlled vocab for entries from metrics cache
+            if ($filter_by != 'Participant') {
+                $entries = $this->getMetricsFieldDefinitions($app, $filter_by);
+            } else {
+                $entries = ['Total Participants'];
+            }
+
+            // iterate again to grab values now that we have all possible entries
+            foreach($results as $row) {
+                $date = explode('T', $row->date)[0];
+                if ($this->checkDates($date, $start_date, $end_date, $control_dates)) {
+                    // grab date for x axis
+                    array_push($dates, $date);
+                    foreach ($entries as $entry) {
+                        if ($filter_by == 'Participant') {
+                            $lookup = $filter_by;
+                        } else {
+                            $lookup = $filter_by . "." . $entry;
                         }
-                    }
+                        $row_entries = $row->entries;
+                        $match = $this->searchEntries($row_entries, 'name', $lookup);
 
-                    // if not performing total participant count, grab total to use for
-                    // percentage text
-                    if ($filter_by != 'Participant' && $filter_key == 'Participant') {
-                        array_push($totals, $entry->value);
+                        if (empty($match)) {
+                            $val = 0;
+                        } else {
+                            $val = $match[0];
+                        }
+
+                        $values[$entry][] = $val;
+
+                        // generate hover text if not doing total participant count
+                        if ($filter_by != 'Participant') {
+                            // grab total (since searchEntries returns array and there is only one val
+                            // it's safe to always grab the first value
+                            $total = $this->searchEntries($row_entries, 'name', 'Participant')[0];
+                            $hover_text[$entry][] = $this->calculatePercentText($val, $total). '<br />'. $date;
+                        }
                     }
                 }
             }
 
-        }
-        // set counter to keep track of how many rows have been processed (for totals array)
-        $i = 0;
+            // reverse sort so that they appear in ascending alphabetical order in the legend
+            rsort($entries);
 
-        // iterate again to grab values now that we have all possible entries
-        foreach($results as $row) {
-            $date = explode('T', $row->date)[0];
-            if ($this->checkDates($date, $start_date, $end_date)) {
-                foreach ($entries as $entry) {
-                    if ($filter_by == 'Participant') {
-                        $lookup = $filter_by;
-                    } else {
-                        $lookup = $filter_by . "." . $entry;
-                    }
-                    $row_entries = $row->entries;
-                    $match = $this->searchEntries($row_entries, 'name', $lookup);
-                    if (empty($match)) {
-                        $val = 0;
-                    } else {
-                        $val = $match[0];
-                    }
-
-                    $values[$entry][] = $val;
-
-                    if ($filter_by != 'Participant') {
-                       $hover_text[$entry][] = $this->calculatePercentText($val, $totals[$i]);
-                    }
+            // assemble data object in Plotly format
+            $i = 0;
+            foreach($entries as $entry) {
+                $trace = array(
+                    "x" => $dates,
+                    "y" => $values[$entry],
+                    "name" => $entry,
+                    "type" => "bar",
+                    "marker" => array(
+                        "color" => $this->getColorBrewerVal($i)
+                    )
+                );
+                // add hover text if needed
+                if ($filter_by != 'Participant') {
+                    $trace["text"] = $hover_text[$entry];
+                    $trace["hoverinfo"] = "text+name";
                 }
+
+                array_push($data, $trace);
                 $i++;
             }
         }
 
-        rsort($entries);
-
-        // assemble data object in Plotly format
-        $i = 0;
-        foreach($entries as $entry) {
-            $trace = array(
-                "x" => $dates,
-                "y" => $values[$entry],
-                "name" => $entry,
-                "type" => "bar",
-                "marker" => array(
-                    "color" => $this->getColorBrewerVal($i)
-                )
-            );
-            // add hover text if needed
-            if ($filter_by != 'Participant') {
-                $trace["text"] = $hover_text[$entry];
-                $trace["hoverinfo"] = "text+name";
-            }
-
-            array_push($data, $trace);
-            $i++;
-        }
         // return json
         return $app->json($data);
     }
@@ -155,10 +144,10 @@ class DashboardController extends AbstractController
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
             return $app->abort(500);
         }
-        
-        $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-        // load attribute to query
-        $metrics_attribute = $request->get('metrics_attribute');
+
+        // get request attributes
+        $map_mode = $request->get('map_mode');
+        $end_date = $this->sanitizeDate($request->get('end_date'));
         $color_profile = $request->get('color_profile');
 
         if ($color_profile == 'Custom') {
@@ -169,47 +158,104 @@ class DashboardController extends AbstractController
             ];
         };
 
-        $result = $metricsApi->metrics($metrics_attribute, "MONTH", "2016-10-01", "2017-10-01")->bucket;
+        // retrieve metrics from cache, or request new if expired
+        $results = $this->getMetricsObject($app, "NONE");
 
-        $all_states = $app['db']->fetchAll("SELECT distinct(state) FROM state_zip_ranges ORDER BY STATE");
-        $state_registrations = [];
-
-        foreach($all_states as $row) {
-            $state = $row['state'];
-            $state_registrations[$state] = 0;
-        }
-
-        foreach($result as $row){
-            if (property_exists($row, 'entries')) {
-                $row_entries = $row->entries;
-                foreach($row_entries as $ent) {
-                    $zip = (int)$ent->name;
-                    $state = $app['db']->fetchColumn("SELECT state FROM state_zip_ranges WHERE zip_min <= ?
-                                                          AND zip_max >= ?", [$zip, $zip]);
-                    if ($state != "0") {
-                        $state_registrations[$state] += $ent->value;
-                    }
-                }
+        // find closest date to requested cutoff and retrieve metrics
+        // iterate in reverse order as last objects are most recent
+        // break once value has been set
+        $lookup_date = $end_date . "T00:00:00";
+        $i = count($results);
+        $raw_results = [];
+        while ($i) {
+            $i--;
+            if ($results[$i]->date == $lookup_date) {
+                $raw_results = $results[$i]->entries;
+                break;
+            } elseif (strtotime($results[$i]->date) < strtotime($lookup_date)) {
+                // if date did not exists, grab current row as it will be closest to actual cutoff
+                $raw_results = $results[$i]->entries;
+                break;
             }
         }
-        $names = [];
-        $registrations = [];
 
-        foreach($state_registrations as $state => $count) {
-            array_push($names, $state);
-            array_push($registrations, $count);
+        $map_data = [];
+
+        if (!empty($results)) {
+            if ($map_mode == 'Participant.state') {
+                $states = $app['db']->fetchAll("SELECT * FROM state_census_regions");
+
+                $state_registrations = [];
+                $state_names = [];
+
+                // grab state names from states array
+                foreach($states as $row) {
+                    array_push($state_names, $row["state"]);
+                }
+                foreach($state_names as $state) {
+                    $state_lookup = $map_mode . "." . $state;
+                    $count = 0;
+
+                    // if data is present, set, otherwise leave default 0 count
+                    $match = $this->searchEntries($raw_results, 'name', $state_lookup);
+                    if (!empty($match)) {
+                        $count = $match[0];
+                    }
+
+                    array_push($state_registrations, $count);
+                }
+
+                $map_data[] = array(
+                    'type' => 'choropleth',
+                    'locationmode' => 'USA-states',
+                    'locations' => $state_names,
+                    'z' => $state_registrations,
+                    'text' => $state_names,
+                    "colorscale" => $color_profile
+                );
+            } else if ($map_mode == 'Participant.census_region') {
+                $states_by_region = [];
+                $registrations_by_state = [];
+                $region_text = [];
+                $census_regions = $app['db']->fetchAll("SELECT * FROM census_regions");
+
+                foreach($census_regions as $region) {
+                    $states = $app['db']->fetchAll("SELECT * FROM state_census_regions WHERE census_region_id = ? ORDER BY state", [$region["id"]]);
+                    $region_states = [];
+                    foreach($states as $state) {
+                        array_push($region_states, $state["state"]);
+                    }
+
+                    // construct lookup key for census region count (combination of map mode and census region (upcased))
+                    $census_lookup = $map_mode . "." . strtoupper($region['label']);
+                    $count = 0;
+
+                    // if data is present, set, otherwise leave default 0 count
+                    $match = $this->searchEntries($raw_results, 'name', $census_lookup);
+                    if (!empty($match)) {
+                        $count = $match[0];
+                    }
+
+                    foreach($region_states as $state) {
+                        array_push($states_by_region, $state);
+                        array_push($registrations_by_state, $count);
+                        array_push($region_text, $region["label"]);
+                    }
+                }
+
+                $map_data[] = array(
+                    'type' => 'choropleth',
+                    'locationmode' => 'USA-states',
+                    'locations' => $states_by_region,
+                    'z' => $registrations_by_state,
+                    'text' => $region_text,
+                    "colorscale" => $color_profile
+                );
+            }
         }
 
-        $data[] = array(
-            'type' => 'choropleth',
-            'locationmode' => 'USA-states',
-            'locations' => $names,
-            'z' => $registrations,
-            'text' => $names,
-            "colorscale" => $color_profile
-        );
-
-        return $app->json($data);
+        // return json
+        return $app->json($map_data);
     }
 
     // DEMO ACTIONS, NOT FOR DEPLOYMENT
@@ -554,6 +600,7 @@ class DashboardController extends AbstractController
     // Main method for retrieving metrics from API
     // stores result in memcache as it only updates daily
     // supports storing multiple entries for faceting
+    // also
     private function getMetricsObject(Application $app, $facet) {
         $memcache = new \Memcache();
         $memcacheKey = 'metrics_api_facet_' . $facet;
@@ -571,9 +618,32 @@ class DashboardController extends AbstractController
         return $metrics;
     }
 
+    // stores and returns field definitions as controlled vocabulary
+    private function getMetricsFieldDefinitions(Application $app, $field_key) {
+        $memcache = new \Memcache();
+        $memcacheKey = 'metrics_api_field_definitions';
+        $definitions = $memcache->get($memcacheKey);
+        if (!$definitions) {
+            try {
+                $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+                $definitions = $metricsApi->metrics(['NONE'])->field_definition;
+                // set expiration to four hours
+                $memcache->set($memcacheKey, $definitions, 0, 14400);
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                return false;
+            }
+        }
+        foreach($definitions as $entry) {
+            if ($entry->name == $field_key) {
+                $keys = $entry->values;
+            }
+        }
+        return $keys;
+    }
+
     // helper function to check date range cutoffs
-    private function checkDates($date, $start, $end) {
-        return strtotime($date) >= strtotime($start) && strtotime($date) <= strtotime($end);
+    private function checkDates($date, $start, $end, $controls) {
+        return strtotime($date) >= strtotime($start) && strtotime($date) <= strtotime($end) && in_array($date, $controls);
     }
 
     // helper function to return array of dates segmented by interval
@@ -595,7 +665,7 @@ class DashboardController extends AbstractController
             return "0 (0%)";
         } else {
             $percentage = $value / $total;
-            return "{$value} (".number_format( $percentage * 100, 2 ) . '%'.")";
+            return "<b>{$value}</b> (".number_format( $percentage * 100, 2 ) . '%'.")";
         }
 
     }
@@ -613,6 +683,12 @@ class DashboardController extends AbstractController
         return (int) $result[0][$key];
     }
 
+    // sanitize url date parameter to prevent SQL injection
+    private function sanitizeDate($date_string) {
+        return date('Y-m-d', strtotime($date_string));
+    }
+
+
     // helper to return either the keys or values for metrics
     // keys are names returned by metrics API, values are for display
     private function getMetricsKeyVals($kind) {
@@ -620,7 +696,9 @@ class DashboardController extends AbstractController
             "Participant" => "Total Participants",
             "Participant.membership_tier" => "Membership Tier",
             "Participant.gender_identity" => "Gender Identity",
-            "Participant.age_range" => "Age Range"
+            "Participant.age_range" => "Age Range",
+            "Participant.ethnicity" => "Ethnicity",
+            "Participant.race" => "Race"
         );
 
         if ($kind == 'keys') {
@@ -644,10 +722,5 @@ class DashboardController extends AbstractController
             }
         }
         return $results;
-    }
-
-    // sanitize url date parameter to prevent SQL injection
-    private function sanitizeDate($date_string) {
-        return date('Y-m-d', strtotime($date_string));
     }
 }

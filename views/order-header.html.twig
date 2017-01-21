@@ -1,9 +1,22 @@
 <h2>
     <i class="fa fa-medkit" aria-hidden="true"></i>
-    {{ order.created_ts|date('n/j/Y') }}
+    {{ order.created_ts|date('n/j/Y', app.userTimezone) }}
     <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
 </h2>
 <p class="lead">Order ID: <strong>{{ order.order_id }}</strong></p>
+
+<dl class="dl-horizontal">
+    <dt>Name</dt>
+    <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
+    <dt>Participant ID</dt>
+    <dd>{{ participant.id }}</dd>
+    <dt>Biobank ID</dt>
+    <dd>{{ participant.biobankId }}</dd>
+    <dt>DOB</dt>
+    <dd>{{ participant.dob|date('n/j/Y') }}</dd>
+    <dt>Gender Identity</dt>
+    <dd>{{ participant.genderIdentity }}</dd>
+</dl>
 
 {% set params = { participantId: participant.id, orderId: order.id } %}
 {% if order.type == 'kit' %}
@@ -21,10 +34,14 @@
     } %}
 {% endif %}
 <ul class="nav nav-tabs">
+    <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
     <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
     {% set nextEnabled = true %}
+    {% set previousStep = false %}
     {% for step, column in steps %}
-        {% if nextEnabled %}
+        {% if step == 'print' and order.finalized_ts %}
+            <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> {{ step|capitalize }}</a></li>
+        {% elseif nextEnabled %}
             <li role="presentation"{% if active == step %} class="active"{% endif %}>
                 <a href="{{ path('order'~(step|capitalize), params) }}">
                     {% if attribute(order, column~'_ts') %}
@@ -36,18 +53,14 @@
                 </a>
             </li>
         {% else %}
-            <li role="presentation" class="disabled"><a href="#">{{ step|capitalize }}</a></li>
+            <li role="presentation" class="disabled"><a href="#" title="{{ previousStep|capitalize }} time must be set to continue" data-toggle="tooltip" data-placement="bottom">{{ step|capitalize }}</a></li>
         {% endif %}
+        {% set previousStep = column %}
     {% endfor %}
 </ul>
 <br />
-<dl class="dl-horizontal">
-    <dt>Name</dt>
-    <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-    <dt>ID</dt>
-    <dd>{{ participant.shortId }}</dd>
-    <dt>DOB</dt>
-    <dd>{{ participant.dob|date('n/j/Y') }}</dd>
-    <dt>Gender Identity</dt>
-    <dd>{{ participant.genderIdentity }}</dd>
-</dl>
+{% if active in ['collect', 'process', 'finalize'] %}
+    {% set route = app.request_stack.currentRequest.attributes.get('_route') %}
+    {% set return = path(route, params) %}
+    <p><strong>Your timezone</strong>: {{ app.userTimezoneDisplay }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
+{% endif %}

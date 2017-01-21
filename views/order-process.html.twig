@@ -1,43 +1,55 @@
 {% extends 'base.html.twig' %}
-{% block title %}Process - Order {{ order.id }} - {% endblock %}
+{% import 'order-samples.html.twig' as samples %}
+{% if order.type != 'saliva' %}
+    {% form_theme processForm 'form/simple_checkbox.html.twig' %}
+{% endif %}
+{% block title %}Process - Order {{ order.order_id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'process' } %}
-    {{ form_start(processForm) }}
+    {{ form_start(processForm, { attr: { class: 'warn-unsaved' } }) }}
         {{ form_errors(processForm) }}
 
         <div class="form-group{% if not processForm.processed_samples.vars.valid %} has-error{% endif %}">
             {{ form_label(processForm.processed_samples) }}
             <span class="toggle-help-image" data-caption="Processed samples help text placeholder.">
-                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                </span>
-            {{ form_widget(processForm.processed_samples) }}
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
+            {% if order.type == 'saliva' %}
+                {{ form_widget(processForm.processed_samples) }}
+            {% else %}
+                {{ samples.form_widget(processForm.processed_samples, false, samplesInfo) }}
+            {% endif %}
             {{ form_errors(processForm.processed_samples) }}
         </div>
 
         <div class="form-group{% if not processForm.processed_notes.vars.valid %} has-error{% endif %}">
             {{ form_label(processForm.processed_notes) }}
             <span class="toggle-help-image" data-caption="Processed notes help text placeholder.">
-                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                </span>
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
             {{ form_widget(processForm.processed_notes) }}
             {{ form_errors(processForm.processed_notes) }}
         </div>
         {{ form_rest(processForm) }}
-        <p>
-            <button type="submit" class="btn btn-primary">
-                {% if order.processed_ts %}
-                    Update
-                {% else %}
-                    Save and mark as processed
-                {% endif %}
-            </button>
-        </p>
+
+        {% if not order.finalized_ts %}
+            <p>
+                <button type="submit" class="btn btn-primary">
+                    {% if order.processed_ts %}
+                        Update
+                    {% else %}
+                        Save and mark as processed
+                    {% endif %}
+                </button>
+            </p>
+        {% endif %}
     {{ form_end(processForm) }}
 {% endblock %}
 
 {% block pagejs %}
 <script>
 $(document).ready(function () {
+{% if order.type == 'saliva' %}
     $('input.sample-disabled').closest('label').addClass('text-danger');
     $('input.sample-disabled').closest('div.checkbox').append('<small class="text-muted">was not collected</small>');
     $('#form_processed_samples input').each(function() {
@@ -52,9 +64,32 @@ $(document).ready(function () {
             .css('margin', '5px 0 15px 20px');
         $('#form_processed_samples_ts_' + sample)
             .addClass('input-sm')
-            .datetimepicker(PMI.datetimepickerDefaults);
+            .pmiDateTimePicker();
     });
     $('#form_processed_samples_ts').remove();
+{% else %}
+    $('.sample-disabled label').addClass('text-danger');
+    $('.sample-disabled').find('td:last').append('<small style="margin-left:15px" class="text-muted">was not collected</small>');
+    $('#form_processed_samples input').each(function() {
+        if ($(this).attr('disabled')) {
+            return;
+        }
+        var checkBoxTr = $(this).closest('tr');
+        var timeTd= $('<td colspan="4">');
+        var timeTr = $('<tr><td></td></tr>');
+        var sample = $(this).val();
+        $('#form_processed_samples_ts_' + sample).closest('.form-group')
+            .detach()
+            .css('margin-bottom', '10px')
+            .appendTo(timeTd);
+        timeTr.append(timeTd);
+        checkBoxTr.after(timeTr);
+        $('#form_processed_samples_ts_' + sample)
+            .addClass('input-sm')
+            .pmiDateTimePicker();
+    });
+    $('#form_processed_samples_ts').remove();
+{% endif %}
 
     var orderView = new PMI.views['OrderSubPage']({
         el: $("body")

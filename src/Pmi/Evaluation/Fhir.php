@@ -101,14 +101,14 @@ class Fhir
                 'subject' => [
                     'reference' => "Patient/{$this->patient}"
                 ],
-                'title' => 'PMI Intake Evaluation',
+                'title' => 'All of Us Intake Evaluation',
                 'type' => [
                     'coding' => [[
                         'code' => "intake-exam-v{$this->version}",
-                        'display' => "PMI Intake Evaluation v{$this->version}",
+                        'display' => "All of Us Intake Evaluation v{$this->version}",
                         'system' => 'http://terminology.pmi-ops.org/CodeSystem/document-type'
                     ]],
-                    'text' => "PMI Intake Evaluation v{$this->version}"
+                    'text' => "All of Us Intake Evaluation v{$this->version}"
                 ]
             ]
         ];
@@ -220,7 +220,12 @@ class Fhir
 
     protected function getBpBodySite($replicate)
     {
-        switch ($this->data->{'blood-pressure-location'}[$replicate - 1]) {
+        if (is_array($this->data->{'blood-pressure-location'})) {
+            $location = $this->data->{'blood-pressure-location'}[$replicate - 1];
+        } else {
+            $location = $this->data->{'blood-pressure-location'};
+        }
+        switch ($location) {
             case 'Left arm':
                 $locationSnomed = '368208006';
                 $locationDisplay = 'Left arm';

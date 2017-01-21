@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Physical Evaluation - {% endblock %}
+{% block title %}Physical Measurements - {% endblock %}
 {% block body %}
     {{ form_errors(evaluationForm) }}
 
@@ -7,9 +7,9 @@
         <h2>
             <i class="fa fa-clipboard" aria-hidden="true"></i>
             {% if evaluation %}
-                {{ evaluation.created_ts|date('n/j/Y') }}
+                {{ evaluation.created_ts|date('n/j/Y', app.userTimezone) }}
             {% else %}
-                New Evaluation
+                New Physical Measurements
             {% endif %}
             <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
         </h2>
@@ -17,15 +17,15 @@
     <dl class="dl-horizontal">
         <dt>Name</dt>
         <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-        <dt>ID</dt>
-        <dd>{{ participant.shortId }}</dd>
+        <dt>Participant ID</dt>
+        <dd>{{ participant.id }}</dd>
         <dt>DOB</dt>
         <dd>{{ participant.dob|date('n/j/Y') }}</dd>
         <dt>Gender Identity</dt>
         <dd>{{ participant.genderIdentity }}</dd>
         {% if evaluation %}
             <dt>Updated</dt>
-            <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia') }}</dd>
+            <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
             {% if evaluation.version != latestVersion %}
                 <dt>Version</dt>
                 <dd>{{ evaluation.version }} <small class="text-muted">(latest version is {{ latestVersion }})</small></dd>
@@ -33,79 +33,21 @@
         {% endif %}
     </dl>
 
-    <div id="physicalEvaluation">
-        {{ form_start(evaluationForm) }}
-            {% for field in schema.fields %}
-                <div data-field="{{ field.name }}" class="field field-{{ field.name }} form-group{% if not evaluationForm[field.name].vars.valid and field.replicates is not defined %} has-error{% endif %}">
-                    {% if field.replicates is defined %}
-                        {{ form_label(evaluationForm[field.name]) }}
-                        {% if field.help.image is defined or field.help.caption is defined %}
-                            <span class="toggle-help-image"
-                                    {% if field.help.image is defined %}
-                                        data-img="{{ asset('img/eval/'~field.help.image) }}"
-                                    {% endif %}
-                                    {% if field.help.caption is defined %}
-                                        data-caption="{{ field.help.caption }}"
-                                    {% endif %}>
-                                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                                    </span>
-                        {% endif %}
-                        {% if field.convert is defined and field.convert %}
-                            <span id="convert-{{ field.name }}" class="pull-right convert"></span>
-                        {% endif %}
-                        <span id="mean-{{ field.name }}" class="pull-right mean"></span>
-                        <div class="row replicate">
-                        {% for replicateField in evaluationForm[field.name] %}
-                            <div class="col-sm-4{% if not replicateField.vars.valid %} has-error{% endif %}">
-                            {% if field.unit is defined %}
-                                <div class="input-group">
-                            {% endif %}
-                                {{ form_widget(replicateField) }}
-                            {% if field.unit is defined %}
-                                    <div class="input-group-addon">{{ field.unit }}</div>
-                                </div>
-                            {% endif %}
-                            {{ form_errors(replicateField) }}
-                            </div>
-                        {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="row">
-                            <div class="col-sm-4">
-                                {{ form_label(evaluationForm[field.name]) }}
-                                {% if field.help.image is defined or field.help.caption is defined %}
-                                    <span class="toggle-help-image"
-                                          {% if field.help.image is defined %}
-                                            data-img="{{ asset('img/eval/'~field.help.image) }}"
-                                          {% endif %}
-                                          {% if field.help.caption is defined %}
-                                            data-caption="{{ field.help.caption }}"
-                                          {% endif %}>
-                                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                                    </span>
-                                {% endif %}
-                                {% if field.convert is defined and field.convert %}
-                                    <span id="convert-{{ field.name }}" class="pull-right convert"></span>
-                                {% endif %}
-                                {% if field.unit is defined %}
-                                    <div class="input-group">
-                                {% endif %}
-                                    {{ form_widget(evaluationForm[field.name]) }}
-                                {% if field.unit is defined %}
-                                        <div class="input-group-addon">{{ field.unit }}</div>
-                                    </div>
-                                {% endif %}
-                                {{ form_errors(evaluationForm[field.name]) }}
-                            </div>
-                            {% if field.name == 'weight' %}
-                                <div class="col-sm-4">
-                                    <div id="bmi"></div>
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
+    <div id="physicalEvaluation" class="form-disable-enter">
+        {{ form_start(evaluationForm, { attr: { class: 'warn-unsaved' } }) }}
+
+            <div id="evaluationAffixSave">
+                <button type="submit" class="btn btn-primary btn-xs" name="save">Save</button>
+            </div>
+
+            {% if schema.template is defined %}
+                {% include 'evaluationform/' ~ schema.template ~ '.html.twig' %}
+            {% else %}
+                {% include 'evaluationform/0.1.html.twig' %}
+            {% endif %}
+
+            {{ form_rest(evaluationForm) }}
+
             {% if evaluation and evaluation.finalized_ts %}
                 <p>
                     <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
@@ -115,7 +57,7 @@
                 <p>
                     <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
                     <button type="submit" class="btn btn-primary" name="save">Save</button>
-                    <button type="submit" class="btn btn-success pull-right" name="finalize" onclick="return confirm('Are you sure you want to finalize this evaluation?');">Save and Finalize</button>
+                    <button type="submit" class="btn btn-success pull-right" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Save and Finalize</button>
                 </p>
             {% endif %}
         {{ form_end(evaluationForm) }}
@@ -125,11 +67,20 @@
 {% block pagejs %}
 <script>
 $(document).ready(function() {
-    var evalView = new PMI.views['PhysicalEvaluation']({
+    var evalView = new PMI.views['PhysicalEvaluation{% if schema.template is defined %}-{{ schema.template }}{% else %}-0.1{% endif %}']({
         el: $("#physicalEvaluation"),
         warnings: {{ warnings|json_encode|raw }},
-        conversions: {{ conversions|json_encode|raw }}
+        conversions: {{ conversions|json_encode|raw }},
+        finalized: {{ (evaluation and evaluation.finalized_ts)|json_encode|raw }}
     });
+    $('#evaluationAffixSave')
+        .affix({
+            offset: {
+                top: 100,
+                bottom: $(window).height()
+            }
+        })
+        .width($('#physicalEvaluation').width());
 });
 </script>
 {% endblock %}

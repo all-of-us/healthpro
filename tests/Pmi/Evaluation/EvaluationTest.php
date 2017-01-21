@@ -83,13 +83,13 @@ class EvaluationTest extends AbstractWebTestCase
             'code' => 'cm',
             'system' => 'http://unitsofmeasure.org',
             'unit' => 'cm',
-            'value' => 175.0
+            'value' => 175
         ], $entries[3]['resource']['valueQuantity']);
         $this->assertSame([
             'code' => 'kg',
             'system' => 'http://unitsofmeasure.org',
             'unit' => 'kg',
-            'value' => 73.0
+            'value' => 73
         ], $entries[4]['resource']['valueQuantity']);
         $this->assertSame([
             'code' => 'kg/m2',
