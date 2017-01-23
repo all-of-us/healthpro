@@ -139,13 +139,22 @@ class WorkQueueController extends AbstractController
             } else {
                 $firstName = $faker->firstName;
             }
+            $withdrawalStatus = $faker->randomElement(array_merge(
+                array_fill(0, 16, 'Enrolled'),
+                [
+                    'Suspension - No Contact',
+                    'Suspension - No Access',
+                    'Withdrawal - No Use',
+                    'Withdrawal - No Use After Death'
+                ]
+            ));
             $results[] = [
                 'firstName' => $firstName,
                 'lastName' => $faker->unique()->lastName,
-                'preferredContact' => $faker->randomElement(['EMAIL', 'EMAIL', 'EMAIL', 'PHONE', 'PHONE', 'MAIL', 'NO_CONTACT']),
-                'phoneNumber' => $faker->phoneNumber,
-                'emailAddress' => $faker->safeEmail,
-                'mailingAddress' => $faker->address,
+                'preferredContact' => $withdrawalStatus === 'Enrolled' ? $faker->randomElement(['EMAIL', 'EMAIL', 'EMAIL', 'PHONE', 'PHONE', 'MAIL', 'NO_CONTACT']) : 'NO_CONTACT',
+                'phoneNumber' => $withdrawalStatus === 'Enrolled' ? $faker->phoneNumber : '',
+                'emailAddress' => $withdrawalStatus === 'Enrolled' ? $faker->safeEmail : '',
+                'mailingAddress' => $withdrawalStatus === 'Enrolled' ? $faker->address : '',
                 'physicalEvaluationStatus' => $physicalStatus,
                 'biobankStatus' => $biobankStatus,
                 'questionnaireOnFamilyHealth' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
@@ -156,15 +165,7 @@ class WorkQueueController extends AbstractController
                 'questionnaireOnPersonalHabits' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
                 'questionnaireOnSociodemographics' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
                 'questionnaireOnSleep' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'withdrawalStatus' => $faker->randomElement(array_merge(
-                    array_fill(0, 16, 'Enrolled'),
-                    [
-                        'Suspension - No Contact',
-                        'Suspension - No Access',
-                        'Withdrawal - No Use',
-                        'Withdrawal - No Use After Death'
-                    ]
-                )),
+                'withdrawalStatus' => $withdrawalStatus,
                 'pmiId' => 'P' . $faker->randomNumber(9),
                 'consentDate' => $faker->dateTimeBetween('-1 year', 'now')
             ];
