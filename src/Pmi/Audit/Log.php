@@ -24,6 +24,7 @@ class Log
     const EVALUATION_EDIT = 'EVALUATION_EDIT';
     const SITE_EDIT = 'SITE_EDIT';
     const SITE_ADD = 'SITE_ADD';
+    const SITE_DELETE = 'SITE_DELETE';
 
     public function __construct($app, $action, $data)
     {

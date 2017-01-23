@@ -278,10 +278,11 @@ class DefaultController extends AbstractController
             $app['em']->getRepository('users')->update($app->getUserId(), [
                 'timezone' => $settingsForm['timezone']->getData()
             ]);
+            $app->addFlashSuccess('Your settings have been updated');
             if ($request->query->has('return')) {
                 return $app->redirect($request->query->get('return'));
             } else {
-                return $app->redirectToRoute('settings');
+                return $app->redirectToRoute('home');
             }
         }
 
