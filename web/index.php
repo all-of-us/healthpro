@@ -27,11 +27,15 @@ $app
     ->mount('/', new Controller\DefaultController())
     ->mount('/', new Controller\OrderController())
     ->mount('/', new Controller\EvaluationController())
-    ->mount('/workqueue', new Controller\WorkQueueController())
     ->mount('/_dev', new Controller\DevController())
     ->mount('/cron', new Controller\CronController())
     ->mount('/dashboard', new Controller\DashboardController())
-    ->mount('/help', new Controller\HelpController())
     ->mount('/admin', new Controller\AdminController())
-    ->run()
 ;
+
+if (!$app->isProd() && !$app->isStable()) {
+    $app->mount('/workqueue', new Controller\WorkQueueController());
+    $app->mount('/help', new Controller\HelpController());
+}
+
+$app->run();
