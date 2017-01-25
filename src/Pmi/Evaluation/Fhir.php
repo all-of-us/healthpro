@@ -260,13 +260,47 @@ class Fhir
      */
     protected function heartrate($replicate = null)
     {
-        return $this->simpleMetric(
+        $entry = $this->simpleMetric(
             is_null($replicate) ? 'heart-rate' : 'heart-rate-' . $replicate,
             is_null($replicate) ? $this->data->{'heart-rate'} : $this->data->{'heart-rate'}[$replicate - 1],
             'Heart rate',
             '8867-4',
             '/min'
         );
+        if ($replicate) {
+            if ($this->data->{'irregular-heart-rate'}[$replicate - 1]) {
+                $concept = [
+                    'coding' => [[
+                        'code' => 'irregularity-detected',
+                        'display' => 'Irregularity detected',
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
+                    ]],
+                    'text' => 'Irregularity detected'
+                ];
+            } else {
+                $concept = [
+                    'coding' => [[
+                        'code' => 'no-irregularity-detected',
+                        'display' => 'No irregularity detected',
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
+                    ]],
+                    'text' => 'No irregularity detected'
+                ];
+            }
+            $entry['resource']['component'] = [[
+                'code' => [
+                    'coding' => [[
+                        'code' => 'heart-rhythm-status',
+                        'display' => 'Heart rhythm status',
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+                    ]],
+                    'text' => 'Heart rhythm status'
+                ],
+                'valueCodeableConcept' => $concept
+            ]];
+        }
+
+        return $entry;
     }
 
     protected function hipcircumference($replicate)
