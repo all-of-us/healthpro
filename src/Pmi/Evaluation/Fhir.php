@@ -222,6 +222,22 @@ class Fhir
         );
     }
 
+    protected function wheelchair()
+    {
+        if (!$this->data->wheelchair) {
+            return;
+        }
+        return $this->valueMetric(
+            'wheelchair',
+            'Wheelchair bound',
+            'Are you wheelchair-bound?',
+            'wheelchair-bound-status',
+            'wheelchair-bound',
+            'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation',
+            'http://terminology.pmi-ops.org/CodeSystem/wheelchair-bound-status'
+        );
+    }
+
     protected function bmi()
     {
         if (!$this->data->height || !$this->data->weight) {
