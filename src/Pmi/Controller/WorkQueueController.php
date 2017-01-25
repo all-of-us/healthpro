@@ -139,35 +139,38 @@ class WorkQueueController extends AbstractController
             } else {
                 $firstName = $faker->firstName;
             }
-            $results[] = [
+            $withdrawalStatus = $faker->randomElement(array_merge(
+                array_fill(0, 16, 'Enrolled'),
+                [
+                    'Suspension - No Contact',
+                    'Suspension - No Access',
+                    'Withdrawal - No Use',
+                    'Withdrawal - No Use After Death'
+                ]
+            ));
+            $row = [
                 'firstName' => $firstName,
                 'lastName' => $faker->unique()->lastName,
-                'preferredContact' => $faker->randomElement(['EMAIL', 'EMAIL', 'EMAIL', 'PHONE', 'PHONE', 'MAIL', 'NO_CONTACT']),
-                'phoneNumber' => $faker->phoneNumber,
-                'emailAddress' => $faker->safeEmail,
-                'mailingAddress' => $faker->address,
+                'preferredContact' => $withdrawalStatus === 'Enrolled' ? $faker->randomElement(['EMAIL', 'EMAIL', 'EMAIL', 'PHONE', 'PHONE', 'MAIL', 'NO_CONTACT']) : 'NO_CONTACT',
+                'phoneNumber' => $withdrawalStatus === 'Enrolled' ? $faker->phoneNumber : '',
+                'emailAddress' => $withdrawalStatus === 'Enrolled' ? $faker->safeEmail : '',
+                'mailingAddress' => $withdrawalStatus === 'Enrolled' ? $faker->address : '',
                 'physicalEvaluationStatus' => $physicalStatus,
                 'biobankStatus' => $biobankStatus,
-                'questionnaireOnFamilyHealth' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnHealthcareAccess' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnMedicalHistory' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnMedications' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnOverallHealth' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnPersonalHabits' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnSociodemographics' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnSleep' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'withdrawalStatus' => $faker->randomElement(array_merge(
-                    array_fill(0, 16, 'Enrolled'),
-                    [
-                        'Suspension - No Contact',
-                        'Suspension - No Access',
-                        'Withdrawal - No Use',
-                        'Withdrawal - No Use After Death'
-                    ]
-                )),
+                'withdrawalStatus' => $withdrawalStatus,
                 'pmiId' => 'P' . $faker->randomNumber(9),
                 'consentDate' => $faker->dateTimeBetween('-1 year', 'now')
             ];
+            foreach (array_keys(self::$surveys) as $survey) {
+                if (isset($params['ppi']) && $params['ppi'] === 'NONE') {
+                    $row["questionnaireOn{$survey}"] = 'UNSET';
+                } elseif (isset($params['ppi']) && $params['ppi'] === 'ALL') {
+                    $row["questionnaireOn{$survey}"] = 'SUBMITTED';
+                } else {
+                    $row["questionnaireOn{$survey}"] = $faker->boolean(70) ? 'SUBMITTED' : 'UNSET';
+                }
+            }
+            $results[] = $row;
         }
         usort($results, function($a, $b) {
             return strcasecmp($a['lastName'], $b['lastName']);
