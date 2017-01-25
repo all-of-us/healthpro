@@ -14,6 +14,7 @@ use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
 use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -475,4 +476,13 @@ abstract class AbstractApplication extends Application
             $log->logDatastore();
         }
     }
-}
+
+    /**
+     * Identical to the built-in json method, but uses json_encode's pretty print option.
+     */
+    public function jsonPrettyPrint($data = array(), $status = 200, array $headers = array())
+    {
+        $response = new JsonResponse($data, $status, $headers);
+        $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
+        return $response;
+    }}
