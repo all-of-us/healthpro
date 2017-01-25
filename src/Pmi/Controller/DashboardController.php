@@ -27,7 +27,9 @@ class DashboardController extends AbstractController
     {
         $color_profiles = ['Blackbody', 'Bluered', 'Blues', 'Custom', 'Earth', 'Electric', 'Greens', 'Hot', 'Jet', 'Picnic',
             'Portland', 'Rainbow', 'RdBu', 'Reds', 'Viridis', 'YlGnBu', 'YlOrRd'];
-        $metrics_attributes = $this->getMetricsKeyVals('');
+        // metrics attributes are hard-coded as we don't have human-readable names in the API yet
+        $metrics_attributes = $this->getMetricsDisplayNames();
+
         return $app['twig']->render('dashboard/index.html.twig', [
             'color_profiles' => $color_profiles,
             'metrics_attributes' => $metrics_attributes
@@ -45,95 +47,92 @@ class DashboardController extends AbstractController
         $interval = $request->get('interval');
         $start_date = $request->get('start_date');
         $end_date = $request->get('end_date');
+        $facet = $request->get('facet');
 
-        // retrieve metrics from cache, or request new if expired
-        $results = $this->getMetricsObject($app, "NONE");
-
-        // if start date isn't supplied, grab first date from metrics response object
-        if (empty($start_date)) {
-            $start_date = $results[0]->date;
+        // set facet to NONE if not provided (shows total counts across all HPOs
+        if (empty($facet)) {
+            $facet = 'NONE';
         }
 
+        // set up & sanitize variables
+        $start_date = $this->sanitizeDate($start_date);
+        $control_dates = array_reverse($this->getDashboardDates($start_date, $end_date, $interval));
         $data = [];
+        $dates = [];
+        $values = [];
+        $hover_text = [];
 
-        if (!empty($results)) {
-            if (empty($start_date)) {
-                $start_date = $results[0]->date;
-            } else {
-                $start_date = $this->sanitizeDate($start_date);
-            }
+        // retrieve controlled vocab for entries from metrics cache
+        if ($filter_by != 'Participant') {
+            $entries = $this->getMetricsFieldDefinitions($app, $filter_by);
+        } else {
+            $entries = [$filter_by];
+        }
 
-            $control_dates = array_reverse($this->getDashboardDates($start_date, $end_date, $interval));
-            $dates = [];
-            $values = [];
-            $hover_text = [];
+        // iterate again to grab values now that we have all possible entries
+        foreach($control_dates as $date) {
+            if ($this->checkDates($date, $start_date, $end_date, $control_dates)) {
+                // grab date for x axis
+                array_push($dates, $date);
+                $metrics = $this->getMetricsObject($app, $facet, $date);
+                // iterate through list of control values to get counts
+                foreach ($entries as $entry) {
+                    // construct lookup key
+                    if ($filter_by == 'Participant') {
+                        $lookup = $filter_by;
+                    } else {
+                        $lookup = $filter_by . "." . $entry;
+                    }
+                    // zero value are not stored in API, so check if key exists first
+                    if (array_key_exists($lookup, $metrics)) {
+                        $val = $metrics[$lookup];
+                    } else {
+                        $val = 0;
+                    }
 
-            // retrieve controlled vocab for entries from metrics cache
-            if ($filter_by != 'Participant') {
-                $entries = $this->getMetricsFieldDefinitions($app, $filter_by);
-            } else {
-                $entries = ['Total Participants'];
-            }
+                    $values[$entry][] = $val;
 
-            // iterate again to grab values now that we have all possible entries
-            foreach($results as $row) {
-                $date = explode('T', $row->date)[0];
-                if ($this->checkDates($date, $start_date, $end_date, $control_dates)) {
-                    // grab date for x axis
-                    array_push($dates, $date);
-                    foreach ($entries as $entry) {
-                        if ($filter_by == 'Participant') {
-                            $lookup = $filter_by;
-                        } else {
-                            $lookup = $filter_by . "." . $entry;
-                        }
-                        $row_entries = $row->entries;
-                        $match = $this->searchEntries($row_entries, 'name', $lookup);
-
-                        if (empty($match)) {
-                            $val = 0;
-                        } else {
-                            $val = $match[0];
-                        }
-
-                        $values[$entry][] = $val;
-
-                        // generate hover text if not doing total participant count
-                        if ($filter_by != 'Participant') {
-                            // grab total (since searchEntries returns array and there is only one val
-                            // it's safe to always grab the first value
-                            $total = $this->searchEntries($row_entries, 'name', 'Participant')[0];
-                            $hover_text[$entry][] = $this->calculatePercentText($val, $total). '<br />'. $date;
-                        }
+                    // generate hover text if not doing total participant count
+                    if ($filter_by != 'Participant') {
+                        // grab total (since searchEntries returns array and there is only one val
+                        // it's safe to always grab the first value
+                        $total = $metrics['Participant'];
+                        $hover_text[$entry][] = $this->calculatePercentText($val, $total) . '<br />' . $date;
                     }
                 }
-            }
 
-            // reverse sort so that they appear in ascending alphabetical order in the legend
-            rsort($entries);
-
-            // assemble data object in Plotly format
-            $i = 0;
-            foreach($entries as $entry) {
-                $trace = array(
-                    "x" => $dates,
-                    "y" => $values[$entry],
-                    "name" => $entry,
-                    "type" => "bar",
-                    "marker" => array(
-                        "color" => $this->getColorBrewerVal($i)
-                    )
-                );
-                // add hover text if needed
-                if ($filter_by != 'Participant') {
-                    $trace["text"] = $hover_text[$entry];
-                    $trace["hoverinfo"] = "text+name";
-                }
-
-                array_push($data, $trace);
-                $i++;
             }
         }
+        // reverse sort so that they appear in ascending alphabetical order in the legend
+        rsort($entries);
+
+        // assemble data object in Plotly format
+        $i = 0;
+        foreach($entries as $entry) {
+            if ($filter_by == 'Participant') {
+                $trace_name = 'Total Participants';
+            } else {
+                $trace_name = $entry;
+            }
+            $trace = array(
+                "x" => $dates,
+                "y" => $values[$entry],
+                "name" => $trace_name,
+                "type" => "bar",
+                "marker" => array(
+                    "color" => $this->getColorBrewerVal($i)
+                )
+            );
+            // add hover text if needed
+            if ($filter_by != 'Participant') {
+                $trace["text"] = $hover_text[$entry];
+                $trace["hoverinfo"] = "text+name";
+            }
+
+            array_push($data, $trace);
+            $i++;
+        }
+
 
         // return json
         return $app->json($data);
@@ -159,7 +158,7 @@ class DashboardController extends AbstractController
         };
 
         // retrieve metrics from cache, or request new if expired
-        $results = $this->getMetricsObject($app, "NONE");
+        $results = $this->getMetricsObject($app);
 
         // find closest date to requested cutoff and retrieve metrics
         // iterate in reverse order as last objects are most recent
@@ -183,15 +182,10 @@ class DashboardController extends AbstractController
 
         if (!empty($results)) {
             if ($map_mode == 'Participant.state') {
-                $states = $app['db']->fetchAll("SELECT * FROM state_census_regions");
-
                 $state_registrations = [];
-                $state_names = [];
+                // grab state names from field definitions cache
+                $state_names = $this->getMetricsFieldDefinitions($app, 'Participant.state');
 
-                // grab state names from states array
-                foreach($states as $row) {
-                    array_push($state_names, $row["state"]);
-                }
                 foreach($state_names as $state) {
                     $state_lookup = $map_mode . "." . $state;
                     $count = 0;
@@ -213,7 +207,7 @@ class DashboardController extends AbstractController
                     'text' => $state_names,
                     "colorscale" => $color_profile
                 );
-            } else if ($map_mode == 'Participant.census_region') {
+            } else if ($map_mode == 'Participant.censusRegion') {
                 $states_by_region = [];
                 $registrations_by_state = [];
                 $region_text = [];
@@ -296,7 +290,7 @@ class DashboardController extends AbstractController
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('demo', $request->get('csrf_token')))) {
             return $app->abort(500);
         }
-        
+
         // determine search attribute
         $search_attr = $request->get('attribute');
         $raw_filters = explode(',', $request->get('centers'));
@@ -396,7 +390,7 @@ class DashboardController extends AbstractController
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('demo', $request->get('csrf_token')))) {
             return $app->abort(500);
         }
-        
+
         // request parameters
         // use date sanitizers to prevent sql injections
         $map_mode = $request->get('map_mode');
@@ -518,7 +512,7 @@ class DashboardController extends AbstractController
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('demo', $request->get('csrf_token')))) {
             return $app->abort(500);
         }
-        
+
         // request parameters
         $start_date = $request->get('start_date');
         $end_date = $this->sanitizeDate($request->get('end_date'));
@@ -599,18 +593,30 @@ class DashboardController extends AbstractController
 
     // Main method for retrieving metrics from API
     // stores result in memcache as it only updates daily
-    // supports storing multiple entries for faceting
-    // also
-    private function getMetricsObject(Application $app, $facet) {
+    // each entry is comprised of a single day
+    // stores each entry as a combination of facet and date
+    private function getMetricsObject(Application $app, $facet, $date) {
         $memcache = new \Memcache();
-        $memcacheKey = 'metrics_api_facet_' . $facet;
+        $memcacheKey = 'metrics_api_' . $facet . '_' . $date;
         $metrics = $memcache->get($memcacheKey);
         if (!$metrics) {
             try {
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-                $metrics = $metricsApi->metrics([$facet])->bucket;
-                // set expiration to four hours
-                $memcache->set($memcacheKey, $metrics, 0, 14400);
+                $all_metrics = $metricsApi->metrics($date, $date);
+                if ($facet == 'NONE') {
+                    $metrics = $all_metrics[0]['entries'];
+                } else {
+                    foreach($all_metrics as $entry) {
+                        $entry_facet = $entry['facets']['hpoId'];
+                        if ($entry_facet == $facet) {
+                            // set expiration to one day
+                            $metrics = $entry['entries'];
+                            // exit loop as we now have the day & facet we were looking for
+                            break;
+                        }
+                    }
+                }
+                $memcache->set($memcacheKey, $metrics, 0, 86400);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
             }
@@ -619,6 +625,7 @@ class DashboardController extends AbstractController
     }
 
     // stores and returns field definitions as controlled vocabulary
+    // can return either values for specified field_key or all keys present
     private function getMetricsFieldDefinitions(Application $app, $field_key) {
         $memcache = new \Memcache();
         $memcacheKey = 'metrics_api_field_definitions';
@@ -626,19 +633,41 @@ class DashboardController extends AbstractController
         if (!$definitions) {
             try {
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-                $definitions = $metricsApi->metrics(['NONE'])->field_definition;
+                $definitions = $metricsApi->metricsFields();
                 // set expiration to four hours
-                $memcache->set($memcacheKey, $definitions, 0, 14400);
+                $memcache->set($memcacheKey, $definitions, 0, 86400);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
             }
         }
+        $keys = [];
         foreach($definitions as $entry) {
-            if ($entry->name == $field_key) {
-                $keys = $entry->values;
+            if (empty($field_key)) {
+                array_push($keys, $entry['name']);
+            } else if ($entry['name'] == $field_key) {
+                $keys = $entry['values'];
             }
         }
+
         return $keys;
+    }
+
+    // stores display names for metrics attibute field names
+    // can return all key-value pairs, or just the display name for a given field
+    private function getMetricsDisplayNames($field = '') {
+        $metrics_attributes = array(
+            "Participant" => "Total Participants",
+            "Participant.membershipTier" => "Membership Tier",
+            "Participant.genderIdentity" => "Gender Identity",
+            "Participant.ageRange" => "Age Range",
+            "Participant.ethnicity" => "Ethnicity",
+            "Participant.race" => "Race"
+        );
+        if (empty($field)){
+            return $metrics_attributes;
+        } else {
+            return $metrics_attributes[$field];
+        }
     }
 
     // helper function to check date range cutoffs
@@ -686,29 +715,6 @@ class DashboardController extends AbstractController
     // sanitize url date parameter to prevent SQL injection
     private function sanitizeDate($date_string) {
         return date('Y-m-d', strtotime($date_string));
-    }
-
-
-    // helper to return either the keys or values for metrics
-    // keys are names returned by metrics API, values are for display
-    private function getMetricsKeyVals($kind) {
-        $metrics = array(
-            "Participant" => "Total Participants",
-            "Participant.membership_tier" => "Membership Tier",
-            "Participant.gender_identity" => "Gender Identity",
-            "Participant.age_range" => "Age Range",
-            "Participant.ethnicity" => "Ethnicity",
-            "Participant.race" => "Race"
-        );
-
-        if ($kind == 'keys') {
-            $return_val = array_keys($metrics);
-        } elseif ($kind == 'values') {
-            $return_val = array_values($metrics);
-        } else {
-            $return_val = $metrics;
-        }
-        return $return_val;
     }
 
     // function to filter metrics API response entries based on requested metric
