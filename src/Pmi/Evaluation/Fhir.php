@@ -114,16 +114,16 @@ class Fhir
         ];
     }
 
-    protected function simpleMetric($metric, $value, $display, $loinc, $unit)
+    protected function simpleMetric($metric, $value, $display, $code, $unit, $system = 'http://loinc.org')
     {
         return [
             'fullUrl' => $this->metricUrns[$metric],
             'resource' => [
                 'code' => [
                     'coding' => [[
-                        'code' => $loinc,
+                        'code' => $code,
                         'display' => $display,
-                        'system' => 'http://loinc.org'
+                        'system' => $system
                     ]],
                     'text' => $display
                 ],
@@ -138,6 +138,37 @@ class Fhir
                     'system' => 'http://unitsofmeasure.org',
                     'unit' => $unit,
                     'value' => $value
+                ]
+            ]
+        ];
+    }
+
+    protected function valueMetric($metric, $value, $display, $codeCode, $valueCode, $codeSystem = 'http://loinc.org', $valueSystem = 'http://loinc.org')
+    {
+        return [
+            'fullUrl' => $this->metricUrns[$metric],
+            'resource' => [
+                'code' => [
+                    'coding' => [[
+                        'code' => $codeCode,
+                        'display' => $display,
+                        'system' => $codeSystem
+                    ]],
+                    'text' => $display
+                ],
+                'effectiveDateTime' => $this->date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->patient}"
+                ],
+                'valueCodeableConcept' => [
+                    'coding' => [[
+                        'code' => $valueCode,
+                        'display' => $value,
+                        'system' => $valueSystem
+                    ]],
+                    'text' => $value
                 ]
             ]
         ];
@@ -162,6 +193,32 @@ class Fhir
             'Body weight',
             '29463-7',
             'kg'
+        );
+    }
+
+    protected function weightprepregnancy()
+    {
+        return $this->simpleMetric(
+            'weight-prepregnancy',
+            $this->data->{'weight-prepregnancy'},
+            'Approximate pre-pregnancy weight',
+            'pre-pregnancy-weight',
+            'kg',
+            'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+        );
+    }
+
+    protected function pregnant()
+    {
+        if (!$this->data->pregnant) {
+            return;
+        }
+        return $this->valueMetric(
+            'pregnant',
+            'Yes (pregnant)',
+            'Are you currently pregnant?',
+            '66174-4',
+            'LA33-6'
         );
     }
 
