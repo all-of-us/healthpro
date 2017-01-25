@@ -245,6 +245,30 @@ class Fhir
         ];
     }
 
+    protected function getBpArmCircumference()
+    {
+        $armCircumference = $this->data->{'blood-pressure-arm-circumference'};
+        if (!$armCircumference) {
+            return false;
+        }
+        return [
+            'code' => [
+                'coding' => [[
+                    'code' => 'arm-circumference',
+                    'display' => 'Arm circumference',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+                ]],
+                'text' => 'Arm circumference'
+            ],
+            'valueQuantity' => [
+                'code' => 'cm',
+                'system' => 'http://unitsofmeasure.org',
+                'unit' => 'cm',
+                'value' => $armCircumference
+            ]
+        ];
+    }
+
     protected function getBpComponent($component, $replicate)
     {
         switch ($component) {
@@ -279,6 +303,14 @@ class Fhir
 
     protected function bloodpressure($replicate)
     {
+        $components = [
+            $this->getBpComponent('systolic', $replicate),
+            $this->getBpComponent('diastolic', $replicate)
+        ];
+        if ($armCircumference = $this->getBpArmCircumference()) {
+            $components[] = $armCircumference;
+        }
+
         return [
             'fullUrl' => $this->metricUrns['blood-pressure-' . $replicate],
             'resource' => [
@@ -291,10 +323,7 @@ class Fhir
                     ]],
                     'text' => 'Blood pressure systolic and diastolic'
                 ],
-                'component' => [
-                    $this->getBpComponent('systolic', $replicate),
-                    $this->getBpComponent('diastolic', $replicate)
-                ],
+                'component' => $components,
                 'effectiveDateTime' => $this->date,
                 'resourceType' => 'Observation',
                 'status' => 'final',
