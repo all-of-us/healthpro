@@ -294,11 +294,20 @@ class Order
             'system' => 'https://www.pmi-ops.org',
             'value' => $this->order['order_id']
         ];
-        if ($this->app && !$this->app->getConfig('ml_mock_order') && $this->order['mayo_id'] != 'pmitest') {
-            $identifiers[] =[
-            'system' => 'https://orders.mayomedicallaboratories.com',
-                'value' => $this->order['mayo_id']
-            ];
+        if ($this->app) {
+            if (!$this->app->getConfig('ml_mock_order') && $this->order['mayo_id'] != 'pmitest') {
+                $identifiers[] =[
+                    'system' => 'https://orders.mayomedicallaboratories.com',
+                    'value' => $this->order['mayo_id']
+                ];
+            }
+            $site = $this->app['em']->getRepository('sites')->fetchOneBy(['google_group' => $this->order['site']]);
+            if ($site && $site['mayolink_account']) {
+                $identifiers[] =[
+                    'system' => 'https://www.pmi-ops.org/mayolink-site-id',
+                    'value' => $site['mayolink_account']
+                ];
+            }
         }
         $obj->identifier = $identifiers;
 
