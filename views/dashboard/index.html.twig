@@ -67,14 +67,13 @@
                     var metricTitle = $('#total-progress-metric-attribute option:selected').text();
                     var showAnnot = $('#total-progress-show-annot').is(':checked');
                     var tpWidth = $('#plotly-total-progress').width() - 30;
-                    var today = new Date().toISOString().split('T')[0];
 
                     // load data from metrics API
                     $.getJSON('/dashboard/metrics_load?csrf_token={{ csrf_token('dashboard') }}&metrics_attribute=' + metricAttr + '&interval=' + tpInterval + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate, function(data) {
                         if (data.length != 0) {
                             var progressAnnot = [];
                             var tpLayout = {
-                                title: 'Count of ' + metricTitle + ' as of ' + today,
+                                title: 'Count of ' + metricTitle + ' as of ' + tpEndDate,
                                 font: PLOTLY_LABEL_FONT,
                                 barmode: 'stack',
                                 width: tpWidth,
@@ -99,8 +98,12 @@
                     });
                 }
 
-                var now = new Date().toISOString().split('T')[0];
-                $('#total-progress-end-date').val(now);
+                var now = new Date();
+                var nowString = now.toISOString().split('T')[0];
+                var lastWeek = new Date().setDate(now.getDate() - 7);
+                var lastWeekStr = new Date(lastWeek).toISOString().split('T')[0];
+                $('#total-progress-end-date').val(nowString);
+                $('#total-progress-start-date').val(lastWeekStr);
                 renderTotalProgressPlot(true);
 
                 // load plot on tab show (to save loading time)
