@@ -32,6 +32,8 @@ ml_mock_order: pmitest
 # ml_orders_endpoint: https://test.orders.mayomedicallaboratories.com
 # ml_auth_endpoint: https://test.pm.mayomedicallaboratories.com/authn
 # ml_provider_name: test.mayomedicallaboratories.com
+# ml_label_pdf: /en/orders/{id}/label-set
+# ml_requisition_pdf: /en/orders/{id}/requisition
 
 # Specify MayoLINK credentials to create real orders in MayoLINK
 # ml_username:
