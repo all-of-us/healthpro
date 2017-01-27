@@ -53,7 +53,7 @@ class MayolinkOrder
 
     public function __construct(Application $app)
     {
-        $this->client = new \GuzzleHttp\Client(['cookies' => true, 'verify' => false]);
+        $this->client = new \GuzzleHttp\Client(['cookies' => true]);
         $configurationMapping = [
             'ordersEndpoint' => 'ml_orders_endpoint',
             'authEndpoint' => 'ml_auth_endpoint',
