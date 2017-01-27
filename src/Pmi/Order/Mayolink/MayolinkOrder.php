@@ -1,6 +1,8 @@
 <?php
 namespace Pmi\Order\Mayolink;
 
+use Silex\Application;
+
 class MayolinkOrder
 {
     protected $ordersEndpoint = 'https://orders.mayomedicallaboratories.com';
@@ -46,9 +48,18 @@ class MayolinkOrder
     private $client;
     private $csrfToken;
 
-    public function __construct()
+    public function __construct(Application $app)
     {
         $this->client = new \GuzzleHttp\Client(['cookies' => true]);
+        if ($ordersEndpoint = $app->getConfig('ml_orders_endpoint')) {
+            $this->ordersEndpoint = $ordersEndpoint;
+        }
+        if ($authEndpoint = $app->getConfig('ml_auth_endpoint')) {
+            $this->authEndpoint = $authEndpoint;
+        }
+        if ($providerName = $app->getConfig('ml_provider_name')) {
+            $this->providerName = $providerName;
+        }
     }
 
     /**
