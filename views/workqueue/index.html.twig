@@ -38,7 +38,7 @@
                 {% endfor %}
                 <th class="secondaryheader multiheader-status">Phys Meas</th>
                 <th class="secondaryheader multiheader-status">Biobank</th>
-                <th class="secondaryheader multiheader-status">Withdrawal Status</th>
+                <th class="secondaryheader multiheader-status"><nobr>Withdrawal Status <i class="fa fa-info-circle" aria-hidden="true" title="This is a temporary placeholder to demonstrate that we will display withdrawal status once the Program SOPs on withdrawal are finalized." data-toggle="tooltip" data-placement="left"></i></nobr></th>
             </tr>
         </thead>
         <tbody>
@@ -84,6 +84,9 @@
                     </td>
                     <td>
                         {{ participant.withdrawalStatus }}
+                        {% if participant.withdrawalStatus != 'Enrolled' %}
+                            <i class="fa fa-info-circle" aria-hidden="true" title="This is a temporary placeholder to demonstrate that we will display withdrawal status once the Program SOPs on withdrawal are finalized." data-toggle="tooltip" data-placement="left"></i>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
