@@ -34,21 +34,40 @@ class Fhir
     {
         $metrics = [];
         foreach ($this->schema->fields as $field) {
-            if (preg_match('/^blood-pressure-/', $field->name) && !preg_match('/^blood-pressure-systolic/', $field->name)) {
-                // only add systolic for now, will process the rest below
-                continue;
+            if (preg_match('/^blood-pressure-/', $field->name)) {
+                if (!preg_match('/^blood-pressure-(systolic|protocol-modification)/', $field->name)) {
+                    // only add systolic and modifications for now, will process the rest below
+                    continue;
+                }
             }
-            if (empty($this->data->{$field->name})) {
-                continue;
+            if (preg_match('/protocol-modification/', $field->name)) {
+                $isModification = true;
+            } else {
+                $isModification = false;
+                switch ($field->name) {
+                    case 'blood-pressure-systolic':
+                    case 'heart-rate':
+                        $modification = 'blood-pressure-protocol-modification';
+                        break;
+                    default:
+                        $modification = $field->name . '-protocol-modification';
+                }
             }
+
             if (!empty($field->replicates)) {
+                if (empty($this->data->{$field->name}) && empty($this->data->{$modification})) {
+                    continue;
+                }
                 foreach ($this->data->{$field->name} as $i => $value) {
-                    if (empty($value)) {
+                    if (empty($value) && empty($this->data->{$modification}[$i])) {
                         continue;
                     }
                     $metrics[] = $field->name . '-' . ($i+1); // 1-indexed
                 }
             } else {
+                if (empty($this->data->{$field->name}) && empty($this->data->{$modification})) {
+                    continue;
+                }
                 $metrics[] = $field->name;
             }
         }
@@ -59,12 +78,13 @@ class Fhir
 
         // check and rename blood pressure metrics
         $diastolic = $this->data->{'blood-pressure-diastolic'};
+        $bpModification = $this->data->{'blood-pressure-protocol-modification'};
         foreach ($metrics as $k => $metric) {
             if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
                 continue;
             }
             $index = $m[1] - 1;
-            if (!empty($diastolic[$index])) {
+            if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
                 $metrics[$k] = 'blood-pressure-' . $m[1];
             } else {
                 // remove if systolic exists but not diastolic
@@ -169,6 +189,47 @@ class Fhir
                         'system' => $valueSystem
                     ]],
                     'text' => $value
+                ]
+            ]
+        ];
+    }
+
+    protected function protocolModification($metric, $replicate = null)
+    {
+        $codeDisplay = "Protocol modifications: " . ucfirst(str_replace('-', ' ', $metric));
+        if (is_null($replicate)) {
+            $conceptCode = $this->data->{"{$metric}-protocol-modification"};
+            $urnKey = $metric . '-protocol-modification';
+        } else {
+            $conceptCode = $this->data->{"{$metric}-protocol-modification"}[$replicate-1];
+            $urnKey = $metric . '-protocol-modification-' . $replicate;
+        }
+        $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
+        $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
+        return [
+            'fullUrl' => $this->metricUrns[$urnKey],
+            'resource' => [
+                'code' => [
+                    'coding' => [[
+                        'code' => "protocol-modifications-{$metric}",
+                        'display' => $codeDisplay,
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+                    ]],
+                    'text' => $codeDisplay
+                ],
+                'effectiveDateTime' => $this->date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->patient}"
+                ],
+                'valueCodeableConcept' => [
+                    'coding' => [[
+                        'code' => $conceptCode,
+                        'display' => $conceptDisplay,
+                        'system' => "http://terminology.pmi-ops.org/CodeSystem/{$conceptCode}"
+                    ]],
+                    'text' => $conceptDisplay
                 ]
             ]
         ];
@@ -439,6 +500,31 @@ class Fhir
                 ]
             ]
         ];
+    }
+
+    protected function bloodpressureprotocolmodification($replicate)
+    {
+        return $this->protocolModification('blood-pressure', $replicate);
+    }
+
+    protected function hipcircumferenceprotocolmodification($replicate)
+    {
+        return $this->protocolModification('hip-circumference', $replicate);
+    }
+
+    protected function waistcircumferenceprotocolmodification($replicate)
+    {
+        return $this->protocolModification('waist-circumference', $replicate);
+    }
+
+    protected function heightprotocolmodification()
+    {
+        return $this->protocolModification('height');
+    }
+
+    protected function weightprotocolmodification()
+    {
+        return $this->protocolModification('weight');
     }
 
     protected function getEntry($metric)
