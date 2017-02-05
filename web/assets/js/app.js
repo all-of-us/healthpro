@@ -104,8 +104,10 @@ $(document).ready(function()
             isHTML: true,
             msg: pmiGetTpl("pmiSystemUsageTpl")(),
             btnTextTrue: "Agree",
-            onTrue: function() {
-                $.post(PMI.path.agreeUsage);
+            onTrue: function(modal) {
+                $.post(PMI.path.agreeUsage, {
+                    csrf_token: modal.$("#csrf_token").val()
+                });
             },
             onFalse: function() {
                 window.location = PMI.path.logout;

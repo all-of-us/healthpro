@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 
@@ -111,6 +112,10 @@ class DefaultController extends AbstractController
     
     public function agreeUsageAction(Application $app, Request $request)
     {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('agreeUsage', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         $request->getSession()->set('isUsageAgreed', true);
         return (new JsonResponse())->setData([]);
     }
