@@ -76,6 +76,7 @@ $(document).ready(function()
             message: "Are you there? For security reasons, inactive sessions will be expired.",
             logoutButton: "Logout",
             keepAliveButton: "Stay Connected",
+            ajaxData: { csrf_token: PMI.keepAliveCsrf },
             countdownBar: true,
             countdownSmart: true,
             keepAliveUrl: PMI.path.keepAlive,

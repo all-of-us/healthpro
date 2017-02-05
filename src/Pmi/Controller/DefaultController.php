@@ -89,7 +89,12 @@ class DefaultController extends AbstractController
     }
     
     /** Dummy action that serves to extend the user's session. */
-    public function keepAliveAction(Application $app, Request $request) {
+    public function keepAliveAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('keepAlive', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         $request->getSession()->set('pmiLastUsed', time());
         $response = new JsonResponse();
         $response->setData(array());
