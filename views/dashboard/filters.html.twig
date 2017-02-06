@@ -25,7 +25,7 @@
                                     {% endif %}
                                     {% for center in centers %}
                                         <li class="list-group-item">
-                                            <label><input type="checkbox" name="recruitment_centers[]" value="{{ center['id'] }}" class="center-filter" checked> {{ center['label'] }}</label>
+                                            <label><input type="checkbox" name="recruitment_centers[]" value="{{ center['code'] }}" class="center-filter" checked> {{ center['label'] }}</label>
                                         </li>
                                     {% endfor %}
                                 </ul>

@@ -29,10 +29,21 @@ class DashboardController extends AbstractController
             'Portland', 'Rainbow', 'RdBu', 'Reds', 'Viridis', 'YlGnBu', 'YlOrRd'];
         // metrics attributes are hard-coded as we don't have human-readable names in the API yet
         $metrics_attributes = $this->getMetricsDisplayNames();
+        $all_centers = $app['db']->fetchAll("SELECT * FROM recruitment_center_codes");
+        $recruitment_centers = array();
+        foreach($all_centers as $center) {
+            $category = $center['category'];
+            if (!array_key_exists($category, $recruitment_centers)) {
+                $recruitment_centers[$category] = [$center];
+            } else {
+                $recruitment_centers[$category][] = $center;
+            }
+        }
 
         return $app['twig']->render('dashboard/index.html.twig', [
             'color_profiles' => $color_profiles,
-            'metrics_attributes' => $metrics_attributes
+            'metrics_attributes' => $metrics_attributes,
+            'recruitment_centers' => $recruitment_centers
         ]);
     }
 
@@ -47,12 +58,7 @@ class DashboardController extends AbstractController
         $interval = $request->get('interval');
         $start_date = $request->get('start_date');
         $end_date = $request->get('end_date');
-        $facet = $request->get('facet');
-
-        // set facet to NONE if not provided (shows total counts across all HPOs
-        if (empty($facet)) {
-            $facet = 'NONE';
-        }
+        $centers = explode(',', $request->get('centers'));
 
         // set up & sanitize variables
         $start_date = $this->sanitizeDate($start_date);
@@ -74,30 +80,45 @@ class DashboardController extends AbstractController
             if ($this->checkDates($date, $start_date, $end_date, $control_dates)) {
                 // grab date for x axis
                 array_push($dates, $date);
-                $metrics = $this->getMetricsObject($app, $facet, $date);
+
+                $metrics = $this->getMetricsObject($app, $date);
                 // iterate through list of control values to get counts
                 foreach ($entries as $entry) {
+                    $facet_total = 0;
+                    $participant_total = 0;
                     // construct lookup key
                     if ($filter_by == 'Participant') {
                         $lookup = $filter_by;
                     } else {
                         $lookup = $filter_by . "." . $entry;
                     }
-                    // zero value are not stored in API, so check if key exists first
-                    if (array_key_exists($lookup, $metrics)) {
-                        $val = $metrics[$lookup];
-                    } else {
-                        $val = 0;
+                    // make sure metrics data exists first
+                    if (!empty($metrics)) {
+                        // iterate through each center to accumulate a running total to store
+                        foreach($centers as $center) {
+                            $requested_center = [];
+                            if ($center == 'ALL') {
+                                $requested_center = $metrics[0]['entries'];
+                            } else {
+                                foreach($metrics as $metric) {
+                                    if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $center) {
+                                        $requested_center = $metric['entries'];
+                                    }
+                                }
+                            }
+                            if (array_key_exists($lookup, $requested_center)) {
+                                $facet_total += $requested_center[$lookup];
+                            }
+                            $participant_total += $requested_center['Participant'];
+                        }
                     }
-
-                    $values[$entry][] = $val;
+                    $values[$entry][] = $facet_total;
 
                     // generate hover text if not doing total participant count
                     if ($filter_by != 'Participant') {
                         // grab total (since searchEntries returns array and there is only one val
                         // it's safe to always grab the first value
-                        $total = $metrics['Participant'];
-                        $hover_text[$entry][] = $this->calculatePercentText($val, $total) . '<br />' . $date;
+                        $hover_text[$entry][] = $this->calculatePercentText($facet_total, $participant_total) . '<br />' . $date;
                     }
                 }
 
@@ -148,6 +169,7 @@ class DashboardController extends AbstractController
         $map_mode = $request->get('map_mode');
         $end_date = $this->sanitizeDate($request->get('end_date'));
         $color_profile = $request->get('color_profile');
+        $centers = explode(',', $request->get('centers'));
 
         if ($color_profile == 'Custom') {
             $color_profile = [
@@ -158,45 +180,46 @@ class DashboardController extends AbstractController
         };
 
         // retrieve metrics from cache, or request new if expired
-        $results = $this->getMetricsObject($app);
-
-        // find closest date to requested cutoff and retrieve metrics
-        // iterate in reverse order as last objects are most recent
-        // break once value has been set
-        $lookup_date = $end_date . "T00:00:00";
-        $i = count($results);
-        $raw_results = [];
-        while ($i) {
-            $i--;
-            if ($results[$i]->date == $lookup_date) {
-                $raw_results = $results[$i]->entries;
-                break;
-            } elseif (strtotime($results[$i]->date) < strtotime($lookup_date)) {
-                // if date did not exists, grab current row as it will be closest to actual cutoff
-                $raw_results = $results[$i]->entries;
-                break;
-            }
-        }
+        $metrics = $this->getMetricsObject($app, $end_date);
 
         $map_data = [];
 
-        if (!empty($results)) {
+        if (!empty($metrics)) {
             if ($map_mode == 'Participant.state') {
                 $state_registrations = [];
-                // grab state names from field definitions cache
-                $state_names = $this->getMetricsFieldDefinitions($app, 'Participant.state');
+                $hover_text = [];
+                $state_names = [];
 
-                foreach($state_names as $state) {
-                    $state_lookup = $map_mode . "." . $state;
+                // grab state names from db to get targets info as well
+                $all_states = $app['db']->fetchAll("SELECT * FROM state_census_regions");
+
+                // now iterate through states
+                foreach($all_states as $state) {
+                    array_push($state_names, $state['state']);
+
+                    $state_lookup = $map_mode . "." . $state['state'];
                     $count = 0;
 
-                    // if data is present, set, otherwise leave default 0 count
-                    $match = $this->searchEntries($raw_results, 'name', $state_lookup);
-                    if (!empty($match)) {
-                        $count = $match[0];
+                    // iterate through each center to accumulate a running total to store
+                    foreach($centers as $center) {
+                        $requested_center = [];
+                        if ($center == 'ALL') {
+                            $requested_center = $metrics[0]['entries'];
+                        } else {
+                            foreach($metrics as $metric) {
+                                if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $center) {
+                                    $requested_center = $metric['entries'];
+                                }
+                            }
+                        }
+                        if (array_key_exists($state_lookup, $requested_center)) {
+                            $count += $requested_center[$state_lookup];
+                        }
                     }
+                    $pct_of_target = round($count / $state['recruitment_target'] * 100, 2);
 
-                    array_push($state_registrations, $count);
+                    array_push($state_registrations, $pct_of_target);
+                    array_push($hover_text, $pct_of_target . "% <br><b>" . $state['state'] . "</b> (Target: " . number_format($state['recruitment_target']) . ")");
                 }
 
                 $map_data[] = array(
@@ -204,8 +227,15 @@ class DashboardController extends AbstractController
                     'locationmode' => 'USA-states',
                     'locations' => $state_names,
                     'z' => $state_registrations,
-                    'text' => $state_names,
-                    "colorscale" => $color_profile
+                    'text' => $hover_text,
+                    "colorscale" => $color_profile,
+                    "zmin" => 0,
+                    "zmax" => 100,
+                    "hoverinfo" => 'text',
+                    "colorbar" => array(
+                        "title" => 'Percentage of target recruitment',
+                        "titleside" => 'right'
+                    )
                 );
             } else if ($map_mode == 'Participant.censusRegion') {
                 $states_by_region = [];
@@ -224,16 +254,28 @@ class DashboardController extends AbstractController
                     $census_lookup = $map_mode . "." . strtoupper($region['label']);
                     $count = 0;
 
-                    // if data is present, set, otherwise leave default 0 count
-                    $match = $this->searchEntries($raw_results, 'name', $census_lookup);
-                    if (!empty($match)) {
-                        $count = $match[0];
+                    // iterate through each center to accumulate a running total to store
+                    foreach($centers as $center) {
+                        $requested_center = [];
+                        if ($center == 'ALL') {
+                            $requested_center = $metrics[0]['entries'];
+                        } else {
+                            foreach($metrics as $metric) {
+                                if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $center) {
+                                    $requested_center = $metric['entries'];
+                                }
+                            }
+                        }
+                        if (array_key_exists($census_lookup, $requested_center)) {
+                            $count += $requested_center[$census_lookup];
+                        }
                     }
+                    $pct_of_target = round($count / $region['recruitment_target'] * 100, 2);
 
                     foreach($region_states as $state) {
                         array_push($states_by_region, $state);
-                        array_push($registrations_by_state, $count);
-                        array_push($region_text, $region["label"]);
+                        array_push($registrations_by_state, $pct_of_target);
+                        array_push($region_text, $pct_of_target . "% <br><b>" . $region["label"] . "</b> (Target: " . number_format($region['recruitment_target']) . ")");
                     }
                 }
 
@@ -243,7 +285,14 @@ class DashboardController extends AbstractController
                     'locations' => $states_by_region,
                     'z' => $registrations_by_state,
                     'text' => $region_text,
-                    "colorscale" => $color_profile
+                    "colorscale" => $color_profile,
+                    "zmin" => 0,
+                    "zmax" => 100,
+                    "hoverinfo" => "text",
+                    "colorbar" => array(
+                        "title" => 'Percentage of target recruitment',
+                        "titleside" => 'right'
+                    )
                 );
             }
         }
@@ -595,28 +644,20 @@ class DashboardController extends AbstractController
     // stores result in memcache as it only updates daily
     // each entry is comprised of a single day
     // stores each entry as a combination of facet and date
-    private function getMetricsObject(Application $app, $facet, $date) {
+    private function getMetricsObject(Application $app, $date) {
         $memcache = new \Memcache();
-        $memcacheKey = 'metrics_api_' . $facet . '_' . $date;
+        $memcacheKey = 'metrics_api_' . $date;
         $metrics = $memcache->get($memcacheKey);
         if (!$metrics) {
             try {
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-                $all_metrics = $metricsApi->metrics($date, $date);
-                if ($facet == 'NONE') {
-                    $metrics = $all_metrics[0]['entries'];
+                $metrics = $metricsApi->metrics($date, $date);
+                // first check if there are metrics available for the given date
+                if (!$metrics) {
+                    return false;
                 } else {
-                    foreach($all_metrics as $entry) {
-                        $entry_facet = $entry['facets']['hpoId'];
-                        if ($entry_facet == $facet) {
-                            // set expiration to one day
-                            $metrics = $entry['entries'];
-                            // exit loop as we now have the day & facet we were looking for
-                            break;
-                        }
-                    }
+                    $memcache->set($memcacheKey, $metrics, 0, 86400);
                 }
-                $memcache->set($memcacheKey, $metrics, 0, 86400);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
             }
@@ -657,7 +698,6 @@ class DashboardController extends AbstractController
     private function getMetricsDisplayNames($field = '') {
         $metrics_attributes = array(
             "Participant" => "Total Participants",
-            "Participant.membershipTier" => "Membership Tier",
             "Participant.genderIdentity" => "Gender Identity",
             "Participant.ageRange" => "Age Range",
             "Participant.ethnicity" => "Ethnicity",
