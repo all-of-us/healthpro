@@ -192,6 +192,13 @@ class HpoApplication extends AbstractApplication
 
         // prevent browsers from sending unencrypted requests
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+        
+        // "low" security finding: prevent MIME type sniffing
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        
+        // "low" security finding: enable XSS Protection
+        // http://blog.innerht.ml/the-misunderstood-x-xss-protection/
+        $response->headers->set('X-XSS-Protection', '1; mode=block');
     }
     
     public function switchSite($email)

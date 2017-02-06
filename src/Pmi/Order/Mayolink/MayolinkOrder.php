@@ -1,11 +1,16 @@
 <?php
 namespace Pmi\Order\Mayolink;
 
+use Silex\Application;
+
 class MayolinkOrder
 {
     protected $ordersEndpoint = 'https://orders.mayomedicallaboratories.com';
     protected $authEndpoint = 'https://profile.mayomedicallaboratories.com/authn';
     protected $providerName = 'www.mayomedicallaboratories.com';
+    protected $labelPdf = '/en/orders/{id}/label-set';
+    protected $requisitionPdf = '/en/orders/{id}/requisition';
+
     protected static $tests = [
         '1SST8' => [
             'temperature' => 'Refrigerated',
@@ -46,9 +51,22 @@ class MayolinkOrder
     private $client;
     private $csrfToken;
 
-    public function __construct()
+    public function __construct(Application $app)
     {
         $this->client = new \GuzzleHttp\Client(['cookies' => true]);
+        $configurationMapping = [
+            'ordersEndpoint' => 'ml_orders_endpoint',
+            'authEndpoint' => 'ml_auth_endpoint',
+            'providerName' => 'ml_provider_name',
+            'labelPdf' => 'ml_label_pdf',
+            'requisitionPdf' => 'ml_requisition_pdf'
+        ];
+
+        foreach ($configurationMapping as $variable => $configName) {
+            if ($value = $app->getConfig($configName)) {
+                $this->$variable = $value;
+            }
+        }
     }
 
     /**
@@ -132,12 +150,13 @@ class MayolinkOrder
     public function getPdf($id, $type)
     {
         if ($type == 'labels') {
-            $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/label-set");
+            $path = str_replace('{id}', $id, $this->labelPdf);
         } elseif ($type == 'requisition') {
-            $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/requisition");
+            $path = str_replace('{id}', $id, $this->requisitionPdf);
         } else {
             return false;
         }
+        $response = $this->client->request('GET', "{$this->ordersEndpoint}{$path}");
         if ($response->getStatusCode() !== 200) {
             return false;
         }

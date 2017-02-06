@@ -127,7 +127,7 @@ class OrderController extends AbstractController
                 } else {
                     // set collected time to today at midnight local time
                     $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
-                    $order = new MayolinkOrder();
+                    $order = new MayolinkOrder($app);
 
                     if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
                         $mayoClientId = $site['mayolink_account'];
@@ -206,7 +206,7 @@ class OrderController extends AbstractController
                 return $app->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
             }
         } else {
-            $mlOrder = new MayolinkOrder();
+            $mlOrder = new MayolinkOrder($app);
             $pdf = $mlOrder->loginAndGetPdf(
                 $app->getConfig('ml_username'),
                 $app->getConfig('ml_password'),
