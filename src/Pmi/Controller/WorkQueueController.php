@@ -243,7 +243,7 @@ class WorkQueueController extends AbstractController
 
         $app->log(Log::WORKQUEUE_EXPORT, [
             'filter' => $params,
-            'site' => $app->getSite()
+            'site' => $app->getSiteId()
         ]);
 
         return $app->stream($stream, 200, [
