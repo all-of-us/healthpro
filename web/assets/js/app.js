@@ -76,6 +76,7 @@ $(document).ready(function()
             message: "Are you there? For security reasons, inactive sessions will be expired.",
             logoutButton: "Logout",
             keepAliveButton: "Stay Connected",
+            ajaxData: { csrf_token: PMI.keepAliveCsrf },
             countdownBar: true,
             countdownSmart: true,
             keepAliveUrl: PMI.path.keepAlive,
@@ -104,8 +105,10 @@ $(document).ready(function()
             isHTML: true,
             msg: pmiGetTpl("pmiSystemUsageTpl")(),
             btnTextTrue: "Agree",
-            onTrue: function() {
-                $.post(PMI.path.agreeUsage);
+            onTrue: function(modal) {
+                $.post(PMI.path.agreeUsage, {
+                    csrf_token: modal.$("#csrf_token").val()
+                });
             },
             onFalse: function() {
                 window.location = PMI.path.logout;
