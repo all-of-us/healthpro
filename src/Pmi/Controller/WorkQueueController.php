@@ -239,16 +239,12 @@ class WorkQueueController extends AbstractController
             fputcsv($output, ['Confidential Information']);
             fclose($output);
         };
-
         $filename = 'workqueue_' . date('Ymd-His') . '.csv';
 
-        $app->log(Log::WORKQUEUE_EXPORT, 
-            [
-                'filter' => $params,
-                'site' => $app->getSite()
-            ]
-        );
-
+        $app->log(Log::WORKQUEUE_EXPORT, [
+            'filter' => $params,
+            'site' => $app->getSite()
+        ]);
 
         return $app->stream($stream, 200, [
             'Content-Type' => 'text/csv',
