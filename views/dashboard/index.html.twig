@@ -1,6 +1,19 @@
 {% extends 'dashboard/base.html.twig' %}
 {% block body %}
     <h2><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard</h2>
+    <div class="modal fade" id="loading-modal" tabindex="-1" role="dialog" aria-labelledby="loading-modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4 class="alert alert-warning text-center">Refreshing cached metrics - this may take a while...</h4>
+                    <div id="modal-spinner-target" style="min-height: 200px; position: relative; margin: 20px 0;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="close" data-dismiss="modal">×</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <br />
     <ul class="nav nav-tabs top-pad" role="tablist">
         <li role="presentation" class="active"><a href="#total-progress" role="tab" data-toggle="tab" id="total-progress-nav"><span class="fa fa-users"></span> Total Progress to Date</a></li>
@@ -20,7 +33,7 @@
                         <div class="panel-body">
                             <div class="row form-group-sm">
                                 <div class="col-md-12 col-xs-3 form-group form-group-sm">
-                                    <label>Display Metric</label>
+                                    <label for="total-progress-metric-attribute">Display Metric</label>
                                     <select id="total-progress-metric-attribute" class="form-control total-progress-control">
                                         {% for metric_key, display_val in metrics_attributes %}
                                             <option value="{{ metric_key }}">{{ display_val }}</option>
@@ -28,15 +41,15 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6 col-xs-3 form-group form-group-sm">
-                                    <label>Start</label>
-                                    <input type="text" class="form-control datepicker total-progress-control" id="total-progress-start-date" />
+                                    <label for="total-progress-start-date">Start</label>
+                                    <input type="text" class="form-control datepicker total-progress-time-control" id="total-progress-start-date" />
                                 </div>
                                 <div class="col-md-6 col-xs-3 form-group form-group-sm">
-                                    <label>Cutoff</label>
-                                    <input type="text" class="form-control datepicker total-progress-control" id="total-progress-end-date" />
+                                    <label for="total-progress-end-date">Cutoff</label>
+                                    <input type="text" class="form-control datepicker total-progress-time-control" id="total-progress-end-date" />
                                 </div>
                                 <div class="col-md-12 col-xs-3 form-group form-group-sm">
-                                    <label>Interval</label>
+                                    <label for="total-progress-interval">Interval</label>
                                     <select id="total-progress-interval" class="form-control total-progress-control">
                                         <option value="DAY">Days</option>
                                         <option value="WEEK">Weeks</option>
@@ -56,15 +69,24 @@
             <script type="text/javascript">
                 // function to grab current filter values and load JSON from load_map_data REST endpoint
                 // success handler calls Plotly.newplot()
-                function renderTotalProgressPlot(showSpinner) {
+                function renderTotalProgressPlot(dialogType) {
                     var centers = loadRecruitmentFilters('total-progress');
                     if (centers.length == 0) {
                         alert('You must select at least one recruitment center to plot results');
                         return false;
                     } else {
-                        if (showSpinner) {
-                            launchSpinner('plotly-total-progress');
+                        var spinnerLoc = 'plotly-total-progress';
+                        if (dialogType == 'spinner') {
+                            launchSpinner(spinnerLoc);
+                        } else if (dialogType == 'modal' ) {
+                            spinnerLoc = 'modal-spinner-target';
+                            // empty target in case there was an error message beforehand
+                            $('#' + spinnerLoc).empty();
+                            launchSpinner(spinnerLoc);
+                            $('#loading-modal').modal('show');
                         }
+                        console.log('calling renderTotalProgressPlot()');
+
                         // gather params
                         var metricAttr = $('#total-progress-metric-attribute').val();
                         var tpInterval = $('#total-progress-interval').val();
@@ -73,7 +95,7 @@
                         var metricTitle = $('#total-progress-metric-attribute option:selected').text();
                         var showAnnot = $('#total-progress-show-annot').is(':checked');
                         var tpWidth = $('#plotly-total-progress').width() - 30;
-                        if (centers.length == {{ recruitment_centers|length }}) {
+                        if (centers.length == $('#total-progress .center-filter').length) {
                             centers = ['ALL'];
                         }
                         // load data from metrics API
@@ -94,13 +116,20 @@
                                     loadBarChartAnnotations(data, progressAnnot);
                                 }
 
+                                // empty div contents in case there had been an error message before
+                                $('#' + spinnerLoc).empty();
+
                                 // render plot and stop spinner
                                 Plotly.newPlot('plotly-total-progress', data, tpLayout, PLOTLY_OPTS);
-                                if (showSpinner) {
-                                    stopSpinner('plotly-total-progress');
+                                stopSpinner(spinnerLoc);
+
+                                if (dialogType == 'modal' ) {
+                                    $('#loading-modal').modal('hide');
                                 }
+                                console.log('renderTotalProgressPlot() complete');
                             } else {
-                                setMetricsError('plotly-total-progress');
+                                setMetricsError(spinnerLoc);
+                                console.log('error in renderTotalProgressPlot()');
                             }
 
                         });
@@ -113,28 +142,39 @@
                 var lastWeekStr = new Date(lastWeek).toISOString().split('T')[0];
                 $('#total-progress-end-date').val(nowString);
                 $('#total-progress-start-date').val(lastWeekStr);
-                renderTotalProgressPlot(true);
+                renderTotalProgressPlot('modal');
+                PLOTS_SHOWN['total-progress-nav'] = true;
 
                 // load plot on tab show (to save loading time)
                 $('#total-progress-nav').on('shown.bs.tab', function (e) {
                     console.log('Showing total progress charts');
-                    renderTotalProgressPlot(false);
+                    // if plot has not been shown yet, render and then store state
+                    // this will prevent points render calls once map has been initialized
+                    if (!PLOTS_SHOWN['total-progress-nav']) {
+                        renderTotalProgressPlot('spinner');
+                        PLOTS_SHOWN['total-progress-nav'] = true;
+                    }
                 });
 
                 // re-render on filter change
                 $('.total-progress-control').change(function() {
-                    renderTotalProgressPlot(true);
+                    renderTotalProgressPlot('spinner');
+                });
+
+                // re-render on time filter change with modal (may need new metrics)
+                $('.total-progress-time-control').change(function() {
+                    renderTotalProgressPlot('modal');
                 });
 
                 // re-render on window resizeEnd if tab is visible
                 $( window ).on('resizeEnd', function() {
                     if ($('#total-progress').is(':visible')) {
-                        renderTotalProgressPlot(false);
+                        renderTotalProgressPlot('');
                     }
                 });
 
                 $('#total-progress').find('.redraw-plotly').click(function() {
-                    renderTotalProgressPlot(true);
+                    renderTotalProgressPlot('spinner');
                 });
             </script>
         </div>
@@ -151,18 +191,19 @@
                         <div class="panel-body">
                             <div class="row form-group-sm">
                                 <div class="col-md-12 col-xs-4 form-group form-group-sm">
-                                    <label>Participant Field</label>
+                                    <label for="map-mode">Display Metric</label>
                                     <select class="form-control region-plot-control" id="map-mode">
                                         <option value="Participant.state" selected>State</option>
                                         <option value="Participant.censusRegion">Census Region</option>
+                                        <option value="Participant.hpoId">Recruitment Origin</option>
                                     </select>
                                 </div>
                                 <div class="col-md-12 col-xs-4 form-group form-group-sm">
-                                    <label>Cutoff</label>
-                                    <input type="text" class="form-control datepicker region-plot-control" id="region-plot-end-date" />
+                                    <label for="region-plot-end-date">Cutoff</label>
+                                    <input type="text" class="form-control datepicker region-plot-time-control" id="region-plot-end-date" />
                                 </div>
                                 <div class="col-md-12 col-xs-4 form-group form-group-sm">
-                                    <label>Color Profile <span class="fa fa-question-circle-o" data-toggle="tooltip" title="Only applies to states and census regions maps"></span></label>
+                                    <label for="map-color-profile">Color Profile <span class="fa fa-question-circle-o" data-toggle="tooltip" title="Only applies to states and census regions maps"></span></label>
                                     <select class="form-control region-plot-control" id="map-color-profile">
                                         {% for color in color_profiles %}
                                             {% if color == 'Custom' %}
@@ -182,22 +223,30 @@
                 <script type="text/javascript">
                     // function to grab current filter values and load JSON from load_map_data REST endpoint
                     // success handler calls Plotly.newplot()
-                    function renderMapPlot(showSpinner) {
+                    function renderMapPlot(dialogType) {
                         var regionCenters = loadRecruitmentFilters('participants-by-region');
                         if (regionCenters.length == 0) {
                             alert('You must select at least one recruitment center to plot results');
                             return false;
                         } else {
-                            if (showSpinner) {
-                                launchSpinner('plotly-participants-by-region');
+                            var spinnerLoc = 'plotly-participants-by-region';
+                            if (dialogType == 'spinner') {
+                                launchSpinner(spinnerLoc);
+                            } else if (dialogType == 'modal' ) {
+                                spinnerLoc = 'modal-spinner-target';
+                                // empty target in case there was an error message beforehand
+                                $('#' + spinnerLoc).empty();
+                                launchSpinner(spinnerLoc);
+                                $('#loading-modal').modal('show');
                             }
+                            console.log('calling renderMapPlot()');
                             // gather params
                             var mapWidth = $('#plotly-participants-by-region').width() - 30;
                             var mapCutoff = $('#region-plot-end-date').val();
                             var mapMode = $('#map-mode').val();
                             var mapModeText = $('#map-mode option:selected').text();
                             var mapColor = $('#map-color-profile').val();
-                            if (regionCenters.length == {{ recruitment_centers|length }}) {
+                            if (regionCenters.length == $('#participants-by-region .center-filter').length) {
                                 regionCenters = ['ALL'];
                             }
 
@@ -207,17 +256,25 @@
                                     var mapLayout = {
                                         title: 'Percentage of target participant registrations by ' + mapModeText + ' of residence as of ' + mapCutoff,
                                         font: PLOTLY_LABEL_FONT,
-                                        showlegend: false,
                                         width: mapWidth,
                                         height: mapWidth / 1.66,
                                         geo: GEO_OPTS
                                     };
 
+                                    // empty div contents in case there had been an error message before
+                                    $('#' + spinnerLoc).empty();
+
                                     // render plot and stop spinner
                                     Plotly.newPlot('plotly-participants-by-region', data, mapLayout, PLOTLY_OPTS);
-                                    stopSpinner('plotly-participants-by-region');
+                                    stopSpinner(spinnerLoc);
+
+                                    if (dialogType == 'modal') {
+                                        $('#loading-modal').modal('hide');
+                                    }
+                                    console.log('renderMapPlot() complete');
                                 } else {
-                                    setMetricsError('plotly-participants-by-region');
+                                    setMetricsError(spinnerLoc);
+                                    console.log('error in renderMapPlot()');
                                 }
                             });
                         }
@@ -229,29 +286,38 @@
                     // load plot on tab show (to save loading time)
                     $('#participants-by-region-nav').on('shown.bs.tab', function (e) {
                         console.log('Showing region plots');
-                        renderMapPlot(true);
+                        // if plot has not been shown yet, render and then store state
+                        // this will prevent points render calls once map has been initialized
+                        if (!PLOTS_SHOWN['participants-by-region-nav']) {
+                            renderMapPlot('spinner');
+                            PLOTS_SHOWN['participants-by-region-nav'] = true;
+                        }
                     });
 
                     // re-render on filter change
                     $('.region-plot-control').change(function() {
-                        renderMapPlot(true);
+                        renderMapPlot('spinner');
+                    });
+
+                    // re-render on filter change with modal (for time changes, may need new metrics)
+                    $('.region-plot-time-control').change(function() {
+                        renderMapPlot('modal');
                     });
 
                     // re-render on window resizeEnd if tab is visible
                     $( window ).on('resizeEnd', function() {
                         if ($('#plotly-participants-by-region').is(':visible')) {
-                            renderMapPlot(false);
+                            renderMapPlot('');
                         }
                     });
 
                     $('#participants-by-region').find('.redraw-plotly').click(function() {
-                        renderMapPlot(true);
+                        renderMapPlot('spinner');
                     });
                 </script>
             </div>
         </div>
     </div>
-
     <script type="text/javascript">
         $('.datepicker').datepicker({dateFormat: 'yy-mm-dd', showButtonPanel: true});
 
