@@ -184,6 +184,7 @@ class HpoApplication extends AbstractApplication
         $whitelist =  "default-src 'self'"
             . " 'unsafe-eval'" // required for setTimeout and setInterval
             . " 'unsafe-inline'" // for the places we are using inline JS
+            . " storage.googleapis.com" // for SOP PDFs stored in a Google Storage bucket
             . " cdn.plot.ly;" // allow plot.ly remote requests
             . " img-src 'self' data:"; // allow self and data: urls for img src
 
@@ -191,6 +192,13 @@ class HpoApplication extends AbstractApplication
 
         // prevent browsers from sending unencrypted requests
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+        
+        // "low" security finding: prevent MIME type sniffing
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        
+        // "low" security finding: enable XSS Protection
+        // http://blog.innerht.ml/the-misunderstood-x-xss-protection/
+        $response->headers->set('X-XSS-Protection', '1; mode=block');
     }
     
     public function switchSite($email)

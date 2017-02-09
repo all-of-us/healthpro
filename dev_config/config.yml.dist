@@ -21,12 +21,24 @@ mysql_host: 127.0.0.1
 # Override API endpoint if necessary
 # rdr_endpoint: https://pmi-drc-api-test.appspot.com/
 
+
+#
 # MayoLINK configuration
+#
 # Specify mock order ID to skip order creation in MayoLINK
 ml_mock_order: pmitest
+
+# Specify MayoLINK URLs to point to non-production
+# ml_orders_endpoint: https://test.orders.mayomedicallaboratories.com
+# ml_auth_endpoint: https://test.pm.mayomedicallaboratories.com/authn
+# ml_provider_name: test.mayomedicallaboratories.com
+# ml_label_pdf: /en/orders/{id}/label.pdf
+# ml_requisition_pdf: /en/orders/{id}.pdf
+
 # Specify MayoLINK credentials to create real orders in MayoLINK
 # ml_username:
 # ml_password:
+
 
 # Google Apps configuration
 # Bypass Google Apps auth

@@ -3,6 +3,7 @@ namespace Pmi\Controller;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Pmi\Audit\Log;
 
 class PhoneNumber extends \Faker\Provider\en_US\PhoneNumber
 {
@@ -139,24 +140,38 @@ class WorkQueueController extends AbstractController
             } else {
                 $firstName = $faker->firstName;
             }
-            $results[] = [
+            $withdrawalStatus = $faker->randomElement(array_merge(
+                array_fill(0, 16, 'Enrolled'),
+                [
+                    'Suspension - No Contact',
+                    'Suspension - No Access',
+                    'Withdrawal - No Use',
+                    'Withdrawal - No Use After Death'
+                ]
+            ));
+            $row = [
                 'firstName' => $firstName,
                 'lastName' => $faker->unique()->lastName,
-                'preferredContact' => $faker->randomElement(['EMAIL', 'EMAIL', 'EMAIL', 'PHONE', 'PHONE', 'MAIL', 'NO_CONTACT']),
-                'phoneNumber' => $faker->phoneNumber,
-                'emailAddress' => $faker->safeEmail,
-                'mailingAddress' => $faker->address,
+                'preferredContact' => $withdrawalStatus === 'Enrolled' ? $faker->randomElement(['EMAIL', 'EMAIL', 'EMAIL', 'PHONE', 'PHONE', 'MAIL', 'NO_CONTACT']) : 'NO_CONTACT',
+                'phoneNumber' => $withdrawalStatus === 'Enrolled' ? $faker->phoneNumber : '',
+                'emailAddress' => $withdrawalStatus === 'Enrolled' ? $faker->safeEmail : '',
+                'mailingAddress' => $withdrawalStatus === 'Enrolled' ? $faker->address : '',
                 'physicalEvaluationStatus' => $physicalStatus,
                 'biobankStatus' => $biobankStatus,
-                'questionnaireOnFamilyHealth' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnHealthcareAccess' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnMedicalHistory' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnMedications' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnOverallHealth' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnPersonalHabits' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnSociodemographics' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET',
-                'questionnaireOnSleep' => $faker->boolean(70) ? 'SUBMITTED' : 'UNSET'
+                'withdrawalStatus' => $withdrawalStatus,
+                'pmiId' => 'P' . $faker->randomNumber(9),
+                'consentDate' => $faker->dateTimeBetween('-1 year', 'now')
             ];
+            foreach (array_keys(self::$surveys) as $survey) {
+                if (isset($params['ppi']) && $params['ppi'] === 'NONE') {
+                    $row["questionnaireOn{$survey}"] = 'UNSET';
+                } elseif (isset($params['ppi']) && $params['ppi'] === 'ALL') {
+                    $row["questionnaireOn{$survey}"] = 'SUBMITTED';
+                } else {
+                    $row["questionnaireOn{$survey}"] = $faker->boolean(70) ? 'SUBMITTED' : 'UNSET';
+                }
+            }
+            $results[] = $row;
         }
         usort($results, function($a, $b) {
             return strcasecmp($a['lastName'], $b['lastName']);
@@ -182,40 +197,55 @@ class WorkQueueController extends AbstractController
         $participants = $this->participantSummarySearch($params);
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
+            fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
+            fwrite($output, "\"\"\n");
             $headers = [
+                'PMI ID',
                 'Last Name',
                 'First Name',
                 'Preferred Contact Method',
                 'Phone Number',
                 'Email Address',
-                'Mailing Address'
+                'Mailing Address',
+                'Consent Date'
             ];
             foreach (self::$surveys as $survey => $label) {
                 $headers[] = $label . ' PPI Survey Completion';
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Biobank Samples';
+            $headers[] = 'Withdrawal Status';
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
                 $row = [
+                    $participant['pmiId'],
                     $participant['lastName'],
                     $participant['firstName'],
                     $participant['preferredContact'],
                     $participant['phoneNumber'],
                     $participant['emailAddress'],
-                    str_replace("\n", ', ', trim($participant['mailingAddress']))
+                    str_replace("\n", ', ', trim($participant['mailingAddress'])),
+                    $participant['consentDate']->format('m/d/Y')
                 ];
                 foreach (self::$surveys as $survey => $label) {
                     $row[] = $participant["questionnaireOn{$survey}"] === 'SUBMITTED' ? 1 : 0;
                 }
                 $row[] = $participant['physicalEvaluationStatus'] === 'SUBMITTED' ? 1 : 0;
                 $row[] = $participant['biobankStatus'];
+                $row[] = $participant['withdrawalStatus'];
                 fputcsv($output, $row);
             }
+            fwrite($output, "\"\"\n");
+            fputcsv($output, ['Confidential Information']);
             fclose($output);
         };
-
         $filename = 'workqueue_' . date('Ymd-His') . '.csv';
+
+        $app->log(Log::WORKQUEUE_EXPORT, [
+            'filter' => $params,
+            'site' => $app->getSiteId()
+        ]);
+
         return $app->stream($stream, 200, [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'

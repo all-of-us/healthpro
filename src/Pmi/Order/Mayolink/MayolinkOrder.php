@@ -1,11 +1,16 @@
 <?php
 namespace Pmi\Order\Mayolink;
 
+use Silex\Application;
+
 class MayolinkOrder
 {
     protected $ordersEndpoint = 'https://orders.mayomedicallaboratories.com';
     protected $authEndpoint = 'https://profile.mayomedicallaboratories.com/authn';
     protected $providerName = 'www.mayomedicallaboratories.com';
+    protected $labelPdf = '/en/orders/{id}/label-set';
+    protected $requisitionPdf = '/en/orders/{id}/requisition';
+
     protected static $tests = [
         '1SST8' => [
             'temperature' => 'Refrigerated',
@@ -42,48 +47,26 @@ class MayolinkOrder
             'specimen' => 'Saliva'
         ]
     ];
-    public static $siteAccounts = [
-        'a' => '7035588',
-        'b' => '7035500',
-        'uofacats' => '7035650',
-        'bannerscampus' => '7035651',
-        'bannerphoenix' => '7035652',
-        'bannerestrella' => '7035653',
-        'bannerdesert' => '7035654',
-        'uicresearch' => '7035707',
-        'nwfeinberggalter' => '7035702',
-        'uofchicago' => '7035703',
-        'rushuniv' => '7035704',
-        'northshoree' => '7035705',
-        'irvingcolumbia' => '7035709',
-        'harlem' => '7035710',
-        'weillcornell' => '7035711',
-        'sdbb' => '7035735', // sdbb and walgreens use the same account
-        'walgreens' => '7035735', // sdbb and walgreens use the same account
-        'vabostonhc' => '7035759',
-        'vapaloalto' => '7035758',
-        'jeanettephillips' => '7035760',
-        'monroeville' => '7035769',
-        'aikenmed' => '7035770',
-        'upmc' => '7035771',
-        'montefiorectrc' => '7035772',
-        'pelionfp' => '7035779',
-        'waverlyfp' => '7035780',
-        'eauclairewi' => '7035781',
-        'morristown' => '7035777',
-        'knoxville' => '7035778',
-        'jamesanderson' => '7035782',
-        'copiah' => '7035783',
-        'otay' => '7035784',
-        'chcoceanview' => '7035785'
-    ];
 
     private $client;
     private $csrfToken;
 
-    public function __construct()
+    public function __construct(Application $app)
     {
         $this->client = new \GuzzleHttp\Client(['cookies' => true]);
+        $configurationMapping = [
+            'ordersEndpoint' => 'ml_orders_endpoint',
+            'authEndpoint' => 'ml_auth_endpoint',
+            'providerName' => 'ml_provider_name',
+            'labelPdf' => 'ml_label_pdf',
+            'requisitionPdf' => 'ml_requisition_pdf'
+        ];
+
+        foreach ($configurationMapping as $variable => $configName) {
+            if ($value = $app->getConfig($configName)) {
+                $this->$variable = $value;
+            }
+        }
     }
 
     /**
@@ -147,8 +130,8 @@ class MayolinkOrder
             $body["temperatures[{$test}][{$testOptions['specimen']}]"] = $testOptions['temperature'];
             $i++;
         }
-        if (isset($options['site']) && isset(self::$siteAccounts[$options['site']])) {
-            $body['account'] = self::$siteAccounts[$options['site']];
+        if (!empty($options['mayoClientId'])) {
+            $body['account'] = $options['mayoClientId'];
         }
         $response = $this->client->request('POST', "{$this->ordersEndpoint}/en/orders", [
             'form_params' => $body,
@@ -167,12 +150,13 @@ class MayolinkOrder
     public function getPdf($id, $type)
     {
         if ($type == 'labels') {
-            $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/label-set");
+            $path = str_replace('{id}', $id, $this->labelPdf);
         } elseif ($type == 'requisition') {
-            $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/requisition");
+            $path = str_replace('{id}', $id, $this->requisitionPdf);
         } else {
             return false;
         }
+        $response = $this->client->request('GET', "{$this->ordersEndpoint}{$path}");
         if ($response->getStatusCode() !== 200) {
             return false;
         }
