@@ -250,7 +250,7 @@ class DashboardController extends AbstractController
                                 }
                             }
                         }
-                        if (array_key_exists($state_lookup, $requested_center)) {
+                        if (!empty($requested_center) && array_key_exists($state_lookup, $requested_center)) {
                             $count += $requested_center[$state_lookup];
                         }
                     }
@@ -311,7 +311,7 @@ class DashboardController extends AbstractController
                                 }
                             }
                         }
-                        if (array_key_exists($census_lookup, $requested_center)) {
+                        if (!empty($requested_center) && array_key_exists($census_lookup, $requested_center)) {
                             $count += $requested_center[$census_lookup];
                         }
                     }
