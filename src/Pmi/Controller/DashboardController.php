@@ -125,10 +125,10 @@ class DashboardController extends AbstractController
                                     }
                                 }
                             }
-                            if (array_key_exists($lookup, $requested_center)) {
+                            if (!empty($requested_center) && array_key_exists($lookup, $requested_center)) {
                                 $facet_total += $requested_center[$lookup];
+                                $participant_total += $requested_center['Participant'];
                             }
-                            $participant_total += $requested_center['Participant'];
                         }
                         $values[$entry][] = $facet_total;
 
