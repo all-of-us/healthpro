@@ -3,6 +3,7 @@ namespace Pmi\Controller;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Pmi\Audit\Log;
 
 class PhoneNumber extends \Faker\Provider\en_US\PhoneNumber
 {
@@ -238,8 +239,13 @@ class WorkQueueController extends AbstractController
             fputcsv($output, ['Confidential Information']);
             fclose($output);
         };
-
         $filename = 'workqueue_' . date('Ymd-His') . '.csv';
+
+        $app->log(Log::WORKQUEUE_EXPORT, [
+            'filter' => $params,
+            'site' => $app->getSiteId()
+        ]);
+
         return $app->stream($stream, 200, [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'

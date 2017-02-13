@@ -31,7 +31,8 @@ class DeployCommand extends Command {
 
     /** GAE application IDs for staging. */
     private static $STAGING_APP_IDS = [
-        'pmi-hpo-staging'
+        'pmi-hpo-staging', // dry run environment
+        'healthpro-staging' // staging environment
     ];
 
     /** Restrict access by IP using dos.yaml */
