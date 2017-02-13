@@ -32,7 +32,11 @@ class DashboardController extends AbstractController
         $metrics_attributes = $this->getMetricsDisplayNames();
 
         // assemble list of centers for filter controls
-        $all_centers = $app['db']->fetchAll("SELECT * FROM recruitment_center_codes");
+        try {
+            $all_centers = $app['db']->fetchAll("SELECT * FROM recruitment_center_codes");
+        } catch (\Exception $e) {
+            $all_centers = [];
+        }
         $recruitment_centers = array();
         foreach($all_centers as $center) {
             $category = $center['category'];
