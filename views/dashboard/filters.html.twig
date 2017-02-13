@@ -25,7 +25,12 @@
                                     {% endif %}
                                     {% for center in centers %}
                                         <li class="list-group-item">
-                                            <label><input type="checkbox" name="recruitment_centers[]" value="{{ center['id'] }}" class="center-filter" checked> {{ center['label'] }}</label>
+                                            {% if center['code'] is defined %}
+                                                {% set identifier = center['code'] %}
+                                            {% else %}
+                                                {% set identifier = center['id'] %}
+                                            {% endif %}
+                                            <label><input type="checkbox" name="recruitment_centers[]" value="{{ identifier }}" class="center-filter" checked> {{ center['label'] }}</label>
                                         </li>
                                     {% endfor %}
                                 </ul>
