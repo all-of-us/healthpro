@@ -359,7 +359,8 @@ class DashboardController extends AbstractController
                                 $requested_center = $metric['entries'];
                             }
                         }
-                        if (array_key_exists($hpo_lookup, $requested_center)) {
+
+                        if (!empty($requested_center) && array_key_exists($hpo_lookup, $requested_center)) {
                             $count += $requested_center[$hpo_lookup];
                         }
 
