@@ -6,6 +6,7 @@ use Tests\Pmi\GoogleGroup;
 use Tests\Pmi\GoogleUserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 class HpoApplicationTest extends AbstractWebTestCase
 {
@@ -87,7 +88,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $client = $this->createClient();
         $client->followRedirects();
         $client->request('GET', '/');
-        $client->request('POST', '/keepalive');
+        $client->request('POST', '/keepalive', ['csrf_token' => $this->app['csrf.token_manager']->getToken('keepAlive')]);
         $this->assertSame(false, $this->app->isLoginExpired());
         $this->assertEquals($email, $this->app->getUser()->getEmail());
         sleep($this->app['sessionTimeout']);
@@ -103,7 +104,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $client = $this->createClient();
         $client->followRedirects();
         $client->request('GET', '/');
-        $client->request('POST', '/keepalive');
+        $client->request('POST', '/keepalive', ['csrf_token' => $this->app['csrf.token_manager']->getToken('keepAlive')]);
         $this->assertSame(false, $this->app->isLoginExpired());
         $this->assertEquals($email, $this->app->getUser()->getEmail());
         sleep($this->app['sessionTimeout']);
@@ -158,7 +159,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
         $crawler = $client->reload();
         $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
-        $client->request('POST', '/agree');
+        $client->request('POST', '/agree', ['csrf_token' => $this->app['csrf.token_manager']->getToken('agreeUsage')]);
         $crawler = $client->request('GET', '/');
         $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')));
     }

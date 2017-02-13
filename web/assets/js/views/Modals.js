@@ -100,7 +100,7 @@ window.PmiConfirmModal = Backbone.View.extend({
         "click .pmi-x-out": "cancel"
     },
     confirm: function() {
-        var closeModal = this._onTrue();
+        var closeModal = this._onTrue(this);
         // if the output is undefined then assume the function isn't being
         // used to control the modal
         if (closeModal || _.isUndefined(closeModal)) {
@@ -113,7 +113,7 @@ window.PmiConfirmModal = Backbone.View.extend({
         this.$(".pmi-confirm-ok").prop("disabled", !isValid);
     },
     cancel: function() {
-        this._onFalse();
+        this._onFalse(this);
         this.$el.modal("hide");
         this.shutdown();
     },

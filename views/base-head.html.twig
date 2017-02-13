@@ -14,6 +14,7 @@
     var PMI = {
         "sessionTimeout": {{ app.sessionTimeout|json_encode|raw }},
         "sessionWarning": {{ app.sessionWarning|json_encode|raw }},
+        "keepAliveCsrf": {{ csrf_token('keepAlive')|json_encode|raw }},
         "path": {
             "clientTimeout": {{ path('clientTimeout')|json_encode|raw }},
             "logout": {{ path('logout')|json_encode|raw }},
