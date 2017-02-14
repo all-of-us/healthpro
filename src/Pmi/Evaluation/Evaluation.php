@@ -259,39 +259,47 @@ class Evaluation
         return Util::versionIsAtLeast($this->version, $minVersion);
     }
 
-    public function canFinalize()
+    public function getFinalizeErrors()
     {
+        $errors = [];
+
         if (!$this->isMinVersion('0.3.0')) {
             // prior to version 0.3.0, any state is valid
-            return true;
+            return $errors;
         }
 
         foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
             foreach ($this->data->$field as $k => $value) {
                 if (!$this->data->{'blood-pressure-protocol-modification'}[$k] && !$value) {
-                    return false;
+                    $errors[] = [$field, $k];
                 }
             }
         }
         foreach (['height', 'weight'] as $field) {
             if (!$this->data->{$field . '-protocol-modification'} && !$this->data->$field) {
-                return false;
+                $errors[] = $field;
             }
         }
         if (!$this->data->pregnant && !$this->data->wheelchair) {
             foreach (['hip-circumference', 'waist-circumference'] as $field) {
                 foreach ($this->data->$field as $k => $value) {
-                    if ($k == 2 && abs($this->data->{$field}[0] - $this->data->{$field}[1]) <= 1) {
-                        // not required if first two are within 1 cm
-                        continue;
+                    if ($k == 2) {
+                        // not an error on the third measurement if first two aren't completed
+                        // or first two measurements are within 1 cm
+                        if (!$this->data->{$field}[0] || !$this->data->{$field}[1]) {
+                            break;
+                        }
+                        if (abs($this->data->{$field}[0] - $this->data->{$field}[1]) <= 1) {
+                            break;
+                        }
                     }
                     if (!$this->data->{$field . '-protocol-modification'}[$k] && !$value) {
-                        return false;
+                        $errors[] = [$field, $k];
                     }
                 }
             }
         }
 
-        return true;
+        return $errors;
     }
 }

@@ -113,7 +113,8 @@ class EvaluationController extends AbstractController
                     $now = new \DateTime();
                     $dbArray['updated_ts'] = $now;
                     if ($request->request->has('finalize')) {
-                        if ($evaluationService->canFinalize()) {
+                        $errors = $evaluationService->getFinalizeErrors();
+                        if (count($errors) === 0) {
                             $dbArray['finalized_ts'] = $now;
                             // Send final evaluation to RDR and store resulting id
                             $fhir = $evaluationService->getFhir($now);
@@ -121,7 +122,15 @@ class EvaluationController extends AbstractController
                                 $dbArray['rdr_id'] = $rdrEvalId;
                             }
                         } else {
-                            $app->addFlashError('Physical measurements were not finalized due to being incomplete');
+                            foreach ($errors as $field) {
+                                if (is_array($field)) {
+                                    list($field, $replicate) = $field;
+                                    $evaluationForm->get($field)->get($replicate)->addError(new FormError('Please complete or add protocol modification.'));
+                                } else {
+                                    $evaluationForm->get($field)->addError(new FormError('Please complete or add protocol modification.'));
+                                }
+                            }
+                            $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
                         }
                     }
                     if (!$evaluation) {
@@ -143,10 +152,15 @@ class EvaluationController extends AbstractController
                         if ($app['em']->getRepository('evaluations')->update($evalId, $dbArray)) {
                             $app->log(Log::EVALUATION_EDIT, $evalId);
                             $app->addFlashNotice('Physical measurements saved');
-                            return $app->redirectToRoute('evaluation', [
-                                'participantId' => $participant->id,
-                                'evalId' => $evalId
-                            ]);
+
+                            // If finalization failed, values are still saved, but do not redirect
+                            // so that errors can be displayed
+                            if ($evaluationForm->isValid()) {
+                                return $app->redirectToRoute('evaluation', [
+                                    'participantId' => $participant->id,
+                                    'evalId' => $evalId
+                                ]);
+                            }
                         } else {
                             $app->addFlashError('Failed to update physical measurements');
                         }
