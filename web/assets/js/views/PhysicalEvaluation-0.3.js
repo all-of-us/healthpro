@@ -20,7 +20,8 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         "change .field-waist-circumference input": "toggleThirdWaistCircumference",
         "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic",
         "click .modification-toggle a": "showModification",
-        "change .modification-select select": "handleProtocolModification"
+        "change .modification-select select": "handleProtocolModification",
+        "click .autofill-protocol-modification": "autofillProtocolModification"
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
@@ -442,6 +443,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 }
             });
         }
+        this.triggerEqualize();
     },
     showModificationBlock: function(block) {
         block.find('.modification-toggle').hide();
@@ -454,9 +456,35 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     },
     showModifications: function() {
         var self = this;
-        $('.modification-block').each(function() {
+        this.$('.modification-block').each(function() {
             self.handleProtocolModificationBlock($(this));
         });
+    },
+    autofillProtocolModification: function(e) {
+        var self = this;
+        var reason = $(e.currentTarget).data('reason');
+        this.$('.modification-block').each(function() {
+            var modification = $(this).find('.modification-select select').val();
+            if (!modification) {
+                var needsModification = false;
+                $(this).find('.modification-affected input[type=text]:visible').each(function() {
+                    if (!$(this).val()) {
+                        needsModification = true;
+                    }
+                });
+                if (needsModification) {
+                    $(this).find('.modification-select select').val(reason);
+                    self.handleProtocolModificationBlock($(this));
+                }
+            }
+        });
+        _.each(['height', 'weight'], function(field) {
+            if (!$('#form_' + field).val() && !$('#form_' + field + '-protocol-modification').val()) {
+                $('#form_' + field + '-protocol-modification').val(reason);
+            }
+        });
+        self.handleHeightProtocol();
+        self.handleWeightProtocol();
     },
     initialize: function(obj) {
         this.warnings = obj.warnings;

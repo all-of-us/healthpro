@@ -1,39 +1,42 @@
 {% extends 'base.html.twig' %}
 {% block title %}Physical Measurements - {% endblock %}
 {% block body %}
-    {{ form_errors(evaluationForm) }}
-
-    <div class="page-header">
-        <h2>
-            <i class="fa fa-clipboard" aria-hidden="true"></i>
-            {% if evaluation %}
-                {{ evaluation.created_ts|date('n/j/Y', app.userTimezone) }}
-            {% else %}
-                New Physical Measurements
-            {% endif %}
-            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
-        </h2>
-    </div>
-    <dl class="dl-horizontal">
-        <dt>Name</dt>
-        <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-        <dt>Participant ID</dt>
-        <dd>{{ participant.id }}</dd>
-        <dt>DOB</dt>
-        <dd>{{ participant.dob|date('n/j/Y') }}</dd>
-        <dt>Gender Identity</dt>
-        <dd>{{ participant.genderIdentity }}</dd>
-        {% if evaluation %}
-            <dt>Updated</dt>
-            <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
-            {% if evaluation.version != latestVersion %}
-                <dt>Version</dt>
-                <dd>{{ evaluation.version }} <small class="text-muted">(latest version is {{ latestVersion }})</small></dd>
-            {% endif %}
-        {% endif %}
-    </dl>
-
     <div id="physicalEvaluation" class="form-disable-enter">
+        {{ form_errors(evaluationForm) }}
+        <p>
+            <button class="autofill-protocol-modification btn btn-default" data-reason="refusal">Mark all missing fields with refusal protocol modification</button>
+        </p>
+
+        <div class="page-header">
+            <h2>
+                <i class="fa fa-clipboard" aria-hidden="true"></i>
+                {% if evaluation %}
+                    {{ evaluation.created_ts|date('n/j/Y', app.userTimezone) }}
+                {% else %}
+                    New Physical Measurements
+                {% endif %}
+                <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+            </h2>
+        </div>
+        <dl class="dl-horizontal">
+            <dt>Name</dt>
+            <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
+            <dt>Participant ID</dt>
+            <dd>{{ participant.id }}</dd>
+            <dt>DOB</dt>
+            <dd>{{ participant.dob|date('n/j/Y') }}</dd>
+            <dt>Gender Identity</dt>
+            <dd>{{ participant.genderIdentity }}</dd>
+            {% if evaluation %}
+                <dt>Updated</dt>
+                <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
+                {% if evaluation.version != latestVersion %}
+                    <dt>Version</dt>
+                    <dd>{{ evaluation.version }} <small class="text-muted">(latest version is {{ latestVersion }})</small></dd>
+                {% endif %}
+            {% endif %}
+        </dl>
+
         {{ form_start(evaluationForm, { attr: { class: 'warn-unsaved' } }) }}
 
             <div id="evaluationAffixSave">
