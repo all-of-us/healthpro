@@ -28,22 +28,22 @@ class RdrParticipants
         if (!is_object($participant)) {
             return false;
         }
-        if (isset($participant->participant_id)) {
-            $id = $participant->participant_id;
+        if (isset($participant->participantId)) {
+            $id = $participant->participantId;
         } else {
             return false;
         }
-        if (!empty($participant->biobank_id)) {
-            $biobankId = $participant->biobank_id;
+        if (!empty($participant->biobankId)) {
+            $biobankId = $participant->biobankId;
         } else {
-            $biobankId = $participant->participant_id; // for older participants without biobank ids
+            return false;
         }
-        if (isset($participant->membership_tier) && in_array($participant->membership_tier, ['VOLUNTEER', 'ENROLLEE', 'FULL_PARTICIPANT'])) {
+        if (isset($participant->membershipTier) && in_array($participant->membershipTier, ['VOLUNTEER', 'ENROLLEE', 'FULL_PARTICIPANT'])) {
             $consentStatus = true;
         } else {
-            $consentStatus = false;
+            $consentStatus = true; // TODO - not sure where we will end up with membership tier. For now, treat all as consented
         }
-        switch ($participant->gender_identity) {
+        switch ($participant->genderIdentity) {
             case 'FEMALE':
                 $gender = 'F';
                 break;
@@ -54,18 +54,18 @@ class RdrParticipants
                 $gender = 'U';
                 break;
         }
-        $genderIdentity = str_replace('_', ' ', $participant->gender_identity);
+        $genderIdentity = str_replace('_', ' ', $participant->genderIdentity);
         $genderIdentity = ucfirst(strtolower($genderIdentity));
         return new Participant([
             'id' => $id,
             'biobankId' => $biobankId,
-            'firstName' => $participant->first_name,
-            'middleName' => $participant->middle_name,
-            'lastName' => $participant->last_name,
-            'dob' => new \DateTime($participant->date_of_birth),
+            'firstName' => $participant->firstName,
+            'middleName' => $participant->middleName,
+            'lastName' => $participant->lastName,
+            'dob' => new \DateTime($participant->dateOfBirth),
             'genderIdentity' => $genderIdentity,
             'gender' => $gender,
-            'zip' => $participant->zip_code,
+            'zip' => $participant->zipCode,
             'consentComplete' => $consentStatus
         ]);
     }
@@ -74,15 +74,15 @@ class RdrParticipants
     {
         $query = [];
         if (isset($params['lastName'])) {
-            $query['last_name'] = ucfirst($params['lastName']);
+            $query['lastName'] = ucfirst($params['lastName']);
         }
         if (isset($params['firstName'])) {
-            $query['first_name'] = ucfirst($params['firstName']);
+            $query['firstName'] = ucfirst($params['firstName']);
         }
         if (isset($params['dob'])) {
             try {
                 $date = new \DateTime($params['dob']);
-                $query['date_of_birth'] = $date->format('Y-m-d');
+                $query['dateOfBirth'] = $date->format('Y-m-d');
             } catch (\Exception $e) {
                 throw new Exception\InvalidDobException();
             }
@@ -95,24 +95,26 @@ class RdrParticipants
     {
         $query = $this->paramsToQuery($params);
         try {
-            $response = $this->getClient()->request('GET', 'Participant', [
+            $response = $this->getClient()->request('GET', 'ParticipantSummary', [
                 'query' => $query
             ]);
         } catch (\Exception $e) {
             throw new Exception\FailedRequestException();
         }
         $responseObject = json_decode($response->getBody()->getContents());
+
         if (!is_object($responseObject)) {
             throw new Exception\InvalidResponseException();
         }
-        if (!isset($responseObject->items) || !is_array($responseObject->items)) {
+        if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
             return [];
         }
         $results = [];
-        foreach ($responseObject->items as $participant) {
-            $result = $this->participantToResult($participant);
-            if ($result) {
-                $results[] = $result;
+        foreach ($responseObject->entry as $participant) {
+            if (isset($participant->resource) && is_object($participant->resource)) {
+                if ($result = $this->participantToResult($participant->resource)) {
+                    $results[] = $result;
+                }
             }
         }
 
@@ -126,7 +128,7 @@ class RdrParticipants
         $participant = $memcache->get($memcacheKey);
         if (!$participant) {
             try {
-                $response = $this->getClient()->request('GET', "Participant/{$id}");
+                $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
                 $participant = json_decode($response->getBody()->getContents());
                 $memcache->set($memcacheKey, $participant, 0, 300);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
