@@ -8,7 +8,8 @@ var PLOTLY_OPTS = {
 
 var PLOTS_SHOWN = {
     'total-progress-nav': false,
-    'participants-by-region-nav': false
+    'participants-by-region-nav': false,
+    'participants-by-lifecycle-nav': false
 };
 
 var GEO_OPTS = {
@@ -78,6 +79,10 @@ function stopSpinner(divId) {
     $('#' + divId).data('spinner').stop();
 }
 
+function removePlotlyLink(divId) {
+    $('#' + divId + ' .plotlyjsicon').remove();
+}
+
 // function to transform plotly data object into array of annotations showing total
 // value of stacked bar columns
 function loadBarChartAnnotations(plotlyData, annotationsArray, interval) {
@@ -122,5 +127,5 @@ function loadRecruitmentFilters(id) {
 // generic error handler for when metrics API doesn't respond with valid results
 function setMetricsError(div) {
     stopSpinner(div);
-    $("#" + div).html("<p class='lead text-danger text-center'>Metrics currently unavailable - either there is an error retrieving data or you requested dates for which no data exists.<br/><br/>Please try again later.</p>");
+    $("#" + div).html("<p class='lead text-danger text-center'>Metrics currently unavailable - either there is an error retrieving data or you requested dates/centers for which no data exists.<br/><br/>Please try again later.</p>");
 }
