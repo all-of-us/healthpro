@@ -146,7 +146,7 @@
 
                 var now = new Date();
                 var nowString = now.toISOString().split('T')[0];
-                var lastWeek = new Date().setDate(now.getDate() - 7);
+                var lastWeek = new Date().setDate(now.getDate() - 6);
                 var lastWeekStr = new Date(lastWeek).toISOString().split('T')[0];
                 $('#total-progress-end-date').val(nowString);
                 $('#total-progress-start-date').val(lastWeekStr);
