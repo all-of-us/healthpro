@@ -64,9 +64,13 @@
                     </div>
                 </div>
             {% endif %}
-            <div id="evaluationAffixSave">
-                <button type="submit" class="btn btn-primary btn-xs" name="save">Save</button>
-            </div>
+
+            {% if not evaluation or not evaluation.finalized_ts %}
+                <div id="evaluationAffixSave">
+                    <button type="submit" class="btn btn-primary btn-xs" name="save">Save</button>
+                    <button type="submit" class="btn btn-success btn-xs" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Save and Finalize</button>
+                </div>
+            {% endif %}
 
             {% if schema.template is defined %}
                 {% include 'evaluationform/' ~ schema.template ~ '.html.twig' %}
