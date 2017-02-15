@@ -2,11 +2,6 @@
 {% block title %}Physical Measurements - {% endblock %}
 {% block body %}
     <div id="physicalEvaluation" class="form-disable-enter">
-        {{ form_errors(evaluationForm) }}
-        <p>
-            <button class="autofill-protocol-modification btn btn-default" data-reason="refusal">Mark all missing fields with refusal protocol modification</button>
-        </p>
-
         <div class="page-header">
             <h2>
                 <i class="fa fa-clipboard" aria-hidden="true"></i>
@@ -38,7 +33,37 @@
         </dl>
 
         {{ form_start(evaluationForm, { attr: { class: 'warn-unsaved' } }) }}
-
+            {{ form_errors(evaluationForm) }}
+            {% if showAutoModification %}
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="panel panel-danger">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <i class="fa fa-forward" aria-hidden="true"></i>
+                                    Or, auto-fill modifications and finalize
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+                                <p>
+                                    If physical measurements are incomplete due to refusal or a medical emergency, auto-fill missing fields with protocol modifications and finalize.
+                                </p>
+                                <p>
+                                    <strong>Finalize physical measurements early due to:</strong>
+                                </p>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <button name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="refusal">Refusal</button>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <button name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="other">Urgent/Emergent Event</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             <div id="evaluationAffixSave">
                 <button type="submit" class="btn btn-primary btn-xs" name="save">Save</button>
             </div>

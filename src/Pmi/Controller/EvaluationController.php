@@ -91,6 +91,7 @@ class EvaluationController extends AbstractController
         } else {
             $evaluation = null;
         }
+        $showAutoModification = false;
 
         $evaluationForm = $evaluationService->getForm($app['form.factory']);
         $evaluationForm->handleRequest($request);
@@ -131,6 +132,7 @@ class EvaluationController extends AbstractController
                                 }
                             }
                             $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
+                            $showAutoModification = true;
                         }
                     }
                     if (!$evaluation) {
@@ -180,7 +182,8 @@ class EvaluationController extends AbstractController
             'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
-            'latestVersion' => $evaluationService::CURRENT_VERSION
+            'latestVersion' => $evaluationService::CURRENT_VERSION,
+            'showAutoModification' => $showAutoModification
         ]);
     }
 }
