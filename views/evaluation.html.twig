@@ -31,11 +31,11 @@
                 {% endif %}
             {% endif %}
         </dl>
-        {% if evaluation.finalized_ts %}
+        {% if evaluation and evaluation.finalized_ts %}
             <div class="alert alert-success"><i class="fa fa-check-circle" aria-hidden="true"></i> <strong>Finalized on {{ evaluation.finalized_ts|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong></div>
         {% endif %}
 
-        {{ form_start(evaluationForm, { attr: { class: 'warn-unsaved disable-enter' } }) }}
+        {{ form_start(evaluationForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(evaluationForm) }}
             {% if showAutoModification %}
                 <div class="row">
@@ -56,10 +56,10 @@
                                 </p>
                                 <div class="row">
                                     <div class="col-xs-6">
-                                        <button name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="refusal">Refusal</button>
+                                        <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="refusal">Refusal</button>
                                     </div>
                                     <div class="col-xs-6">
-                                        <button name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="emergency">Urgent/Emergent Event</button>
+                                        <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="emergency">Urgent/Emergent Event</button>
                                     </div>
                                 </div>
                             </div>

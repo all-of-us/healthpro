@@ -63,6 +63,21 @@ $(document).ready(function()
 
 
     /*************************************************************************
+     * Disable forms being double-submitted by disabling any submit buttons
+     * while submitting
+     ************************************************************************/
+    $('form.prevent-resubmit').on('submit', function(e) {
+        var form = $(e.currentTarget);
+        if (form.data('submitting')) {
+            e.preventDefault();
+            return;
+        } else {
+            form.data('submitting', 1);
+            form.find('button[type=submit], input[type=submit]').css('opacity', 0.5);
+        }
+    });
+
+    /*************************************************************************
      * Auto-enable bootstrap tooltips
      ************************************************************************/
     $('[data-toggle="tooltip"]').tooltip();
