@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block title %}Physical Measurements - {% endblock %}
 {% block body %}
-    <div id="physicalEvaluation" class="form-disable-enter">
+    <div id="physicalEvaluation">
         <div class="page-header">
             <h2>
                 <i class="fa fa-clipboard" aria-hidden="true"></i>
@@ -35,7 +35,7 @@
             <div class="alert alert-success"><i class="fa fa-check-circle" aria-hidden="true"></i> <strong>Finalized on {{ evaluation.finalized_ts|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong></div>
         {% endif %}
 
-        {{ form_start(evaluationForm, { attr: { class: 'warn-unsaved' } }) }}
+        {{ form_start(evaluationForm, { attr: { class: 'warn-unsaved disable-enter' } }) }}
             {{ form_errors(evaluationForm) }}
             {% if showAutoModification %}
                 <div class="row">

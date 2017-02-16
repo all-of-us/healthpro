@@ -31,9 +31,9 @@
     <br />
 
     <div id="createOrder">
-        {{ form_start(confirmForm) }}
+        {{ form_start(confirmForm, { attr: { class: 'warn-unsaved disable-enter' } }) }}
             {{ form_errors(confirmForm) }}
-            <div class="row row-equal-height form-disable-enter">
+            <div class="row row-equal-height">
                 <div class="col-sm-6 col-md-5">
                     <div class="panel panel-default">
                         <div class="panel-heading">

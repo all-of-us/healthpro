@@ -54,7 +54,7 @@ $(document).ready(function()
      * Disable forms being submitted via enter/return key on any text input
      * inside an element with the .form-disable-enter class
      ************************************************************************/
-    $('.form-disable-enter input:text').on('keypress keyup', function(e) {
+    $('form.disable-enter input:text').on('keypress keyup', function(e) {
         if (e.which == 13) {
             e.preventDefault();
             return false;
