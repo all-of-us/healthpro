@@ -33,7 +33,7 @@
                                 {{ evaluation.created_ts|date('D n/j/Y', app.userTimezone) }}<br />
                                 <small class="text-muted">
                                     {% if evaluation.finalized_ts %}
-                                        <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
+                                        <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                     {% else %}
                                         <span class="label label-default">Updated</span> {{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                     {% endif %}
