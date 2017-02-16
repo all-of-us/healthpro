@@ -31,6 +31,9 @@
                 {% endif %}
             {% endif %}
         </dl>
+        {% if evaluation.finalized_ts %}
+            <div class="alert alert-success"><i class="fa fa-check-circle" aria-hidden="true"></i> <strong>Finalized on {{ evaluation.finalized_ts|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong></div>
+        {% endif %}
 
         {{ form_start(evaluationForm, { attr: { class: 'warn-unsaved' } }) }}
             {{ form_errors(evaluationForm) }}
