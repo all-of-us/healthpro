@@ -143,10 +143,21 @@ class EvaluationController extends AbstractController
                         if ($evalId = $app['em']->getRepository('evaluations')->insert($dbArray)) {
                             $app->log(Log::EVALUATION_CREATE, $evalId);
                             $app->addFlashNotice('Physical measurements saved');
-                            return $app->redirectToRoute('evaluation', [
-                                'participantId' => $participant->id,
-                                'evalId' => $evalId
-                            ]);
+
+                            // If finalization failed, new physical measurements are created, but
+                            // show errors and auto-modification options on subsequent display
+                            if (!$evaluationForm->isValid()) {
+                                return $app->redirectToRoute('evaluation', [
+                                    'participantId' => $participant->id,
+                                    'evalId' => $evalId,
+                                    'showAutoModification' => 1
+                                ]);
+                            } else {
+                                return $app->redirectToRoute('evaluation', [
+                                    'participantId' => $participant->id,
+                                    'evalId' => $evalId
+                                ]);
+                            }
                         } else {
                             $app->addFlashError('Failed to create new physical measurements');
                         }
@@ -171,6 +182,21 @@ class EvaluationController extends AbstractController
                     if (count($evaluationForm->getErrors()) == 0) {
                         $evaluationForm->addError(new FormError('Please correct the errors below'));
                     }
+                }
+            } elseif ($request->query->get('showAutoModification')) {
+                // if new physical measurements were created and failed to finalize, generate errors post-redirect
+                $errors = $evaluationService->getFinalizeErrors();
+                if (count($errors) > 0) {
+                    foreach ($errors as $field) {
+                        if (is_array($field)) {
+                            list($field, $replicate) = $field;
+                            $evaluationForm->get($field)->get($replicate)->addError(new FormError('Please complete or add protocol modification.'));
+                        } else {
+                            $evaluationForm->get($field)->addError(new FormError('Please complete or add protocol modification.'));
+                        }
+                    }
+                    $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
+                    $showAutoModification = true;
                 }
             }
         }
