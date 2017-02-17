@@ -34,7 +34,6 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         this.triggerEqualize();
     },
     inputKeyup: function(e) {
-        this.clearServerErrors(e);
         this.updateConversion(e);
     },
     displayHelpModal: function(e) {
