@@ -74,7 +74,7 @@ abstract class AbstractApplication extends Application
             $values['isUnitTest'] = false;
         }
         if (!array_key_exists('debug', $values)) {
-            $values['debug'] = ($values['env'] === self::ENV_PROD || $values['env'] === self::ENV_STAGING || $values['env'] === self::ENV_STABLE || $values['isUnitTest']) ? false : true;
+            $values['debug'] = ($values['env'] === self::ENV_LOCAL && !$values['isUnitTest']);
         }
         $values['assetVer'] = $values['env'] === self::ENV_LOCAL ?
             date('YmdHis') : $values['release'];
