@@ -158,11 +158,16 @@
             "options": {
                 "None": "",
                 "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
                 "Other": "other"
             },
             "warnings": [
                 {
                     "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "emergency",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -240,6 +245,7 @@
                 "Wheelchair-bound": "wheelchair-bound",
                 "Unable to stand in a straight position": "unable-to-stand-straight",
                 "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
                 "Other": "other"
             },
             "help": {
@@ -264,6 +270,10 @@
                 },
                 {
                     "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "emergency",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -324,6 +334,7 @@
                 "Wheelchair-bound": "wheelchair-bound",
                 "Pregnancy": "pregnancy",
                 "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
                 "Other": "other"
             },
             "help": {
@@ -348,6 +359,10 @@
                 },
                 {
                     "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "emergency",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -382,11 +397,16 @@
             "options": {
                 "None": "",
                 "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
                 "Other": "other"
             },
             "warnings": [
                 {
                     "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "emergency",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -433,6 +453,7 @@
                 "None": "",
                 "Colostomy bag": "colostomy-bag",
                 "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
                 "Other": "other"
             },
             "help": {
@@ -445,6 +466,10 @@
                 },
                 {
                     "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "emergency",
                     "message": "Deviation successfully captured."
                 },
                 {
