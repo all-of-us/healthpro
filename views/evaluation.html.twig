@@ -56,10 +56,10 @@
                                 </p>
                                 <div class="row">
                                     <div class="col-xs-6">
-                                        <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="refusal">Refusal</button>
+                                        <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="refusal" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Refusal</button>
                                     </div>
                                     <div class="col-xs-6">
-                                        <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="emergency">Urgent/Emergent Event</button>
+                                        <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="emergency" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Urgent/Emergent Event</button>
                                     </div>
                                 </div>
                             </div>
