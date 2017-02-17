@@ -76,6 +76,11 @@ $(document).ready(function()
             form.find('button[type=submit], input[type=submit]').css('opacity', 0.5);
         }
     });
+    // If form submission is stopped by parsley, clear the submitting status and opacity
+    window.Parsley.on('form:error', function() {
+        $(this.$element).data('submitting', 0);
+        $(this.$element).find('button[type=submit], input[type=submit]').css('opacity', 1);
+    });
 
     /*************************************************************************
      * Auto-enable bootstrap tooltips
