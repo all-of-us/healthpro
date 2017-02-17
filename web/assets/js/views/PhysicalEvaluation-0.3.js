@@ -249,8 +249,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             container.append($('<div class="diastolic-warning text-warning">').text('Diastolic pressure must be less than systolic pressure'));
         }
     },
-    clearServerErrors: function() {
-        this.$('span.help-block ul li').remove();
+    clearServerErrors: function(e) {
+        var field = $(e.currentTarget).closest('.field');
+        field.find('span.help-block ul li').remove();
     },
     kgToLb: function(kg) {
         return (parseFloat(kg) * 2.2046).toFixed(1);
