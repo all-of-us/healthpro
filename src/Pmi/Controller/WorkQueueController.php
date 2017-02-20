@@ -89,8 +89,7 @@ class WorkQueueController extends AbstractController
         'Sleep' => 'Sleep'
     ];
 
-    // This will be replaced with an RDR Participant Summary API call when available
-    protected function participantSummarySearch($params)
+    protected function participantSummarySearchFaker($params)
     {
         $results = [];
         $faker = \Faker\Factory::create();
@@ -179,10 +178,23 @@ class WorkQueueController extends AbstractController
         return $results;
     }
 
+    protected function participantSummarySearch($params, $app)
+    {
+        $params['hpoId'] = 'PITT';
+        $summaries = $app['pmi.drc.participants']->listParticipantSummaries($params);
+        $results = [];
+        foreach ($summaries as $summary) {
+            if (isset($summary->resource)) {
+                $results[] = $summary->resource;
+            }
+        }
+        return $results;
+    }
+
     public function indexAction(Application $app, Request $request)
     {
         $params = array_filter($request->query->all());
-        $participants = $this->participantSummarySearch($params);
+        $participants = $this->participantSummarySearch($params, $app);
         return $app['twig']->render('workqueue/index.html.twig', [
             'filters' => self::$filters,
             'surveys' => self::$surveys,

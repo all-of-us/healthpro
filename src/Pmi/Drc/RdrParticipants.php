@@ -121,6 +121,27 @@ class RdrParticipants
         return $results;
     }
 
+    public function listParticipantSummaries($params)
+    {
+        try {
+            $response = $this->getClient()->request('GET', 'ParticipantSummary', [
+                'query' => $params
+            ]);
+        } catch (\Exception $e) {
+            throw new Exception\FailedRequestException();
+        }
+        $responseObject = json_decode($response->getBody()->getContents());
+
+        if (!is_object($responseObject)) {
+            throw new Exception\InvalidResponseException();
+        }
+        if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
+            return [];
+        }
+
+        return $responseObject->entry;
+    }
+
     public function getById($id)
     {
         $memcache = new \Memcache();
