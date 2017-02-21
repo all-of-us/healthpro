@@ -38,7 +38,7 @@
                 {% endfor %}
                 <th class="secondaryheader multiheader-status">Phys Meas</th>
                 <th class="secondaryheader multiheader-status">Biobank</th>
-                <th class="secondaryheader multiheader-status"><nobr>Withdrawal Status <i class="fa fa-info-circle" aria-hidden="true" title="This is a temporary placeholder to demonstrate that we will display withdrawal status once the Program SOPs on withdrawal are finalized." data-toggle="tooltip" data-placement="left"></i></nobr></th>
+                <th class="secondaryheader multiheader-status">Withdrawal Status</th>
             </tr>
         </thead>
         <tbody>
@@ -67,7 +67,7 @@
                     </td>
                     {% for field, label in surveys %}
                         <td class="text-center">
-                            {% if participant['questionnaireOn' ~ field]|default('') == 'SUBMITTED' %}
+                            {% if attribute(participant, 'questionnaireOn' ~ field)|default('') == 'SUBMITTED' %}
                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
                             {% else %}
                                 <i class="fa fa-times text-danger" aria-hidden="true"></i>
@@ -85,14 +85,7 @@
                     <td class="text-center">
                         <strong class="text-{{ participant.numBaselineSamplesArrived == 7 ? 'success' : 'danger' }}">{{ participant.numBaselineSamplesArrived }}/7</strong>
                     </td>
-                    <td>
-                        {#
-                        {{ participant.withdrawalStatus }}
-                        {% if participant.withdrawalStatus != 'Enrolled' %}
-                            <i class="fa fa-info-circle" aria-hidden="true" title="This is a temporary placeholder to demonstrate that we will display withdrawal status once the Program SOPs on withdrawal are finalized." data-toggle="tooltip" data-placement="left"></i>
-                        {% endif %}
-                        #}
-                    </td>
+                    <td></td>
                 </tr>
             {% endfor %}
         </tbody>
