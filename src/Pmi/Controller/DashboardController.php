@@ -74,10 +74,13 @@ class DashboardController extends AbstractController
         $error_check = 0;
 
         // retrieve controlled vocab for entries from metrics cache
-        if ($filter_by != 'Participant') {
-            $entries = $this->getMetricsFieldDefinitions($app, $filter_by);
-        } else {
+        if ($filter_by == 'Participant') {
             $entries = [$filter_by];
+        } elseif ($filter_by == 'Participant.registrationStatus') {
+            $entries = ['Registered', 'Consented', 'Full Participants'];
+
+        } else {
+            $entries = $this->getMetricsFieldDefinitions($app, $filter_by);
         }
 
         // if we have no entries to iterate over, halt execution and return empty data
@@ -94,16 +97,17 @@ class DashboardController extends AbstractController
 
                 $metrics = $this->getMetricsObject($app, $date);
 
-                // iterate through list of control values to get counts
-                foreach ($entries as $entry) {
-                    $facet_total = 0;
+                // special case for registration status as this is a composite metric
+                // made up of total registrations and Participant.consentForStudyEnrollment
+                if ($filter_by == 'Participant.registrationStatus') {
+                    // iterate through list of control values to get counts
+                    $consent_total = 0;
+                    $full_participant_total = 0;
                     $participant_total = 0;
                     // construct lookup key
-                    if ($filter_by == 'Participant') {
-                        $lookup = $filter_by;
-                    } else {
-                        $lookup = $filter_by . "." . $entry;
-                    }
+                    $consent_lookup = "Participant.consentForStudyEnrollment.SUBMITTED" ;
+                    $full_participant_lookup = "Participant.fullParticipant.SUBMITTED" ;
+
                     // make sure metrics data exists first, if metrics cache or API fail return value will be false
                     if (!empty($metrics)) {
                         // iterate through each center to accumulate a running total to store
@@ -119,26 +123,91 @@ class DashboardController extends AbstractController
                                     }
                                 }
                             }
-                            if (!empty($requested_center) && array_key_exists($lookup, $requested_center)) {
-                                $facet_total += $requested_center[$lookup];
+                            // set all 3 values discretely, checking to make sure they exist first
+                            if (!empty($requested_center) && array_key_exists($consent_lookup, $requested_center)) {
+                                $consent_total += $requested_center[$consent_lookup];
+                            }
+
+                            if (!empty($requested_center) && array_key_exists($full_participant_lookup, $requested_center)) {
+                                $full_participant_total += $requested_center[$full_participant_lookup];
+                            }
+
+                            if (!empty($requested_center) && array_key_exists('Participant', $requested_center)) {
                                 $participant_total += $requested_center['Participant'];
                             }
                         }
-                        $values[$entry][] = $facet_total;
+                        // set consented && full participant values
+                        $values['Consented'][] = $consent_total;
+                        $values['Full Participants'][] = $full_participant_total;
+
+                        $registered_count = $participant_total - $consent_total - $full_participant_total;
+                        $values['Registered'][] = $registered_count;
 
                         // add to error_check
-                        $error_check += $facet_total;
+                        $error_check += $registered_count;
 
                         // generate hover text if not doing total participant count
-                        if ($filter_by != 'Participant') {
-                            $hover_text[$entry][] = $this->calculatePercentText($facet_total, $participant_total) . '<br />' . $date;
-                        }
+                        $hover_text['Consented'][] = $this->calculatePercentText($consent_total, $participant_total) . '<br />' . $date;
+                        $hover_text['Full Participants'][] = $this->calculatePercentText($full_participant_total, $participant_total) . '<br />' . $date;
+                        $hover_text['Registered'][] = $this->calculatePercentText($registered_count, $participant_total) . '<br />' . $date;
 
                     } else {
                         // error retrieving metrics data from cache & API, so record error for this date
                         // acts as fallback in case only some data is missing in query range
-                        $values[$entry][] = 0;
-                        $hover_text[$entry][] = 'Error retrieving data for ' . $date;
+                        $values['Consented'][] = 0;
+                        $values['Registered'][] = 0;
+                        $values['Full Participants'][] = 0;
+                        $hover_text['Consented'][] = 'Error retrieving data for ' . $date;
+                        $hover_text['Registered'][] = 'Error retrieving data for ' . $date;
+                        $hover_text['Full Participants'][] = 'Error retrieving data for ' . $date;
+                    }
+                } else {
+                    // iterate through list of control values to get counts
+                    foreach ($entries as $entry) {
+                        $facet_total = 0;
+                        $participant_total = 0;
+                        // construct lookup key
+                        if ($filter_by == 'Participant') {
+                            $lookup = $filter_by;
+                        } else {
+                            $lookup = $filter_by . "." . $entry;
+                        }
+                        // make sure metrics data exists first, if metrics cache or API fail return value will be false
+                        if (!empty($metrics)) {
+                            // iterate through each center to accumulate a running total to store
+                            foreach ($centers as $center) {
+                                $requested_center = [];
+                                if ($center == 'ALL') {
+                                    // first entry is always non-faceted (total counts)
+                                    $requested_center = $metrics[0]['entries'];
+                                } else {
+                                    foreach ($metrics as $metric) {
+                                        if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $center) {
+                                            $requested_center = $metric['entries'];
+                                        }
+                                    }
+                                }
+                                if (!empty($requested_center) && array_key_exists($lookup, $requested_center)) {
+                                    $facet_total += $requested_center[$lookup];
+                                    $participant_total += $requested_center['Participant'];
+                                }
+                            }
+                            $values[$entry][] = $facet_total;
+
+                            // add to error_check
+                            $error_check += $facet_total;
+
+                            // generate hover text if not doing total participant count
+                            if ($filter_by != 'Participant') {
+                                $hover_text[$entry][] = $this->calculatePercentText($facet_total, $participant_total) . '<br />' . $date;
+                            }
+
+                        } else {
+                            // error retrieving metrics data from cache & API, so record error for this date
+                            // acts as fallback in case only some data is missing in query range
+                            $values[$entry][] = 0;
+                            $hover_text[$entry][] = 'Error retrieving data for ' . $date;
+                        }
                     }
                 }
             }
@@ -151,7 +220,10 @@ class DashboardController extends AbstractController
         }
 
         // reverse sort so that they appear in ascending alphabetical order in the legend
-        rsort($entries);
+        // ignore registrationStatus composite metric as we want to maintain order
+        if ($filter_by != 'Participant.registrationStatus') {
+            rsort($entries);
+        }
 
         // if we got this far, we have data!
         // assemble data object in Plotly format
@@ -465,7 +537,7 @@ class DashboardController extends AbstractController
             'PPI Module: Sociodemographics',
             'PPI Module: Overall Health',
             'PPI Module: Medical History',
-            'Physical Measurments',
+            'Physical Measurements',
             'Sample Collection'
         );
 
@@ -618,6 +690,7 @@ class DashboardController extends AbstractController
     private function getMetricsDisplayNames() {
         $metrics_attributes = array(
             "Participant" => "Total Participants",
+            "Participant.registrationStatus" => "Registration Status",
             "Participant.genderIdentity" => "Gender Identity",
             "Participant.ageRange" => "Age Range",
             "Participant.ethnicity" => "Ethnicity",

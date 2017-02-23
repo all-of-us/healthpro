@@ -1,8 +1,81 @@
 <div class="modal fade" id="dashboad-help-modal" tabindex="-1" role="dialog" aria-labelledby="loading-modal" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-body">
+            <div class="modal-header">
                 <h2 class="text-center">Dashboard Help</h2>
+            </div>
+            <div class="modal-body">
+                <h3>General Usage/ Plot Options</h3>
+                <p>To view any individual metric, select if from the dropdown in the <strong>Plot Options</strong> pane and
+                    the associated plot will automatically update.  Every plot has an end date that specifies the last day
+                    of metrics used to compute the plot.</p>
+                <p>Changing any value in the Plot Options pane will cause the associated plot to automatically update.</p>
+                <h3>Advanced Filters</h3>
+                <p>With any plot, you can filter the source data by selecting individual or groups of HPOs.  This will
+                    calculate the selected metric by only using data corresponding to the selected centers.  To view this
+                    data, select the desired centers individually and click <strong>Filter Results</strong>.  You can also
+                    select/deselect entire groups or all centers by using the <strong>Group</strong> or <strong>All</strong>
+                    toggles, respectively.</p>
+                <h3>Using Plots</h3>
+                <p>All plots, whether bar- or map-based, can be zoomed or panned by either clicking and dragging or using the
+                    plot zoom controls in the upper right-hand corner of the plot.  Every element displayed on the plot will
+                    contain additional information that is displayed on mouse hover.  Double clicking any plot will reset the
+                    zoom to its default level.  You can also export an image of the current view by clicking the camera icon
+                    in the plot control bar.</p>
+                <h3>Available Dashboards</h3>
+                <p>There are 3 available plots in the dashboard: <strong>Total Progress to Date</strong>, <strong>Participants
+                    by Region</strong>, and <strong>Participants by Lifecyle Phase</strong>.</p>
+                <h4 class="text-primary">Total Progress to Date</h4>
+                <p>This plot will show various participant metrics and their associated values grouped over time. The available
+                metrics include:</p>
+                <ul>
+                    <li><strong>Total Participants</strong> (registered)</li>
+                    <li><strong>Registration Status</strong> (registered vs. consented vs. full participants)</li>
+                    <li><strong>Gender Identity</strong></li>
+                    <li><strong>Age Range</strong></li>
+                    <li><strong>Ethinicity</strong></li>
+                    <li><strong>Race</strong></li>
+                </ul>
+                <p>The Total Progress to date plot has an additional start date to specify a discrete range of dates to calculate
+                    (this defaults to one week from the current date). You can also choose to see of rollup of values bucketed
+                    by days, weeks, or months by using the <strong>Interval</strong> dropdown.  On bar charts, you can display
+                    column totals above each bar by clicking <strong>Show Column Totals</strong>.</p>
+                <p>Registrations Status is a composite metrics that is determined by taking counts of consented</p>
+                <h4 class="text-primary">Participants by Region</h4>
+                <p>The Participants by Region plot is a choropleth map of the United States showing several participant
+                    metrics that correspond to geographic locations.  These include:</p>
+                <ul>
+                    <li><strong>State</strong> of residence</li>
+                    <li><strong>Census Region</strong> of residence</li>
+                    <li><strong>Recruitment Origin</strong> (what HPO a participant registered through)</li>
+                </ul>
+                <p>The values shown on the map are calculated as a percentage against that particular metric's target goal for
+                    the current year.  For States & Census Regions, this is one-third of one percent (0.333%) of the total
+                    population recorded in the 2010 United States Census.  For Recruitment Origin, this is the target
+                    registration goal for the associated center.</p>
+                <p>The <strong>Color Profile</strong> dropdown allows you to re-color the map in a variety of shades (this
+                    only applies to the State and Census Region metrics).</p>
+                <h4 class="text-primary">Participants by Lifecycle Phase</h4>
+                <p>The Participants by Lifecycle Phase is a bar chart showing the progression of participants through the
+                    registration process.  This measures counts at various milestones and gates 'eligibility' based on
+                    how many participants have completed the upstream events.  The time points show are:</p>
+                <ul>
+                    <li><strong>Registered</strong></li>
+                    <li><strong>Consent for Enrollment</strong></li>
+                    <li><strong>Consent for Health Records</strong></li>
+                    <li><strong>PPI Module on Sociodemographics</strong></li>
+                    <li><strong>PPI Module on Overall Health</strong></li>
+                    <li><strong>PPI Module on Medical History</strong></li>
+                    <li><strong>Physical Measurements</strong></li>
+                    <li><strong>Sample Collection</strong></li>
+                    <li><strong>Full Participants</strong></li>
+                </ul>
+                <p>For the Registration, Consent, PPI modules, and Physical Measurements milestones, we are counting participants
+                    who have completed these milestones.  Sample collection is defined as participants
+                    for whom <em>4ml of blood or saliva</em> has been collected and received.  Full Participants are defined as any
+                    participant that has completed all of the above milestones.</p>
+                <p>Eligibility for Consent is defined as any participant that has registered.  Eligibility for any milestone
+                    from PPI modules onward is defined as any participant that has completed both Consent milestones.</p>
             </div>
             <div class="modal-footer">
                 <button class="close" data-dismiss="modal">×</button>
