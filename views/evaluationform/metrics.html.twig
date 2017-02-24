@@ -1,6 +1,6 @@
 {% macro form_row(form, definition) %}
     {% set name = definition.name %}
-    <div data-field="{{ name }}" class="field field-{{ name }} form-group{% if not form[name].vars.valid %} has-error{% endif %}">
+    <div data-field="{{ name }}" class="field field-{{ name }} form-group{% if not form[name].vars.valid %} has-error{% endif %}"{% if definition.alternateunits is defined and definition.alternateunits %} style="margin-bottom:0"{% endif %}>
         {{ form_label(form[name]) }}
         {% if definition.convert is defined %}
             <span id="convert-{{ name }}" class="pull-right convert"></span>
@@ -14,7 +14,26 @@
             {{ form_widget(form[name]) }}
         {% endif %}
         {{ form_errors(form[name]) }}
+
+        {% if definition.alternateunits is defined and definition.alternateunits %}
+        {% endif %}
     </div>
+
+    {% if definition.alternateunits is defined and definition.alternateunits %}
+        <div class="alt-units-block">
+            <div class="alt-units-toggle">
+                <p><a class="small">Enter in {{ definition.unit == 'cm' ? 'inches' : 'pounds' }} (value will be stored in {{ definition.unit }})</a></p>
+            </div>
+            <div class="alt-units-field form-group" style="display:none; margin-top:15px;">
+                <label for="alt-units-{{ name }}">Enter in {{ definition.unit == 'cm' ? 'inches' : 'pounds' }} (value will be stored in {{ definition.unit }})</label>
+                <div class="input-group">
+                    <input type="text" id="alt-units-{{ name }}" class="form-control">
+                    <div class="input-group-addon">{{ definition.unit == 'cm' ? 'in' : 'lb' }}</div>
+                </div>
+                <p><a class="small">Cancel</a></p>
+            </div>
+        </div>
+    {% endif %}
 {% endmacro %}
 
 {% macro form_row_replicate(form, definition, i) %}

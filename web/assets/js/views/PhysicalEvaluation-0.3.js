@@ -21,7 +21,11 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic",
         "click .modification-toggle a": "showModification",
         "change .modification-select select": "handleProtocolModification",
-        "click .autofill-protocol-modification": "autofillProtocolModification"
+        "click .autofill-protocol-modification": "autofillProtocolModification",
+        "click .alt-units-toggle a": "enableAltUnits",
+        "click .alt-units-field a": "cancelAltUnits",
+        "keyup .alt-units-field input": "convertAltUnits",
+        "change .alt-units-field input": "convertAltUnits"
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
@@ -137,8 +141,12 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             this.$('#hip-waist-skip').html('<span class="label label-danger">Skip</span>');
             this.$('#panel-hip-waist>.panel-body').hide();
         }
+        var ppwNext = this.$('.field-weight-prepregnancy').next();
         if (isPregnant) {
             this.$('.field-weight-prepregnancy').show();
+            if (ppwNext.hasClass('alt-units-block')) {
+                ppwNext.show();
+            }
             if (this.rendered) {
                 this.$('#form_weight-protocol-modification').valChange('pregnancy');
             }
@@ -146,6 +154,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         if (!isPregnant) {
             this.$('#form_weight-prepregnancy').valChange('');
             this.$('.field-weight-prepregnancy').hide();
+            if (ppwNext.hasClass('alt-units-block')) {
+                ppwNext.hide();
+            }
             if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'pregnancy') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
@@ -257,6 +268,12 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     },
     cmToIn: function(cm) {
         return (parseFloat(cm) * 0.3937).toFixed(1);
+    },
+    lbToKg: function(lb) {
+        return (parseFloat(lb) / 2.2046).toFixed(1);
+    },
+    inToCm: function(inches) {
+        return (parseFloat(inches) / 0.3937).toFixed(1);
     },
     convert: function(type, val) {
         switch (type) {
@@ -485,6 +502,37 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         });
         self.handleHeightProtocol();
         self.handleWeightProtocol();
+    },
+    enableAltUnits: function(e) {
+        var block = $(e.currentTarget).closest('.alt-units-block');
+        block.find('.alt-units-field').show();
+        block.find('.alt-units-toggle').hide();
+        block.prev().find('input').attr('readonly', true);
+        this.triggerEqualize();
+    },
+    cancelAltUnits: function(e) {
+        var block = $(e.currentTarget).closest('.alt-units-block');
+        block.find('.alt-units-toggle').show();
+        block.find('.alt-units-field').hide();
+        block.prev().find('input').attr('readonly', false);
+        block.find('.alt-units-field input').val('');
+        this.triggerEqualize();
+    },
+    convertAltUnits: function(e) {
+        var block = $(e.currentTarget).closest('.alt-units-block');
+        var val = block.find('.alt-units-field input').val();
+        var unit = block.find('.input-group-addon').text();
+        if (unit == 'in') {
+            val = this.inToCm(val);
+        } else {
+            val = this.lbToKg(val);
+        }
+        if (e.type == 'change') {
+            block.prev().find('input').val(val);
+            block.prev().find('input').change(); // trigger change even if not different
+        } else {
+            block.prev().find('input').val(val);
+        }
     },
     initialize: function(obj) {
         this.warnings = obj.warnings;

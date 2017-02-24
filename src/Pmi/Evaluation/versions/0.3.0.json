@@ -217,6 +217,7 @@
             "decimals": 1,
             "max": 300,
             "convert": "ftin",
+            "alternateunits": true,
             "help": {
                 "image": "height.png"
             },
@@ -299,6 +300,7 @@
                 }
             ],
             "convert": "lb",
+            "alternateunits": true,
             "help": {
                 "caption": "Help text placeholder."
             }
@@ -320,6 +322,7 @@
                 }
             ],
             "convert": "lb",
+            "alternateunits": true,
             "help": {
                 "caption": "Help text placeholder."
             }
