@@ -527,6 +527,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         } else {
             val = this.lbToKg(val);
         }
+        if (isNaN(val)) {
+            val = '';
+        }
         if (e.type == 'change') {
             block.prev().find('input').val(val);
             block.prev().find('input').change(); // trigger change even if not different
