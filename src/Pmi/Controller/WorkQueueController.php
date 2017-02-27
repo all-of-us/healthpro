@@ -5,11 +5,6 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Pmi\Audit\Log;
 
-class PhoneNumber extends \Faker\Provider\en_US\PhoneNumber
-{
-    protected static $formats = ['{{areaCode}}-{{exchangeCode}}-####'];
-}
-
 class WorkQueueController extends AbstractController
 {
     protected static $name = 'workqueue';
@@ -60,22 +55,6 @@ class WorkQueueController extends AbstractController
                 'White' => 'WHITE',
                 'Other race' => 'OTHER_RACE'
             ]
-        ],
-        'ppi' => [
-            'label' => 'PPI Surveys Completed',
-            'options' => [
-                'None' => 'NONE',
-                'Some' => 'SOME',
-                'All' => 'ALL'
-            ]
-        ],
-        'biobank' => [
-            'label' => 'Biospecimens banked',
-            'options' => [
-                'None' => 'NONE',
-                'Some' => 'SOME',
-                'All' => 'ALL'
-            ]
         ]
     ];
     protected static $surveys = [
@@ -87,95 +66,6 @@ class WorkQueueController extends AbstractController
         'FamilyHealth' => 'Family',
         'HealthcareAccess' => 'Access'
     ];
-
-    protected function participantSummarySearchFaker($params)
-    {
-        $results = [];
-        $faker = \Faker\Factory::create();
-        $faker->addProvider(new PhoneNumber($faker));
-        $count = 100 + rand(0,20);
-        if (isset($params['age'])) {
-            $count = round($count * 0.3);
-        }
-        if (isset($params['gender'])) {
-            $count = round($count * 0.5);
-        }
-        if (isset($params['ethnicity'])) {
-            $count = round($count * 0.5);
-        }
-        if (isset($params['race'])) {
-            $count = round($count * 0.5);
-        }
-        if (isset($params['biobank'])) {
-            $count = round($count * 0.3);
-        }
-        if (isset($params['ppi'])) {
-            $count = round($count * 0.3);
-        }
-        for ($i = 0; $i < $count; $i++) {
-            $biobankStatus = $faker->randomElement([0,0,0,0,1,2,3,4,5,6,7,7,7,7,7,7]);
-            if (isset($params['biobank'])) {
-                switch ($params['biobank']) {
-                    case 'ALL':
-                        $biobankStatus = 7;
-                        break;
-                    case 'SOME':
-                        $biobankStatus = $faker->numberBetween(1,6);
-                        break;
-                    default:
-                        $biobankStatus = 0;
-                }
-            }
-            $physicalStatus = $faker->boolean(50) ? 'SUBMITTED' : 'UNSET';
-            if (isset($params['gender'])) {
-                if ($params['gender'] === 'MALE') {
-                    $firstName = $faker->firstNameMale;
-                } elseif ($params['gender'] === 'FEMALE') {
-                    $firstName = $faker->firstNameFemale;
-                } else {
-                    $firstName = $faker->firstName;
-                }
-            } else {
-                $firstName = $faker->firstName;
-            }
-            $withdrawalStatus = $faker->randomElement(array_merge(
-                array_fill(0, 16, 'Enrolled'),
-                [
-                    'Suspension - No Contact',
-                    'Suspension - No Access',
-                    'Withdrawal - No Use',
-                    'Withdrawal - No Use After Death'
-                ]
-            ));
-            $row = [
-                'firstName' => $firstName,
-                'lastName' => $faker->unique()->lastName,
-                'preferredContact' => $withdrawalStatus === 'Enrolled' ? $faker->randomElement(['EMAIL', 'EMAIL', 'EMAIL', 'PHONE', 'PHONE', 'MAIL', 'NO_CONTACT']) : 'NO_CONTACT',
-                'phoneNumber' => $withdrawalStatus === 'Enrolled' ? $faker->phoneNumber : '',
-                'emailAddress' => $withdrawalStatus === 'Enrolled' ? $faker->safeEmail : '',
-                'mailingAddress' => $withdrawalStatus === 'Enrolled' ? $faker->address : '',
-                'physicalEvaluationStatus' => $physicalStatus,
-                'biobankStatus' => $biobankStatus,
-                'withdrawalStatus' => $withdrawalStatus,
-                'pmiId' => 'P' . $faker->randomNumber(9),
-                'consentDate' => $faker->dateTimeBetween('-1 year', 'now')
-            ];
-            foreach (array_keys(self::$surveys) as $survey) {
-                if (isset($params['ppi']) && $params['ppi'] === 'NONE') {
-                    $row["questionnaireOn{$survey}"] = 'UNSET';
-                } elseif (isset($params['ppi']) && $params['ppi'] === 'ALL') {
-                    $row["questionnaireOn{$survey}"] = 'SUBMITTED';
-                } else {
-                    $row["questionnaireOn{$survey}"] = $faker->boolean(70) ? 'SUBMITTED' : 'UNSET';
-                }
-            }
-            $results[] = $row;
-        }
-        usort($results, function($a, $b) {
-            return strcasecmp($a['lastName'], $b['lastName']);
-        });
-        return $results;
-    }
 
     protected function participantSummarySearch($params, $app)
     {

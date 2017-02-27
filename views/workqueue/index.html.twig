@@ -47,22 +47,7 @@
                 <tr>
                     <td>{{ participant.lastName }}</td>
                     <td>{{ participant.firstName }}</td>
-                    <td>
-                        {{ participant.zipCode }}
-                        {#
-                        <nobr>
-                        {% if participant.preferredContact == 'EMAIL' %}
-                            <i class="fa fa-envelope" aria-hidden="true"></i> <a href="mailto:{{ participant.emailAddress }}">{{ participant.emailAddress }}</a>
-                        {% elseif participant.preferredContact == 'PHONE' %}
-                            <i class="fa fa-phone" aria-hidden="true"></i> {{ participant.phoneNumber }}
-                        {% elseif participant.preferredContact == 'MAIL' %}
-                            <i class="fa fa-home" aria-hidden="true"></i> {{ participant.mailingAddress|replace({'\n': ', '}) }}
-                        {% elseif participant.preferredContact == 'NO_CONTACT' %}
-                            <i class="fa fa-minus-circle text-danger" aria-hidden="true"></i> No contact
-                        {% endif %}
-                        </nobr>
-                        #}
-                    </td>
+                    <td>{{ participant.zipCode }}</td>
                     <td>
                         {{ participant.consentForStudyEnrollmentTime|date('m/d/Y') }}
                     </td>
