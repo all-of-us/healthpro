@@ -22,7 +22,7 @@
         <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
     </div>
     <h4>{{ participants|length|number_format }}{{ params|length > 0 ? ' matching' : '' }} participant{{ participants|length == 1 ? '' : 's'}} at {{ app.session.get('site').name }}</h4>
-    <table class="table table-striped table-bordered table-small">
+    <table class="table table-striped table-bordered table-small" id="workqueue">
         <thead>
             <tr>
                 <th rowspan="2">Last Name</th>
@@ -100,6 +100,7 @@ $(document).ready(function() {
             btnTextTrue: 'Accept'
         });
     });
+    $('#workqueue').DataTable();
 });
 </script>
 {% endblock %}
