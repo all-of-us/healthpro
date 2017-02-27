@@ -6,6 +6,7 @@ api_version: 1
 skip_files:
 - ^(.*/)?vendor/mouf/nodejs-installer/.*$
 - ^(.*/)?vendor/nodejs/.*$
+- ^(.*/)?vendor/google/apiclient-services/src/Google/Service/(AdExchange|AdSense|Android|Blogger|Books|Games|ShoppingContent|YouTube).*$
 - ^(.*/)?node_modules.*$
 - ^(.*/)?bower_components.*$
 - ^(.*/)?\.gitignore$
