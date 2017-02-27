@@ -30,7 +30,7 @@
                 <th rowspan="2">Preferred Contact</th>
                 <th rowspan="2">Consent Date</th>
                 <th colspan="{{ surveys|length }}" class="topheader multiheader-survey">PPI Survey Completion</th>
-                <th colspan="3" class="topheader multiheader-status">HealthPro Status</th>
+                <th colspan="4" class="topheader multiheader-status">HealthPro Status</th>
             </tr>
             <tr>
                 {% for field, label in surveys %}
@@ -38,7 +38,8 @@
                 {% endfor %}
                 <th class="secondaryheader multiheader-status">Phys Meas</th>
                 <th class="secondaryheader multiheader-status">Biobank</th>
-                <th class="secondaryheader multiheader-status">Withdrawal Status</th>
+                <th class="secondaryheader multiheader-status">Membership</th>
+                <th class="secondaryheader multiheader-status">Consent</th>
             </tr>
         </thead>
         <tbody>
@@ -85,7 +86,8 @@
                     <td class="text-center">
                         <strong class="text-{{ participant.numBaselineSamplesArrived == 7 ? 'success' : 'danger' }}">{{ participant.numBaselineSamplesArrived }}/7</strong>
                     </td>
-                    <td></td>
+                    <td>{{ participant.membershipTier }}</td>
+                    <td>{{ participant.consentForStudyEnrollment }}</td>
                 </tr>
             {% endfor %}
         </tbody>

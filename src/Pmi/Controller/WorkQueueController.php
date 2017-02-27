@@ -85,8 +85,7 @@ class WorkQueueController extends AbstractController
         'OverallHealth' => 'Health',
         'PersonalHabits' => 'Habits',
         'FamilyHealth' => 'Family',
-        'HealthcareAccess' => 'Access',
-        'Sleep' => 'Sleep'
+        'HealthcareAccess' => 'Access'
     ];
 
     protected function participantSummarySearchFaker($params)
@@ -180,6 +179,7 @@ class WorkQueueController extends AbstractController
 
     protected function participantSummarySearch($params, $app)
     {
+        // TODO: map site to organization
         $params['hpoId'] = 'PITT';
         $summaries = $app['pmi.drc.participants']->listParticipantSummaries($params);
         $results = [];
@@ -206,7 +206,7 @@ class WorkQueueController extends AbstractController
     public function exportAction(Application $app, Request $request)
     {
         $params = array_filter($request->query->all());
-        $participants = $this->participantSummarySearch($params);
+        $participants = $this->participantSummarySearch($params, $app);
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
             fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
@@ -215,10 +215,6 @@ class WorkQueueController extends AbstractController
                 'PMI ID',
                 'Last Name',
                 'First Name',
-                'Preferred Contact Method',
-                'Phone Number',
-                'Email Address',
-                'Mailing Address',
                 'Consent Date'
             ];
             foreach (self::$surveys as $survey => $label) {
@@ -226,25 +222,23 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Biobank Samples';
-            $headers[] = 'Withdrawal Status';
+            $headers[] = 'Membership Tier';
+            $headers[] = 'Consent Status';
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
                 $row = [
-                    $participant['pmiId'],
-                    $participant['lastName'],
-                    $participant['firstName'],
-                    $participant['preferredContact'],
-                    $participant['phoneNumber'],
-                    $participant['emailAddress'],
-                    str_replace("\n", ', ', trim($participant['mailingAddress'])),
-                    $participant['consentDate']->format('m/d/Y')
+                    $participant->participantId,
+                    $participant->lastName,
+                    $participant->firstName,
+                    date('m/d/Y', strtotime($participant->consentForStudyEnrollmentTime))
                 ];
                 foreach (self::$surveys as $survey => $label) {
-                    $row[] = $participant["questionnaireOn{$survey}"] === 'SUBMITTED' ? 1 : 0;
+                    $row[] = $participant->{"questionnaireOn{$survey}"} === 'SUBMITTED' ? 1 : 0;
                 }
-                $row[] = $participant['physicalEvaluationStatus'] === 'SUBMITTED' ? 1 : 0;
-                $row[] = $participant['biobankStatus'];
-                $row[] = $participant['withdrawalStatus'];
+                $row[] = $participant->physicalMeasurementsStatus === 'SUBMITTED' ? 1 : 0;
+                $row[] = $participant->numBaselineSamplesArrived;
+                $row[] = $participant->membershipTier;
+                $row[] = $participant->consentForStudyEnrollment;
                 fputcsv($output, $row);
             }
             fwrite($output, "\"\"\n");
