@@ -6,6 +6,7 @@ api_version: 1
 skip_files:
 - ^(.*/)?vendor/mouf/nodejs-installer/.*$
 - ^(.*/)?vendor/nodejs/.*$
+- ^(.*/)?vendor/google/apiclient-services/src/Google/Service/(AdExchange|AdSense|Android|Blogger|Books|Games|ShoppingContent|YouTube).*$
 - ^(.*/)?node_modules.*$
 - ^(.*/)?bower_components.*$
 - ^(.*/)?\.gitignore$
@@ -29,6 +30,12 @@ handlers:
 - url: /assets
   static_dir: web/assets
   secure: always
+  http_headers:
+    X-Content-Type-Options: nosniff
+- url: /cron/.*
+  script: web/index.php
+  secure: always
+  login: admin
 - url: /timeout
   script: web/index.php
   secure: always

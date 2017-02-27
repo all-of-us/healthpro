@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Participant {{ participant.shortId }} - {% endblock %}
+{% block title %}Participant {{ participant.id }} - {% endblock %}
 {% block body %}
     <div class="page-header">
         <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>{{ participant.shortId }}</small></h2>
@@ -8,8 +8,10 @@
     <dl class="dl-horizontal">
         <dt>Name</dt>
         <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-        <dt>ID</dt>
-        <dd>{{ participant.shortId }}</dd>
+        <dt>Participant ID</dt>
+        <dd>{{ participant.id }}</dd>
+        <dt>Biobank ID</dt>
+        <dd>{{ participant.biobankId }}</dd>
         <dt>DOB</dt>
         <dd>{{ participant.dob|date('n/j/Y') }}</dd>
         <dt>Gender Identity</dt>
@@ -20,7 +22,7 @@
             <div class="col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Evaluation</h3>
+                        <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h3>
                     </div>
                     <div class="panel-body">
                         {% for evaluation in evaluations %}
@@ -28,12 +30,12 @@
                                 <div id="evaluation-overflow">
                             {% endif %}
                             <a href="{{ path('evaluation', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg btn-default">
-                                {{ evaluation.created_ts|date('D n/j/Y') }}<br />
+                                {{ evaluation.created_ts|date('D n/j/Y', app.userTimezone) }}<br />
                                 <small class="text-muted">
                                     {% if evaluation.finalized_ts %}
-                                        <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia') }}</small>
+                                        <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
                                     {% else %}
-                                        <span class="label label-default">Updated</span> {{ evaluation.updated_ts|date('n/j/Y g:ia') }}
+                                        <span class="label label-default">Updated</span> {{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                     {% endif %}
                                 </small>
                             </a>
@@ -51,7 +53,7 @@
                             {% else %}
                                 Start
                             {% endif %}
-                            Evaluation
+                            Physical Measurements
                         </a>
                     </div>
                 </div>
@@ -68,14 +70,14 @@
                                 <div id="order-overflow">
                             {% endif %}
                             <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
-                                {{ order.created_ts|date('D n/j/Y') }} <small class="text-muted"><strong>{{ order.order_id }}</strong></small><br />
+                                {{ order.created_ts|date('D n/j/Y', app.userTimezone) }} <small class="text-muted"><strong>{{ order.order_id }}</strong></small><br />
                                 <small class="text-muted">
                                     {% if order.finalized_ts %}
-                                        <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia') }}</small>
+                                        <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
                                     {% elseif order.processed_ts %}
-                                        <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia') }}</small>
+                                        <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
                                     {% elseif order.collected_ts %}
-                                        <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia') }}</small>
+                                        <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
                                     {% else %}
                                     {% endif %}                                    
                                 </small>
@@ -87,7 +89,7 @@
                                 <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
                             </a>
                         {% endif %}
-                        <a href="{{ path('orderCreate', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
+                        <a href="{{ path('orderCheck', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
                     </div>
                 </div>
             </div>

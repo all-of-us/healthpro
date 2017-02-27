@@ -71,7 +71,7 @@
                     var displayText = $('#plot-value option:selected').text();
                     var interval = $('#interval').val();
                     var centers = loadRecruitmentFilters('participants-by-time');
-                    $.getJSON('/dashboard/demo_load_data?start_date=' + startDate + '&end_date=' + endDate + '&attribute=' + attribute + '&interval=' + interval + "&centers=" + centers, function(data) {
+                    $.getJSON('/dashboard/demo_load_data?csrf_token={{ csrf_token('demo') }}&start_date=' + startDate + '&end_date=' + endDate + '&attribute=' + attribute + '&interval=' + interval + "&centers=" + centers, function(data) {
                         var timeTitle;
                         if ($('#start-date').val() == '') {
                             timeTitle = 'Participant registrations by ' + displayText + ' as of ' + endDate;
@@ -188,7 +188,7 @@
                     var mapMode = $('#map-mode').val();
                     var mapModeText = $('#map-mode option:selected').text();
                     var mapColor = $('#map-color-profile').val();
-                    $.getJSON('/dashboard/demo_load_map_data?start_date=' + mapStartDate + '&end_date=' + mapEndDate + '&map_mode=' + mapMode + '&color_profile=' + mapColor, function(data) {
+                    $.getJSON('/dashboard/demo_load_map_data?csrf_token={{ csrf_token('demo') }}&start_date=' + mapStartDate + '&end_date=' + mapEndDate + '&map_mode=' + mapMode + '&color_profile=' + mapColor, function(data) {
                         var mapTitle;
                         if ($('#region-date-start').val() == '') {
                             mapTitle = 'Participant registrations by ' + mapModeText + ' as of ' + mapEndDate;
@@ -272,7 +272,7 @@
                     var lcEndDate = $('#lifecycle-date-end').val();
                     var lcCenters = loadRecruitmentFilters('participants-by-lifecycle');
 
-                    $.getJSON('/dashboard/demo_load_lifecycle_data?start_date=' + lcStartDate + '&end_date=' + lcEndDate + '&centers=' + lcCenters, function(data) {
+                    $.getJSON('/dashboard/demo_load_lifecycle_data?csrf_token={{ csrf_token('demo') }}&start_date=' + lcStartDate + '&end_date=' + lcEndDate + '&centers=' + lcCenters, function(data) {
                         var lcTitle;
                         if ($('#lifecycle-date-start').val() == '') {
                             lcTitle = 'Participant registrations by lifecycle phase as of ' + lcEndDate;

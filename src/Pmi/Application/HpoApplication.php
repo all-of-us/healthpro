@@ -17,14 +17,14 @@ class HpoApplication extends AbstractApplication
         parent::setup($config);
 
         $rdrOptions = [];
-        if ($this->isDev()) {
+        if ($this->isLocal()) {
             $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
             if (file_exists($keyFile)) {
                 $rdrOptions['key_file'] = $keyFile;
             }
-            if ($this->getConfig('rdr_endpoint')) {
-                $rdrOptions['endpoint'] = $this->getConfig('rdr_endpoint');
-            }
+        }
+        if ($this->getConfig('rdr_endpoint')) {
+            $rdrOptions['endpoint'] = $this->getConfig('rdr_endpoint');
         }
         if ($this->getConfig('rdr_auth_json')) {
             $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
@@ -92,6 +92,9 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/dashboard/.*$', 'ips' => $ips], 'ROLE_DASHBOARD'],
                 [['path' => '^/dashboard/.*$'], 'ROLE_NO_ACCESS'],
 
+                [['path' => '^/admin/.*$', 'ips' => $ips], 'ROLE_SITE_ADMIN'],
+                [['path' => '^/admin/.*$'], 'ROLE_NO_ACCESS'],
+
                 [['path' => '^/.*$', 'ips' => $ips], 'ROLE_USER'],
                 [['path' => '^/.*$'], 'ROLE_NO_ACCESS']
             ]
@@ -100,13 +103,18 @@ class HpoApplication extends AbstractApplication
 
     protected function loadConfiguration($override = [])
     {
+        // default two-factor setting
+        $this->configuration['enforce2fa'] = $this->isProd();
+        
         $appDir = realpath(__DIR__ . '/../../../');
         $configFile = $appDir . '/dev_config/config.yml';
-        if ($this->isDev() && file_exists($configFile)) {
+        if ($this->isLocal() && file_exists($configFile)) {
             $yaml = new \Symfony\Component\Yaml\Parser();
-            $config = $yaml->parse(file_get_contents($configFile));
-            if (is_array($config) || count($config) > 0) {
-                $this->configuration = $config;
+            $configs = $yaml->parse(file_get_contents($configFile));
+            if (is_array($configs) || count($configs) > 0) {
+                foreach ($configs as $key => $val) {
+                    $this->configuration[$key] = $val;
+                }
             }
         }
 
@@ -175,12 +183,22 @@ class HpoApplication extends AbstractApplication
         // whitelist content that the client is allowed to request
         $whitelist =  "default-src 'self'"
             . " 'unsafe-eval'" // required for setTimeout and setInterval
-            . " 'unsafe-inline'"; // for the places we are using inline JS
+            . " 'unsafe-inline'" // for the places we are using inline JS
+            . " storage.googleapis.com" // for SOP PDFs stored in a Google Storage bucket
+            . " cdn.plot.ly;" // allow plot.ly remote requests
+            . " img-src 'self' data:"; // allow self and data: urls for img src
 
         $response->headers->set('Content-Security-Policy', $whitelist);
 
         // prevent browsers from sending unencrypted requests
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+        
+        // "low" security finding: prevent MIME type sniffing
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        
+        // "low" security finding: enable XSS Protection
+        // http://blog.innerht.ml/the-misunderstood-x-xss-protection/
+        $response->headers->set('X-XSS-Protection', '1; mode=block');
     }
     
     public function switchSite($email)
@@ -198,6 +216,15 @@ class HpoApplication extends AbstractApplication
     public function getSite()
     {
         return $this['session']->get('site');
+    }
+
+    public function getSiteId()
+    {
+        if ($site = $this->getSite()) {
+            return $site->id;
+        } else {
+            return null;
+        }
     }
     
     protected function beforeCallback(Request $request, AbstractApplication $app)
@@ -218,11 +245,15 @@ class HpoApplication extends AbstractApplication
         if ($this['session']->get('isLoginReturn') && $this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD') && !$this->isUpkeepRoute($request)) {
             return $this->forwardToRoute('dashSplash', $request);
         }
-        
+
+        if ($this->isLoggedIn()) {
+            $user = $this->getUser();
+            $this['em']->setTimezone($this->getUserTimezone());
+        }
+
         // HPO users must select their site first
         if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER'))
         {
-            $user = $this->getUser();
             // auto-select since they only have one site
             if (count($user->getSites()) === 1) {
                 $this->switchSite($user->getSites()[0]->email);

@@ -6,6 +6,7 @@ use Tests\Pmi\GoogleGroup;
 use Tests\Pmi\GoogleUserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 class HpoApplicationTest extends AbstractWebTestCase
 {
@@ -37,6 +38,21 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertSame(true, $this->isLoginAfter);
         // gets set to false by the finishCallback()
         $this->assertSame(false, $this->app['session']->get('isLogin'));
+    }
+    
+    public function testTwoFactorDeny()
+    {
+        $email = 'testTwoFactorDeny@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [
+            new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::TWOFACTOR_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
+        ]);
+        $client = $this->createClient();
+        $client->followRedirects();
+        $crawler = $client->request('GET', '/');
+        $this->assertSame(1, count($crawler->filter('#twoFactorAlert')));
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
     }
 
     public function testDashboardDeny()
@@ -72,7 +88,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $client = $this->createClient();
         $client->followRedirects();
         $client->request('GET', '/');
-        $client->request('POST', '/keepalive');
+        $client->request('POST', '/keepalive', ['csrf_token' => $this->app['csrf.token_manager']->getToken('keepAlive')]);
         $this->assertSame(false, $this->app->isLoginExpired());
         $this->assertEquals($email, $this->app->getUser()->getEmail());
         sleep($this->app['sessionTimeout']);
@@ -88,7 +104,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $client = $this->createClient();
         $client->followRedirects();
         $client->request('GET', '/');
-        $client->request('POST', '/keepalive');
+        $client->request('POST', '/keepalive', ['csrf_token' => $this->app['csrf.token_manager']->getToken('keepAlive')]);
         $this->assertSame(false, $this->app->isLoginExpired());
         $this->assertEquals($email, $this->app->getUser()->getEmail());
         sleep($this->app['sessionTimeout']);
@@ -143,7 +159,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
         $crawler = $client->reload();
         $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
-        $client->request('POST', '/agree');
+        $client->request('POST', '/agree', ['csrf_token' => $this->app['csrf.token_manager']->getToken('agreeUsage')]);
         $crawler = $client->request('GET', '/');
         $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')));
     }

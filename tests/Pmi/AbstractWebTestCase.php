@@ -14,7 +14,7 @@ abstract class AbstractWebTestCase extends WebTestCase
     /** http://silex.sensiolabs.org/doc/master/testing.html#webtestcase */
     public function createApplication()
     {
-        putenv('PMI_ENV=' . HpoApplication::ENV_DEV);
+        putenv('PMI_ENV=' . HpoApplication::ENV_LOCAL);
         $app = new HpoApplication([
             'templatesDirectory' => __DIR__ . '/../../views',
             'errorTemplate' => 'error.html.twig',
@@ -38,11 +38,13 @@ abstract class AbstractWebTestCase extends WebTestCase
             'gaBypass' => false,
             'gaDomain' => 'pmi-drc-hpo-unit-tests.biz',
             'ip_whitelist' => $this->getIpWhitelist(),
-            'gae_auth' => true
+            'gae_auth' => true,
+            'enforce2fa' => true
         ]);
         $app->mount('/', new Controller\DefaultController());
         $app->mount('/dashboard', new Controller\DashboardController());
-        
+        $app->mount('/help', new Controller\HelpController());
+
         return $app;
     }
     

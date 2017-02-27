@@ -63,10 +63,6 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         }
         $client->setClientId($this->app->getConfig('auth_client_id'));
         $client->setClientSecret($this->app->getConfig('auth_client_secret'));
-        // http://stackoverflow.com/a/33838098/1402028
-        if ($this->app->isDev()) {
-            $client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
-        }
 
         $callbackUrl = $this->app->generateUrl('loginReturn', [], true);
         $client->setRedirectUri($callbackUrl);
@@ -127,10 +123,11 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             // just a safeguard in case the Google user and our user get out of sync somehow
             strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;
 
-        if ($this->app->isDev() && $this->app->getConfig('gaBypass')) {
+        if (!$this->app->isProd() && $this->app->getConfig('gaBypass')) {
             return $validCredentials; // Bypass groups auth
         } else {
-            return $validCredentials && count($user->getGroups()) > 0;
+            $valid2fa = !$this->app->getConfig('enforce2fa') || $user->hasTwoFactorAuth();
+            return $validCredentials && count($user->getGroups()) > 0 && $valid2fa;
         }
     }
     
@@ -139,11 +136,26 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $code = 403;
         $googleUser = $this->app->getGoogleUser();
         if ($googleUser) {
-            $template = 'error-auth.html.twig';
             $params = [
                 'email' => $googleUser->getEmail(),
                 'logoutUrl' => $this->app->getGoogleLogoutUrl()
             ];
+            
+            // attempt to load the user object for error msg customization
+            try {
+                $userProvider = new \Pmi\Security\UserProvider($this->app);
+                $user = $userProvider->loadUserByUsername($googleUser->getEmail());
+            } catch (\Exception $e) {
+                $user = null;
+            }
+            
+            // infer the reason behind the auth failure
+            if ($user && $this->app->getConfig('enforce2fa') && !$user->hasTwoFactorAuth()) {
+                $template = 'error-2fa.html.twig';
+            } else {
+                $template = 'error-auth.html.twig';
+            }
+            
         } elseif ($this->app->getConfig('gae_auth')) {
             $template = 'error-gae-auth.html.twig';
             $params = ['loginUrl' => $this->app->getGoogleLoginUrl()];

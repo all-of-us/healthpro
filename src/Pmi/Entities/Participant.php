@@ -6,6 +6,7 @@ use Pmi\Util;
 class Participant
 {
     public $id;
+    public $biobankId;
     public $firstName;
     public $lastName;
     public $dob;
@@ -33,6 +34,17 @@ class Participant
             return strtoupper(Util::shortenUuid($this->id));
         } else {
             return $this->id;
+        }
+    }
+
+    public function getMayolinkDob($type = null)
+    {
+        if ($type == 'kit') {
+            return new \DateTime('1960-01-01');
+        } else {
+            $mlDob = new \DateTime();
+            $mlDob->setDate(1960, $this->dob->format('m'), $this->dob->format('d'));
+            return $mlDob;
         }
     }
 }

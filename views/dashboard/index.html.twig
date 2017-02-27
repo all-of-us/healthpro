@@ -1,6 +1,19 @@
 {% extends 'dashboard/base.html.twig' %}
 {% block body %}
     <h2><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard</h2>
+    <div class="modal fade" id="loading-modal" tabindex="-1" role="dialog" aria-labelledby="loading-modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4 class="alert alert-warning text-center">Refreshing cached metrics - this may take a while...</h4>
+                    <div id="modal-spinner-target" style="min-height: 200px; position: relative; margin: 20px 0;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="close" data-dismiss="modal">×</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <br />
     <ul class="nav nav-tabs top-pad" role="tablist">
         <li role="presentation" class="active"><a href="#total-progress" role="tab" data-toggle="tab" id="total-progress-nav"><span class="fa fa-users"></span> Total Progress to Date</a></li>
@@ -10,6 +23,7 @@
         <div id="total-progress" class="tab-pane pad active fade in">
             <div class="row">
                 <div id="total-progress-filters" class="col-md-3">
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'total-progress'} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -19,22 +33,30 @@
                         <div class="panel-body">
                             <div class="row form-group-sm">
                                 <div class="col-md-12 col-xs-3 form-group form-group-sm">
-                                    <label>Display Metric</label>
+                                    <label for="total-progress-metric-attribute">Display Metric</label>
                                     <select id="total-progress-metric-attribute" class="form-control total-progress-control">
-                                        <option value="PARTICIPANT_TOTAL">Total Participants</option>
-                                        <option value="PARTICIPANT_MEMBERSHIP_TIER">Participant Membership Tiers</option>
+                                        {% for metric_key, display_val in metrics_attributes %}
+                                            <option value="{{ metric_key }}">{{ display_val }}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
+                                <div class="col-md-6 col-xs-3 form-group form-group-sm">
+                                    <label for="total-progress-start-date">Start</label>
+                                    <input type="text" class="form-control datepicker total-progress-time-control" id="total-progress-start-date" />
+                                </div>
+                                <div class="col-md-6 col-xs-3 form-group form-group-sm">
+                                    <label for="total-progress-end-date">Cutoff</label>
+                                    <input type="text" class="form-control datepicker total-progress-time-control" id="total-progress-end-date" />
+                                </div>
                                 <div class="col-md-12 col-xs-3 form-group form-group-sm">
-                                    <label>Interval</label>
-                                    <select id="total-progress-bucket-by" class="form-control total-progress-control">
-                                        <option value="NONE" selected>None</option>
+                                    <label for="total-progress-interval">Interval</label>
+                                    <select id="total-progress-interval" class="form-control total-progress-control">
                                         <option value="DAY">Days</option>
                                         <option value="WEEK">Weeks</option>
                                         <option value="MONTH">Months</option>
                                     </select>
                                 </div>
-                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
+                                <div class="col-md-12 col-xs-12 form-group form-group-sm">
                                     <label>Show Column Totals <input type="checkbox" id="total-progress-show-annot" class="total-progress-control"></label>
                                 </div>
                             </div>
@@ -47,75 +69,119 @@
             <script type="text/javascript">
                 // function to grab current filter values and load JSON from load_map_data REST endpoint
                 // success handler calls Plotly.newplot()
-                function renderTotalProgressPlot() {
-                    launchSpinner('plotly-total-progress');
-                    // gather params
-                    var metricAttr = $('#total-progress-metric-attribute').val();
-                    var bucket = $('#total-progress-bucket-by').val();
-                    var metricTitle = $('#total-progress-metric-attribute option:selected').text();
-                    var showAnnot = $('#total-progress-show-annot').is(':checked');
-                    var tpWidth = $('#plotly-total-progress').width() - 30;
-                    var today = new Date().toISOString().split('T')[0];
-
-                    // load data from metrics API
-                    $.getJSON('/dashboard/metrics_load?metrics_attribute=' + metricAttr + '&bucket_by=' + bucket, function(data) {
-                        var progressAnnot = [];
-                        if (metricAttr == 'PARTICIPANT_ZIP_CODE') {
-                            var tpLayout = {
-                                title: 'Participant Registrations by state',
-                                font: PLOTLY_LABEL_FONT,
-                                showlegend: false,
-                                width: tpWidth,
-                                height: tpWidth / 1.66,
-                                geo: GEO_OPTS
-                            };
-                        } else {
-                            var tpLayout = {
-                                title: 'Count of ' + metricTitle + ' as of ' + today,
-                                font: PLOTLY_LABEL_FONT,
-                                barmode: 'stack',
-                                width: tpWidth,
-                                height: tpWidth / 1.66,
-                                annotations: progressAnnot
-                            };
+                function renderTotalProgressPlot(dialogType) {
+                    var centers = loadRecruitmentFilters('total-progress');
+                    if (centers.length == 0) {
+                        alert('You must select at least one recruitment center to plot results');
+                        return false;
+                    } else {
+                        var spinnerLoc = 'plotly-total-progress';
+                        if (dialogType == 'spinner') {
+                            launchSpinner(spinnerLoc);
+                        } else if (dialogType == 'modal' ) {
+                            spinnerLoc = 'modal-spinner-target';
+                            // empty target in case there was an error message beforehand
+                            $('#' + spinnerLoc).empty();
+                            launchSpinner(spinnerLoc);
+                            $('#loading-modal').modal('show');
                         }
+                        console.log('calling renderTotalProgressPlot()');
 
-
-                        // load column totals if requested
-                        if (showAnnot) {
-                            loadBarChartAnnotations(plotlyData, progressAnnot);
+                        // gather params
+                        var metricAttr = $('#total-progress-metric-attribute').val();
+                        var tpInterval = $('#total-progress-interval').val();
+                        var tpStartDate = $('#total-progress-start-date').val();
+                        var tpEndDate = $('#total-progress-end-date').val();
+                        var metricTitle = $('#total-progress-metric-attribute option:selected').text();
+                        var showAnnot = $('#total-progress-show-annot').is(':checked');
+                        var tpWidth = $('#plotly-total-progress').width() - 30;
+                        if (centers.length == $('#total-progress .center-filter').length) {
+                            centers = ['ALL'];
                         }
+                        // load data from metrics API
+                        $.getJSON('/dashboard/metrics_load?csrf_token={{ csrf_token('dashboard') }}&metrics_attribute=' + metricAttr + '&interval=' + tpInterval + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate + '&centers=' + centers, function(data) {
+                            if (data.length != 0) {
+                                var progressAnnot = [];
+                                var tpLayout = {
+                                    title: 'Count of ' + metricTitle + ' from ' + tpStartDate + ' to ' + tpEndDate,
+                                    font: PLOTLY_LABEL_FONT,
+                                    barmode: 'stack',
+                                    width: tpWidth,
+                                    height: tpWidth / 1.66,
+                                    annotations: progressAnnot
+                                };
 
-                        // render plot and stop spinner
-                        Plotly.newPlot('plotly-total-progress', data, tpLayout, PLOTLY_OPTS);
-                        stopSpinner('plotly-total-progress');
-                    });
+                                // load column totals if requested
+                                if (showAnnot) {
+                                    loadBarChartAnnotations(data, progressAnnot);
+                                }
+
+                                // empty div contents in case there had been an error message before
+                                $('#' + spinnerLoc).empty();
+
+                                // render plot and stop spinner
+                                Plotly.newPlot('plotly-total-progress', data, tpLayout, PLOTLY_OPTS);
+                                stopSpinner(spinnerLoc);
+
+                                if (dialogType == 'modal' ) {
+                                    $('#loading-modal').modal('hide');
+                                }
+                                console.log('renderTotalProgressPlot() complete');
+                            } else {
+                                setMetricsError(spinnerLoc);
+                                console.log('error in renderTotalProgressPlot()');
+                            }
+
+                        });
+                    }
                 }
 
-                renderTotalProgressPlot();
+                var now = new Date();
+                var nowString = now.toISOString().split('T')[0];
+                var lastWeek = new Date().setDate(now.getDate() - 7);
+                var lastWeekStr = new Date(lastWeek).toISOString().split('T')[0];
+                $('#total-progress-end-date').val(nowString);
+                $('#total-progress-start-date').val(lastWeekStr);
+                renderTotalProgressPlot('modal');
+                PLOTS_SHOWN['total-progress-nav'] = true;
 
                 // load plot on tab show (to save loading time)
                 $('#total-progress-nav').on('shown.bs.tab', function (e) {
                     console.log('Showing total progress charts');
-                    renderTotalProgressPlot();
+                    // if plot has not been shown yet, render and then store state
+                    // this will prevent points render calls once map has been initialized
+                    if (!PLOTS_SHOWN['total-progress-nav']) {
+                        renderTotalProgressPlot('spinner');
+                        PLOTS_SHOWN['total-progress-nav'] = true;
+                    }
                 });
 
                 // re-render on filter change
                 $('.total-progress-control').change(function() {
-                    renderTotalProgressPlot();
+                    renderTotalProgressPlot('spinner');
+                });
+
+                // re-render on time filter change with modal (may need new metrics)
+                $('.total-progress-time-control').change(function() {
+                    renderTotalProgressPlot('modal');
                 });
 
                 // re-render on window resizeEnd if tab is visible
                 $( window ).on('resizeEnd', function() {
                     if ($('#total-progress').is(':visible')) {
-                        renderTotalProgressPlot();
+                        renderTotalProgressPlot('');
                     }
+                });
+
+                $('#total-progress').find('.redraw-plotly').click(function() {
+                    renderTotalProgressPlot('spinner');
                 });
             </script>
         </div>
         <div id="participants-by-region" class="tab-pane pad fade">
             <div class="row">
-                <div class="col-md-3">
+                <div id="participants-by-region-filters" class="col-md-3">
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-region'} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -124,14 +190,20 @@
                         </div>
                         <div class="panel-body">
                             <div class="row form-group-sm">
-                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
-                                    <label>Participant Field</label>
+                                <div class="col-md-12 col-xs-4 form-group form-group-sm">
+                                    <label for="map-mode">Display Metric</label>
                                     <select class="form-control region-plot-control" id="map-mode">
-                                        <option value="PARTICIPANT_ZIP_CODE" selected>State</option>
+                                        <option value="Participant.state" selected>State</option>
+                                        <option value="Participant.censusRegion">Census Region</option>
+                                        <option value="Participant.hpoId">Recruitment Origin</option>
                                     </select>
                                 </div>
-                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
-                                    <label>Color Profile <span class="fa fa-question-circle-o" data-toggle="tooltip" title="Only applies to states and census regions maps"></span></label>
+                                <div class="col-md-12 col-xs-4 form-group form-group-sm">
+                                    <label for="region-plot-end-date">Cutoff</label>
+                                    <input type="text" class="form-control datepicker region-plot-time-control" id="region-plot-end-date" />
+                                </div>
+                                <div class="col-md-12 col-xs-4 form-group form-group-sm">
+                                    <label for="map-color-profile">Color Profile <span class="fa fa-question-circle-o" data-toggle="tooltip" title="Only applies to states and census regions maps"></span></label>
                                     <select class="form-control region-plot-control" id="map-color-profile">
                                         {% for color in color_profiles %}
                                             {% if color == 'Custom' %}
@@ -151,55 +223,101 @@
                 <script type="text/javascript">
                     // function to grab current filter values and load JSON from load_map_data REST endpoint
                     // success handler calls Plotly.newplot()
-                    function renderMapPlot() {
-                        launchSpinner('plotly-participants-by-region');
-                        // gather params
-                        var mapWidth = $('#plotly-participants-by-region').width() - 30;
-                        var mapMode = $('#map-mode').val();
-                        var mapModeText = $('#map-mode option:selected').text();
-                        var mapColor = $('#map-color-profile').val();
+                    function renderMapPlot(dialogType) {
+                        var regionCenters = loadRecruitmentFilters('participants-by-region');
+                        if (regionCenters.length == 0) {
+                            alert('You must select at least one recruitment center to plot results');
+                            return false;
+                        } else {
+                            var spinnerLoc = 'plotly-participants-by-region';
+                            if (dialogType == 'spinner') {
+                                launchSpinner(spinnerLoc);
+                            } else if (dialogType == 'modal' ) {
+                                spinnerLoc = 'modal-spinner-target';
+                                // empty target in case there was an error message beforehand
+                                $('#' + spinnerLoc).empty();
+                                launchSpinner(spinnerLoc);
+                                $('#loading-modal').modal('show');
+                            }
+                            console.log('calling renderMapPlot()');
+                            // gather params
+                            var mapWidth = $('#plotly-participants-by-region').width() - 30;
+                            var mapCutoff = $('#region-plot-end-date').val();
+                            var mapMode = $('#map-mode').val();
+                            var mapModeText = $('#map-mode option:selected').text();
+                            var mapColor = $('#map-color-profile').val();
+                            if (regionCenters.length == $('#participants-by-region .center-filter').length) {
+                                regionCenters = ['ALL'];
+                            }
 
-                        // load data from metrics API
-                        $.getJSON('/dashboard/metrics_load_region?metrics_attribute=' + mapMode + '&color_profile=' + mapColor, function(data) {
+                            // load data from metrics API
+                            $.getJSON('/dashboard/metrics_load_region?csrf_token={{ csrf_token('dashboard') }}&map_mode=' + mapMode + '&end_date=' + mapCutoff + '&centers=' + regionCenters + '&color_profile=' + mapColor, function (data) {
+                                if (data.length != 0) {
+                                    var mapLayout = {
+                                        title: 'Percentage of target participant registrations by ' + mapModeText + ' of residence as of ' + mapCutoff,
+                                        font: PLOTLY_LABEL_FONT,
+                                        width: mapWidth,
+                                        height: mapWidth / 1.66,
+                                        geo: GEO_OPTS
+                                    };
 
-                            var mapLayout = {
-                                title: 'Participant Registrations by ' + mapModeText,
-                                font: PLOTLY_LABEL_FONT,
-                                showlegend: false,
-                                width: mapWidth,
-                                height: mapWidth / 1.66,
-                                geo: GEO_OPTS
-                            };
+                                    // empty div contents in case there had been an error message before
+                                    $('#' + spinnerLoc).empty();
 
+                                    // render plot and stop spinner
+                                    Plotly.newPlot('plotly-participants-by-region', data, mapLayout, PLOTLY_OPTS);
+                                    stopSpinner(spinnerLoc);
 
-                            // render plot and stop spinner
-                            Plotly.newPlot('plotly-participants-by-region', data, mapLayout, PLOTLY_OPTS);
-                            stopSpinner('plotly-participants-by-region');
-                        });
+                                    if (dialogType == 'modal') {
+                                        $('#loading-modal').modal('hide');
+                                    }
+                                    console.log('renderMapPlot() complete');
+                                } else {
+                                    setMetricsError(spinnerLoc);
+                                    console.log('error in renderMapPlot()');
+                                }
+                            });
+                        }
                     }
+
+                    var now = new Date().toISOString().split('T')[0];
+                    $('#region-plot-end-date').val(now);
 
                     // load plot on tab show (to save loading time)
                     $('#participants-by-region-nav').on('shown.bs.tab', function (e) {
                         console.log('Showing region plots');
-                        renderMapPlot();
+                        // if plot has not been shown yet, render and then store state
+                        // this will prevent points render calls once map has been initialized
+                        if (!PLOTS_SHOWN['participants-by-region-nav']) {
+                            renderMapPlot('spinner');
+                            PLOTS_SHOWN['participants-by-region-nav'] = true;
+                        }
                     });
 
                     // re-render on filter change
                     $('.region-plot-control').change(function() {
-                        renderMapPlot();
+                        renderMapPlot('spinner');
+                    });
+
+                    // re-render on filter change with modal (for time changes, may need new metrics)
+                    $('.region-plot-time-control').change(function() {
+                        renderMapPlot('modal');
                     });
 
                     // re-render on window resizeEnd if tab is visible
                     $( window ).on('resizeEnd', function() {
                         if ($('#plotly-participants-by-region').is(':visible')) {
-                            renderMapPlot();
+                            renderMapPlot('');
                         }
+                    });
+
+                    $('#participants-by-region').find('.redraw-plotly').click(function() {
+                        renderMapPlot('spinner');
                     });
                 </script>
             </div>
         </div>
     </div>
-
     <script type="text/javascript">
         $('.datepicker').datepicker({dateFormat: 'yy-mm-dd', showButtonPanel: true});
 

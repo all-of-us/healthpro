@@ -4,6 +4,16 @@
 $(document).ready(function()
 {
     /*************************************************************************
+     * Security fix: https://github.com/jquery/jquery/issues/2432#issuecomment-140038536
+     * Can be removed after upgrading to jQuery 3.x
+     ************************************************************************/
+    $.ajaxSetup({
+        contents: {
+            javascript: false
+        }
+    });
+    
+    /*************************************************************************
      * Supplement Underscore with a truthy function
      ************************************************************************/
     _["truthy"] = function(val) {
@@ -36,9 +46,26 @@ $(document).ready(function()
     /*************************************************************************
      * Disable click on disabled tabs (prevents unnecessary navigation to #)
      ************************************************************************/
-     $('.nav-tabs li.disabled a').on('click', function(e) {
+    $('.nav-tabs li.disabled a').on('click', function(e) {
         e.preventDefault();
-     });
+    });
+
+    /*************************************************************************
+     * Disable forms being submitted via enter/return key on any text input
+     * inside an element with the .form-disable-enter class
+     ************************************************************************/
+    $('.form-disable-enter input:text').on('keypress keyup', function(e) {
+        if (e.which == 13) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+
+    /*************************************************************************
+     * Auto-enable bootstrap tooltips
+     ************************************************************************/
+    $('[data-toggle="tooltip"]').tooltip();
      
     /*************************************************************************
      * Handle session timeout
@@ -49,6 +76,7 @@ $(document).ready(function()
             message: "Are you there? For security reasons, inactive sessions will be expired.",
             logoutButton: "Logout",
             keepAliveButton: "Stay Connected",
+            ajaxData: { csrf_token: PMI.keepAliveCsrf },
             countdownBar: true,
             countdownSmart: true,
             keepAliveUrl: PMI.path.keepAlive,
@@ -57,7 +85,12 @@ $(document).ready(function()
             redirUrl: PMI.path.clientTimeout,
             redirAfter: PMI.sessionTimeout * 1000,
             warnAfter: PMI.sessionTimeout * 1000 - (PMI.sessionWarning * 1000),
-            warnAutoClose: false
+            warnAutoClose: false,
+            onRedir: function(opt) {
+                // suppress unsaved warning when user is being logged out
+                PMI.markSaved();
+                window.location = opt.redirUrl;
+            }
         });
     }
 
@@ -72,8 +105,10 @@ $(document).ready(function()
             isHTML: true,
             msg: pmiGetTpl("pmiSystemUsageTpl")(),
             btnTextTrue: "Agree",
-            onTrue: function() {
-                $.post(PMI.path.agreeUsage);
+            onTrue: function(modal) {
+                $.post(PMI.path.agreeUsage, {
+                    csrf_token: modal.$("#csrf_token").val()
+                });
             },
             onFalse: function() {
                 window.location = PMI.path.logout;
@@ -81,43 +116,115 @@ $(document).ready(function()
         });
     }
 
-    window.equalizePanelHeight = function(selector) {
-        // reset heights
-        $(selector).each(function() {
-            $(this).find('.panel').height('auto');
-        });
-        // set heights
-        $(selector).each(function() {
-            var height = 0;
-            if ($('#is-xs').is(':visible')) {
-                height = 'auto';
-            } else {
-                $(this).find('.panel').each(function() {
-                    if ($(this).height() > height) {
-                        height = $(this).height();
-                    }
-                });
-            }
-            $(this).find('.panel').each(function() {
-                $(this).height(height);
-            });
-        });
-    };
-
+    /*************************************************************************
+     * Plugin for making panels in bootstrap columns equal heights
+     ************************************************************************/
     $.fn.equalizePanelHeight = function() {
         var selector = this.selector;
-        window.equalizePanelHeight(selector);
+        var equalize = function(selector) {
+            // reset heights
+            $(selector).each(function() {
+                $(this).find('.panel').height('auto');
+            });
+            // set heights
+            $(selector).each(function() {
+                var height = 0;
+                if ($('#is-xs').is(':visible')) {
+                    height = 'auto';
+                } else {
+                    $(this).find('.panel').each(function() {
+                        if ($(this).is(':visible') && $(this).height() > height) {
+                            height = $(this).height();
+                        }
+                    });
+                }
+                $(this).find('.panel').each(function() {
+                    $(this).height(height);
+                });
+            });
+        };
+        equalize(selector);
         $(window).on('resize', _.debounce(function() {
-            window.equalizePanelHeight(selector);
+            equalize(selector);
         }, 250));
+        $(window).on('pmi.equalize', function() {
+            equalize(selector);
+        });
     };
     $('.row-equal-height').equalizePanelHeight();
 
-    PMI.datetimepickerDefaults = {
-        toolbarPlacement: 'top',
-        sideBySide: true,
-        showTodayButton: true,
-        showClear: true,
-        showClose: true
+    /*************************************************************************
+     * Plugin to initialize datetimepicker and register change event listener
+     ************************************************************************/
+    $.fn.pmiDateTimePicker = function() {
+        // datetimepicker documentation: https://eonasdan.github.io/bootstrap-datetimepicker/
+        var pickerOptions = {
+            toolbarPlacement: 'top',
+            sideBySide: true,
+            showTodayButton: true,
+            showClear: true,
+            showClose: true
+        };
+        var selector = this.selector;
+        $(selector).datetimepicker(pickerOptions);
+        $(selector).on('dp.change', function() {
+            PMI.markUnsaved();
+        });
     };
+
+    /*************************************************************************
+     * Plugin to set value and trigger change event if changed
+     ************************************************************************/
+    $.fn.valChange = function(val) {
+        var triggerChange = (this.val() != val);
+        this.val(val);
+        if (triggerChange) {
+            this.change();
+        }
+        return this;
+    };
+
+    /*************************************************************************
+     * Unsaved changes prompter
+     ************************************************************************/
+    PMI.hasChanges = false;
+    PMI.markUnsaved = function() {
+        this.hasChanges = true;
+    };
+    PMI.markSaved = function() {
+        this.hasChanges = false;
+    };
+    PMI.enableUnsavedPrompt = function(selector) {
+        if (typeof selector === 'undefined') {
+            selector = document;
+        }
+        $(window).on('beforeunload', function() {
+            if (PMI.hasChanges) {
+                return 'You have unsaved changes on this page that will not be saved if you continue.';
+            }
+        });
+        var handleChangedInput = function() {
+            // Mark as unsaved unless element has the class "ignore-unsaved"
+            if (!$(this).is('.ignore-unsaved')) {
+                PMI.markUnsaved();
+            }
+        };
+
+        // Mark unsaved on change
+        $(selector).on('change', 'input, select, textarea', handleChangedInput);
+
+        // Also mark unsaved on keyup or paste since the change event
+        // does not fire on text fields until the field loses focus, meaning
+        // that text entry followed by browser forward/back/close would be missed
+        $(selector).on('keyup paste', 'input[type=text], textarea',
+            _.debounce(handleChangedInput, 2000, true)
+        );
+
+        // Mark as saved when clicking a submit button
+        $(selector).on('click', 'button[type=submit]', function() {
+            PMI.markSaved();
+        });
+    };
+    // Automatically enable unsaved prompt on forms with warn-unsaved class
+    PMI.enableUnsavedPrompt('form.warn-unsaved');
 });

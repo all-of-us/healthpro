@@ -5,12 +5,14 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
-use Pmi\Mayolink\Order as MayoLinkOrder;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 
 class DefaultController extends AbstractController
@@ -31,12 +33,18 @@ class DefaultController extends AbstractController
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}'],
+        ['settings', '/settings', ['method' => 'GET|POST']],
     ];
 
     public function homeAction(Application $app, Request $request)
     {
         if ($app->hasRole('ROLE_USER')) {
-            return $app['twig']->render('index.html.twig');
+            if (!$app->getUserTimezone(false)) {
+                $app->addFlashNotice('Please select your current timezone');
+                return $app->redirectToRoute('settings');
+            } else {
+                return $app['twig']->render('index.html.twig');
+            }
         } elseif ($app->hasRole('ROLE_DASHBOARD')) {
             return $app->redirectToRoute('dashboard_home');
         } else {
@@ -81,7 +89,12 @@ class DefaultController extends AbstractController
     }
     
     /** Dummy action that serves to extend the user's session. */
-    public function keepAliveAction(Application $app, Request $request) {
+    public function keepAliveAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('keepAlive', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         $request->getSession()->set('pmiLastUsed', time());
         $response = new JsonResponse();
         $response->setData(array());
@@ -104,6 +117,10 @@ class DefaultController extends AbstractController
     
     public function agreeUsageAction(Application $app, Request $request)
     {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('agreeUsage', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
         $request->getSession()->set('isUsageAgreed', true);
         return (new JsonResponse())->setData([]);
     }
@@ -200,7 +217,7 @@ class DefaultController extends AbstractController
     public function ordersAction(Application $app, Request $request)
     {
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
-            ->add('mayoId', TextType::class, ['label' => 'MayoLINK order ID', 'attr' => ['placeholder' => 'Scan barcode']])
+            ->add('mayoId', TextType::class, ['label' => 'Order ID', 'attr' => ['placeholder' => 'Scan barcode']])
             ->getForm();
 
         $idForm->handleRequest($request);
@@ -208,7 +225,7 @@ class DefaultController extends AbstractController
         if ($idForm->isValid()) {
             $id = $idForm->get('mayoId')->getData();
             $order = $app['em']->getRepository('orders')->fetchOneBy([
-                'mayo_id' => $id
+                'order_id' => $id
             ]);
             if ($order) {
                 return $app->redirectToRoute('order', [
@@ -216,13 +233,13 @@ class DefaultController extends AbstractController
                     'orderId' => $order['id']
                 ]);
             }
-            $app->addFlashError('Participant ID not found');
+            $app->addFlashError('Order ID not found');
         }
 
-        $recentOrders = $app['em']->getRepository('orders')->fetchBy(
-            [],
-            ['created_ts' => 'DESC', 'id' => 'DESC'],
-            5
+        $recentOrders = $app['em']->getRepository('orders')->fetchBySql(
+            'site = ? AND created_ts >= ?',
+            [$app->getSiteId(), (new \DateTime('-1 day'))->format('Y-m-d H:i:s')],
+            ['created_ts' => 'DESC', 'id' => 'DESC']
         );
         foreach ($recentOrders as &$order) {
             $order['participant'] = $app['pmi.drc.participants']->getById($order['participant_id']);
@@ -251,6 +268,36 @@ class DefaultController extends AbstractController
             'participant' => $participant,
             'orders' => $orders,
             'evaluations' => $evaluations
+        ]);
+    }
+
+    public function settingsAction(Application $app, Request $request)
+    {
+        $settingsData = ['timezone' => $app->getUserTimezone(false)];
+        $settingsForm = $app['form.factory']->createBuilder(FormType::class, $settingsData)
+            ->add('timezone', Type\ChoiceType::class, [
+                'label' => 'Timezone',
+                'choices' => array_flip($app::$timezoneOptions),
+                'placeholder' => '-- Select your timezone --',
+                'required' => true
+            ])
+            ->getForm();
+
+        $settingsForm->handleRequest($request);
+        if ($settingsForm->isValid()) {
+            $app['em']->getRepository('users')->update($app->getUserId(), [
+                'timezone' => $settingsForm['timezone']->getData()
+            ]);
+            $app->addFlashSuccess('Your settings have been updated');
+            if ($request->query->has('return')) {
+                return $app->redirect($request->query->get('return'));
+            } else {
+                return $app->redirectToRoute('home');
+            }
+        }
+
+        return $app['twig']->render('settings.html.twig', [
+            'settingsForm' => $settingsForm->createView()
         ]);
     }
 }

@@ -2,12 +2,13 @@
  * Dashboard scripts to run on every page in /dashboard
  */
 
-var COLORBREWER_SET = ['rgb(166,206,227)','rgb(31,120,180)','rgb(178,223,138)','rgb(51,160,44)','rgb(251,154,153)',
-    'rgb(227,26,28)', 'rgb(253,191,111)','rgb(255,127,0)','rgb(202,178,214)','rgb(106,61,154)','rgb(255,255,153)',
-    'rgb(177,89,40)'];
-
 var PLOTLY_OPTS = {
     modeBarButtonsToRemove: ['sendDataToCloud']
+};
+
+var PLOTS_SHOWN = {
+    'total-progress-nav': false,
+    'participants-by-region-nav': false
 };
 
 var GEO_OPTS = {
@@ -71,7 +72,7 @@ function launchSpinner(divId) {
     var target = $('#' + divId)[0];
     var spinner = new Spinner(opts).spin(target);
     $(target).data('spinner', spinner);
-};
+}
 
 function stopSpinner(divId) {
     $('#' + divId).data('spinner').stop();
@@ -87,7 +88,11 @@ function loadBarChartAnnotations(plotlyData, annotationsArray, interval) {
     for (var i = 0; i < plotlyData[0]['x'].length ; i++){
         var total = 0;
         plotlyData.map(function(el) {
-            total += parseInt(el['y'][i]);
+            var c = parseInt(el['y'][i]);
+            if (isNaN(c)) {
+                c = 0;
+            }
+            total += c;
         });
         var annot = {
             x: plotlyData[0]['x'][i],
@@ -112,4 +117,10 @@ function loadRecruitmentFilters(id) {
         centers.push($(this).val());
     });
     return centers;
+}
+
+// generic error handler for when metrics API doesn't respond with valid results
+function setMetricsError(div) {
+    stopSpinner(div);
+    $("#" + div).html("<p class='lead text-danger text-center'>Metrics currently unavailable - either there is an error retrieving data or you requested dates for which no data exists.<br/><br/>Please try again later.</p>");
 }

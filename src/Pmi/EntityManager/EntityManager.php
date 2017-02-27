@@ -6,9 +6,13 @@ class EntityManager
     protected $dbal;
 
     protected $entities = [
+        'users' => 'doctrine',
         'orders' => 'doctrine',
-        'evaluations' => 'doctrine'
+        'evaluations' => 'doctrine',
+        'sites' => 'doctrine'
     ];
+
+    protected $timezone;
 
     public function setDbal($dbal)
     {
@@ -24,10 +28,20 @@ class EntityManager
                 if (!$this->dbal) {
                     throw new \Exception('No DBAL available');
                 }
-                return new DoctrineRepository($this->dbal, $entity);
+                return new DoctrineRepository($this->dbal, $entity, $this->getTimezone());
 
             default:
                 throw new \Exception('Invalid entity type');
         }
+    }
+
+    public function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
+    }
+
+    public function getTimezone()
+    {
+        return $this->timezone;
     }
 }

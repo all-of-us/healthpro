@@ -10,23 +10,24 @@ class RdrMetrics
         $this->rdrHelper = $rdrHelper;
     }
 
-    public function metrics($metric, $bucket)
+    public function metrics($start_date, $end_date)
     {
         $client = $this->rdrHelper->getClient();
         $response = $client->request('POST', 'rdr/v1/Metrics', [
             'json' => [
-                'metric' => $metric,
-                'bucket_by' => $bucket
+                'start_date' => $start_date,
+                'end_date' => $end_date
             ]
         ]);
-        $responseObject = json_decode($response->getBody()->getContents());
-        if (!is_object($responseObject)) {
-            // Response could be double-encoded. Try double decoding.
-            $responseObject = json_decode($responseObject);
-            if (!is_object($responseObject)) {
-                throw new Exception\InvalidResponseException();
-            }
-        }
+        $responseObject = json_decode($response->getBody()->getContents(), True);
+        return $responseObject;
+    }
+
+    public function metricsFields()
+    {
+        $client = $this->rdrHelper->getClient();
+        $response = $client->request('GET', 'rdr/v1/MetricsFields');
+        $responseObject = json_decode($response->getBody()->getContents(), True);
         return $responseObject;
     }
 }

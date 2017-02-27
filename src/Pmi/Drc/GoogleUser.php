@@ -24,4 +24,12 @@ class GoogleUser
     {
         return $this->email;
     }
+
+    /*
+     * For parity with google\appengine\api\users\User::getUserId
+     */
+    public function getUserId()
+    {
+        return $this->getId();
+    }
 }

@@ -1,20 +1,17 @@
 <?php
-namespace Pmi\Mayolink;
+namespace Pmi\Order\Mayolink;
 
-class Order
+use Silex\Application;
+
+class MayolinkOrder
 {
     protected $ordersEndpoint = 'https://orders.mayomedicallaboratories.com';
     protected $authEndpoint = 'https://profile.mayomedicallaboratories.com/authn';
     protected $providerName = 'www.mayomedicallaboratories.com';
+    protected $labelPdf = '/en/orders/{id}/label-set';
+    protected $requisitionPdf = '/en/orders/{id}/requisition';
+
     protected static $tests = [
-        '1ED04' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
-        '1ED10' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
         '1SST8' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'Serum SST'
@@ -23,13 +20,21 @@ class Order
             'temperature' => 'Refrigerated',
             'specimen' => 'Plasma PST'
         ],
-        '2ED10' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
         '1HEP4' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'WB Sodium Heparin'
+        ],
+        '1ED04' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '1ED10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '2ED10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
         ],
         '1UR10' => [
             'temperature' => 'Refrigerated',
@@ -42,17 +47,26 @@ class Order
             'specimen' => 'Saliva'
         ]
     ];
-    protected static $siteAccounts = [
-        'a' => '7035588',
-        'b' => '7035500'
-    ];
 
     private $client;
     private $csrfToken;
 
-    public function __construct()
+    public function __construct(Application $app)
     {
         $this->client = new \GuzzleHttp\Client(['cookies' => true]);
+        $configurationMapping = [
+            'ordersEndpoint' => 'ml_orders_endpoint',
+            'authEndpoint' => 'ml_auth_endpoint',
+            'providerName' => 'ml_provider_name',
+            'labelPdf' => 'ml_label_pdf',
+            'requisitionPdf' => 'ml_requisition_pdf'
+        ];
+
+        foreach ($configurationMapping as $variable => $configName) {
+            if ($value = $app->getConfig($configName)) {
+                $this->$variable = $value;
+            }
+        }
     }
 
     /**
@@ -116,8 +130,8 @@ class Order
             $body["temperatures[{$test}][{$testOptions['specimen']}]"] = $testOptions['temperature'];
             $i++;
         }
-        if (isset($options['site']) && isset(self::$siteAccounts[$options['site']])) {
-            $body['account'] = self::$siteAccounts[$options['site']];
+        if (!empty($options['mayoClientId'])) {
+            $body['account'] = $options['mayoClientId'];
         }
         $response = $this->client->request('POST', "{$this->ordersEndpoint}/en/orders", [
             'form_params' => $body,
@@ -136,12 +150,13 @@ class Order
     public function getPdf($id, $type)
     {
         if ($type == 'labels') {
-            $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/label-set");
+            $path = str_replace('{id}', $id, $this->labelPdf);
         } elseif ($type == 'requisition') {
-            $response = $this->client->request('GET', "{$this->ordersEndpoint}/en/orders/{$id}/requisition");
+            $path = str_replace('{id}', $id, $this->requisitionPdf);
         } else {
             return false;
         }
+        $response = $this->client->request('GET', "{$this->ordersEndpoint}{$path}");
         if ($response->getStatusCode() !== 200) {
             return false;
         }

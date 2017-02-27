@@ -21,26 +21,41 @@ class DeployCommand extends Command {
 
     /** GAE application IDs for production. */
     private static $PROD_APP_IDS = [
-        'pmi-hpo-staging',
-        'pmi-hpo-test',
-        'pmi-hpo-dev'
+        'pmi-hpo'
+    ];
+
+    /** GAE application IDs for security testing and/or training. */
+    private static $STABLE_APP_IDS = [
+        'pmi-hpo-test'
+    ];
+
+    /** GAE application IDs for staging. */
+    private static $STAGING_APP_IDS = [
+        'pmi-hpo-staging', // dry run environment
+        'healthpro-staging' // staging environment
     ];
 
     /** Restrict access by IP using dos.yaml */
     private static $IPRESTRICT_APP_IDS = [
+        'pmi-hpo',
         'pmi-hpo-test'
     ];
 
     /** Create release tag when deploying these application IDs. */
     private static $TAG_APP_IDS = [
+        'pmi-hpo',
         'pmi-hpo-test'
     ];
 
     /** Don't require `login: admin` for these application IDs. */
-    private static $SKIP_ADMIN_APP_IDS = [];
+    private static $SKIP_ADMIN_APP_IDS = [
+        'pmi-hpo-dev' // this is behind a WAF so we don't want GAE login
+    ];
 
     /** Apply enhanced instance class and scaling for these application IDs. */
-    private static $SCALE_APP_IDS = [];
+    private static $SCALE_APP_IDS = [
+        'pmi-hpo'
+    ];
 
     /**#@+ Config settings set by execute(). */
     private $sdkDir;
@@ -156,15 +171,14 @@ class DeployCommand extends Command {
         $this->generateAppConfig();
         $this->generateIpWhitelistConfig();
         $this->generatePhpConfig();
-
-        $this->runSecurityCheck();
+        $this->generateCronConfig();
 
         // If not local, compile assets. Run ./bin/gulp when developing locally.
         if (!$this->local && !$this->index) {
             // ensure that we are up-to-date with the latest NPM dependencies
             $output->writeln('');
             $output->writeln("Checking NPM dependencies...");
-            $this->exec("{$this->appDir}/bin/npm install");
+            $this->exec("npm install");
 
             // ensure that we are up-to-date with the latest Bower dependencies
             $output->writeln('');
@@ -183,9 +197,14 @@ class DeployCommand extends Command {
             $twigInput = new ArrayInput(['command' => 'pmi:twig']);
             $command->run($twigInput, $output);
         }
+        
+        // security checks
+        $this->runSecurityCheck();
+        $this->out->writeln('');
+        $this->runJsSecurityCheck(); // must occur after asset compilation
 
-        // unit tests should pass before production deploy
-        if ($this->isProd()) {
+        // unit tests should pass before deploying to testers or production
+        if ($this->isStaging() || $this->isStable() || $this->isProd()) {
             $this->runUnitTests();
         }
 
@@ -229,6 +248,11 @@ class DeployCommand extends Command {
             }
             $output->writeln('');
             $output->writeln('All done 👍'); // emoji :thumbsup:
+            // taggable implies we are tracking/auditing
+            if ($this->isTaggable()) {
+                $output->writeln('');
+                $output->writeln('<error>Remember to attach deploy output to Jira ticket!</error>');
+            }
         }
         else {
             $output->writeln('');
@@ -239,15 +263,35 @@ class DeployCommand extends Command {
     /** Determines the environment we are deploying to. */
     public function determineEnv() {
         if ($this->local) {
+            return AbstractApplication::ENV_LOCAL;
+        } elseif ($this->isDev()) {
             return AbstractApplication::ENV_DEV;
+        } elseif ($this->isStable()) {
+            return AbstractApplication::ENV_STABLE;
+        } elseif ($this->isStaging()) {
+            return AbstractApplication::ENV_STAGING;
         } elseif ($this->isProd()) {
             return AbstractApplication::ENV_PROD;
         } else {
-            return AbstractApplication::ENV_TEST;
+            throw new \Exception('Unable to determine environment!');
         }
     }
 
-    /** Are we deploying to production? */
+    private function isDev()
+    {
+        return !$this->local && !$this->isStable() && !$this->isStaging() && !$this->isProd();
+    }
+
+    private function isStable()
+    {
+        return !$this->local && in_array($this->appId, self::$STABLE_APP_IDS);
+    }
+    
+    private function isStaging()
+    {
+        return !$this->local && in_array($this->appId, self::$STAGING_APP_IDS);
+    }
+
     private function isProd()
     {
         return !$this->local && in_array($this->appId, self::$PROD_APP_IDS);
@@ -256,12 +300,6 @@ class DeployCommand extends Command {
     private function isTaggable()
     {
         return !$this->local && in_array($this->appId, self::$TAG_APP_IDS);
-    }
-
-    /** Are we deploying to test? */
-    private function isTest()
-    {
-        return $this->determineEnv() === AbstractApplication::ENV_TEST;
     }
 
     /** Adds and pushes a release tag to git. */
@@ -315,8 +353,8 @@ class DeployCommand extends Command {
         $yaml = new Parser();
         $config = $yaml->parse(file_get_contents($distFile));
 
-        // lock down all the test sites
-        if ($this->isTest() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS)) {
+        // require admin login for developer GAE sites
+        if ($this->isDev() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS)) {
             $this->requireAdminLogin($config);
         }
 
@@ -344,7 +382,7 @@ class DeployCommand extends Command {
             throw new Exception("Couldn't find $dosDistFile");
         }
         
-        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
+        if (in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
             copy($dosDistFile, $dosFile);
         } else {
             // https://cloud.google.com/appengine/docs/php/config/dos#delete
@@ -357,7 +395,7 @@ class DeployCommand extends Command {
             throw new Exception("Couldn't find $whitelistDistFile");
         }
         
-        if ($this->isProd() && in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
+        if (in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
             copy($whitelistDistFile, $whitelistFile);
         } else {
             // https://cloud.google.com/appengine/docs/php/config/dos#delete
@@ -382,7 +420,7 @@ class DeployCommand extends Command {
             if (strlen($line) === 0) {
                 continue;
             } elseif (preg_match('/^display_errors\s*=/i', $line)) {
-                $line = 'display_errors = ' . ($this->isProd() ? 0 : 1);
+                $line = 'display_errors = ' . (($this->isProd() || $this->isStable() || $this->isStaging()) ? 0 : 1);
             } elseif (preg_match('/^error_reporting\s*=/i', $line)) {
                 $line = 'error_reporting = ' . ($this->isProd() ?
                     'E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED' : 'E_ALL');
@@ -393,6 +431,82 @@ class DeployCommand extends Command {
         }
 
         file_put_contents($configFile, $ini);
+    }
+    
+    /** Generate cron configuration. */
+    private function generateCronConfig()
+    {
+        $configFile = $this->appDir . DIRECTORY_SEPARATOR . 'cron.yaml';
+        $distFile = "{$configFile}.dist";
+        if (!file_exists($distFile)) {
+            throw new Exception("Couldn't find $distFile");
+        }
+        
+        $yaml = new Parser();
+        $config = $yaml->parse(file_get_contents($distFile));
+        
+        // do this prior to excluding crons so developers are notified about
+        // missing backups well in advance of to deploying to production
+        $this->checkCronBackups($config);
+        
+        // adjust crons depending on environment
+        $crons = [];
+        foreach ($config['cron'] as $c) {
+            if (stristr($c['url'], '/ping-test') !== false && $this->isProd()) {
+                continue;
+            } elseif (stristr($c['url'], '/_ah/datastore_admin/backup.create') !== false) {
+                // enable DS backup only in production and test sites
+                if (!$this->isProd() && !$this->isStable() && !$this->isStaging()) {
+                    continue;
+                } else {
+                    $c['url'] = str_replace('{BUCKET_PREFIX}', $this->appId, $c['url']);
+                }
+            }
+            $crons[] = $c;
+        }
+        $config['cron'] = $crons;
+        
+        $dumper = new Dumper();
+        file_put_contents($configFile, count($crons) ? $dumper->dump($config, PHP_INT_MAX) : 'cron:');
+    }
+    
+    private function checkCronBackups($config)
+    {
+        $cronKinds = [];
+        foreach ($config['cron'] as $c) {
+            if (stripos($c['url'], '/_ah/datastore_admin/backup.create') === 0) {
+                if (strlen($c['url']) > 2000) {
+                    throw new \Exception("URL character limit exceeded: {$c['url']}");
+                }
+                if (preg_match_all('/kind=(\w+)/', $c['url'], $m) > 0) {
+                    foreach ($m[1] as $kind) {
+                        $cronKinds[$kind] = $kind;
+                    }
+                }
+            }
+        }
+        
+        $pmiKinds = [];
+        $files = glob("{$this->appDir}/src/Pmi/Entities/*.php");
+        if (count($files) === 0) {
+            throw new \Exception("No Datastore entity classes were found!");
+        }
+        foreach ($files as $file) {
+            $entity = basename($file, '.php');
+            $pmiKinds[$entity] = $entity;
+        }
+        
+        foreach ($pmiKinds as $kind) {
+            if (empty($cronKinds[$kind]) && $kind !== 'Session') {
+                throw new \Exception("Datastore kind {$kind} is not being backed up!");
+            }
+        }
+        
+        foreach ($cronKinds as $kind) {
+            if (empty($pmiKinds[$kind])) {
+                throw new \Exception("No entity exists for datastore backup of kind {$kind}!");
+            }
+        }
     }
 
     /** Tell all handlers to require admin login. */
@@ -424,7 +538,7 @@ class DeployCommand extends Command {
         foreach ($config['handlers'] as $handler) {
             if (empty($handler['secure']) || $handler['secure'] !== 'always') {
                 throw new \Exception("Handler URL '{$handler['url']}' does not force SSL!");
-            } elseif ($this->isTest() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS) && (empty($handler['login']) || $handler['login'] !== 'admin')) {
+            } elseif ($this->isDev() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS) && (empty($handler['login']) || $handler['login'] !== 'admin')) {
                 throw new \Exception("Handler URL '{$handler['url']}' does not require login!");
             }
         }
@@ -469,6 +583,21 @@ class DeployCommand extends Command {
                 if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
                     throw new \Exception('Aborting due to security vulnerability');
                 }
+            }
+        }
+    }
+    
+    private function runJsSecurityCheck()
+    {
+        $this->out->writeln("Running RetireJS scanner...");
+        $process = $this->exec("{$this->appDir}/node_modules/retire/bin/retire --nocache --nodepath {$this->appDir}/node_modules --jspath {$this->appDir}/web/assets/dist/js", false);
+        if ($process->getExitCode() == 0) {
+            $this->out->writeln('No JS files or node modules have known vulnerabilities');
+        } else {            
+            $this->out->writeln('');
+            $helper = $this->getHelper('question');
+            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerablities?</error> '))) {
+                throw new \Exception('Aborting due to JS security vulnerability');
             }
         }
     }

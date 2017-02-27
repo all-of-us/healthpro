@@ -5,13 +5,15 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
 
 class Evaluation
 {
-    const CURRENT_VERSION = '0.1.3';
+    const CURRENT_VERSION = '0.3.0';
     protected $version;
     protected $data;
     protected $schema;
@@ -64,6 +66,17 @@ class Evaluation
         return $this->schema;
     }
 
+    public function getAssociativeSchema()
+    {
+        $schema = clone $this->schema;
+        $associativeFields = [];
+        foreach ($schema->fields as $field) {
+            $associativeFields[$field->name] = $field;
+        }
+        $schema->fields = $associativeFields;
+        return $schema;
+    }
+
     public function getWarnings()
     {
         $warnings = [];
@@ -90,6 +103,11 @@ class Evaluation
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
         foreach ($this->schema->fields as $field) {
+            if (isset($field->type)) {
+                $type = $field->type;
+            } else {
+                $type = null;
+            }
             $constraints = [];
             $attributes = [];
             $options = [
@@ -112,28 +130,65 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } elseif (!isset($field->options)) {
+            } elseif (!isset($field->options) && $type != 'checkbox' && $type != 'textarea') {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
-            $options['constraints'] = $constraints;
-            $options['attr'] = $attributes;
 
             if (isset($field->options)) {
                 $class = ChoiceType::class;
                 unset($options['scale']);
-                $options['choices'] = array_combine($field->options, $field->options);
+                if (is_array($field->options)) {
+                    $options['choices'] = array_combine($field->options, $field->options);
+                } else {
+                    $options['choices'] = (array)$field->options;
+                }
                 $options['placeholder'] = false;
+            } elseif ($type == 'checkbox') {
+                unset($options['scale']);
+                $class = CheckboxType::class;
+            } elseif ($type == 'textarea') {
+                unset($options['scale']);
+                $class = TextareaType::class;
+                $attributes['rows'] = 4;
             } else {
                 $class = NumberType::class;
             }
+
+            $options['constraints'] = $constraints;
+            $options['attr'] = $attributes;
+
             if (isset($field->replicates)) {
-                $formBuilder->add($field->name, CollectionType::class, [
+                $collectionOptions = [
                     'entry_type' => $class,
                     'entry_options' => $options,
                     'required' => false,
                     'label' => isset($options['label']) ? $options['label'] : null
-                ]);
+                ];
+                if (isset($field->compare)) {
+                    $compareType = $field->compare->type;
+                    $compareField = $field->compare->field;
+                    $compareMessage = $field->compare->message;
+                    $form = $formBuilder->getForm();
+                    $callback = function($value, $context, $replicate) use ($form, $compareField, $compareType, $compareMessage) {
+                        $compareTo = $form->getData()->$compareField;
+                        if (!isset($compareTo[$replicate])) {
+                            return;
+                        }
+                        if ($compareType == 'greater-than' && $value <= $compareTo[$replicate]) {
+                            $context->buildViolation($compareMessage)->addViolation();
+                        } elseif ($compareType == 'less-than' && $value >= $compareTo[$replicate]) {
+                            $context->buildViolation($compareMessage)->addViolation();
+                        }
+                    };
+                    $collectionConstraintFields = [];
+                    for ($i = 0; $i < $field->replicates; $i++) {
+                        $collectionConstraintFields[] = new Constraints\Callback(['callback' => $callback, 'payload' => $i]);
+                    }
+                    $compareConstraint = new Constraints\Collection($collectionConstraintFields);
+                    $collectionOptions['constraints'] = [$compareConstraint];
+                }
+                $formBuilder->add($field->name, CollectionType::class, $collectionOptions);
             } else {
                 $formBuilder->add($field->name, $class, $options);
             }
@@ -167,8 +222,8 @@ class Evaluation
     protected function normalizeData()
     {
         foreach ($this->data as $key => $value) {
-            if (!is_array($value)) {
-                $this->data->$key = floatval($value) ?: null;
+            if ($value === 0) {
+                $this->data->$key = null;
             }
         }
         foreach ($this->schema->fields as $field) {
@@ -197,5 +252,46 @@ class Evaluation
             'datetime' => $datetime
         ]);
         return $fhir->toObject();
+    }
+
+    protected function isMinVersion($minVersion)
+    {
+        return Util::versionIsAtLeast($this->version, $minVersion);
+    }
+
+    public function canFinalize()
+    {
+        if (!$this->isMinVersion('0.3.0')) {
+            // prior to version 0.3.0, any state is valid
+            return true;
+        }
+
+        foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
+            foreach ($this->data->$field as $k => $value) {
+                if (!$this->data->{'blood-pressure-protocol-modification'}[$k] && !$value) {
+                    return false;
+                }
+            }
+        }
+        foreach (['height', 'weight'] as $field) {
+            if (!$this->data->{$field . '-protocol-modification'} && !$this->data->$field) {
+                return false;
+            }
+        }
+        if (!$this->data->pregnant && !$this->data->wheelchair) {
+            foreach (['hip-circumference', 'waist-circumference'] as $field) {
+                foreach ($this->data->$field as $k => $value) {
+                    if ($k == 2 && abs($this->data->{$field}[0] - $this->data->{$field}[1]) <= 1) {
+                        // not required if first two are within 1 cm
+                        continue;
+                    }
+                    if (!$this->data->{$field . '-protocol-modification'}[$k] && !$value) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }

@@ -4,15 +4,15 @@
 .page-header h2 {
     margin-top: 0;
 }
+a {
+    cursor: pointer;
+}
 iframe.pdf {
     width: 100%;
     height: 600px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-}
-.inline-buttons .btn {
-    margin-bottom: 10px;
 }
 #flash-notices {
     margin-top: -15px;
@@ -23,6 +23,9 @@ iframe.pdf {
     text-align: center;
     font-weight: bold;
     margin: 0;
+}
+.btn-block {
+    margin-bottom: 10px;
 }
 @media(max-width:767px) {
     h2 {
@@ -44,11 +47,47 @@ label.required::after {
     margin-left: auto;
     margin-right: auto;
 }
+.table-small>tbody>tr>td, .table-small>tbody>tr>th, .table-small>tfoot>tr>td, .table-small>tfoot>tr>th, .table-small>thead>tr>td, .table-small>thead>tr>th {
+    padding: 5px;
+}
+.table-small {
+    font-size: 12px;
+}
+.table-auto-width {
+    width: auto;
+}
+label.label-normal {
+    display: inline;
+    margin: 0;
+    font-weight: normal;
+}
 /* for bootstrap date picker */
 .form-group {
     position: relative;
 }
 
+/* Nav bar customization */
+.navbar-brand-subtitle {
+    font-size: 11px;
+    margin-top: -7px;
+    text-align: right;
+}
+.navbar-inverse {
+    border: 0;
+    border-radius: 0;
+}
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a, .navbar-inverse .navbar-text {
+    color: #ddd; /* increase contrast */
+}
+.navbar-allofus, .navbar-allofus .navbar-toggle {
+    background-color: #262262;
+}
+.navbar-allofus .navbar-toggle:focus, .navbar-allofus .navbar-toggle:hover {
+    background-color: #363272;
+}
+.navbar-allofus .navbar-nav>.open>a, .navbar-allofus .navbar-nav>.open>a:focus, .navbar-allofus .navbar-nav>.open>a:hover {
+    background-color: #161252;
+}
 
 /* Physical evaluation */
 #physicalEvaluation .toggle-help-image {
@@ -76,6 +115,29 @@ label.required::after {
 #physicalEvaluation .convert {
     margin-left: 4px;
 }
+#physicalEvaluation #evaluationAffixSave {
+    background-color: #ffe;
+    padding: 2px 0;
+}
+#physicalEvaluation #evaluationAffixSave.affix-top {
+    visibility: hidden;
+    position: fixed;
+}
+#physicalEvaluation #evaluationAffixSave.affix-bottom {
+    position: fixed;
+    visibility: hidden;
+}
+#physicalEvaluation #evaluationAffixSave.affix {
+    top: 0;
+    z-index: 10;
+    text-align: center;
+    position: fixed;
+    visibility: visible;
+}
+#physicalEvaluation #evaluationAffixSave button {
+    padding-right: 20px;
+    padding-left: 20px;
+}
 
 /* Participant page */
 #order-overflow, #evaluation-overflow {
@@ -84,4 +146,34 @@ label.required::after {
 }
 #order-overflow-show, #evaluation-overflow-show {
     margin-top: 5px
+}
+
+.toggle-help-image {
+    cursor: pointer;
+    color: #337ab7;
+}
+
+/* Participant work queue */
+.topheader {
+    border-bottom: 0 !important;
+    text-align: center;
+}
+.secondaryheader {
+    border-top: 0 !important;
+    font-weight: normal;
+    text-align: center;
+}
+.multiheader-survey {
+    background-color: #dde;
+}
+.multiheader-status {
+    background-color: #eec;
+}
+
+/* Orders */
+table.table-samples {
+    margin-bottom: 5px;
+}
+table.table-samples td {
+    border-top: 0 !important;
 }

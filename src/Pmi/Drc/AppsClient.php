@@ -18,26 +18,22 @@ class AppsClient
     public static function createFromApp(HpoApplication $app)
     {
         $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/googleapps_key.json';
-        if ($app->isDev() && file_exists($keyFile)) {
-            return new self($app->getConfig('gaApplicationName'), file_get_contents($keyFile), $app->getConfig('gaAdminEmail'), $app->getConfig('gaDomain'), $app->isDev());
+        if ($app->isLocal() && file_exists($keyFile)) {
+            return new self($app->getConfig('gaApplicationName'), file_get_contents($keyFile), $app->getConfig('gaAdminEmail'), $app->getConfig('gaDomain'), $app->isLocal());
         } elseif ($app->getConfig('gaAuthJson')) {
-            return new self($app->getConfig('gaApplicationName'), $app->getConfig('gaAuthJson'), $app->getConfig('gaAdminEmail'), $app->getConfig('gaDomain'), $app->isDev());
+            return new self($app->getConfig('gaApplicationName'), $app->getConfig('gaAuthJson'), $app->getConfig('gaAdminEmail'), $app->getConfig('gaDomain'), $app->isLocal());
         } else {
             return null;
         }
     }
     
-    public function __construct($appName, $authJson, $adminEmail, $domain, $isDev)
+    public function __construct($appName, $authJson, $adminEmail, $domain, $isLocal)
     {
         $this->domain = $domain;
         $this->client = new \Google_Client();
         $this->client->setApplicationName($appName);
         $this->client->setAuthConfig(json_decode($authJson, true));
         $this->client->setSubject($adminEmail);
-        // http://stackoverflow.com/a/33838098/1402028
-        if ($isDev) {
-            $this->client->setHttpClient(new \GuzzleHttp\Client(['verify'=>false]));
-        }
         $this->client->setScopes(implode(' ', [
             \Google_Service_Directory::ADMIN_DIRECTORY_GROUP_READONLY
         ]));
