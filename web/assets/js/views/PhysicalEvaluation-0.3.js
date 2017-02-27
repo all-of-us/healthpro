@@ -141,12 +141,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             this.$('#hip-waist-skip').html('<span class="label label-danger">Skip</span>');
             this.$('#panel-hip-waist>.panel-body').hide();
         }
-        var ppwNext = this.$('.field-weight-prepregnancy').next();
         if (isPregnant) {
             this.$('.field-weight-prepregnancy').show();
-            if (ppwNext.hasClass('alt-units-block')) {
-                ppwNext.show();
-            }
+            this.$('.field-weight-prepregnancy').next('.alt-units-block').show();
             if (this.rendered) {
                 this.$('#form_weight-protocol-modification').valChange('pregnancy');
             }
@@ -154,9 +151,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         if (!isPregnant) {
             this.$('#form_weight-prepregnancy').valChange('');
             this.$('.field-weight-prepregnancy').hide();
-            if (ppwNext.hasClass('alt-units-block')) {
-                ppwNext.hide();
-            }
+            this.$('.field-weight-prepregnancy').next('.alt-units-block').hide();
             if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'pregnancy') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
@@ -191,9 +186,11 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     handleHeightProtocol: function() {
         if (this.$('#form_height-protocol-modification').val() == 'refusal') {
             this.$('#form_height').valChange('').attr('disabled', true);
+            this.$('.field-height').next('.alt-units-block').hide();
         } else {
             if (!this.finalized) {
                 this.$('#form_height').attr('disabled', false);
+                this.$('.field-height').next('.alt-units-block').show();
             }
         }
     },
@@ -201,9 +198,11 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         var selected = this.$('#form_weight-protocol-modification').val();
         if (selected == 'cannot-balance-on-scale' || selected == 'refusal') {
             this.$('#form_weight').valChange('').attr('disabled', true);
+            this.$('.field-weight').next('.alt-units-block').hide();
         } else {
             if (!this.finalized) {
                 this.$('#form_weight').attr('disabled', false);
+                this.$('.field-weight').next('.alt-units-block').show();
             }
         }
     },
