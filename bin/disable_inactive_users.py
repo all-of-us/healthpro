@@ -1,6 +1,7 @@
 from __future__ import print_function
 import httplib2
 import os
+import json
 
 from apiclient import discovery
 from oauth2client import client
@@ -9,7 +10,7 @@ from oauth2client.file import Storage
 from googleapiclient.discovery import build
 
 from oauth2client.service_account import ServiceAccountCredentials
-from datetime import date, timedelta
+from datetime import date, timedelta,datetime
 #pip install httplib2 boto google-api-python-client
 
 try:
@@ -27,6 +28,7 @@ CLIENT_SECRET_FILE = '/Users/dbernick/Downloads/PMIOpsManage-d1bfcf0991ed.json'
 DELEGATE_ACCOUNT = 'dbernick@pmi-ops.org'
 APPLICATION_NAME = 'Directory API Python Quickstart'
 GOOGLE_2FA_EXCEPTION_GROUP = 'mfa_exception@pmi-ops.org'
+INACTIVEDAYS=60
 
 def create_directory_service(user_email):
 
@@ -47,7 +49,8 @@ def create_report_service(user_email):
 
     return build('admin', 'reports_v1', http=http_auth)
 
-def getReportResults(useremail,daycount):
+
+def getInactveReportResults(daycount):
     reportservice = create_report_service(SERVICE_ACCOUNT_USER)
 
     results = None
@@ -55,57 +58,42 @@ def getReportResults(useremail,daycount):
         try:
             # connect
             #
-            yesterday = date.today() - timedelta(days=daycount)
+            activeSince = date.today() - timedelta(days=daycount)
             results = reportservice.userUsageReport().get(userKey=useremail,date=yesterday.strftime('%Y-%m-%d'),parameters='accounts:is_2sv_enrolled').execute()
         except:
             daycount=daycount+1
 
     return results,daycount
 
-def getNo2FAUsers(users,google_2fa_members):
-    reportservice = create_report_service(SERVICE_ACCOUNT_USER)
-    userlist=[]
-    removeList=[]
-
-    if not users:
-        print('No users in the domain.')
-    else:
-        for user in users:
-            userEmail = user['primaryEmail'].encode('utf-8')
-            daycount=1
-            results,daycount = getReportResults(userEmail,daycount)
-            if results.get('usageReports'):
-                for item in results.get('usageReports'):
-                    if item.get("parameters"):
-                        for par in item.get("parameters"):
-                            #if user has not activated 2fa and is in 2fa_exception group, list
-                            #if user has activated 2fa and is in 2fa exception group, remove from exception group
-                            if not par.get("boolValue") and userEmail in google_2fa_members:
-                                userlist.append(userEmail)
-                            elif par.get("boolValue") and userEmail in google_2fa_members:
-                                removeList.append(userEmail)
-            else:
-                userlist.append(userEmail)
-    return userlist,removeList
-
 def main():
     dirservice = create_directory_service(SERVICE_ACCOUNT_USER)
-    groupresults = dirservice.members().list(groupKey=GOOGLE_2FA_EXCEPTION_GROUP).execute()
-    google_2fa_members=[]
-    for member in groupresults.get('members'):
-        google_2fa_members.append(member.get('email').encode("utf-8"))
+    #groupresults = dirservice.members().list(groupKey=GOOGLE_2FA_EXCEPTION_GROUP).execute()
+    #google_2fa_members=[]
+    #for member in groupresults.get('members'):
+    #    google_2fa_members.append(member.get('email').encode("utf-8"))
+    page_token=None
+    new_page_token=None
+    loopAgain=True
+    users=[]
+    usersToDisable=[]
+    while loopAgain:
+        results = dirservice.users().list(domain = 'pmi-ops.org',orderBy='email',maxResults=10,pageToken=page_token).execute()
+        page_token=results.get('nextPageToken',None)
+        loopAgain=False
+        if page_token:
+            loopAgain=True
+        for u in results.get('users', []):
+            users.append(u)
+            lastLogin=datetime.strptime(u.get('lastLoginTime',None),"%Y-%m-%dT%H:%M:%S.%fZ")
+            if (datetime.today()-lastLogin).days > INACTIVEDAYS:
+                usersToDisable.append(u)
 
-    results = dirservice.users().list(domain = 'pmi-ops.org',orderBy='email').execute()
-    users = results.get('users', [])
-    no2faUsers,removeList = getNo2FAUsers(users,google_2fa_members)
-
-    print("users without 2fa: %s" % no2faUsers)
-    print("users to remove from 2fa exception: %s" % removeList)
-
-    for user in removeList:
-        print("Removing %s" % user)
-        dirservice.members().list(groupKey=GOOGLE_2FA_EXCEPTION_GROUP,memberKey=user).execute()
-
+    for user in usersToDisable:
+        print("Suspending %s" % user.get('primaryEmail',None))
+        user["suspended"]=True
+        user["suspensionReason"]="Inactivity"
+        dirservice.users().update(userKey=user.get('primaryEmail',None),body=user).execute()
+        print(user)
 
 if __name__ == '__main__':
     main()
