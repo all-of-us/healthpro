@@ -11,6 +11,8 @@ var ASSETS = {
         BOWER_DIR + '/parsleyjs/dist/parsley.js',
         BOWER_DIR + '/datatables.net/js/jquery.datatables.js',
         BOWER_DIR + '/datatables.net-bs/js/dataTables.bootstrap.js',
+        BOWER_DIR + '/datatables.net-responsive/js/dataTables.responsive.js',
+        BOWER_DIR + '/datatables.net-responsive-bs/js/responsive.bootstrap.js',
         ASSETS_DIR + '/js/parsley-comparison.js',
         ASSETS_DIR + '/js/bootstrap-session-timeout.js',
         ASSETS_DIR + '/js/app.js',
@@ -20,7 +22,8 @@ var ASSETS = {
         BOWER_DIR + '/bootstrap/dist/css/bootstrap.min.css',
         BOWER_DIR + '/font-awesome/css/font-awesome.min.css',
         BOWER_DIR + '/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
-        BOWER_DIR + '/datatables.net-bs/css/dataTables.bootstrap.css'
+        BOWER_DIR + '/datatables.net-bs/css/dataTables.bootstrap.css',
+        BOWER_DIR + '/datatables.net-responsive-bs/css/responsive.bootstrap.css'
     ],
     'csslocal': [
         ASSETS_DIR + '/css/app.css'

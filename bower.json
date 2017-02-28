@@ -10,6 +10,8 @@
     "eonasdan-bootstrap-datetimepicker": "^4.17.42",
     "parsleyjs": "^2.5.0",
     "datatables.net": "~2.1.1",
-    "datatables.net-bs": "~2.1.1"
+    "datatables.net-bs": "~2.1.1",
+    "datatables.net-responsive": "^2.1.1",
+    "datatables.net-responsive-bs": "^2.1.1"
   }
 }
