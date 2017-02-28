@@ -22,7 +22,7 @@
     {% if not form[name].vars.disabled and definition.alternateunits is defined and definition.alternateunits %}
         <div class="alt-units-block">
             <div class="alt-units-toggle" style="margin-top: -15px;">
-                <p><a class="small">Enter in {{ definition.unit == 'cm' ? 'inches' : 'pounds' }} (value will be stored in {{ definition.unit }})</a></p>
+                <p class="text-right"><a class="small">Enter in {{ definition.unit == 'cm' ? 'inches' : 'pounds' }} (value will be stored in {{ definition.unit }})</a></p>
             </div>
             <div class="alt-units-field form-group" style="display:none; margin-top:15px;">
                 <label for="alt-units-{{ name }}">Enter in {{ definition.unit == 'cm' ? 'inches' : 'pounds' }} (value will be stored in {{ definition.unit }})</label>
@@ -30,7 +30,7 @@
                     <input type="text" id="alt-units-{{ name }}" class="form-control">
                     <div class="input-group-addon">{{ definition.unit == 'cm' ? 'in' : 'lb' }}</div>
                 </div>
-                <p><a class="small">Cancel</a></p>
+                <p class="text-right"><a class="small">Cancel</a></p>
             </div>
         </div>
     {% endif %}
