@@ -36,6 +36,9 @@
                 <th class="multiheader-status">Biobank</th>
                 <th class="multiheader-status">Membership</th>
                 <th class="multiheader-status">Consent</th>
+                <th>Ethnicity</th>
+                <th>Race</th>
+                <th>Gender Identity</th>
             </tr>
         </thead>
         <tbody>
@@ -69,6 +72,9 @@
                     </td>
                     <td>{{ participant.membershipTier }}</td>
                     <td>{{ participant.consentForStudyEnrollment }}</td>
+                    <td>{{ participant.ethnicity }}</td>
+                    <td>{{ participant.race }}</td>
+                    <td>{{ participant.genderIdentity }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -112,7 +118,10 @@ $(document).ready(function() {
             { name: 'physicalMeasurementsStatus' },
             { name: 'biobankSamples' },
             { name: 'membershipTier' },
-            { name: 'consentStatus' }
+            { name: 'consentStatus' },
+            { name: 'ethnicity', visible: false },
+            { name: 'race', visible: false },
+            { name: 'genderIdentity', visible: false }
         ],
         pageLength: 25,
         buttons: [
