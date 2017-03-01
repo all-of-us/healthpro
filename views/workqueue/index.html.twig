@@ -101,6 +101,19 @@ $(document).ready(function() {
         //processing: true,
         //serverSide: true,
         //ajax: {{ path('workqueue_data')|json_encode|raw }},
+        columns: [
+            { name: 'lastName' },
+            { name: 'firstName' },
+            { name: 'contact' },
+            { name: 'consent' },
+            {% for field, label in surveys %}
+                { name: 'ppi{{ field }}' },
+            {% endfor %}
+            { name: 'physicalMeasurementsStatus' },
+            { name: 'biobankSamples' },
+            { name: 'membershipTier' },
+            { name: 'consentStatus' }
+        ],
         pageLength: 25,
         buttons: [
             {
@@ -111,14 +124,30 @@ $(document).ready(function() {
             {
                 extend: 'colvisGroup',
                 text: 'PPI Modules',
-                show: [ 4, 5, 6, 7, 8, 9, 10 ],
-                hide: [ 2, 3, 11, 12, 13, 14 ]
+                show: [ {% for field, label in surveys %}'ppi{{field}}:name', {% endfor %} ],
+                hide: [
+                    'contact:name',
+                    'consent:name',
+                    'physicalMeasurementsStatus:name',
+                    'biobankSamples:name',
+                    'membershipTier:name',
+                    'consentStatus:name'
+                ]
             },
             {
                 extend: 'colvisGroup',
                 text: 'Status',
-                show: [ 11, 12, 13, 14 ],
-                hide: [ 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+                show: [
+                    'physicalMeasurementsStatus:name',
+                    'biobankSamples:name',
+                    'membershipTier:name',
+                    'consentStatus:name'
+                ],
+                hide: [
+                    'contact:name',
+                    'consent:name',
+                    {% for field, label in surveys %}'ppi{{field}}:name', {% endfor %}
+                ]
             },
             {
                 extend: 'colvisGroup',
