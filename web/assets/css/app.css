@@ -169,6 +169,9 @@ label.label-normal {
 .multiheader-status {
     background-color: #eec;
 }
+.multiheader-demographics {
+    background-color: #ded;
+}
 
 /* Orders */
 table.table-samples {
