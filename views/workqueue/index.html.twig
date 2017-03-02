@@ -24,7 +24,7 @@
         <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
     </p>
     <h4>{{ participants|length|number_format }}{{ params|length > 0 ? ' matching' : '' }} participant{{ participants|length == 1 ? '' : 's'}} at {{ app.session.get('site').name }}</h4>
-    <table class="table table-striped table-bordered dt-responsive nowrap" id="workqueue" width="100%">
+    <table class="table table-striped table-bordered table-small dt-responsive nowrap" id="workqueue" width="100%">
         <thead>
             <tr>
                 <th class="col-group-name">Last Name</th>
@@ -75,12 +75,12 @@
                     <td class="text-center" data-order="{{ participant.numBaselineSamplesArrived }}">
                         <strong class="text-{{ participant.numBaselineSamplesArrived == 7 ? 'success' : 'danger' }}">{{ participant.numBaselineSamplesArrived }}/7</strong>
                     </td>
-                    <td>{{ participant.membershipTier }}</td>
-                    <td>{{ participant.consentForStudyEnrollment }}</td>
+                    <td>{{ participant.membershipTier|display_code }}</td>
+                    <td>{{ participant.consentForStudyEnrollment|display_code }}</td>
                     <td data-order="{{ participant.consentForStudyEnrollmentTime }}">{{ participant.consentForStudyEnrollmentTime|date('m/d/Y') }}</td>
-                    <td>{{ participant.ethnicity }}</td>
-                    <td>{{ participant.race }}</td>
-                    <td>{{ participant.genderIdentity|trans }}</td>
+                    <td>{{ participant.ethnicity|display_code }}</td>
+                    <td>{{ participant.race|display_code }}</td>
+                    <td>{{ participant.genderIdentity|display_code }}</td>
                 </tr>
             {% endfor %}
         </tbody>
