@@ -27,21 +27,31 @@
     <table class="table table-striped table-bordered table-small dt-responsive nowrap" id="workqueue" width="100%">
         <thead>
             <tr>
+                <th rowspan="2">Last Name</th>
+                <th rowspan="2">First Name</th>
+                <th rowspan="2">Date of Birth</th>
+                <th colspan="{{ 2 * (surveys|length) }}" class="topheader multiheader-survey">PPI Survey Completion</th>
+                <th colspan="5" class="topheader multiheader-status">Status</th>
+                <th colspan="3" class="topheader multiheader-demographics">Demographics</th>
+            </tr>
+            <tr>
+                {#
                 <th class="col-group-name">Last Name</th>
                 <th class="col-group-name">First Name</th>
                 <th>Date of Birth</th>
+                #}
                 {% for field, label in surveys %}
-                    <th class="col-group-ppi multiheader-survey">{{ label }}</th>
-                    <th class="col-group-ppi-time multiheader-survey">{{ label }} Date</th>
+                    <th class="secondaryheader col-group-ppi multiheader-survey">{{ label }}</th>
+                    <th class="secondaryheader col-group-ppi-time multiheader-survey">{{ label }} Date</th>
                 {% endfor %}
-                <th class="col-group-status multiheader-status">Phys Meas</th>
-                <th class="col-group-status multiheader-status">Biobank</th>
-                <th class="col-group-status multiheader-status">Membership</th>
-                <th class="col-group-status multiheader-status">Consent</th>
-                <th class="col-group-status multiheader-status">Consent Date</th>
-                <th class="col-group-demographics multiheader-demographics">Ethnicity</th>
-                <th class="col-group-demographics multiheader-demographics">Race</th>
-                <th class="col-group-demographics multiheader-demographics">Gender Identity</th>
+                <th class="secondaryheader col-group-status multiheader-status">Phys Meas</th>
+                <th class="secondaryheader col-group-status multiheader-status">Biobank</th>
+                <th class="secondaryheader col-group-status multiheader-status">Membership</th>
+                <th class="secondaryheader col-group-status multiheader-status">Consent</th>
+                <th class="secondaryheader col-group-status multiheader-status">Consent Date</th>
+                <th class="secondaryheader col-group-demographics multiheader-demographics">Ethnicity</th>
+                <th class="secondaryheader col-group-demographics multiheader-demographics">Race</th>
+                <th class="secondaryheader col-group-demographics multiheader-demographics">Gender Identity</th>
             </tr>
         </thead>
         <tbody>
@@ -147,7 +157,7 @@ $(document).ready(function() {
             },
             {
                 extend: 'colvisGroup',
-                text: 'PPI Modules',
+                text: 'PPI Surveys',
                 show: [
                     'dateOfBirth:name',
                     '.col-group-ppi'
@@ -160,7 +170,7 @@ $(document).ready(function() {
             },
             {
                 extend: 'colvisGroup',
-                text: 'PPI Modules + Date',
+                text: 'PPI Surveys + Date',
                 show: [
                     '.col-group-ppi',
                     '.col-group-ppi-time'
