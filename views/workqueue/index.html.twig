@@ -27,7 +27,7 @@
             <tr>
                 <th>Last Name</th>
                 <th>First Name</th>
-                <th>Preferred Contact</th>
+                <th>Date of Birth</th>
                 <th>Consent Date</th>
                 {% for field, label in surveys %}
                     <th class="multiheader-survey">{{ label }}</th>
@@ -47,33 +47,31 @@
                 <tr>
                     <td>{{ participant.lastName }}</td>
                     <td>{{ participant.firstName }}</td>
-                    <td>{{ participant.zipCode }}</td>
-                    <td>
-                        {{ participant.consentForStudyEnrollmentTime|date('m/d/Y') }}
-                    </td>
+                    <td data-order="{{ participant.dateOfBirth }}">{{ participant.dateOfBirth|date('m/d/Y') }}</td>
+                    <td data-order="{{ participant.consentForStudyEnrollmentTime }}">{{ participant.consentForStudyEnrollmentTime|date('m/d/Y') }}</td>
                     {% for field, label in surveys %}
-                        <td class="text-center">
+                        <td class="text-center" data-order="{{ attribute(participant, 'questionnaireOn' ~ field)|default('') == 'SUBMITTED' ? '1' : '0' }}">
                             {% if attribute(participant, 'questionnaireOn' ~ field)|default('') == 'SUBMITTED' %}
                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
                             {% else %}
                                 <i class="fa fa-times text-danger" aria-hidden="true"></i>
                             {% endif %}
                         </td>
-                        <td>
+                        <td data-order="{{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time')|default('') }}">
                             {% if attribute(participant, 'questionnaireOn' ~ field ~ 'Time') is defined %}
                                 {{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time')|date('m/d/Y') }}
                             {% endif %}
                         </td>
                     {% endfor %}
 
-                    <td class="text-center">
+                    <td class="text-center" data-order="{{ participant.physicalMeasurementsStatus|default('') == 'SUBMITTED' ? '1' : '0' }}">
                         {% if participant.physicalMeasurementsStatus == 'SUBMITTED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
                     </td>
-                    <td class="text-center">
+                    <td class="text-center" data-order="{{ participant.numBaselineSamplesArrived }}">
                         <strong class="text-{{ participant.numBaselineSamplesArrived == 7 ? 'success' : 'danger' }}">{{ participant.numBaselineSamplesArrived }}/7</strong>
                     </td>
                     <td>{{ participant.membershipTier }}</td>
@@ -116,7 +114,7 @@ $(document).ready(function() {
         columns: [
             { name: 'lastName' },
             { name: 'firstName' },
-            { name: 'contact' },
+            { name: 'dateOfBirth' },
             { name: 'consent' },
             {% for field, label in surveys %}
                 { name: 'ppi{{ field }}' },
@@ -142,7 +140,6 @@ $(document).ready(function() {
                 text: 'PPI Modules',
                 show: [ {% for field, label in surveys %}'ppi{{field}}:name', {% endfor %} ],
                 hide: [
-                    'contact:name',
                     'consent:name',
                     'physicalMeasurementsStatus:name',
                     'biobankSamples:name',
@@ -160,7 +157,6 @@ $(document).ready(function() {
                     'consentStatus:name'
                 ],
                 hide: [
-                    'contact:name',
                     'consent:name',
                     {% for field, label in surveys %}'ppi{{field}}:name', {% endfor %}
                 ]
