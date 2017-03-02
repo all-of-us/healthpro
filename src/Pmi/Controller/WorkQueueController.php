@@ -119,30 +119,44 @@ class WorkQueueController extends AbstractController
                 'PMI ID',
                 'Last Name',
                 'First Name',
+                'Date of Birth',
                 'Consent Date'
             ];
             foreach (self::$surveys as $survey => $label) {
-                $headers[] = $label . ' PPI Survey Completion';
+                $headers[] = $label . ' PPI Survey Complete';
+                $headers[] = $label . ' PPI Survey Completion Date';
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Biobank Samples';
             $headers[] = 'Membership Tier';
             $headers[] = 'Consent Status';
+            $headers[] = 'Ethnicity';
+            $headers[] = 'Race';
+            $headers[] = 'Gender Identity';
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
                 $row = [
                     $participant->participantId,
                     $participant->lastName,
                     $participant->firstName,
+                    date('m/d/Y', strtotime($participant->dateOfBirth)),
                     date('m/d/Y', strtotime($participant->consentForStudyEnrollmentTime))
                 ];
                 foreach (self::$surveys as $survey => $label) {
                     $row[] = $participant->{"questionnaireOn{$survey}"} === 'SUBMITTED' ? 1 : 0;
+                    if (isset($participant->{"questionnaireOn{$survey}Time"})) {
+                        $row[] = date('m/d/Y', strtotime($participant->{"questionnaireOn{$survey}Time"}));
+                    } else {
+                        $row[] = '';
+                    }
                 }
                 $row[] = $participant->physicalMeasurementsStatus === 'SUBMITTED' ? 1 : 0;
                 $row[] = $participant->numBaselineSamplesArrived;
                 $row[] = $participant->membershipTier;
                 $row[] = $participant->consentForStudyEnrollment;
+                $row[] = $participant->ethnicity;
+                $row[] = $participant->race;
+                $row[] = $participant->genderIdentity;
                 fputcsv($output, $row);
             }
             fwrite($output, "\"\"\n");
