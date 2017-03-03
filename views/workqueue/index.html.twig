@@ -29,6 +29,7 @@
             <tr>
                 <th rowspan="2" class="col-group-name">Last Name</th>
                 <th rowspan="2" class="col-group-name">First Name</th>
+                <th rowspan="2">PMI ID</th>
                 <th rowspan="2">Date of Birth</th>
                 <th colspan="{{ 2 * (surveys|length) }}" class="topheader multiheader-survey">PPI Survey Completion</th>
                 <th colspan="5" class="topheader multiheader-status">Status</th>
@@ -57,8 +58,9 @@
         <tbody>
             {% for participant in participants %}
                 <tr>
-                    <td>{{ participant.lastName }}</td>
-                    <td>{{ participant.firstName }}</td>
+                    <td data-order="{{ participant.lastName }}"><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.lastName }}</a></td>
+                    <td data-order="{{ participant.firstName }}"><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.firstName }}</a></td>
+                    <td>{{ participant.participantId }}</td>
                     <td data-order="{{ participant.dateOfBirth }}">{{ participant.dateOfBirth|date('m/d/Y') }}</td>
                     {% for field, label in surveys %}
                         <td class="text-center" data-order="{{ attribute(participant, 'questionnaireOn' ~ field)|default('') == 'SUBMITTED' ? '1' : '0' }}">
@@ -126,6 +128,7 @@ $(document).ready(function() {
         columns: [
             { name: 'lastName' },
             { name: 'firstName' },
+            { name: 'participantId', visible: false },
             { name: 'dateOfBirth' },
             {% for field, label in surveys %}
                 { name: 'ppi{{ field }}' },
@@ -151,6 +154,7 @@ $(document).ready(function() {
                     '.col-group-status'
                 ],
                 hide: [
+                    'participantId:name',
                     '.col-group-ppi-time',
                     '.col-group-demographics'
                 ]
@@ -163,6 +167,7 @@ $(document).ready(function() {
                     '.col-group-ppi'
                 ],
                 hide: [
+                    'participantId:name',
                     '.col-group-ppi-time',
                     '.col-group-status',
                     '.col-group-demographics'
@@ -176,6 +181,7 @@ $(document).ready(function() {
                     '.col-group-ppi-time'
                 ],
                 hide: [
+                    'participantId:name',
                     'dateOfBirth:name',
                     '.col-group-status',
                     '.col-group-demographics'
@@ -189,6 +195,7 @@ $(document).ready(function() {
                     '.col-group-status'
                 ],
                 hide: [
+                    'participantId:name',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-demographics'
@@ -202,6 +209,7 @@ $(document).ready(function() {
                     '.col-group-demographics'
                 ],
                 hide: [
+                    'participantId:name',
                     '.col-group-status',
                     '.col-group-ppi',
                     '.col-group-ppi-time'
