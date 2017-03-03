@@ -119,17 +119,17 @@ class WorkQueueController extends AbstractController
                 'PMI ID',
                 'Last Name',
                 'First Name',
-                'Date of Birth',
-                'Consent Date'
+                'Date of Birth'
             ];
             foreach (self::$surveys as $survey => $label) {
                 $headers[] = $label . ' PPI Survey Complete';
                 $headers[] = $label . ' PPI Survey Completion Date';
             }
             $headers[] = 'Physical Measurements Status';
-            $headers[] = 'Biobank Samples';
-            $headers[] = 'Membership Tier';
-            $headers[] = 'Consent Status';
+            $headers[] = 'Biospecimens';
+            $headers[] = 'General Consent Status';
+            $headers[] = 'General Consent Date';
+            $headers[] = 'EHR Consent Status';
             $headers[] = 'Ethnicity';
             $headers[] = 'Race';
             $headers[] = 'Gender Identity';
@@ -140,7 +140,6 @@ class WorkQueueController extends AbstractController
                     $participant->lastName,
                     $participant->firstName,
                     date('m/d/Y', strtotime($participant->dateOfBirth)),
-                    date('m/d/Y', strtotime($participant->consentForStudyEnrollmentTime))
                 ];
                 foreach (self::$surveys as $survey => $label) {
                     $row[] = $participant->{"questionnaireOn{$survey}"} === 'SUBMITTED' ? 1 : 0;
@@ -152,8 +151,9 @@ class WorkQueueController extends AbstractController
                 }
                 $row[] = $participant->physicalMeasurementsStatus === 'SUBMITTED' ? 1 : 0;
                 $row[] = $participant->numBaselineSamplesArrived;
-                $row[] = $participant->membershipTier;
-                $row[] = $participant->consentForStudyEnrollment;
+                $row[] = $participant->consentForStudyEnrollment === 'SUBMITTED' ? 1 : 0;
+                $row[] = date('m/d/Y', strtotime($participant->consentForStudyEnrollmentTime));
+                $row[] = $participant->consentForElectronicHealthRecords === 'SUBMITTED' ? 1 : 0;
                 $row[] = $participant->ethnicity;
                 $row[] = $participant->race;
                 $row[] = $participant->genderIdentity;
