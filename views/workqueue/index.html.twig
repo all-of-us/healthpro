@@ -27,8 +27,8 @@
     <table class="table table-striped table-bordered table-small" id="workqueue" width="100%">
         <thead>
             <tr>
-                <th rowspan="2">Last Name</th>
-                <th rowspan="2">First Name</th>
+                <th rowspan="2" class="col-group-name">Last Name</th>
+                <th rowspan="2" class="col-group-name">First Name</th>
                 <th rowspan="2">Date of Birth</th>
                 <th colspan="{{ 2 * (surveys|length) }}" class="topheader multiheader-survey">PPI Survey Completion</th>
                 <th colspan="5" class="topheader multiheader-status">Status</th>
@@ -215,7 +215,7 @@ $(document).ready(function() {
             {
                 extend: 'colvis',
                 text: 'Columns <i class="fa fa-caret-down" aria-hidden="true"></i>',
-                columns: ':not(:first-child):not(:nth-child(2))'
+                columns: ':not(.col-group-name)'
             }
         ]
     });
