@@ -587,7 +587,7 @@ class DashboardController extends AbstractController
         foreach($metrics_keys as $index => $val) {
             if ($val == 'Participant') {
                 $eligible[] = 0;
-            } elseif ($val == 'Participant.consentForStudyEnrollment' || $val == 'Participant.consentForElectronicHealthRecords') {
+            } elseif ($val == 'Participant.consentForStudyEnrollment') {
                 $eligible[] = $completed[0] - $completed[$index];
             } else {
                 $eligible[] = $highest_consent - $completed[$index];
