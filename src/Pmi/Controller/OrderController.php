@@ -232,6 +232,7 @@ class OrderController extends AbstractController
             $app->abort(403);
         }
         if (!in_array('print', $order->getAvailableSteps())) {
+            // 404 because print is not a valid route for kit orders regardless of state
             $app->abort(404);
         }
         if (!$order->get('printed_ts')) {
@@ -275,7 +276,10 @@ class OrderController extends AbstractController
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
         if (!in_array('process', $order->getAvailableSteps())) {
-            $app->abort(403);
+            return $app->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
         }
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
@@ -315,7 +319,10 @@ class OrderController extends AbstractController
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
         if (!in_array('finalize', $order->getAvailableSteps())) {
-            $app->abort(403);
+            return $app->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
         }
         $finalizeForm = $order->createOrderForm('finalized', $app['form.factory']);
         $finalizeForm->handleRequest($request);
