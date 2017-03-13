@@ -141,6 +141,27 @@ class Order
         return $step;
     }
 
+    public function getAvailableSteps()
+    {
+        $columns = [
+            'print' => 'printed',
+            'collect' => 'collected',
+            'process' => 'processed',
+            'finalize' => 'finalized'
+        ];
+        if ($this->order['type'] === 'kit') {
+            unset($columns['print']);
+        }
+        $steps = [];
+        foreach ($columns as $name => $column) {
+            $steps[] = $name;
+            if (!$this->order["{$column}_ts"]) {
+                break;
+            }
+        }
+        return $steps;
+    }
+
     public function getOrderUpdateFromForm($set, $form)
     {
         $updateArray = [];
