@@ -5,18 +5,25 @@
         <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>{{ participant.shortId }}</small></h2>
     </div>
 
-    <dl class="dl-horizontal">
-        <dt>Name</dt>
-        <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-        <dt>Participant ID</dt>
-        <dd>{{ participant.id }}</dd>
-        <dt>Biobank ID</dt>
-        <dd>{{ participant.biobankId }}</dd>
-        <dt>DOB</dt>
-        <dd>{{ participant.dob|date('n/j/Y') }}</dd>
-        <dt>Gender Identity</dt>
-        <dd>{{ participant.genderIdentity }}</dd>
-    </dl>
+    <div class="row">
+        <div class="col-sm-6">
+            <dl class="dl-horizontal">
+                <dt>Name</dt>
+                <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
+                <dt>Participant ID</dt>
+                <dd>{{ participant.id }}</dd>
+                <dt>Biobank ID</dt>
+                <dd>{{ participant.biobankId }}</dd>
+                <dt>DOB</dt>
+                <dd>{{ participant.dob|date('n/j/Y') }}</dd>
+                <dt>Gender Identity</dt>
+                <dd>{{ participant.genderIdentity }}</dd>
+            </dl>
+        </div>
+        <div class="col-sm-6 text-center">
+            <svg id="participant-barcode"></svg>
+        </div>
+    </div>
     {% if participant.consentComplete %}
         <div class="row">
             <div class="col-sm-6">
@@ -122,6 +129,11 @@ $(document).ready(function() {
         $(this).hide();
         $('#evaluation-overflow').show();
         e.preventDefault();
+    });
+    JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
+        width: 2,
+        height: 50,
+        displayValue: true
     });
 });
 </script>

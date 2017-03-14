@@ -8,6 +8,7 @@
     "font-awesome": "^4.6.3",
     "bootstrap": "3.*",
     "eonasdan-bootstrap-datetimepicker": "^4.17.42",
-    "parsleyjs": "^2.5.0"
+    "parsleyjs": "^2.5.0",
+    "JsBarcode": "jsbarcode#^3.5.8"
   }
 }
