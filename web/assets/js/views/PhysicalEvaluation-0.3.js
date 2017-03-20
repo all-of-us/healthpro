@@ -388,6 +388,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                     var input = $(e.currentTarget);
                     new PmiConfirmModal({
                         msg: warning.message,
+                        isHTML: true,
                         onFalse: function() {
                             input.val('');
                             input.focus();
@@ -418,6 +419,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 if (!warning.consecutive && self.warningConditionMet(warning, val)) {
                     if (warning.alert) {
                         new PmiConfirmModal({
+                            isHTML: true,
                             msg: warning.message,
                             onFalse: function() {
                                 input.val('');
