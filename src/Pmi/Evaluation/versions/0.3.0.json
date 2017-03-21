@@ -177,6 +177,11 @@
             ]
         },
         {
+            "name": "blood-pressure-protocol-modification-notes",
+            "label": "Reason",
+            "replicates": 3
+        },
+        {
             "name": "pregnant",
             "label": "Is participant pregnant?",
             "options": {
@@ -284,6 +289,10 @@
             ]
         },
         {
+            "name": "height-protocol-modification-notes",
+            "label": "Reason"
+        },
+        {
             "name": "weight",
             "label": "Weight",
             "unit": "kg",
@@ -375,6 +384,10 @@
             ]
         },
         {
+            "name": "weight-protocol-modification-notes",
+            "label": "Reason"
+        },
+        {
             "name": "hip-circumference",
             "label": "Hip Circumference",
             "unit": "cm",
@@ -417,6 +430,11 @@
                     "message": "Please specify reason for protocol deviation in the Additional Notes section."
                 }
             ]
+        },
+        {
+            "name": "hip-circumference-protocol-modification-notes",
+            "label": "Reason",
+            "replicates": 3
         },
         {
             "name": "waist-circumference",
@@ -480,6 +498,11 @@
                     "message": "Please specify reason for protocol deviation in the Additional Notes section."
                 }
             ]
+        },
+        {
+            "name": "waist-circumference-protocol-modification-notes",
+            "label": "Reason",
+            "replicates": 3
         },
         {
             "name": "notes",
