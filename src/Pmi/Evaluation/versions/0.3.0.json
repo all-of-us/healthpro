@@ -195,7 +195,7 @@
         },
         {
             "name": "wheelchair",
-            "label": "Is participant wheelchair bound?",
+            "label": "Is participant wheelchair user?",
             "options": {
                 "No": false,
                 "Yes": true
