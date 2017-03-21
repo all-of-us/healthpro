@@ -41,8 +41,8 @@
                     "consecutive": 2
                 },
                 {
-                    "min": 70,
-                    "message": "Participant could be in a hypotensive crisis. Refer to your site's SOP.",
+                    "min": 100,
+                    "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
                     "alert": true,
                     "consecutive": 2
                 },
@@ -55,8 +55,8 @@
                     "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
                 },
                 {
-                    "min": 70,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure."
+                    "min": 100,
+                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
                 }
             ],
             "help": {
@@ -88,8 +88,8 @@
                     "consecutive": 2
                 },
                 {
-                    "min": 40,
-                    "message": "Participant could be in a hypotensive crisis. Refer to your site's SOP.",
+                    "min": 60,
+                    "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
                     "alert": true,
                     "consecutive": 2
                 },
@@ -102,8 +102,8 @@
                     "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
                 },
                 {
-                    "min": 40,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure."
+                    "min": 60,
+                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
                 }
             ],
             "help": {
@@ -119,23 +119,23 @@
             "warnings": [
                 {
                     "max": 100,
-                    "message": "Participant could be tachycardic and at risk for hypertensive crisis. Refer to your site's SOP for Immediate referral.",
+                    "message": "Participant could be at risk for hypertensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
                     "alert": true,
                     "consecutive": 2
                 },
                 {
-                    "min": 40,
-                    "message": "Participant could be bradycardic and at risk for hypotensive crisis. Refer to your site's SOP.",
+                    "min": 60,
+                    "message": "Participant could be at risk for hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
                     "alert": true,
                     "consecutive": 2
                 },
                 {
                     "max": 100,
-                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
                 },
                 {
-                    "min": 40,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure."
+                    "min": 60,
+                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability or if the participant's systolic blood pressure is < 90 mmHg."
                 }
             ],
             "help": {
