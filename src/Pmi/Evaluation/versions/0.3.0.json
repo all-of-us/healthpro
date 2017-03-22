@@ -3,25 +3,6 @@
     "template": "0.3",
     "fields": [
         {
-            "name": "blood-pressure-location",
-            "label": "Location",
-            "options": ["Right arm", "Left arm"],
-            "help": {
-                "caption": "Help text placeholder."
-            }
-        },
-        {
-            "name": "blood-pressure-arm-circumference",
-            "label": "Arm Circumference",
-            "help": {
-                "caption": "Help text placeholder."
-            },
-            "convert": "in",
-            "unit": "cm",
-            "decimals": 1,
-            "max": 100
-        },
-        {
             "name": "blood-pressure-systolic",
             "label": "Systolic",
             "unit": "mmHg",
