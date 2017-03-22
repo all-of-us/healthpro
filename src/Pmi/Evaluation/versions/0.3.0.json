@@ -195,7 +195,7 @@
         },
         {
             "name": "wheelchair",
-            "label": "Is participant wheelchair user?",
+            "label": "Is participant a wheelchair user?",
             "options": {
                 "No": false,
                 "Yes": true
@@ -243,7 +243,7 @@
                 "None": "",
                 "Height is more than measuring device range": "height-out-of-range",
                 "Hair style": "hair-style",
-                "Wheelchair-bound": "wheelchair-bound",
+                "Wheelchair user": "wheelchair-bound",
                 "Unable to stand in a straight position": "unable-to-stand-straight",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
@@ -334,7 +334,7 @@
                 "None": "",
                 "Weight is more than weight measuring range": "weight-out-of-range",
                 "Can't balance on scale": "cannot-balance-on-scale",
-                "Wheelchair-bound": "wheelchair-bound",
+                "Wheelchair user": "wheelchair-bound",
                 "Pregnancy": "pregnancy",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
