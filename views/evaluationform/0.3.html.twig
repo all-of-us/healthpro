@@ -42,7 +42,9 @@
                             </div>
                             <div class="modification-select" style="display:none">
                                 {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-protocol-modification'], i) }}
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-protocol-modification-notes'], i) }}
+                                <div class="modification-notes" style="display:none">
+                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-protocol-modification-notes'], i) }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -102,7 +104,9 @@
                     <div class="panel-body">
                         {{ metrics.form_row(evaluationForm, schema.fields['height']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['height-protocol-modification']) }}
-                        {{ metrics.form_row(evaluationForm, schema.fields['height-protocol-modification-notes']) }}
+                        <div class="modification-notes" style="display:none">
+                            {{ metrics.form_row(evaluationForm, schema.fields['height-protocol-modification-notes']) }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -112,7 +116,9 @@
                         {{ metrics.form_row(evaluationForm, schema.fields['weight']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-prepregnancy']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-protocol-modification']) }}
-                        {{ metrics.form_row(evaluationForm, schema.fields['weight-protocol-modification-notes']) }}
+                        <div class="modification-notes" style="display:none">
+                            {{ metrics.form_row(evaluationForm, schema.fields['weight-protocol-modification-notes']) }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,7 +165,9 @@
                             </div>
                             <div class="modification-select" style="display:none">
                                 {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference-protocol-modification'], i) }}
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference-protocol-modification-notes'], i) }}
+                                <div class="modification-notes" style="display:none">
+                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference-protocol-modification-notes'], i) }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -194,7 +202,9 @@
                             </div>
                             <div class="modification-select" style="display:none">
                                 {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference-protocol-modification'], i) }}
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference-protocol-modification-notes'], i) }}
+                                <div class="modification-notes" style="display:none">
+                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference-protocol-modification-notes'], i) }}
+                                </div>
                             </div>
                         </div>
                     </div>

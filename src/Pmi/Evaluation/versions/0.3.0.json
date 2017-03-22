@@ -172,7 +172,7 @@
                 },
                 {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
         },
@@ -285,7 +285,7 @@
                 },
                 {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
         },
@@ -381,7 +381,7 @@
                 },
                 {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
         },
@@ -430,7 +430,7 @@
                 },
                 {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
         },
@@ -499,7 +499,7 @@
                 },
                 {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
         },

@@ -461,6 +461,12 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 }
             });
         }
+        if (modification === 'other') {
+            block.find('.modification-notes').show();
+        } else {
+            block.find('.modification-notes').hide();
+            block.find('.modification-notes input').val('');
+        }
         this.triggerEqualize();
     },
     showModificationBlock: function(block) {
