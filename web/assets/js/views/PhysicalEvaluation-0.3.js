@@ -184,7 +184,8 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         }
     },
     handleHeightProtocol: function() {
-        if (this.$('#form_height-protocol-modification').val() == 'refusal') {
+        var selected = this.$('#form_height-protocol-modification').val();
+        if (selected === 'refusal') {
             this.$('#form_height').valChange('').attr('disabled', true);
             this.$('.field-height').next('.alt-units-block').hide();
         } else {
@@ -193,10 +194,16 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 this.$('.field-height').next('.alt-units-block').show();
             }
         }
+        if (selected === 'other') {
+            this.$('.field-height-protocol-modification-notes').parent().show();
+        } else {
+            this.$('.field-height-protocol-modification-notes').parent().hide();
+            this.$('#form_height-protocol-modification-notes').val('');
+        }
     },
     handleWeightProtocol: function() {
         var selected = this.$('#form_weight-protocol-modification').val();
-        if (selected == 'cannot-balance-on-scale' || selected == 'refusal') {
+        if (selected === 'cannot-balance-on-scale' || selected === 'refusal') {
             this.$('#form_weight').valChange('').attr('disabled', true);
             this.$('.field-weight').next('.alt-units-block').hide();
         } else {
@@ -204,6 +211,12 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 this.$('#form_weight').attr('disabled', false);
                 this.$('.field-weight').next('.alt-units-block').show();
             }
+        }
+        if (selected === 'other') {
+            this.$('.field-weight-protocol-modification-notes').parent().show();
+        } else {
+            this.$('.field-weight-protocol-modification-notes').parent().hide();
+            this.$('#form_weight-protocol-modification-notes').val('');
         }
     },
     toggleThirdReading: function(field) {
