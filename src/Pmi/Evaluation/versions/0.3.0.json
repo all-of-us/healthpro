@@ -179,7 +179,8 @@
         {
             "name": "blood-pressure-protocol-modification-notes",
             "label": "Reason",
-            "replicates": 3
+            "replicates": 3,
+            "type": "text"
         },
         {
             "name": "pregnant",
@@ -290,7 +291,8 @@
         },
         {
             "name": "height-protocol-modification-notes",
-            "label": "Reason"
+            "label": "Reason",
+            "type": "text"
         },
         {
             "name": "weight",
@@ -385,7 +387,8 @@
         },
         {
             "name": "weight-protocol-modification-notes",
-            "label": "Reason"
+            "label": "Reason",
+            "type": "text"
         },
         {
             "name": "hip-circumference",
@@ -434,7 +437,8 @@
         {
             "name": "hip-circumference-protocol-modification-notes",
             "label": "Reason",
-            "replicates": 3
+            "replicates": 3,
+            "type": "text"
         },
         {
             "name": "waist-circumference",
@@ -502,7 +506,8 @@
         {
             "name": "waist-circumference-protocol-modification-notes",
             "label": "Reason",
-            "replicates": 3
+            "replicates": 3,
+            "type": "text"
         },
         {
             "name": "notes",
