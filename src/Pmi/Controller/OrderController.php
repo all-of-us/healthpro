@@ -45,7 +45,7 @@ class OrderController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->consentComplete) {
+        if (!$participant->status) {
             $app->abort(403);
         }
         return $app['twig']->render('order-check.html.twig', [
@@ -59,7 +59,7 @@ class OrderController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->consentComplete) {
+        if (!$participant->status) {
             $app->abort(403);
         }
         $confirmForm = $app['form.factory']->createBuilder(FormType::class)

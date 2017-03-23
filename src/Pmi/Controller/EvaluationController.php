@@ -75,7 +75,7 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->consentComplete) {
+        if (!$participant->status) {
             $app->abort(403);
         }
         $evaluationService = new Evaluation();
