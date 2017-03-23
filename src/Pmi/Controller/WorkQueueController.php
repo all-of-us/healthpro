@@ -10,7 +10,6 @@ class WorkQueueController extends AbstractController
     protected static $name = 'workqueue';
     protected static $routes = [
         ['index', '/'],
-        ['data', '/data'],
         ['export', '/export.csv']
     ];
     protected static $filters = [
