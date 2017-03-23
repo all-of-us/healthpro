@@ -156,18 +156,19 @@ label.label-normal {
 /* Participant work queue */
 .topheader {
     border-bottom: 0 !important;
-    text-align: center;
+    font-style: italic;
 }
 .secondaryheader {
     border-top: 0 !important;
-    font-weight: normal;
-    text-align: center;
 }
 .multiheader-survey {
     background-color: #dde;
 }
 .multiheader-status {
     background-color: #eec;
+}
+.multiheader-demographics {
+    background-color: #ded;
 }
 
 /* Orders */

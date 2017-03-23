@@ -121,6 +121,39 @@ class RdrParticipants
         return $results;
     }
 
+    public function listParticipantSummaries($params)
+    {
+        $memcache = new \Memcache();
+        $memcacheKey = 'rdr_psumm_' . md5(serialize($params));
+        $contents = $memcache->get($memcacheKey);
+        if ($contents &&
+            ($responseObject = json_decode($contents)) &&
+            isset($responseObject->entry) &&
+            is_array($responseObject->entry)
+        ) {
+            $responseObject = json_decode($contents);
+        } else {
+            try {
+                $response = $this->getClient()->request('GET', 'ParticipantSummary', [
+                    'query' => $params
+                ]);
+            } catch (\Exception $e) {
+                throw new Exception\FailedRequestException();
+            }
+            $contents = $response->getBody()->getContents();
+            $responseObject = json_decode($contents);
+            if (!is_object($responseObject)) {
+                throw new Exception\InvalidResponseException();
+            }
+            if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
+                return [];
+            }
+            $memcache->set($memcacheKey, $contents, 0, 300);
+        }
+
+        return $responseObject->entry;
+    }
+
     public function getById($id)
     {
         $memcache = new \Memcache();

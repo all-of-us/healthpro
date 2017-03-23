@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Twig_SimpleFilter;
 use Twig_SimpleFunction;
 
 abstract class AbstractApplication extends Application
@@ -370,6 +371,11 @@ abstract class AbstractApplication extends Application
         // Register custom Twig path_exists function
         $this['twig']->addFunction(new Twig_SimpleFunction('path_exists', function($name) {
             return !is_null($this['routes']->get($name));
+        }));
+
+        // Register custom Twig display_code filter
+        $this['twig']->addFilter(new Twig_SimpleFilter('display_code', function($text) {
+            return ucwords(strtolower(str_replace('_', ' ', $text)));
         }));
 
         // Register custom Twig cache

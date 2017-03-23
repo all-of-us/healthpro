@@ -5,11 +5,6 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Pmi\Audit\Log;
 
-class PhoneNumber extends \Faker\Provider\en_US\PhoneNumber
-{
-    protected static $formats = ['{{areaCode}}-{{exchangeCode}}-####'];
-}
-
 class WorkQueueController extends AbstractController
 {
     protected static $name = 'workqueue';
@@ -60,129 +55,36 @@ class WorkQueueController extends AbstractController
                 'White' => 'WHITE',
                 'Other race' => 'OTHER_RACE'
             ]
-        ],
-        'ppi' => [
-            'label' => 'PPI Surveys Completed',
-            'options' => [
-                'None' => 'NONE',
-                'Some' => 'SOME',
-                'All' => 'ALL'
-            ]
-        ],
-        'biobank' => [
-            'label' => 'Biospecimens banked',
-            'options' => [
-                'None' => 'NONE',
-                'Some' => 'SOME',
-                'All' => 'ALL'
-            ]
         ]
     ];
     protected static $surveys = [
-        'Sociodemographics' => 'Demo',
+        'Sociodemographics' => 'Basics',
         'MedicalHistory' => 'Hist',
         'Medications' => 'Meds',
         'OverallHealth' => 'Health',
-        'PersonalHabits' => 'Habits',
+        'PersonalHabits' => 'Lifestyle',
         'FamilyHealth' => 'Family',
-        'HealthcareAccess' => 'Access',
-        'Sleep' => 'Sleep'
+        'HealthcareAccess' => 'Access'
     ];
 
-    // This will be replaced with an RDR Participant Summary API call when available
-    protected function participantSummarySearch($params)
+    protected function participantSummarySearch($params, $app)
     {
+        // TODO: map site to organization
+        $params['hpoId'] = 'PITT';
+        $summaries = $app['pmi.drc.participants']->listParticipantSummaries($params);
         $results = [];
-        $faker = \Faker\Factory::create();
-        $faker->addProvider(new PhoneNumber($faker));
-        $count = 100 + rand(0,20);
-        if (isset($params['age'])) {
-            $count = round($count * 0.3);
-        }
-        if (isset($params['gender'])) {
-            $count = round($count * 0.5);
-        }
-        if (isset($params['ethnicity'])) {
-            $count = round($count * 0.5);
-        }
-        if (isset($params['race'])) {
-            $count = round($count * 0.5);
-        }
-        if (isset($params['biobank'])) {
-            $count = round($count * 0.3);
-        }
-        if (isset($params['ppi'])) {
-            $count = round($count * 0.3);
-        }
-        for ($i = 0; $i < $count; $i++) {
-            $biobankStatus = $faker->randomElement([0,0,0,0,1,2,3,4,5,6,7,7,7,7,7,7]);
-            if (isset($params['biobank'])) {
-                switch ($params['biobank']) {
-                    case 'ALL':
-                        $biobankStatus = 7;
-                        break;
-                    case 'SOME':
-                        $biobankStatus = $faker->numberBetween(1,6);
-                        break;
-                    default:
-                        $biobankStatus = 0;
-                }
+        foreach ($summaries as $summary) {
+            if (isset($summary->resource)) {
+                $results[] = $summary->resource;
             }
-            $physicalStatus = $faker->boolean(50) ? 'SUBMITTED' : 'UNSET';
-            if (isset($params['gender'])) {
-                if ($params['gender'] === 'MALE') {
-                    $firstName = $faker->firstNameMale;
-                } elseif ($params['gender'] === 'FEMALE') {
-                    $firstName = $faker->firstNameFemale;
-                } else {
-                    $firstName = $faker->firstName;
-                }
-            } else {
-                $firstName = $faker->firstName;
-            }
-            $withdrawalStatus = $faker->randomElement(array_merge(
-                array_fill(0, 16, 'Enrolled'),
-                [
-                    'Suspension - No Contact',
-                    'Suspension - No Access',
-                    'Withdrawal - No Use',
-                    'Withdrawal - No Use After Death'
-                ]
-            ));
-            $row = [
-                'firstName' => $firstName,
-                'lastName' => $faker->unique()->lastName,
-                'preferredContact' => $withdrawalStatus === 'Enrolled' ? $faker->randomElement(['EMAIL', 'EMAIL', 'EMAIL', 'PHONE', 'PHONE', 'MAIL', 'NO_CONTACT']) : 'NO_CONTACT',
-                'phoneNumber' => $withdrawalStatus === 'Enrolled' ? $faker->phoneNumber : '',
-                'emailAddress' => $withdrawalStatus === 'Enrolled' ? $faker->safeEmail : '',
-                'mailingAddress' => $withdrawalStatus === 'Enrolled' ? $faker->address : '',
-                'physicalEvaluationStatus' => $physicalStatus,
-                'biobankStatus' => $biobankStatus,
-                'withdrawalStatus' => $withdrawalStatus,
-                'pmiId' => 'P' . $faker->randomNumber(9),
-                'consentDate' => $faker->dateTimeBetween('-1 year', 'now')
-            ];
-            foreach (array_keys(self::$surveys) as $survey) {
-                if (isset($params['ppi']) && $params['ppi'] === 'NONE') {
-                    $row["questionnaireOn{$survey}"] = 'UNSET';
-                } elseif (isset($params['ppi']) && $params['ppi'] === 'ALL') {
-                    $row["questionnaireOn{$survey}"] = 'SUBMITTED';
-                } else {
-                    $row["questionnaireOn{$survey}"] = $faker->boolean(70) ? 'SUBMITTED' : 'UNSET';
-                }
-            }
-            $results[] = $row;
         }
-        usort($results, function($a, $b) {
-            return strcasecmp($a['lastName'], $b['lastName']);
-        });
         return $results;
     }
 
     public function indexAction(Application $app, Request $request)
     {
         $params = array_filter($request->query->all());
-        $participants = $this->participantSummarySearch($params);
+        $participants = $this->participantSummarySearch($params, $app);
         return $app['twig']->render('workqueue/index.html.twig', [
             'filters' => self::$filters,
             'surveys' => self::$surveys,
@@ -194,7 +96,7 @@ class WorkQueueController extends AbstractController
     public function exportAction(Application $app, Request $request)
     {
         $params = array_filter($request->query->all());
-        $participants = $this->participantSummarySearch($params);
+        $participants = $this->participantSummarySearch($params, $app);
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
             fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
@@ -203,36 +105,44 @@ class WorkQueueController extends AbstractController
                 'PMI ID',
                 'Last Name',
                 'First Name',
-                'Preferred Contact Method',
-                'Phone Number',
-                'Email Address',
-                'Mailing Address',
-                'Consent Date'
+                'Date of Birth'
             ];
             foreach (self::$surveys as $survey => $label) {
-                $headers[] = $label . ' PPI Survey Completion';
+                $headers[] = $label . ' PPI Survey Complete';
+                $headers[] = $label . ' PPI Survey Completion Date';
             }
             $headers[] = 'Physical Measurements Status';
-            $headers[] = 'Biobank Samples';
-            $headers[] = 'Withdrawal Status';
+            $headers[] = 'Biospecimens';
+            $headers[] = 'General Consent Status';
+            $headers[] = 'General Consent Date';
+            $headers[] = 'EHR Consent Status';
+            $headers[] = 'Ethnicity';
+            $headers[] = 'Race';
+            $headers[] = 'Gender Identity';
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
                 $row = [
-                    $participant['pmiId'],
-                    $participant['lastName'],
-                    $participant['firstName'],
-                    $participant['preferredContact'],
-                    $participant['phoneNumber'],
-                    $participant['emailAddress'],
-                    str_replace("\n", ', ', trim($participant['mailingAddress'])),
-                    $participant['consentDate']->format('m/d/Y')
+                    $participant->participantId,
+                    $participant->lastName,
+                    $participant->firstName,
+                    date('m/d/Y', strtotime($participant->dateOfBirth)),
                 ];
                 foreach (self::$surveys as $survey => $label) {
-                    $row[] = $participant["questionnaireOn{$survey}"] === 'SUBMITTED' ? 1 : 0;
+                    $row[] = $participant->{"questionnaireOn{$survey}"} === 'SUBMITTED' ? 1 : 0;
+                    if (isset($participant->{"questionnaireOn{$survey}Time"})) {
+                        $row[] = date('m/d/Y', strtotime($participant->{"questionnaireOn{$survey}Time"}));
+                    } else {
+                        $row[] = '';
+                    }
                 }
-                $row[] = $participant['physicalEvaluationStatus'] === 'SUBMITTED' ? 1 : 0;
-                $row[] = $participant['biobankStatus'];
-                $row[] = $participant['withdrawalStatus'];
+                $row[] = $participant->physicalMeasurementsStatus === 'SUBMITTED' ? 1 : 0;
+                $row[] = $participant->numBaselineSamplesArrived;
+                $row[] = $participant->consentForStudyEnrollment === 'SUBMITTED' ? 1 : 0;
+                $row[] = date('m/d/Y', strtotime($participant->consentForStudyEnrollmentTime));
+                $row[] = $participant->consentForElectronicHealthRecords === 'SUBMITTED' ? 1 : 0;
+                $row[] = $participant->ethnicity;
+                $row[] = $participant->race;
+                $row[] = $participant->genderIdentity;
                 fputcsv($output, $row);
             }
             fwrite($output, "\"\"\n");
