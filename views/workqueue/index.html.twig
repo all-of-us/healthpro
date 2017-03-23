@@ -36,11 +36,6 @@
                 <th colspan="3" class="topheader multiheader-demographics">Demographics</th>
             </tr>
             <tr>
-                {#
-                <th class="col-group-name">Last Name</th>
-                <th class="col-group-name">First Name</th>
-                <th>Date of Birth</th>
-                #}
                 {% for field, label in surveys %}
                     <th class="secondaryheader col-group-ppi multiheader-survey">{{ label }}</th>
                     <th class="secondaryheader col-group-ppi-time multiheader-survey">{{ label }} Date</th>
@@ -134,9 +129,6 @@ $(document).ready(function() {
     });
     var table = $('#workqueue').DataTable({
         dom: 'lBrtip',
-        //processing: true,
-        //serverSide: true,
-        //ajax: {{ path('workqueue_data')|json_encode|raw }},
         columns: [
             { name: 'lastName' },
             { name: 'firstName' },

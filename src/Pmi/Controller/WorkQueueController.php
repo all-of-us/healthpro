@@ -82,19 +82,6 @@ class WorkQueueController extends AbstractController
         return $results;
     }
 
-    public function dataAction(Application $app, Request $request)
-    {
-        return $app->json([
-            'draw' => (int)$request->get('draw'),
-            'data' => [
-                [
-                    'test',
-                    'test2'
-                ]
-            ]
-        ]);
-    }
-
     public function indexAction(Application $app, Request $request)
     {
         $params = array_filter($request->query->all());
