@@ -38,10 +38,10 @@ class RdrParticipants
         } else {
             return false;
         }
-        if (isset($participant->membershipTier) && in_array($participant->membershipTier, ['VOLUNTEER', 'ENROLLEE', 'FULL_PARTICIPANT'])) {
-            $consentStatus = true;
+        if (!empty($participant->questionnaireOnSociodemographics) & $participant->questionnaireOnSociodemographics === 'SUBMITTED') {
+            $status = true;
         } else {
-            $consentStatus = true; // TODO - not sure where we will end up with membership tier. For now, treat all as consented
+            $status = false;
         }
         switch ($participant->genderIdentity) {
             case 'FEMALE':
@@ -66,7 +66,7 @@ class RdrParticipants
             'genderIdentity' => $genderIdentity,
             'gender' => $gender,
             'zip' => $participant->zipCode,
-            'consentComplete' => $consentStatus
+            'status' => $status
         ]);
     }
 
