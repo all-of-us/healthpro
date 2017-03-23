@@ -153,9 +153,15 @@
                 },
                 {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
+        },
+        {
+            "name": "blood-pressure-protocol-modification-notes",
+            "label": "Reason",
+            "replicates": 3,
+            "type": "text"
         },
         {
             "name": "pregnant",
@@ -260,9 +266,14 @@
                 },
                 {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
+        },
+        {
+            "name": "height-protocol-modification-notes",
+            "label": "Reason",
+            "type": "text"
         },
         {
             "name": "weight",
@@ -351,9 +362,14 @@
                 },
                 {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
+        },
+        {
+            "name": "weight-protocol-modification-notes",
+            "label": "Reason",
+            "type": "text"
         },
         {
             "name": "hip-circumference",
@@ -395,9 +411,15 @@
                 },
                 {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
+        },
+        {
+            "name": "hip-circumference-protocol-modification-notes",
+            "label": "Reason",
+            "replicates": 3,
+            "type": "text"
         },
         {
             "name": "waist-circumference",
@@ -458,9 +480,15 @@
                 },
                 {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
+        },
+        {
+            "name": "waist-circumference-protocol-modification-notes",
+            "label": "Reason",
+            "replicates": 3,
+            "type": "text"
         },
         {
             "name": "notes",

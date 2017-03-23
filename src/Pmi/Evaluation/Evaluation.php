@@ -7,6 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
@@ -130,7 +131,7 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } elseif (!isset($field->options) && $type != 'checkbox' && $type != 'textarea') {
+            } elseif (!isset($field->options) && !in_array($type, ['checkbox', 'text', 'textarea'])) {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
@@ -151,6 +152,9 @@ class Evaluation
                 unset($options['scale']);
                 $class = TextareaType::class;
                 $attributes['rows'] = 4;
+            } elseif ($type == 'text') {
+                unset($options['scale']);
+                $class = TextType::class;
             } else {
                 $class = NumberType::class;
             }
