@@ -22,16 +22,31 @@
     {% if not form[name].vars.disabled and definition.alternateunits is defined and definition.alternateunits %}
         <div class="alt-units-block">
             <div class="alt-units-toggle" style="margin-top: -15px;">
-                <p class="text-right"><a class="small">Enter in {{ definition.unit == 'cm' ? 'inches' : 'pounds' }} (value will be stored in {{ definition.unit }})</a></p>
+                <p class="text-right"><a class="small">Enter in {{ definition.unit == 'cm' ? 'feet & inches' : 'pounds' }} (value will be stored in {{ definition.unit }})</a></p>
             </div>
-            <div class="alt-units-field form-group" style="display:none; margin-top:15px;">
-                <label for="alt-units-{{ name }}">Enter in {{ definition.unit == 'cm' ? 'inches' : 'pounds' }} (value will be stored in {{ definition.unit }})</label>
-                <div class="input-group">
-                    <input type="text" id="alt-units-{{ name }}" class="form-control">
-                    <div class="input-group-addon">{{ definition.unit == 'cm' ? 'in' : 'lb' }}</div>
+            {% if definition.unit == 'cm' %}
+                <div class="alt-units-field form-group" style="display:none; margin-top:15px;">
+                    <label for="alt-units-{{ name }}">Enter in feet & inches (value will be stored in {{ definition.unit }})</label>
+                    <div class="input-group col-md-5">
+                        <input type="text" id="alt-units-{{ name }}-ft" class="form-control">
+                        <div class="input-group-addon">ft</div>
+                    </div>
+                    <div class="input-group col-md-5" style="float:right; margin-top:-34px;">
+                        <input type="text" id="alt-units-{{ name }}-in" class="form-control">
+                        <div class="input-group-addon">in</div>
+                    </div>
+                    <p class="text-right"><a class="small">Cancel</a></p>
                 </div>
-                <p class="text-right"><a class="small">Cancel</a></p>
-            </div>
+            {% else %}
+                <div class="alt-units-field form-group" style="display:none; margin-top:15px;">
+                    <label for="alt-units-{{ name }}">Enter in pounds (value will be stored in {{ definition.unit }})</label>
+                    <div class="input-group">
+                        <input type="text" id="alt-units-{{ name }}" class="form-control">
+                        <div class="input-group-addon">lb</div>
+                    </div>
+                    <p class="text-right"><a class="small">Cancel</a></p>
+                </div>
+            {% endif %}
         </div>
     {% endif %}
 {% endmacro %}
