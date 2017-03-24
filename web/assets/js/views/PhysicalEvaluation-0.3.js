@@ -287,9 +287,6 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     inToCm: function(inches) {
         return (parseFloat(inches) / 0.3937).toFixed(1);
     },
-    ftToCm: function(ft) {
-        return (parseFloat(ft) * 30.48).toFixed(1);
-    },
     convert: function(type, val) {
         switch (type) {
             case 'in':
@@ -544,22 +541,33 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     convertAltUnits: function(e) {
         var block = $(e.currentTarget).closest('.alt-units-field');
         var type = block.find('label').attr('for');
+        var val;
         if (type == 'alt-units-height') {
-            var val1 = $('#'+type+'-ft').val() ? this.ftToCm($('#'+type+'-ft').val()) : 0;
-            var val2 = $('#'+type+'-in').val() ? this.inToCm($('#'+type+'-in').val()) : 0;
-            var val = (parseFloat(val1)+parseFloat(val2)).toFixed(1);
+            var inches = 0;
+            if (parseFloat($('#alt-units-height-ft').val())) {
+                inches += 12*parseFloat($('#alt-units-height-ft').val());
+            }
+            if (parseFloat($('#alt-units-height-in').val())) {
+                inches += parseFloat($('#alt-units-height-in').val());
+            }
+            val = this.inToCm(inches);
         } else {
-            var val = block.find('input').val();
+            var unit = block.find('.input-group-addon').text();
+            val = block.find('input').val();
+            if (unit == 'in') {
+                val = this.inToCm(val);
+            } else if (unit == 'lb') {
                 val = this.lbToKg(val);
-            if (isNaN(val)) {
-                val = '';
-            }            
+            }
         }
+        if (isNaN(val)) {
+            val = '';
+        }
+        var input = block.parent().prev().find('input');
+        input.val(val);
         if (e.type == 'change') {
-            block.parent().prev().find('input').val(val);
             block.parent().prev().find('input').change(); // trigger change even if not different
-        } else {
-            block.parent().prev().find('input').val(val);
+            block.parent().prev().find('input').parsley().validate(); // trigger parsley validation
         }
     },
     initialize: function(obj) {

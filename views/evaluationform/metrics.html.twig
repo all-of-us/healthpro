@@ -1,4 +1,5 @@
 {% macro form_row(form, definition) %}
+    {% import _self as self %}
     {% set name = definition.name %}
     <div data-field="{{ name }}" class="field field-{{ name }} form-group{% if not form[name].vars.valid %} has-error{% endif %}">
         {{ form_label(form[name]) }}
@@ -20,38 +21,12 @@
     </div>
 
     {% if not form[name].vars.disabled and definition.alternateunits is defined and definition.alternateunits %}
-        <div class="alt-units-block">
-            <div class="alt-units-toggle" style="margin-top: -15px;">
-                <p class="text-right"><a class="small">Enter in {{ definition.unit == 'cm' ? 'feet &amp; inches' : 'pounds' }} (value will be stored in {{ definition.unit }})</a></p>
-            </div>
-            {% if definition.unit == 'cm' %}
-                <div class="alt-units-field form-group" style="display:none; margin-top:15px;">
-                    <label for="alt-units-{{ name }}">Enter in feet &amp; inches (value will be stored in {{ definition.unit }})</label>
-                    <div class="input-group col-md-5">
-                        <input type="text" id="alt-units-{{ name }}-ft" class="form-control">
-                        <div class="input-group-addon">ft</div>
-                    </div>
-                    <div class="input-group col-md-5" style="float:right; margin-top:-34px;">
-                        <input type="text" id="alt-units-{{ name }}-in" class="form-control">
-                        <div class="input-group-addon">in</div>
-                    </div>
-                    <p class="text-right"><a class="small">Cancel</a></p>
-                </div>
-            {% else %}
-                <div class="alt-units-field form-group" style="display:none; margin-top:15px;">
-                    <label for="alt-units-{{ name }}">Enter in pounds (value will be stored in {{ definition.unit }})</label>
-                    <div class="input-group">
-                        <input type="text" id="alt-units-{{ name }}" class="form-control">
-                        <div class="input-group-addon">lb</div>
-                    </div>
-                    <p class="text-right"><a class="small">Cancel</a></p>
-                </div>
-            {% endif %}
-        </div>
+        {{ self.form_row_alternate_units(definition, name) }}
     {% endif %}
 {% endmacro %}
 
 {% macro form_row_replicate(form, definition, i) %}
+    {% import _self as self %}
     {% set name = definition.name %}
     <div data-field="{{ name }}" data-replicate="{{ i + 1 }}" class="field field-{{ name }} form-group{% if not form[name][i].vars.valid %} has-error{% endif %}">
         {{ form_label(form[name][i]) }}
@@ -65,4 +40,50 @@
         {% endif %}
         {{ form_errors(form[name][i]) }}
     </div>
+
+    {% if not form[name].vars.disabled and definition.alternateunits is defined and definition.alternateunits %}
+        {{ self.form_row_alternate_units(definition, name) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro form_row_alternate_units(definition, name) %}
+    {% if definition.convert in ['in', 'lb', 'ftin'] %}
+        {% if definition.convert == 'in' %}
+            {% set label = 'inches' %}
+        {% elseif definition.convert == 'lb' %}
+            {% set label = 'pounds' %}
+        {% elseif definition.convert == 'ftin' %}
+            {% set label = 'feet & inches' %}
+        {% endif %}
+        <div class="alt-units-block">
+            <div class="alt-units-toggle" style="margin-top: -15px;">
+                <p class="text-right"><a class="small">Enter in {{ label }} (value will be stored in {{ definition.unit }})</a></p>
+            </div>
+            <div class="alt-units-field form-group" style="display:none; margin-top:15px;">
+                <label for="alt-units-{{ name }}">Enter in {{ label }} (value will be stored in {{ definition.unit }})</label>
+                {% if definition.convert == 'ftin' %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" id="alt-units-{{ name }}-ft" class="form-control">
+                                <div class="input-group-addon">ft</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" id="alt-units-{{ name }}-in" class="form-control">
+                                <div class="input-group-addon">in</div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="input-group">
+                        <input type="text" id="alt-units-{{ name }}" class="form-control">
+                        <div class="input-group-addon">{{ definition.convert }}</div>
+                    </div>
+                {% endif %}
+                <p class="text-right"><a class="small">Cancel</a></p>
+            </div>
+        </div>
+    {% endif %}
 {% endmacro %}
