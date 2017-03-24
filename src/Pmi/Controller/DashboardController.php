@@ -538,7 +538,7 @@ class DashboardController extends AbstractController
             'PPI Module: Overall Health',
             'PPI Module: Medical History',
             'Physical Measurements',
-            'Sample Collection'
+            'Samples Received'
         );
 
         foreach ($metrics_keys as $index => $metric_val) {
