@@ -563,11 +563,11 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         if (isNaN(val)) {
             val = '';
         }
+        var input = block.parent().prev().find('input');
+        input.val(val);
         if (e.type == 'change') {
-            block.parent().prev().find('input').val(val);
             block.parent().prev().find('input').change(); // trigger change even if not different
-        } else {
-            block.parent().prev().find('input').val(val);
+            block.parent().prev().find('input').parsley().validate(); // trigger parsley validation
         }
     },
     initialize: function(obj) {
