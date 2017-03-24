@@ -552,7 +552,13 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             }
             val = this.inToCm(inches);
         } else {
-            val = this.lbToKg(block.find('input').val());
+            var unit = block.find('.input-group-addon').text();
+            val = block.find('input').val();
+            if (unit == 'in') {
+                val = this.inToCm(val);
+            } else if (unit == 'lb') {
+                val = this.lbToKg(val);
+            }
         }
         if (isNaN(val)) {
             val = '';

@@ -26,6 +26,7 @@
 {% endmacro %}
 
 {% macro form_row_replicate(form, definition, i) %}
+    {% import _self as self %}
     {% set name = definition.name %}
     <div data-field="{{ name }}" data-replicate="{{ i + 1 }}" class="field field-{{ name }} form-group{% if not form[name][i].vars.valid %} has-error{% endif %}">
         {{ form_label(form[name][i]) }}
@@ -39,6 +40,10 @@
         {% endif %}
         {{ form_errors(form[name][i]) }}
     </div>
+
+    {% if not form[name].vars.disabled and definition.alternateunits is defined and definition.alternateunits %}
+        {{ self.form_row_alternate_units(definition, name) }}
+    {% endif %}
 {% endmacro %}
 
 {% macro form_row_alternate_units(definition, name) %}
