@@ -287,6 +287,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     inToCm: function(inches) {
         return (parseFloat(inches) / 0.3937).toFixed(1);
     },
+    ftToCm: function(ft) {
+        return (parseFloat(ft) * 30.48).toFixed(1);
+    },
     convert: function(type, val) {
         switch (type) {
             case 'in':
@@ -539,22 +542,24 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         this.triggerEqualize();
     },
     convertAltUnits: function(e) {
-        var block = $(e.currentTarget).closest('.alt-units-block');
-        var val = block.find('.alt-units-field input').val();
-        var unit = block.find('.input-group-addon').text();
-        if (unit == 'in') {
-            val = this.inToCm(val);
+        var block = $(e.currentTarget).closest('.alt-units-field');
+        var type = block.find('label').attr('for');
+        if (type == 'alt-units-height') {
+            var val1 = $('#'+type+'-ft').val() ? this.ftToCm($('#'+type+'-ft').val()) : 0;
+            var val2 = $('#'+type+'-in').val() ? this.inToCm($('#'+type+'-in').val()) : 0;
+            var val = (parseFloat(val1)+parseFloat(val2)).toFixed(1);
         } else {
-            val = this.lbToKg(val);
-        }
-        if (isNaN(val)) {
-            val = '';
+            var val = block.find('input').val();
+                val = this.lbToKg(val);
+            if (isNaN(val)) {
+                val = '';
+            }            
         }
         if (e.type == 'change') {
-            block.prev().find('input').val(val);
-            block.prev().find('input').change(); // trigger change even if not different
+            block.parent().prev().find('input').val(val);
+            block.parent().prev().find('input').change(); // trigger change even if not different
         } else {
-            block.prev().find('input').val(val);
+            block.parent().prev().find('input').val(val);
         }
     },
     initialize: function(obj) {
