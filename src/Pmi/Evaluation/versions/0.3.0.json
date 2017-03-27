@@ -3,25 +3,6 @@
     "template": "0.3",
     "fields": [
         {
-            "name": "blood-pressure-location",
-            "label": "Location",
-            "options": ["Right arm", "Left arm"],
-            "help": {
-                "caption": "Help text placeholder."
-            }
-        },
-        {
-            "name": "blood-pressure-arm-circumference",
-            "label": "Arm Circumference",
-            "help": {
-                "caption": "Help text placeholder."
-            },
-            "convert": "in",
-            "unit": "cm",
-            "decimals": 1,
-            "max": 100
-        },
-        {
             "name": "blood-pressure-systolic",
             "label": "Systolic",
             "unit": "mmHg",
@@ -41,8 +22,8 @@
                     "consecutive": 2
                 },
                 {
-                    "min": 70,
-                    "message": "Participant could be in a hypotensive crisis. Refer to your site's SOP.",
+                    "min": 100,
+                    "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
                     "alert": true,
                     "consecutive": 2
                 },
@@ -55,8 +36,8 @@
                     "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
                 },
                 {
-                    "min": 70,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure."
+                    "min": 100,
+                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
                 }
             ],
             "help": {
@@ -88,8 +69,8 @@
                     "consecutive": 2
                 },
                 {
-                    "min": 40,
-                    "message": "Participant could be in a hypotensive crisis. Refer to your site's SOP.",
+                    "min": 60,
+                    "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
                     "alert": true,
                     "consecutive": 2
                 },
@@ -102,8 +83,8 @@
                     "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
                 },
                 {
-                    "min": 40,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure."
+                    "min": 60,
+                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
                 }
             ],
             "help": {
@@ -119,23 +100,23 @@
             "warnings": [
                 {
                     "max": 100,
-                    "message": "Participant could be tachycardic and at risk for hypertensive crisis. Refer to your site's SOP for Immediate referral.",
+                    "message": "Participant could be at risk for hypertensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
                     "alert": true,
                     "consecutive": 2
                 },
                 {
-                    "min": 40,
-                    "message": "Participant could be bradycardic and at risk for hypotensive crisis. Refer to your site's SOP.",
+                    "min": 60,
+                    "message": "Participant could be at risk for hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
                     "alert": true,
                     "consecutive": 2
                 },
                 {
                     "max": 100,
-                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
                 },
                 {
-                    "min": 40,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure."
+                    "min": 60,
+                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability or if the participant's systolic blood pressure is < 90 mmHg."
                 }
             ],
             "help": {
@@ -158,6 +139,7 @@
             "options": {
                 "None": "",
                 "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
                 "Other": "other"
             },
             "warnings": [
@@ -166,10 +148,20 @@
                     "message": "Deviation successfully captured."
                 },
                 {
+                    "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
+        },
+        {
+            "name": "blood-pressure-protocol-modification-notes",
+            "label": "Reason",
+            "replicates": 3,
+            "type": "text"
         },
         {
             "name": "pregnant",
@@ -190,7 +182,7 @@
         },
         {
             "name": "wheelchair",
-            "label": "Is participant wheelchair bound?",
+            "label": "Is participant a wheelchair user?",
             "options": {
                 "No": false,
                 "Yes": true
@@ -212,6 +204,7 @@
             "decimals": 1,
             "max": 300,
             "convert": "ftin",
+            "alternateunits": true,
             "help": {
                 "image": "height.png"
             },
@@ -237,9 +230,10 @@
                 "None": "",
                 "Height is more than measuring device range": "height-out-of-range",
                 "Hair style": "hair-style",
-                "Wheelchair-bound": "wheelchair-bound",
+                "Wheelchair user": "wheelchair-bound",
                 "Unable to stand in a straight position": "unable-to-stand-straight",
                 "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
                 "Other": "other"
             },
             "help": {
@@ -267,10 +261,19 @@
                     "message": "Deviation successfully captured."
                 },
                 {
+                    "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
+        },
+        {
+            "name": "height-protocol-modification-notes",
+            "label": "Reason",
+            "type": "text"
         },
         {
             "name": "weight",
@@ -289,6 +292,7 @@
                 }
             ],
             "convert": "lb",
+            "alternateunits": true,
             "help": {
                 "caption": "Help text placeholder."
             }
@@ -310,6 +314,7 @@
                 }
             ],
             "convert": "lb",
+            "alternateunits": true,
             "help": {
                 "caption": "Help text placeholder."
             }
@@ -321,9 +326,10 @@
                 "None": "",
                 "Weight is more than weight measuring range": "weight-out-of-range",
                 "Can't balance on scale": "cannot-balance-on-scale",
-                "Wheelchair-bound": "wheelchair-bound",
+                "Wheelchair user": "wheelchair-bound",
                 "Pregnancy": "pregnancy",
                 "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
                 "Other": "other"
             },
             "help": {
@@ -351,15 +357,25 @@
                     "message": "Deviation successfully captured."
                 },
                 {
+                    "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
+        },
+        {
+            "name": "weight-protocol-modification-notes",
+            "label": "Reason",
+            "type": "text"
         },
         {
             "name": "hip-circumference",
             "label": "Hip Circumference",
             "unit": "cm",
+            "alternateunits": true,
             "decimals": 1,
             "replicates": 3,
             "max": 300,
@@ -382,6 +398,7 @@
             "options": {
                 "None": "",
                 "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
                 "Other": "other"
             },
             "warnings": [
@@ -390,15 +407,26 @@
                     "message": "Deviation successfully captured."
                 },
                 {
+                    "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
+        },
+        {
+            "name": "hip-circumference-protocol-modification-notes",
+            "label": "Reason",
+            "replicates": 3,
+            "type": "text"
         },
         {
             "name": "waist-circumference",
             "label": "Waist Circumference",
             "unit": "cm",
+            "alternateunits": true,
             "decimals": 1,
             "replicates": 3,
             "max": 300,
@@ -433,6 +461,7 @@
                 "None": "",
                 "Colostomy bag": "colostomy-bag",
                 "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
                 "Other": "other"
             },
             "help": {
@@ -448,10 +477,20 @@
                     "message": "Deviation successfully captured."
                 },
                 {
+                    "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
                     "val": "other",
-                    "message": "Please specify reason for protocol deviation in the Additional Notes section."
+                    "message": "Please specify reason for protocol deviation."
                 }
             ]
+        },
+        {
+            "name": "waist-circumference-protocol-modification-notes",
+            "label": "Reason",
+            "replicates": 3,
+            "type": "text"
         },
         {
             "name": "notes",

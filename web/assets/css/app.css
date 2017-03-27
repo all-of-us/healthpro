@@ -103,12 +103,18 @@ label.label-normal {
     margin-right: -6px;
     margin-left: -6px;
 }
-#physicalEvaluation .row .col-sm-4 {
+#physicalEvaluation .row .col-sm-4,
+#physicalEvaluation .row .col-md-6 {
     padding-right: 6px;
     padding-left: 6px;
 }
 @media(max-width:767px) {
     #physicalEvaluation .row .col-sm-4 {
+        margin-bottom: 6px;
+    }
+}
+@media(max-width:991px) {
+    #physicalEvaluation .row .col-md-6 {
         margin-bottom: 6px;
     }
 }

@@ -16,6 +16,7 @@ var ASSETS = {
         BOWER_DIR + '/datatables.net-buttons/js/dataTables.buttons.js',
         BOWER_DIR + '/datatables.net-buttons/js/buttons.colVis.js',
         BOWER_DIR + '/datatables.net-buttons-bs/js/buttons.bootstrap.js',
+        BOWER_DIR + '/JsBarcode/dist/barcodes/JsBarcode.code128.min.js',
         ASSETS_DIR + '/js/parsley-comparison.js',
         ASSETS_DIR + '/js/bootstrap-session-timeout.js',
         ASSETS_DIR + '/js/app.js',
