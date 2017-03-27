@@ -12,10 +12,26 @@ class DashboardController extends AbstractController
 
     protected static $routes = [
         ['home', '/'],
+        ['view_raw_metrics', '/metrics'],
         ['metrics_load', '/metrics_load'],
         ['metrics_load_region', '/metrics_load_region'],
         ['metrics_load_lifecycle', '/metrics_load_lifecycle'],
     ];
+
+    public function view_raw_metricsAction(Application $app, Request $request) {
+        $type = $request->get('type');
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
+        if ($type == 'fields') {
+            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+            $metrics = $metricsApi->metricsFields();
+        } else {
+            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+            $metrics = $metricsApi->metrics($start_date, $end_date);
+        }
+        return $app->json($metrics);
+    }
+
 
     public function homeAction(Application $app, Request $request)
     {
@@ -519,7 +535,6 @@ class DashboardController extends AbstractController
         $metrics_keys = array(
             'Participant',
             'Participant.consentForStudyEnrollment',
-            'Participant.consentForElectronicHealthRecords',
             'Participant.consentForStudyEnrollmentAndEHR',
             'Participant.questionnaireOnLifestyle',
             'Participant.questionnaireOnOverallHealth',
@@ -532,8 +547,7 @@ class DashboardController extends AbstractController
 
         $display_values = array(
             'Registered',
-            'Consent: Study Enrollment',
-            'Consent: EHR',
+            'Consent: Enrollment',
             'Consent: Complete',
             'PPI Module: Lifestyle',
             'PPI Module: Overall Health',
@@ -589,15 +603,13 @@ class DashboardController extends AbstractController
         // now that we have counts (in order), go back through to determine what the elibible numbers are
         // this is based off of external logic, so cannot be done while assembling counts
 
-        $completed_consent = $completed[3];
+        $completed_consent = $completed[2];
 
         foreach($metrics_keys as $index => $val) {
             if ($val == 'Participant') {
                 $eligible[] = 0;
             } elseif ($val == 'Participant.consentForStudyEnrollment') {
                 $eligible[] = $completed[0] - $completed[$index];
-            } elseif ($val == 'Participant.consentForElectronicHealthRecords') {
-                $eligible[] = $completed[1] - $completed[$index];
             } else {
                 $eligible[] = $completed_consent - $completed[$index] < 0 ? 0 : $completed_consent - $completed[$index];
             }
