@@ -12,7 +12,7 @@ class Participant
     public $dob;
     public $gender;
     public $zip;
-    public $consentComplete;
+    public $status;
 
     public function __construct($options = null)
     {
