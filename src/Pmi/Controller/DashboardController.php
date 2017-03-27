@@ -76,9 +76,6 @@ class DashboardController extends AbstractController
         // retrieve controlled vocab for entries from metrics cache
         if ($filter_by == 'Participant') {
             $entries = [$filter_by];
-        } elseif ($filter_by == 'Participant.registrationStatus') {
-            $entries = ['Registered', 'Consented', 'Full Participants'];
-
         } else {
             $entries = $this->getMetricsFieldDefinitions($app, $filter_by);
         }
@@ -523,29 +520,39 @@ class DashboardController extends AbstractController
             'Participant',
             'Participant.consentForStudyEnrollment',
             'Participant.consentForElectronicHealthRecords',
-            'Participant.questionnaireOnSociodemographics',
+            'Participant.consentForStudyEnrollmentAndEHR',
+            'Participant.questionnaireOnLifestyle',
             'Participant.questionnaireOnOverallHealth',
-            'Participant.questionnaireOnMedicalHistory',
+            'Participant.questionnaireOnTheBasics',
+            'Participant.numCompletedBaselinePPIModules',
             'Participant.physicalMeasurements',
-            'Participant.biospecimenSamples'
+            'Participant.samplesToIsolateDNA',
+            'Participant.enrollmentStatus'
         );
 
         $display_values = array(
             'Registered',
-            'Consent for Enrollment',
-            'Consent for Health Records',
-            'PPI Module: Sociodemographics',
+            'Consent: Study Enrollment',
+            'Consent: EHR',
+            'Consent: Complete',
+            'PPI Module: Lifestyle',
             'PPI Module: Overall Health',
-            'PPI Module: Medical History',
+            'PPI Module: The Basics',
+            'Baseline PPI Modules Complete',
             'Physical Measurements',
-            'Samples Received'
+            'Samples Received',
+            'Full Participant'
         );
 
         foreach ($metrics_keys as $index => $metric_val) {
             if ($metric_val == 'Participant') {
                 $lookup = $metric_val;
-            } elseif ($metric_val == 'Participant.biospecimenSamples') {
-                $lookup = $metric_val . '.SAMPLES_ARRIVED';
+            } elseif ($metric_val == 'Participant.samplesToIsolateDNA') {
+                $lookup = $metric_val . '.RECEIVED';
+            } elseif ($metric_val == 'Participant.enrollmentStatus') {
+                $lookup = $metric_val . '.FULL_PARTICIPANT';
+            } elseif ($metric_val == 'Participant.physicalMeasurements') {
+                $lookup = $metric_val . '.COMPLETED';
             } else {
                 $lookup = $metric_val . '.SUBMITTED';
             }
@@ -582,15 +589,17 @@ class DashboardController extends AbstractController
         // now that we have counts (in order), go back through to determine what the elibible numbers are
         // this is based off of external logic, so cannot be done while assembling counts
 
-        $highest_consent = $completed[1] > $completed[2] ? $completed[1] : $completed[2];
+        $completed_consent = $completed[3];
 
         foreach($metrics_keys as $index => $val) {
             if ($val == 'Participant') {
                 $eligible[] = 0;
             } elseif ($val == 'Participant.consentForStudyEnrollment') {
                 $eligible[] = $completed[0] - $completed[$index];
+            } elseif ($val == 'Participant.consentForElectronicHealthRecords') {
+                $eligible[] = $completed[1] - $completed[$index];
             } else {
-                $eligible[] = $highest_consent - $completed[$index];
+                $eligible[] = $completed_consent - $completed[$index] < 0 ? 0 : $completed_consent - $completed[$index];
             }
         }
 
@@ -690,10 +699,9 @@ class DashboardController extends AbstractController
     private function getMetricsDisplayNames() {
         $metrics_attributes = array(
             "Participant" => "Total Participants",
-            "Participant.registrationStatus" => "Registration Status",
+            "Participant.enrollmentStatus" => "Enrollment Status",
             "Participant.genderIdentity" => "Gender Identity",
             "Participant.ageRange" => "Age Range",
-            "Participant.ethnicity" => "Ethnicity",
             "Participant.race" => "Race"
         );
         return $metrics_attributes;
