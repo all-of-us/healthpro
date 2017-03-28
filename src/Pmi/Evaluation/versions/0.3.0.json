@@ -220,6 +220,10 @@
                 {
                     "between": [36, 89.9],
                     "message": "Please verify that this height has been entered in centimeters, and not inches (1in = 2.54cm)"
+                },
+                {
+                    "max": 228,
+                    "message": "Please verify that this height is correct."
                 }
             ]
         },
