@@ -11,6 +11,7 @@ class Fhir
     protected $version;
     protected $date;
     protected $metricUrns;
+    protected $parentRdr;
 
     public function __construct(array $options)
     {
@@ -24,6 +25,7 @@ class Fhir
         $date = clone $options['datetime'];
         $date->setTimezone(new \DateTimeZone('UTC'));
         $this->date = $date->format('Y-m-d\TH:i:s\Z');
+        $this->parentRdr = $options['parent_rdr'];
     }
 
     /*
@@ -307,6 +309,14 @@ class Fhir
             if ($entry = $this->getEntry($metric)) {
                 $fhir->entry[] = $entry;
             }
+        }
+        if ($this->parentRdr != null) {
+            $fhir->extension = [
+                'url' => 'http://terminology.pmi-ops.org/StructureDefinition/amends',
+                'valueReference' => [
+                    'reference' => "PhysicalMeasurements/{$this->parentRdr}"
+                ]
+            ];
         }
         return $fhir;
     }

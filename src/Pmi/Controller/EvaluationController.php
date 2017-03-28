@@ -15,7 +15,8 @@ class EvaluationController extends AbstractController
             'defaults' => ['evalId' => null]
         ]],
         ['evaluationFhir', '/participant/{participantId}/measurements/{evalId}/fhir.json'],
-        ['evaluationRdr', '/participant/{participantId}/measurements/{evalId}/rdr.json']
+        ['evaluationRdr', '/participant/{participantId}/measurements/{evalId}/rdr.json'],
+        ['evaluationClone', '/participant/{participantId}/measurements/{evalId}/clone']
     ];
 
     /* For debugging generated FHIR bundle - only allowed in dev */
@@ -118,7 +119,14 @@ class EvaluationController extends AbstractController
                         if (count($errors) === 0) {
                             $dbArray['finalized_ts'] = $now;
                             // Send final evaluation to RDR and store resulting id
-                            $fhir = $evaluationService->getFhir($now);
+                            if ($evaluation != null && $evaluation['parent_id'] != null) {
+                                $parentEvaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
+                                    'id' => $evaluation['parent_id']
+                                ]);
+                                $fhir = $evaluationService->getFhir($now, $parentEvaluation['rdr_id']);
+                            } else {
+                                $fhir = $evaluationService->getFhir($now);
+                            }
                             if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($participant->id, $fhir)) {
                                 $dbArray['rdr_id'] = $rdrEvalId;
                             }
@@ -211,5 +219,42 @@ class EvaluationController extends AbstractController
             'latestVersion' => $evaluationService::CURRENT_VERSION,
             'showAutoModification' => $showAutoModification
         ]);
+    }
+
+    public function evaluationCloneAction($participantId, $evalId, Application $app)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->consentComplete) {
+            $app->abort(403);
+        }
+        $evaluationService = new Evaluation();
+        if ($evalId) {
+            $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
+                'id' => $evalId,
+                'participant_id' => $participantId
+            ]);
+            if (!$evaluation) {
+                $app->abort(404);
+            }
+        }
+        if ($evaluation['finalized_ts'] != null) {
+            $evaluation['user_id'] = $app->getUser()->getId();
+            $evaluation['site'] = $app->getSiteId();
+            $evaluation['parent_id'] = $evaluation['id'];
+            $evaluation['updated_ts'] = new \DateTime();
+            unset($evaluation['id'], $evaluation['rdr_id'], $evaluation['finalized_ts']);
+            if ($evalId = $app['em']->getRepository('evaluations')->insert($evaluation)) {
+                $app->log(Log::EVALUATION_CREATE, $evalId);
+                $app->addFlashNotice('Physical measurements saved');
+            } else {
+                $app->addFlashError('Failed to create new physical measurements');
+            } 
+        }
+        return $app->redirectToRoute('participant', [
+            'id' => $participantId
+        ]);   
     }
 }
