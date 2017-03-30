@@ -229,7 +229,7 @@
             "options": {
                 "None": "",
                 "Height is more than measuring device range": "height-out-of-range",
-                "Hair style": "hair-style",
+                "Hairstyle/headgear": "hair-style",
                 "Wheelchair user": "wheelchair-bound",
                 "Unable to stand in a straight position": "unable-to-stand-straight",
                 "Refusal": "refusal",
@@ -246,7 +246,7 @@
                 },
                 {
                     "val": "hair-style",
-                    "message": "Deviation successfully captured. Height measurement may be innacurate due to hair style."
+                    "message": "Deviation successfully captured. Height measurement may be innacurate due to hairstyle/headgear."
                 },
                 {
                     "val": "wheelchair-bound",
