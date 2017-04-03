@@ -65,12 +65,11 @@ class RdrParticipants
             'id' => $id,
             'biobankId' => $biobankId,
             'firstName' => $participant->firstName,
-            'middleName' => $participant->middleName,
             'lastName' => $participant->lastName,
-            'dob' => new \DateTime($participant->dateOfBirth),
+            'dob' => isset($participant->dateOfBirth) ? new \DateTime($participant->dateOfBirth) : null,
             'genderIdentity' => $genderIdentity,
             'gender' => $gender,
-            'zip' => $participant->zipCode,
+            'zip' => isset($participant->zipCode) ? $participant->zipCode : null,
             'status' => $status
         ]);
     }

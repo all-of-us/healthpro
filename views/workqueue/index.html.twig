@@ -53,10 +53,10 @@
         <tbody>
             {% for participant in participants %}
                 <tr>
-                    <td data-order="{{ participant.lastName }}"><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.lastName }}</a></td>
-                    <td data-order="{{ participant.firstName }}"><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.firstName }}</a></td>
+                    <td data-order="{{ participant.lastName|default('') }}"><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.lastName|default('') }}</a></td>
+                    <td data-order="{{ participant.firstName|default('') }}"><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.firstName|default('') }}</a></td>
                     <td>{{ participant.participantId }}</td>
-                    <td data-order="{{ participant.dateOfBirth }}">{{ participant.dateOfBirth|date('m/d/Y') }}</td>
+                    <td data-order="{{ participant.dateOfBirth|default('') }}">{{ participant.dateOfBirth is defined ? participant.dateOfBirth|date('m/d/Y') : '' }}</td>
                     {% for field, label in surveys %}
                         <td class="text-center" data-order="{{ attribute(participant, 'questionnaireOn' ~ field)|default('') == 'SUBMITTED' ? '1' : '0' }}">
                             {% if attribute(participant, 'questionnaireOn' ~ field)|default('') == 'SUBMITTED' %}
@@ -72,34 +72,34 @@
                         </td>
                     {% endfor %}
 
-                    <td class="text-center" data-order="{{ participant.physicalMeasurementsStatus|default('') == 'SUBMITTED' ? '1' : '0' }}">
-                        {% if participant.physicalMeasurementsStatus == 'SUBMITTED' %}
+                    <td class="text-center" data-order="{{ participant.physicalMeasurementsStatus|default('') == 'COMPLETED' ? '1' : '0' }}">
+                        {% if participant.physicalMeasurementsStatus|default('') == 'COMPLETED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
                     </td>
-                    <td class="text-center" data-order="{{ participant.numBaselineSamplesArrived }}">
-                        <strong class="text-{{ participant.numBaselineSamplesArrived == 7 ? 'success' : 'danger' }}">{{ participant.numBaselineSamplesArrived }}</strong>
+                    <td class="text-center" data-order="{{ participant.numBaselineSamplesArrived|default(0) }}">
+                        <strong class="text-{{ participant.numBaselineSamplesArrived|default(0) >= 7 ? 'success' : 'danger' }}">{{ participant.numBaselineSamplesArrived }}</strong>
                     </td>
                     <td class="text-center" data-order="{{ participant.consentForStudyEnrollment|default('') == 'SUBMITTED' ? '1' : '0' }}">
-                        {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
+                        {% if participant.consentForStudyEnrollment|default('') == 'SUBMITTED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
                     </td>
-                    <td data-order="{{ participant.consentForStudyEnrollmentTime }}">{{ participant.consentForStudyEnrollmentTime|date('m/d/Y') }}</td>
+                    <td data-order="{{ participant.consentForStudyEnrollmentTime|default('') }}">{{ participant.consentForStudyEnrollmentTime is defined ? participant.consentForStudyEnrollmentTime|date('m/d/Y') : '' }}</td>
                     <td class="text-center" data-order="{{ participant.consentForElectronicHealthRecords|default('') == 'SUBMITTED' ? '1' : '0' }}">
-                        {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
+                        {% if participant.consentForElectronicHealthRecords|default('') == 'SUBMITTED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
                     </td>
-                    <td>{{ participant.ethnicity|display_code }}</td>
-                    <td>{{ participant.race|display_code }}</td>
-                    <td>{{ participant.genderIdentity|display_code }}</td>
+                    <td>{{ participant.ethnicity|default('') }}</td>
+                    <td>{{ participant.race|default('') }}</td>
+                    <td>{{ participant.genderIdentity|default('') }}</td>
                 </tr>
             {% endfor %}
         </tbody>

@@ -125,7 +125,7 @@ class WorkQueueController extends AbstractController
                     $participant->participantId,
                     $participant->lastName,
                     $participant->firstName,
-                    date('m/d/Y', strtotime($participant->dateOfBirth)),
+                    isset($participant->dateOfBirth) ? date('m/d/Y', strtotime($participant->dateOfBirth)) : '',
                 ];
                 foreach (self::$surveys as $survey => $label) {
                     $row[] = $participant->{"questionnaireOn{$survey}"} === 'SUBMITTED' ? 1 : 0;
@@ -135,14 +135,14 @@ class WorkQueueController extends AbstractController
                         $row[] = '';
                     }
                 }
-                $row[] = $participant->physicalMeasurementsStatus === 'SUBMITTED' ? 1 : 0;
+                $row[] = isset($participant->physicalMeasurementsStatus) && $participant->physicalMeasurementsStatus === 'SUBMITTED' ? 1 : 0;
                 $row[] = $participant->numBaselineSamplesArrived;
-                $row[] = $participant->consentForStudyEnrollment === 'SUBMITTED' ? 1 : 0;
-                $row[] = date('m/d/Y', strtotime($participant->consentForStudyEnrollmentTime));
-                $row[] = $participant->consentForElectronicHealthRecords === 'SUBMITTED' ? 1 : 0;
-                $row[] = $participant->ethnicity;
-                $row[] = $participant->race;
-                $row[] = $participant->genderIdentity;
+                $row[] = isset($participant->consentForStudyEnrollment) && $participant->consentForStudyEnrollment === 'SUBMITTED' ? 1 : 0;
+                $row[] = isset($participant->consentForStudyEnrollmentTime) ? date('m/d/Y', strtotime($participant->consentForStudyEnrollmentTime)) : '';
+                $row[] = isset($participant->consentForElectronicHealthRecords) && $participant->consentForElectronicHealthRecords === 'SUBMITTED' ? 1 : 0;
+                $row[] = isset($participant->ethnicity) ? $participant->ethnicity : '';
+                $row[] = isset($participant->race) ? $participant->race : '';
+                $row[] = isset($participant->genderIdentity) ? $participant->genderIdentity : '';
                 fputcsv($output, $row);
             }
             fwrite($output, "\"\"\n");
