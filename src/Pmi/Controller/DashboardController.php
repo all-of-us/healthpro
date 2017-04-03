@@ -12,26 +12,10 @@ class DashboardController extends AbstractController
 
     protected static $routes = [
         ['home', '/'],
-        ['view_raw_metrics', '/metrics'],
         ['metrics_load', '/metrics_load'],
         ['metrics_load_region', '/metrics_load_region'],
         ['metrics_load_lifecycle', '/metrics_load_lifecycle'],
     ];
-
-    public function view_raw_metricsAction(Application $app, Request $request) {
-        $type = $request->get('type');
-        $start_date = $request->get('start_date');
-        $end_date = $request->get('end_date');
-        if ($type == 'fields') {
-            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-            $metrics = $metricsApi->metricsFields();
-        } else {
-            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-            $metrics = $metricsApi->metrics($start_date, $end_date);
-        }
-        return $app->json($metrics);
-    }
-
 
     public function homeAction(Application $app, Request $request)
     {
@@ -610,6 +594,8 @@ class DashboardController extends AbstractController
                 $eligible[] = 0;
             } elseif ($val == 'Participant.consentForStudyEnrollment') {
                 $eligible[] = $completed[0] - $completed[$index];
+            } elseif ($val == 'Participant.consentForStudyEnrollmentAndEHR') {
+                $eligible[] = $completed[1] - $completed[$index];
             } else {
                 $eligible[] = $completed_consent - $completed[$index] < 0 ? 0 : $completed_consent - $completed[$index];
             }
@@ -757,11 +743,6 @@ class DashboardController extends AbstractController
             'rgb(229,196,148)', 'rgb(85,85,85)', 'rgb(251,128,114)', 'rgb(128,177,211)', 'rgb(188,128,189)'
         ];
         return $colors[$index];
-    }
-
-    // helper function to return count values from fetchAll (due to DBAL in query type issues)
-    private function getCount($result, $key) {
-        return (int) $result[0][$key];
     }
 
     // sanitize url date parameter to prevent SQL injection
