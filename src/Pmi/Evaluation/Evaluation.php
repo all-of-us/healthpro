@@ -7,6 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
@@ -130,7 +131,7 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } elseif (!isset($field->options) && $type != 'checkbox' && $type != 'textarea') {
+            } elseif (!isset($field->options) && !in_array($type, ['checkbox', 'text', 'textarea'])) {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
@@ -151,6 +152,9 @@ class Evaluation
                 unset($options['scale']);
                 $class = TextareaType::class;
                 $attributes['rows'] = 4;
+            } elseif ($type == 'text') {
+                unset($options['scale']);
+                $class = TextType::class;
             } else {
                 $class = NumberType::class;
             }
@@ -259,39 +263,47 @@ class Evaluation
         return Util::versionIsAtLeast($this->version, $minVersion);
     }
 
-    public function canFinalize()
+    public function getFinalizeErrors()
     {
+        $errors = [];
+
         if (!$this->isMinVersion('0.3.0')) {
             // prior to version 0.3.0, any state is valid
-            return true;
+            return $errors;
         }
 
         foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
             foreach ($this->data->$field as $k => $value) {
                 if (!$this->data->{'blood-pressure-protocol-modification'}[$k] && !$value) {
-                    return false;
+                    $errors[] = [$field, $k];
                 }
             }
         }
         foreach (['height', 'weight'] as $field) {
             if (!$this->data->{$field . '-protocol-modification'} && !$this->data->$field) {
-                return false;
+                $errors[] = $field;
             }
         }
         if (!$this->data->pregnant && !$this->data->wheelchair) {
             foreach (['hip-circumference', 'waist-circumference'] as $field) {
                 foreach ($this->data->$field as $k => $value) {
-                    if ($k == 2 && abs($this->data->{$field}[0] - $this->data->{$field}[1]) <= 1) {
-                        // not required if first two are within 1 cm
-                        continue;
+                    if ($k == 2) {
+                        // not an error on the third measurement if first two aren't completed
+                        // or first two measurements are within 1 cm
+                        if (!$this->data->{$field}[0] || !$this->data->{$field}[1]) {
+                            break;
+                        }
+                        if (abs($this->data->{$field}[0] - $this->data->{$field}[1]) <= 1) {
+                            break;
+                        }
                     }
                     if (!$this->data->{$field . '-protocol-modification'}[$k] && !$value) {
-                        return false;
+                        $errors[] = [$field, $k];
                     }
                 }
             }
         }
 
-        return true;
+        return $errors;
     }
 }

@@ -20,7 +20,12 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         "change .field-waist-circumference input": "toggleThirdWaistCircumference",
         "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic",
         "click .modification-toggle a": "showModification",
-        "change .modification-select select": "handleProtocolModification"
+        "change .modification-select select": "handleProtocolModification",
+        "click .autofill-protocol-modification": "autofillProtocolModification",
+        "click .alt-units-toggle a": "enableAltUnits",
+        "click .alt-units-field a": "cancelAltUnits",
+        "keyup .alt-units-field input": "convertAltUnits",
+        "change .alt-units-field input": "convertAltUnits"
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
@@ -33,7 +38,6 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         this.triggerEqualize();
     },
     inputKeyup: function(e) {
-        this.clearServerErrors(e);
         this.updateConversion(e);
     },
     displayHelpModal: function(e) {
@@ -139,6 +143,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         }
         if (isPregnant) {
             this.$('.field-weight-prepregnancy').show();
+            this.$('.field-weight-prepregnancy').next('.alt-units-block').show();
             if (this.rendered) {
                 this.$('#form_weight-protocol-modification').valChange('pregnancy');
             }
@@ -146,6 +151,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         if (!isPregnant) {
             this.$('#form_weight-prepregnancy').valChange('');
             this.$('.field-weight-prepregnancy').hide();
+            this.$('.field-weight-prepregnancy').next('.alt-units-block').hide();
             if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'pregnancy') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
@@ -178,22 +184,39 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         }
     },
     handleHeightProtocol: function() {
-        if (this.$('#form_height-protocol-modification').val() == 'refusal') {
+        var selected = this.$('#form_height-protocol-modification').val();
+        if (selected === 'refusal') {
             this.$('#form_height').valChange('').attr('disabled', true);
+            this.$('.field-height').next('.alt-units-block').hide();
         } else {
             if (!this.finalized) {
                 this.$('#form_height').attr('disabled', false);
+                this.$('.field-height').next('.alt-units-block').show();
             }
+        }
+        if (selected === 'other') {
+            this.$('.field-height-protocol-modification-notes').parent().show();
+        } else {
+            this.$('.field-height-protocol-modification-notes').parent().hide();
+            this.$('#form_height-protocol-modification-notes').val('');
         }
     },
     handleWeightProtocol: function() {
         var selected = this.$('#form_weight-protocol-modification').val();
-        if (selected == 'cannot-balance-on-scale' || selected == 'refusal') {
+        if (selected === 'cannot-balance-on-scale' || selected === 'refusal') {
             this.$('#form_weight').valChange('').attr('disabled', true);
+            this.$('.field-weight').next('.alt-units-block').hide();
         } else {
             if (!this.finalized) {
                 this.$('#form_weight').attr('disabled', false);
+                this.$('.field-weight').next('.alt-units-block').show();
             }
+        }
+        if (selected === 'other') {
+            this.$('.field-weight-protocol-modification-notes').parent().show();
+        } else {
+            this.$('.field-weight-protocol-modification-notes').parent().hide();
+            this.$('#form_weight-protocol-modification-notes').val('');
         }
     },
     toggleThirdReading: function(field) {
@@ -248,14 +271,21 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             container.append($('<div class="diastolic-warning text-warning">').text('Diastolic pressure must be less than systolic pressure'));
         }
     },
-    clearServerErrors: function() {
-        this.$('span.help-block ul li').remove();
+    clearServerErrors: function(e) {
+        var field = $(e.currentTarget).closest('.field');
+        field.find('span.help-block ul li').remove();
     },
     kgToLb: function(kg) {
         return (parseFloat(kg) * 2.2046).toFixed(1);
     },
     cmToIn: function(cm) {
         return (parseFloat(cm) * 0.3937).toFixed(1);
+    },
+    lbToKg: function(lb) {
+        return (parseFloat(lb) / 2.2046).toFixed(1);
+    },
+    inToCm: function(inches) {
+        return (parseFloat(inches) / 0.3937).toFixed(1);
     },
     convert: function(type, val) {
         switch (type) {
@@ -371,6 +401,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                     var input = $(e.currentTarget);
                     new PmiConfirmModal({
                         msg: warning.message,
+                        isHTML: true,
                         onFalse: function() {
                             input.val('');
                             input.focus();
@@ -401,6 +432,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 if (!warning.consecutive && self.warningConditionMet(warning, val)) {
                     if (warning.alert) {
                         new PmiConfirmModal({
+                            isHTML: true,
                             msg: warning.message,
                             onFalse: function() {
                                 input.val('');
@@ -442,6 +474,13 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 }
             });
         }
+        if (modification === 'other') {
+            block.find('.modification-notes').show();
+        } else {
+            block.find('.modification-notes').hide();
+            block.find('.modification-notes input').val('');
+        }
+        this.triggerEqualize();
     },
     showModificationBlock: function(block) {
         block.find('.modification-toggle').hide();
@@ -454,9 +493,82 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     },
     showModifications: function() {
         var self = this;
-        $('.modification-block').each(function() {
+        this.$('.modification-block').each(function() {
             self.handleProtocolModificationBlock($(this));
         });
+    },
+    autofillProtocolModification: function(e) {
+        var self = this;
+        var reason = $(e.currentTarget).data('reason');
+        this.$('.modification-block').each(function() {
+            var modification = $(this).find('.modification-select select').val();
+            if (!modification) {
+                var needsModification = false;
+                $(this).find('.modification-affected input[type=text]:visible').each(function() {
+                    if (!$(this).val()) {
+                        needsModification = true;
+                    }
+                });
+                if (needsModification) {
+                    $(this).find('.modification-select select').val(reason);
+                    self.handleProtocolModificationBlock($(this));
+                }
+            }
+        });
+        _.each(['height', 'weight'], function(field) {
+            if (!$('#form_' + field).val() && !$('#form_' + field + '-protocol-modification').val()) {
+                $('#form_' + field + '-protocol-modification').val(reason);
+            }
+        });
+        self.handleHeightProtocol();
+        self.handleWeightProtocol();
+    },
+    enableAltUnits: function(e) {
+        var block = $(e.currentTarget).closest('.alt-units-block');
+        block.find('.alt-units-field').show();
+        block.find('.alt-units-toggle').hide();
+        block.prev().find('input').attr('readonly', true);
+        this.triggerEqualize();
+    },
+    cancelAltUnits: function(e) {
+        var block = $(e.currentTarget).closest('.alt-units-block');
+        block.find('.alt-units-toggle').show();
+        block.find('.alt-units-field').hide();
+        block.prev().find('input').attr('readonly', false);
+        block.find('.alt-units-field input').val('');
+        this.triggerEqualize();
+    },
+    convertAltUnits: function(e) {
+        var block = $(e.currentTarget).closest('.alt-units-field');
+        var type = block.find('label').attr('for');
+        var val;
+        if (type == 'alt-units-height') {
+            var inches = 0;
+            if (parseFloat($('#alt-units-height-ft').val())) {
+                inches += 12*parseFloat($('#alt-units-height-ft').val());
+            }
+            if (parseFloat($('#alt-units-height-in').val())) {
+                inches += parseFloat($('#alt-units-height-in').val());
+            }
+            val = this.inToCm(inches);
+        } else {
+            var unit = block.find('.input-group-addon').text();
+            val = block.find('input').val();
+            if (unit == 'in') {
+                val = this.inToCm(val);
+            } else if (unit == 'lb') {
+                val = this.lbToKg(val);
+            }
+        }
+        if (isNaN(val)) {
+            val = '';
+        }
+        var input = block.parent().prev().find('input');
+        input.val(val);
+        if (e.type == 'change') {
+            block.parent().prev().find('input').change(); // trigger change even if not different
+            block.parent().prev().find('input').parsley().validate(); // trigger parsley validation
+        }
     },
     initialize: function(obj) {
         this.warnings = obj.warnings;

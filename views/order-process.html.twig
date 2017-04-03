@@ -53,9 +53,11 @@ $(document).ready(function () {
     $('input.sample-disabled').closest('label').addClass('text-danger');
     $('input.sample-disabled').closest('div.checkbox').append('<small class="text-muted">was not collected</small>');
     $('#form_processed_samples input').each(function() {
-        if ($(this).attr('disabled')) {
-            return;
-        }
+        {% if not order.finalized_ts %}
+            if ($(this).attr('disabled')) {
+                return;
+            }
+        {% endif %}
         var checkBoxDiv = $(this).closest('div.checkbox');
         var sample = $(this).val();
         $('#form_processed_samples_ts_' + sample).closest('.form-group')
@@ -71,9 +73,11 @@ $(document).ready(function () {
     $('.sample-disabled label').addClass('text-danger');
     $('.sample-disabled').find('td:last').append('<small style="margin-left:15px" class="text-muted">was not collected</small>');
     $('#form_processed_samples input').each(function() {
-        if ($(this).attr('disabled')) {
-            return;
-        }
+        {% if not order.finalized_ts %}
+            if ($(this).attr('disabled')) {
+                return;
+            }
+        {% endif %}
         var checkBoxTr = $(this).closest('tr');
         var timeTd= $('<td colspan="4">');
         var timeTr = $('<tr><td></td></tr>');

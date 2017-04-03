@@ -91,6 +91,7 @@ class EvaluationController extends AbstractController
         } else {
             $evaluation = null;
         }
+        $showAutoModification = false;
 
         $evaluationForm = $evaluationService->getForm($app['form.factory']);
         $evaluationForm->handleRequest($request);
@@ -113,7 +114,8 @@ class EvaluationController extends AbstractController
                     $now = new \DateTime();
                     $dbArray['updated_ts'] = $now;
                     if ($request->request->has('finalize')) {
-                        if ($evaluationService->canFinalize()) {
+                        $errors = $evaluationService->getFinalizeErrors();
+                        if (count($errors) === 0) {
                             $dbArray['finalized_ts'] = $now;
                             // Send final evaluation to RDR and store resulting id
                             $fhir = $evaluationService->getFhir($now);
@@ -121,7 +123,16 @@ class EvaluationController extends AbstractController
                                 $dbArray['rdr_id'] = $rdrEvalId;
                             }
                         } else {
-                            $app->addFlashError('Physical measurements were not finalized due to being incomplete');
+                            foreach ($errors as $field) {
+                                if (is_array($field)) {
+                                    list($field, $replicate) = $field;
+                                    $evaluationForm->get($field)->get($replicate)->addError(new FormError('Please complete or add protocol modification.'));
+                                } else {
+                                    $evaluationForm->get($field)->addError(new FormError('Please complete or add protocol modification.'));
+                                }
+                            }
+                            $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
+                            $showAutoModification = true;
                         }
                     }
                     if (!$evaluation) {
@@ -132,10 +143,21 @@ class EvaluationController extends AbstractController
                         if ($evalId = $app['em']->getRepository('evaluations')->insert($dbArray)) {
                             $app->log(Log::EVALUATION_CREATE, $evalId);
                             $app->addFlashNotice('Physical measurements saved');
-                            return $app->redirectToRoute('evaluation', [
-                                'participantId' => $participant->id,
-                                'evalId' => $evalId
-                            ]);
+
+                            // If finalization failed, new physical measurements are created, but
+                            // show errors and auto-modification options on subsequent display
+                            if (!$evaluationForm->isValid()) {
+                                return $app->redirectToRoute('evaluation', [
+                                    'participantId' => $participant->id,
+                                    'evalId' => $evalId,
+                                    'showAutoModification' => 1
+                                ]);
+                            } else {
+                                return $app->redirectToRoute('evaluation', [
+                                    'participantId' => $participant->id,
+                                    'evalId' => $evalId
+                                ]);
+                            }
                         } else {
                             $app->addFlashError('Failed to create new physical measurements');
                         }
@@ -143,10 +165,15 @@ class EvaluationController extends AbstractController
                         if ($app['em']->getRepository('evaluations')->update($evalId, $dbArray)) {
                             $app->log(Log::EVALUATION_EDIT, $evalId);
                             $app->addFlashNotice('Physical measurements saved');
-                            return $app->redirectToRoute('evaluation', [
-                                'participantId' => $participant->id,
-                                'evalId' => $evalId
-                            ]);
+
+                            // If finalization failed, values are still saved, but do not redirect
+                            // so that errors can be displayed
+                            if ($evaluationForm->isValid()) {
+                                return $app->redirectToRoute('evaluation', [
+                                    'participantId' => $participant->id,
+                                    'evalId' => $evalId
+                                ]);
+                            }
                         } else {
                             $app->addFlashError('Failed to update physical measurements');
                         }
@@ -155,6 +182,21 @@ class EvaluationController extends AbstractController
                     if (count($evaluationForm->getErrors()) == 0) {
                         $evaluationForm->addError(new FormError('Please correct the errors below'));
                     }
+                }
+            } elseif ($request->query->get('showAutoModification')) {
+                // if new physical measurements were created and failed to finalize, generate errors post-redirect
+                $errors = $evaluationService->getFinalizeErrors();
+                if (count($errors) > 0) {
+                    foreach ($errors as $field) {
+                        if (is_array($field)) {
+                            list($field, $replicate) = $field;
+                            $evaluationForm->get($field)->get($replicate)->addError(new FormError('Please complete or add protocol modification.'));
+                        } else {
+                            $evaluationForm->get($field)->addError(new FormError('Please complete or add protocol modification.'));
+                        }
+                    }
+                    $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
+                    $showAutoModification = true;
                 }
             }
         }
@@ -166,7 +208,8 @@ class EvaluationController extends AbstractController
             'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
-            'latestVersion' => $evaluationService::CURRENT_VERSION
+            'latestVersion' => $evaluationService::CURRENT_VERSION,
+            'showAutoModification' => $showAutoModification
         ]);
     }
 }

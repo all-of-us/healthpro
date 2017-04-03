@@ -5,18 +5,25 @@
         <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>{{ participant.shortId }}</small></h2>
     </div>
 
-    <dl class="dl-horizontal">
-        <dt>Name</dt>
-        <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-        <dt>Participant ID</dt>
-        <dd>{{ participant.id }}</dd>
-        <dt>Biobank ID</dt>
-        <dd>{{ participant.biobankId }}</dd>
-        <dt>DOB</dt>
-        <dd>{{ participant.dob|date('n/j/Y') }}</dd>
-        <dt>Gender Identity</dt>
-        <dd>{{ participant.genderIdentity }}</dd>
-    </dl>
+    <div class="row">
+        <div class="col-sm-6">
+            <dl class="dl-horizontal">
+                <dt>Name</dt>
+                <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
+                <dt>Participant ID</dt>
+                <dd>{{ participant.id }}</dd>
+                <dt>Biobank ID</dt>
+                <dd>{{ participant.biobankId }}</dd>
+                <dt>DOB</dt>
+                <dd>{{ participant.dob|date('n/j/Y') }}</dd>
+                <dt>Gender Identity</dt>
+                <dd>{{ participant.genderIdentity }}</dd>
+            </dl>
+        </div>
+        <div class="col-sm-6 text-center">
+            <svg id="participant-barcode"></svg>
+        </div>
+    </div>
     {% if participant.status %}
         <div class="row">
             <div class="col-sm-6">
@@ -33,7 +40,7 @@
                                 {{ evaluation.created_ts|date('D n/j/Y', app.userTimezone) }}<br />
                                 <small class="text-muted">
                                     {% if evaluation.finalized_ts %}
-                                        <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
+                                        <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                     {% else %}
                                         <span class="label label-default">Updated</span> {{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                     {% endif %}
@@ -99,10 +106,10 @@
             <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
                 <div class="panel panel-danger">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> Basics Module not complete</h3>
+                        <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> The Basics survey not complete</h3>
                     </div>
                     <div class="panel-body">
-                        This participant does not meet requirements. Please direct participant to the Participant Technologies Center resource.  For more information call <span class="text-muted">[call center phone number]</span>
+                        This participant has consented but has not completed "The Basics" survey in the participant app and is therefore ineligible for physical measurements and biospecimen collection. Please direct the participant to complete "The Basics" survey in the participant application to enable in person enrollment or contact the help desk if needed.
                     </div>
                 </div>
             </div>
@@ -122,6 +129,11 @@ $(document).ready(function() {
         $(this).hide();
         $('#evaluation-overflow').show();
         e.preventDefault();
+    });
+    JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
+        width: 2,
+        height: 50,
+        displayValue: true
     });
 });
 </script>

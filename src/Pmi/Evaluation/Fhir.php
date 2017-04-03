@@ -218,33 +218,6 @@ class Fhir
         );
     }
 
-    protected function getBpBodySite($replicate)
-    {
-        if (is_array($this->data->{'blood-pressure-location'})) {
-            $location = $this->data->{'blood-pressure-location'}[$replicate - 1];
-        } else {
-            $location = $this->data->{'blood-pressure-location'};
-        }
-        switch ($location) {
-            case 'Left arm':
-                $locationSnomed = '368208006';
-                $locationDisplay = 'Left arm';
-                break;
-            default:
-                $locationSnomed = '368209003';
-                $locationDisplay = 'Right arm';
-                break;
-        }
-        return [
-            'coding' => [[
-                'code' => $locationSnomed,
-                'display' => $locationDisplay,
-                'system' => 'http://snomed.info/sct'
-            ]],
-            'text' => $locationDisplay
-        ];
-    }
-
     protected function getBpComponent($component, $replicate)
     {
         switch ($component) {
@@ -282,7 +255,6 @@ class Fhir
         return [
             'fullUrl' => $this->metricUrns['blood-pressure-' . $replicate],
             'resource' => [
-                'bodySite' => $this->getBpBodySite($replicate),
                 'code' => [
                     'coding' => [[
                         'code' => '55284-4',
