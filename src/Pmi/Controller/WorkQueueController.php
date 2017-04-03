@@ -58,11 +58,11 @@ class WorkQueueController extends AbstractController
         ]
     ];
     protected static $surveys = [
-        'Sociodemographics' => 'Basics',
+        'TheBasics' => 'Basics',
         'MedicalHistory' => 'Hist',
         'Medications' => 'Meds',
         'OverallHealth' => 'Health',
-        'PersonalHabits' => 'Lifestyle',
+        'Lifestyle' => 'Lifestyle',
         'FamilyHealth' => 'Family',
         'HealthcareAccess' => 'Access'
     ];

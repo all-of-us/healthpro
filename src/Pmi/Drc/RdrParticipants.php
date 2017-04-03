@@ -38,9 +38,14 @@ class RdrParticipants
         } else {
             return false;
         }
-        if (!empty($participant->questionnaireOnSociodemographics) & $participant->questionnaireOnSociodemographics === 'SUBMITTED') {
+
+        // HealthPro status is active if participant is consented AND has completed basics survey
+        if (!empty($participant->questionnaireOnTheBasics) && $participant->questionnaireOnTheBasics === 'SUBMITTED') {
             $status = true;
         } else {
+            $status = false;
+        }
+        if (empty($participant->consentForStudyEnrollment) || $participant->consentForStudyEnrollment !== 'SUBMITTED') {
             $status = false;
         }
         switch ($participant->genderIdentity) {
