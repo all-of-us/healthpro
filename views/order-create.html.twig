@@ -19,7 +19,7 @@
         <dt>DOB</dt>
         <dd>{{ participant.dob|date('n/j/Y') }}</dd>
         <dt>Gender Identity</dt>
-        <dd>{{ participant.genderIdentity }}</dd>
+        <dd>{{ participant.genderIdentity|display_code }}</dd>
     </dl>
     <ul class="nav nav-tabs">
         <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>

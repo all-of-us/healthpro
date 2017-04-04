@@ -21,7 +21,7 @@
             <dt>DOB</dt>
             <dd>{{ participant.dob|date('n/j/Y') }}</dd>
             <dt>Gender Identity</dt>
-            <dd>{{ participant.genderIdentity }}</dd>
+            <dd>{{ participant.genderIdentity|display_code }}</dd>
             {% if evaluation %}
                 <dt>Updated</dt>
                 <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>

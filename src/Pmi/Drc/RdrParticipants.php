@@ -49,25 +49,23 @@ class RdrParticipants
             $status = false;
         }
         switch ($participant->genderIdentity) {
-            case 'FEMALE':
+            case 'GenderIdentity_Woman':
                 $gender = 'F';
                 break;
-            case 'MALE':
+            case 'GenderIdentity_Man':
                 $gender = 'M';
                 break;
             default:
                 $gender = 'U';
                 break;
         }
-        $genderIdentity = str_replace('_', ' ', $participant->genderIdentity);
-        $genderIdentity = ucfirst(strtolower($genderIdentity));
         return new Participant([
             'id' => $id,
             'biobankId' => $biobankId,
             'firstName' => $participant->firstName,
             'lastName' => $participant->lastName,
             'dob' => isset($participant->dateOfBirth) ? new \DateTime($participant->dateOfBirth) : null,
-            'genderIdentity' => $genderIdentity,
+            'genderIdentity' => isset($participant->genderIdentity) ? $participant->genderIdentity : '',
             'gender' => $gender,
             'zip' => isset($participant->zipCode) ? $participant->zipCode : null,
             'status' => $status

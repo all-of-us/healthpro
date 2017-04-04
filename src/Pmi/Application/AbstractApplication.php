@@ -375,7 +375,13 @@ abstract class AbstractApplication extends Application
 
         // Register custom Twig display_code filter
         $this['twig']->addFilter(new Twig_SimpleFilter('display_code', function($text) {
-            return ucwords(strtolower(str_replace('_', ' ', $text)));
+            if (preg_match('/^[A-Z_]+$/', $text)) {
+                return $text;
+            }
+            $text = preg_replace('/^.*_/', '', $text);
+            $text = preg_replace('/([A-Z])/', ' $1', $text);
+            $text = trim($text);
+            return $text;
         }));
 
         // Register custom Twig cache
