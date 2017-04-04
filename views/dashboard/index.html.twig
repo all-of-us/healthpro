@@ -1,6 +1,6 @@
 {% extends 'dashboard/base.html.twig' %}
 {% block body %}
-    <h2><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard</h2>
+    <h2><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard <i class="fa fa-question-circle text-info pull-right" style="cursor: pointer;" id="dashboard-help"></i> </h2>
     <div class="modal fade" id="loading-modal" tabindex="-1" role="dialog" aria-labelledby="loading-modal" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -18,6 +18,7 @@
     <ul class="nav nav-tabs top-pad" role="tablist">
         <li role="presentation" class="active"><a href="#total-progress" role="tab" data-toggle="tab" id="total-progress-nav"><span class="fa fa-users"></span> Total Progress to Date</a></li>
         <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab" id="participants-by-region-nav"><span class="fa fa-globe"></span> Participants by Region</a></li>
+        <li role="presentation"><a href="#participants-by-lifecycle" role="tab" data-toggle="tab" id="participants-by-lifecycle-nav"><span class="fa fa-sitemap"></span> Participants by Lifecycle Phase</a></li>
     </ul>
     <div id="plotly-tabs" class="tab-content">
         <div id="total-progress" class="tab-pane pad active fade in">
@@ -70,9 +71,16 @@
                 // function to grab current filter values and load JSON from load_map_data REST endpoint
                 // success handler calls Plotly.newplot()
                 function renderTotalProgressPlot(dialogType) {
+                    // throw error if date selection is invalid
+                    var tpStartDate = $('#total-progress-start-date').val();
+                    var tpEndDate = $('#total-progress-end-date').val();
+                    if ( new Date(tpStartDate) > new Date(tpEndDate)) {
+                        alert('Your date selection is invalid: The selected cutoff date of ' + tpEndDate + ' is before ' + tpStartDate + '. Please select a valid date range.');
+                        return false;
+                    }
                     var centers = loadRecruitmentFilters('total-progress');
                     if (centers.length == 0) {
-                        alert('You must select at least one recruitment center to plot results');
+                        alert('You must select at least one recruitment center to plot results.');
                         return false;
                     } else {
                         var spinnerLoc = 'plotly-total-progress';
@@ -90,20 +98,19 @@
                         // gather params
                         var metricAttr = $('#total-progress-metric-attribute').val();
                         var tpInterval = $('#total-progress-interval').val();
-                        var tpStartDate = $('#total-progress-start-date').val();
-                        var tpEndDate = $('#total-progress-end-date').val();
                         var metricTitle = $('#total-progress-metric-attribute option:selected').text();
                         var showAnnot = $('#total-progress-show-annot').is(':checked');
                         var tpWidth = $('#plotly-total-progress').width() - 30;
                         if (centers.length == $('#total-progress .center-filter').length) {
                             centers = ['ALL'];
                         }
+
                         // load data from metrics API
                         $.getJSON('/dashboard/metrics_load?csrf_token={{ csrf_token('dashboard') }}&metrics_attribute=' + metricAttr + '&interval=' + tpInterval + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate + '&centers=' + centers, function(data) {
                             if (data.length != 0) {
                                 var progressAnnot = [];
                                 var tpLayout = {
-                                    title: 'Count of ' + metricTitle + ' from ' + tpStartDate + ' to ' + tpEndDate,
+                                    title: 'Count of <b>' + metricTitle.toLowerCase() + '</b> from ' + tpStartDate + ' to ' + tpEndDate,
                                     font: PLOTLY_LABEL_FONT,
                                     barmode: 'stack',
                                     width: tpWidth,
@@ -119,8 +126,9 @@
                                 // empty div contents in case there had been an error message before
                                 $('#' + spinnerLoc).empty();
 
-                                // render plot and stop spinner
+                                // render plot, remove plotly link and stop spinner
                                 Plotly.newPlot('plotly-total-progress', data, tpLayout, PLOTLY_OPTS);
+                                removePlotlyLink('plotly-total-progress');
                                 stopSpinner(spinnerLoc);
 
                                 if (dialogType == 'modal' ) {
@@ -138,7 +146,7 @@
 
                 var now = new Date();
                 var nowString = now.toISOString().split('T')[0];
-                var lastWeek = new Date().setDate(now.getDate() - 7);
+                var lastWeek = new Date().setDate(now.getDate() - 6);
                 var lastWeekStr = new Date(lastWeek).toISOString().split('T')[0];
                 $('#total-progress-end-date').val(nowString);
                 $('#total-progress-start-date').val(lastWeekStr);
@@ -202,7 +210,7 @@
                                     <label for="region-plot-end-date">Cutoff</label>
                                     <input type="text" class="form-control datepicker region-plot-time-control" id="region-plot-end-date" />
                                 </div>
-                                <div class="col-md-12 col-xs-4 form-group form-group-sm">
+                                <div id="color-profile-select" class="col-md-12 col-xs-4 form-group form-group-sm">
                                     <label for="map-color-profile">Color Profile <span class="fa fa-question-circle-o" data-toggle="tooltip" title="Only applies to states and census regions maps"></span></label>
                                     <select class="form-control region-plot-control" id="map-color-profile">
                                         {% for color in color_profiles %}
@@ -250,11 +258,20 @@
                                 regionCenters = ['ALL'];
                             }
 
+                            if (mapMode == 'Participant.hpoId') {
+                                $('#map-color-profile').prop('disabled', true);
+                            } else {
+                                $('#map-color-profile').prop('disabled', false);
+                            }
+
                             // load data from metrics API
                             $.getJSON('/dashboard/metrics_load_region?csrf_token={{ csrf_token('dashboard') }}&map_mode=' + mapMode + '&end_date=' + mapCutoff + '&centers=' + regionCenters + '&color_profile=' + mapColor, function (data) {
                                 if (data.length != 0) {
+                                    if (mapModeText != 'Recruitment Origin') {
+                                        mapModeText += ' of residence'
+                                    }
                                     var mapLayout = {
-                                        title: 'Percentage of target participant registrations by ' + mapModeText + ' of residence as of ' + mapCutoff,
+                                        title: 'Percentage of target consented registrations by <b>' + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
                                         font: PLOTLY_LABEL_FONT,
                                         width: mapWidth,
                                         height: mapWidth / 1.66,
@@ -266,6 +283,7 @@
 
                                     // render plot and stop spinner
                                     Plotly.newPlot('plotly-participants-by-region', data, mapLayout, PLOTLY_OPTS);
+                                    removePlotlyLink('plotly-participants-by-region');
                                     stopSpinner(spinnerLoc);
 
                                     if (dialogType == 'modal') {
@@ -317,7 +335,141 @@
                 </script>
             </div>
         </div>
+        <div id="participants-by-lifecycle" class="tab-pane pad fade">
+            <div class="row">
+                <div class="col-md-3">
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-lifecycle'} %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <h4 class="text-primary">Plot Options</h4>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row form-group-sm">
+                                <div class="col-md-12 col-xs-12 form-group form-group-sm">
+                                    <label>Cutoff</label>
+                                    <input type="text" class="form-control lifecycle-time-control datepicker" id="lifecycle-end-date" />
+                                </div>
+                                <div class="col-md-12 col-xs-12 form-group form-group-sm">
+                                    <label>Show Column Totals <input type="checkbox" id="lifecycle-plot-show-annot" class="lifecycle-plot-control"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9 plotly-div" id="plotly-participants-by-lifecycle"></div>
+
+                <script type="text/javascript">
+                    // function to grab current filter values and load JSON from load_map_data REST endpoint
+                    // success handler calls Plotly.newplot()
+                    function renderLcPlot(dialogType) {
+                        var lifecycleCenters = loadRecruitmentFilters('participants-by-lifecycle');
+                        if (lifecycleCenters.length == 0) {
+                            alert('You must select at least one recruitment center to plot results');
+                            return false;
+                        } else {
+                            var lcWidth = $('#plotly-participants-by-lifecycle').width() - 30;
+                            var spinnerLoc = 'plotly-participants-by-lifecycle';
+                            if (dialogType == 'spinner') {
+                                launchSpinner(spinnerLoc);
+                            } else if (dialogType == 'modal') {
+                                spinnerLoc = 'modal-spinner-target';
+                                // empty target in case there was an error message beforehand
+                                $('#' + spinnerLoc).empty();
+                                launchSpinner(spinnerLoc);
+                                $('#loading-modal').modal('show');
+                            }
+                            console.log('calling renderLcPlot()');
+                            var lcEndDate = $('#lifecycle-end-date').val();
+                            var lcShowAnnot = $('#lifecycle-plot-show-annot').is(':checked');
+
+                            if (lifecycleCenters.length == $('#participants-by-lifecycle .center-filter').length) {
+                                lifecycleCenters = ['ALL'];
+                            }
+
+                            $.getJSON('/dashboard/metrics_load_lifecycle?csrf_token={{ csrf_token('dashboard') }}&end_date=' + lcEndDate + '&centers=' + lifecycleCenters, function (data) {
+                                if (data.length != 0) {
+                                    var lcAnnot = [];
+                                    var lcTitle = 'Participant registrations by <b>lifecycle phase</b> as of ' + lcEndDate;
+                                    var lcLayout = {
+                                        title: lcTitle,
+                                        font: PLOTLY_LABEL_FONT,
+                                        barmode: 'stack',
+                                        width: lcWidth,
+                                        height: lcWidth / 1.66,
+                                        annotations: lcAnnot,
+                                        xaxis: {
+                                            tickangle: -45
+                                        },
+                                        margin: {
+                                            b: 150,
+                                            pad: 5
+                                        }
+                                    };
+
+                                    // load column totals if requested
+                                    if (lcShowAnnot) {
+                                        loadBarChartAnnotations(data, lcAnnot);
+                                    }
+
+                                    // render plot, remove plotly link and stop spinner
+                                    Plotly.newPlot('plotly-participants-by-lifecycle', data, lcLayout, PLOTLY_OPTS);
+                                    removePlotlyLink('plotly-participants-by-lifecycle');
+                                    stopSpinner(spinnerLoc);
+
+                                    if (dialogType == 'modal') {
+                                        $('#loading-modal').modal('hide');
+                                    }
+                                    console.log('renderLcPlot() complete');
+                                } else {
+                                    setMetricsError(spinnerLoc);
+                                    console.log('error in renderLcPlot()');
+                                }
+                            });
+                        }
+                    }
+
+
+                    var now = new Date().toISOString().split('T')[0];
+                    $('#lifecycle-end-date').val(now);
+
+                    // load plot on tab show (to save loading time)
+                    $('#participants-by-lifecycle-nav').on('shown.bs.tab', function (e) {
+                        console.log('Showing lifecycle plot');
+                        // if plot has not been shown yet, render and then store state
+                        // this will prevent points render calls once map has been initialized
+                        if (!PLOTS_SHOWN['participants-by-lifecycle-nav']) {
+                            renderLcPlot('spinner');
+                            PLOTS_SHOWN['participants-by-lifecycle-nav'] = true;
+                        }
+                    });
+
+                    // re-render on filter change
+                    $('.lifecycle-plot-control').change(function() {
+                        renderLcPlot('spinner');
+                    });
+
+                    // re-render on filter change with modal (for time changes, may need new metrics)
+                    $('.lifecycle-time-control').change(function() {
+                        renderLcPlot('modal');
+                    });
+
+                    // re-render on window resizeEnd if tab is visible
+                    $( window ).on('resizeEnd', function() {
+                        if ($('#plotly-participants-by-lifecycle').is(':visible')) {
+                            renderLcPlot('');
+                        }
+                    });
+
+                    $('#participants-by-lifecycle').find('.redraw-plotly').click(function() {
+                        renderLcPlot('spinner');
+                    });
+                </script>
+            </div>
+        </div>
     </div>
+    {% include 'dashboard/dashboard_help.html.twig' %}
     <script type="text/javascript">
         $('.datepicker').datepicker({dateFormat: 'yy-mm-dd', showButtonPanel: true});
 
