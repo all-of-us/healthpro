@@ -302,7 +302,7 @@ class DashboardController extends AbstractController
                 foreach($all_states as $state) {
                     array_push($state_names, $state['state']);
 
-                    $state_lookup = $map_mode . "." . $state['state'];
+                    $state_lookup = $map_mode . ".PIIState_" . $state['state'];
                     $count = 0;
 
                     // iterate through each center to accumulate a running total to store
