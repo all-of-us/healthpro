@@ -38,13 +38,6 @@ class WorkQueueController extends AbstractController
                 'Other' => 'OTHER'
             ]
         ],
-        'ethnicity' => [
-            'label' => 'Ethnicity',
-            'options' => [
-                'Hispanic' => 'HISPANIC',
-                'Non Hispanic' => 'NON_HISPANIC'
-            ]
-        ],
         'race' => [
             'label' => 'Race',
             'options' => [
@@ -116,7 +109,6 @@ class WorkQueueController extends AbstractController
             $headers[] = 'General Consent Status';
             $headers[] = 'General Consent Date';
             $headers[] = 'EHR Consent Status';
-            $headers[] = 'Ethnicity';
             $headers[] = 'Race';
             $headers[] = 'Gender Identity';
             fputcsv($output, $headers);
@@ -140,7 +132,6 @@ class WorkQueueController extends AbstractController
                 $row[] = isset($participant->consentForStudyEnrollment) && $participant->consentForStudyEnrollment === 'SUBMITTED' ? 1 : 0;
                 $row[] = isset($participant->consentForStudyEnrollmentTime) ? date('m/d/Y', strtotime($participant->consentForStudyEnrollmentTime)) : '';
                 $row[] = isset($participant->consentForElectronicHealthRecords) && $participant->consentForElectronicHealthRecords === 'SUBMITTED' ? 1 : 0;
-                $row[] = isset($participant->ethnicity) ? $participant->ethnicity : '';
                 $row[] = isset($participant->race) ? $participant->race : '';
                 $row[] = isset($participant->genderIdentity) ? $participant->genderIdentity : '';
                 fputcsv($output, $row);
