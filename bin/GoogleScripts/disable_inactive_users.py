@@ -91,8 +91,10 @@ def main(argv):
         for u in results.get('users', []):
             users.append(u)
             lastLogin=datetime.strptime(u.get('lastLoginTime',None),"%Y-%m-%dT%H:%M:%S.%fZ")
-            if (datetime.today()-lastLogin).days > INACTIVEDAYS:
+            creationtime=datetime.strptime(u.get('creationTime',None),"%Y-%m-%dT%H:%M:%S.%fZ")
+            if ((datetime.today()-lastLogin).days > INACTIVEDAYS) or ((datetime.today()-lastLogin).days > 2000 and (datetime.today()-creationtime).days > INACTIVEDAYS):
                 usersToDisable.append(u)
+                continue
 
     for user in usersToDisable:
         if not DRYRUN:
