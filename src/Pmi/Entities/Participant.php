@@ -46,7 +46,7 @@ class Participant
         }
 
         // Map gender identity to gender options for MayoLINK.  TODO: should we switch to using participant sex if populated?
-        switch ($participant->genderIdentity) {
+        switch (isset($participant->genderIdentity) ? $participant->genderIdentity : null) {
             case 'GenderIdentity_Woman':
                 $this->gender = 'F';
                 break;
