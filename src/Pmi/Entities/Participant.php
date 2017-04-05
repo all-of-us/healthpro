@@ -2,20 +2,12 @@
 namespace Pmi\Entities;
 
 use Pmi\Util;
+use Pmi\Drc\CodeBook;
 
 class Participant
 {
     public $status = false;
-
     public $id;
-    public $biobankId;
-    public $firstName;
-    public $lastName;
-    public $dob;
-    public $genderIdentity;
-    public $gender;
-    public $zip;
-
     protected $rdrData;
 
     public function __construct($rdrParticipant = null)
@@ -66,13 +58,6 @@ class Participant
                 $this->dob = null;
             }
         }
-
-        // Add values if they exist
-        foreach (['biobankId', 'firstName', 'lastName', 'genderIdentity', 'zip'] as $field) {
-            if (isset($participant->{$field})) {
-                $this->{$field} = $participant->{$field};
-            }
-        }
     }
 
     public function getShortId()
@@ -101,7 +86,7 @@ class Participant
     public function __get($key)
     {
         if (isset($this->rdrData->{$key})) {
-            return $this->rdrData->{$key};
+            return CodeBook::display($this->rdrData->{$key});
         } else {
             if (strpos($key, 'num') === 0) {
                 return 0;

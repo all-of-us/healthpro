@@ -15,7 +15,7 @@
     <dt>DOB</dt>
     <dd>{{ participant.dob|date('n/j/Y') }}</dd>
     <dt>Gender Identity</dt>
-    <dd>{{ participant.genderIdentity|display_code }}</dd>
+    <dd>{{ participant.genderIdentity }}</dd>
 </dl>
 
 {% set params = { participantId: participant.id, orderId: order.id } %}
