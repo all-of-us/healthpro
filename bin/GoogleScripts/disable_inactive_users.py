@@ -12,13 +12,6 @@ from googleapiclient.discovery import build
 
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import date, timedelta,datetime
-#pip install httplib2 boto google-api-python-client
-
-#try:
-#    import argparse
-#    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-#except ImportError:
-#    flags = None
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/admin-directory_v1-python-quickstart.json
@@ -102,9 +95,11 @@ def main(argv):
                 usersToDisable.append(u)
 
     for user in usersToDisable:
-        user["suspended"]=True
-        user["suspensionReason"]="Inactivity"
         if not DRYRUN:
+            if user["suspended"]:
+                continue
+            user["suspended"]=True
+            user["suspensionReason"]="Inactivity"
             dirservice.users().update(userKey=user.get('primaryEmail',None),body=user).execute()
             print("Suspending %s" % user.get('primaryEmail',None))
             continue
