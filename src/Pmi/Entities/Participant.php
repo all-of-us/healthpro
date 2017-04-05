@@ -80,6 +80,29 @@ class Participant
         }
     }
 
+    public function getAddress()
+    {
+        $address = '';
+        if ($this->streetAddress) {
+            $address .= $this->streetAddress . "\n";
+        }
+        if ($this->city) {
+            $address .= $this->city;
+            if ($this->state) {
+                $address .= ', ';
+            } else {
+                $address .= ' ';
+            }
+        }
+        if ($this->state) {
+            $address .= $this->state . ' ';
+        }
+        if ($this->zipCode) {
+            $address .= $this->zipCode;
+        }
+        return trim($address);
+    }
+
     /**
      * Magic methods for RDR data
      */

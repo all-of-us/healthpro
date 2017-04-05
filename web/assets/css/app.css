@@ -176,6 +176,9 @@ label.label-normal {
 .multiheader-demographics {
     background-color: #ded;
 }
+.multiheader-contact {
+    background-color: #edd;
+}
 
 /* Orders */
 table.table-samples {
