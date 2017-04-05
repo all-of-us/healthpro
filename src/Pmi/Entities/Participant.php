@@ -103,16 +103,16 @@ class Participant
         if (isset($this->rdrData->{$key})) {
             return $this->rdrData->{$key};
         } else {
-            return null;
+            if (strpos($key, 'num') === 0) {
+                return 0;
+            } else {
+                return null;
+            }
         }
     }
 
     public function __isset($key)
     {
-        if (isset($this->rdrData->{$key})) {
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     }
 }
