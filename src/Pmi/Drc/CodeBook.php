@@ -17,6 +17,11 @@ class CodeBook
         'GenderIdentity_NonBinary' => 'Non-binary',
         'GenderIdentity_Transgender' => 'Transgender',
         'GenderIdentity_AdditionalOptions' => 'Other',
+        'SexualOrientation_Straight' => 'Straight',
+        'SexualOrientation_Gay' => 'Gay',
+        'SexualOrientation_Lesbian' => 'Lesbian',
+        'SexualOrientation_Bisexual' => 'Bisexual',
+        'SexualOrientation_None' => 'Other',
         'SpokenWrittenLanguage_Arabic' => 'Arabic',
         'SpokenWrittenLanguage_Bengali' => 'Bengali',
         'SpokenWrittenLanguage_Czech' => 'Czech',
@@ -72,6 +77,15 @@ class CodeBook
         'SpokenWrittenLanguage_ChineseHongKong' => 'Chinese (Hong Kong)',
         'SpokenWrittenLanguage_ChineseSingapore' => 'Chinese (Singapore)',
         'SpokenWrittenLanguage_ChineseTaiwan' => 'Chinese (Taiwan)',
+        'AnnualIncome_less10k' => 'Less than $10,000',
+        'AnnualIncome_10k25k' => '$10,000- $24,999',
+        'AnnualIncome_25k35k' => '$25,000- $34,999',
+        'AnnualIncome_35k50k' => '$35,000- $49,999',
+        'AnnualIncome_50k75k' => '$50,000- $74,999',
+        'AnnualIncome_75k100k' => '$75,000-$99,999$',
+        'AnnualIncome_100k150k' => '$100,000- $149,999',
+        'AnnualIncome_150k200k' => '$150,000- $199,999',
+        'AnnualIncome_more200k' => '$200,000 or more',
     ];
 
     public static function display($code)

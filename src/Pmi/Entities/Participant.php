@@ -103,6 +103,17 @@ class Participant
         return trim($address);
     }
 
+    public function getAge()
+    {
+        if (!$this->dob) {
+            return null;
+        } else {
+            return $this->dob
+                ->diff(new \DateTime())
+                ->y;
+        }
+    }
+
     /**
      * Magic methods for RDR data
      */

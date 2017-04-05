@@ -42,7 +42,7 @@
 
                 <th colspan="2" class="topheader multiheader-status">Status</th>
 
-                <th colspan="2" class="topheader multiheader-demographics">Demographics</th>
+                <th colspan="7" class="topheader multiheader-demographics">Demographics</th>
             </tr>
             <tr>
                 <th class="secondaryheader col-group-contact multiheader-contact">Address</th>
@@ -57,8 +57,13 @@
                 <th class="secondaryheader col-group-status multiheader-status">Phys Meas</th>
                 <th class="secondaryheader col-group-status multiheader-status">Bio&shy;specimens</th>
 
-                <th class="secondaryheader col-group-demographics multiheader-demographics">Race</th>
+                <th class="secondaryheader col-group-demographics multiheader-demographics">Age</th>
+                <th class="secondaryheader col-group-demographics multiheader-demographics">Sex</th>
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Gender Identity</th>
+                <th class="secondaryheader col-group-demographics multiheader-demographics">Sexual Orientation</th>
+                <th class="secondaryheader col-group-demographics multiheader-demographics">Race/Ethnicity</th>
+                <th class="secondaryheader col-group-demographics multiheader-demographics">Education</th>
+                <th class="secondaryheader col-group-demographics multiheader-demographics">Income</th>
             </tr>
         </thead>
         <tbody>
@@ -115,8 +120,14 @@
                     <td class="text-center" data-order="{{ participant.numBaselineSamplesArrived }}">
                         <strong class="text-{{ participant.numBaselineSamplesArrived >= 7 ? 'success' : 'danger' }}">{{ participant.numBaselineSamplesArrived }}</strong>
                     </td>
-                    <td>{{ participant.race }}</td>
+
+                    <td>{{ participant.getAge() }}</td>
+                    <td>{{ participant.sex }}</td>
                     <td>{{ participant.genderIdentity }}</td>
+                    <td>{{ participant.sexualOrientation }}</td>
+                    <td>{{ participant.race }}</td>
+                    <td>{{ participant.education }}</td>
+                    <td>{{ participant.income }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -163,8 +174,13 @@ $(document).ready(function() {
             {% endfor %}
             { name: 'physicalMeasurementsStatus' },
             { name: 'biobankSamples' },
+            { name: 'age', visible: false },
+            { name: 'sex', visible: false },
+            { name: 'genderIdentity', visible: false },
+            { name: 'sexualOrientation', visible: false },
             { name: 'race', visible: false },
-            { name: 'genderIdentity', visible: false }
+            { name: 'education', visible: false },
+            { name: 'income', visible: false }
         ],
         pageLength: 25,
         buttons: [
