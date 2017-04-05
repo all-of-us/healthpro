@@ -25,51 +25,7 @@ class RdrParticipants
 
     protected function participantToResult($participant)
     {
-        if (!is_object($participant)) {
-            return false;
-        }
-        if (isset($participant->participantId)) {
-            $id = $participant->participantId;
-        } else {
-            return false;
-        }
-        if (!empty($participant->biobankId)) {
-            $biobankId = $participant->biobankId;
-        } else {
-            return false;
-        }
-
-        // HealthPro status is active if participant is consented AND has completed basics survey
-        if (!empty($participant->questionnaireOnTheBasics) && $participant->questionnaireOnTheBasics === 'SUBMITTED') {
-            $status = true;
-        } else {
-            $status = false;
-        }
-        if (empty($participant->consentForStudyEnrollment) || $participant->consentForStudyEnrollment !== 'SUBMITTED') {
-            $status = false;
-        }
-        switch ($participant->genderIdentity) {
-            case 'GenderIdentity_Woman':
-                $gender = 'F';
-                break;
-            case 'GenderIdentity_Man':
-                $gender = 'M';
-                break;
-            default:
-                $gender = 'U';
-                break;
-        }
-        return new Participant([
-            'id' => $id,
-            'biobankId' => $biobankId,
-            'firstName' => $participant->firstName,
-            'lastName' => $participant->lastName,
-            'dob' => isset($participant->dateOfBirth) ? new \DateTime($participant->dateOfBirth) : null,
-            'genderIdentity' => isset($participant->genderIdentity) ? $participant->genderIdentity : '',
-            'gender' => $gender,
-            'zip' => isset($participant->zipCode) ? $participant->zipCode : null,
-            'status' => $status
-        ]);
+        return new Participant($participant);
     }
 
     protected function paramsToQuery($params)

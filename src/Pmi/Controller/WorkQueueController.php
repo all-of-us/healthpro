@@ -4,6 +4,7 @@ namespace Pmi\Controller;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Pmi\Audit\Log;
+use Pmi\Entities\Participant;
 
 class WorkQueueController extends AbstractController
 {
@@ -68,7 +69,7 @@ class WorkQueueController extends AbstractController
         $results = [];
         foreach ($summaries as $summary) {
             if (isset($summary->resource)) {
-                $results[] = $summary->resource;
+                $results[] = new Participant($summary->resource);
             }
         }
         return $results;

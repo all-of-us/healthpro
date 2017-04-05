@@ -52,10 +52,10 @@
         <tbody>
             {% for participant in participants %}
                 <tr>
-                    <td data-order="{{ participant.lastName|default('') }}"><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.lastName|default('') }}</a></td>
-                    <td data-order="{{ participant.firstName|default('') }}"><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.firstName|default('') }}</a></td>
-                    <td>{{ participant.participantId }}</td>
-                    <td data-order="{{ participant.dateOfBirth|default('') }}">{{ participant.dateOfBirth is defined ? participant.dateOfBirth|date('m/d/Y') : '' }}</td>
+                    <td data-order="{{ participant.lastName }}"><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}</a></td>
+                    <td data-order="{{ participant.firstName }}"><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a></td>
+                    <td>{{ participant.id }}</td>
+                    <td data-order="{{ participant.dob ? participant.dob|date('Y-m-d') : '' }}">{{ participant.dob ? participant.dob|date('m/d/Y') : '' }}</td>
                     {% for field, label in surveys %}
                         <td class="text-center" data-order="{{ attribute(participant, 'questionnaireOn' ~ field)|default('') == 'SUBMITTED' ? '1' : '0' }}">
                             {% if attribute(participant, 'questionnaireOn' ~ field)|default('') == 'SUBMITTED' %}
