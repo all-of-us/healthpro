@@ -92,14 +92,16 @@ def main(argv):
             users.append(u)
             lastLogin=datetime.strptime(u.get('lastLoginTime',None),"%Y-%m-%dT%H:%M:%S.%fZ")
             creationtime=datetime.strptime(u.get('creationTime',None),"%Y-%m-%dT%H:%M:%S.%fZ")
+            if (datetime.today()-creationtime).days<=0:
+                continue
             if ((datetime.today()-lastLogin).days > INACTIVEDAYS) or ((datetime.today()-lastLogin).days > 2000 and (datetime.today()-creationtime).days > INACTIVEDAYS):
                 usersToDisable.append(u)
                 continue
 
     for user in usersToDisable:
+        if user["suspended"]:
+            continue
         if not DRYRUN:
-            if user["suspended"]:
-                continue
             user["suspended"]=True
             user["suspensionReason"]="Inactivity"
             dirservice.users().update(userKey=user.get('primaryEmail',None),body=user).execute()
