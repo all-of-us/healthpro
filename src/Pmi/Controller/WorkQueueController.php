@@ -118,23 +118,19 @@ class WorkQueueController extends AbstractController
                     $participant->participantId,
                     $participant->lastName,
                     $participant->firstName,
-                    isset($participant->dateOfBirth) ? date('m/d/Y', strtotime($participant->dateOfBirth)) : '',
+                    $participant->dob ? $participant->dob->format('m/d/Y') : '',
                 ];
                 foreach (self::$surveys as $survey => $label) {
                     $row[] = $participant->{"questionnaireOn{$survey}"} === 'SUBMITTED' ? 1 : 0;
-                    if (isset($participant->{"questionnaireOn{$survey}Time"})) {
-                        $row[] = date('m/d/Y', strtotime($participant->{"questionnaireOn{$survey}Time"}));
-                    } else {
-                        $row[] = '';
-                    }
+                    $row[] = $participant->{"questionnaireOn{$survey}Time"} ? date('m/d/Y', strtotime($participant->{"questionnaireOn{$survey}Time"})) : '';
                 }
-                $row[] = isset($participant->physicalMeasurementsStatus) && $participant->physicalMeasurementsStatus === 'SUBMITTED' ? 1 : 0;
+                $row[] = $participant->physicalMeasurementsStatus === 'SUBMITTED' ? 1 : 0;
                 $row[] = $participant->numBaselineSamplesArrived;
-                $row[] = isset($participant->consentForStudyEnrollment) && $participant->consentForStudyEnrollment === 'SUBMITTED' ? 1 : 0;
-                $row[] = isset($participant->consentForStudyEnrollmentTime) ? date('m/d/Y', strtotime($participant->consentForStudyEnrollmentTime)) : '';
-                $row[] = isset($participant->consentForElectronicHealthRecords) && $participant->consentForElectronicHealthRecords === 'SUBMITTED' ? 1 : 0;
-                $row[] = isset($participant->race) ? $participant->race : '';
-                $row[] = isset($participant->genderIdentity) ? $participant->genderIdentity : '';
+                $row[] = $participant->consentForStudyEnrollment === 'SUBMITTED' ? 1 : 0;
+                $row[] = $participant->consentForStudyEnrollmentTime ? date('m/d/Y', strtotime($participant->consentForStudyEnrollmentTime)) : '';
+                $row[] = $participant->consentForElectronicHealthRecords === 'SUBMITTED' ? 1 : 0;
+                $row[] = $participant->race;
+                $row[] = $participant->genderIdentity;
                 fputcsv($output, $row);
             }
             fwrite($output, "\"\"\n");
