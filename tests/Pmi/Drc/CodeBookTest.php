@@ -20,4 +20,14 @@ class CodeBookTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame('TN', CodeBook::display('PIIState_TN'));
     }
+
+    public function testAgeRangeConversion()
+    {
+        $ten = (new \DateTime('-10 years'))->format('Y-m-d');
+        $twenty = (new \DateTime('-20 years'))->format('Y-m-d');
+        $eighty = (new \DateTime('-80 years'))->format('Y-m-d');
+
+        $this->assertSame(["ge{$ten}", "le{$twenty}"], CodeBook::ageRangeToDob('10-20'));
+        $this->assertSame(["ge{$eighty}"], CodeBook::ageRangeToDob('80-'));
+    }
 }

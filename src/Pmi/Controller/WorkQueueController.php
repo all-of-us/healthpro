@@ -5,6 +5,7 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Pmi\Audit\Log;
 use Pmi\Entities\Participant;
+use Pmi\Drc\CodeBook;
 
 class WorkQueueController extends AbstractController
 {
@@ -14,7 +15,7 @@ class WorkQueueController extends AbstractController
         ['export', '/export.csv']
     ];
     protected static $filters = [
-        'age' => [
+        'ageRange' => [
             'label' => 'Age',
             'options' => [
                 '0-17' => '0-17',
@@ -25,29 +26,35 @@ class WorkQueueController extends AbstractController
                 '56-65' => '56-65',
                 '66-75' => '66-75',
                 '76-85' => '76-85',
-                '86+' => '86+'
+                '86+' => '86-'
             ]
         ],
-        'gender' => [
+        'genderIdentity' => [
             'label' => 'Gender identity',
             'options' => [
-                'Female' => 'FEMALE',
-                'Male' => 'MALE',
-                'Female to male transgender' => 'FEMALE_TO_MALE_TRANSGENDER',
-                'Male to female transgender' => 'MALE_TO_FEMALE_TRANSGENDER',
-                'Intersex' => 'INTERSEX',
-                'Other' => 'OTHER'
+                'Man' => 'GenderIdentity_Man',
+                'Woman' => 'GenderIdentity_Woman',
+                'Non-binary' => 'GenderIdentity_NonBinary',
+                'Transgender' => 'GenderIdentity_Transgender',
+                'Other' => 'GenderIdentity_AdditionalOptions'
             ]
         ],
         'race' => [
             'label' => 'Race',
             'options' => [
-                'American Indian or Alaska Native' => 'AMERICAN_INDIAN_OR_ALASKA_NATIVE',
+                'American Indian / Alaska Native' => 'AMERICAN_INDIAN_OR_ALASKA_NATIVE',
                 'Black or African American' => 'BLACK_OR_AFRICAN_AMERICAN',
                 'Asian' => 'ASIAN',
-                'Native Hawaiian or other Pacific Islander' => 'NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER',
+                'Native Hawaiian or Other Pacific Islander' => 'NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER',
                 'White' => 'WHITE',
-                'Other race' => 'OTHER_RACE'
+                'Hispanic, Latino, or Spanish' => 'HISPANIC_LATINO_OR_SPANISH',
+                'Middle Eastern or North African' => 'MIDDLE_EASTERN_OR_NORTH_AFRICAN',
+                'H/L/S and White' => 'HLS_AND_WHITE',
+                'H/L/S and Black' => 'HLS_AND_BLACK',
+                'H/L/S and one other race' => 'HLS_AND_ONE_OTHER_RACE',
+                'H/L/S and more than one other race' => 'HLS_AND_MORE_THAN_ONE_OTHER_RACE',
+                'More than one race' => 'MORE_THAN_ONE_RACE',
+                'Other' => 'OTHER_RACE'
             ]
         ]
     ];
@@ -65,6 +72,18 @@ class WorkQueueController extends AbstractController
     {
         // TODO: map site to organization
         $params['hpoId'] = 'PITT';
+
+        // convert age range to dob filters - using string instead of array to support multiple params with same name
+        if (isset($params['ageRange'])) {
+            $ageRange = $params['ageRange'];
+            unset($params['ageRange']);
+            $params = http_build_query($params, null, '&', PHP_QUERY_RFC3986);
+
+            $dateOfBirthFilters = CodeBook::ageRangeToDob($ageRange);
+            foreach ($dateOfBirthFilters as $filter) {
+                $params .= '&dateOfBirth=' . rawurlencode($filter);
+            }
+        }
         $summaries = $app['pmi.drc.participants']->listParticipantSummaries($params);
         $results = [];
         foreach ($summaries as $summary) {

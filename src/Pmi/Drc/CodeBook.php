@@ -112,4 +112,22 @@ class CodeBook
             return $code;
         }
     }
+
+    public static function ageRangeToDob($range)
+    {
+        $parameters = [];
+        if (!preg_match('/^(\d+)-(\d+)?$/', $range, $matches)) {
+            return $parameters;
+        }
+
+        $start = new \DateTime("-{$matches[1]} years");
+        $parameters[] = 'ge' . $start->format('Y-m-d');
+
+        if (isset($matches[2])) {
+            $end = new \DateTime("-{$matches[2]} years");
+            $parameters[] = 'le' . $end->format('Y-m-d');
+        }
+
+        return $parameters;
+    }
 }
