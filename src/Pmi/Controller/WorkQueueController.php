@@ -87,6 +87,25 @@ class WorkQueueController extends AbstractController
         ]);
     }
 
+    protected static function csvDateFromObject($date)
+    {
+        return is_object($date) ? $date->format('m/d/Y') : '';
+    }
+
+    protected static function csvDateFromString($string)
+    {
+        if (!empty($string) && ($time = strtotime($string))) {
+            return date('m/d/Y', $time);
+        } else {
+            return '';
+        }
+    }
+
+    protected static function csvStatusFromSubmitted($status)
+    {
+        return $status === 'SUBMITTED' ? 1 : 0;
+    }
+
     public function exportAction(Application $app, Request $request)
     {
         $params = array_filter($request->query->all());
@@ -99,7 +118,21 @@ class WorkQueueController extends AbstractController
                 'PMI ID',
                 'Last Name',
                 'First Name',
-                'Date of Birth'
+                'Date of Birth',
+                'Language',
+                'General Consent Status',
+                'General Consent Date',
+                'EHR Consent Status',
+                'EHR Consent Date',
+                'Address',
+                'Email',
+                'Phone',
+                'Sex',
+                'Gender Identity',
+                'Sexual Orientation',
+                'Race/Ethnicity',
+                'Education',
+                'Income'
             ];
             foreach (self::$surveys as $survey => $label) {
                 $headers[] = $label . ' PPI Survey Complete';
@@ -107,30 +140,34 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Biospecimens';
-            $headers[] = 'General Consent Status';
-            $headers[] = 'General Consent Date';
-            $headers[] = 'EHR Consent Status';
-            $headers[] = 'Race';
-            $headers[] = 'Gender Identity';
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
                 $row = [
-                    $participant->participantId,
+                    $participant->id,
                     $participant->lastName,
                     $participant->firstName,
-                    $participant->dob ? $participant->dob->format('m/d/Y') : '',
+                    self::csvDateFromObject($participant->dob),
+                    $participant->language,
+                    self::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
+                    self::csvDateFromString($participant->consentForStudyEnrollmentTime),
+                    self::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
+                    self::csvDateFromString($participant->consentForElectronicHealthRecordsTime),
+                    $participant->getAddress(),
+                    $participant->email,
+                    $participant->phoneNumber,
+                    $participant->sex,
+                    $participant->genderIdentity,
+                    $participant->sexualOrientation,
+                    $participant->race,
+                    $participant->education,
+                    $participant->income
                 ];
                 foreach (self::$surveys as $survey => $label) {
-                    $row[] = $participant->{"questionnaireOn{$survey}"} === 'SUBMITTED' ? 1 : 0;
-                    $row[] = $participant->{"questionnaireOn{$survey}Time"} ? date('m/d/Y', strtotime($participant->{"questionnaireOn{$survey}Time"})) : '';
+                    $row[] = self::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
+                    $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"});
                 }
-                $row[] = $participant->physicalMeasurementsStatus === 'SUBMITTED' ? 1 : 0;
+                $row[] = self::csvStatusFromSubmitted($participant->physicalMeasurementsStatus);
                 $row[] = $participant->numBaselineSamplesArrived;
-                $row[] = $participant->consentForStudyEnrollment === 'SUBMITTED' ? 1 : 0;
-                $row[] = $participant->consentForStudyEnrollmentTime ? date('m/d/Y', strtotime($participant->consentForStudyEnrollmentTime)) : '';
-                $row[] = $participant->consentForElectronicHealthRecords === 'SUBMITTED' ? 1 : 0;
-                $row[] = $participant->race;
-                $row[] = $participant->genderIdentity;
                 fputcsv($output, $row);
             }
             fwrite($output, "\"\"\n");

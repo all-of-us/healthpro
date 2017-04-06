@@ -84,7 +84,10 @@ class Participant
     {
         $address = '';
         if ($this->streetAddress) {
-            $address .= $this->streetAddress . "\n";
+            $address .= $this->streetAddress;
+            if ($this->city || $this->state || $this->zipCode) {
+                $address .= ', ';
+            }
         }
         if ($this->city) {
             $address .= $this->city;
