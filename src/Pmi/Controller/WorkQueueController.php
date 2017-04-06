@@ -60,10 +60,10 @@ class WorkQueueController extends AbstractController
     ];
     protected static $surveys = [
         'TheBasics' => 'Basics',
-        'MedicalHistory' => 'Hist',
-        'Medications' => 'Meds',
         'OverallHealth' => 'Health',
         'Lifestyle' => 'Lifestyle',
+        'MedicalHistory' => 'Hist',
+        'Medications' => 'Meds',
         'FamilyHealth' => 'Family',
         'HealthcareAccess' => 'Access'
     ];
@@ -155,7 +155,9 @@ class WorkQueueController extends AbstractController
                 'Sexual Orientation',
                 'Race/Ethnicity',
                 'Education',
-                'Income'
+                'Income',
+                'Required PPI Surveys Complete',
+                'Completed Surveys'
             ];
             foreach (self::$surveys as $survey => $label) {
                 $headers[] = $label . ' PPI Survey Complete';
@@ -187,7 +189,9 @@ class WorkQueueController extends AbstractController
                     $participant->sexualOrientation,
                     $participant->race,
                     $participant->education,
-                    $participant->income
+                    $participant->income,
+                    $participant->numCompletedBaselinePPIModules == 3 ? '1' : '0',
+                    $participant->numCompletedPPIModules
                 ];
                 foreach (self::$surveys as $survey => $label) {
                     $row[] = self::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
