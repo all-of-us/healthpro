@@ -6,6 +6,7 @@ class CodeBook
     protected static $map = [
         'UNSET' => '',
         'UNMAPPED' => '',
+        'PREFER_NOT_TO_SAY' => 'Prefer Not To Answer',
         'PMI_Skip' => 'Skip',
         'PMI_PreferNotToAnswer' => 'Prefer Not To Answer',
         'PMI_Other' => 'Other',
@@ -86,6 +87,19 @@ class CodeBook
         'AnnualIncome_100k150k' => '$100,000- $149,999',
         'AnnualIncome_150k200k' => '$150,000- $199,999',
         'AnnualIncome_more200k' => '$200,000 or more',
+        'AMERICAN_INDIAN_OR_ALASKA_NATIVE' => 'American Indian / Alaska Native',
+        'BLACK_OR_AFRICAN_AMERICAN' => 'Black or African American',
+        'ASIAN' => 'Asian',
+        'NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER' => 'Native Hawaiian or Other Pacific Islander',
+        'WHITE' => 'White',
+        'HISPANIC_LATINO_OR_SPANISH' => 'Hispanic, Latino, or Spanish',
+        'MIDDLE_EASTERN_OR_NORTH_AFRICAN' => 'Middle Eastern or North African',
+        'HLS_AND_WHITE' => 'H/L/S and White',
+        'HLS_AND_BLACK' => 'H/L/S and Black',
+        'HLS_AND_ONE_OTHER_RACE' => 'H/L/S and one other race',
+        'HLS_AND_MORE_THAN_ONE_OTHER_RACE' => 'H/L/S and more than one other race',
+        'MORE_THAN_ONE_RACE' => 'More than one race',
+        'OTHER_RACE' => 'Other',
     ];
 
     public static function display($code)
