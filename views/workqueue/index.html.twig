@@ -41,7 +41,7 @@
 
                 <th colspan="{{ 2 * (surveys|length) + 2 }}" class="topheader multiheader-survey">PPI Survey Completion</th>
 
-                <th colspan="2" class="topheader multiheader-status">Status</th>
+                <th colspan="{{ 2 * (samples|length) + 3 }}" class="topheader multiheader-inperson">In-Person Enrollment</th>
 
                 <th colspan="7" class="topheader multiheader-demographics">Demographics</th>
             </tr>
@@ -51,15 +51,20 @@
                 <th class="secondaryheader col-group-contact multiheader-contact">Email</th>
                 <th class="secondaryheader col-group-contact multiheader-contact">Phone</th>
 
-                <th class="secondaryheader col-group-ppi multiheader-survey">Required Complete?</th>
-                <th class="secondaryheader col-group-ppi multiheader-survey">Completed Surveys</th>
+                <th class="secondaryheader col-group-ppi col-group-default multiheader-survey">Required Complete?</th>
+                <th class="secondaryheader col-group-ppi col-group-default multiheader-survey">Completed Surveys</th>
                 {% for field, label in surveys %}
                     <th class="secondaryheader col-group-ppi multiheader-survey">{{ label }}</th>
                     <th class="secondaryheader col-group-ppi-time multiheader-survey">{{ label }} Date</th>
                 {% endfor %}
 
-                <th class="secondaryheader col-group-status multiheader-status">Phys Meas</th>
-                <th class="secondaryheader col-group-status multiheader-status">Bio&shy;specimens</th>
+                <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Phys Measurements</th>
+                <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">DNA Isolation Complete?</th>
+                <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Bio&shy;specimens</th>
+                {% for field, label in samples %}
+                    <th class="secondaryheader col-group-inperson multiheader-inperson">{{ label }}</th>
+                    <th class="secondaryheader col-group-inperson-time multiheader-inperson">{{ label }} Date</th>
+                {% endfor %}
 
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Age</th>
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Sex</th>
@@ -73,6 +78,7 @@
         <tbody>
             {% for participant in participants %}
                 <tr>
+                    {# Identifiers and status #}
                     <td data-order="{{ participant.lastName }}"><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}</a></td>
                     <td data-order="{{ participant.firstName }}"><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a></td>
                     <td data-order="{{ participant.dob ? participant.dob|date('Y-m-d') : '' }}">{{ participant.dob ? participant.dob|date('m/d/Y') : '' }}</td>
@@ -101,11 +107,13 @@
                         {% endif %}
                     </td>
 
+                    {# Contact #}
                     <td>{{ participant.recontactMethod }}</td>
                     <td>{{ participant.getAddress() }}</td>
                     <td>{{ participant.email }}</td>
                     <td>{{ participant.phoneNumber }}</td>
 
+                    {# PPI Surveys #}
                     <td class="text-center" data-order="{{ participant.numCompletedBaselinePPIModules == 3 ? '1' : '0' }}">
                         {% if participant.numCompletedBaselinePPIModules == 3 %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
@@ -129,17 +137,44 @@
                         </td>
                     {% endfor %}
 
-                    <td class="text-center" data-order="{{ participant.physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0' }}">
+                    {# In-Person Enrollment #}
+                    <td class="text-center"  data-order="{{ participant.physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0' }}-{{ participant.physicalMeasurementsTime }}">
                         {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
+                            <i class="fa fa-check text-success" aria-hidden="true"></i>
+                            {{ participant.physicalMeasurementsTime ? participant.physicalMeasurementsTime|date('m/d/Y') : '' }}
+                        {% else %}
+                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        {% endif %}
+                    </td>
+                    <td class="text-center" data-order="{{ participant.samplesToIsolateDNA == 'RECEIVED' ? '1' : '0' }}">
+                        {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
                     </td>
                     <td class="text-center" data-order="{{ participant.numBaselineSamplesArrived }}">
-                        <strong class="text-{{ participant.numBaselineSamplesArrived >= 7 ? 'success' : 'danger' }}">{{ participant.numBaselineSamplesArrived }}</strong>
+                        {% if participant.numBaselineSamplesArrived >= 7 %}
+                            <i class="fa fa-check text-success" aria-hidden="true"></i>
+                        {% endif %}
+                        {{ participant.numBaselineSamplesArrived }}
                     </td>
+                    {% for field, label in samples %}
+                        <td class="text-center" data-order="{{ attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' ? '1' : '0' }}">
+                            {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
+                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                            {% endif %}
+                        </td>
+                        <td data-order="{{ attribute(participant, 'sampleStatus' ~ field ~ 'Time') }}">
+                            {% if attribute(participant, 'sampleStatus' ~ field ~ 'Time') %}
+                                {{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y') }}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
 
+                    {# Demographics #}
                     <td>{{ participant.getAge() }}</td>
                     <td>{{ participant.sex }}</td>
                     <td>{{ participant.genderIdentity }}</td>
@@ -192,11 +227,16 @@ $(document).ready(function() {
             { name: 'ppiStatus' },
             { name: 'ppiSurveys' },
             {% for field, label in surveys %}
-                { name: 'ppi{{ field }}' },
+                { name: 'ppi{{ field }}', visible: false },
                 { name: 'ppi{{ field }}Time', visible: false },
             {% endfor %}
             { name: 'physicalMeasurementsStatus' },
+            { name: 'biobankDnaStatus' },
             { name: 'biobankSamples' },
+            {% for field, label in samples %}
+                { name: 'sample{{ field }}', visible: false },
+                { name: 'sample{{ field }}Time', visible: false },
+            {% endfor %}
             { name: 'age', visible: false },
             { name: 'sex', visible: false },
             { name: 'genderIdentity', visible: false },
@@ -211,13 +251,14 @@ $(document).ready(function() {
                 extend: 'colvisGroup',
                 text: 'Default',
                 show: [
-                    '.col-group-default',
-                    '.col-group-ppi',
-                    '.col-group-status'
+                    '.col-group-default'
                 ],
                 hide: [
                     '.col-group-info:not(.col-group-default)',
+                    '.col-group-ppi:not(.col-group-default)',
                     '.col-group-ppi-time',
+                    '.col-group-inperson:not(.col-group-default)',
+                    '.col-group-inperson-time',
                     '.col-group-demographics',
                     '.col-group-contact'
                 ]
@@ -232,14 +273,15 @@ $(document).ready(function() {
                 hide: [
                     '.col-group-info',
                     '.col-group-ppi-time',
-                    '.col-group-status',
+                    '.col-group-inperson',
+                    '.col-group-inperson-time',
                     '.col-group-demographics',
                     '.col-group-contact'
                 ]
             },
             {
                 extend: 'colvisGroup',
-                text: 'PPI Surveys + Date',
+                text: 'PPI Surveys + Dates',
                 show: [
                     '.col-group-ppi',
                     '.col-group-ppi-time'
@@ -247,19 +289,38 @@ $(document).ready(function() {
                 hide: [
                     'dateOfBirth:name',
                     '.col-group-info',
-                    '.col-group-status',
+                    '.col-group-inperson',
+                    '.col-group-inperson-time',
                     '.col-group-demographics',
                     '.col-group-contact'
                 ]
             },
             {
                 extend: 'colvisGroup',
-                text: 'Status',
+                text: 'In-Person',
                 show: [
-                    '.col-group-info',
-                    '.col-group-status'
+                    'dateOfBirth:name',
+                    '.col-group-inperson'
                 ],
                 hide: [
+                    '.col-group-info',
+                    '.col-group-ppi',
+                    '.col-group-ppi-time',
+                    '.col-group-inperson-time',
+                    '.col-group-demographics',
+                    '.col-group-contact'
+                ]
+            },
+            {
+                extend: 'colvisGroup',
+                text: 'In-Person + Sample Dates',
+                show: [
+                    '.col-group-inperson',
+                    '.col-group-inperson-time'
+                ],
+                hide: [
+                    'dateOfBirth:name',
+                    '.col-group-info',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-demographics',
@@ -275,7 +336,8 @@ $(document).ready(function() {
                 ],
                 hide: [
                     '.col-group-info',
-                    '.col-group-status',
+                    '.col-group-inperson',
+                    '.col-group-inperson-time',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-contact'
@@ -292,7 +354,8 @@ $(document).ready(function() {
                 hide: [
                     '.col-group-demographics',
                     '.col-group-info:not(.col-group-default)',
-                    '.col-group-status',
+                    '.col-group-inperson',
+                    '.col-group-inperson-time',
                     '.col-group-ppi',
                     '.col-group-ppi-time'
                 ]

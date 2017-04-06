@@ -67,6 +67,16 @@ class WorkQueueController extends AbstractController
         'FamilyHealth' => 'Family',
         'HealthcareAccess' => 'Access'
     ];
+    protected static $samples = [
+        '1SST8' => '8 mL SST',
+        '1PST8' => '8 mL PST',
+        '1HEP4' => '4 mL Na-Hep',
+        '1ED04' => '4 mL EDTA',
+        '1ED10' => '1st 10 mL EDTA',
+        '2ED10' => '2nd 10 mL EDTA',
+        '1UR10' => 'Urine 10 mL',
+        '1SAL' => 'Saliva'
+    ];
 
     protected function participantSummarySearch($params, $app)
     {
@@ -101,6 +111,7 @@ class WorkQueueController extends AbstractController
         return $app['twig']->render('workqueue/index.html.twig', [
             'filters' => self::$filters,
             'surveys' => self::$surveys,
+            'samples' => self::$samples,
             'participants' => $participants,
             'params' => $params
         ]);
@@ -164,7 +175,13 @@ class WorkQueueController extends AbstractController
                 $headers[] = $label . ' PPI Survey Completion Date';
             }
             $headers[] = 'Physical Measurements Status';
+            $headers[] = 'Physical Measurements Completion Date';
+            $headers[] = 'DNA Isolation Complete';
             $headers[] = 'Biospecimens';
+            foreach (self::$samples as $sample => $label) {
+                $headers[] = $label . ' Collected';
+                $headers[] = $label . ' Collection Date';
+            }
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
                 $row = [
@@ -197,8 +214,14 @@ class WorkQueueController extends AbstractController
                     $row[] = self::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
                     $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"});
                 }
-                $row[] = self::csvStatusFromSubmitted($participant->physicalMeasurementsStatus);
+                $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
+                $row[] = self::csvDateFromString($participant->physicalMeasurementsTime);
+                $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                 $row[] = $participant->numBaselineSamplesArrived;
+                foreach (self::$samples as $sample => $label) {
+                    $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
+                    $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"});
+                }
                 fputcsv($output, $row);
             }
             fwrite($output, "\"\"\n");
