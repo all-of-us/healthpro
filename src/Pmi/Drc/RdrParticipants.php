@@ -179,25 +179,6 @@ class RdrParticipants
         return false;
     }
 
-    /*
-     * Evaluation PUT method is not yet supported
-     */
-    public function updateEvaluation($participantId, $evaluationId, $evaluation)
-    {
-        try {
-            $response = $this->getClient()->request('PUT', "Participant/{$participantId}/PhysicalEvaluation/{$evaluationId}", [
-                'json' => $evaluation
-            ]);
-            $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->id)) {
-                return $result->id;
-            }
-        } catch (\Exception $e) {
-            return false;
-        }
-        return false;
-    }
-
     public function getOrder($participantId, $orderId)
     {
         try {
