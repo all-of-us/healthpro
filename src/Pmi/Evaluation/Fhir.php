@@ -11,6 +11,7 @@ class Fhir
     protected $version;
     protected $date;
     protected $metricUrns;
+    protected $parentRdr;
 
     public function __construct(array $options)
     {
@@ -24,6 +25,7 @@ class Fhir
         $date = clone $options['datetime'];
         $date->setTimezone(new \DateTimeZone('UTC'));
         $this->date = $date->format('Y-m-d\TH:i:s\Z');
+        $this->parentRdr = $options['parent_rdr'];
     }
 
     /*
@@ -88,7 +90,7 @@ class Fhir
         foreach ($this->metricUrns as $metric => $urn) {
             $references[] = ['reference' => $urn];
         }
-        return [
+        $composition = [
             'fullUrl' => 'urn:uuid:' . Util::generateUuid(),
             'resource' => [
                 'author' => [['display' => 'N/A']],
@@ -112,6 +114,15 @@ class Fhir
                 ]
             ]
         ];
+        if ($this->parentRdr) {
+            $composition['resource']['extension'] = [
+                'url' => 'http://terminology.pmi-ops.org/StructureDefinition/amends',
+                'valueReference' => [
+                    'reference' => "PhysicalMeasurements/{$this->parentRdr}"
+                ]
+            ];
+        }
+        return $composition;
     }
 
     protected function simpleMetric($metric, $value, $display, $loinc, $unit)
