@@ -9,7 +9,7 @@
             <a href="{{ path('addSite') }}" class="btn btn-primary">Add Site</a>
             {% if sites|length > 0 %}
                 <table class="table table-striped">
-                    <thead><tr><th>ID</th><th>Name</th><th>Google Group</th><th>MayoLink Account</th></tr></thead>
+                    <thead><tr><th>ID</th><th>Name</th><th>Google Group</th><th>MayoLink Account</th><th>Organization</th></tr></thead>
                     <tbody>
                     {% for site in sites %}
                         <tr>
@@ -17,6 +17,7 @@
                             <td><a href="{{ path('editSite', { siteId: site.id }) }}">{{ site.name }}</a></td>
                             <td>{{ site.google_group }}</td>
                             <td>{{ site.mayolink_account }}</td>
+                            <td>{{ site.organization }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>

@@ -8,8 +8,8 @@ $app = new HpoApplication();
 $app['templatesDirectory'] = realpath(__DIR__ . '/../views');
 $app['errorTemplate'] = 'error.html.twig';
 
-// Session timeout after 7 minutes (or 24 hours in local dev)
-$app['sessionTimeout'] = $app->isLocal() ? 3600 * 24 : 7 * 60;
+// Session timeout after 30 minutes (or 24 hours in local dev)
+$app['sessionTimeout'] = $app->isLocal() ? 3600 * 24 : 30 * 60;
 // Display warning 2 minutes before timeout
 $app['sessionWarning'] = 2 * 60;
 
