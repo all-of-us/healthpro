@@ -27,7 +27,7 @@ class CodeBookTest extends \PHPUnit_Framework_TestCase
         $twenty = (new \DateTime('-20 years'))->format('Y-m-d');
         $eighty = (new \DateTime('-80 years'))->format('Y-m-d');
 
-        $this->assertSame(["ge{$ten}", "le{$twenty}"], CodeBook::ageRangeToDob('10-20'));
-        $this->assertSame(["ge{$eighty}"], CodeBook::ageRangeToDob('80-'));
+        $this->assertSame(["le{$ten}", "ge{$twenty}"], CodeBook::ageRangeToDob('10-20'));
+        $this->assertSame(["le{$eighty}"], CodeBook::ageRangeToDob('80-'));
     }
 }

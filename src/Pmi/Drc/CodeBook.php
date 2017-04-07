@@ -126,11 +126,11 @@ class CodeBook
         }
 
         $start = new \DateTime("-{$matches[1]} years");
-        $parameters[] = 'ge' . $start->format('Y-m-d');
+        $parameters[] = 'le' . $start->format('Y-m-d');
 
         if (isset($matches[2])) {
             $end = new \DateTime("-{$matches[2]} years");
-            $parameters[] = 'le' . $end->format('Y-m-d');
+            $parameters[] = 'ge' . $end->format('Y-m-d');
         }
 
         return $parameters;
