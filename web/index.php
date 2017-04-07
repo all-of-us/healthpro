@@ -32,10 +32,7 @@ $app
     ->mount('/dashboard', new Controller\DashboardController())
     ->mount('/admin', new Controller\AdminController())
     ->mount('/help', new Controller\HelpController())
+    ->mount('/workqueue', new Controller\WorkQueueController())
 ;
-
-if (!$app->isProd() && !$app->isStable()) {
-    $app->mount('/workqueue', new Controller\WorkQueueController());
-}
 
 $app->run();
