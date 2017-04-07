@@ -137,9 +137,10 @@ class WorkQueueController extends AbstractController
         '1SAL' => 'Saliva'
     ];
 
-    protected function participantSummarySearch($params, $app)
+    protected function participantSummarySearch($organization, $params, $app)
     {
         $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
+        $params['hpoId'] = $organization;
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($params['ageRange'])) {
@@ -170,14 +171,14 @@ class WorkQueueController extends AbstractController
         }
 
         $params = array_filter($request->query->all());
-        $params['hpoId'] = $organization;
-        $participants = $this->participantSummarySearch($params, $app);
+        $participants = $this->participantSummarySearch($organization, $params, $app);
         return $app['twig']->render('workqueue/index.html.twig', [
             'filters' => self::$filters,
             'surveys' => self::$surveys,
             'samples' => self::$samples,
             'participants' => $participants,
-            'params' => $params
+            'params' => $params,
+            'organization' => $organization
         ]);
     }
 
@@ -208,9 +209,8 @@ class WorkQueueController extends AbstractController
         }
 
         $params = array_filter($request->query->all());
-        $params['hpoId'] = $organization;
 
-        $participants = $this->participantSummarySearch($params, $app);
+        $participants = $this->participantSummarySearch($organization, $params, $app);
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
             fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
@@ -299,7 +299,7 @@ class WorkQueueController extends AbstractController
             fputcsv($output, ['Confidential Information']);
             fclose($output);
         };
-        $filename = 'workqueue_' . date('Ymd-His') . '.csv';
+        $filename = "workqueue_{$organization}_" . date('Ymd-His') . '.csv';
 
         $app->log(Log::WORKQUEUE_EXPORT, [
             'filter' => $params,
