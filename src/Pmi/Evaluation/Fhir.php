@@ -90,7 +90,7 @@ class Fhir
         foreach ($this->metricUrns as $metric => $urn) {
             $references[] = ['reference' => $urn];
         }
-        return [
+        $composition = [
             'fullUrl' => 'urn:uuid:' . Util::generateUuid(),
             'resource' => [
                 'author' => [['display' => 'N/A']],
@@ -114,6 +114,15 @@ class Fhir
                 ]
             ]
         ];
+        if ($this->parentRdr) {
+            $composition['resource']['extension'] = [
+                'url' => 'http://terminology.pmi-ops.org/StructureDefinition/amends',
+                'valueReference' => [
+                    'reference' => "PhysicalMeasurements/{$this->parentRdr}"
+                ]
+            ];
+        }
+        return $composition;
     }
 
     protected function simpleMetric($metric, $value, $display, $loinc, $unit)
@@ -309,14 +318,6 @@ class Fhir
             if ($entry = $this->getEntry($metric)) {
                 $fhir->entry[] = $entry;
             }
-        }
-        if ($this->parentRdr != null) {
-            $fhir->extension = [
-                'url' => 'http://terminology.pmi-ops.org/StructureDefinition/amends',
-                'valueReference' => [
-                    'reference' => "PhysicalMeasurements/{$this->parentRdr}"
-                ]
-            ];
         }
         return $fhir;
     }
