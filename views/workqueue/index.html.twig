@@ -210,7 +210,7 @@ $(document).ready(function() {
         });
     });
     var table = $('#workqueue').DataTable({
-        order: [],
+        order: [[5, 'desc']],
         dom: 'lBrtip',
         columns: [
             { name: 'lastName' },
