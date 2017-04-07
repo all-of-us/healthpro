@@ -170,11 +170,14 @@ label.label-normal {
 .multiheader-survey {
     background-color: #dde;
 }
-.multiheader-status {
+.multiheader-inperson {
     background-color: #eec;
 }
 .multiheader-demographics {
     background-color: #ded;
+}
+.multiheader-contact {
+    background-color: #edd;
 }
 
 /* Orders */

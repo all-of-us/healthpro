@@ -25,49 +25,7 @@ class RdrParticipants
 
     protected function participantToResult($participant)
     {
-        if (!is_object($participant)) {
-            return false;
-        }
-        if (isset($participant->participantId)) {
-            $id = $participant->participantId;
-        } else {
-            return false;
-        }
-        if (!empty($participant->biobankId)) {
-            $biobankId = $participant->biobankId;
-        } else {
-            return false;
-        }
-        if (!empty($participant->questionnaireOnSociodemographics) & $participant->questionnaireOnSociodemographics === 'SUBMITTED') {
-            $status = true;
-        } else {
-            $status = false;
-        }
-        switch ($participant->genderIdentity) {
-            case 'FEMALE':
-                $gender = 'F';
-                break;
-            case 'MALE':
-                $gender = 'M';
-                break;
-            default:
-                $gender = 'U';
-                break;
-        }
-        $genderIdentity = str_replace('_', ' ', $participant->genderIdentity);
-        $genderIdentity = ucfirst(strtolower($genderIdentity));
-        return new Participant([
-            'id' => $id,
-            'biobankId' => $biobankId,
-            'firstName' => $participant->firstName,
-            'middleName' => $participant->middleName,
-            'lastName' => $participant->lastName,
-            'dob' => new \DateTime($participant->dateOfBirth),
-            'genderIdentity' => $genderIdentity,
-            'gender' => $gender,
-            'zip' => $participant->zipCode,
-            'status' => $status
-        ]);
+        return new Participant($participant);
     }
 
     protected function paramsToQuery($params)

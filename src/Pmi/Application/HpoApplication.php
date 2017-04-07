@@ -226,6 +226,30 @@ class HpoApplication extends AbstractApplication
             return null;
         }
     }
+
+    public function getSiteEntity()
+    {
+        $googleGroup = $this->getSiteId();
+        if (!$googleGroup) {
+            return null;
+        }
+        return $this['em']
+            ->getRepository('sites')
+            ->fetchOneBy(['google_group' => $googleGroup]);
+    }
+
+    public function getSiteOrganization()
+    {
+        if ($this['isUnitTest']) {
+            return null;
+        }
+        $site = $this->getSiteEntity();
+        if (!$site || empty($site['organization'])) {
+            return null;
+        } else {
+            return $site['organization'];
+        }
+    }
     
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {

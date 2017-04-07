@@ -373,11 +373,6 @@ abstract class AbstractApplication extends Application
             return !is_null($this['routes']->get($name));
         }));
 
-        // Register custom Twig display_code filter
-        $this['twig']->addFilter(new Twig_SimpleFilter('display_code', function($text) {
-            return ucwords(strtolower(str_replace('_', ' ', $text)));
-        }));
-
         // Register custom Twig cache
         if (isset($this['twigCacheHandler'])) {
             switch ($this['twigCacheHandler']) {
