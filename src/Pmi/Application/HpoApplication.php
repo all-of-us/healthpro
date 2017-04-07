@@ -240,6 +240,9 @@ class HpoApplication extends AbstractApplication
 
     public function getSiteOrganization()
     {
+        if ($this['isUnitTest']) {
+            return null;
+        }
         $site = $this->getSiteEntity();
         if (!$site || empty($site['organization'])) {
             return null;
