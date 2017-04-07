@@ -15,6 +15,20 @@ class WorkQueueController extends AbstractController
         ['export', '/export.csv']
     ];
     protected static $filters = [
+        'withdrawalStatus' => [
+            'label' => 'Withdrawal Status',
+            'options' => [
+                'Withdrawn' => 'NO_USE',
+                'Not withdrawn' => 'NOT_WITHDRAWN'
+            ]
+        ],
+        'consentForElectronicHealthRecords' => [
+            'label' => 'EHR Consent Status',
+            'options' => [
+                'Consented' => 'SUBMITTED',
+                'Not consented' => 'UNSET'
+            ]
+        ],
         'ageRange' => [
             'label' => 'Age',
             'options' => [
@@ -39,13 +53,6 @@ class WorkQueueController extends AbstractController
                 'Other' => 'GenderIdentity_AdditionalOptions'
             ]
         ],
-        'consentForElectronicHealthRecords' => [
-            'label' => 'EHR Consent Status',
-            'options' => [
-                'Consented' => 'SUBMITTED',
-                'Not consented' => 'UNSET'
-            ]
-        ],
         'race' => [
             'label' => 'Race',
             'options' => [
@@ -63,13 +70,6 @@ class WorkQueueController extends AbstractController
                 'More than one race' => 'MORE_THAN_ONE_RACE',
                 'Other' => 'OTHER_RACE'
             ]
-        ],
-        'withdrawalStatus' => [
-            'label' => 'Withdrawal Status',
-            'options' => [
-                'Withdrawn' => 'NO_USE',
-                'Not withdrawn' => 'NOT_WITHDRAWN'
-            ]
         ]
     ];
     // These are currently not working in the RDR
@@ -79,13 +79,6 @@ class WorkQueueController extends AbstractController
             'options' => [
                 'English' => 'SpokenWrittenLanguage_English',
                 'Spanish' => 'SpokenWrittenLanguage_Spanish'
-            ]
-        ],
-        'race' => [
-            'label' => 'Race',
-            'options' => [
-                'White' => 'WHITE',
-                'Not white' => 'neWHITE'
             ]
         ],
         'recontactMethod' => [
@@ -100,15 +93,27 @@ class WorkQueueController extends AbstractController
         'sex' => [
             'label' => 'Sex',
             'options' => [
-                'Male' => '',
-                'Female' => ''
+                'Male' => 'SexAtBirth_Male',
+                'Female' => 'SexAtBirth_Female',
+                'Intersex' => 'SexAtBirth_Intersex'
             ]
         ],
         'sexualOrientation' => [
             'label' => 'Sexual Orientation',
             'options' => [
                 'Straight' => 'SexualOrientation_Straight',
-                'Not straight' => 'neSexualOrientation_Straight'
+                'Gay' => 'SexualOrientation_Gay',
+                'Lesbian' => 'SexualOrientation_Lesbian',
+                'Bisexual' => 'SexualOrientation_Bisexual',
+                'Other' => 'SexualOrientation_None'
+            ]
+        ],
+        // ne not supported with enums
+        'race' => [
+            'label' => 'Race',
+            'options' => [
+                'White' => 'WHITE',
+                'Not white' => 'neWHITE'
             ]
         ]
     ];
