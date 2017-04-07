@@ -152,7 +152,7 @@ class RdrParticipants
     public function getEvaluation($participantId, $evaluationId)
     {
         try {
-            $response = $this->getClient()->request('GET', "Participant/{$participantId}/PhysicalEvaluation/{$evaluationId}");
+            $response = $this->getClient()->request('GET', "Participant/{$participantId}/PhysicalMeasurements/{$evaluationId}");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;
@@ -166,26 +166,7 @@ class RdrParticipants
     public function createEvaluation($participantId, $evaluation)
     {
         try {
-            $response = $this->getClient()->request('POST', "Participant/{$participantId}/PhysicalEvaluation", [
-                'json' => $evaluation
-            ]);
-            $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->id)) {
-                return $result->id;
-            }
-        } catch (\Exception $e) {
-            return false;
-        }
-        return false;
-    }
-
-    /*
-     * Evaluation PUT method is not yet supported
-     */
-    public function updateEvaluation($participantId, $evaluationId, $evaluation)
-    {
-        try {
-            $response = $this->getClient()->request('PUT', "Participant/{$participantId}/PhysicalEvaluation/{$evaluationId}", [
+            $response = $this->getClient()->request('POST', "Participant/{$participantId}/PhysicalMeasurements", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
