@@ -59,7 +59,7 @@
                 {% endfor %}
 
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Phys Measurements</th>
-                <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">DNA Isolation Complete?</th>
+                <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Samples for DNA Received?</th>
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Bio&shy;specimens</th>
                 {% for field, label in samples %}
                     <th class="secondaryheader col-group-inperson multiheader-inperson">{{ label }}</th>
@@ -210,6 +210,7 @@ $(document).ready(function() {
         });
     });
     var table = $('#workqueue').DataTable({
+        order: [],
         dom: 'lBrtip',
         columns: [
             { name: 'lastName' },

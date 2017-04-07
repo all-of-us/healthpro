@@ -30,13 +30,20 @@ class WorkQueueController extends AbstractController
             ]
         ],
         'genderIdentity' => [
-            'label' => 'Gender identity',
+            'label' => 'Gender Identity',
             'options' => [
                 'Man' => 'GenderIdentity_Man',
                 'Woman' => 'GenderIdentity_Woman',
                 'Non-binary' => 'GenderIdentity_NonBinary',
                 'Transgender' => 'GenderIdentity_Transgender',
                 'Other' => 'GenderIdentity_AdditionalOptions'
+            ]
+        ],
+        'consentForElectronicHealthRecords' => [
+            'label' => 'EHR Consent Status',
+            'options' => [
+                'Consented' => 'SUBMITTED',
+                'Not consented' => 'UNSET'
             ]
         ],
         'race' => [
@@ -55,6 +62,53 @@ class WorkQueueController extends AbstractController
                 'H/L/S and more than one other race' => 'HLS_AND_MORE_THAN_ONE_OTHER_RACE',
                 'More than one race' => 'MORE_THAN_ONE_RACE',
                 'Other' => 'OTHER_RACE'
+            ]
+        ],
+        'withdrawalStatus' => [
+            'label' => 'Withdrawal Status',
+            'options' => [
+                'Withdrawn' => 'NO_USE',
+                'Not withdrawn' => 'NOT_WITHDRAWN'
+            ]
+        ]
+    ];
+    // These are currently not working in the RDR
+    protected static $filtersDisabled = [
+        'language' => [
+            'label' => 'Language',
+            'options' => [
+                'English' => 'SpokenWrittenLanguage_English',
+                'Spanish' => 'SpokenWrittenLanguage_Spanish'
+            ]
+        ],
+        'race' => [
+            'label' => 'Race',
+            'options' => [
+                'White' => 'WHITE',
+                'Not white' => 'neWHITE'
+            ]
+        ],
+        'recontactMethod' => [
+            'label' => 'Contact Method',
+            'options' => [
+                'House Phone' => 'RecontactMethod_HousePhone',
+                'Cell Phone' => 'RecontactMethod_CellPhone',
+                'Email' => 'RecontactMethod_Email',
+                'Physical Address' => 'RecontactMethod_Address'
+            ]
+        ],
+        'sex' => [
+            'label' => 'Sex',
+            'options' => [
+                'Male' => '',
+                'Female' => ''
+            ]
+        ],
+        'sexualOrientation' => [
+            'label' => 'Sexual Orientation',
+            'options' => [
+                'Straight' => 'SexualOrientation_Straight',
+                'Not straight' => 'neSexualOrientation_Straight'
             ]
         ]
     ];
@@ -81,6 +135,7 @@ class WorkQueueController extends AbstractController
     protected function participantSummarySearch($params, $app)
     {
         // TODO: map site to organization
+        $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
         $params['hpoId'] = 'PITT';
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
@@ -93,6 +148,7 @@ class WorkQueueController extends AbstractController
             foreach ($dateOfBirthFilters as $filter) {
                 $params .= '&dateOfBirth=' . rawurlencode($filter);
             }
+            echo $params;
         }
         $summaries = $app['pmi.drc.participants']->listParticipantSummaries($params);
         $results = [];
@@ -176,7 +232,7 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Physical Measurements Completion Date';
-            $headers[] = 'DNA Isolation Complete';
+            $headers[] = 'Samples for DNA Received';
             $headers[] = 'Biospecimens';
             foreach (self::$samples as $sample => $label) {
                 $headers[] = $label . ' Collected';
