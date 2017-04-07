@@ -101,7 +101,7 @@ class EvaluationController extends AbstractController
                 $dbArray = $evaluationService->toArray();
                 $now = new \DateTime();
                 $dbArray['updated_ts'] = $now;
-                if ($request->request->has('finalize')) {
+                if ($request->request->has('finalize') && (!$evaluation || empty($evaluation['finalized_ts']))) {
                     $errors = $evaluationService->getFinalizeErrors();
                     if (count($errors) === 0) {
                         $dbArray['finalized_ts'] = $now;
