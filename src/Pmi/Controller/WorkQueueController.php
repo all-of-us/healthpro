@@ -139,9 +139,7 @@ class WorkQueueController extends AbstractController
 
     protected function participantSummarySearch($params, $app)
     {
-        // TODO: map site to organization
         $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
-        $params['hpoId'] = 'PITT';
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($params['ageRange'])) {
@@ -153,7 +151,6 @@ class WorkQueueController extends AbstractController
             foreach ($dateOfBirthFilters as $filter) {
                 $params .= '&dateOfBirth=' . rawurlencode($filter);
             }
-            echo $params;
         }
         $summaries = $app['pmi.drc.participants']->listParticipantSummaries($params);
         $results = [];
@@ -167,7 +164,13 @@ class WorkQueueController extends AbstractController
 
     public function indexAction(Application $app, Request $request)
     {
+        $organization = $app->getSiteOrganization();
+        if (!$organization) {
+            return $app['twig']->render('workqueue/no-organization.html.twig');
+        }
+
         $params = array_filter($request->query->all());
+        $params['hpoId'] = $organization;
         $participants = $this->participantSummarySearch($params, $app);
         return $app['twig']->render('workqueue/index.html.twig', [
             'filters' => self::$filters,
@@ -199,7 +202,14 @@ class WorkQueueController extends AbstractController
 
     public function exportAction(Application $app, Request $request)
     {
+        $organization = $app->getSiteOrganization();
+        if (!$organization) {
+            return $app['twig']->render('workqueue/no-organization.html.twig');
+        }
+
         $params = array_filter($request->query->all());
+        $params['hpoId'] = $organization;
+
         $participants = $this->participantSummarySearch($params, $app);
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
