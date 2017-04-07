@@ -91,11 +91,7 @@ class Participant
         }
         if ($this->city) {
             $address .= $this->city;
-            if ($this->state) {
-                $address .= ', ';
-            } else {
-                $address .= ' ';
-            }
+            $address .= $this->state ? ', ' : ' ';
         }
         if ($this->state) {
             $address .= $this->state . ' ';
