@@ -69,15 +69,9 @@ class Participant
         }
     }
 
-    public function getMayolinkDob($type = null)
+    public function getMayolinkDob()
     {
-        if ($type == 'kit') {
-            return new \DateTime('1960-01-01');
-        } else {
-            $mlDob = new \DateTime();
-            $mlDob->setDate(1960, $this->dob->format('m'), $this->dob->format('d'));
-            return $mlDob;
-        }
+        return new \DateTime('1933-03-03');
     }
 
     public function getAddress()
