@@ -103,12 +103,18 @@ label.label-normal {
     margin-right: -6px;
     margin-left: -6px;
 }
-#physicalEvaluation .row .col-sm-4 {
+#physicalEvaluation .row .col-sm-4,
+#physicalEvaluation .row .col-md-6 {
     padding-right: 6px;
     padding-left: 6px;
 }
 @media(max-width:767px) {
     #physicalEvaluation .row .col-sm-4 {
+        margin-bottom: 6px;
+    }
+}
+@media(max-width:991px) {
+    #physicalEvaluation .row .col-md-6 {
         margin-bottom: 6px;
     }
 }
@@ -156,18 +162,22 @@ label.label-normal {
 /* Participant work queue */
 .topheader {
     border-bottom: 0 !important;
-    text-align: center;
+    font-style: italic;
 }
 .secondaryheader {
     border-top: 0 !important;
-    font-weight: normal;
-    text-align: center;
 }
 .multiheader-survey {
     background-color: #dde;
 }
-.multiheader-status {
+.multiheader-inperson {
     background-color: #eec;
+}
+.multiheader-demographics {
+    background-color: #ded;
+}
+.multiheader-contact {
+    background-color: #edd;
 }
 
 /* Orders */

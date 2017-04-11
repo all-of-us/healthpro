@@ -5,6 +5,7 @@ use Silex\Application;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
+use Pmi\Util;
 
 class Order
 {
@@ -326,7 +327,7 @@ class Order
             if ($site && $site['mayolink_account']) {
                 $identifiers[] =[
                     'system' => 'https://www.pmi-ops.org/mayolink-site-id',
-                    'value' => $site['mayolink_account']
+                    'value' => $site['mayolink_account'] . '.' . Util::generateUuid()
                 ];
             }
         }

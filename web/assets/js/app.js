@@ -54,13 +54,33 @@ $(document).ready(function()
      * Disable forms being submitted via enter/return key on any text input
      * inside an element with the .form-disable-enter class
      ************************************************************************/
-    $('.form-disable-enter input:text').on('keypress keyup', function(e) {
+    $('form.disable-enter input:text').on('keypress keyup', function(e) {
         if (e.which == 13) {
             e.preventDefault();
             return false;
         }
     });
 
+
+    /*************************************************************************
+     * Disable forms being double-submitted by disabling any submit buttons
+     * while submitting
+     ************************************************************************/
+    $('form.prevent-resubmit').on('submit', function(e) {
+        var form = $(e.currentTarget);
+        if (form.data('submitting')) {
+            e.preventDefault();
+            return;
+        } else {
+            form.data('submitting', 1);
+            form.find('button[type=submit], input[type=submit]').css('opacity', 0.5);
+        }
+    });
+    // If form submission is stopped by parsley, clear the submitting status and opacity
+    window.Parsley.on('form:error', function() {
+        $(this.$element).data('submitting', 0);
+        $(this.$element).find('button[type=submit], input[type=submit]').css('opacity', 1);
+    });
 
     /*************************************************************************
      * Auto-enable bootstrap tooltips

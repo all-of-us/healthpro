@@ -4,6 +4,7 @@ CREATE TABLE `sites` (
   `google_group` varchar(255) NOT NULL,
   `mayolink_account` varchar(255) NOT NULL,
   `timezone` varchar(100) DEFAULT NULL,
+  `organization` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8mb4;
 
