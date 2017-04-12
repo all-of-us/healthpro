@@ -100,10 +100,10 @@
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
                     </td>
-                    <td class="text-center" data-order="{{ participant.withdrawalStatus == 'NO_USE' ? '1' : '0' }}">
+                    <td class="text-center" data-order="{{ participant.withdrawalStatus == 'NO_USE' ? '1' : '0' }}-{{ participant.withdrawalTime }}">
                         {% if participant.withdrawalStatus == 'NO_USE' %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            No Use
+                            <span class="text-danger">No Use</span> - {{ participant.withdrawalTime ? participant.withdrawalTime|date('m/d/Y') : '' }}
                         {% endif %}
                     </td>
 
