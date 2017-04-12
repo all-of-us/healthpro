@@ -102,14 +102,25 @@
             </div>
         </div>
     {% else %}
+        {% if participant.statusReason == 'basics' %}
+            {% set errorTitle = 'The Basics survey not complete' %}
+            {% set errorMessage = 'This participant has consented but has not completed "The Basics" survey in the participant app and is therefore ineligible for physical measurements and biospecimen collection. Please direct the participant to complete "The Basics" survey in the participant application to enable in person enrollment or contact the help desk if needed.' %}
+        {% elseif participant.statusReason == 'withdrawal' %}
+            {# TODO: add real error title and message #}
+            {% set errorTitle = 'Withdrawn participant' %}
+            {% set errorMessage = 'This participant has withdrawn.' %}
+        {% else %}
+            {% set errorTitle = 'Consent not complete' %}
+            {% set errorMessage = 'This participant has not completed consent for enrollment.' %}
+        {% endif %}
         <div class="row">
             <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
                 <div class="panel panel-danger">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> The Basics survey not complete</h3>
+                        <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> {{ errorTitle }}</h3>
                     </div>
                     <div class="panel-body">
-                        This participant has consented but has not completed "The Basics" survey in the participant app and is therefore ineligible for physical measurements and biospecimen collection. Please direct the participant to complete "The Basics" survey in the participant application to enable in person enrollment or contact the help desk if needed.
+                        {{ errorMessage }}
                     </div>
                 </div>
             </div>
