@@ -139,7 +139,9 @@ class WorkQueueController extends AbstractController
 
     protected function participantSummarySearch($organization, $params, $app)
     {
-        $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
+        if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] !== 'NO_USE') {
+            $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
+        }
         $params['hpoId'] = $organization;
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
