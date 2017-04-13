@@ -32,6 +32,7 @@
 
                 <th rowspan="2" class="col-group-default">Date of Birth</th>
                 <th rowspan="2" class="col-group-info">PMI ID</th>
+                <th rowspan="2" class="col-group-info">Biobank ID</th>
                 <th rowspan="2" class="col-group-info">Language</th>
                 <th rowspan="2" class="col-group-default col-group-info">General Consent</th>
                 <th rowspan="2" class="col-group-default col-group-info">EHR Consent</th>
@@ -83,6 +84,7 @@
                     <td data-order="{{ participant.firstName }}"><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a></td>
                     <td data-order="{{ participant.dob ? participant.dob|date('Y-m-d') : '' }}">{{ participant.dob ? participant.dob|date('m/d/Y') : '' }}</td>
                     <td>{{ participant.id }}</td>
+                    <td>{{ participant.biobankId }}</td>
                     <td>{{ participant.language }}</td>
                     <td class="text-center" data-order="{{ participant.consentForStudyEnrollment == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForStudyEnrollmentTime }}">
                         {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
@@ -217,6 +219,7 @@ $(document).ready(function() {
             { name: 'firstName' },
             { name: 'dateOfBirth' },
             { name: 'participantId', visible: false },
+            { name: 'biobankId', visible: false },
             { name: 'language', visible: false  },
             { name: 'generalConsent' },
             { name: 'ehrConsent' },

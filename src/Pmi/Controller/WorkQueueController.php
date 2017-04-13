@@ -219,6 +219,7 @@ class WorkQueueController extends AbstractController
             fwrite($output, "\"\"\n");
             $headers = [
                 'PMI ID',
+                'Biobank ID',
                 'Last Name',
                 'First Name',
                 'Date of Birth',
@@ -260,6 +261,7 @@ class WorkQueueController extends AbstractController
             foreach ($participants as $participant) {
                 $row = [
                     $participant->id,
+                    $participant->biobankId,
                     $participant->lastName,
                     $participant->firstName,
                     self::csvDateFromObject($participant->dob),
