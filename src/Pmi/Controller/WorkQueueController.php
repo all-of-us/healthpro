@@ -139,7 +139,13 @@ class WorkQueueController extends AbstractController
 
     protected function participantSummarySearch($organization, $params, $app)
     {
-        if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] !== 'NO_USE') {
+        if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] === 'NO_USE') {
+            foreach ($params as $key => $value) {
+                if ($key !== 'withdrawalStatus') {
+                    unset($params[$key]);
+                }
+            }
+        } else {
             $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
         }
         $params['hpoId'] = $organization;
