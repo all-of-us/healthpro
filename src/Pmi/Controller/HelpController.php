@@ -14,6 +14,11 @@ class HelpController extends AbstractController
         ['sopPdf', '/sop/viewer/{filename}']
     ];
 
+    private function getStoragePath(Application $app)
+    {
+        return $app->getConfig('help_storage_path') ?: 'https://storage.googleapis.com/pmi-hpo-staging.appspot.com';
+    }
+
     public function homeAction(Application $app)
     {
         return $app['twig']->render('help/index.html.twig');
@@ -26,7 +31,9 @@ class HelpController extends AbstractController
 
     public function faqAction(Application $app)
     {
-        return $app['twig']->render('help/faq.html.twig');
+        return $app['twig']->render('help/faq.html.twig', [
+            'path' => $this->getStoragePath($app)
+        ]);
     }
 
     public function sopAction(Application $app)
@@ -115,17 +122,13 @@ class HelpController extends AbstractController
         if (!preg_match('/^(SOP-\d+)\.\d+ (.+)\.pdf$/', $filename, $m)) {
             $app->abort(404);
         }
-        $path = $app->getConfig('sop_storage_path');
-        if (!$path) {
-            $path = 'https://storage.googleapis.com/pmi-hpo-staging.appspot.com';
-        }
         $sop = $m[1];
         $title = $m[2];
         return $app['twig']->render('help/sop-pdf.html.twig', [
             'filename' => $filename,
             'sop' => $sop,
             'title' => $title,
-            'path' => $path
+            'path' => $this->getStoragePath($app)
         ]);
     }
 }
