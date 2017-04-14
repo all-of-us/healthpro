@@ -6,7 +6,8 @@ use Pmi\Drc\CodeBook;
 
 class Participant
 {
-    public $status = false;
+    public $status = true;
+    public $statusReason;
     public $id;
     protected $rdrData;
 
@@ -29,12 +30,19 @@ class Participant
             $this->id = $participant->participantId;
         }
 
-        // HealthPro status is active if participant is consented AND has completed basics survey
-        if (!empty($participant->questionnaireOnTheBasics) && $participant->questionnaireOnTheBasics === 'SUBMITTED') {
-            $this->status = true;
+        // HealthPro status is active if participant is consented, has completed basics survey, and is not withdrawn
+        if (empty($participant->questionnaireOnTheBasics) || $participant->questionnaireOnTheBasics !== 'SUBMITTED') {
+            $this->status = false;
+            $this->statusReason = 'basics';
         }
         if (empty($participant->consentForStudyEnrollment) || $participant->consentForStudyEnrollment !== 'SUBMITTED') {
+            // RDR should not be returning participant data for unconsented participants, but adding this check to be safe
             $this->status = false;
+            $this->statusReason = 'consent';
+        }
+        if (!empty($participant->withdrawalStatus) && $participant->withdrawalStatus === 'NO_USE') {
+            $this->status = false;
+            $this->statusReason = 'withdrawal';
         }
 
         // Map gender identity to gender options for MayoLINK.  TODO: should we switch to using participant sex if populated?
@@ -69,15 +77,9 @@ class Participant
         }
     }
 
-    public function getMayolinkDob($type = null)
+    public function getMayolinkDob()
     {
-        if ($type == 'kit') {
-            return new \DateTime('1960-01-01');
-        } else {
-            $mlDob = new \DateTime();
-            $mlDob->setDate(1960, $this->dob->format('m'), $this->dob->format('d'));
-            return $mlDob;
-        }
+        return new \DateTime('1933-03-03');
     }
 
     public function getAddress()

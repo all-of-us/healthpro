@@ -138,7 +138,7 @@ class OrderController extends AbstractController
                         'type' => $orderData['type'],
                         'patient_id' => $participant->biobankId,
                         'gender' => $participant->gender,
-                        'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob($orderData['type']),
+                        'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
                         'order_id' => $orderData['order_id'],
                         'collected_at' => $collectedAt,
                         'mayoClientId' => $mayoClientId

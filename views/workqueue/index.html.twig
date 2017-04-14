@@ -32,6 +32,7 @@
 
                 <th rowspan="2" class="col-group-default">Date of Birth</th>
                 <th rowspan="2" class="col-group-info">PMI ID</th>
+                <th rowspan="2" class="col-group-info">Biobank ID</th>
                 <th rowspan="2" class="col-group-info">Language</th>
                 <th rowspan="2" class="col-group-default col-group-info">General Consent</th>
                 <th rowspan="2" class="col-group-default col-group-info">EHR Consent</th>
@@ -83,6 +84,7 @@
                     <td data-order="{{ participant.firstName }}"><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a></td>
                     <td data-order="{{ participant.dob ? participant.dob|date('Y-m-d') : '' }}">{{ participant.dob ? participant.dob|date('m/d/Y') : '' }}</td>
                     <td>{{ participant.id }}</td>
+                    <td>{{ participant.biobankId }}</td>
                     <td>{{ participant.language }}</td>
                     <td class="text-center" data-order="{{ participant.consentForStudyEnrollment == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForStudyEnrollmentTime }}">
                         {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
@@ -100,10 +102,10 @@
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
                     </td>
-                    <td class="text-center" data-order="{{ participant.withdrawalStatus == 'NO_USE' ? '1' : '0' }}">
+                    <td class="text-center" data-order="{{ participant.withdrawalStatus == 'NO_USE' ? '1' : '0' }}-{{ participant.withdrawalTime }}">
                         {% if participant.withdrawalStatus == 'NO_USE' %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            No Use
+                            <span class="text-danger">No Use</span> - {{ participant.withdrawalTime ? participant.withdrawalTime|date('m/d/Y') : '' }}
                         {% endif %}
                     </td>
 
@@ -194,7 +196,17 @@
 {% block pagejs %}
 <script>
 $(document).ready(function() {
+    var checkFilters = function () {
+        if ($('select[name=withdrawalStatus]').val() == 'NO_USE') {
+            $('select').not('[name=withdrawalStatus]').val('');
+            $('select').not('[name=withdrawalStatus]').prop('disabled', true);
+        } else {
+            $('select').prop('disabled', false);
+        }
+    };
+    checkFilters();
     $('#filters select').change(function() {
+        checkFilters();
         $('#filters').submit();
     })
     $('button.export').click(function() {
@@ -210,13 +222,14 @@ $(document).ready(function() {
         });
     });
     var table = $('#workqueue').DataTable({
-        order: [[5, 'desc']],
+        order: [[6, 'desc']],
         dom: 'lBrtip',
         columns: [
             { name: 'lastName' },
             { name: 'firstName' },
             { name: 'dateOfBirth' },
             { name: 'participantId', visible: false },
+            { name: 'biobankId', visible: false },
             { name: 'language', visible: false  },
             { name: 'generalConsent' },
             { name: 'ehrConsent' },
