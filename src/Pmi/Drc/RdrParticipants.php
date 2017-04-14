@@ -25,49 +25,7 @@ class RdrParticipants
 
     protected function participantToResult($participant)
     {
-        if (!is_object($participant)) {
-            return false;
-        }
-        if (isset($participant->participantId)) {
-            $id = $participant->participantId;
-        } else {
-            return false;
-        }
-        if (!empty($participant->biobankId)) {
-            $biobankId = $participant->biobankId;
-        } else {
-            return false;
-        }
-        if (!empty($participant->questionnaireOnSociodemographics) & $participant->questionnaireOnSociodemographics === 'SUBMITTED') {
-            $status = true;
-        } else {
-            $status = false;
-        }
-        switch ($participant->genderIdentity) {
-            case 'FEMALE':
-                $gender = 'F';
-                break;
-            case 'MALE':
-                $gender = 'M';
-                break;
-            default:
-                $gender = 'U';
-                break;
-        }
-        $genderIdentity = str_replace('_', ' ', $participant->genderIdentity);
-        $genderIdentity = ucfirst(strtolower($genderIdentity));
-        return new Participant([
-            'id' => $id,
-            'biobankId' => $biobankId,
-            'firstName' => $participant->firstName,
-            'middleName' => $participant->middleName,
-            'lastName' => $participant->lastName,
-            'dob' => new \DateTime($participant->dateOfBirth),
-            'genderIdentity' => $genderIdentity,
-            'gender' => $gender,
-            'zip' => $participant->zipCode,
-            'status' => $status
-        ]);
+        return new Participant($participant);
     }
 
     protected function paramsToQuery($params)
@@ -194,7 +152,7 @@ class RdrParticipants
     public function getEvaluation($participantId, $evaluationId)
     {
         try {
-            $response = $this->getClient()->request('GET', "Participant/{$participantId}/PhysicalEvaluation/{$evaluationId}");
+            $response = $this->getClient()->request('GET', "Participant/{$participantId}/PhysicalMeasurements/{$evaluationId}");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;
@@ -208,26 +166,7 @@ class RdrParticipants
     public function createEvaluation($participantId, $evaluation)
     {
         try {
-            $response = $this->getClient()->request('POST', "Participant/{$participantId}/PhysicalEvaluation", [
-                'json' => $evaluation
-            ]);
-            $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->id)) {
-                return $result->id;
-            }
-        } catch (\Exception $e) {
-            return false;
-        }
-        return false;
-    }
-
-    /*
-     * Evaluation PUT method is not yet supported
-     */
-    public function updateEvaluation($participantId, $evaluationId, $evaluation)
-    {
-        try {
-            $response = $this->getClient()->request('PUT', "Participant/{$participantId}/PhysicalEvaluation/{$evaluationId}", [
+            $response = $this->getClient()->request('POST', "Participant/{$participantId}/PhysicalMeasurements", [
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());

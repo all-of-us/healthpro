@@ -246,14 +246,15 @@ class Evaluation
         }
     }
 
-    public function getFhir($datetime)
+    public function getFhir($datetime, $parentRdr = null)
     {
         $fhir = new Fhir([
             'data' => $this->data,
             'schema' => $this->schema,
             'patient' => $this->participant,
             'version' => $this->version,
-            'datetime' => $datetime
+            'datetime' => $datetime,
+            'parent_rdr' => $parentRdr
         ]);
         return $fhir->toObject();
     }
