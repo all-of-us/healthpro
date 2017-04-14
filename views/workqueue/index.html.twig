@@ -196,7 +196,17 @@
 {% block pagejs %}
 <script>
 $(document).ready(function() {
+    var checkFilters = function () {
+        if ($('select[name=withdrawalStatus]').val() == 'NO_USE') {
+            $('select').not('[name=withdrawalStatus]').val('');
+            $('select').not('[name=withdrawalStatus]').prop('disabled', true);
+        } else {
+            $('select').prop('disabled', false);
+        }
+    };
+    checkFilters();
     $('#filters select').change(function() {
+        checkFilters();
         $('#filters').submit();
     })
     $('button.export').click(function() {
