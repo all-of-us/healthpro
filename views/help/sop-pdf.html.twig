@@ -9,5 +9,5 @@
     <div class="page-header">
         <h2><i class="fa fa-file-text-o" aria-hidden="true"></i> {{ sop }} <small>{{ title }}</small></h2>
     </div>
-    <iframe class="pdf" name="pdf" src="https://storage.googleapis.com/pmi-hpo-staging.appspot.com/{{ filename|url_encode }}#view=FitH"></iframe>
+    <iframe class="pdf" name="pdf" src="{{ path }}/{{ filename|url_encode }}#view=FitH"></iframe>
 {% endblock %}

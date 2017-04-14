@@ -115,12 +115,17 @@ class HelpController extends AbstractController
         if (!preg_match('/^(SOP-\d+)\.\d+ (.+)\.pdf$/', $filename, $m)) {
             $app->abort(404);
         }
+        $path = $app->getConfig('sop_storage_path');
+        if (!$path) {
+            $path = 'https://storage.googleapis.com/pmi-hpo-staging.appspot.com';
+        }
         $sop = $m[1];
         $title = $m[2];
         return $app['twig']->render('help/sop-pdf.html.twig', [
             'filename' => $filename,
             'sop' => $sop,
-            'title' => $title
+            'title' => $title,
+            'path' => $path
         ]);
     }
 }
