@@ -58,27 +58,27 @@ class HelpController extends AbstractController
                 'documents' => [
                     [
                         'title' => 'SOP-001 HPO Creating a PMI Biobank Order and Printing Specimen Label and Test Requisition',
-                        'filename' => 'SOP-001.01 HPO Creating a PMI Biobank Order and Printing Specimen Labels and Test Requisition.pdf'
+                        'filename' => 'SOP-001.02 HPO Creating a PMI Biobank Order and Printing Specimen Labels and Test Requisition.pdf'
                     ],
                     [
                         'title' => 'SOP-003 HPO Blood Specimens Collection and Processing',
-                        'filename' => 'SOP-003.01 HPO Blood Specimens Collection and Processing.pdf'
+                        'filename' => 'SOP-003.02 HPO Blood Specimens Collection and Processing.pdf'
                     ],
                     [
                         'title' => 'SOP-005 HPO Urine Specimen Collection',
-                        'filename' => 'SOP-005.01 HPO Urine Specimen Collection.pdf'
+                        'filename' => 'SOP-005.02 HPO Urine Specimen Collection.pdf'
                     ],
                     [
                         'title' => 'SOP-007 HPO Saliva Oragene Collection',
-                        'filename' => 'SOP-007.01 HPO Saliva Oragene Collection.pdf'
+                        'filename' => 'SOP-007.02 HPO Saliva Oragene Collection.pdf'
                     ],
                     [
                         'title' => 'SOP-009 HPO Packaging and Shipping PMI Specimens',
-                        'filename' => 'SOP-009.01 HPO Packaging and Shipping PMI Specimens.pdf'
+                        'filename' => 'SOP-009.02 HPO Packaging and Shipping PMI Specimens.pdf'
                     ],
                     [
                         'title' => 'SOP-010 HPO Ordering Supplies from MML',
-                        'filename' => 'SOP-010.01 HPO Ordering Supplies from MML.pdf'
+                        'filename' => 'SOP-010.02 HPO Ordering Supplies from MML.pdf'
                     ]
                 ]
             ],
@@ -87,19 +87,19 @@ class HelpController extends AbstractController
                 'documents' => [
                     [
                         'title' => 'SOP-002 DV Registering a PMI Kit and Creating a PMI Biobank Order',
-                        'filename' => 'SOP-002.01 DV Registering a PMI Kit and Creating a PMI Biobank Order.pdf'
+                        'filename' => 'SOP-002.02 DV Registering a PMI Kit and Creating a PMI Biobank Order.pdf'
                     ],
                     [
                         'title' => 'SOP-004 DV Blood Specimens Collection and Processing',
-                        'filename' => 'SOP-004.01 DV Blood Specimens Collection and Processing.pdf'
+                        'filename' => 'SOP-004.02 DV Blood Specimens Collection and Processing.pdf'
                     ],
                     [
                         'title' => 'SOP-006 DV Urine Specimen Collection',
-                        'filename' => 'SOP-006.01 DV Urine Specimen Collection.pdf'
+                        'filename' => 'SOP-006.02 DV Urine Specimen Collection.pdf'
                     ],
                     [
                         'title' => 'SOP-011 DV Packaging and Shipping PMI Specimens',
-                        'filename' => 'SOP-011.01 DV Packaging and Shipping PMI Specimens.pdf'
+                        'filename' => 'SOP-011.02 DV Packaging and Shipping PMI Specimens.pdf'
                     ]
                 ]
             ]
@@ -115,12 +115,17 @@ class HelpController extends AbstractController
         if (!preg_match('/^(SOP-\d+)\.\d+ (.+)\.pdf$/', $filename, $m)) {
             $app->abort(404);
         }
+        $path = $app->getConfig('sop_storage_path');
+        if (!$path) {
+            $path = 'https://storage.googleapis.com/pmi-hpo-staging.appspot.com';
+        }
         $sop = $m[1];
         $title = $m[2];
         return $app['twig']->render('help/sop-pdf.html.twig', [
             'filename' => $filename,
             'sop' => $sop,
-            'title' => $title
+            'title' => $title,
+            'path' => $path
         ]);
     }
 }

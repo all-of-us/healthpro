@@ -39,6 +39,8 @@ ml_mock_order: pmitest
 # ml_username:
 # ml_password:
 
+# Path to SOP documents
+# sop_storage_path: https://storage.googleapis.com/pmi-hpo-staging.appspot.com
 
 # Google Apps configuration
 # Bypass Google Apps auth
