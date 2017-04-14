@@ -300,7 +300,7 @@ class DashboardController extends AbstractController
 
         // make sure metrics data exists first, if metrics cache or API fail return value will be false
         if (!empty($metrics)) {
-            if ($map_mode == 'Participant.state') {
+            if ($map_mode == 'FullParticipant.state') {
                 $state_registrations = [];
                 $hover_text = [];
                 $state_names = [];
@@ -363,7 +363,7 @@ class DashboardController extends AbstractController
                         "titleside" => 'right'
                     )
                 );
-            } else if ($map_mode == 'Participant.censusRegion') {
+            } else if ($map_mode == 'FullParticipant.censusRegion') {
                 $states_by_region = [];
                 $registrations_by_state = [];
                 $region_text = [];
@@ -435,7 +435,7 @@ class DashboardController extends AbstractController
                         "titleside" => 'right'
                     )
                 );
-            } else if ($map_mode == 'Participant.hpoId') {
+            } else if ($map_mode == 'FullParticipant.hpoId') {
                 $i = 0;
                 try {
                     $recruitment_centers = $app['db']->fetchAll("SELECT * FROM recruitment_center_codes");
