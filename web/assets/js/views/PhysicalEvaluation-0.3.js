@@ -97,6 +97,10 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 var converted = this.convert(this.conversions[field], mean);
                 this.$('#convert-' + field).html('('+converted+')');
             }
+            if ($.inArray(field, twoClosestFields) !== -1) {
+                var label = values.length == 3 ? '(average of three measures)' : '(average of two closest measures)';
+                this.$('#convert-' + field).next().html(label);
+            }
         } else {
             this.$('#mean-' + field).text('--');
             this.$('#convert-' + field).text();
