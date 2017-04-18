@@ -21,7 +21,7 @@ class DeployCommand extends Command {
 
     /** GAE application IDs for production. */
     private static $PROD_APP_IDS = [
-        'pmi-hpo'
+        'healthpro-prod'
     ];
 
     /** GAE application IDs for security testing and/or training. */
