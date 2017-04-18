@@ -11,7 +11,8 @@ class HelpController extends AbstractController
         ['videos', '/videos'],
         ['faq', '/faq'],
         ['sop', '/sop'],
-        ['sopPdf', '/sop/viewer/{filename}']
+        ['sopPdf', '/sop/viewer/{filename}'],
+        ['sopDownload', '/sop/download/{filename}']
     ];
 
     private function getStoragePath(Application $app)
@@ -86,6 +87,10 @@ class HelpController extends AbstractController
                     [
                         'title' => 'SOP-010 HPO Ordering Supplies from MML',
                         'filename' => 'SOP-010.02 HPO Ordering Supplies from MML.pdf'
+                    ],
+                    [
+                        'title' => 'HPO SOP Changes Presentation 04-12-2017',
+                        'filename' => 'HPO SOP Changes Presentation 04-12-2017.pptx'
                     ]
                 ]
             ],
@@ -107,13 +112,18 @@ class HelpController extends AbstractController
                     [
                         'title' => 'SOP-011 DV Packaging and Shipping PMI Specimens',
                         'filename' => 'SOP-011.02 DV Packaging and Shipping PMI Specimens.pdf'
+                    ],
+                    [
+                        'title' => 'DV SOP Changes Presentation 04-12-2017',
+                        'filename' => 'DV SOP Changes Presentation 04-12-2017.pptx'
                     ]
                 ]
             ]
         ];
 
         return $app['twig']->render('help/sop.html.twig', [
-            'documentGroups' => $documentGroups
+            'documentGroups' => $documentGroups,
+            'path' => $this->getStoragePath($app)
         ]);
     }
 
@@ -130,5 +140,10 @@ class HelpController extends AbstractController
             'title' => $title,
             'path' => $this->getStoragePath($app)
         ]);
+    }
+
+    public function sopDownloadAction(Application $app, $filename)
+    {
+        return $app->redirect($this->getStoragePath($app) . '/' . rawurlencode($filename));
     }
 }
