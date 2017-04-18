@@ -137,25 +137,33 @@ class WorkQueueController extends AbstractController
         '1SAL' => 'Saliva'
     ];
 
-    protected function participantSummarySearch($organization, $params, $app)
+    protected function participantSummarySearch($organization, &$params, $app)
     {
-        if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] !== 'NO_USE') {
-            $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
+        $rdrParams = [];
+        if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] === 'NO_USE') {
+            foreach ($params as $key => $value) {
+                if ($key !== 'withdrawalStatus') {
+                    unset($params[$key]);
+                }
+            }
+        } else {
+            $rdrParams['_sort:desc'] = 'consentForStudyEnrollmentTime';
         }
-        $params['hpoId'] = $organization;
+        $rdrParams = array_merge($rdrParams, $params);
+        $rdrParams['hpoId'] = $organization;
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
-        if (isset($params['ageRange'])) {
-            $ageRange = $params['ageRange'];
-            unset($params['ageRange']);
-            $params = http_build_query($params, null, '&', PHP_QUERY_RFC3986);
+        if (isset($rdrParams['ageRange'])) {
+            $ageRange = $rdrParams['ageRange'];
+            unset($rdrParams['ageRange']);
+            $rdrParams = http_build_query($rdrParams, null, '&', PHP_QUERY_RFC3986);
 
             $dateOfBirthFilters = CodeBook::ageRangeToDob($ageRange);
             foreach ($dateOfBirthFilters as $filter) {
-                $params .= '&dateOfBirth=' . rawurlencode($filter);
+                $rdrParams .= '&dateOfBirth=' . rawurlencode($filter);
             }
         }
-        $summaries = $app['pmi.drc.participants']->listParticipantSummaries($params);
+        $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams);
         $results = [];
         foreach ($summaries as $summary) {
             if (isset($summary->resource)) {
