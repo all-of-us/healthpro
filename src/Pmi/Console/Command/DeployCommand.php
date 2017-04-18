@@ -37,13 +37,13 @@ class DeployCommand extends Command {
 
     /** Restrict access by IP using dos.yaml */
     private static $IPRESTRICT_APP_IDS = [
-        'pmi-hpo',
+        'healthpro-prod',
         'pmi-hpo-test'
     ];
 
     /** Create release tag when deploying these application IDs. */
     private static $TAG_APP_IDS = [
-        'pmi-hpo',
+        'healthpro-prod',
         'pmi-hpo-test'
     ];
 
@@ -54,7 +54,7 @@ class DeployCommand extends Command {
 
     /** Apply enhanced instance class and scaling for these application IDs. */
     private static $SCALE_APP_IDS = [
-        'pmi-hpo'
+        'healthpro-prod'
     ];
 
     /**#@+ Config settings set by execute(). */
