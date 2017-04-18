@@ -25,7 +25,11 @@ class DashboardController extends AbstractController
         // metrics attributes are hard-coded as we don't have human-readable names in the API yet
         $metrics_attributes = $this->getMetricsDisplayNames();
 
-        $center_codes = $this->getMetricsFieldDefinitions($app, 'Participant.hpoId');
+        try {
+            $center_codes = $this->getMetricsFieldDefinitions($app, 'Participant.hpoId');
+        } catch (\Exception $e) {
+            $center_codes = [];
+        }
 
         // remove UNSET value as we don't care about this for the filters
         if(($key = array_search('UNSET', $center_codes)) !== false) {
