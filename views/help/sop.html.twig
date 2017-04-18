@@ -12,7 +12,11 @@
         <h3><em>All of Us</em> {{ group.title }}</h3>
         <ul>
             {% for document in group.documents %}
-                <li><a href="{{ path('help_sopPdf', { filename: document.filename }) }}">{{ document.title }}</a></li>
+                {% if document.filename matches '/\.pdf$/' %}
+                    <li><a href="{{ path('help_sopPdf', { filename: document.filename }) }}">{{ document.title }}</a></li>
+                {% else %}
+                    <li><a href="{{ path('help_sopDownload', { filename: document.filename }) }}">{{ document.title }}</a> <i class="fa fa-download" aria-hidden="true"></i></li>
+                {% endif %}
             {% endfor %}
         </ul>
     {% endfor %}

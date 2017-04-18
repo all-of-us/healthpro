@@ -11,7 +11,8 @@ class HelpController extends AbstractController
         ['videos', '/videos'],
         ['faq', '/faq'],
         ['sop', '/sop'],
-        ['sopPdf', '/sop/viewer/{filename}']
+        ['sopPdf', '/sop/viewer/{filename}'],
+        ['sopDownload', '/sop/download/{filename}']
     ];
 
     private function getStoragePath(Application $app)
@@ -43,19 +44,19 @@ class HelpController extends AbstractController
                 'title' => 'Physical Measurements for DVs and HPOs',
                 'documents' => [
                     [
-                        'title' => 'SOP-012 HPO Blood Pressure Measurement',
+                        'title' => 'SOP-012.01 HPO Blood Pressure Measurement',
                         'filename' => 'SOP-012.01 HPO Blood Pressure Measurement.pdf'
                     ],
                     [
-                        'title' => 'SOP-013 HPO Heart Rate Measurement',
+                        'title' => 'SOP-013.01 HPO Heart Rate Measurement',
                         'filename' => 'SOP-013.01 HPO Heart Rate Measurement.pdf'
                     ],
                     [
-                        'title' => 'SOP-014 HPO Height and Weight Measurement',
+                        'title' => 'SOP-014.01 HPO Height and Weight Measurement',
                         'filename' => 'SOP-014.01 HPO Height and Weight Measurement.pdf'
                     ],
                     [
-                        'title' => 'SOP-015 HPO Waist-Hip Circumference Measurement',
+                        'title' => 'SOP-015.01 HPO Waist-Hip Circumference Measurement',
                         'filename' => 'SOP-015.01 HPO Waist-Hip Circumference Measurement.pdf'
                     ]
                 ]
@@ -64,28 +65,32 @@ class HelpController extends AbstractController
                 'title' => 'Biobank Standard Operating Procedures for HPO',
                 'documents' => [
                     [
-                        'title' => 'SOP-001 HPO Creating a PMI Biobank Order and Printing Specimen Label and Test Requisition',
+                        'title' => 'SOP-001.02 HPO Creating a PMI Biobank Order and Printing Specimen Label and Test Requisition',
                         'filename' => 'SOP-001.02 HPO Creating a PMI Biobank Order and Printing Specimen Labels and Test Requisition.pdf'
                     ],
                     [
-                        'title' => 'SOP-003 HPO Blood Specimens Collection and Processing',
+                        'title' => 'SOP-003.02 HPO Blood Specimens Collection and Processing',
                         'filename' => 'SOP-003.02 HPO Blood Specimens Collection and Processing.pdf'
                     ],
                     [
-                        'title' => 'SOP-005 HPO Urine Specimen Collection',
+                        'title' => 'SOP-005.02 HPO Urine Specimen Collection',
                         'filename' => 'SOP-005.02 HPO Urine Specimen Collection.pdf'
                     ],
                     [
-                        'title' => 'SOP-007 HPO Saliva Oragene Collection',
+                        'title' => 'SOP-007.02 HPO Saliva Oragene Collection',
                         'filename' => 'SOP-007.02 HPO Saliva Oragene Collection.pdf'
                     ],
                     [
-                        'title' => 'SOP-009 HPO Packaging and Shipping PMI Specimens',
+                        'title' => 'SOP-009.02 HPO Packaging and Shipping PMI Specimens',
                         'filename' => 'SOP-009.02 HPO Packaging and Shipping PMI Specimens.pdf'
                     ],
                     [
-                        'title' => 'SOP-010 HPO Ordering Supplies from MML',
+                        'title' => 'SOP-010.02 HPO Ordering Supplies from MML',
                         'filename' => 'SOP-010.02 HPO Ordering Supplies from MML.pdf'
+                    ],
+                    [
+                        'title' => 'HPO SOP Changes Presentation 04-12-2017',
+                        'filename' => 'HPO SOP Changes Presentation 04-12-2017.pptx'
                     ]
                 ]
             ],
@@ -93,27 +98,32 @@ class HelpController extends AbstractController
                 'title' => 'Biobank Standard Operating Procedures for DV',
                 'documents' => [
                     [
-                        'title' => 'SOP-002 DV Registering a PMI Kit and Creating a PMI Biobank Order',
+                        'title' => 'SOP-002.02 DV Registering a PMI Kit and Creating a PMI Biobank Order',
                         'filename' => 'SOP-002.02 DV Registering a PMI Kit and Creating a PMI Biobank Order.pdf'
                     ],
                     [
-                        'title' => 'SOP-004 DV Blood Specimens Collection and Processing',
+                        'title' => 'SOP-004.02 DV Blood Specimens Collection and Processing',
                         'filename' => 'SOP-004.02 DV Blood Specimens Collection and Processing.pdf'
                     ],
                     [
-                        'title' => 'SOP-006 DV Urine Specimen Collection',
+                        'title' => 'SOP-006.02 DV Urine Specimen Collection',
                         'filename' => 'SOP-006.02 DV Urine Specimen Collection.pdf'
                     ],
                     [
-                        'title' => 'SOP-011 DV Packaging and Shipping PMI Specimens',
+                        'title' => 'SOP-011.02 DV Packaging and Shipping PMI Specimens',
                         'filename' => 'SOP-011.02 DV Packaging and Shipping PMI Specimens.pdf'
+                    ],
+                    [
+                        'title' => 'DV SOP Changes Presentation 04-12-2017',
+                        'filename' => 'DV SOP Changes Presentation 04-12-2017.pptx'
                     ]
                 ]
             ]
         ];
 
         return $app['twig']->render('help/sop.html.twig', [
-            'documentGroups' => $documentGroups
+            'documentGroups' => $documentGroups,
+            'path' => $this->getStoragePath($app)
         ]);
     }
 
@@ -130,5 +140,10 @@ class HelpController extends AbstractController
             'title' => $title,
             'path' => $this->getStoragePath($app)
         ]);
+    }
+
+    public function sopDownloadAction(Application $app, $filename)
+    {
+        return $app->redirect($this->getStoragePath($app) . '/' . rawurlencode($filename));
     }
 }
