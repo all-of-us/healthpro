@@ -38,7 +38,13 @@ class DashboardController extends AbstractController
 
         // build up array of centers with categories, lat/long and provisional targets
         foreach($center_codes as $code) {
-            $center = $app['db']->fetchAssoc("SELECT * FROM recruitment_center_codes WHERE code = ?", array($code));
+            try {
+                $center = $app['db']->fetchAssoc("SELECT * FROM recruitment_center_codes WHERE code = ?", array($code));
+            } catch (\Exception $e) {
+                $center = ['code' => $code, 'label' => $code, 'latitude' => '33.0000', 'longitude' => '-71.' . $i . '000', 'category' => 'Unknown', 'recruitment_target' => 10000];
+                $i++;
+            }
+
             if (!$center) {
                 // in case center isn't found in DB
                 $center = ['code' => $code, 'label' => $code, 'latitude' => '33.0000', 'longitude' => '-71.' . $i . '000', 'category' => 'Unknown', 'recruitment_target' => 10000];
