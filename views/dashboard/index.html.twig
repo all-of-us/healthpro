@@ -201,9 +201,9 @@
                                 <div class="col-md-12 col-xs-4 form-group form-group-sm">
                                     <label for="map-mode">Display Metric</label>
                                     <select class="form-control region-plot-control" id="map-mode">
-                                        <option value="Participant.state" selected>State</option>
-                                        <option value="Participant.censusRegion">Census Region</option>
-                                        <option value="Participant.hpoId">Recruitment Origin</option>
+                                        <option value="FullParticipant.state" selected>State</option>
+                                        <option value="FullParticipant.censusRegion">Census Region</option>
+                                        <option value="FullParticipant.hpoId">Recruitment Origin</option>
                                     </select>
                                 </div>
                                 <div class="col-md-12 col-xs-4 form-group form-group-sm">
@@ -271,7 +271,7 @@
                                         mapModeText += ' of residence'
                                     }
                                     var mapLayout = {
-                                        title: 'Percentage of target consented registrations by <b>' + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
+                                        title: 'Percentage of target full participant registrations by <b>' + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
                                         font: PLOTLY_LABEL_FONT,
                                         width: mapWidth,
                                         height: mapWidth / 1.66,

@@ -25,13 +25,38 @@ class DashboardController extends AbstractController
         // metrics attributes are hard-coded as we don't have human-readable names in the API yet
         $metrics_attributes = $this->getMetricsDisplayNames();
 
-        // assemble list of centers for filter controls
         try {
-            $all_centers = $app['db']->fetchAll("SELECT * FROM recruitment_center_codes");
+            $center_codes = $this->getMetricsFieldDefinitions($app, 'Participant.hpoId');
         } catch (\Exception $e) {
-            $all_centers = [];
+            $center_codes = [];
         }
+
+        // remove UNSET value as we don't care about this for the filters
+        if(($key = array_search('UNSET', $center_codes)) !== false) {
+            unset($center_codes[$key]);
+        }
+
+        $all_centers = array();
         $recruitment_centers = array();
+        $i = 5;
+
+        // build up array of centers with categories, lat/long and provisional targets
+        foreach($center_codes as $code) {
+            try {
+                $center = $app['db']->fetchAssoc("SELECT * FROM recruitment_center_codes WHERE code = ?", array($code));
+            } catch (\Exception $e) {
+                $center = ['code' => $code, 'label' => $code, 'latitude' => '33.0000', 'longitude' => '-71.' . $i . '000', 'category' => 'Unknown', 'recruitment_target' => 10000];
+                $i++;
+            }
+
+            if (!$center) {
+                // in case center isn't found in DB
+                $center = ['code' => $code, 'label' => $code, 'latitude' => '33.0000', 'longitude' => '-71.' . $i . '000', 'category' => 'Unknown', 'recruitment_target' => 10000];
+                $i++;
+            }
+            array_push($all_centers, $center);
+        }
+
         foreach($all_centers as $center) {
             $category = $center['category'];
             if (!array_key_exists($category, $recruitment_centers)) {
@@ -40,7 +65,6 @@ class DashboardController extends AbstractController
                 $recruitment_centers[$category][] = $center;
             }
         }
-
         return $app['twig']->render('dashboard/index.html.twig', [
             'color_profiles' => $color_profiles,
             'metrics_attributes' => $metrics_attributes,
@@ -286,7 +310,7 @@ class DashboardController extends AbstractController
 
         // make sure metrics data exists first, if metrics cache or API fail return value will be false
         if (!empty($metrics)) {
-            if ($map_mode == 'Participant.state') {
+            if ($map_mode == 'FullParticipant.state') {
                 $state_registrations = [];
                 $hover_text = [];
                 $state_names = [];
@@ -349,7 +373,7 @@ class DashboardController extends AbstractController
                         "titleside" => 'right'
                     )
                 );
-            } else if ($map_mode == 'Participant.censusRegion') {
+            } else if ($map_mode == 'FullParticipant.censusRegion') {
                 $states_by_region = [];
                 $registrations_by_state = [];
                 $region_text = [];
@@ -421,7 +445,7 @@ class DashboardController extends AbstractController
                         "titleside" => 'right'
                     )
                 );
-            } else if ($map_mode == 'Participant.hpoId') {
+            } else if ($map_mode == 'FullParticipant.hpoId') {
                 $i = 0;
                 try {
                     $recruitment_centers = $app['db']->fetchAll("SELECT * FROM recruitment_center_codes");
@@ -551,6 +575,8 @@ class DashboardController extends AbstractController
                 $lookup = $metric_val . '.FULL_PARTICIPANT';
             } elseif ($metric_val == 'Participant.physicalMeasurements') {
                 $lookup = $metric_val . '.COMPLETED';
+            } elseif ($metric_val == 'Participant.numCompletedBaselinePPIModules') {
+                $lookup = $metric_val . '.3';
             } else {
                 $lookup = $metric_val . '.SUBMITTED';
             }
@@ -587,15 +613,13 @@ class DashboardController extends AbstractController
         // now that we have counts (in order), go back through to determine what the elibible numbers are
         // this is based off of external logic, so cannot be done while assembling counts
 
-        $completed_consent = $completed[2];
+        $completed_consent = $completed[1];
 
         foreach($metrics_keys as $index => $val) {
             if ($val == 'Participant') {
                 $eligible[] = 0;
             } elseif ($val == 'Participant.consentForStudyEnrollment') {
                 $eligible[] = $completed[0] - $completed[$index];
-            } elseif ($val == 'Participant.consentForStudyEnrollmentAndEHR') {
-                $eligible[] = $completed[1] - $completed[$index];
             } else {
                 $eligible[] = $completed_consent - $completed[$index] < 0 ? 0 : $completed_consent - $completed[$index];
             }
