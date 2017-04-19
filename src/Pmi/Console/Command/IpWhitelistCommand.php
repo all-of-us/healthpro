@@ -49,7 +49,7 @@ class IpWhitelistCommand extends Command
         $reader = new Reader($dbFile);
         $config = ['whitelist' => []];
         foreach (array_merge($networks->ipRanges, $networks->ipv6Ranges) as $network) {
-            $process = $this->exec("{$this->appDir}/bin/network2ip $network", true, true);
+            $process = $this->exec("{$this->appDir}/bin/network2ip " . escapeshellarg($network), true, true);
             $ip = trim($process->getOutput());
             $record = $reader->country($ip);
             $descr = "... {$network}... {$ip}... {$record->country->isoCode}";
