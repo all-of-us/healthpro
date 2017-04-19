@@ -10,11 +10,11 @@ class AppsClient
 {
     /** Number of times we will retry an API call before failing. */
     const RETRY_LIMIT = 5;
-    
+
     private $domain;
     private $client;
     private $directory;
-    
+
     public static function createFromApp(HpoApplication $app)
     {
         $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/googleapps_key.json';
@@ -26,7 +26,7 @@ class AppsClient
             return null;
         }
     }
-    
+
     public function __construct($appName, $authJson, $adminEmail, $domain, $isLocal)
     {
         $this->domain = $domain;
@@ -39,7 +39,7 @@ class AppsClient
         ]));
         $this->directory = new \Google_Service_Directory($this->client);
     }
-    
+
     /**
      * Executes an API call, automatically retrying in cases where we are
      * being rate-limited.
@@ -75,7 +75,7 @@ class AppsClient
         } while ($doRetry);
         return $response;
     }
-    
+
     /**
      * Calculates the amount of time to sleep after a failed API call as
      * specified by Google's recommended "exponential backoff" algorithm.
@@ -89,12 +89,13 @@ class AppsClient
         $millis = mt_rand(1, 999);
         return $seconds * 1000000 + $millis * 1000;
     }
-    
+
     /** Gets all groups to which a user belongs (or all groups if no user). */
     public function getGroups($userEmail = null)
     {
         $groups = [];
         $nextToken = null;
+        $email = "@{$this->domain}";
         do {
             $params = ['domain' => $this->domain];
             if ($userEmail) {
@@ -106,13 +107,20 @@ class AppsClient
             $groupsCollection = $this->callApi($this->directory, 'groups', 'listGroups', [$params]);
             $models = $groupsCollection->getGroups();
             if (is_array($models)) {
-                $groups = array_merge($groups, $models);
+                // restrict groups to the configured (sub)domain (Google API includes *all* our groups)
+                $domainModels = [];
+                foreach ($models as $model) {
+                    if (strcasecmp(substr($model->getEmail(), -strlen($email)), $email) === 0) {
+                        $domainModels[] = $model;
+                    }
+                }
+                $groups = array_merge($groups, $domainModels);
             }
             $nextToken = $groupsCollection->getNextPageToken();
         } while ($nextToken);
         return $groups;
     }
-    
+
     /**
      * Checks if the given user is subscribed to the given group.
      * @param string $groupEmail the email address of the group.
