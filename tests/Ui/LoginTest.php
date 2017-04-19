@@ -5,7 +5,7 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\WebDriverCapabilityType;
 use Tests\Ui\Page;
 
-class ParticipantLoginTest extends AbstractPmiUiTestCase
+class LoginTest extends AbstractPmiUiTestCase
 {
     public function testLogin()
     {
@@ -20,6 +20,10 @@ class ParticipantLoginTest extends AbstractPmiUiTestCase
         $this->assertContains('Login', $this->webDriver->getTitle());
         $loginPage->enterEmail($email);
         $loginPage->loginUser();
+        
+        $homePage->waitForClassVisible('pmi-confirm-ok');
+        $homePage->clickAgree();
         $this->assertContains('Choose Destination - HealthPro', $this->webDriver->getTitle());
+
     }
 }

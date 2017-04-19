@@ -47,6 +47,11 @@ class BasePage
         return $this->waitForElementVisible(WebDriverBy::id($id));
     }
 
+    public function waitForClassVisible($class)
+    {
+        return $this->waitForElementVisible(WebDriverBy::className($class));
+    }
+
     public function findById($id)
     {
         return $this->webDriver->findElement(WebDriverBy::id($id));

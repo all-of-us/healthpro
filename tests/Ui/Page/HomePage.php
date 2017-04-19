@@ -9,4 +9,9 @@ class HomePage extends BasePage
     {
         $this->findBySelector('.container a')->click();
     }
+
+    public function clickAgree()
+    {
+    	$this->findBySelector('.pmi-confirm-ok')->click();
+    }
 }
