@@ -68,7 +68,7 @@ class HealthProTest extends AbstractPmiUiTestCase
         $select->selectByValue('hpo-site-hogwarts@pmi-ops.io');
 
         //Click continue
-        $this->findByClass('site-submit')->click();
+        $this->findByClass('site-submit')->submit();
 
         //Go to Workqueue page
         $this->findByXPath('/workqueue/')->click();
