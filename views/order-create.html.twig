@@ -17,7 +17,7 @@
         <dt>Biobank ID</dt>
         <dd>{{ participant.biobankId }}</dd>
         <dt>DOB</dt>
-        <dd>{{ participant.dob|date('n/j/Y') }}</dd>
+        <dd>{{ participant.dob ? participant.dob|date('n/j/Y') }}</dd>
         <dt>Gender Identity</dt>
         <dd>{{ participant.genderIdentity }}</dd>
     </dl>
