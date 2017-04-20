@@ -27,14 +27,11 @@ class HealthProTest extends AbstractPmiUiTestCase
     {
         $this->webDriver->get($this->baseUrl);
 
-        //Check home page
+        //Check base page
         $this->assertContains('Error - HealthPro', $this->webDriver->getTitle());
 
         //Click try again
         $this->findBySelector('.container a')->click();
-
-        //Go to login page
-        $this->assertContains('Login', $this->webDriver->getTitle());
 
         //Enter email
         $email = 'test@example.com';
@@ -47,6 +44,8 @@ class HealthProTest extends AbstractPmiUiTestCase
         //Click agree
         $this->waitForClassVisible('pmi-confirm-ok');
         $this->findBySelector('.pmi-confirm-ok')->click();
+
+        //Check home page
         $this->assertContains('Choose Destination - HealthPro', $this->webDriver->getTitle());
     }
 
@@ -100,6 +99,8 @@ class HealthProTest extends AbstractPmiUiTestCase
         //Click search
         $this->findBySelector('form[name=search] .btn-primary')->click();
         $body = $this->findBySelector('body')->getText();
+
+        //Check if search result contains lastname
         $this->assertContains($lastName, $body);
     }
 
@@ -145,7 +146,7 @@ class HealthProTest extends AbstractPmiUiTestCase
         //Go to Workqueue page
         $this->webDriver->get($this->baseUrl.'/workqueue/?'.time());
 
-        //Get PM created date
+        //Get participant PM created date
         $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
         for ($i = 1; $i <= count($elements); $i++) { 
             if ($this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText() == $this->pmiId) {
@@ -153,6 +154,8 @@ class HealthProTest extends AbstractPmiUiTestCase
                 break;
             }
         }
+
+        //Check if PM finalized date exists
         $this->assertContains(date('m/d/Y',$this->finalizedDate), $date);      
     }
 }
