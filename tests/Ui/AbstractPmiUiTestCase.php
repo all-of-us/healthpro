@@ -7,6 +7,7 @@ use Facebook\WebDriver\Remote\WebDriverCapabilityType;
 abstract class AbstractPmiUiTestCase extends \PHPUnit_Framework_TestCase
 {
     private $webDriverUrl = 'http://localhost:4444/wd/hub';
+    protected $baseUrl = 'http://localhost:8080';
     protected $webDriver;
 
     public function setUp()
