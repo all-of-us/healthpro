@@ -9,11 +9,18 @@ use Facebook\WebDriver\WebDriverExpectedCondition;
 
 class HealthProTest extends AbstractPmiUiTestCase
 {
+    private $pmiId;
+    private $createdDate;
+
     public function testHealthPro()
     {
         $this->login();
 
         $this->participantLookup();
+
+        $this->createPhysicalMeasurements();
+
+        $this->checkFinalizedPM();
     }
 
     public function login()
@@ -24,26 +31,22 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->assertContains('Error - HealthPro', $this->webDriver->getTitle());
 
         //Click try again
-        $this->webDriver->findElement(WebDriverBy::cssSelector('.container a'))->click();
+        $this->findBySelector('.container a')->click();
 
         //Go to login page
         $this->assertContains('Login', $this->webDriver->getTitle());
 
         //Enter email
         $email = 'test@example.com';
-        $elementEmail = $this->webDriver->findElement(WebDriverBy::name('email'));
-        $elementEmail->clear();
-        $elementEmail->click();
-        $this->webDriver->getKeyboard()->sendKeys($email);
+        $this->findByName('email')->clear();
+        $this->setInput('email', $email);
 
         //Click login
-        $this->webDriver->findElement(WebDriverBy::id('submit-login'))->click();
+        $this->findById('submit-login')->click();
         
         //Click agree
-        $this->webDriver->wait(5, 500)->until(
-            WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::className('pmi-confirm-ok'))
-        );
-        $this->webDriver->findElement(WebDriverBy::cssSelector('.pmi-confirm-ok'))->click();
+        $this->waitForClassVisible('pmi-confirm-ok');
+        $this->findBySelector('.pmi-confirm-ok')->click();
         $this->assertContains('Choose Destination - HealthPro', $this->webDriver->getTitle());
     }
 
@@ -51,7 +54,7 @@ class HealthProTest extends AbstractPmiUiTestCase
     {
         //Wait untill modal window completly disappears
         $driver = $this->webDriver;
-        $this->webDriver->wait()->until(
+        $this->webDriver->wait(5, 500)->until(
             function () use ($driver) {
                 $elements = $driver->findElements(WebDriverBy::cssSelector('.modal-open'));
                 return count($elements) == 0;
@@ -59,34 +62,26 @@ class HealthProTest extends AbstractPmiUiTestCase
         );
 
         //Click Healthpro destination
-        $this->webDriver->findElement(WebDriverBy::xpath("//a[@href='/']"))->click();
-        $this->webDriver->wait()->until(
-            WebDriverExpectedCondition::titleContains('Choose Site - HealthPro')
-        );
+        $this->findByXPath('/')->click();
 
-        //Select site Hogwarts
-        $select = new WebDriverSelect($this->webDriver->findElement(WebDriverBy::tagName('select')));
+        //Select site
+        $select = new WebDriverSelect($this->findByTag('select'));
         $select->selectByValue('hpo-site-hogwarts@pmi-ops.io');
 
         //Click continue
-        $this->webDriver->findElement(WebDriverBy::className('site-submit'))->click();
-        $this->webDriver->wait()->until(
-            WebDriverExpectedCondition::titleContains('HealthPro')
-        );
+        $this->findByClass('site-submit')->click();
 
         //Go to Workqueue page
-        $this->webDriver->findElement(WebDriverBy::xpath("//a[@href='/workqueue/']"))->click();
-        $this->webDriver->wait()->until(
-            WebDriverExpectedCondition::titleContains('Participant Work Queue - HealthPro')
-        );
+        $this->findByXPath('/workqueue/')->click();
 
         //Select patient who's status is not withdrawn
         $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
         for ($i = 1; $i <= count($elements); $i++) { 
-            $tableCols = $this->webDriver->findElement(WebDriverBy::cssSelector('tbody tr:nth-child('.$i.') td:nth-child(9)'));
-            if (empty($tableCols->getText())){
-                $lastName = $this->webDriver->findElement(WebDriverBy::cssSelector('tbody tr:nth-child('.$i.') td:nth-child(1)'))->getText();
-                $dob = $this->webDriver->findElement(WebDriverBy::cssSelector('tbody tr:nth-child('.$i.') td:nth-child(3)'))->getText();
+            $withdrawn = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(9)')->getText();
+            if (empty($withdrawn)) {
+                $lastName = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(1)')->getText();
+                $dob = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(3)')->getText();
+                $this->pmiId = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText();
                 if (!empty($dob)) {
                     break;
                 }
@@ -94,17 +89,70 @@ class HealthProTest extends AbstractPmiUiTestCase
         }
 
         //Go to ParticipantsLookup page
-        $this->webDriver->findElement(WebDriverBy::xpath("//a[@href='/participants']"))->click();
+        $this->findByXPath('/participants')->click();
 
         //Enter lastname and dob
-        $this->webDriver->findElement(WebDriverBy::id('search_lastName'))->click();
-        $this->webDriver->getKeyboard()->sendKeys($lastName);
-        $this->webDriver->findElement(WebDriverBy::id('search_dob'))->click();
-        $this->webDriver->getKeyboard()->sendKeys($dob);
+        $this->findById('search_lastName')->click();
+        $this->sendKeys($lastName);
+        $this->findById('search_dob')->click();
+        $this->sendKeys($dob);
 
         //Click search
-        $this->webDriver->findElement(WebDriverBy::cssSelector('form[name=search] .btn-primary'))->click();
-        $body = $this->webDriver->findElement(WebDriverBy::cssSelector('body'))->getText();
+        $this->findBySelector('form[name=search] .btn-primary')->click();
+        $body = $this->findBySelector('body')->getText();
         $this->assertContains($lastName, $body);
+    }
+
+    public function createPhysicalMeasurements()
+    {
+        //Click participant
+        $this->findByXPath('/participant/'.$this->pmiId.'')->click();
+
+        //Click start physical measurements
+        $this->findByXPath('/participant/'.$this->pmiId.'/measurements')->click();
+
+        //Enter blood pressure values
+        $this->setInput('form[blood-pressure-systolic][0]', '112');
+        $this->setInput('form[blood-pressure-systolic][1]', '122');
+        $this->setInput('form[blood-pressure-systolic][2]', '126');
+
+        $this->setInput('form[blood-pressure-diastolic][0]', '84');
+        $this->setInput('form[blood-pressure-diastolic][1]', '82');
+        $this->setInput('form[blood-pressure-diastolic][2]', '80');
+
+        $this->setInput('form[heart-rate][0]', '80');
+        $this->setInput('form[heart-rate][1]', '82');
+        $this->setInput('form[heart-rate][2]', '84');
+
+        //Enter height and weight values
+        $this->setInput('form[height]', '140');
+        $this->setInput('form[weight]', '56');
+
+        //Enter waist and hip circumference
+        $this->setInput('form[waist-circumference][0]', '32');
+        $this->setInput('form[waist-circumference][1]', '33');
+        $this->setInput('form[hip-circumference][0]', '34');
+        $this->setInput('form[hip-circumference][1]', '35');
+
+        //Save and finalize PM
+        $this->findByClass('btn-success')->click();
+        $this->webDriver->switchTo()->alert()->accept();      
+        $this->finalizedDate = strtotime($this->findBySelector('.dl-horizontal dd:last-child')->getText());
+    }
+
+    public function checkFinalizedPM()
+    {
+        //Go to Workqueue page
+        $this->webDriver->get($this->baseUrl.'/workqueue/?'.time());
+
+        //Get PM created date
+        $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
+        for ($i = 1; $i <= count($elements); $i++) { 
+            if ($this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText() == $this->pmiId) {
+                $date = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(30)')->getText();
+                break;
+            }
+        }
+        $this->assertContains(date('m/d/Y',$this->finalizedDate), $date);      
     }
 }
