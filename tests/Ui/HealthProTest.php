@@ -73,11 +73,13 @@ class HealthProTest extends AbstractPmiUiTestCase
         //Go to Workqueue page
         $this->findByXPath('/workqueue/')->click();
 
-        //Select patient who's status is not withdrawn
+        //Select patient who's status is not withdrawn, completed basic survery and doesn't have a PM
         $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
         for ($i = 1; $i <= count($elements); $i++) { 
             $withdrawn = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(9)')->getText();
-            if (empty($withdrawn)) {
+            $basicsDate = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(17)')->getText();
+            $pmDate = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(30)')->getAttribute('data-order');
+            if (empty($withdrawn) && !empty($basicsDate) && $pmDate == '0-') {
                 $lastName = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(1)')->getText();
                 $dob = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(3)')->getText();
                 $this->pmiId = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText();
@@ -144,7 +146,7 @@ class HealthProTest extends AbstractPmiUiTestCase
     public function checkFinalizedPM()
     {
         //Go to Workqueue page
-        $this->webDriver->get($this->baseUrl.'/workqueue/?'.time());
+        $this->webDriver->get($this->baseUrl.'/workqueue?test='.time());
 
         //Get participant PM created date
         $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
