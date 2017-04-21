@@ -87,7 +87,7 @@ class RdrParticipants
         if ($contents &&
             ($responseObject = json_decode($contents)) &&
             isset($responseObject->entry) &&
-            is_array($responseObject->entry)
+            is_array($responseObject->entry) && !isset($params['test'])
         ) {
             $responseObject = json_decode($contents);
         } else {
