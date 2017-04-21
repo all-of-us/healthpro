@@ -71,7 +71,7 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->findByClass('site-submit')->submit();
 
         //Go to Workqueue page
-        $this->findByXPath('/workqueue/')->click();
+        $this->webDriver->get($this->baseUrl.'/workqueue?test='.time());
 
         //Select patient who's status is not withdrawn, completed basic survery and doesn't have a PM
         $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
@@ -100,10 +100,9 @@ class HealthProTest extends AbstractPmiUiTestCase
 
         //Click search
         $this->findBySelector('form[name=search] .btn-primary')->click();
-        $body = $this->findBySelector('body')->getText();
 
         //Check if search result contains lastname
-        $this->assertContains($lastName, $body);
+        $this->assertContains($lastName, $this->findByClass('table')->getText());
     }
 
     public function createPhysicalMeasurements()
@@ -137,8 +136,14 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->setInput('form[hip-circumference][0]', '34');
         $this->setInput('form[hip-circumference][1]', '35');
 
-        //Save and finalize PM
-        $this->findByClass('btn-success')->click();
+        //Save PM
+        $this->findByClass('btn-primary')->click();
+
+        //Check if PM is saved
+        $this->assertContains('Physical measurements saved', $this->findById('flash-notices')->getText());
+
+        //Finalize PM
+        $this->findBySelector('.btn-success.pull-right')->click();
         $this->webDriver->switchTo()->alert()->accept();      
         $this->finalizedDate = strtotime($this->findBySelector('.dl-horizontal dd:last-child')->getText());
     }
