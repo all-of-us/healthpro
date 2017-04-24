@@ -45,6 +45,12 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->waitForClassVisible('pmi-confirm-ok');
         $this->findBySelector('.pmi-confirm-ok')->click();
 
+        //Wait for ajax request to complete
+        $this->webDriver->wait(5, 500)->until(function() {
+            $condition = 'return ($.active == 0);';
+            return $this->webDriver->executeScript($condition);
+        });
+
         //Check home page
         $this->assertContains('Choose Destination - HealthPro', $this->webDriver->getTitle());
     }
