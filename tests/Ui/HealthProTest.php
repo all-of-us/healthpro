@@ -10,7 +10,9 @@ use Facebook\WebDriver\WebDriverExpectedCondition;
 class HealthProTest extends AbstractPmiUiTestCase
 {
     private $pmiId;
-    private $createdDate;
+    private $lastName;
+    private $dob;
+    private $finalizedDate;
 
     public function testHealthPro()
     {
@@ -85,14 +87,17 @@ class HealthProTest extends AbstractPmiUiTestCase
             $withdrawn = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(9)')->getText();
             $basicsDate = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(17)')->getText();
             $pmDate = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(30)')->getAttribute('data-order');
-            if (empty($withdrawn) && !empty($basicsDate) && $pmDate == '0-') {
-                $lastName = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(1)')->getText();
-                $dob = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(3)')->getText();
+            $this->dob = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(3)')->getText();
+            if (empty($withdrawn) && !empty($basicsDate) && $pmDate == '0-' && !empty($this->dob)) {
+                $this->lastName = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(1)')->getText();
                 $this->pmiId = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText();
-                if (!empty($dob)) {
-                    break;
-                }
+                break;
             }
+        }
+
+        //Throw exception if the desired participant not found.
+        if (empty($this->lastName) || empty($this->dob)) {
+            throw new \Exception("Participant not found");            
         }
 
         //Go to ParticipantsLookup page
@@ -100,15 +105,15 @@ class HealthProTest extends AbstractPmiUiTestCase
 
         //Enter lastname and dob
         $this->findById('search_lastName')->click();
-        $this->sendKeys($lastName);
+        $this->sendKeys($this->lastName);
         $this->findById('search_dob')->click();
-        $this->sendKeys($dob);
+        $this->sendKeys($this->dob);
 
         //Click search
         $this->findBySelector('form[name=search] .btn-primary')->click();
 
         //Check if search result contains lastname
-        $this->assertContains($lastName, $this->findByClass('table')->getText());
+        $this->assertContains($this->lastName, $this->findByClass('table')->getText());
     }
 
     public function createPhysicalMeasurements()
