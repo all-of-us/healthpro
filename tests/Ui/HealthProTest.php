@@ -21,6 +21,8 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->createPhysicalMeasurements();
 
         $this->checkFinalizedPM();
+
+        $this->createBiobankOrder();
     }
 
     public function login()
@@ -77,7 +79,7 @@ class HealthProTest extends AbstractPmiUiTestCase
         //Go to Workqueue page
         $this->webDriver->get($this->baseUrl.'/workqueue?test='.time());
 
-        //Select patient who's status is not withdrawn, completed basic survery and doesn't have a PM
+        //Select participant who's status is not withdrawn, completed basic survery and doesn't have a PM
         $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
         for ($i = 1; $i <= count($elements); $i++) { 
             $withdrawn = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(9)')->getText();
@@ -168,5 +170,64 @@ class HealthProTest extends AbstractPmiUiTestCase
 
         //Check if PM finalized date exists
         $this->assertContains(date('m/d/Y',$this->finalizedDate), $date);      
+    }
+
+    public function createBiobankOrder()
+    {
+        //Select participant who's status is not withdrawn and completed basic survery
+        $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
+        for ($i = 1; $i <= count($elements); $i++) { 
+            $withdrawn = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(9)')->getText();
+            $basicsDate = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(17)')->getText();
+            if (empty($withdrawn) && !empty($basicsDate)) {
+                $this->pmiId = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText();
+                $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(1) a')->click();
+                break;
+            }
+        }
+
+        //Click new order
+        $this->findByXPath('/participant/'.$this->pmiId.'/order/check')->click();
+
+        //Safety Check
+        $this->webDriver->findElements(WebDriverBy::name("donate"))[1]->click();
+        $this->webDriver->findElements(WebDriverBy::name("transfusion"))[1]->click();
+        $this->findByXPath('/participant/'.$this->pmiId.'/order/create')->click();
+
+        //Create HPO biobank order
+        $this->findByName('standard')->click();
+
+        //Print - check if the print labels exist
+        $this->assertCount(1, $this->webDriver->findElements(WebDriverBy::className("pdf-requisition")));
+        $this->assertCount(1, $this->webDriver->findElements(WebDriverBy::className("pdf-labels")));
+
+        //Collect
+        $this->findBySelector('ul li[role=presentation]:nth-child(4)')->click();
+        $this->findByName('form[collected_ts]')->click();
+        $this->findBySelector('.bootstrap-datetimepicker-widget a[data-action=close]')->click();
+        $this->findById('checkall')->click();
+        $this->findBySelector('.btn-primary[type=submit]')->click();
+        $this->assertContains('Order collection', $this->findById('flash-notices')->getText());
+
+        //Process
+        $this->findBySelector('ul li[role=presentation]:nth-child(5)')->click();
+        $this->findById('form_processed_samples_0')->click();
+        $this->findByName('form[processed_samples_ts][1SST8]')->click();
+        $this->findBySelector('.bootstrap-datetimepicker-widget a[data-action=close]')->click();
+
+        $this->findById('form_processed_samples_1')->click();
+        $this->findByName('form[processed_samples_ts][1PST8]')->click();
+        $this->findBySelector('.bootstrap-datetimepicker-widget a[data-action=close]')->click();
+        $this->findBySelector('.btn-primary[type=submit]')->click();
+        $this->assertContains('Order processing', $this->findById('flash-notices')->getText());
+
+        //Finalize
+        $this->findBySelector('ul li[role=presentation]:nth-child(6)')->click();
+        $this->findByName('form[finalized_ts]')->click();
+        $this->findBySelector('.bootstrap-datetimepicker-widget a[data-action=close]')->click();
+        $this->findById('checkall')->click();
+        $this->findBySelector('.btn-primary[type=submit]')->click();
+        $this->webDriver->switchTo()->alert()->accept();
+        $this->assertContains('Order finalization', $this->findById('flash-notices')->getText());
     }
 }
