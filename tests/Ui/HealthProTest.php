@@ -9,22 +9,40 @@ use Facebook\WebDriver\WebDriverExpectedCondition;
 
 class HealthProTest extends AbstractPmiUiTestCase
 {
-    private $pmiId;
+    private $firstName;
     private $lastName;
     private $dob;
-    private $finalizedDate;
+    private $participantId;
 
     public function testHealthPro()
     {
+        $data = $this->getData();
+
+        $this->setData($data);
+
         $this->login();
 
         $this->participantLookup();
 
         $this->createPhysicalMeasurements();
 
-        $this->checkFinalizedPM();
+        $this->participantLookupById();
 
         $this->createBiobankOrder();
+    }
+
+    public function getData()
+    {
+        $data = file_get_contents(__DIR__.'/PtscInput.json');
+        return json_decode($data);
+    }
+
+    public function setData($data)
+    {
+        $this->firstName = $data->firstName;
+        $this->lastName = $data->lastName;
+        $this->dob = $data->dob;
+        $this->participantId = $data->participantId;
     }
 
     public function login()
@@ -53,12 +71,6 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->waitForClassVisible('pmi-confirm-ok');
         $this->findBySelector('.pmi-confirm-ok')->click();
 
-        //Check home page
-        $this->assertContains('Choose Destination - HealthPro', $this->webDriver->getTitle());
-    }
-
-    public function participantLookup()
-    {
         //Wait untill modal window completly disappears
         $driver = $this->webDriver;
         $this->webDriver->wait(5, 500)->until(
@@ -68,38 +80,20 @@ class HealthProTest extends AbstractPmiUiTestCase
             }
         );
 
-        //Click Healthpro destination
-        $this->findByXPath('/')->click();
-
-        //Select site
-        $select = new WebDriverSelect($this->findByTag('select'));
-        $select->selectByValue('hpo-site-hogwarts@pmi-ops.io');
-
-        //Click continue
-        $this->findByClass('site-submit')->submit();
-
-        //Go to Workqueue page
-        $this->webDriver->get($this->baseUrl.'/workqueue?test='.time());
-
-        //Select participant who's status is not withdrawn, completed basic survery and doesn't have a PM
-        $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
-        for ($i = 1; $i <= count($elements); $i++) { 
-            $withdrawn = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(9)')->getText();
-            $basicsDate = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(17)')->getText();
-            $pmDate = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(30)')->getAttribute('data-order');
-            $this->dob = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(3)')->getText();
-            if (empty($withdrawn) && !empty($basicsDate) && $pmDate == '0-' && !empty($this->dob)) {
-                $this->lastName = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(1)')->getText();
-                $this->pmiId = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText();
-                break;
-            }
+        //Select destination if exists
+        if ($this->webDriver->getTitle() == 'Choose Destination - HealthPro') {
+            //Click Healthpro destination
+            $this->findByXPath('/')->click();            
         }
 
-        //Throw exception if the desired participant not found.
-        if (empty($this->lastName) || empty($this->dob)) {
-            throw new \Exception("Participant not found");            
+        //Select site if exists
+        if ($this->webDriver->getTitle() == 'Choose Site - HealthPro') {
+            $this->findByClass('site-submit')->submit();           
         }
+    }
 
+    public function participantLookup()
+    {
         //Go to ParticipantsLookup page
         $this->findByXPath('/participants')->click();
 
@@ -119,10 +113,10 @@ class HealthProTest extends AbstractPmiUiTestCase
     public function createPhysicalMeasurements()
     {
         //Click participant
-        $this->findByXPath('/participant/'.$this->pmiId.'')->click();
+        $this->findByXPath('/participant/'.$this->participantId.'')->click();
 
         //Click start physical measurements
-        $this->findByXPath('/participant/'.$this->pmiId.'/measurements')->click();
+        $this->findByXPath('/participant/'.$this->participantId.'/measurements')->click();
 
         //Enter blood pressure values
         $this->setInput('form[blood-pressure-systolic][0]', '112');
@@ -155,49 +149,32 @@ class HealthProTest extends AbstractPmiUiTestCase
 
         //Finalize PM
         $this->findBySelector('.btn-success.pull-right')->click();
-        $this->webDriver->switchTo()->alert()->accept();      
-        $this->finalizedDate = strtotime($this->findBySelector('.dl-horizontal dd:last-child')->getText());
+        $this->webDriver->switchTo()->alert()->accept();
+
+        //Check if PM is finalized
+        $this->assertContains('Finalized', $this->findByClass('alert-success')->getText());
     }
 
-    public function checkFinalizedPM()
+    public function participantLookupById()
     {
-        //Go to Workqueue page
-        $this->webDriver->get($this->baseUrl.'/workqueue?test='.time());
+        //Go to ParticipantsLookup page
+        $this->findByXPath('/participants')->click();
+        $this->findById('id_participantId')->click();
+        $this->sendKeys($this->participantId);
 
-        //Get participant PM created date
-        $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
-        for ($i = 1; $i <= count($elements); $i++) { 
-            if ($this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText() == $this->pmiId) {
-                $date = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(30)')->getText();
-                break;
-            }
-        }
-
-        //Check if PM finalized date exists
-        $this->assertContains(date('m/d/Y',$this->finalizedDate), $date);      
+        //Click go
+        $this->findBySelector('form[name=id] .btn-primary')->click();  
     }
 
     public function createBiobankOrder()
     {
-        //Select participant who's status is not withdrawn and completed basic survery
-        $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
-        for ($i = 1; $i <= count($elements); $i++) { 
-            $withdrawn = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(9)')->getText();
-            $basicsDate = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(17)')->getText();
-            if (empty($withdrawn) && !empty($basicsDate)) {
-                $this->pmiId = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText();
-                $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(1) a')->click();
-                break;
-            }
-        }
-
         //Click new order
-        $this->findByXPath('/participant/'.$this->pmiId.'/order/check')->click();
+        $this->findByXPath('/participant/'.$this->participantId.'/order/check')->click();
 
         //Safety Check
         $this->webDriver->findElements(WebDriverBy::name("donate"))[1]->click();
         $this->webDriver->findElements(WebDriverBy::name("transfusion"))[1]->click();
-        $this->findByXPath('/participant/'.$this->pmiId.'/order/create')->click();
+        $this->findByXPath('/participant/'.$this->participantId.'/order/create')->click();
 
         //Create HPO biobank order
         $this->findByName('standard')->click();
@@ -212,6 +189,8 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->findBySelector('.bootstrap-datetimepicker-widget a[data-action=close]')->click();
         $this->findById('checkall')->click();
         $this->findBySelector('.btn-primary[type=submit]')->click();
+
+        //Check order collection
         $this->assertContains('Order collection', $this->findById('flash-notices')->getText());
 
         //Process
@@ -224,6 +203,8 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->findByName('form[processed_samples_ts][1PST8]')->click();
         $this->findBySelector('.bootstrap-datetimepicker-widget a[data-action=close]')->click();
         $this->findBySelector('.btn-primary[type=submit]')->click();
+
+        //Check order processing
         $this->assertContains('Order processing', $this->findById('flash-notices')->getText());
 
         //Finalize
@@ -233,6 +214,8 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->findById('checkall')->click();
         $this->findBySelector('.btn-primary[type=submit]')->click();
         $this->webDriver->switchTo()->alert()->accept();
+
+        //Check order finalization
         $this->assertContains('Order finalization', $this->findById('flash-notices')->getText());
     }
 }
