@@ -13,6 +13,7 @@ class HealthProTest extends AbstractPmiUiTestCase
     private $lastName;
     private $dob;
     private $participantId;
+    private $pmFinalizedDate;
 
     public function testHealthPro()
     {
@@ -29,6 +30,8 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->participantLookupById();
 
         $this->createBiobankOrder();
+
+        $this->verifyParticipantSummary();
     }
 
     public function getData()
@@ -153,6 +156,8 @@ class HealthProTest extends AbstractPmiUiTestCase
 
         //Check if PM is finalized
         $this->assertContains('Finalized', $this->findByClass('alert-success')->getText());
+
+        $this->pmFinalizedDate = strtotime($this->findBySelector('.dl-horizontal dd:last-child')->getText());
     }
 
     public function participantLookupById()
@@ -217,5 +222,34 @@ class HealthProTest extends AbstractPmiUiTestCase
 
         //Check order finalization
         $this->assertContains('Order finalization', $this->findById('flash-notices')->getText());
+    }
+
+    public function verifyParticipantSummary()
+    {
+        //Go to Workqueue page
+        $this->findByXPath('/workqueue/')->click();
+
+        //Show all columns
+        $this->findBySelector('.dt-buttons a:nth-child(8)')->click();
+
+        //Display 100 rows
+        $select = new WebDriverSelect($this->findByName('workqueue_length'));
+        $select->selectByValue('100');
+
+        //Sort physical measurements by desending order
+        $this->findBySelector('thead tr:nth-child(2) th:nth-child(21)')->click();
+        $this->findBySelector('thead tr:nth-child(2) th:nth-child(21)')->click();
+
+        //Get participant PM finalized date
+        $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
+        for ($i = 1; $i <= count($elements); $i++) {
+            if ($this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText() == $this->participantId) {
+                $date = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(30)')->getText();
+                break;
+            }
+        }
+
+        //Check if PM finalized date exists
+        $this->assertEquals(date('m/d/Y',$this->pmFinalizedDate), $date);
     }
 }
