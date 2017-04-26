@@ -53,12 +53,6 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->waitForClassVisible('pmi-confirm-ok');
         $this->findBySelector('.pmi-confirm-ok')->click();
 
-        //Check home page
-        $this->assertContains('Choose Destination - HealthPro', $this->webDriver->getTitle());
-    }
-
-    public function participantLookup()
-    {
         //Wait untill modal window completly disappears
         $driver = $this->webDriver;
         $this->webDriver->wait(5, 500)->until(
@@ -67,19 +61,25 @@ class HealthProTest extends AbstractPmiUiTestCase
                 return count($elements) == 0;
             }
         );
+        //Select destination if exists
+        if ($this->webDriver->getTitle() == 'Choose Destination - HealthPro') {
+            //Click Healthpro destination
+            $this->findByXPath('/')->click();            
+        }
+        //Select site if exists
+        if ($this->webDriver->getTitle() == 'Choose Site - HealthPro') {
+            $this->findByClass('site-submit')->submit();           
+        }
+    }
 
-        //Click Healthpro destination
-        $this->findByXPath('/')->click();
-
-        //Select site
-        $select = new WebDriverSelect($this->findByTag('select'));
-        $select->selectByValue('hpo-site-hogwarts@pmi-ops.io');
-
-        //Click continue
-        $this->findByClass('site-submit')->submit();
-
+    public function participantLookup()
+    {
         //Go to Workqueue page
         $this->webDriver->get($this->baseUrl.'/workqueue?test='.time());
+
+        $this->findBySelector('.dt-buttons a:nth-child(8)')->click();
+        $select = new WebDriverSelect($this->findByName('workqueue_length'));
+        $select->selectByValue('100');
 
         //Select participant who's status is not withdrawn, completed basic survery and doesn't have a PM
         $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
@@ -163,6 +163,10 @@ class HealthProTest extends AbstractPmiUiTestCase
     {
         //Go to Workqueue page
         $this->webDriver->get($this->baseUrl.'/workqueue?test='.time());
+
+        $this->findBySelector('.dt-buttons a:nth-child(8)')->click();
+        $select = new WebDriverSelect($this->findByName('workqueue_length'));
+        $select->selectByValue('100');
 
         //Get participant PM created date
         $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
