@@ -6,12 +6,16 @@ class RdrHelper
     protected $client;
     protected $endpoint = 'https://pmi-drc-api-test.appspot.com/';
     protected $options = [];
+    protected $cacheEnabled = true;
 
     public function __construct(array $options)
     {
         if (!empty($options)) {
             if (!empty($options['endpoint'])) {
                 $this->endpoint = $options['endpoint'];
+            }
+            if (!empty($options['disable_cache']) && $options['disable_cache']) {
+                $this->cacheEnabled = false;
             }
             $this->options = $options;
         }
@@ -40,5 +44,10 @@ class RdrHelper
         return $googleClient->authorize(new \GuzzleHttp\Client([
             'base_uri' => $endpoint
         ]));
+    }
+
+    public function isCacheEnabled()
+    {
+        return $this->cacheEnabled;
     }
 }

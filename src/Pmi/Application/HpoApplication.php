@@ -29,6 +29,9 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('rdr_auth_json')) {
             $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
         }
+        if ($this->getConfig('rdr_disable_cache')) {
+            $rdrOptions['disable_cache'] = true;
+        }
 
         $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
         if ($this->participantSource == 'mock') {
