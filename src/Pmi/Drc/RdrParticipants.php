@@ -8,11 +8,13 @@ class RdrParticipants
 {
     protected $rdrHelper;
     protected $client;
+    protected $cacheEnabled = true;
     protected static $resourceEndpoint = 'rdr/v1/';
 
     public function __construct(RdrHelper $rdrHelper)
     {
         $this->rdrHelper = $rdrHelper;
+        $this->cacheEnabled = $rdrHelper->isCacheEnabled();
     }
 
     protected function getClient()
@@ -81,16 +83,18 @@ class RdrParticipants
 
     public function listParticipantSummaries($params)
     {
-        $memcache = new \Memcache();
-        $memcacheKey = 'rdr_psumm_' . md5(serialize($params));
-        $contents = $memcache->get($memcacheKey);
-        if ($contents &&
-            ($responseObject = json_decode($contents)) &&
-            isset($responseObject->entry) &&
-            is_array($responseObject->entry)
-        ) {
-            $responseObject = json_decode($contents);
-        } else {
+        if ($this->cacheEnabled) {
+            $memcache = new \Memcache();
+            $memcacheKey = 'rdr_psumm_' . md5(serialize($params));
+            $contents = $memcache->get($memcacheKey);
+            if ($contents) {
+                $responseObject = json_decode($contents);
+                if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
+                    unset($responseObject);
+                }
+            }
+        }
+        if (!$this->cacheEnabled || !isset($responseObject)) {
             try {
                 $response = $this->getClient()->request('GET', 'ParticipantSummary', [
                     'query' => $params
@@ -106,7 +110,9 @@ class RdrParticipants
             if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
                 return [];
             }
-            $memcache->set($memcacheKey, $contents, 0, 300);
+            if ($this->cacheEnabled) {
+                $memcache->set($memcacheKey, $contents, 0, 300);
+            }
         }
 
         return $responseObject->entry;
@@ -114,14 +120,18 @@ class RdrParticipants
 
     public function getById($id)
     {
-        $memcache = new \Memcache();
-        $memcacheKey = 'rdr_participant_' . $id;
-        $participant = $memcache->get($memcacheKey);
-        if (!$participant) {
+        if ($this->cacheEnabled) {
+            $memcache = new \Memcache();
+            $memcacheKey = 'rdr_participant_' . $id;
+            $participant = $memcache->get($memcacheKey);
+        }
+        if (!$this->cacheEnabled || !$participant) {
             try {
                 $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
                 $participant = json_decode($response->getBody()->getContents());
-                $memcache->set($memcacheKey, $participant, 0, 300);
+                if ($this->cacheEnabled) {
+                    $memcache->set($memcacheKey, $participant, 0, 300);
+                }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
             }
