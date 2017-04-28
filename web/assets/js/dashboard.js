@@ -129,3 +129,22 @@ function setMetricsError(div) {
     stopSpinner(div);
     $("#" + div).html("<p class='lead text-danger text-center'>Metrics currently unavailable - either there is an error retrieving data or you requested dates/centers for which no data exists.<br/><br/>Please try again later.</p>");
 }
+
+// function to toggle all traces in a Plotly div
+function togglePlotlyTraces(div) {
+    var plotlyData = document.getElementById(div).data;
+    var visibility = plotlyData[0].visible;
+
+    // if visibility is undefined or true, that means it is visible and we want to set this to 'legendonly'
+    // when visibility == 'legendonly', we can set this back to true to show all traces
+    if( visibility === undefined || visibility === true) {
+        visibility = 'legendonly';
+    } else {
+        visibility = true
+    }
+
+    Plotly.restyle(div, 'visible', visibility);
+    // toggle class of toggle glyph
+    $('#toggle-traces .toggle-switch').toggleClass('fa-toggle-on fa-toggle-off');
+
+}
