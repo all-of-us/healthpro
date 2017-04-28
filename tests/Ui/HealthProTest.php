@@ -32,6 +32,8 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->createBiobankOrder();
 
         $this->verifyParticipantSummary();
+
+        $this->verifyDashboard();
     }
 
     public function getData()
@@ -251,5 +253,22 @@ class HealthProTest extends AbstractPmiUiTestCase
 
         //Check if PM finalized date exists
         $this->assertEquals(date('m/d/Y',$this->pmFinalizedDate), $date);
+    }
+
+    public function verifyDashboard()
+    {
+        $dashboard = $this->webDriver->findElements(WebDriverBy::xpath("//a[@href='/dashboard/']"));
+        if (count($dashboard)) {
+            $this->findByXPath('/dashboard/')->click();
+            
+            //Check if page is loaded
+            $driver = $this->webDriver;
+            $this->webDriver->wait(60, 500)->until(
+                function () use ($driver) {
+                    $elements = $driver->findElements(WebDriverBy::cssSelector('.modal-open'));
+                    return count($elements) == 0;
+                }
+            );
+        }
     }
 }
