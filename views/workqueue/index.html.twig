@@ -97,9 +97,14 @@
                     <td class="text-center" data-order="{{ participant.consentForElectronicHealthRecords == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForElectronicHealthRecordsTime }}">
                         {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('m/d/Y') : '' }}
+                            {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('m/d/Y') }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                            {% if participant.consentForElectronicHealthRecordsTime %}
+                                {{ participant.consentForElectronicHealthRecordsTime|date('m/d/Y') }}
+                            {% else %}
+                                (not completed)
+                            {% endif %}
                         {% endif %}
                     </td>
                     <td class="text-center" data-order="{{ participant.withdrawalStatus == 'NO_USE' ? '1' : '0' }}-{{ participant.withdrawalTime }}">
