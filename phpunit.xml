@@ -13,5 +13,8 @@
         <testsuite name="unit">
             <directory>tests/Pmi</directory>
         </testsuite>
+        <testsuite name="ui">
+            <directory>tests/Ui</directory>
+        </testsuite>
     </testsuites>
 </phpunit>
