@@ -9,6 +9,9 @@
          stopOnFailure="false"
          syntaxCheck="false"
     >
+    <php>
+        <env name="data" value="workqueue"/>
+    </php>
     <testsuites>
         <testsuite name="unit">
             <directory>tests/Pmi</directory>
