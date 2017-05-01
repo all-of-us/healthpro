@@ -75,7 +75,7 @@ class HealthProTest extends AbstractPmiUiTestCase
     public function participantLookup()
     {
         //Go to Workqueue page
-        $this->webDriver->get($this->baseUrl.'/workqueue?test='.time());
+        $this->findByXPath('/workqueue/')->click();
 
         $this->findBySelector('.dt-buttons a:nth-child(8)')->click();
         $select = new WebDriverSelect($this->findByName('workqueue_length'));
@@ -162,7 +162,7 @@ class HealthProTest extends AbstractPmiUiTestCase
     public function checkFinalizedPM()
     {
         //Go to Workqueue page
-        $this->webDriver->get($this->baseUrl.'/workqueue?test='.time());
+        $this->findByXPath('/workqueue/')->click();
 
         $this->findBySelector('.dt-buttons a:nth-child(8)')->click();
         $select = new WebDriverSelect($this->findByName('workqueue_length'));
