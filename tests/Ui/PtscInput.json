@@ -2,5 +2,8 @@
 	"firstName": "Xavier",
 	"lastName": "Gonzales",
 	"dob": "8/24/1942",
-	"participantEmail": "XavierGonzales@example.com"
+	"participantEmail": "XavierGonzales@example.com",
+	"hpoAffiliation": "PITT",
+	"generalConsent": true,
+	"ppiCompletedSurveys": 1
 }

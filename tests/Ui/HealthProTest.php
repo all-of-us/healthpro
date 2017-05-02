@@ -13,27 +13,24 @@ class HealthProTest extends AbstractPmiUiTestCase
     private $lastName;
     private $dob;
     private $participantEmail;
+    private $hpoAffiliation;
+    private $generalConsent;
+    private $ppiCompletedSurveys;
     private $participantId;
     private $pmFinalizedDate;
 
     public function testHealthPro()
     {
         $this->login();
-
         $data = $this->getData();
-
         $this->setData($data);
-
         $this->participantLookup();
-
-        $this->createPhysicalMeasurements();
-
-        $this->participantLookupById();
-
-        $this->createBiobankOrder();
-
-        $this->verifyParticipantSummary();
-
+        if ($this->checkParticipantEligibility()) {
+            $this->createPhysicalMeasurements();
+            $this->participantLookupById();
+            $this->createBiobankOrder();
+            $this->verifyParticipantSummary();
+        }
         $this->verifyDashboard();
     }
 
@@ -54,6 +51,9 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->lastName = $data['lastName'];
         $this->dob = $data['dob'];
         $this->participantEmail = $data['participantEmail'];
+        $this->hpoAffiliation = $data['hpoAffiliation'];
+        $this->generalConsent = $data['generalConsent'];
+        $this->ppiCompletedSurveys = $data['ppiCompletedSurveys'];
     }
 
     public function getParticipantDataFromPtscJson()
@@ -161,11 +161,26 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->assertContains($this->lastName, $this->findByClass('table')->getText());
     }
 
-    public function createPhysicalMeasurements()
+    public function checkParticipantEligibility()
     {
         //Click participant
         $this->findBySelector('tbody tr:nth-child(1) td:nth-child(1) a')->click();
 
+        if (isset($this->ppiCompletedSurveys) && $this->ppiCompletedSurveys == 0) {
+            $this->assertContains('The Basics survey not complete', $this->findBySelector('.panel-danger .panel-heading')->getText());
+            return false;
+        }
+
+        if (isset($this->generalConsent) && $this->generalConsent == false) {
+            $this->assertContains('Consent not complete', $this->findBySelector('.panel-danger .panel-heading')->getText());
+            return false;
+        }
+
+        return true;
+    }
+
+    public function createPhysicalMeasurements()
+    {
         //Get participantId
         $this->participantId = $this->findBySelector('.dl-horizontal dd:nth-child(4)')->getText();
 
