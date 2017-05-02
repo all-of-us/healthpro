@@ -12,6 +12,7 @@ class HealthProTest extends AbstractPmiUiTestCase
     private $firstName;
     private $lastName;
     private $dob;
+    private $participantEmail;
     private $participantId;
     private $pmFinalizedDate;
 
@@ -52,7 +53,7 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->firstName = $data['firstName'];
         $this->lastName = $data['lastName'];
         $this->dob = $data['dob'];
-        $this->participantId = $data['participantId'];
+        $this->participantEmail = $data['participantEmail'];
     }
 
     public function getParticipantDataFromPtscJson()
@@ -81,7 +82,7 @@ class HealthProTest extends AbstractPmiUiTestCase
             if (empty($withdrawn) && !empty($basicsDate) && $pmDate == '0-' && !empty($dob)) {
                 $data['firstName'] = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(2)')->getText();
                 $data['lastName'] = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(1)')->getText();
-                $data['participantId'] = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText();
+                $data['participantEmail'] = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(12)')->getText();
                 $data['dob'] = $dob;
                 break;
             }
@@ -163,7 +164,10 @@ class HealthProTest extends AbstractPmiUiTestCase
     public function createPhysicalMeasurements()
     {
         //Click participant
-        $this->findByXPath('/participant/'.$this->participantId.'')->click();
+        $this->findBySelector('tbody tr:nth-child(1) td:nth-child(1) a')->click();
+
+        //Get participantId
+        $this->participantId = $this->findBySelector('.dl-horizontal dd:nth-child(4)')->getText();
 
         //Click start physical measurements
         $this->findByXPath('/participant/'.$this->participantId.'/measurements')->click();
@@ -290,7 +294,7 @@ class HealthProTest extends AbstractPmiUiTestCase
         //Get participant PM finalized date
         $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
         for ($i = 1; $i <= count($elements); $i++) {
-            if ($this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText() == $this->participantId) {
+            if ($this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(12)')->getText() == $this->participantEmail) {
                 $date = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(30)')->getText();
                 break;
             }
