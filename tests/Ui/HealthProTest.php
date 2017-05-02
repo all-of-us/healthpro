@@ -17,11 +17,11 @@ class HealthProTest extends AbstractPmiUiTestCase
 
     public function testHealthPro()
     {
+        $this->login();
+
         $data = $this->getData();
 
         $this->setData($data);
-
-        $this->login();
 
         $this->participantLookup();
 
@@ -38,16 +38,61 @@ class HealthProTest extends AbstractPmiUiTestCase
 
     public function getData()
     {
-        $data = file_get_contents(__DIR__.'/PtscInput.json');
-        return json_decode($data);
+        if (getenv('data') == 'json') {
+            $data = $this->getParticipantDataFromPtscJson();
+        } else {
+            $data = $this->getParticipantDataFromWorkQueue();
+        }
+
+        return $data;
     }
 
     public function setData($data)
     {
-        $this->firstName = $data->firstName;
-        $this->lastName = $data->lastName;
-        $this->dob = $data->dob;
-        $this->participantId = $data->participantId;
+        $this->firstName = $data['firstName'];
+        $this->lastName = $data['lastName'];
+        $this->dob = $data['dob'];
+        $this->participantId = $data['participantId'];
+    }
+
+    public function getParticipantDataFromPtscJson()
+    {
+        $data = file_get_contents(__DIR__.'/PtscInput.json');
+        return json_decode($data, true);
+    }
+
+    public function getParticipantDataFromWorkQueue()
+    {
+        //Go to Workqueue page
+        $this->findByXPath('/workqueue/')->click();
+
+        $this->findBySelector('.dt-buttons a:nth-child(8)')->click();
+        $select = new WebDriverSelect($this->findByName('workqueue_length'));
+        $select->selectByValue('100');
+
+        //Select participant who's status is not withdrawn, completed basic survery and doesn't have a PM
+        $elements = $this->webDriver->findElements(WebDriverBy::cssSelector('tbody tr'));
+        $data = [];
+        for ($i = 1; $i <= count($elements); $i++) { 
+            $withdrawn = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(9)')->getText();
+            $basicsDate = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(17)')->getText();
+            $pmDate = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(30)')->getAttribute('data-order');
+            $dob = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(3)')->getText();
+            if (empty($withdrawn) && !empty($basicsDate) && $pmDate == '0-' && !empty($dob)) {
+                $data['firstName'] = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(2)')->getText();
+                $data['lastName'] = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(1)')->getText();
+                $data['participantId'] = $this->findBySelector('tbody tr:nth-child('.$i.') td:nth-child(4)')->getText();
+                $data['dob'] = $dob;
+                break;
+            }
+        }
+
+        //Throw exception if the desired participant not found.
+        if (empty($data)) {
+            throw new \Exception("Participant not found");            
+        } else {
+            return $data;
+        }
     }
 
     public function login()
