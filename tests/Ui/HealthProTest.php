@@ -317,6 +317,11 @@ class HealthProTest extends AbstractPmiUiTestCase
 
         //Check if PM finalized date exists
         $this->assertEquals(date('m/d/Y',$this->pmFinalizedDate), $date);
+
+        if (isset($this->hpoAffiliation)) {
+            //Check HPO affiliation
+            $this->assertContains($this->hpoAffiliation, $this->findBySelector('small h4')->getText());
+        }
     }
 
     public function verifyDashboard()
