@@ -22,14 +22,16 @@ class HealthProTest extends AbstractPmiUiTestCase
     public function testHealthPro()
     {
         $this->login();
-        $data = $this->getData();
-        $this->setData($data);
-        $this->participantLookup();
-        if ($this->checkParticipantEligibility()) {
-            $this->createPhysicalMeasurements();
-            $this->participantLookupById();
-            $this->createBiobankOrder();
-            $this->verifyParticipantSummary();
+        $participants = $this->getData();
+        foreach ($participants as $participant) {
+            $this->setData($participant);
+            $this->participantLookup();
+            if ($this->checkParticipantEligibility()) {
+                $this->createPhysicalMeasurements();
+                $this->participantLookupById();
+                $this->createBiobankOrder();
+                $this->verifyParticipantSummary();
+            }
         }
         $this->verifyDashboard();
     }
@@ -42,7 +44,7 @@ class HealthProTest extends AbstractPmiUiTestCase
             $data = $this->getParticipantDataFromWorkQueue();
         }
 
-        return $data;
+        return $data['participantsInfo'];
     }
 
     public function setData($data)
@@ -92,7 +94,9 @@ class HealthProTest extends AbstractPmiUiTestCase
         if (empty($data)) {
             throw new \Exception("Participant not found");            
         } else {
-            return $data;
+            $participants = [];
+            $participants['participantsInfo'][] = $data;
+            return $participants;
         }
     }
 

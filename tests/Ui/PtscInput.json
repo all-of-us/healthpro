@@ -1,9 +1,22 @@
 {
-	"firstName": "Xavier",
-	"lastName": "Gonzales",
-	"dob": "8/24/1942",
-	"participantEmail": "XavierGonzales@example.com",
-	"hpoAffiliation": "PITT",
-	"generalConsent": true,
-	"ppiCompletedSurveys": 1
+	"participantsInfo": [
+		{
+			"firstName": "Xavier",
+			"lastName": "Gonzales",
+			"dob": "8/24/1942",
+			"participantEmail": "XavierGonzales@example.com",
+			"hpoAffiliation": "PITT",
+			"generalConsent": true,
+			"ppiCompletedSurveys": 1
+		},
+		{
+			"firstName": "Aaron",
+			"lastName": "Ramirez",
+			"dob": "4/23/1991",
+			"participantEmail": "AaronRamirez@example.com",
+			"hpoAffiliation": "PITT",
+			"generalConsent": true,
+			"ppiCompletedSurveys": 1
+		}
+	]
 }
