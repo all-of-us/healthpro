@@ -124,7 +124,7 @@ class HealthProTest extends AbstractPmiUiTestCase
 
         //Wait untill modal window completly disappears
         $driver = $this->webDriver;
-        $this->webDriver->wait(5, 500)->until(
+        $this->webDriver->wait(15, 500)->until(
             function () use ($driver) {
                 $elements = $driver->findElements(WebDriverBy::cssSelector('.modal-open'));
                 return count($elements) == 0;

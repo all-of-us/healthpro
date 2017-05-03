@@ -29,7 +29,7 @@ abstract class AbstractPmiUiTestCase extends \PHPUnit_Framework_TestCase
 
     public function waitForElementVisible($elt)
     {
-        $this->webDriver->wait(5, 500)->until(
+        $this->webDriver->wait(15, 500)->until(
             WebDriverExpectedCondition::visibilityOfElementLocated($elt)
         );
     }
