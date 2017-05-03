@@ -494,9 +494,9 @@ class DashboardController extends AbstractController
             'Participant',
             'Participant.consentForStudyEnrollment',
             'Participant.consentForStudyEnrollmentAndEHR',
-            'Participant.questionnaireOnLifestyle',
-            'Participant.questionnaireOnOverallHealth',
             'Participant.questionnaireOnTheBasics',
+            'Participant.questionnaireOnOverallHealth',
+            'Participant.questionnaireOnLifestyle',
             'Participant.numCompletedBaselinePPIModules',
             'Participant.physicalMeasurements',
             'Participant.samplesToIsolateDNA',
@@ -507,9 +507,9 @@ class DashboardController extends AbstractController
             'Registered',
             'Consent: Enrollment',
             'Consent: Complete',
-            'PPI Module: Lifestyle',
-            'PPI Module: Overall Health',
             'PPI Module: The Basics',
+            'PPI Module: Overall Health',
+            'PPI Module: Lifestyle',
             'Baseline PPI Modules Complete',
             'Physical Measurements',
             'Samples Received',
@@ -602,7 +602,7 @@ class DashboardController extends AbstractController
                     "text" => $eligible_text,
                     "type" => 'bar',
                     "hoverinfo" => 'text+name',
-                    "name" => 'Eligible, incomplete',
+                    "name" => 'Eligible, not completed',
                     "marker" => array(
                         "color" => $this->getColorBrewerVal(0)
                     )
@@ -670,7 +670,7 @@ class DashboardController extends AbstractController
     // stores display names for metrics attribute field names to be used in selection
     private function getMetricsDisplayNames() {
         $metrics_attributes = array(
-            "Participant" => "Total Participants",
+            "Participant" => "Total Registered Participants",
             "Participant.enrollmentStatus" => "Enrollment Status",
             "Participant.genderIdentity" => "Gender Identity",
             "Participant.ageRange" => "Age Range",
