@@ -1,0 +1,14 @@
+# Copy this file to config.yml and edit as necessary
+
+# Account login details
+user_name: test@example.com
+password: password
+
+# Web driver url
+web_driver_url: http://localhost:4444/wd/hub
+
+# Host url
+host_url: http://localhost:8080
+
+# PTSC json file path
+ptsc_json_path: /pmi-drc-hpo/tests/Ui/PtscInput.json

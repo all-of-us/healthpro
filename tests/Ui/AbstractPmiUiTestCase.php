@@ -6,15 +6,20 @@ use Facebook\WebDriver\Remote\WebDriverCapabilityType;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverSelect;
 use Facebook\WebDriver\WebDriverExpectedCondition;
+use Symfony\Component\Yaml\Yaml;
 
 abstract class AbstractPmiUiTestCase extends \PHPUnit_Framework_TestCase
 {
-    private $webDriverUrl = 'http://localhost:4444/wd/hub';
-    protected $baseUrl = 'http://localhost:8080';
+    private $webDriverUrl;
+    protected $baseUrl;
     protected $webDriver;
+    private $config;
 
     public function setUp()
     {
+        $this->config = Yaml::parse(file_get_contents(__DIR__.'/Config.yml'));
+        $this->webDriverUrl = $this->getConfig('web_driver_url');
+        $this->baseUrl = $this->getConfig('host_url');
         $this->webDriver = RemoteWebDriver::create($this->webDriverUrl, [
             WebDriverCapabilityType::BROWSER_NAME => 'chrome'
         ]);
@@ -25,6 +30,11 @@ abstract class AbstractPmiUiTestCase extends \PHPUnit_Framework_TestCase
         if ($this->webDriver instanceof RemoteWebDriver) {
             $this->webDriver->quit();
         }
+    }
+
+    public function getConfig($name)
+    {
+        return $this->config[$name];
     }
 
     public function waitForElementVisible($elt)

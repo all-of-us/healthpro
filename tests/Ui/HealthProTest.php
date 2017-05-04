@@ -60,7 +60,7 @@ class HealthProTest extends AbstractPmiUiTestCase
 
     public function getParticipantDataFromPtscJson()
     {
-        $data = file_get_contents(__DIR__.'/PtscInput.json');
+        $data = file_get_contents($this->getConfig('ptsc_json_path'));
         return json_decode($data, true);
     }
 
@@ -111,7 +111,7 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->findBySelector('.container a')->click();
 
         //Enter email
-        $email = 'test@example.com';
+        $email = $this->getConfig('user_name');
         $this->findByName('email')->clear();
         $this->setInput('email', $email);
 
