@@ -191,28 +191,32 @@ class HealthProTest extends AbstractPmiUiTestCase
         //Click start physical measurements
         $this->findByXPath('/participant/'.$this->participantId.'/measurements')->click();
 
+        $formData = file_get_contents(__DIR__.'/FormInputs.json');
+        $formData = json_decode($formData, true);
+        $physicalMeasurements = $formData['physicalMeasurements'][0];
+
         //Enter blood pressure values
-        $this->setInput('form[blood-pressure-systolic][0]', '112');
-        $this->setInput('form[blood-pressure-systolic][1]', '122');
-        $this->setInput('form[blood-pressure-systolic][2]', '126');
+        $this->setInput('form[blood-pressure-systolic][0]', $physicalMeasurements['bloodPressureSystolic']);
+        $this->setInput('form[blood-pressure-systolic][1]', $physicalMeasurements['bloodPressureSystolic1']);
+        $this->setInput('form[blood-pressure-systolic][2]', $physicalMeasurements['bloodPressureSystolic2']);
 
-        $this->setInput('form[blood-pressure-diastolic][0]', '84');
-        $this->setInput('form[blood-pressure-diastolic][1]', '82');
-        $this->setInput('form[blood-pressure-diastolic][2]', '80');
+        $this->setInput('form[blood-pressure-diastolic][0]', $physicalMeasurements['bloodPressureDiastolic']);
+        $this->setInput('form[blood-pressure-diastolic][1]', $physicalMeasurements['bloodPressureDiastolic1']);
+        $this->setInput('form[blood-pressure-diastolic][2]', $physicalMeasurements['bloodPressureDiastolic2']);
 
-        $this->setInput('form[heart-rate][0]', '80');
-        $this->setInput('form[heart-rate][1]', '82');
-        $this->setInput('form[heart-rate][2]', '84');
+        $this->setInput('form[heart-rate][0]', $physicalMeasurements['heartRate']);
+        $this->setInput('form[heart-rate][1]', $physicalMeasurements['heartRate1']);
+        $this->setInput('form[heart-rate][2]', $physicalMeasurements['heartRate2']);
 
         //Enter height and weight values
-        $this->setInput('form[height]', '140');
-        $this->setInput('form[weight]', '56');
+        $this->setInput('form[height]', $physicalMeasurements['height']);
+        $this->setInput('form[weight]', $physicalMeasurements['weight']);
 
         //Enter waist and hip circumference
-        $this->setInput('form[waist-circumference][0]', '32');
-        $this->setInput('form[waist-circumference][1]', '33');
-        $this->setInput('form[hip-circumference][0]', '34');
-        $this->setInput('form[hip-circumference][1]', '35');
+        $this->setInput('form[waist-circumference][0]', $physicalMeasurements['waistCircumference']);
+        $this->setInput('form[waist-circumference][1]', $physicalMeasurements['waistCircumference1']);
+        $this->setInput('form[hip-circumference][0]', $physicalMeasurements['hipCircumference']);
+        $this->setInput('form[hip-circumference][1]', $physicalMeasurements['hipCircumference1']);
 
         //Save PM
         $this->findByClass('btn-primary')->click();

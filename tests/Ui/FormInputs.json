@@ -1,0 +1,21 @@
+{
+	"physicalMeasurements": [
+		{
+			"bloodPressureSystolic": 112,
+			"bloodPressureSystolic1": 122,
+			"bloodPressureSystolic2": 126,
+			"bloodPressureDiastolic": 84,
+			"bloodPressureDiastolic1": 82,
+			"bloodPressureDiastolic2": 80,
+			"heartRate": 80,
+			"heartRate1": 82,
+			"heartRate2": 84,
+			"height": 140,
+			"weight": 56,
+			"waistCircumference": 32,
+			"waistCircumference1": 33,
+			"hipCircumference": 34,
+			"hipCircumference1": 35
+		}
+	]
+}
