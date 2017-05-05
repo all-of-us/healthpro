@@ -156,7 +156,7 @@ class HealthProTest extends AbstractPmiUiTestCase
             $timeZone = date_default_timezone_get();
 
             //Select a default timezone if not present in the options
-            if (!in_array($timeZone, $timeZones)) {
+            if (!in_array($timeZone, array_slice($timeZones, 1))) {
                 $timeZone = 'America/Chicago';
             }
             $select = new WebDriverSelect($this->findByName('form[timezone]'));
