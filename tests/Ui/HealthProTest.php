@@ -104,19 +104,22 @@ class HealthProTest extends AbstractPmiUiTestCase
     {
         $this->webDriver->get($this->baseUrl);
 
-        //Check base page
-        $this->assertContains('Error - HealthPro', $this->webDriver->getTitle());
-
-        //Click try again
-        $this->findBySelector('.container a')->click();
-
-        //Enter email
         $email = $this->getConfig('user_name');
-        $this->findByName('email')->clear();
-        $this->setInput('email', $email);
+        $password = $this->getConfig('password');
 
-        //Click login
-        $this->findById('submit-login')->click();
+        //Sign in with google account if exists
+        if ($this->webDriver->getTitle() == 'Sign in - Google Accounts') {
+            $this->setInput('identifier', $email);
+            $this->findById('identifierNext')->click();
+            $this->waitForElementVisible(WebDriverBy::name('password'));
+            $this->setInput('password', $password);
+            $this->findById('passwordNext')->click();
+        } else {
+            $this->findBySelector('.container a')->click();
+            $this->findByName('email')->clear();
+            $this->setInput('email', $email);
+            $this->findById('submit-login')->click();            
+        }
 
         //Make mouse movement to trigger keepalive ajax call
         $element = $this->findByClass('modal-header');
