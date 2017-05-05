@@ -145,6 +145,24 @@ class HealthProTest extends AbstractPmiUiTestCase
         if ($this->webDriver->getTitle() == 'Choose Site - HealthPro') {
             $this->findByClass('site-submit')->submit();           
         }
+
+        //Select timezone if exists
+        if ($this->webDriver->findElements(WebDriverBy::id('form_timezone'))) {
+            $select = $this->findByName('form[timezone]');
+            $options = $select->findElements(WebDriverBy::tagName('option'));
+            foreach ($options as $option) {
+                $timeZones[] = $option->getAttribute('value');
+            }
+            $timeZone = date_default_timezone_get();
+
+            //Select a default timezone if not present in the options
+            if (!in_array($timeZone, $timeZones)) {
+                $timeZone = 'America/Chicago';
+            }
+            $select = new WebDriverSelect($this->findByName('form[timezone]'));
+            $select->selectByValue($timeZone);
+            $this->findByClass('btn-primary')->click();        
+        }
     }
 
     public function participantLookup()
