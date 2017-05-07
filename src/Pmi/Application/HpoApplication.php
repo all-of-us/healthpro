@@ -29,6 +29,9 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('rdr_auth_json')) {
             $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
         }
+        if ($this->getConfig('rdr_disable_cache')) {
+            $rdrOptions['disable_cache'] = true;
+        }
 
         $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
         if ($this->participantSource == 'mock') {
@@ -192,6 +195,13 @@ class HpoApplication extends AbstractApplication
 
         // prevent browsers from sending unencrypted requests
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+        
+        // "low" security finding: prevent MIME type sniffing
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        
+        // "low" security finding: enable XSS Protection
+        // http://blog.innerht.ml/the-misunderstood-x-xss-protection/
+        $response->headers->set('X-XSS-Protection', '1; mode=block');
     }
     
     public function switchSite($email)
@@ -217,6 +227,30 @@ class HpoApplication extends AbstractApplication
             return $site->id;
         } else {
             return null;
+        }
+    }
+
+    public function getSiteEntity()
+    {
+        $googleGroup = $this->getSiteId();
+        if (!$googleGroup) {
+            return null;
+        }
+        return $this['em']
+            ->getRepository('sites')
+            ->fetchOneBy(['google_group' => $googleGroup]);
+    }
+
+    public function getSiteOrganization()
+    {
+        if ($this['isUnitTest']) {
+            return null;
+        }
+        $site = $this->getSiteEntity();
+        if (!$site || empty($site['organization'])) {
+            return null;
+        } else {
+            return $site['organization'];
         }
     }
     

@@ -19,7 +19,7 @@ class MockParticipantSearch
             'dob' => new \DateTime($row[2]),
             'gender' => $row[3],
             'zip' => $row[4],
-            'consentComplete' => $row[5]
+            'status' => $row[5]
         ];
     }
 

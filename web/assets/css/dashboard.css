@@ -4,6 +4,10 @@
     margin-top: 15px;
 }
 
+.plotly-div g.g-gtitle tspan {
+    text-decoration: underline;
+}
+
 .center-filter-panel {
     max-height: 400px;
     overflow-y: scroll;
@@ -13,3 +17,4 @@
     /* so the spinner doesn't appear on top of Bootstrap modals */
     z-index: 999 !important;
 }
+

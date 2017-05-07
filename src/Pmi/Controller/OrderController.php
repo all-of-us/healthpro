@@ -45,7 +45,7 @@ class OrderController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->consentComplete) {
+        if (!$participant->status) {
             $app->abort(403);
         }
         return $app['twig']->render('order-check.html.twig', [
@@ -59,7 +59,7 @@ class OrderController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->consentComplete) {
+        if (!$participant->status) {
             $app->abort(403);
         }
         $confirmForm = $app['form.factory']->createBuilder(FormType::class)
@@ -127,7 +127,7 @@ class OrderController extends AbstractController
                 } else {
                     // set collected time to today at midnight local time
                     $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
-                    $order = new MayolinkOrder();
+                    $order = new MayolinkOrder($app);
 
                     if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
                         $mayoClientId = $site['mayolink_account'];
@@ -138,7 +138,7 @@ class OrderController extends AbstractController
                         'type' => $orderData['type'],
                         'patient_id' => $participant->biobankId,
                         'gender' => $participant->gender,
-                        'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob($orderData['type']),
+                        'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
                         'order_id' => $orderData['order_id'],
                         'collected_at' => $collectedAt,
                         'mayoClientId' => $mayoClientId
@@ -199,6 +199,9 @@ class OrderController extends AbstractController
         if ($order->get('finalized_ts')) {
             $app->abort(403);
         }
+        if (!in_array('print', $order->getAvailableSteps())) {
+            $app->abort(404);
+        }
         if ($app->getConfig('ml_mock_order')) {
             if ($type == 'labels') {
                 return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
@@ -206,7 +209,7 @@ class OrderController extends AbstractController
                 return $app->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
             }
         } else {
-            $mlOrder = new MayolinkOrder();
+            $mlOrder = new MayolinkOrder($app);
             $pdf = $mlOrder->loginAndGetPdf(
                 $app->getConfig('ml_username'),
                 $app->getConfig('ml_password'),
@@ -227,6 +230,10 @@ class OrderController extends AbstractController
         $order = $this->loadOrder($participantId, $orderId, $app);
         if ($order->get('finalized_ts')) {
             $app->abort(403);
+        }
+        if (!in_array('print', $order->getAvailableSteps())) {
+            // 404 because print is not a valid route for kit orders regardless of state
+            $app->abort(404);
         }
         if (!$order->get('printed_ts')) {
             $app->log(Log::ORDER_EDIT, $orderId);
@@ -268,6 +275,12 @@ class OrderController extends AbstractController
     public function orderProcessAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if (!in_array('process', $order->getAvailableSteps())) {
+            return $app->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
+        }
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
         if ($processForm->isValid() && !$order->get('finalized_ts')) {
@@ -305,6 +318,12 @@ class OrderController extends AbstractController
     public function orderFinalizeAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if (!in_array('finalize', $order->getAvailableSteps())) {
+            return $app->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
+        }
         $finalizeForm = $order->createOrderForm('finalized', $app['form.factory']);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isValid()) {

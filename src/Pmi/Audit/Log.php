@@ -25,6 +25,7 @@ class Log
     const SITE_EDIT = 'SITE_EDIT';
     const SITE_ADD = 'SITE_ADD';
     const SITE_DELETE = 'SITE_DELETE';
+    const WORKQUEUE_EXPORT = 'WORKQUEUE_EXPORT';
 
     public function __construct($app, $action, $data)
     {

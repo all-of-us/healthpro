@@ -75,7 +75,7 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->consentComplete) {
+        if (!$participant->status) {
             $app->abort(403);
         }
         $evaluationService = new Evaluation();
@@ -91,71 +91,111 @@ class EvaluationController extends AbstractController
         } else {
             $evaluation = null;
         }
+        $showAutoModification = false;
 
         $evaluationForm = $evaluationService->getForm($app['form.factory']);
         $evaluationForm->handleRequest($request);
-        if (!empty($evaluation['finalized_ts'])) {
-            if ($evaluationForm->isValid() && $request->request->has('reopen')) {
-                $app['em']->getRepository('evaluations')->update($evalId, [
-                    'finalized_ts' => null
-                ]);
-                $app->addFlashNotice('Physical measurements reopened');
-                return $app->redirectToRoute('evaluation', [
-                    'participantId' => $participant->id,
-                    'evalId' => $evalId
-                ]);
-            }
-        } else {
-            if ($evaluationForm->isSubmitted()) {
-                if ($evaluationForm->isValid()) {
-                    $evaluationService->setData($evaluationForm->getData());
-                    $dbArray = $evaluationService->toArray();
-                    $now = new \DateTime();
-                    $dbArray['updated_ts'] = $now;
-                    if ($request->request->has('finalize')) {
-                        if ($evaluationService->canFinalize()) {
-                            $dbArray['finalized_ts'] = $now;
-                            // Send final evaluation to RDR and store resulting id
-                            $fhir = $evaluationService->getFhir($now);
-                            if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($participant->id, $fhir)) {
-                                $dbArray['rdr_id'] = $rdrEvalId;
-                            }
-                        } else {
-                            $app->addFlashError('Physical measurements were not finalized due to being incomplete');
-                        }
-                    }
-                    if (!$evaluation) {
-                        $dbArray['user_id'] = $app->getUser()->getId();
-                        $dbArray['site'] = $app->getSiteId();
-                        $dbArray['participant_id'] = $participant->id;
-                        $dbArray['created_ts'] = $dbArray['updated_ts'];
-                        if ($evalId = $app['em']->getRepository('evaluations')->insert($dbArray)) {
-                            $app->log(Log::EVALUATION_CREATE, $evalId);
-                            $app->addFlashNotice('Physical measurements saved');
-                            return $app->redirectToRoute('evaluation', [
-                                'participantId' => $participant->id,
-                                'evalId' => $evalId
+        if ($evaluationForm->isSubmitted()) {
+            if ($evaluationForm->isValid()) {
+                $evaluationService->setData($evaluationForm->getData());
+                $dbArray = $evaluationService->toArray();
+                $now = new \DateTime();
+                $dbArray['updated_ts'] = $now;
+                if ($request->request->has('finalize') && (!$evaluation || empty($evaluation['finalized_ts']))) {
+                    $errors = $evaluationService->getFinalizeErrors();
+                    if (count($errors) === 0) {
+                        $dbArray['finalized_ts'] = $now;
+                        // Send final evaluation to RDR and store resulting id
+                        if ($evaluation != null && $evaluation['parent_id'] != null) {
+                            $parentEvaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
+                                'id' => $evaluation['parent_id']
                             ]);
+                            $fhir = $evaluationService->getFhir($now, $parentEvaluation['rdr_id']);
                         } else {
-                            $app->addFlashError('Failed to create new physical measurements');
+                            $fhir = $evaluationService->getFhir($now);
+                        }
+                        if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($participant->id, $fhir)) {
+                            $dbArray['rdr_id'] = $rdrEvalId;
                         }
                     } else {
-                        if ($app['em']->getRepository('evaluations')->update($evalId, $dbArray)) {
-                            $app->log(Log::EVALUATION_EDIT, $evalId);
-                            $app->addFlashNotice('Physical measurements saved');
+                        foreach ($errors as $field) {
+                            if (is_array($field)) {
+                                list($field, $replicate) = $field;
+                                $evaluationForm->get($field)->get($replicate)->addError(new FormError('Please complete or add protocol modification.'));
+                            } else {
+                                $evaluationForm->get($field)->addError(new FormError('Please complete or add protocol modification.'));
+                            }
+                        }
+                        $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
+                        $showAutoModification = true;
+                    }
+                }
+                if (!$evaluation || $request->request->has('copy')) {
+                    $dbArray['user_id'] = $app->getUser()->getId();
+                    $dbArray['site'] = $app->getSiteId();
+                    $dbArray['participant_id'] = $participant->id;
+                    $dbArray['created_ts'] = $dbArray['updated_ts'];
+                    if ($request->request->has('copy')) {
+                        $dbArray['parent_id'] = $evaluation['id'];
+                        $dbArray['created_ts'] = $evaluation['created_ts'];
+                    }
+                    if ($evalId = $app['em']->getRepository('evaluations')->insert($dbArray)) {
+                        $app->log(Log::EVALUATION_CREATE, $evalId);
+                        $app->addFlashNotice(!$request->request->has('copy') ? 'Physical measurements saved': 'Physical measurements copied');
+
+                        // If finalization failed, new physical measurements are created, but
+                        // show errors and auto-modification options on subsequent display
+                        if (!$evaluationForm->isValid()) {
+                            return $app->redirectToRoute('evaluation', [
+                                'participantId' => $participant->id,
+                                'evalId' => $evalId,
+                                'showAutoModification' => 1
+                            ]);
+                        } else {
                             return $app->redirectToRoute('evaluation', [
                                 'participantId' => $participant->id,
                                 'evalId' => $evalId
                             ]);
-                        } else {
-                            $app->addFlashError('Failed to update physical measurements');
                         }
+                    } else {
+                        $app->addFlashError('Failed to create new physical measurements');
                     }
                 } else {
-                    if (count($evaluationForm->getErrors()) == 0) {
-                        $evaluationForm->addError(new FormError('Please correct the errors below'));
+                    if ($app['em']->getRepository('evaluations')->update($evalId, $dbArray)) {
+                        $app->log(Log::EVALUATION_EDIT, $evalId);
+                        $app->addFlashNotice('Physical measurements saved');
+
+                        // If finalization failed, values are still saved, but do not redirect
+                        // so that errors can be displayed
+                        if ($evaluationForm->isValid()) {
+                            return $app->redirectToRoute('evaluation', [
+                                'participantId' => $participant->id,
+                                'evalId' => $evalId
+                            ]);
+                        }
+                    } else {
+                        $app->addFlashError('Failed to update physical measurements');
                     }
                 }
+            } else {
+                if (count($evaluationForm->getErrors()) == 0) {
+                    $evaluationForm->addError(new FormError('Please correct the errors below'));
+                }
+            }
+        } elseif ($request->query->get('showAutoModification')) {
+            // if new physical measurements were created and failed to finalize, generate errors post-redirect
+            $errors = $evaluationService->getFinalizeErrors();
+            if (count($errors) > 0) {
+                foreach ($errors as $field) {
+                    if (is_array($field)) {
+                        list($field, $replicate) = $field;
+                        $evaluationForm->get($field)->get($replicate)->addError(new FormError('Please complete or add protocol modification.'));
+                    } else {
+                        $evaluationForm->get($field)->addError(new FormError('Please complete or add protocol modification.'));
+                    }
+                }
+                $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
+                $showAutoModification = true;
             }
         }
 
@@ -166,7 +206,8 @@ class EvaluationController extends AbstractController
             'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
-            'latestVersion' => $evaluationService::CURRENT_VERSION
+            'latestVersion' => $evaluationService::CURRENT_VERSION,
+            'showAutoModification' => $showAutoModification
         ]);
     }
 }

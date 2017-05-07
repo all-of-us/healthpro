@@ -4,6 +4,7 @@ CREATE TABLE `evaluations` (
   `site` varchar(50) NOT NULL,
   `participant_id` varchar(50) NOT NULL,
   `rdr_id` VARCHAR(50) NULL DEFAULT NULL,
+  `parent_id` int(11) NULL DEFAULT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `finalized_ts` TIMESTAMP NULL DEFAULT NULL,

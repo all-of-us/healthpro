@@ -5,6 +5,7 @@ use Silex\Application;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
+use Pmi\Util;
 
 class Order
 {
@@ -139,6 +140,27 @@ class Order
             }
         }
         return $step;
+    }
+
+    public function getAvailableSteps()
+    {
+        $columns = [
+            'print' => 'printed',
+            'collect' => 'collected',
+            'process' => 'processed',
+            'finalize' => 'finalized'
+        ];
+        if ($this->order['type'] === 'kit') {
+            unset($columns['print']);
+        }
+        $steps = [];
+        foreach ($columns as $name => $column) {
+            $steps[] = $name;
+            if (!$this->order["{$column}_ts"]) {
+                break;
+            }
+        }
+        return $steps;
     }
 
     public function getOrderUpdateFromForm($set, $form)
@@ -305,7 +327,7 @@ class Order
             if ($site && $site['mayolink_account']) {
                 $identifiers[] =[
                     'system' => 'https://www.pmi-ops.org/mayolink-site-id',
-                    'value' => $site['mayolink_account']
+                    'value' => $site['mayolink_account'] . '.' . Util::generateUuid()
                 ];
             }
         }

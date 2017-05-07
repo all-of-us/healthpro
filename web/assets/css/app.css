@@ -66,6 +66,28 @@ label.label-normal {
     position: relative;
 }
 
+/* Nav bar customization */
+.navbar-brand-subtitle {
+    font-size: 11px;
+    margin-top: -7px;
+    text-align: right;
+}
+.navbar-inverse {
+    border: 0;
+    border-radius: 0;
+}
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a, .navbar-inverse .navbar-text {
+    color: #ddd; /* increase contrast */
+}
+.navbar-allofus, .navbar-allofus .navbar-toggle {
+    background-color: #262262;
+}
+.navbar-allofus .navbar-toggle:focus, .navbar-allofus .navbar-toggle:hover {
+    background-color: #363272;
+}
+.navbar-allofus .navbar-nav>.open>a, .navbar-allofus .navbar-nav>.open>a:focus, .navbar-allofus .navbar-nav>.open>a:hover {
+    background-color: #161252;
+}
 
 /* Physical evaluation */
 #physicalEvaluation .toggle-help-image {
@@ -81,12 +103,18 @@ label.label-normal {
     margin-right: -6px;
     margin-left: -6px;
 }
-#physicalEvaluation .row .col-sm-4 {
+#physicalEvaluation .row .col-sm-4,
+#physicalEvaluation .row .col-md-6 {
     padding-right: 6px;
     padding-left: 6px;
 }
 @media(max-width:767px) {
     #physicalEvaluation .row .col-sm-4 {
+        margin-bottom: 6px;
+    }
+}
+@media(max-width:991px) {
+    #physicalEvaluation .row .col-md-6 {
         margin-bottom: 6px;
     }
 }
@@ -134,18 +162,22 @@ label.label-normal {
 /* Participant work queue */
 .topheader {
     border-bottom: 0 !important;
-    text-align: center;
+    font-style: italic;
 }
 .secondaryheader {
     border-top: 0 !important;
-    font-weight: normal;
-    text-align: center;
 }
 .multiheader-survey {
     background-color: #dde;
 }
-.multiheader-status {
+.multiheader-inperson {
     background-color: #eec;
+}
+.multiheader-demographics {
+    background-color: #ded;
+}
+.multiheader-contact {
+    background-color: #edd;
 }
 
 /* Orders */

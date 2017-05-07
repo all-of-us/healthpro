@@ -43,7 +43,8 @@ class AdminController extends AbstractController
             if ($app['em']->getRepository('sites')->update($siteId, [
                 'name' => $siteEditForm['name']->getData(),
                 'google_group' => $siteEditForm['google_group']->getData(),
-                'mayolink_account' => $siteEditForm['mayolink_account']->getData()
+                'mayolink_account' => $siteEditForm['mayolink_account']->getData(),
+                'organization' => $siteEditForm['organization']->getData()
             ])) {
                 $app->log(Log::SITE_EDIT, $siteId);
                 $app->addFlashNotice('Site updated');
@@ -70,7 +71,8 @@ class AdminController extends AbstractController
             if ($siteId = $app['em']->getRepository('sites')->insert([
                 'name' => $siteAddForm['name']->getData(),
                 'google_group' => $siteAddForm['google_group']->getData(),
-                'mayolink_account' => $siteAddForm['mayolink_account']->getData()
+                'mayolink_account' => $siteAddForm['mayolink_account']->getData(),
+                'organization' => $siteAddForm['organization']->getData()
             ])) {
                 $app->log(Log::SITE_ADD, $siteId);
                 $app->addFlashNotice('Site added');
@@ -98,8 +100,12 @@ class AdminController extends AbstractController
                 'required' => true
             ])
             ->add('mayolink_account', Type\TextType::class, [
-                'label' => 'MayLink Account',
+                'label' => 'MayoLink Account',
                 'required' => true
+            ])
+            ->add('organization', Type\TextType::class, [
+                'label' => 'Organization',
+                'required' => false
             ])
             ->getForm();
         return $form;

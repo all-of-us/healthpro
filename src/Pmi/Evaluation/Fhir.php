@@ -11,6 +11,7 @@ class Fhir
     protected $version;
     protected $date;
     protected $metricUrns;
+    protected $parentRdr;
 
     public function __construct(array $options)
     {
@@ -24,6 +25,7 @@ class Fhir
         $date = clone $options['datetime'];
         $date->setTimezone(new \DateTimeZone('UTC'));
         $this->date = $date->format('Y-m-d\TH:i:s\Z');
+        $this->parentRdr = $options['parent_rdr'];
     }
 
     /*
@@ -108,7 +110,7 @@ class Fhir
         foreach ($this->metricUrns as $metric => $urn) {
             $references[] = ['reference' => $urn];
         }
-        return [
+        $composition = [
             'fullUrl' => 'urn:uuid:' . Util::generateUuid(),
             'resource' => [
                 'author' => [['display' => 'N/A']],
@@ -132,6 +134,15 @@ class Fhir
                 ]
             ]
         ];
+        if ($this->parentRdr) {
+            $composition['resource']['extension'] = [
+                'url' => 'http://terminology.pmi-ops.org/StructureDefinition/amends',
+                'valueReference' => [
+                    'reference' => "PhysicalMeasurements/{$this->parentRdr}"
+                ]
+            ];
+        }
+        return $composition;
     }
 
     protected function simpleMetric($metric, $value, $display, $code, $unit, $system = 'http://loinc.org')
@@ -386,57 +397,6 @@ class Fhir
         );
     }
 
-    protected function getBpBodySite($replicate)
-    {
-        if (is_array($this->data->{'blood-pressure-location'})) {
-            $location = $this->data->{'blood-pressure-location'}[$replicate - 1];
-        } else {
-            $location = $this->data->{'blood-pressure-location'};
-        }
-        switch ($location) {
-            case 'Left arm':
-                $locationSnomed = '368208006';
-                $locationDisplay = 'Left arm';
-                break;
-            default:
-                $locationSnomed = '368209003';
-                $locationDisplay = 'Right arm';
-                break;
-        }
-        return [
-            'coding' => [[
-                'code' => $locationSnomed,
-                'display' => $locationDisplay,
-                'system' => 'http://snomed.info/sct'
-            ]],
-            'text' => $locationDisplay
-        ];
-    }
-
-    protected function getBpArmCircumference()
-    {
-        $armCircumference = $this->data->{'blood-pressure-arm-circumference'};
-        if (!$armCircumference) {
-            return false;
-        }
-        return [
-            'code' => [
-                'coding' => [[
-                    'code' => 'arm-circumference',
-                    'display' => 'Arm circumference',
-                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
-                ]],
-                'text' => 'Arm circumference'
-            ],
-            'valueQuantity' => [
-                'code' => 'cm',
-                'system' => 'http://unitsofmeasure.org',
-                'unit' => 'cm',
-                'value' => $armCircumference
-            ]
-        ];
-    }
-
     protected function getBpComponent($component, $replicate)
     {
         switch ($component) {
@@ -475,14 +435,9 @@ class Fhir
             $this->getBpComponent('systolic', $replicate),
             $this->getBpComponent('diastolic', $replicate)
         ];
-        if ($armCircumference = $this->getBpArmCircumference()) {
-            $components[] = $armCircumference;
-        }
-
         return [
             'fullUrl' => $this->metricUrns['blood-pressure-' . $replicate],
             'resource' => [
-                'bodySite' => $this->getBpBodySite($replicate),
                 'code' => [
                     'coding' => [[
                         'code' => '55284-4',

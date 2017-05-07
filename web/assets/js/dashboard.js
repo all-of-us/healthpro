@@ -2,12 +2,14 @@
  * Dashboard scripts to run on every page in /dashboard
  */
 
-var COLORBREWER_SET = ['rgb(166,206,227)','rgb(31,120,180)','rgb(178,223,138)','rgb(51,160,44)','rgb(251,154,153)',
-    'rgb(227,26,28)', 'rgb(253,191,111)','rgb(255,127,0)','rgb(202,178,214)','rgb(106,61,154)','rgb(255,255,153)',
-    'rgb(177,89,40)'];
-
 var PLOTLY_OPTS = {
     modeBarButtonsToRemove: ['sendDataToCloud']
+};
+
+var PLOTS_SHOWN = {
+    'total-progress-nav': false,
+    'participants-by-region-nav': false,
+    'participants-by-lifecycle-nav': false
 };
 
 var GEO_OPTS = {
@@ -71,10 +73,14 @@ function launchSpinner(divId) {
     var target = $('#' + divId)[0];
     var spinner = new Spinner(opts).spin(target);
     $(target).data('spinner', spinner);
-};
+}
 
 function stopSpinner(divId) {
     $('#' + divId).data('spinner').stop();
+}
+
+function removePlotlyLink(divId) {
+    $('#' + divId + ' .plotlyjsicon').remove();
 }
 
 // function to transform plotly data object into array of annotations showing total
@@ -121,6 +127,24 @@ function loadRecruitmentFilters(id) {
 // generic error handler for when metrics API doesn't respond with valid results
 function setMetricsError(div) {
     stopSpinner(div);
-    alert('Error: cannot retrieve metrics');
-    $("#" + div).html("<p class='lead text-danger text-center'>Metrics currently unavailable; please try again later.</p>");
+    $("#" + div).html("<p class='lead text-danger text-center'>Metrics currently unavailable - either there is an error retrieving data or you requested dates/centers for which no data exists.<br/><br/>Please try again later.</p>");
+}
+
+// function to toggle all traces in a Plotly div
+function togglePlotlyTraces(div) {
+    var plotlyData = document.getElementById(div).data;
+    var visibility = plotlyData[0].visible;
+
+    // if visibility is undefined or true, that means it is visible and we want to set this to 'legendonly'
+    // when visibility == 'legendonly', we can set this back to true to show all traces
+    if( visibility === undefined || visibility === true) {
+        visibility = 'legendonly';
+    } else {
+        visibility = true
+    }
+
+    Plotly.restyle(div, 'visible', visibility);
+    // toggle class of toggle glyph
+    $('#toggle-traces .toggle-switch').toggleClass('fa-toggle-on fa-toggle-off');
+
 }
