@@ -174,7 +174,11 @@ class Fhir
                 'value' => $value
             ];
         }
-        $modificationMetric = $metric . '-protocol-modification';
+        if (preg_match('/-(\d+)$/', $metric)) {
+            $modificationMetric = preg_replace('/-(\d+)$/', '-protocol-modification-$1', $metric);
+        } else {
+            $modificationMetric = $metric . '-protocol-modification';
+        }
         if (array_key_exists($modificationMetric, $this->metricUrns)) {
             $entry['resource']['related'] = [[
                 'type' => 'qualified-by',
