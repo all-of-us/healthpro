@@ -147,7 +147,7 @@ class Fhir
 
     protected function simpleMetric($metric, $value, $display, $code, $unit, $system = 'http://loinc.org')
     {
-        return [
+        $entry = [
             'fullUrl' => $this->metricUrns[$metric],
             'resource' => [
                 'code' => [
@@ -163,15 +163,27 @@ class Fhir
                 'status' => 'final',
                 'subject' => [
                     'reference' => "Patient/{$this->patient}"
-                ],
-                'valueQuantity' => [
-                    'code' => $unit,
-                    'system' => 'http://unitsofmeasure.org',
-                    'unit' => $unit,
-                    'value' => $value
                 ]
             ]
         ];
+        if (!is_null($value)) {
+            $entry['resource']['valueQuantity'] = [
+                'code' => $unit,
+                'system' => 'http://unitsofmeasure.org',
+                'unit' => $unit,
+                'value' => $value
+            ];
+        }
+        $modificationMetric = $metric . '-protocol-modification';
+        if (array_key_exists($modificationMetric, $this->metricUrns)) {
+            $entry['resource']['related'] = [[
+                'type' => 'qualified-by',
+                'target' => [
+                    'reference' => $this->metricUrns[$modificationMetric]
+                ]
+            ]];
+        }
+        return $entry;
     }
 
     protected function valueMetric($metric, $value, $display, $codeCode, $valueCode, $codeSystem = 'http://loinc.org', $valueSystem = 'http://loinc.org')
@@ -370,6 +382,15 @@ class Fhir
                 ],
                 'valueCodeableConcept' => $concept
             ]];
+            $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
+            if (array_key_exists($modificationMetric, $this->metricUrns)) {
+                $entry['resource']['related'] = [[
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns[$modificationMetric]
+                    ]
+                ]];
+            }
         }
 
         return $entry;
@@ -411,6 +432,10 @@ class Fhir
             default:
                 throw new \Exception('Invalid blood pressure component');
         }
+        $value = $this->data->{'blood-pressure-' . $component}[$replicate - 1];
+        if (is_null($value)) {
+            return null;
+        }
         return [
             'code' => [
                 'coding' => [[
@@ -424,7 +449,7 @@ class Fhir
                 'code' => 'mm[Hg]',
                 'system' => 'http://unitsofmeasure.org',
                 'unit' => 'mmHg',
-                'value' => $this->data->{'blood-pressure-' . $component}[$replicate - 1]
+                'value' => $value
             ]
         ];
     }
@@ -435,7 +460,8 @@ class Fhir
             $this->getBpComponent('systolic', $replicate),
             $this->getBpComponent('diastolic', $replicate)
         ];
-        return [
+        $components = array_filter($components); // remove components that return null
+        $entry = [
             'fullUrl' => $this->metricUrns['blood-pressure-' . $replicate],
             'resource' => [
                 'code' => [
@@ -455,6 +481,16 @@ class Fhir
                 ]
             ]
         ];
+        $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
+        if (array_key_exists($modificationMetric, $this->metricUrns)) {
+            $entry['resource']['related'] = [[
+                'type' => 'qualified-by',
+                'target' => [
+                    'reference' => $this->metricUrns[$modificationMetric]
+                ]
+            ]];
+        }
+        return $entry;
     }
 
     protected function bloodpressureprotocolmodification($replicate)
