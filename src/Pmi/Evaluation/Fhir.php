@@ -547,12 +547,14 @@ class Fhir
         $fhir->entry = [];
         $fhir->resourceType = 'Bundle';
         $fhir->type = 'document';
-        $fhir->entry[] = $this->getComposition();
         foreach ($this->metricUrns as $metric => $uuid) {
             if ($entry = $this->getEntry($metric)) {
                 $fhir->entry[] = $entry;
+            } else {
+                unset($this->metricUrns[$metric]);
             }
         }
+        array_unshift($fhir->entry, $this->getComposition());
         return $fhir;
     }
 }
