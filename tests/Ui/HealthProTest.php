@@ -112,7 +112,9 @@ class HealthProTest extends AbstractPmiUiTestCase
             $this->setInput('identifier', $email);
             $this->findById('identifierNext')->click();
             $this->waitForElementVisible(WebDriverBy::name('password'));
+            $this->waitForElementClickable(WebDriverBy::name('password'));
             $this->setInput('password', $password);
+            $this->waitForElementClickable(WebDriverBy::id('passwordNext'));
             $this->findById('passwordNext')->click();
         } else {
             $this->findBySelector('.container a')->click();

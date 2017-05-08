@@ -44,6 +44,13 @@ abstract class AbstractPmiUiTestCase extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function waitForElementClickable($elt)
+    {
+        $this->webDriver->wait(15, 500)->until(
+            WebDriverExpectedCondition::elementToBeClickable($elt)
+        );
+    }
+
     public function waitForIdVisible($id)
     {
         return $this->waitForElementVisible(WebDriverBy::id($id));
