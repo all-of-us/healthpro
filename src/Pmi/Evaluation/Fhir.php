@@ -227,9 +227,11 @@ class Fhir
         if (is_null($replicate)) {
             $conceptCode = $this->data->{"{$metric}-protocol-modification"};
             $urnKey = $metric . '-protocol-modification';
+            $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}) ? $this->data->{"{$metric}-protocol-modification-notes"} : '';
         } else {
             $conceptCode = $this->data->{"{$metric}-protocol-modification"}[$replicate-1];
             $urnKey = $metric . '-protocol-modification-' . $replicate;
+            $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1]) ? $this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1] : '';
         }
         $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
         $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
@@ -256,7 +258,7 @@ class Fhir
                         'display' => $conceptDisplay,
                         'system' => "http://terminology.pmi-ops.org/CodeSystem/{$conceptCode}"
                     ]],
-                    'text' => $conceptDisplay
+                    'text' => ($conceptCode === 'other' && !empty($notes)) ? $notes : $conceptDisplay
                 ]
             ]
         ];
