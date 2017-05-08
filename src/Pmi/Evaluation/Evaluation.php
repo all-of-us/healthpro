@@ -250,7 +250,7 @@ class Evaluation
     {
         $fhir = new Fhir([
             'data' => $this->data,
-            'schema' => $this->schema,
+            'schema' => $this->getAssociativeSchema(),
             'patient' => $this->participant,
             'version' => $this->version,
             'datetime' => $datetime,

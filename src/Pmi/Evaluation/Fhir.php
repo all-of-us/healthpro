@@ -36,21 +36,40 @@ class Fhir
     {
         $metrics = [];
         foreach ($this->schema->fields as $field) {
-            if (preg_match('/^blood-pressure-/', $field->name) && !preg_match('/^blood-pressure-systolic/', $field->name)) {
-                // only add systolic for now, will process the rest below
-                continue;
+            if (preg_match('/^blood-pressure-/', $field->name)) {
+                if (!preg_match('/^blood-pressure-(systolic|protocol-modification)/', $field->name)) {
+                    // only add systolic and modifications for now, will process the rest below
+                    continue;
+                }
             }
-            if (empty($this->data->{$field->name})) {
-                continue;
+            if (preg_match('/protocol-modification/', $field->name)) {
+                $isModification = true;
+            } else {
+                $isModification = false;
+                switch ($field->name) {
+                    case 'blood-pressure-systolic':
+                    case 'heart-rate':
+                        $modification = 'blood-pressure-protocol-modification';
+                        break;
+                    default:
+                        $modification = $field->name . '-protocol-modification';
+                }
             }
+
             if (!empty($field->replicates)) {
+                if (empty($this->data->{$field->name}) && empty($this->data->{$modification})) {
+                    continue;
+                }
                 foreach ($this->data->{$field->name} as $i => $value) {
-                    if (empty($value)) {
+                    if (empty($value) && empty($this->data->{$modification}[$i])) {
                         continue;
                     }
                     $metrics[] = $field->name . '-' . ($i+1); // 1-indexed
                 }
             } else {
+                if (empty($this->data->{$field->name}) && empty($this->data->{$modification})) {
+                    continue;
+                }
                 $metrics[] = $field->name;
             }
         }
@@ -61,12 +80,13 @@ class Fhir
 
         // check and rename blood pressure metrics
         $diastolic = $this->data->{'blood-pressure-diastolic'};
+        $bpModification = $this->data->{'blood-pressure-protocol-modification'};
         foreach ($metrics as $k => $metric) {
             if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
                 continue;
             }
             $index = $m[1] - 1;
-            if (!empty($diastolic[$index])) {
+            if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
                 $metrics[$k] = 'blood-pressure-' . $m[1];
             } else {
                 // remove if systolic exists but not diastolic
@@ -125,16 +145,61 @@ class Fhir
         return $composition;
     }
 
-    protected function simpleMetric($metric, $value, $display, $loinc, $unit)
+    protected function simpleMetric($metric, $value, $display, $code, $unit, $system = 'http://loinc.org')
+    {
+        $entry = [
+            'fullUrl' => $this->metricUrns[$metric],
+            'resource' => [
+                'code' => [
+                    'coding' => [[
+                        'code' => $code,
+                        'display' => $display,
+                        'system' => $system
+                    ]],
+                    'text' => $display
+                ],
+                'effectiveDateTime' => $this->date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->patient}"
+                ]
+            ]
+        ];
+        if (!is_null($value)) {
+            $entry['resource']['valueQuantity'] = [
+                'code' => $unit,
+                'system' => 'http://unitsofmeasure.org',
+                'unit' => $unit,
+                'value' => $value
+            ];
+        }
+        if (preg_match('/-(\d+)$/', $metric)) {
+            $modificationMetric = preg_replace('/-(\d+)$/', '-protocol-modification-$1', $metric);
+        } else {
+            $modificationMetric = $metric . '-protocol-modification';
+        }
+        if (array_key_exists($modificationMetric, $this->metricUrns)) {
+            $entry['resource']['related'] = [[
+                'type' => 'qualified-by',
+                'target' => [
+                    'reference' => $this->metricUrns[$modificationMetric]
+                ]
+            ]];
+        }
+        return $entry;
+    }
+
+    protected function valueMetric($metric, $value, $display, $codeCode, $valueCode, $codeSystem = 'http://loinc.org', $valueSystem = 'http://loinc.org')
     {
         return [
             'fullUrl' => $this->metricUrns[$metric],
             'resource' => [
                 'code' => [
                     'coding' => [[
-                        'code' => $loinc,
+                        'code' => $codeCode,
                         'display' => $display,
-                        'system' => 'http://loinc.org'
+                        'system' => $codeSystem
                     ]],
                     'text' => $display
                 ],
@@ -144,11 +209,56 @@ class Fhir
                 'subject' => [
                     'reference' => "Patient/{$this->patient}"
                 ],
-                'valueQuantity' => [
-                    'code' => $unit,
-                    'system' => 'http://unitsofmeasure.org',
-                    'unit' => $unit,
-                    'value' => $value
+                'valueCodeableConcept' => [
+                    'coding' => [[
+                        'code' => $valueCode,
+                        'display' => $value,
+                        'system' => $valueSystem
+                    ]],
+                    'text' => $value
+                ]
+            ]
+        ];
+    }
+
+    protected function protocolModification($metric, $replicate = null)
+    {
+        $codeDisplay = "Protocol modifications: " . ucfirst(str_replace('-', ' ', $metric));
+        if (is_null($replicate)) {
+            $conceptCode = $this->data->{"{$metric}-protocol-modification"};
+            $urnKey = $metric . '-protocol-modification';
+            $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}) ? $this->data->{"{$metric}-protocol-modification-notes"} : '';
+        } else {
+            $conceptCode = $this->data->{"{$metric}-protocol-modification"}[$replicate-1];
+            $urnKey = $metric . '-protocol-modification-' . $replicate;
+            $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1]) ? $this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1] : '';
+        }
+        $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
+        $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
+        return [
+            'fullUrl' => $this->metricUrns[$urnKey],
+            'resource' => [
+                'code' => [
+                    'coding' => [[
+                        'code' => "protocol-modifications-{$metric}",
+                        'display' => $codeDisplay,
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+                    ]],
+                    'text' => $codeDisplay
+                ],
+                'effectiveDateTime' => $this->date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->patient}"
+                ],
+                'valueCodeableConcept' => [
+                    'coding' => [[
+                        'code' => $conceptCode,
+                        'display' => $conceptDisplay,
+                        'system' => "http://terminology.pmi-ops.org/CodeSystem/{$conceptCode}"
+                    ]],
+                    'text' => ($conceptCode === 'other' && !empty($notes)) ? $notes : $conceptDisplay
                 ]
             ]
         ];
@@ -176,6 +286,48 @@ class Fhir
         );
     }
 
+    protected function weightprepregnancy()
+    {
+        return $this->simpleMetric(
+            'weight-prepregnancy',
+            $this->data->{'weight-prepregnancy'},
+            'Approximate pre-pregnancy weight',
+            'pre-pregnancy-weight',
+            'kg',
+            'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+        );
+    }
+
+    protected function pregnant()
+    {
+        if (!$this->data->pregnant) {
+            return;
+        }
+        return $this->valueMetric(
+            'pregnant',
+            'Yes (pregnant)',
+            'Are you currently pregnant?',
+            '66174-4',
+            'LA33-6'
+        );
+    }
+
+    protected function wheelchair()
+    {
+        if (!$this->data->wheelchair) {
+            return;
+        }
+        return $this->valueMetric(
+            'wheelchair',
+            'Wheelchair bound',
+            'Are you wheelchair-bound?',
+            'wheelchair-bound-status',
+            'wheelchair-bound',
+            'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation',
+            'http://terminology.pmi-ops.org/CodeSystem/wheelchair-bound-status'
+        );
+    }
+
     protected function bmi()
     {
         if (!$this->data->height || !$this->data->weight) {
@@ -198,13 +350,56 @@ class Fhir
      */
     protected function heartrate($replicate = null)
     {
-        return $this->simpleMetric(
+        $entry = $this->simpleMetric(
             is_null($replicate) ? 'heart-rate' : 'heart-rate-' . $replicate,
             is_null($replicate) ? $this->data->{'heart-rate'} : $this->data->{'heart-rate'}[$replicate - 1],
             'Heart rate',
             '8867-4',
             '/min'
         );
+        if ($replicate) {
+            if ($this->data->{'irregular-heart-rate'}[$replicate - 1]) {
+                $concept = [
+                    'coding' => [[
+                        'code' => 'irregularity-detected',
+                        'display' => 'Irregularity detected',
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
+                    ]],
+                    'text' => 'Irregularity detected'
+                ];
+            } else {
+                $concept = [
+                    'coding' => [[
+                        'code' => 'no-irregularity-detected',
+                        'display' => 'No irregularity detected',
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
+                    ]],
+                    'text' => 'No irregularity detected'
+                ];
+            }
+            $entry['resource']['component'] = [[
+                'code' => [
+                    'coding' => [[
+                        'code' => 'heart-rhythm-status',
+                        'display' => 'Heart rhythm status',
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+                    ]],
+                    'text' => 'Heart rhythm status'
+                ],
+                'valueCodeableConcept' => $concept
+            ]];
+            $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
+            if (array_key_exists($modificationMetric, $this->metricUrns)) {
+                $entry['resource']['related'] = [[
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns[$modificationMetric]
+                    ]
+                ]];
+            }
+        }
+
+        return $entry;
     }
 
     protected function hipcircumference($replicate)
@@ -243,6 +438,10 @@ class Fhir
             default:
                 throw new \Exception('Invalid blood pressure component');
         }
+        $value = $this->data->{'blood-pressure-' . $component}[$replicate - 1];
+        if (is_null($value)) {
+            return null;
+        }
         return [
             'code' => [
                 'coding' => [[
@@ -256,14 +455,19 @@ class Fhir
                 'code' => 'mm[Hg]',
                 'system' => 'http://unitsofmeasure.org',
                 'unit' => 'mmHg',
-                'value' => $this->data->{'blood-pressure-' . $component}[$replicate - 1]
+                'value' => $value
             ]
         ];
     }
 
     protected function bloodpressure($replicate)
     {
-        return [
+        $components = [
+            $this->getBpComponent('systolic', $replicate),
+            $this->getBpComponent('diastolic', $replicate)
+        ];
+        $components = array_filter($components); // remove components that return null
+        $entry = [
             'fullUrl' => $this->metricUrns['blood-pressure-' . $replicate],
             'resource' => [
                 'code' => [
@@ -274,10 +478,7 @@ class Fhir
                     ]],
                     'text' => 'Blood pressure systolic and diastolic'
                 ],
-                'component' => [
-                    $this->getBpComponent('systolic', $replicate),
-                    $this->getBpComponent('diastolic', $replicate)
-                ],
+                'component' => $components,
                 'effectiveDateTime' => $this->date,
                 'resourceType' => 'Observation',
                 'status' => 'final',
@@ -286,6 +487,41 @@ class Fhir
                 ]
             ]
         ];
+        $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
+        if (array_key_exists($modificationMetric, $this->metricUrns)) {
+            $entry['resource']['related'] = [[
+                'type' => 'qualified-by',
+                'target' => [
+                    'reference' => $this->metricUrns[$modificationMetric]
+                ]
+            ]];
+        }
+        return $entry;
+    }
+
+    protected function bloodpressureprotocolmodification($replicate)
+    {
+        return $this->protocolModification('blood-pressure', $replicate);
+    }
+
+    protected function hipcircumferenceprotocolmodification($replicate)
+    {
+        return $this->protocolModification('hip-circumference', $replicate);
+    }
+
+    protected function waistcircumferenceprotocolmodification($replicate)
+    {
+        return $this->protocolModification('waist-circumference', $replicate);
+    }
+
+    protected function heightprotocolmodification()
+    {
+        return $this->protocolModification('height');
+    }
+
+    protected function weightprotocolmodification()
+    {
+        return $this->protocolModification('weight');
     }
 
     protected function getEntry($metric)
@@ -313,12 +549,14 @@ class Fhir
         $fhir->entry = [];
         $fhir->resourceType = 'Bundle';
         $fhir->type = 'document';
-        $fhir->entry[] = $this->getComposition();
         foreach ($this->metricUrns as $metric => $uuid) {
             if ($entry = $this->getEntry($metric)) {
                 $fhir->entry[] = $entry;
+            } else {
+                unset($this->metricUrns[$metric]);
             }
         }
+        array_unshift($fhir->entry, $this->getComposition());
         return $fhir;
     }
 }
