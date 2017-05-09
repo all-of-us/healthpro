@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Controller;
 
+use GuzzleHttp\Client;
 use Silex\Application;
 
 class HelpController extends AbstractController
@@ -11,13 +12,107 @@ class HelpController extends AbstractController
         ['videos', '/videos'],
         ['faq', '/faq'],
         ['sop', '/sop'],
-        ['sopPdf', '/sop/viewer/{filename}'],
-        ['sopDownload', '/sop/download/{filename}']
+        ['sopView', '/sop/{id}'],
+        ['sopFile', '/sop/file/{id}'],
+        ['sopRedirect', '/sop/redirect/{id}']
+    ];
+    private static $documentGroups = [
+        [
+            'title' => 'Physical Measurements for DVs and HPOs',
+            'documents' => [
+                'SOP-012' => [
+                    'title' => 'SOP-012 Blood Pressure Measurement',
+                    'filename' => 'SOP-012 Blood Pressure Measurement.pdf'
+                ],
+                'SOP-013' => [
+                    'title' => 'SOP-013 Heart Rate Measurement',
+                    'filename' => 'SOP-013 Heart Rate Measurement.pdf'
+                ],
+                'SOP-014' => [
+                    'title' => 'SOP-014 Height and Weight Measurement',
+                    'filename' => 'SOP-014 Height and Weight Measurement.pdf'
+                ],
+                'SOP-015' => [
+                    'title' => 'SOP-015 Waist-Hip Circumference Measurement',
+                    'filename' => 'SOP-015 Waist-Hip Circumference Measurement.pdf'
+                ]
+            ]
+        ],
+        [
+            'title' => 'Biobank Standard Operating Procedures for HPO',
+            'documents' => [
+                'SOP-001' => [
+                    'title' => 'SOP-001 HPO Creating a PMI Biobank Order and Printing Specimen Label and Test Requisition',
+                    'filename' => 'SOP-001 HPO Creating a PMI Biobank Order and Printing Specimen Labels and Test Requisition.pdf'
+                ],
+                'SOP-003' => [
+                    'title' => 'SOP-003 HPO Blood Specimens Collection and Processing',
+                    'filename' => 'SOP-003 HPO Blood Specimens Collection and Processing.pdf'
+                ],
+                'SOP-005' => [
+                    'title' => 'SOP-005 HPO Urine Specimen Collection',
+                    'filename' => 'SOP-005 HPO Urine Specimen Collection.pdf'
+                ],
+                'SOP-007' => [
+                    'title' => 'SOP-007 HPO Saliva Oragene Collection',
+                    'filename' => 'SOP-007 HPO Saliva Oragene Collection.pdf'
+                ],
+                'SOP-009' => [
+                    'title' => 'SOP-009 HPO Packaging and Shipping PMI Specimens',
+                    'filename' => 'SOP-009 HPO Packaging and Shipping PMI Specimens.pdf'
+                ],
+                'SOP-010' => [
+                    'title' => 'SOP-010 HPO Ordering Supplies from MML',
+                    'filename' => 'SOP-010 HPO Ordering Supplies from MML.pdf'
+                ],
+                'CHANGES-20170412-HPO' => [
+                    'download' => true,
+                    'title' => 'HPO SOP Changes Presentation 04-12-2017',
+                    'filename' => 'HPO SOP Changes Presentation 04-12-2017.pptx'
+                ]
+            ]
+        ],
+        [
+            'title' => 'Biobank Standard Operating Procedures for DV',
+            'documents' => [
+                'SOP-002' => [
+                    'title' => 'SOP-002 DV Registering a PMI Kit and Creating a PMI Biobank Order',
+                    'filename' => 'SOP-002 DV Registering a PMI Kit and Creating a PMI Biobank Order.pdf'
+                ],
+                'SOP-004' => [
+                    'title' => 'SOP-004 DV Blood Specimens Collection and Processing',
+                    'filename' => 'SOP-004 DV Blood Specimens Collection and Processing.pdf'
+                ],
+                'SOP-006' => [
+                    'title' => 'SOP-006 DV Urine Specimen Collection',
+                    'filename' => 'SOP-006 DV Urine Specimen Collection.pdf'
+                ],
+                'SOP-011' => [
+                    'title' => 'SOP-011 DV Packaging and Shipping PMI Specimens',
+                    'filename' => 'SOP-011 DV Packaging and Shipping PMI Specimens.pdf'
+                ],
+                'CHANGES-20170412-DV' => [
+                    'download' => true,
+                    'title' => 'DV SOP Changes Presentation 04-12-2017',
+                    'filename' => 'DV SOP Changes Presentation 04-12-2017.pptx'
+                ]
+            ]
+        ]
     ];
 
     private function getStoragePath(Application $app)
     {
-        return $app->getConfig('help_storage_path') ?: 'https://storage.googleapis.com/pmi-hpo-staging.appspot.com';
+        return $app->getConfig('help_storage_path') ?: 'https://docsallofus.atlassian.net/wiki/download/attachments/44357';
+    }
+
+    private function getDocumentInfo($id)
+    {
+        foreach (self::$documentGroups as $documentGroup) {
+            if (array_key_exists($id, $documentGroup['documents'])) {
+                return $documentGroup['documents'][$id];
+            }
+        }
+        return false;
     }
 
     public function homeAction(Application $app)
@@ -32,118 +127,64 @@ class HelpController extends AbstractController
 
     public function faqAction(Application $app)
     {
-        return $app['twig']->render('help/faq.html.twig', [
-            'path' => $this->getStoragePath($app)
-        ]);
+        return $app['twig']->render('help/faq.html.twig');
     }
 
     public function sopAction(Application $app)
     {
-        $documentGroups = [
-            [
-                'title' => 'Physical Measurements for DVs and HPOs',
-                'documents' => [
-                    [
-                        'title' => 'SOP-012.01 HPO Blood Pressure Measurement',
-                        'filename' => 'SOP-012.01 HPO Blood Pressure Measurement.pdf'
-                    ],
-                    [
-                        'title' => 'SOP-013.01 HPO Heart Rate Measurement',
-                        'filename' => 'SOP-013.01 HPO Heart Rate Measurement.pdf'
-                    ],
-                    [
-                        'title' => 'SOP-014.01 HPO Height and Weight Measurement',
-                        'filename' => 'SOP-014.01 HPO Height and Weight Measurement.pdf'
-                    ],
-                    [
-                        'title' => 'SOP-015.01 HPO Waist-Hip Circumference Measurement',
-                        'filename' => 'SOP-015.01 HPO Waist-Hip Circumference Measurement.pdf'
-                    ]
-                ]
-            ],
-            [
-                'title' => 'Biobank Standard Operating Procedures for HPO',
-                'documents' => [
-                    [
-                        'title' => 'SOP-001.02 HPO Creating a PMI Biobank Order and Printing Specimen Label and Test Requisition',
-                        'filename' => 'SOP-001.02 HPO Creating a PMI Biobank Order and Printing Specimen Labels and Test Requisition.pdf'
-                    ],
-                    [
-                        'title' => 'SOP-003.02 HPO Blood Specimens Collection and Processing',
-                        'filename' => 'SOP-003.02 HPO Blood Specimens Collection and Processing.pdf'
-                    ],
-                    [
-                        'title' => 'SOP-005.02 HPO Urine Specimen Collection',
-                        'filename' => 'SOP-005.02 HPO Urine Specimen Collection.pdf'
-                    ],
-                    [
-                        'title' => 'SOP-007.02 HPO Saliva Oragene Collection',
-                        'filename' => 'SOP-007.02 HPO Saliva Oragene Collection.pdf'
-                    ],
-                    [
-                        'title' => 'SOP-009.02 HPO Packaging and Shipping PMI Specimens',
-                        'filename' => 'SOP-009.02 HPO Packaging and Shipping PMI Specimens.pdf'
-                    ],
-                    [
-                        'title' => 'SOP-010.02 HPO Ordering Supplies from MML',
-                        'filename' => 'SOP-010.02 HPO Ordering Supplies from MML.pdf'
-                    ],
-                    [
-                        'title' => 'HPO SOP Changes Presentation 04-12-2017',
-                        'filename' => 'HPO SOP Changes Presentation 04-12-2017.pptx'
-                    ]
-                ]
-            ],
-            [
-                'title' => 'Biobank Standard Operating Procedures for DV',
-                'documents' => [
-                    [
-                        'title' => 'SOP-002.02 DV Registering a PMI Kit and Creating a PMI Biobank Order',
-                        'filename' => 'SOP-002.02 DV Registering a PMI Kit and Creating a PMI Biobank Order.pdf'
-                    ],
-                    [
-                        'title' => 'SOP-004.02 DV Blood Specimens Collection and Processing',
-                        'filename' => 'SOP-004.02 DV Blood Specimens Collection and Processing.pdf'
-                    ],
-                    [
-                        'title' => 'SOP-006.02 DV Urine Specimen Collection',
-                        'filename' => 'SOP-006.02 DV Urine Specimen Collection.pdf'
-                    ],
-                    [
-                        'title' => 'SOP-011.02 DV Packaging and Shipping PMI Specimens',
-                        'filename' => 'SOP-011.02 DV Packaging and Shipping PMI Specimens.pdf'
-                    ],
-                    [
-                        'title' => 'DV SOP Changes Presentation 04-12-2017',
-                        'filename' => 'DV SOP Changes Presentation 04-12-2017.pptx'
-                    ]
-                ]
-            ]
-        ];
-
         return $app['twig']->render('help/sop.html.twig', [
-            'documentGroups' => $documentGroups,
+            'documentGroups' => self::$documentGroups,
             'path' => $this->getStoragePath($app)
         ]);
     }
 
-    public function sopPdfAction(Application $app, $filename)
+    public function sopViewAction(Application $app, $id)
     {
-        if (!preg_match('/^(SOP-\d+)\.\d+ (.+)\.pdf$/', $filename, $m)) {
+        $document = $this->getDocumentInfo($id);
+        if (!$document) {
             $app->abort(404);
         }
-        $sop = $m[1];
-        $title = $m[2];
         return $app['twig']->render('help/sop-pdf.html.twig', [
-            'filename' => $filename,
-            'sop' => $sop,
-            'title' => $title,
+            'sop' => $id,
+            'title' => trim(str_replace($id, '', $document['title'])),
+            'document' => $document,
             'path' => $this->getStoragePath($app)
         ]);
     }
 
-    public function sopDownloadAction(Application $app, $filename)
+    public function sopFileAction(Application $app, $id)
     {
-        return $app->redirect($this->getStoragePath($app) . '/' . rawurlencode($filename));
+        $document = $this->getDocumentInfo($id);
+        if (!$document) {
+            $app->abort(404);
+        }
+        $url = $this->getStoragePath($app) . '/' . rawurlencode($document['filename']);
+        try {
+            $client = new Client();
+            $response = $client->get($url, ['stream' => true]);
+            $responseBody = $response->getBody();
+            $stream = function () use ($responseBody) {
+                while (!$responseBody->eof()) {
+                    echo $responseBody->read(1024);
+                }
+            };
+            return $app->stream($stream, 200, [
+                'Content-Type' => 'application/pdf'
+            ]);
+        } catch (\Exception $e) {
+            error_log('Failed to retrieve Confluence file ' . $url . ' (' . $id . ')');
+            echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>';
+            exit;
+        }
+    }
+
+    public function sopRedirectAction(Application $app, $id)
+    {
+        $document = $this->getDocumentInfo($id);
+        if (!$document) {
+            $app->abort(404);
+        }
+        $url = $this->getStoragePath($app) . '/' . rawurlencode($document['filename']);
+        return $app->redirect($url);
     }
 }

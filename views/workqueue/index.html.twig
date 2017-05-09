@@ -23,7 +23,7 @@
     <p class="text-right">
         <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
     </p>
-    <h4>{{ participants|length == 100 ? '>' : ''}}{{ participants|length|number_format }}{{ params|length > 0 ? ' matching' : '' }} participant{{ participants|length == 1 ? '' : 's'}} ({{ organization }})</h4>
+    <h4>{{ participants|length == 100 ? '>' }}{{ participants|length|number_format }}{{ params|length > 0 ? ' matching' }} participant{{ participants|length != 1 ? 's'}} ({{ organization }})</h4>
     <table class="table table-striped table-bordered table-small" id="workqueue" width="100%">
         <thead>
             <tr>
@@ -82,14 +82,14 @@
                     {# Identifiers and status #}
                     <td data-order="{{ participant.lastName }}"><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}</a></td>
                     <td data-order="{{ participant.firstName }}"><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a></td>
-                    <td data-order="{{ participant.dob ? participant.dob|date('Y-m-d') : '' }}">{{ participant.dob ? participant.dob|date('m/d/Y') : '' }}</td>
+                    <td data-order="{{ participant.dob ? participant.dob|date('Y-m-d') }}">{{ participant.dob ? participant.dob|date('m/d/Y') }}</td>
                     <td>{{ participant.id }}</td>
                     <td>{{ participant.biobankId }}</td>
                     <td>{{ participant.language }}</td>
                     <td class="text-center" data-order="{{ participant.consentForStudyEnrollment == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForStudyEnrollmentTime }}">
                         {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.consentForStudyEnrollmentTime ? participant.consentForStudyEnrollmentTime|date('m/d/Y') : '' }}
+                            {{ participant.consentForStudyEnrollmentTime ? participant.consentForStudyEnrollmentTime|date('m/d/Y') }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
@@ -97,15 +97,16 @@
                     <td class="text-center" data-order="{{ participant.consentForElectronicHealthRecords == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForElectronicHealthRecordsTime }}">
                         {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('m/d/Y') : '' }}
+                            {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('m/d/Y') }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                            {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('m/d/Y') : '(not completed)' }}
                         {% endif %}
                     </td>
                     <td class="text-center" data-order="{{ participant.withdrawalStatus == 'NO_USE' ? '1' : '0' }}-{{ participant.withdrawalTime }}">
                         {% if participant.withdrawalStatus == 'NO_USE' %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            <span class="text-danger">No Use</span> - {{ participant.withdrawalTime ? participant.withdrawalTime|date('m/d/Y') : '' }}
+                            <span class="text-danger">No Use</span> - {{ participant.withdrawalTime ? participant.withdrawalTime|date('m/d/Y') }}
                         {% endif %}
                     </td>
 
@@ -143,7 +144,7 @@
                     <td class="text-center"  data-order="{{ participant.physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0' }}-{{ participant.physicalMeasurementsTime }}">
                         {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.physicalMeasurementsTime ? participant.physicalMeasurementsTime|date('m/d/Y') : '' }}
+                            {{ participant.physicalMeasurementsTime ? participant.physicalMeasurementsTime|date('m/d/Y') }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}

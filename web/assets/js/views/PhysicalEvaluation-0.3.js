@@ -66,7 +66,8 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         var fieldSelector = '.field-' + field;
         var secondThirdFields = [
             'blood-pressure-systolic',
-            'blood-pressure-diastolic'
+            'blood-pressure-diastolic',
+            'heart-rate'
         ];
         var twoClosestFields = [
             'hip-circumference',

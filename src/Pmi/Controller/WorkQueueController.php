@@ -223,6 +223,8 @@ class WorkQueueController extends AbstractController
         $participants = $this->participantSummarySearch($organization, $params, $app);
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
+            // Add UTF-8 BOM
+            fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
             fwrite($output, "\"\"\n");
             $headers = [

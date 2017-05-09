@@ -42,7 +42,7 @@ class EvaluationController extends AbstractController
         } else {
             $date = new \DateTime();
         }
-        return $app->json($evaluationService->getFhir($date));
+        return $app->jsonPrettyPrint($evaluationService->getFhir($date));
     }
 
     /* For debugging evaluation object pushed to RDR - only allowed in dev */

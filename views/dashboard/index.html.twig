@@ -17,7 +17,7 @@
     <br />
     <ul class="nav nav-tabs top-pad" role="tablist">
         <li role="presentation" class="active"><a href="#total-progress" role="tab" data-toggle="tab" id="total-progress-nav"><span class="fa fa-users"></span> Total Progress to Date</a></li>
-        <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab" id="participants-by-region-nav"><span class="fa fa-globe"></span> Participants by Region</a></li>
+        <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab" id="participants-by-region-nav"><span class="fa fa-globe"></span> Full Participants by Region</a></li>
         <li role="presentation"><a href="#participants-by-lifecycle" role="tab" data-toggle="tab" id="participants-by-lifecycle-nav"><span class="fa fa-sitemap"></span> Participants by Lifecycle Phase</a></li>
     </ul>
     <div id="plotly-tabs" class="tab-content">
@@ -60,12 +60,18 @@
                                 <div class="col-md-12 col-xs-12 form-group form-group-sm">
                                     <label>Show Column Totals <input type="checkbox" id="total-progress-show-annot" class="total-progress-control"></label>
                                 </div>
+                                <div class="col-md-12 col-xs-12 form-group form-group-sm">
+                                    <label>Toggle Data Traces <i class="fa fa-question-circle" title="Click to toggle all traces, or toggle individual traces by clicking the legend entry" data-toggle="tooltip"></i> </label>
+                                    <a href="javascript:;" class="btn btn-default btn-sm" id="toggle-traces" >&nbsp;<i class='fa fa-toggle-on toggle-switch'></i></a>
+                                </div>
                             </div>
                         </div>
 
                     </div>
                 </div>
-                <div id="plotly-total-progress" class="col-md-9 plotly-div"></div>
+                <div id="plotly-total-progress" class="col-md-9 plotly-div">
+                </div>
+
             </div>
             <script type="text/javascript">
                 // function to grab current filter values and load JSON from load_map_data REST endpoint
@@ -110,11 +116,12 @@
                             if (data.length != 0) {
                                 var progressAnnot = [];
                                 var tpLayout = {
-                                    title: 'Count of <b>' + metricTitle.toLowerCase() + '</b> from ' + tpStartDate + ' to ' + tpEndDate,
+                                    title: 'Count of <b>' + metricTitle.toLowerCase() + '</b> by date',
                                     font: PLOTLY_LABEL_FONT,
                                     barmode: 'stack',
                                     width: tpWidth,
                                     height: tpWidth / 1.66,
+                                    hovermode: 'closest',
                                     annotations: progressAnnot
                                 };
 
@@ -134,6 +141,10 @@
                                 if (dialogType == 'modal' ) {
                                     $('#loading-modal').modal('hide');
                                 }
+
+                                // set toggle traces switch to on, regardless of previous state
+                                $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
+
                                 console.log('renderTotalProgressPlot() complete');
                             } else {
                                 setMetricsError(spinnerLoc);
@@ -143,6 +154,10 @@
                         });
                     }
                 }
+
+                $('#toggle-traces').click(function() {
+                    togglePlotlyTraces('plotly-total-progress');
+                });
 
                 var now = new Date();
                 var nowString = now.toISOString().split('T')[0];
@@ -271,7 +286,7 @@
                                         mapModeText += ' of residence'
                                     }
                                     var mapLayout = {
-                                        title: 'Percentage of target full participant registrations by <b>' + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
+                                        title: "Percentage of target <b>full participants</b> by <b>" + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
                                         font: PLOTLY_LABEL_FONT,
                                         width: mapWidth,
                                         height: mapWidth / 1.66,
@@ -289,6 +304,7 @@
                                     if (dialogType == 'modal') {
                                         $('#loading-modal').modal('hide');
                                     }
+
                                     console.log('renderMapPlot() complete');
                                 } else {
                                     setMetricsError(spinnerLoc);
@@ -348,7 +364,7 @@
                         <div class="panel-body">
                             <div class="row form-group-sm">
                                 <div class="col-md-12 col-xs-12 form-group form-group-sm">
-                                    <label>Cutoff</label>
+                                    <label for="lifecycle-end-date">Cutoff</label>
                                     <input type="text" class="form-control lifecycle-time-control datepicker" id="lifecycle-end-date" />
                                 </div>
                                 <div class="col-md-12 col-xs-12 form-group form-group-sm">
