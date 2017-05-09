@@ -127,9 +127,7 @@ class HelpController extends AbstractController
 
     public function faqAction(Application $app)
     {
-        return $app['twig']->render('help/faq.html.twig', [
-            'path' => $this->getStoragePath($app)
-        ]);
+        return $app['twig']->render('help/faq.html.twig');
     }
 
     public function sopAction(Application $app)
