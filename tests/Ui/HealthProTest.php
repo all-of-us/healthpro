@@ -283,6 +283,8 @@ class HealthProTest extends AbstractPmiUiTestCase
         $this->findByName('standard')->click();
 
         //Print - check if the print labels exist
+        $this->waitForClassVisible('pdf-requisition');
+        $this->waitForClassVisible('pdf-labels');
         $this->assertCount(1, $this->webDriver->findElements(WebDriverBy::className("pdf-requisition")));
         $this->assertCount(1, $this->webDriver->findElements(WebDriverBy::className("pdf-labels")));
 
