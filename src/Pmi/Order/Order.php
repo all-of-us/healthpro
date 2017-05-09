@@ -329,6 +329,12 @@ class Order
                 'system' => 'https://www.pmi-ops.org/site-id',
                 'value' => $siteGoogleGroup
             ];
+            $obj->author = [
+                'identifier' => [[
+                    'system' => 'https://www.pmi-ops.org/healthpro-username',
+                    'value' => $this->app->getUserEmail()
+                ]]
+            ];
         }
         $obj->identifier = $identifiers;
 
