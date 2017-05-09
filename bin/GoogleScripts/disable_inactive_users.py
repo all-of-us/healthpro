@@ -92,8 +92,9 @@ def main(argv):
             users.append(u)
             lastLogin=datetime.strptime(u.get('lastLoginTime',None),"%Y-%m-%dT%H:%M:%S.%fZ")
             creationtime=datetime.strptime(u.get('creationTime',None),"%Y-%m-%dT%H:%M:%S.%fZ")
-            print((datetime.today()-creationtime).days)
             print(u.get('primaryEmail',None))
+            print("Days since create: %s" % (datetime.today()-creationtime).days)
+            print("Days since last login: %s" % (datetime.today()-lastLogin).days)
             if (datetime.today()-creationtime).days==-1:
                 continue
             if ((datetime.today()-lastLogin).days > INACTIVEDAYS and (datetime.today()-creationtime).days > INACTIVEDAYS+1) or ((datetime.today()-lastLogin).days > 2000 and (datetime.today()-creationtime).days > INACTIVEDAYS):
