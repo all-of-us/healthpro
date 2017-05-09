@@ -324,12 +324,11 @@ class Order
                 ];
             }
             $site = $this->app['em']->getRepository('sites')->fetchOneBy(['google_group' => $this->order['site']]);
-            if ($site && $site['mayolink_account']) {
-                $identifiers[] =[
-                    'system' => 'https://www.pmi-ops.org/mayolink-site-id',
-                    'value' => $site['mayolink_account'] . '.' . Util::generateUuid()
-                ];
-            }
+            $siteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $this->order['site'] . '@' . $this->app->getConfig('gaDomain');
+            $obj->sourceSite = [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => $siteGoogleGroup
+            ];
         }
         $obj->identifier = $identifiers;
 
