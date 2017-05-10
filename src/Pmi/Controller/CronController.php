@@ -16,7 +16,8 @@ class CronController extends AbstractController
 
     protected static $routes = [
         ['dashboard', '/'],
-        ['pingTest', '/ping-test']
+        ['pingTest', '/ping-test'],
+        ['withdrawal', '/withdrawal']
     ];
     
     /**
@@ -27,6 +28,35 @@ class CronController extends AbstractController
     {
         return UserService::isCurrentUserAdmin() ||
             $request->headers->get('X-Appengine-Cron') === 'true';
+    }
+
+    public function withdrawalAction(Application $app, Request $request)
+    {
+        if (!$this->isAdmin($request)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $rows = $app['db']->fetchAll('SELECT distinct organization FROM sites where organization is not null');
+        foreach ($rows as $row) {
+            $organization = $row['organization'];
+            $searchParams = [
+                'withdrawalStatus' => 'NO_USE',
+                'hpoId' => $organization,
+                '_sort:desc' => 'withdrawalTime'
+            ];
+            // TODO: filter by withdrawal time
+            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($searchParams);
+            $message = "The following participants have withdrawn ({$organization}):\n\n";
+            foreach ($summaries as $summary) {
+                // TODO: check log
+                $participantId = $summary->resource->participantId;
+                // TODO: insert into log
+                $message .= "{$participantId}\n";
+            }
+            // TODO: Send email
+        }
+        
+        return (new JsonResponse())->setData(true);
     }
 
     public function dashboardAction(Application $app, Request $request)
