@@ -28,7 +28,7 @@ class AdminController extends AbstractController
 
     public function sitesAction(Application $app)
     {
-        $sites = $app['db']->fetchAll("SELECT * FROM sites order by `name`");
+        $sites = $app['em']->getRepository('sites')->fetchBy([], ['name' => 'asc']);
         return $app['twig']->render('admin/sites/index.html.twig', ['sites' => $sites]);
     }
 
