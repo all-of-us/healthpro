@@ -111,8 +111,7 @@ class HealthProTest extends AbstractPmiUiTestCase
         if ($this->webDriver->getTitle() == 'Sign in - Google Accounts') {
             $this->setInput('identifier', $email);
             $this->findById('identifierNext')->click();
-            $this->waitForElementVisible(WebDriverBy::name('password'));
-            $this->waitForElementClickable(WebDriverBy::name('password'));
+            $this->waitForElementVisible(WebDriverBy::cssSelector('input[type="password"]'));
             $this->setInput('password', $password);
             $this->waitForElementClickable(WebDriverBy::id('passwordNext'));
             $this->findById('passwordNext')->click();
