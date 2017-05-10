@@ -15,13 +15,19 @@ class AdminController extends AbstractController
     protected static $name = 'admin';
 
     protected static $routes = [
+        ['home', '/'],
         ['sites', '/sites'],
         ['siteEdit', '/site/edit/{siteId}', ['method' => 'GET|POST']],
         ['siteCreate', '/site/add', ['method' => 'GET|POST']],
         ['siteDelete', '/site/delete/{siteId}', ['method' => 'GET|POST']]
     ];
 
-    public function sitesAction(Application $app, Request $request)
+    public function homeAction(Application $app)
+    {
+        return $app['twig']->render('admin/index.html.twig');
+    }
+
+    public function sitesAction(Application $app)
     {
         $sites = $app['db']->fetchAll("SELECT * FROM sites order by `name`");
         return $app['twig']->render('admin/sites/index.html.twig', ['sites' => $sites]);
