@@ -12,23 +12,23 @@ use Pmi\Audit\Log;
 
 class AdminController extends AbstractController
 {
+    protected static $name = 'admin';
+
     protected static $routes = [
-        ['siteIndex', '/sites'],
-        ['editSite', '/site/edit/{siteId}', ['method' => 'GET|POST']],
-        ['addSite', '/site/add', ['method' => 'GET|POST']],
-        ['deleteSite', '/site/delete/{siteId}', ['method' => 'GET|POST']]
+        ['sites', '/sites'],
+        ['siteEdit', '/site/edit/{siteId}', ['method' => 'GET|POST']],
+        ['siteCreate', '/site/add', ['method' => 'GET|POST']],
+        ['siteDelete', '/site/delete/{siteId}', ['method' => 'GET|POST']]
     ];
 
-    public function siteIndexAction(Application $app, Request $request)
+    public function sitesAction(Application $app, Request $request)
     {
-        $sites = $app['db']->fetchAll("SELECT * FROM sites");
-        return $app['twig']->render('site-index.html.twig', ['sites' => $sites]);
+        $sites = $app['db']->fetchAll("SELECT * FROM sites order by `name`");
+        return $app['twig']->render('admin/sites/index.html.twig', ['sites' => $sites]);
     }
 
-
-    public function editSiteAction($siteId, Application $app, Request $request)
+    public function siteEditAction($siteId, Application $app, Request $request)
     {
-
         $site = $app['em']->getRepository('sites')->fetchOneBy([
             'id' => $siteId
         ]);
@@ -53,14 +53,14 @@ class AdminController extends AbstractController
             }
         }
 
-        return $app['twig']->render('site-edit.html.twig', [
+        return $app['twig']->render('admin/sites/edit.html.twig', [
             'site' => $site,
             'verb' => 'Edit',
             'siteForm' => $siteEditForm->createView()
         ]);
     }
 
-    public function addSiteAction(Application $app, Request $request)
+    public function siteCreateAction(Application $app, Request $request)
     {
         $site = array();
         $siteAddForm = $this->getSiteEditForm($app);
@@ -81,7 +81,7 @@ class AdminController extends AbstractController
             }
         }
 
-        return $app['twig']->render('site-edit.html.twig', [
+        return $app['twig']->render('admin/sites/edit.html.twig', [
             'site' => $site,
             'verb' => 'Add',
             'siteForm' => $siteAddForm->createView()
@@ -111,7 +111,7 @@ class AdminController extends AbstractController
         return $form;
     }
 
-    public function deleteSiteAction($siteId, Application $app)
+    public function siteDeleteAction($siteId, Application $app)
     {
         $site = $app['em']->getRepository('sites')->fetchOneBy([
             'id' => $siteId
@@ -129,4 +129,3 @@ class AdminController extends AbstractController
 
     }
 }
-

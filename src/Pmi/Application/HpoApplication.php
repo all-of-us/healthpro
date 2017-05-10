@@ -95,7 +95,7 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/dashboard/.*$', 'ips' => $ips], 'ROLE_DASHBOARD'],
                 [['path' => '^/dashboard/.*$'], 'ROLE_NO_ACCESS'],
 
-                [['path' => '^/admin/.*$', 'ips' => $ips], 'ROLE_SITE_ADMIN'],
+                [['path' => '^/admin/.*$', 'ips' => $ips], 'ROLE_ADMIN'],
                 [['path' => '^/admin/.*$'], 'ROLE_NO_ACCESS'],
 
                 [['path' => '^/.*$', 'ips' => $ips], 'ROLE_USER'],
