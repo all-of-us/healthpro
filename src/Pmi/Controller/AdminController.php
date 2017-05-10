@@ -55,7 +55,7 @@ class AdminController extends AbstractController
                 $app->log(Log::SITE_EDIT, $siteId);
                 $app->addFlashNotice('Site updated');
 
-                return $app->redirectToRoute('siteIndex');
+                return $app->redirectToRoute('admin_sites');
             }
         }
 
@@ -83,7 +83,7 @@ class AdminController extends AbstractController
                 $app->log(Log::SITE_ADD, $siteId);
                 $app->addFlashNotice('Site added');
 
-                return $app->redirectToRoute('siteIndex');
+                return $app->redirectToRoute('admin_sites');
             }
         }
 
@@ -131,7 +131,6 @@ class AdminController extends AbstractController
         $app->log(Log::SITE_DELETE, $siteId);
         $app->addFlashNotice('Site removed.');
 
-        return $app->redirectToRoute('siteIndex');
-
+        return $app->redirectToRoute('admin_sites');
     }
 }
