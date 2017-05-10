@@ -18,8 +18,7 @@ class AdminController extends AbstractController
         ['home', '/'],
         ['sites', '/sites'],
         ['siteEdit', '/site/edit/{siteId}', ['method' => 'GET|POST']],
-        ['siteCreate', '/site/add', ['method' => 'GET|POST']],
-        ['siteDelete', '/site/delete/{siteId}', ['method' => 'GET|POST']]
+        ['siteCreate', '/site/add', ['method' => 'GET|POST']]
     ];
 
     public function homeAction(Application $app)
@@ -42,8 +41,14 @@ class AdminController extends AbstractController
             $app->abort(404);;
         }
 
-        $siteEditForm = $this->getSiteEditForm($app, $site);
+        if ($request->request->has('delete')) {
+            $app['em']->getRepository('sites')->delete($siteId);
+            $app->log(Log::SITE_DELETE, $siteId);
+            $app->addFlashNotice('Site removed.');
+            return $app->redirectToRoute('admin_sites');
+        }
 
+        $siteEditForm = $this->getSiteEditForm($app, $site);
         $siteEditForm->handleRequest($request);
         if ($siteEditForm->isValid()) {
             if ($app['em']->getRepository('sites')->update($siteId, [
@@ -70,10 +75,8 @@ class AdminController extends AbstractController
     {
         $site = array();
         $siteAddForm = $this->getSiteEditForm($app);
-
         $siteAddForm->handleRequest($request);
         if ($siteAddForm->isValid()) {
-
             if ($siteId = $app['em']->getRepository('sites')->insert([
                 'name' => $siteAddForm['name']->getData(),
                 'google_group' => $siteAddForm['google_group']->getData(),
@@ -96,7 +99,7 @@ class AdminController extends AbstractController
 
     protected function getSiteEditForm(Application $app, $site = null)
     {
-        $form = $app['form.factory']->createBuilder(FormType::class, $site)
+        return $app['form.factory']->createBuilder(FormType::class, $site)
             ->add('name', Type\TextType::class, [
                 'label' => 'Name',
                 'required' => true
@@ -114,23 +117,5 @@ class AdminController extends AbstractController
                 'required' => false
             ])
             ->getForm();
-        return $form;
-    }
-
-    public function siteDeleteAction($siteId, Application $app)
-    {
-        $site = $app['em']->getRepository('sites')->fetchOneBy([
-            'id' => $siteId
-        ]);
-        if (!$site) {
-            $app->abort(404);;
-        }
-        
-        $app['em']->getRepository('sites')->delete($siteId);
-
-        $app->log(Log::SITE_DELETE, $siteId);
-        $app->addFlashNotice('Site removed.');
-
-        return $app->redirectToRoute('admin_sites');
     }
 }

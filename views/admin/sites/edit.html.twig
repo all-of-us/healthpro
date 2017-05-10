@@ -11,7 +11,7 @@
             <button type="submit" class="btn btn-primary">Save Site</button>
             <a class="btn btn-default" href="{{ path('admin_sites') }}">Cancel</a>
             {% if verb == 'Edit' %}
-                <a href="{{ path('admin_siteDelete', { siteId: site.id }) }}" class="btn btn-danger pull-right confirm">Delete Site</a>
+                <button type="submit" name="delete" class="btn btn-danger pull-right confirm">Delete Site</a>
             {% endif %}
             {{ form_end(siteForm) }}
         </div>
