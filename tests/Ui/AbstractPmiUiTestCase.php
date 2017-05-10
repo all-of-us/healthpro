@@ -114,4 +114,12 @@ abstract class AbstractPmiUiTestCase extends \PHPUnit_Framework_TestCase
         $input->click();
         $this->sendKeys($value);
     }
+
+    public function waitForAjaxRequestToComplete()
+    {
+        $this->webDriver->wait(15, 500)->until(function() {
+            $condition = 'return ($.active == 0);';
+            return $this->webDriver->executeScript($condition);
+        });
+    }
 }

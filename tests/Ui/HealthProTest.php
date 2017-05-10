@@ -127,9 +127,15 @@ class HealthProTest extends AbstractPmiUiTestCase
         $element = $this->findByClass('modal-header');
         $this->webDriver->getMouse()->mouseMove($element->getCoordinates());
 
+        //Wait for keepalive ajax request to complete
+        $this->waitForAjaxRequestToComplete();
+
         //Click agree
         $this->waitForClassVisible('pmi-confirm-ok');
         $this->findByClass('pmi-confirm-ok')->click();
+
+        //Wait for agree ajax request to complete
+        $this->waitForAjaxRequestToComplete();
 
         //Wait untill modal window completly disappears
         $driver = $this->webDriver;
