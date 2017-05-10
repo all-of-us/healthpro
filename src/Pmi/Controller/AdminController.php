@@ -107,7 +107,7 @@ class AdminController extends AbstractController
             ])
             ->add('mayolink_account', Type\TextType::class, [
                 'label' => 'MayoLink Account',
-                'required' => true
+                'required' => false
             ])
             ->add('organization', Type\TextType::class, [
                 'label' => 'Organization',
