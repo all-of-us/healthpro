@@ -2,10 +2,10 @@ Subject: All of Us Participant Withdrawals
 
 The following participants have withdrawn:
 
-{% for organization, participantIds in organizationWithdrawals %}
+{% for organization, participants in organizationWithdrawals %}
 {{ organization }}:
-{% for id in participantIds %}
-{{ id }}
+{% for participant in participants %}
+{{ participant.id }}
 {% endfor %}
 
 {% endfor %}
