@@ -59,6 +59,9 @@ class Log
             } else {
                 $logArray['ip'] = $request->getClientIp();
             }
+            if ($logArray['user'] === null && $request->headers->get('X-Appengine-Cron') === 'true') {
+                $logArray['user'] = 'Appengine-Cron';
+            }
         } else {
             $logArray['ip'] = null;
         }
