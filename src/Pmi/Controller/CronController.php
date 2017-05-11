@@ -16,7 +16,6 @@ class CronController extends AbstractController
     protected static $name = 'cron';
 
     protected static $routes = [
-        ['dashboard', '/'],
         ['pingTest', '/ping-test'],
         ['withdrawal', '/withdrawal']
     ];
@@ -42,25 +41,21 @@ class CronController extends AbstractController
 
         return (new JsonResponse())->setData(true);
     }
-
-    public function dashboardAction(Application $app, Request $request)
-    {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
-        }
-        
-        $request->getSession()->getFlashBag()->add('error', 'Not yet implemented!');
-        return $app->redirectToRoute('home');
-    }
     
     public function pingTestAction(Application $app, Request $request)
     {
         if (!$this->isAdmin($request)) {
             throw new AccessDeniedHttpException();
         }
-        
-        $email = UserService::getCurrentUser()->getEmail();
-        error_log("Cron ping test requested by $email [" . $request->getClientIp() . "]");
+
+        $user = UserService::getCurrentUser();
+        if ($user) {
+            $email = $user->getEmail();
+            error_log("Cron ping test requested by $email [" . $request->getClientIp() . "]");
+        }
+        if ($request->headers->get('X-Appengine-Cron') === 'true') {
+            error_log('Cron ping test requested by Appengine-Cron');
+        }
         
         return (new JsonResponse())->setData(true);
     }
