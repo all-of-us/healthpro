@@ -97,6 +97,23 @@ class Message
         return $this;
     }
 
+    public function render($template, $parameters)
+    {
+        $templateFile = "emails/{$template}.txt.twig";
+        $content = $this->app['twig']->render($templateFile, $parameters);
+        $regex = '/^Subject:\s*(.*)\n/';
+        if (preg_match($regex, $content, $m)) {
+            $content = trim(preg_replace($regex, '', $content));
+            $subject = trim($m[1]);
+        } else{
+            $subject = '';
+        }
+        $this->setSubject($subject);
+        $this->setContent($content);
+
+        return $this;
+    }
+
     protected function getDefaultSender()
     {
         $applicationId = AppIdentityService::getApplicationId();
