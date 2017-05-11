@@ -6,6 +6,7 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Pmi\Mail\Message;
 
 /**
  * NOTE: all /cron routes should be protected by `login: admin` in app.yaml
@@ -36,7 +37,13 @@ class CronController extends AbstractController
             throw new AccessDeniedHttpException();
         }
 
+        $emailTo = $app->getConfig('withdrawal_notification_email');
+        if (empty($emailTo)) {
+            throw new \Exception('withdrawal_notification_email not defined');
+        }
+
         $rows = $app['db']->fetchAll('SELECT distinct organization FROM sites where organization is not null');
+        $organizationWithdrawals = [];
         foreach ($rows as $row) {
             $organization = $row['organization'];
             $searchParams = [
@@ -44,18 +51,28 @@ class CronController extends AbstractController
                 'hpoId' => $organization,
                 '_sort:desc' => 'withdrawalTime'
             ];
+
             // TODO: filter by withdrawal time
             $summaries = $app['pmi.drc.participants']->listParticipantSummaries($searchParams);
-            $message = "The following participants have withdrawn ({$organization}):\n\n";
-            foreach ($summaries as $summary) {
-                // TODO: check log
-                $participantId = $summary->resource->participantId;
-                // TODO: insert into log
-                $message .= "{$participantId}\n";
+            if (count($summaries) > 0) {
+                $participantIds = [];
+                foreach ($summaries as $summary) {
+                    // TODO: check log
+                    $participantIds[] = $summary->resource->participantId;
+                    // TODO: insert into log
+                }
+                $organizationWithdrawals[$organization] = $participantIds;
             }
-            // TODO: Send email
         }
-        
+
+        $message = new Message($app);
+        $message
+            ->setTo($emailTo)
+            ->render('withdrawals', [
+                'organizationWithdrawals' => $organizationWithdrawals
+            ])
+            ->send();
+
         return (new JsonResponse())->setData(true);
     }
 
