@@ -59,6 +59,7 @@ class RdrParticipants
                 'query' => $query
             ]);
         } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
             throw new Exception\FailedRequestException();
         }
         $responseObject = json_decode($response->getBody()->getContents());
@@ -100,6 +101,7 @@ class RdrParticipants
                     'query' => $params
                 ]);
             } catch (\Exception $e) {
+                $this->rdrHelper->logException($e);
                 throw new Exception\FailedRequestException();
             }
             $contents = $response->getBody()->getContents();
@@ -154,6 +156,7 @@ class RdrParticipants
                 return isset($result->drc_internal_id) ? $result->drc_internal_id : $result->participant_id;
             }
         } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
             return false;
         }
         return false;
@@ -168,6 +171,7 @@ class RdrParticipants
                 return $result;
             }
         } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
             return false;
         }
         return false;
@@ -184,6 +188,7 @@ class RdrParticipants
                 return $result->id;
             }
         } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
             return false;
         }
         return false;
@@ -198,6 +203,7 @@ class RdrParticipants
                 return $result;
             }
         } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
             return false;
         }
         return false;
@@ -214,25 +220,7 @@ class RdrParticipants
                 return $result->id;
             }
         } catch (\Exception $e) {
-            return false;
-        }
-        return false;
-    }
-
-    /*
-     * Order PUT method is not yet supported
-     */
-    public function updateOrder($participantId, $orderId, $order)
-    {
-        try {
-            $response = $this->getClient()->request('PUT', "Participant/{$participantId}/BiobankOrder/{$orderId}", [
-                'json' => $order
-            ]);
-            $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->id)) {
-                return $result->id;
-            }
-        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
             return false;
         }
         return false;

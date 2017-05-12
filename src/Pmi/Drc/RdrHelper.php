@@ -50,4 +50,16 @@ class RdrHelper
     {
         return $this->cacheEnabled;
     }
+
+    public function logException(\Exception $e)
+    {
+        syslog(LOG_ERR, $e->getMessage());
+        if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+            $response = $e->getResponse();
+            $responseCode = $response->getStatusCode();
+            $contents = $response->getBody()->getContents();
+            syslog(LOG_INFO, "Response code: {$responseCode}");
+            syslog(LOG_INFO, "Response body: {$contents}");
+        }
+    }
 }
