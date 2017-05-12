@@ -323,17 +323,19 @@ class Order
                     'value' => $this->order['mayo_id']
                 ];
             }
-            $site = $this->app['em']->getRepository('sites')->fetchOneBy(['google_group' => $this->order['site']]);
-            $siteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $this->order['site'] . '@' . $this->app->getConfig('gaDomain');
+            $obj->author = [
+                'system' => 'https://www.pmi-ops.org/healthpro-username',
+                'value' => $this->app->getUserEmail()
+            ];
+            $sourceSiteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $this->order['site'];
+            $finalizedSiteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $this->app->getSiteId();
             $obj->sourceSite = [
                 'system' => 'https://www.pmi-ops.org/site-id',
-                'value' => $siteGoogleGroup
+                'value' => $sourceSiteGoogleGroup
             ];
-            $obj->author = [
-                'identifier' => [[
-                    'system' => 'https://www.pmi-ops.org/healthpro-username',
-                    'value' => $this->app->getUserEmail()
-                ]]
+            $obj->finalizedSite = [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => $finalizedSiteGoogleGroup
             ];
         }
         $obj->identifier = $identifiers;
