@@ -369,23 +369,12 @@ class Order
             return false;
         }
         $order = $this->getRdrObject();
-        if ($this->order['rdr_id']) {
-            // TODO: update endpoint for participants is not yet available
-            /*
-            $this->app['pmi.drc.participants']->updateOrder(
-                $this->participant->id,
-                $this->order['rdr_id'],
-                $order
+        $rdrId = $this->app['pmi.drc.participants']->createOrder($this->participant->id, $order);
+        if ($rdrId) {
+            $this->app['em']->getRepository('orders')->update(
+                $this->order['id'],
+                ['rdr_id' => $rdrId]
             );
-            */
-        } else {
-            $rdrId = $this->app['pmi.drc.participants']->createOrder($this->participant->id, $order);
-            if ($rdrId) {
-                $this->app['em']->getRepository('orders')->update(
-                    $this->order['id'],
-                    ['rdr_id' => $rdrId]
-                );
-            }
         }
     }
 
