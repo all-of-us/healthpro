@@ -21,93 +21,102 @@ class WithdrawalService
 
     protected function getOrganizations()
     {
-        $rows = $this->db->fetchAll('SELECT distinct organization FROM sites where organization is not null');
+        $rows = $this->db->fetchAll('SELECT organization, GROUP_CONCAT(email) as emails FROM sites WHERE organization IS NOT NULL GROUP BY organization');
         $organizations = [];
         foreach ($rows as $row) {
-            $organizations[] = $row['organization'];
+            $emails = [];
+            $list = explode(',', trim($row['emails']));
+            foreach ($list as $email) {
+                $email = trim(strtolower($email));
+                if (!empty($email) && !in_array($email, $emails)) {
+                    $emails[] = $email;
+                }
+            }
+            $organizations[] = [
+                'id' => $row['organization'],
+                'emails' => $emails
+            ];
         }
         return $organizations;
     }
 
-    protected function getOrganizationWithdrawals()
+    protected function getOrganizationWithdrawals($id)
     {
-        $organizationWithdrawals = [];
-        foreach ($this->getOrganizations() as $organization) {
-            $searchParams = [
-                'withdrawalStatus' => 'NO_USE',
-                'hpoId' => $organization,
-                '_sort:desc' => 'withdrawalTime'
-            ];
-
-            // TODO: filter by withdrawal time
+        $participants = [];
+        $searchParams = [
+            'withdrawalStatus' => 'NO_USE',
+            'hpoId' => $id,
+            '_sort:desc' => 'withdrawalTime'
+        ];
+        // TODO: filter by withdrawal time
+        try {
             $summaries = $this->rdr->listParticipantSummaries($searchParams);
-            if (count($summaries) > 0) {
-                $participants = [];
-                foreach ($summaries as $summary) {
-                    $participants[] = [
-                        'id' => $summary->resource->participantId,
-                        'withdrawalTime' => $summary->resource->withdrawalTime
-                    ];
-                }
-                $organizationWithdrawals[$organization] = $participants;
+            foreach ($summaries as $summary) {
+                $participants[] = [
+                    'id' => $summary->resource->participantId,
+                    'withdrawalTime' => $summary->resource->withdrawalTime
+                ];
             }
+        } catch (\Exception $e) {
+            // RDR error already logged
         }
-        return $organizationWithdrawals;
+        return $participants;
     }
 
-    protected function insertLogsRemoveDups(&$organizationWithdrawals, $email)
+    protected function insertLogsRemoveDups($organization, &$participants)
     {
         $insert = new \DateTime();
-        foreach ($organizationWithdrawals as $organization => $participants) {
-            foreach ($participants as $k => $participant) {
-                $log = [
-                    'participant_id' => $participant['id'],
-                    'insert_ts' => $insert,
-                    'withdrawal_ts' => new \DateTime($participant['withdrawalTime']),
-                    'hpo_id' => $organization,
-                    'email_notified' => $email
-                ];
-                try {
-                    $this->em->getRepository('withdrawal_log')->insert($log);
-                } catch (UniqueConstraintViolationException $e) {
-                    // remove from if already notified
-                    unset($organizationWithdrawals[$organization][$k]);
-                }
-                if (count($organizationWithdrawals[$organization]) === 0) {
-                    // if all participants were removed (because already notified),
-                    // remove the organization from the list
-                    unset($organizationWithdrawals[$organization]);
-                }
+        foreach ($participants as $k => $participant) {
+            $log = [
+                'participant_id' => $participant['id'],
+                'insert_ts' => $insert,
+                'withdrawal_ts' => new \DateTime($participant['withdrawalTime']),
+                'hpo_id' => $organization['id'],
+                'email_notified' => implode(', ', $organization['emails'])
+            ];
+            try {
+                $this->em->getRepository('withdrawal_log')->insert($log);
+            } catch (UniqueConstraintViolationException $e) {
+                // remove from if already notified
+                unset($participants[$k]);
             }
         }
     }
 
-    public function sendWithdrawalEmail()
+    public function sendWithdrawalEmails()
     {
-        $emailTo = $this->app->getConfig('withdrawal_notification_email');
-        if (empty($emailTo)) {
-            throw new \Exception('withdrawal_notification_email not defined');
-        }
-        $organizationWithdrawals = $this->getOrganizationWithdrawals();
-        $this->insertLogsRemoveDups($organizationWithdrawals, $emailTo);
-        if (count($organizationWithdrawals) === 0) {
-            $this->app->log(Log::WITHDRAWAL_NOTIFY, 'Nothing to notify');
-        } else {
-            $message = new Message($this->app);
-            $message
-                ->setTo($emailTo)
-                ->render('withdrawals', [
-                    'organizationWithdrawals' => $organizationWithdrawals
-                ])
-                ->send();
-            $counts = [];
-            foreach ($organizationWithdrawals as $organization => $participants) {
-                $counts[$organization] = count($participants);
+        $organizations = $this->getOrganizations();
+        foreach ($organizations as $organization) {
+            $withdrawnParticipants = $this->getOrganizationWithdrawals($organization['id']);
+            $this->insertLogsRemoveDups($organization, $withdrawnParticipants);
+            if (count($withdrawnParticipants) === 0) {
+                $this->app->log(Log::WITHDRAWAL_NOTIFY, [
+                    'org' => $organization['id'],
+                    'status' => 'Nothing to notify'
+                ]);
+            } else {
+                if (count($organization['emails']) === 0) {
+                    $this->app->log(Log::WITHDRAWAL_NOTIFY, [
+                        'org' => $organization['id'],
+                        'status' => 'Withdrawn participants but no one to notify',
+                        'count' => count($withdrawnParticipants)
+                    ]);
+                } else {
+                    $message = new Message($this->app);
+                    $message
+                        ->setTo($organization['emails'])
+                        ->render('withdrawals', [
+                            'organization' => $organization['id']
+                        ])
+                        ->send();
+                    $this->app->log(Log::WITHDRAWAL_NOTIFY, [
+                        'org' => $organization['id'],
+                        'status' => 'Notifications sent',
+                        'count' => count($withdrawnParticipants),
+                        'notified' => $organization['emails']
+                    ]);
+                }
             }
-            $this->app->log(Log::WITHDRAWAL_NOTIFY, [
-                'counts' => $counts,
-                'notified' => $emailTo
-            ]);
         }
     }
 }

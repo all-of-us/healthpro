@@ -1,11 +1,3 @@
 Subject: All of Us Participant Withdrawals
 
-The following participants have withdrawn:
-
-{% for organization, participants in organizationWithdrawals %}
-{{ organization }}:
-{% for participant in participants %}
-{{ participant.id }}
-{% endfor %}
-
-{% endfor %}
+{{ organization }} participants have withdrawn in the last 24 hours

@@ -37,7 +37,7 @@ class CronController extends AbstractController
         }
 
         $withdrawal = new WithdrawalService($app);
-        $withdrawal->sendWithdrawalEmail();
+        $withdrawal->sendWithdrawalEmails();
 
         return (new JsonResponse())->setData(true);
     }
