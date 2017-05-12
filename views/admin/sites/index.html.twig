@@ -22,3 +22,14 @@
         </table>
     {% endif %}
 {% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    var table = $('table').DataTable({
+        order: [[1, 'asc']],
+        pageLength: 50
+    });
+});
+</script>
+{% endblock %}
