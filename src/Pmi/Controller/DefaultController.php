@@ -200,16 +200,9 @@ class DefaultController extends AbstractController
             $searchParameters = $searchForm->getData();
             try {
                 $searchResults = $app['pmi.drc.participants']->search($searchParameters);
-                $dob = new \DateTime($searchForm->getData()['dob']);
-                if (strpos($searchForm->getData()['dob'], $dob->format('Y')) === false) {
-                    $searchForm->addError(new FormError('Please enter a four digit year'));
-                } elseif ($dob > new \DateTime(date('m/d/Y'))) {
-                    $searchForm->addError(new FormError('Date of birth cannot be a future date'));
-                } else {
-                    return $app['twig']->render('participants-list.html.twig', [
-                        'participants' => $searchResults
-                    ]);
-                }
+                return $app['twig']->render('participants-list.html.twig', [
+                    'participants' => $searchResults
+                ]);
             } catch (ParticipantSearchExceptionInterface $e) {
                 $searchForm->addError(new FormError($e->getMessage()));
             }
