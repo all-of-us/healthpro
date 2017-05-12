@@ -322,6 +322,11 @@ class Order
                     'system' => 'https://orders.mayomedicallaboratories.com',
                     'value' => $this->order['mayo_id']
                 ];
+            } else {
+                $identifiers[] =[
+                    'system' => 'https://orders.mayomedicallaboratories.com',
+                    'value' => 'PMITEST-' . $this->order['order_id']
+                ];
             }
             $obj->author = [
                 'system' => 'https://www.pmi-ops.org/healthpro-username',
