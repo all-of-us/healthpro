@@ -46,6 +46,11 @@ class RdrParticipants
             } catch (\Exception $e) {
                 throw new Exception\InvalidDobException();
             }
+            if (strpos($params['dob'], $date->format('Y')) === false) {
+                throw new Exception\InvalidDobException('Please enter a four digit year');
+            } elseif ($date > new \DateTime('today')) {
+                throw new Exception\InvalidDobException('Date of birth cannot be a future date');
+            }
         }
 
         return $query;
