@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Validation;
 use Pmi\Audit\Log;
 
 
@@ -101,6 +102,31 @@ class AdminController extends AbstractController
             ->add('organization', Type\TextType::class, [
                 'label' => 'Organization',
                 'required' => false
+            ])
+            ->add('email', Type\TextType::class, [
+                'label' => 'Email address(es)',
+                'required' => false,
+                'constraints' => [
+                    new Constraints\Length(['max' => 512]),
+                    new Constraints\Callback(function($list, $context) {
+                        $list = trim($list);
+                        if (empty($list)) {
+                            return;
+                        }
+                        $emails = explode(',', $list);
+                        $validator = Validation::createValidator();
+                        foreach ($emails as $email) {
+                            $email = trim($email);
+                            $errors = $validator->validate($email, new Constraints\Email());
+                            if (count($errors) > 0) {
+                                $context
+                                    ->buildViolation('Must be a comma-separated list of valid email addresses')
+                                    ->addViolation();
+                                break;
+                            }
+                        }
+                    })
+                ]
             ])
             ->getForm();
     }
