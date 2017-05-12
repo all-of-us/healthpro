@@ -4,7 +4,7 @@
     <div class="page-header">
         <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> Site Management</h2>
     </div>
-    <p><a href="{{ path('admin_siteCreate') }}" class="btn btn-primary">Add Site</a></p>
+    <p><a href="{{ path('admin_site') }}" class="btn btn-primary">Add Site</a></p>
     {% if sites|length > 0 %}
         <table class="table table-striped table-hover">
             <thead><tr><th>ID</th><th>Name</th><th>Google Group</th><th>MayoLink Account</th><th>Organization</th></tr></thead>
@@ -12,7 +12,7 @@
             {% for site in sites %}
                 <tr>
                     <td>{{ site.id }}</td>
-                    <td><a href="{{ path('admin_siteEdit', { siteId: site.id }) }}">{{ site.name }}</a></td>
+                    <td><a href="{{ path('admin_site', { siteId: site.id }) }}">{{ site.name }}</a></td>
                     <td>{{ site.google_group }}</td>
                     <td>{{ site.mayolink_account }}</td>
                     <td>{{ site.organization }}</td>
