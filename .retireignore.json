@@ -3,5 +3,10 @@
         "component": "jquery",
         "identifiers" : { "issue": "2432"},
         "justification" : "We have disabled jQuery's AJAX execution of remote javascript (https://github.com/vanderbilt/pmi-drc-hpo/commit/95a5b44c)"
+    },
+    { 
+        "component": "bootstrap",
+        "version" : "3.3.7",
+        "justification" : "https://github.com/twbs/bootstrap/issues/20184 is not a vulnerability in our application because we do not set any data-target attributes dynamically. Note that this ignore entry is targeting the Bootstrap version because currently, the entry in Retire.js does not have an identifier. This should be changed to target the issue as when it is possible (see https://github.com/RetireJS/retire.js/issues/167)"
     }
 ]

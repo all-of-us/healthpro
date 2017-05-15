@@ -277,6 +277,16 @@ abstract class AbstractApplication extends Application
         }
     }
 
+    public function getUserEmail()
+    {
+        if ($user = $this->getUser()) {
+            if (($info = $user->getInfo()) && isset($info['email'])) {
+                return $info['email'];
+            }
+        }
+        return null;
+    }
+
     public function getUserTimezoneDisplay()
     {
         $timezone = $this->getUserTimezone();
