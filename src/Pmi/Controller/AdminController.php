@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 use Pmi\Audit\Log;
-
+use Pmi\Service\WithdrawalService;
 
 class AdminController extends AbstractController
 {
@@ -22,7 +22,8 @@ class AdminController extends AbstractController
         ['site', '/site/{siteId}', [
             'method' => 'GET|POST',
             'defaults' => ['siteId' => null]
-        ]]
+        ]],
+        ['withdrawalNotifications', '/notifications/withdrawal']
     ];
 
     public function homeAction(Application $app)
@@ -129,5 +130,12 @@ class AdminController extends AbstractController
                 ]
             ])
             ->getForm();
+    }
+
+    public function withdrawalNotificationsAction(Application $app)
+    {
+        $withdrawal = new WithdrawalService($app);
+        $notifications = $withdrawal->getWithdrawalNotifications();
+        return $app['twig']->render('admin/notifications/withdrawal.html.twig', ['notifications' => $notifications]);
     }
 }
