@@ -19,10 +19,21 @@ class WithdrawalService
         $this->rdr = $app['pmi.drc.participants'];
     }
 
+    protected function getOrganizationsLastWithdrawals()
+    {
+        $rows = $this->db->fetchAll('SELECT hpo_id, max(withdrawal_ts) as ts FROM withdrawal_log GROUP BY hpo_id');
+        $lastWithdrawals = [];
+        foreach ($rows as $row) {
+            $lastWithdrawals[$row['hpo_id']] = $row['ts'];
+        }
+        return $lastWithdrawals;
+    }
+
     protected function getOrganizations()
     {
         $rows = $this->db->fetchAll('SELECT organization, GROUP_CONCAT(email) as emails FROM sites WHERE organization IS NOT NULL GROUP BY organization');
         $organizations = [];
+        $lastWithdrawals = $this->getOrganizationsLastWithdrawals();
         foreach ($rows as $row) {
             $emails = [];
             $list = explode(',', trim($row['emails']));
@@ -34,13 +45,14 @@ class WithdrawalService
             }
             $organizations[] = [
                 'id' => $row['organization'],
-                'emails' => $emails
+                'emails' => $emails,
+                'last' => isset($lastWithdrawals[$row['organization']]) ? new \DateTime($lastWithdrawals[$row['organization']]) : false
             ];
         }
         return $organizations;
     }
 
-    protected function getOrganizationWithdrawals($id)
+    protected function getOrganizationWithdrawals($id, $lastWithdrawal)
     {
         $participants = [];
         $searchParams = [
@@ -48,7 +60,12 @@ class WithdrawalService
             'hpoId' => $id,
             '_sort:desc' => 'withdrawalTime'
         ];
-        // TODO: filter by withdrawal time
+        if ($lastWithdrawal) {
+            $filterTime = clone $lastWithdrawal;
+            // Go back 1 day to make sure no participants are missed
+            $filterTime->sub(new \DateInterval('P1D'));
+            $searchParams['withdrawalTime'] = 'ge' . $filterTime->format('Y-m-d\TH:i:s');
+        }
         try {
             $summaries = $this->rdr->listParticipantSummaries($searchParams);
             foreach ($summaries as $summary) {
@@ -87,7 +104,7 @@ class WithdrawalService
     {
         $organizations = $this->getOrganizations();
         foreach ($organizations as $organization) {
-            $withdrawnParticipants = $this->getOrganizationWithdrawals($organization['id']);
+            $withdrawnParticipants = $this->getOrganizationWithdrawals($organization['id'], $organization['last']);
             $this->insertLogsRemoveDups($organization, $withdrawnParticipants);
             if (count($withdrawnParticipants) === 0) {
                 $this->app->log(Log::WITHDRAWAL_NOTIFY, [

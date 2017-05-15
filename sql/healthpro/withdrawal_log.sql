@@ -6,5 +6,6 @@ CREATE TABLE `withdrawal_log` (
   `hpo_id` varchar(100) DEFAULT NULL,
   `email_notified` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `participant_id` (`participant_id`)
+  UNIQUE KEY `participant_id` (`participant_id`),
+  KEY `hpo_id` (`hpo_id`)
 ) DEFAULT CHARSET=utf8mb4
