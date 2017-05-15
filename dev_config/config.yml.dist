@@ -21,7 +21,6 @@ mysql_host: 127.0.0.1
 # Override API endpoint if necessary
 # rdr_endpoint: https://pmi-drc-api-test.appspot.com/
 
-# withdrawal_notification_email:
 
 #
 # MayoLINK configuration
