@@ -6,6 +6,7 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Pmi\Service\WithdrawalService;
 
 /**
  * NOTE: all /cron routes should be protected by `login: admin` in app.yaml
@@ -15,8 +16,8 @@ class CronController extends AbstractController
     protected static $name = 'cron';
 
     protected static $routes = [
-        ['dashboard', '/'],
-        ['pingTest', '/ping-test']
+        ['pingTest', '/ping-test'],
+        ['withdrawal', '/withdrawal']
     ];
     
     /**
@@ -29,14 +30,16 @@ class CronController extends AbstractController
             $request->headers->get('X-Appengine-Cron') === 'true';
     }
 
-    public function dashboardAction(Application $app, Request $request)
+    public function withdrawalAction(Application $app, Request $request)
     {
         if (!$this->isAdmin($request)) {
             throw new AccessDeniedHttpException();
         }
-        
-        $request->getSession()->getFlashBag()->add('error', 'Not yet implemented!');
-        return $app->redirectToRoute('home');
+
+        $withdrawal = new WithdrawalService($app);
+        $withdrawal->sendWithdrawalEmails();
+
+        return (new JsonResponse())->setData(true);
     }
     
     public function pingTestAction(Application $app, Request $request)
@@ -44,9 +47,15 @@ class CronController extends AbstractController
         if (!$this->isAdmin($request)) {
             throw new AccessDeniedHttpException();
         }
-        
-        $email = UserService::getCurrentUser()->getEmail();
-        error_log("Cron ping test requested by $email [" . $request->getClientIp() . "]");
+
+        $user = UserService::getCurrentUser();
+        if ($user) {
+            $email = $user->getEmail();
+            error_log("Cron ping test requested by $email [" . $request->getClientIp() . "]");
+        }
+        if ($request->headers->get('X-Appengine-Cron') === 'true') {
+            error_log('Cron ping test requested by Appengine-Cron');
+        }
         
         return (new JsonResponse())->setData(true);
     }

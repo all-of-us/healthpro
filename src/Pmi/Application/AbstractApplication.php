@@ -277,6 +277,16 @@ abstract class AbstractApplication extends Application
         }
     }
 
+    public function getUserEmail()
+    {
+        if ($user = $this->getUser()) {
+            if (($info = $user->getInfo()) && isset($info['email'])) {
+                return $info['email'];
+            }
+        }
+        return null;
+    }
+
     public function getUserTimezoneDisplay()
     {
         $timezone = $this->getUserTimezone();
@@ -313,12 +323,15 @@ abstract class AbstractApplication extends Application
      */
     public function isUpkeepRoute(Request $request)
     {
-        return $request->attributes->get('_route') === 'logout' ||
-            $request->attributes->get('_route') === 'loginReturn' ||
-            $request->attributes->get('_route') === 'timeout' ||
-            $request->attributes->get('_route') === 'keepAlive' ||
-            $request->attributes->get('_route') === 'clientTimeout' ||
-            $request->attributes->get('_route') === 'agreeUsage';
+        $route = $request->attributes->get('_route');
+        return (in_array($route, [
+            'logout',
+            'loginReturn',
+            'timeout',
+            'keepAlive',
+            'clientTimeout',
+            'agreeUsage'
+        ]) || strpos($route, 'cron_') === 0);
     }
 
     protected function enableTwig()

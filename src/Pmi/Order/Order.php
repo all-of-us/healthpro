@@ -322,12 +322,25 @@ class Order
                     'system' => 'https://orders.mayomedicallaboratories.com',
                     'value' => $this->order['mayo_id']
                 ];
+            } else {
+                $identifiers[] =[
+                    'system' => 'https://orders.mayomedicallaboratories.com',
+                    'value' => 'PMITEST-' . $this->order['order_id']
+                ];
             }
-            $site = $this->app['em']->getRepository('sites')->fetchOneBy(['google_group' => $this->order['site']]);
-            $siteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $this->order['site'] . '@' . $this->app->getConfig('gaDomain');
+            $obj->author = [
+                'system' => 'https://www.pmi-ops.org/healthpro-username',
+                'value' => $this->app->getUserEmail()
+            ];
+            $sourceSiteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $this->order['site'];
+            $finalizedSiteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $this->app->getSiteId();
             $obj->sourceSite = [
                 'system' => 'https://www.pmi-ops.org/site-id',
-                'value' => $siteGoogleGroup
+                'value' => $sourceSiteGoogleGroup
+            ];
+            $obj->finalizedSite = [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => $finalizedSiteGoogleGroup
             ];
         }
         $obj->identifier = $identifiers;
@@ -356,23 +369,12 @@ class Order
             return false;
         }
         $order = $this->getRdrObject();
-        if ($this->order['rdr_id']) {
-            // TODO: update endpoint for participants is not yet available
-            /*
-            $this->app['pmi.drc.participants']->updateOrder(
-                $this->participant->id,
-                $this->order['rdr_id'],
-                $order
+        $rdrId = $this->app['pmi.drc.participants']->createOrder($this->participant->id, $order);
+        if ($rdrId) {
+            $this->app['em']->getRepository('orders')->update(
+                $this->order['id'],
+                ['rdr_id' => $rdrId]
             );
-            */
-        } else {
-            $rdrId = $this->app['pmi.drc.participants']->createOrder($this->participant->id, $order);
-            if ($rdrId) {
-                $this->app['em']->getRepository('orders')->update(
-                    $this->order['id'],
-                    ['rdr_id' => $rdrId]
-                );
-            }
         }
     }
 

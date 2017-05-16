@@ -9,7 +9,8 @@ class EntityManager
         'users' => 'doctrine',
         'orders' => 'doctrine',
         'evaluations' => 'doctrine',
-        'sites' => 'doctrine'
+        'sites' => 'doctrine',
+        'withdrawal_log' => 'doctrine'
     ];
 
     protected $timezone;
