@@ -1,6 +1,27 @@
 {% extends 'base.html.twig' %}
 {% block title %}Participant {{ participant.id }} - {% endblock %}
 {% block body %}
+{% if participant.hpoId != app.getSiteOrganization() and app.session.get('agreeCrossDomain_'~participant.id) is empty %}
+    <div class="row">
+        <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa" aria-hidden="true"></i>Warning</h3>
+                </div>
+                <div class="panel-body">
+                    This access will be audited and subject to review. Unauthorized access to records may result in loss of access to the system. By continuing access you are acknowledging that ...(you require access for DRC purposes)
+                </div>
+                <div class="panel-footer">
+                    <form action="#" method="post">
+                        {{ form_widget(agreeForm) }}
+                        <a href="{{ path('participants') }}" class="btn btn-default">Cancel</a>
+                        <button type="submit" class="btn btn-success">Agree</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div> 
+{% else %}
     <div class="page-header">
         <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>{{ participant.shortId }}</small></h2>
     </div>
@@ -124,6 +145,7 @@
                 </div>
             </div>
         </div>
+    {% endif %}
     {% endif %}
 {% endblock %}
 

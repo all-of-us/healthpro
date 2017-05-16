@@ -32,8 +32,9 @@ class DefaultController extends AbstractController
         ['selectSite', '/site/select'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
-        ['participant', '/participant/{id}'],
+        ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['settings', '/settings', ['method' => 'GET|POST']],
+        ['agreeCrossDomainAccess', '/agree-cross-domain-access', ['method' => 'POST']],
     ];
 
     public function homeAction(Application $app, Request $request)
@@ -256,6 +257,13 @@ class DefaultController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
+
+        $agreeForm = $app['form.factory']->createBuilder(FormType::class)->getForm();
+        $agreeForm->handleRequest($request);
+        if ($agreeForm->isValid()) {
+            $app['session']->set('agreeCrossDomain_'.$id, true);
+        }
+
         $orders = $app['em']->getRepository('orders')->fetchBy(
             ['participant_id' => $id],
             ['created_ts' => 'DESC', 'id' => 'DESC']
@@ -267,7 +275,8 @@ class DefaultController extends AbstractController
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
-            'evaluations' => $evaluations
+            'evaluations' => $evaluations,
+            'agreeForm' => $agreeForm->createView()
         ]);
     }
 
