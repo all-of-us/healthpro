@@ -139,6 +139,6 @@ class WithdrawalService
 
     public function getWithdrawalNotifications()
     {
-        return $this->db->fetchAll('SELECT count(*) as count, insert_ts, hpo_id, email_notified as email FROM withdrawal_log GROUP BY hpo_id, insert_ts ORDER BY insert_ts DESC LIMIT 100');
+        return $this->db->fetchAll('SELECT count(*) as count, insert_ts, hpo_id, email_notified as email FROM withdrawal_log GROUP BY hpo_id, insert_ts, email_notified ORDER BY insert_ts DESC LIMIT 100');
     }
 }
