@@ -187,3 +187,8 @@ table.table-samples {
 table.table-samples td {
     border-top: 0 !important;
 }
+
+.help-footer {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
