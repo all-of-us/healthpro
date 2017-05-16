@@ -10,5 +10,5 @@
         <h2><i class="fa fa-file-text-o" aria-hidden="true"></i> {{ sop }} <small>{{ title }}</small></h2>
     </div>
     <iframe class="pdf" name="pdf" src="{{ path('help_sopFile', { id: sop }) }}#view=FitH"></iframe>
-    {% include 'base-help-footer.html.twig' %}
+    {% include 'help/footer.html.twig' %}
 {% endblock %}
