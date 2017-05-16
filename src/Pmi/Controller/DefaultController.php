@@ -32,7 +32,7 @@ class DefaultController extends AbstractController
         ['selectSite', '/site/select'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
-        ['participant', '/participant/{id}'],
+        ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['settings', '/settings', ['method' => 'GET|POST']],
     ];
 
@@ -256,6 +256,33 @@ class DefaultController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
+
+        $agreeForm = $app['form.factory']->createBuilder(FormType::class)->getForm();
+        $agreeForm->handleRequest($request);
+        if ($agreeForm->isValid()) {
+            $app['session']->set('agreeCrossOrg_'.$id, true);
+            $app->log(Log::CROSS_ORG_PARTICIPANT_AGREE, [
+                'participantId' => $id,
+                'organization' => $participant->hpoId
+            ]);
+            return $app->redirectToRoute('participant', [
+                'id' => $id
+            ]);
+        }
+
+        $isCrossOrg = $participant->hpoId !== $app->getSiteOrganization();
+        $hasNoParticipantAccess = $isCrossOrg && empty($app['session']->get('agreeCrossOrg_'.$id));
+        if ($hasNoParticipantAccess) {
+            $app->log(Log::CROSS_ORG_PARTICIPANT_ATTEMPT, [
+                'participantId' => $id,
+                'organization' => $participant->hpoId
+            ]);
+        } elseif ($isCrossOrg) {
+            $app->log(Log::CROSS_ORG_PARTICIPANT_VIEW, [
+                'participantId' => $id,
+                'organization' => $participant->hpoId
+            ]);
+        }
         $orders = $app['em']->getRepository('orders')->fetchBy(
             ['participant_id' => $id],
             ['created_ts' => 'DESC', 'id' => 'DESC']
@@ -267,7 +294,9 @@ class DefaultController extends AbstractController
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
-            'evaluations' => $evaluations
+            'evaluations' => $evaluations,
+            'hasNoParticipantAccess' => $hasNoParticipantAccess,
+            'agreeForm' => $agreeForm->createView()
         ]);
     }
 
