@@ -34,7 +34,6 @@ class DefaultController extends AbstractController
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['settings', '/settings', ['method' => 'GET|POST']],
-        ['agreeCrossDomainAccess', '/agree-cross-domain-access', ['method' => 'POST']],
     ];
 
     public function homeAction(Application $app, Request $request)
@@ -266,8 +265,12 @@ class DefaultController extends AbstractController
                 'participantId' => $id,
                 'organization' => $participant->hpoId
             ]);
+            return $app->redirectToRoute('participant', [
+                'id' => $id
+            ]);
         }
 
+        $hasNoPaticipantAccess = $participant->hpoId != $app->getSiteOrganization() && empty($app['session']->get('agreeCrossDomain_'.$id));
         $orders = $app['em']->getRepository('orders')->fetchBy(
             ['participant_id' => $id],
             ['created_ts' => 'DESC', 'id' => 'DESC']
@@ -280,6 +283,7 @@ class DefaultController extends AbstractController
             'participant' => $participant,
             'orders' => $orders,
             'evaluations' => $evaluations,
+            'hasNoPaticipantAccess' => $hasNoPaticipantAccess,
             'agreeForm' => $agreeForm->createView()
         ]);
     }
