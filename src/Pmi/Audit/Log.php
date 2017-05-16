@@ -26,6 +26,7 @@ class Log
     const SITE_ADD = 'SITE_ADD';
     const SITE_DELETE = 'SITE_DELETE';
     const WORKQUEUE_EXPORT = 'WORKQUEUE_EXPORT';
+    const WITHDRAWAL_NOTIFY = 'WITHDRAWAL_NOTIFY';
 
     public function __construct($app, $action, $data)
     {
@@ -57,6 +58,9 @@ class Log
                 Request::setTrustedProxies($originalTrustedProxies);
             } else {
                 $logArray['ip'] = $request->getClientIp();
+            }
+            if ($logArray['user'] === null && $request->headers->get('X-Appengine-Cron') === 'true') {
+                $logArray['user'] = 'Appengine-Cron';
             }
         } else {
             $logArray['ip'] = null;

@@ -15,7 +15,7 @@ class User implements UserInterface
     private $groups;
     private $sites;
     private $dashboardAccess;
-    private $siteAdminAccess;
+    private $adminAccess;
     private $info;
     private $timezone;
     
@@ -27,7 +27,7 @@ class User implements UserInterface
         $this->timezone = $timezone;
         $this->sites = $this->computeSites();
         $this->dashboardAccess = $this->computeDashboardAccess();
-        $this->siteAdminAccess = $this->computeSiteAdminAccess();
+        $this->adminAccess = $this->computeAdminAccess();
     }
     
     public function getGroups()
@@ -69,7 +69,7 @@ class User implements UserInterface
         return $hasAccess;
     }
 
-    private function computeSiteAdminAccess()
+    private function computeAdminAccess()
     {
         $hasAccess = false;
         foreach ($this->groups as $group) {
@@ -141,8 +141,8 @@ class User implements UserInterface
         if ($this->dashboardAccess) {
             $roles[] = 'ROLE_DASHBOARD';
         }
-        if ($this->siteAdminAccess) {
-            $roles[] = 'ROLE_SITE_ADMIN';
+        if ($this->adminAccess) {
+            $roles[] = 'ROLE_ADMIN';
         }
         return $roles;
     }
