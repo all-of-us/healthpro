@@ -11,6 +11,7 @@ class AuditLog extends Entity
         return (new Schema('AuditLog'))
             ->addString('action')
             ->addString('user')
+            ->addString('site')
             ->addDatetime('timestamp')
             ->addString('ip')
             ->addString('data', false);

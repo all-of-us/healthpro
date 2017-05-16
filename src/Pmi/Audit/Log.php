@@ -50,6 +50,7 @@ class Log
         } else {
             $logArray['user'] = null;
         }
+        $logArray['site'] = $this->app->getSiteId();
 
         if ($request = $this->app['request_stack']->getCurrentRequest()) {
             if ($list = $this->app->getConfig('ip_whitelist')) {
@@ -73,6 +74,7 @@ class Log
         $syslogData = [];
         $syslogData[] = $logArray['ip'];
         $syslogData[] = $logArray['user'];
+        $syslogData[] = $logArray['site'];
         $syslogData[] = '[' . self::PMI_AUDIT_PREFIX . $logArray['action'] . ']';
         if ($logArray['data']) {
             $syslogData[] = json_encode($logArray['data']);
@@ -87,6 +89,7 @@ class Log
         $entity->setAction($logArray['action']);
         $entity->setTimestamp($logArray['ts']);
         $entity->setUser($logArray['user']);
+        $entity->setSite($logArray['site']);
         $entity->setIp($logArray['ip']);
         if ($logArray['data']) {
             $entity->setData(json_encode($logArray['data']));
