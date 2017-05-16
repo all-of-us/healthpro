@@ -261,7 +261,7 @@ class DefaultController extends AbstractController
         $agreeForm->handleRequest($request);
         if ($agreeForm->isValid()) {
             $app['session']->set('agreeCrossDomain_'.$id, true);
-            $app->log(Log::AGREE_CROSS_ORG_PARTICIPANTS, [
+            $app->log(Log::CROSS_ORG_PARTICIPANT_AGREE, [
                 'participantId' => $id,
                 'organization' => $participant->hpoId
             ]);
@@ -270,7 +270,19 @@ class DefaultController extends AbstractController
             ]);
         }
 
-        $hasNoPaticipantAccess = $participant->hpoId != $app->getSiteOrganization() && empty($app['session']->get('agreeCrossDomain_'.$id));
+        $isCrossOrg = $participant->hpoId !== $app->getSiteOrganization();
+        $hasNoParticipantAccess = $isCrossOrg && empty($app['session']->get('agreeCrossDomain_'.$id));
+        if ($hasNoParticipantAccess) {
+            $app->log(Log::CROSS_ORG_PARTICIPANT_ATTEMPT, [
+                'participantId' => $id,
+                'organization' => $participant->hpoId
+            ]);
+        } elseif ($isCrossOrg) {
+            $app->log(Log::CROSS_ORG_PARTICIPANT_VIEW, [
+                'participantId' => $id,
+                'organization' => $participant->hpoId
+            ]);
+        }
         $orders = $app['em']->getRepository('orders')->fetchBy(
             ['participant_id' => $id],
             ['created_ts' => 'DESC', 'id' => 'DESC']
@@ -283,7 +295,7 @@ class DefaultController extends AbstractController
             'participant' => $participant,
             'orders' => $orders,
             'evaluations' => $evaluations,
-            'hasNoPaticipantAccess' => $hasNoPaticipantAccess,
+            'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView()
         ]);
     }
