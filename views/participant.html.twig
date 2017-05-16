@@ -11,11 +11,11 @@
                 <div class="panel-body">
                     The participant you have selected is either unpaired or paired with another enrollment site. Please verify that this is the correct participant. By continuing, you acknowledge that you have a valid need to access this record. Access to this record will be audited and is subject to review. Unauthorized access to records may result in loss of access to HealthPro.
                 </div>
-                <div class="panel-footer">
-                    <form action="#" method="post">
+                <div class="modal-footer text-right">
+                    <form action="" method="post">
                         {{ form_widget(agreeForm) }}
-                        <a href="{{ path('participants') }}" class="btn btn-default">Cancel</a>
                         <button type="submit" class="btn btn-success">Agree</button>
+                        <a href="{{ path('participants') }}" class="btn btn-default">Cancel</a>
                     </form>
                 </div>
             </div>
