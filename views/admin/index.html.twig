@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+{% block title %}Admin - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2><i class="fa fa-cog" aria-hidden="true"></i> Admin</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 col-md-4 col-md-offset-2">
+            <a href="{{ path('admin_sites') }}" class="btn btn-lg btn-default btn-block"><i class="fa fa-hospital-o" aria-hidden="true"></i> Sites</a>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <a href="{{ path('admin_withdrawalNotifications') }}" class="btn btn-lg btn-default btn-block"><i class="fa fa-bell" aria-hidden="true"></i> Withdrawal Notifications</a>
+        </div>
+    </div>
+{% endblock %}

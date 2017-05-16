@@ -3,8 +3,12 @@ cron:
   url: /cron/ping-test
   schedule: 29 of feb 00:00
   timezone: America/Chicago
+- description: "Withdrawal notification"
+  url: /cron/withdrawal
+  schedule: every day 07:00
+  timezone: America/Chicago
 - description: "Datastore normal-Kind backup"
-  url: /_ah/datastore_admin/backup.create?name=dsNormalBackup&filesystem=gs&gs_bucket_name={BUCKET_PREFIX}-ds-backups&kind=Configuration&kind=Participant
+  url: /_ah/datastore_admin/backup.create?name=dsNormalBackup&filesystem=gs&gs_bucket_name={BUCKET_PREFIX}-ds-backups&kind=Configuration
   schedule: every day 04:00
   target: ah-builtin-python-bundle
   timezone: America/Chicago

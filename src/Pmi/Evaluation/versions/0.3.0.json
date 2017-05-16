@@ -401,11 +401,16 @@
             "replicates": 3,
             "options": {
                 "None": "",
+                "Hip circumference is more than measuring device range": "hip-circumference-out-of-range",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
                 "Other": "other"
             },
             "warnings": [
+                {
+                    "val": "hip-circumference-out-of-range",
+                    "message": "Deviation successfully captured. Please record the length of the tape measure in centimeters in the \"Hip Circumference\" field."
+                },   
                 {
                     "val": "refusal",
                     "message": "Deviation successfully captured."
@@ -463,6 +468,7 @@
             "replicates": 3,
             "options": {
                 "None": "",
+                "Waist circumference is more than measuring device range": "waist-circumference-out-of-range",
                 "Colostomy bag": "colostomy-bag",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
@@ -472,6 +478,10 @@
                 "caption": "Help text placeholder."
             },
             "warnings": [
+                {
+                    "val": "waist-circumference-out-of-range",
+                    "message": "Deviation successfully captured. Please record the length of the tape measure in centimeters in the \"Waist Circumference\" field."
+                },
                 {
                     "val": "colostomy-bag",
                     "message": "Deviation successfully captured."

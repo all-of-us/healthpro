@@ -495,13 +495,7 @@ class DeployCommand extends Command {
             $entity = basename($file, '.php');
             $pmiKinds[$entity] = $entity;
         }
-        
-        foreach ($pmiKinds as $kind) {
-            if (empty($cronKinds[$kind]) && $kind !== 'Session') {
-                throw new \Exception("Datastore kind {$kind} is not being backed up!");
-            }
-        }
-        
+
         foreach ($cronKinds as $kind) {
             if (empty($pmiKinds[$kind])) {
                 throw new \Exception("No entity exists for datastore backup of kind {$kind}!");

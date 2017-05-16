@@ -29,6 +29,7 @@ class Log
     const CROSS_ORG_PARTICIPANT_ATTEMPT = 'CROSS_ORG_PARTICIPANT_ATTEMPT';
     const CROSS_ORG_PARTICIPANT_AGREE = 'CROSS_ORG_PARTICIPANT_AGREE';
     const CROSS_ORG_PARTICIPANT_VIEW = 'CROSS_ORG_PARTICIPANT_VIEW';
+    const WITHDRAWAL_NOTIFY = 'WITHDRAWAL_NOTIFY';
 
     public function __construct($app, $action, $data)
     {
@@ -61,6 +62,9 @@ class Log
                 Request::setTrustedProxies($originalTrustedProxies);
             } else {
                 $logArray['ip'] = $request->getClientIp();
+            }
+            if ($logArray['user'] === null && $request->headers->get('X-Appengine-Cron') === 'true') {
+                $logArray['user'] = 'Appengine-Cron';
             }
         } else {
             $logArray['ip'] = null;
