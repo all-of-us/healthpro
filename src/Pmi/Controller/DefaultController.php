@@ -260,7 +260,7 @@ class DefaultController extends AbstractController
         $agreeForm = $app['form.factory']->createBuilder(FormType::class)->getForm();
         $agreeForm->handleRequest($request);
         if ($agreeForm->isValid()) {
-            $app['session']->set('agreeCrossDomain_'.$id, true);
+            $app['session']->set('agreeCrossOrg_'.$id, true);
             $app->log(Log::CROSS_ORG_PARTICIPANT_AGREE, [
                 'participantId' => $id,
                 'organization' => $participant->hpoId
@@ -271,7 +271,7 @@ class DefaultController extends AbstractController
         }
 
         $isCrossOrg = $participant->hpoId !== $app->getSiteOrganization();
-        $hasNoParticipantAccess = $isCrossOrg && empty($app['session']->get('agreeCrossDomain_'.$id));
+        $hasNoParticipantAccess = $isCrossOrg && empty($app['session']->get('agreeCrossOrg_'.$id));
         if ($hasNoParticipantAccess) {
             $app->log(Log::CROSS_ORG_PARTICIPANT_ATTEMPT, [
                 'participantId' => $id,
