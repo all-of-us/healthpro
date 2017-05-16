@@ -262,6 +262,10 @@ class DefaultController extends AbstractController
         $agreeForm->handleRequest($request);
         if ($agreeForm->isValid()) {
             $app['session']->set('agreeCrossDomain_'.$id, true);
+            $app->log(Log::AGREE_CROSS_ORG_PARTICIPANTS, [
+                'participantId' => $id,
+                'organization' => $participant->hpoId
+            ]);
         }
 
         $orders = $app['em']->getRepository('orders')->fetchBy(
