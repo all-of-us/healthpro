@@ -61,7 +61,7 @@ class IpWhitelistCommand extends Command
             }
         }
         $output->writeln('');
-        
+        $config['whitelist'][] = '0.0.0.0/8'; // whitelist internal 0.* block
         $configFile = "{$this->appDir}/ip_whitelist.yml.dist";
         $output->write("Writing $configFile...");
         $dumper = new Dumper();

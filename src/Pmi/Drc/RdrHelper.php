@@ -53,7 +53,7 @@ class RdrHelper
 
     public function logException(\Exception $e)
     {
-        syslog(LOG_ERR, $e->getMessage());
+        syslog(LOG_CRIT, $e->getMessage());
         if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
             $response = $e->getResponse();
             $responseCode = $response->getStatusCode();
