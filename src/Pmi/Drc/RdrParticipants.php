@@ -230,4 +230,24 @@ class RdrParticipants
         }
         return false;
     }
+
+    public function createMockBiobankSamples($participantId)
+    {
+        $order = [];
+        $order['create_biobank_samples'] = $participantId;
+        try {
+            $response = $this->getClient()->request('POST', "DataGen", [
+                'json' => $order
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->num_samples)) {
+                return $result->num_samples;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
+
 }
