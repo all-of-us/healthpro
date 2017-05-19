@@ -23,7 +23,9 @@ class AdminController extends AbstractController
             'method' => 'GET|POST',
             'defaults' => ['siteId' => null]
         ]],
-        ['withdrawalNotifications', '/notifications/withdrawal']
+        ['withdrawalNotifications', '/notifications/withdrawal'],
+        ['missingMeasurements', '/missing/measurements'],
+        ['missingOrders', '/missing/orders']
     ];
 
     public function homeAction(Application $app)
@@ -137,5 +139,17 @@ class AdminController extends AbstractController
         $withdrawal = new WithdrawalService($app);
         $notifications = $withdrawal->getWithdrawalNotifications();
         return $app['twig']->render('admin/notifications/withdrawal.html.twig', ['notifications' => $notifications]);
+    }
+
+    public function missingMeasurementsAction(Application $app)
+    {
+        $missing = $app['em']->getRepository('evaluations')->fetchBySQL('finalized_ts is not null and rdr_id is null');
+        return $app['twig']->render('admin/missing/measurements.html.twig', ['missing' => $missing]);
+    }
+
+    public function missingOrdersAction(Application $app)
+    {
+        $missing = $app['em']->getRepository('orders')->fetchBySQL('finalized_ts is not null and rdr_id is null');
+        return $app['twig']->render('admin/missing/orders.html.twig', ['missing' => $missing]);
     }
 }
