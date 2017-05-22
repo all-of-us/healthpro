@@ -233,11 +233,9 @@ class RdrParticipants
 
     public function createMockBiobankSamples($participantId)
     {
-        $order = [];
-        $order['create_biobank_samples'] = $participantId;
         try {
             $response = $this->getClient()->request('POST', "DataGen", [
-                'json' => $order
+                'json' => ['create_biobank_samples' => $participantId]
             ]);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->num_samples)) {
