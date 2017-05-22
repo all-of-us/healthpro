@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 use Pmi\Audit\Log;
 use Pmi\Service\WithdrawalService;
+use Pmi\Evaluation\Evaluation;
 
 class AdminController extends AbstractController
 {
@@ -24,8 +25,8 @@ class AdminController extends AbstractController
             'defaults' => ['siteId' => null]
         ]],
         ['withdrawalNotifications', '/notifications/withdrawal'],
-        ['missingMeasurements', '/missing/measurements'],
-        ['missingOrders', '/missing/orders']
+        ['missingMeasurements', '/missing/measurements', ['method' => 'GET|POST']],
+        ['missingOrders', '/missing/orders', ['method' => 'GET|POST']]
     ];
 
     public function homeAction(Application $app)
@@ -141,10 +142,52 @@ class AdminController extends AbstractController
         return $app['twig']->render('admin/notifications/withdrawal.html.twig', ['notifications' => $notifications]);
     }
 
-    public function missingMeasurementsAction(Application $app)
+    public function missingMeasurementsAction(Application $app, Request $request, $_route)
     {
         $missing = $app['em']->getRepository('evaluations')->fetchBySQL('finalized_ts is not null and rdr_id is null');
-        return $app['twig']->render('admin/missing/measurements.html.twig', ['missing' => $missing]);
+        $choices = [];
+        foreach ($missing as $physicalMeasurements) {
+            $choices[$physicalMeasurements['id']] = $physicalMeasurements['id'];
+        }
+        $form = $app['form.factory']->createBuilder(FormType::class)
+            ->add('ids', Type\ChoiceType::class, [
+                'multiple' => true,
+                'expanded' => true,
+                'choices' => $choices,
+                'choice_label' => function ($value, $key, $index) {
+                    return ' ';
+                }
+            ])
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $ids = $form->get('ids')->getData();
+            $repository = $app['em']->getRepository('evaluations');
+            foreach ($ids as $id) {
+                $evaluationService = new Evaluation();
+                $evaluation = $repository->fetchOneBy(['id' => $id]);
+                if (!$evaluation) {
+                    continue;
+                }
+                $evaluationService->loadFromArray($evaluation);
+                $parentRdrId = null;
+                if ($evaluation['parent_id']) {
+                    $parentEvaluation = $repository->fetchOneBy(['id' => $evaluation['parent_id']]);
+                    if ($parentEvaluation) {
+                        $parentRdrId = $parentEvaluation['rdr_id'];
+                    }
+                }
+                $fhir = $evaluationService->getFhir($evaluation['finalized_ts'], $parentRdrId);
+                if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($evaluation['participant_id'], $fhir)) {
+                    $repository->update($evaluation['id'], ['rdr_id' => $rdrEvalId]);
+                }
+            }
+            return $app->redirectToRoute($_route);
+        }
+        return $app['twig']->render('admin/missing/measurements.html.twig', [
+            'missing' => $missing,
+            'form' => $form->createView()
+        ]);
     }
 
     public function missingOrdersAction(Application $app)
