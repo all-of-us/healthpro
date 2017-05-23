@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Validation;
 use Pmi\Audit\Log;
 use Pmi\Service\WithdrawalService;
 use Pmi\Evaluation\Evaluation;
+use Pmi\Order\Order;
 
 class AdminController extends AbstractController
 {
@@ -190,9 +191,41 @@ class AdminController extends AbstractController
         ]);
     }
 
-    public function missingOrdersAction(Application $app)
+    public function missingOrdersAction(Application $app, Request $request, $_route)
     {
         $missing = $app['em']->getRepository('orders')->fetchBySQL('finalized_ts is not null and rdr_id is null');
-        return $app['twig']->render('admin/missing/orders.html.twig', ['missing' => $missing]);
+        $choices = [];
+        foreach ($missing as $orders) {
+            $choices[$orders['id']] = $orders['id'];
+        }
+        $form = $app['form.factory']->createBuilder(FormType::class)
+            ->add('ids', Type\ChoiceType::class, [
+                'multiple' => true,
+                'expanded' => true,
+                'choices' => $choices,
+                'choice_label' => function ($value, $key, $index) {
+                    return ' ';
+                }
+            ])
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $ids = $form->get('ids')->getData();
+            $repository = $app['em']->getRepository('orders');
+            foreach ($ids as $id) {
+                $orderService = new Order();
+                $order = $repository->fetchOneBy(['id' => $id]);
+                if (!$order) {
+                    continue;
+                }
+                $orderService->loadOrder($order['participant_id'], $id, $app);
+                $orderService->sendToRdr();
+            }
+            return $app->redirectToRoute($_route);
+        }
+        return $app['twig']->render('admin/missing/orders.html.twig', [
+            'missing' => $missing,
+            'form' => $form->createView()
+        ]);
     }
 }

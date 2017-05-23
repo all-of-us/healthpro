@@ -4,22 +4,26 @@
     <div class="page-header">
         <h2><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Missing Biobank Orders</h2>
     </div>
+    {{ form_start(form) }}
     <table class="table table-striped table-hover">
-        <thead><tr><th>Finalized Time</th><th>Created Time</th><th>Site</th><th>Participant ID</th><th>Biobank ID</th><th>Order ID</th><th>MayoLINK ID</th></tr></thead>
+        <thead><tr><th></th><th>Finalized Time</th><th>Created Time</th><th>Site</th><th>Participant ID</th><th>Biobank ID</th><th>Order ID</th><th>MayoLINK ID</th></tr></thead>
         <tbody>
-        {% for measurements in missing  %}
+        {% for k, orders in missing  %}
             <tr>
-                <td data-order="{{ measurements.finalized_ts }}">{{ measurements.finalized_ts|date('n/j/Y g:ia') }}</td>
-                <td data-order="{{ measurements.created_ts }}">{{ measurements.created_ts|date('n/j/Y g:ia') }}</td>
-                <td>{{ measurements.site }}</td>
-                <td>{{ measurements.participant_id }}</td>
-                <td>{{ measurements.biobank_id }}</td>
-                <td>{{ measurements.order_id }}</td>
-                <td>{{ measurements.mayo_id }}</td>
+                <td>{{ form_widget(form.ids[k]) }}</td>
+                <td data-order="{{ orders.finalized_ts }}">{{ orders.finalized_ts|date('n/j/Y g:ia') }}</td>
+                <td data-order="{{ orders.created_ts }}">{{ orders.created_ts|date('n/j/Y g:ia') }}</td>
+                <td>{{ orders.site }}</td>
+                <td>{{ orders.participant_id }}</td>
+                <td>{{ orders.biobank_id }}</td>
+                <td>{{ orders.order_id }}</td>
+                <td>{{ orders.mayo_id }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+    <button type="submit" class="btn btn-primary">Resend selected</button>
+    {{ form_end(form) }}
 {% endblock %}
 
 {% block pagejs %}
