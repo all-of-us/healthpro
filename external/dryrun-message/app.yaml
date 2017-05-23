@@ -1,0 +1,10 @@
+runtime: php55
+api_version: 1
+
+handlers:
+- url: /assets
+  static_dir: assets
+  secure: always
+- url: /.*
+  script: moved.html
+  secure: always
