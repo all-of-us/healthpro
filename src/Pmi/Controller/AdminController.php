@@ -218,8 +218,10 @@ class AdminController extends AbstractController
                 if (!$order) {
                     continue;
                 }
-                $orderService->loadOrder($order['participant_id'], $id, $app);
-                $orderService->sendToRdr();
+                $orderRdrObject = $orderService->getRdrObject($order, $app);
+                if ($rdrId = $app['pmi.drc.participants']->createOrder($order['participant_id'], $orderRdrObject)) {
+                    $repository->update($order['id'], ['rdr_id' => $rdrId]);
+                }
             }
             return $app->redirectToRoute($_route);
         }
