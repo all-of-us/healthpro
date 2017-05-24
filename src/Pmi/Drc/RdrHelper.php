@@ -7,6 +7,7 @@ class RdrHelper
     protected $endpoint = 'https://pmi-drc-api-test.appspot.com/';
     protected $options = [];
     protected $cacheEnabled = true;
+    public $errorMessage;
 
     public function __construct(array $options)
     {
@@ -60,6 +61,7 @@ class RdrHelper
             $contents = $response->getBody()->getContents();
             syslog(LOG_INFO, "Response code: {$responseCode}");
             syslog(LOG_INFO, "Response body: {$contents}");
+            $this->errorMessage = $contents;
         }
     }
 }
