@@ -328,12 +328,21 @@ class Order
                     'value' => 'PMITEST-' . $this->order['order_id']
                 ];
             }
+            if ($this->order['finalized_user_id']) {
+                $user = $this->app['em']->getRepository('users')->fetchOneBy([
+                    'id' => $this->order['finalized_user_id']
+                ]);
+                $finalizedUser = $user['email'];
+            } else {
+                $finalizedUser = $this->app->getUserEmail();
+            }
             $obj->author = [
                 'system' => 'https://www.pmi-ops.org/healthpro-username',
-                'value' => $this->app->getUserEmail()
+                'value' => $finalizedUser
             ];
+            $finalizedSite = $this->order['finalized_site'] ? $this->order['finalized_site'] : $this->app->getSiteId();
             $sourceSiteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $this->order['site'];
-            $finalizedSiteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $this->app->getSiteId();
+            $finalizedSiteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $finalizedSite;
             $obj->sourceSite = [
                 'system' => 'https://www.pmi-ops.org/site-id',
                 'value' => $sourceSiteGoogleGroup
