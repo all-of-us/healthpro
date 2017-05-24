@@ -368,6 +368,10 @@ class Order
         if (!$this->order['finalized_ts']) {
             return false;
         }
+        $this->app['em']->getRepository('orders')->update(
+            $this->order['id'],
+            ['finalized_user_id' => $this->app->getUser()->getId(), 'finalized_site' => $this->app->getSiteId()]
+        );
         $order = $this->getRdrObject();
         $rdrId = $this->app['pmi.drc.participants']->createOrder($this->participant->id, $order);
         if ($rdrId) {
