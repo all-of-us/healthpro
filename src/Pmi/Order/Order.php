@@ -307,8 +307,14 @@ class Order
         return $form;
     }
 
-    public function getRdrObject()
+    public function getRdrObject($order = null, $app = null)
     {
+        if ($order) {
+            $this->order = $order;
+        }
+        if ($app) {
+            $this->app = $app;
+        }
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $this->order['participant_id'];
         $identifiers = [];

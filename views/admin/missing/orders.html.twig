@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+{% block title %}Biobank Orders - Missing RDR Data - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Missing Biobank Orders</h2>
+    </div>
+    {{ form_start(form) }}
+    <table class="table table-striped table-hover">
+        <thead><tr><th></th><th>Finalized Time</th><th>Created Time</th><th>Site</th><th>Participant ID</th><th>Biobank ID</th><th>Order ID</th><th>MayoLINK ID</th></tr></thead>
+        <tbody>
+        {% for k, orders in missing  %}
+            <tr>
+                <td>{{ form_widget(form.ids[k]) }}</td>
+                <td data-order="{{ orders.finalized_ts }}">{{ orders.finalized_ts|date('n/j/Y g:ia') }}</td>
+                <td data-order="{{ orders.created_ts }}">{{ orders.created_ts|date('n/j/Y g:ia') }}</td>
+                <td>{{ orders.site }}</td>
+                <td>{{ orders.participant_id }}</td>
+                <td>{{ orders.biobank_id }}</td>
+                <td>{{ orders.order_id }}</td>
+                <td>{{ orders.mayo_id }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Resend selected</button>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    var table = $('table').DataTable({
+        order: [[0, 'desc']],
+        pageLength: 25
+    });
+});
+</script>
+{% endblock %}
