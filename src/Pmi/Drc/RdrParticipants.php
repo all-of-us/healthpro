@@ -10,7 +10,6 @@ class RdrParticipants
     protected $client;
     protected $cacheEnabled = true;
     protected static $resourceEndpoint = 'rdr/v1/';
-    public $rdrErrorMessage;
 
     public function __construct(RdrHelper $rdrHelper)
     {
@@ -195,7 +194,6 @@ class RdrParticipants
             }
         } catch (\Exception $e) {
             $this->rdrHelper->logException($e);
-            $this->rdrErrorMessage = $this->rdrHelper->errorMessage;
             return false;
         }
         return false;
@@ -228,9 +226,13 @@ class RdrParticipants
             }
         } catch (\Exception $e) {
             $this->rdrHelper->logException($e);
-            $this->rdrErrorMessage = $this->rdrHelper->errorMessage;
             return false;
         }
         return false;
+    }
+
+    public function getLastError()
+    {
+        return $this->rdrHelper->getLastError();
     }
 }
