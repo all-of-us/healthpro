@@ -181,7 +181,7 @@ class AdminController extends AbstractController
                 $fhir = $evaluationService->getFhir($evaluation['finalized_ts'], $parentRdrId);
                 if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($evaluation['participant_id'], $fhir)) {
                     $repository->update($evaluation['id'], ['rdr_id' => $rdrEvalId]);
-                    $app->addFlashSuccess('Measurement Id: '.$id.' Succesfully submitted to RDR');
+                    $app->addFlashSuccess('Measurement Id: '.$id.' Successfully submitted to RDR');
                 } else {
                     $app->addFlashError('Failed! - Measurement Id: '.$id.' '.$app['pmi.drc.participants']->rdrErrorMessage);
                 }
@@ -224,7 +224,7 @@ class AdminController extends AbstractController
                 $orderRdrObject = $orderService->getRdrObject($order, $app);
                 if ($rdrId = $app['pmi.drc.participants']->createOrder($order['participant_id'], $orderRdrObject)) {
                     $repository->update($order['id'], ['rdr_id' => $rdrId]);
-                    $app->addFlashSuccess('Order Id: '.$id.' Succesfully submitted to RDR');
+                    $app->addFlashSuccess('Order Id: '.$id.' Successfully submitted to RDR');
                 } else {
                     $app->addFlashError('Failed! - Order Id: '.$id.' '.$app['pmi.drc.participants']->rdrErrorMessage);
                 }
