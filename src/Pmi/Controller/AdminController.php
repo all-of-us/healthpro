@@ -11,6 +11,8 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 use Pmi\Audit\Log;
 use Pmi\Service\WithdrawalService;
+use Pmi\Evaluation\Evaluation;
+use Pmi\Order\Order;
 
 class AdminController extends AbstractController
 {
@@ -23,7 +25,9 @@ class AdminController extends AbstractController
             'method' => 'GET|POST',
             'defaults' => ['siteId' => null]
         ]],
-        ['withdrawalNotifications', '/notifications/withdrawal']
+        ['withdrawalNotifications', '/notifications/withdrawal'],
+        ['missingMeasurements', '/missing/measurements', ['method' => 'GET|POST']],
+        ['missingOrders', '/missing/orders', ['method' => 'GET|POST']]
     ];
 
     public function homeAction(Application $app)
@@ -137,5 +141,99 @@ class AdminController extends AbstractController
         $withdrawal = new WithdrawalService($app);
         $notifications = $withdrawal->getWithdrawalNotifications();
         return $app['twig']->render('admin/notifications/withdrawal.html.twig', ['notifications' => $notifications]);
+    }
+
+    public function missingMeasurementsAction(Application $app, Request $request, $_route)
+    {
+        $missing = $app['em']->getRepository('evaluations')->fetchBySQL('finalized_ts is not null and rdr_id is null');
+        $choices = [];
+        foreach ($missing as $physicalMeasurements) {
+            $choices[$physicalMeasurements['id']] = $physicalMeasurements['id'];
+        }
+        $form = $app['form.factory']->createBuilder(FormType::class)
+            ->add('ids', Type\ChoiceType::class, [
+                'multiple' => true,
+                'expanded' => true,
+                'choices' => $choices,
+                'choice_label' => function ($value, $key, $index) {
+                    return ' ';
+                }
+            ])
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $ids = $form->get('ids')->getData();
+            $repository = $app['em']->getRepository('evaluations');
+            foreach ($ids as $id) {
+                $evaluationService = new Evaluation();
+                $evaluation = $repository->fetchOneBy(['id' => $id]);
+                if (!$evaluation) {
+                    continue;
+                }
+                $evaluationService->loadFromArray($evaluation);
+                $parentRdrId = null;
+                if ($evaluation['parent_id']) {
+                    $parentEvaluation = $repository->fetchOneBy(['id' => $evaluation['parent_id']]);
+                    if ($parentEvaluation) {
+                        $parentRdrId = $parentEvaluation['rdr_id'];
+                    }
+                }
+                $fhir = $evaluationService->getFhir($evaluation['finalized_ts'], $parentRdrId);
+                if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($evaluation['participant_id'], $fhir)) {
+                    $repository->update($evaluation['id'], ['rdr_id' => $rdrEvalId]);
+                    $app->addFlashSuccess("#{$id} successfully sent to RDR");
+                } else {
+                    $app->addFlashError("#{$id} failed sending to RDR: " . $app['pmi.drc.participants']->getLastError());
+                }
+            }
+            return $app->redirectToRoute($_route);
+        }
+        return $app['twig']->render('admin/missing/measurements.html.twig', [
+            'missing' => $missing,
+            'form' => $form->createView()
+        ]);
+    }
+
+    public function missingOrdersAction(Application $app, Request $request, $_route)
+    {
+        $missing = $app['em']->getRepository('orders')->fetchBySQL('finalized_ts is not null and rdr_id is null');
+        $choices = [];
+        foreach ($missing as $orders) {
+            $choices[$orders['id']] = $orders['id'];
+        }
+        $form = $app['form.factory']->createBuilder(FormType::class)
+            ->add('ids', Type\ChoiceType::class, [
+                'multiple' => true,
+                'expanded' => true,
+                'choices' => $choices,
+                'choice_label' => function ($value, $key, $index) {
+                    return ' ';
+                }
+            ])
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $ids = $form->get('ids')->getData();
+            $repository = $app['em']->getRepository('orders');
+            foreach ($ids as $id) {
+                $orderService = new Order();
+                $order = $repository->fetchOneBy(['id' => $id]);
+                if (!$order) {
+                    continue;
+                }
+                $orderRdrObject = $orderService->getRdrObject($order, $app);
+                if ($rdrId = $app['pmi.drc.participants']->createOrder($order['participant_id'], $orderRdrObject)) {
+                    $repository->update($order['id'], ['rdr_id' => $rdrId]);
+                    $app->addFlashSuccess("#{$id} successfully sent to RDR");
+                } else {
+                    $app->addFlashError("#{$id} failed sending to RDR: " . $app['pmi.drc.participants']->getLastError());
+                }
+            }
+            return $app->redirectToRoute($_route);
+        }
+        return $app['twig']->render('admin/missing/orders.html.twig', [
+            'missing' => $missing,
+            'form' => $form->createView()
+        ]);
     }
 }
