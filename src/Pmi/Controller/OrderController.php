@@ -328,6 +328,8 @@ class OrderController extends AbstractController
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isValid()) {
             $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
+            $updateArray['finalized_user_id'] = $app->getUser()->getId();
+            $updateArray['finalized_site'] = $app->getSiteId();
             if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
                 $order = $this->loadOrder($participantId, $orderId, $app);
