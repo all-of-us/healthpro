@@ -14,9 +14,8 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-sm-12" align="center">
-            <a href="{{ path('admin_missingMeasurements') }}">Missing Measurements</a>&nbsp;/&nbsp;<a href="{{ path('admin_missingOrders') }}">Missing Orders</a>
-        </div>
+    <div class="text-right small" style="margin-top: 200px;">
+        <a href="{{ path('admin_missingMeasurements') }}">Missing Physical Measurements</a><br />
+        <a href="{{ path('admin_missingOrders') }}">Missing Biobank Orders</a>
     </div>
 {% endblock %}
