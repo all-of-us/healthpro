@@ -28,6 +28,8 @@
                             </div>
                             <div class="modification-select" style="display:none">
                                 {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-protocol-modification'], i) }}
+                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['manual-blood-pressure'], i) }}
+                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['manual-heart-rate'], i) }}
                                 <div class="modification-notes" style="display:none">
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-protocol-modification-notes'], i) }}
                                 </div>

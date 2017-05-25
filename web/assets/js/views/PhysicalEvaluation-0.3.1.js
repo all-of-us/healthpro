@@ -1,7 +1,7 @@
 /**
  * Physical evaluation form view
  */
-PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
+PMI.views['PhysicalEvaluation-0.3.1'] = Backbone.View.extend({
     events: {
         "click .toggle-help-image": "displayHelpModal",
         "change .replicate input": "updateMean",

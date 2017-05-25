@@ -1,6 +1,6 @@
 {
-    "version": "0.3.0",
-    "template": "0.3",
+    "version": "0.3.1",
+    "template": "0.3.1",
     "fields": [
         {
             "name": "blood-pressure-systolic",
@@ -156,6 +156,18 @@
                     "message": "Please specify reason for protocol deviation."
                 }
             ]
+        },
+        {
+            "name": "manual-blood-pressure",
+            "label": "Blood pressure measured manually",
+            "type": "checkbox",
+            "replicates": 3
+        },
+        {
+            "name": "manual-heart-rate",
+            "label": "Heart rate measured manually",
+            "type": "checkbox",
+            "replicates": 3
         },
         {
             "name": "blood-pressure-protocol-modification-notes",
