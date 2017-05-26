@@ -32,11 +32,14 @@ class OrderController extends AbstractController
     {
         $order = new Order();
         $order->loadOrder($participantId, $orderId, $app);
-        if ($order->isValid()) {
-            return $order;
-        } else {
+        if (!$order->isValid()) {
             $app->abort(404);
         }
+        if (!$order->getParticipant()->status) {
+            $app->abort(403);
+        }
+
+        return $order;
     }
 
     public function orderCheckAction($participantId, Application $app)
