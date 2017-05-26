@@ -230,4 +230,9 @@ class RdrParticipants
         }
         return false;
     }
+
+    public function getLastError()
+    {
+        return $this->rdrHelper->getLastError();
+    }
 }

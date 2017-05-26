@@ -32,11 +32,14 @@ class OrderController extends AbstractController
     {
         $order = new Order();
         $order->loadOrder($participantId, $orderId, $app);
-        if ($order->isValid()) {
-            return $order;
-        } else {
+        if (!$order->isValid()) {
             $app->abort(404);
         }
+        if (!$order->getParticipant()->status) {
+            $app->abort(403);
+        }
+
+        return $order;
     }
 
     public function orderCheckAction($participantId, Application $app)
@@ -328,6 +331,8 @@ class OrderController extends AbstractController
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isValid()) {
             $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
+            $updateArray['finalized_user_id'] = $app->getUser()->getId();
+            $updateArray['finalized_site'] = $app->getSiteId();
             if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
                 $order = $this->loadOrder($participantId, $orderId, $app);

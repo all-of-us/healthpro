@@ -22,7 +22,7 @@ iframe.pdf {
     padding: 5px;
     text-align: center;
     font-weight: bold;
-    margin: 0;
+    margin: 0 0 5px 0;
 }
 .btn-block {
     margin-bottom: 10px;

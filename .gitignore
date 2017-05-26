@@ -1,5 +1,5 @@
 /vendor/
-app.yaml
+/app.yaml
 cron.yaml
 dos.yaml
 ip_whitelist.yml
