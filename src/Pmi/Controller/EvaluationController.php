@@ -42,7 +42,16 @@ class EvaluationController extends AbstractController
         } else {
             $date = new \DateTime();
         }
-        return $app->jsonPrettyPrint($evaluationService->getFhir($date));
+        $parentRdrId = null;
+        if ($evaluation['parent_id']) {
+            $parentEvaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
+                'id' => $evaluation['parent_id']
+            ]);
+            if ($parentEvaluation) {
+                $parentRdrId = $parentEvaluation['rdr_id'];
+            }
+        }
+        return $app->jsonPrettyPrint($evaluationService->getFhir($date, $parentRdrId));
     }
 
     /* For debugging evaluation object pushed to RDR - only allowed in dev */
