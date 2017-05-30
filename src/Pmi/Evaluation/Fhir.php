@@ -429,6 +429,7 @@ class Fhir
                 'valueCodeableConcept' => $concept
             ]];
             $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
+            $modificationMetricManual = 'manual-heart-rate-' . $replicate;
             if (array_key_exists($modificationMetric, $this->metricUrns)) {
                 $entry['resource']['related'] = [[
                     'type' => 'qualified-by',
@@ -436,6 +437,19 @@ class Fhir
                         'reference' => $this->metricUrns[$modificationMetric]
                     ]
                 ]];
+            }
+            if (array_key_exists($modificationMetricManual, $this->metricUrns)) {
+                $qualifiedBy = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns[$modificationMetricManual]
+                    ]
+                ];
+                if (empty($entry['resource']['related'])) {
+                    $entry['resource']['related'] = [$qualifiedBy];
+                } else {
+                    $entry['resource']['related'][] = $qualifiedBy;
+                }
             }
         }
 
@@ -528,6 +542,7 @@ class Fhir
             ]
         ];
         $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
+        $modificationMetricManual = 'manual-blood-pressure-' . $replicate;
         if (array_key_exists($modificationMetric, $this->metricUrns)) {
             $entry['resource']['related'] = [[
                 'type' => 'qualified-by',
@@ -535,6 +550,19 @@ class Fhir
                     'reference' => $this->metricUrns[$modificationMetric]
                 ]
             ]];
+        }
+        if (array_key_exists($modificationMetricManual, $this->metricUrns)) {
+            $qualifiedBy = [
+                'type' => 'qualified-by',
+                'target' => [
+                    'reference' => $this->metricUrns[$modificationMetricManual]
+                ]
+            ];
+            if (empty($entry['resource']['related'])) {
+                $entry['resource']['related'] = [$qualifiedBy];
+            } else {
+                $entry['resource']['related'][] = $qualifiedBy;
+            }
         }
         return $entry;
     }
