@@ -264,6 +264,46 @@ class Fhir
         ];
     }
 
+    protected function protocolModificationManual($metric, $replicate = null)
+    {
+        $codeDisplay = "Protocol modifications: Blood pressure";
+        if (is_null($replicate)) {
+            $conceptCode = $metric;
+            $urnKey = $metric;
+        } else {
+            $conceptCode = $metric;
+            $urnKey = $metric .'-'. $replicate;
+        }
+        $conceptDisplay = ucfirst(str_replace('-', ' ', $metric));
+        return [
+            'fullUrl' => $this->metricUrns[$urnKey],
+            'resource' => [
+                'code' => [
+                    'coding' => [[
+                        'code' => "protocol-modifications-blood-pressure",
+                        'display' => $codeDisplay,
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+                    ]],
+                    'text' => $codeDisplay
+                ],
+                'effectiveDateTime' => $this->date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->patient}"
+                ],
+                'valueCodeableConcept' => [
+                    'coding' => [[
+                        'code' => $conceptCode,
+                        'display' => $conceptDisplay,
+                        'system' => "http://terminology.pmi-ops.org/CodeSystem/{$conceptCode}"
+                    ]],
+                    'text' => $conceptDisplay
+                ]
+            ]
+        ];
+    }
+
     protected function height()
     {
         return $this->simpleMetric(
@@ -502,6 +542,16 @@ class Fhir
     protected function bloodpressureprotocolmodification($replicate)
     {
         return $this->protocolModification('blood-pressure', $replicate);
+    }
+
+    protected function manualbloodpressure($replicate)
+    {
+        return $this->protocolModificationManual('manual-blood-pressure', $replicate);
+    }
+
+    protected function manualheartrate($replicate)
+    {
+        return $this->protocolModificationManual('manual-heart-rate', $replicate);
     }
 
     protected function hipcircumferenceprotocolmodification($replicate)
