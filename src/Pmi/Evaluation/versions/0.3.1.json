@@ -1,6 +1,6 @@
 {
     "version": "0.3.1",
-    "template": "0.3.1",
+    "template": "0.3",
     "fields": [
         {
             "name": "blood-pressure-systolic",

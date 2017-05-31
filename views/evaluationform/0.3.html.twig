@@ -31,6 +31,10 @@
                                 <div class="modification-notes" style="display:none">
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-protocol-modification-notes'], i) }}
                                 </div>
+                                {% if schema.fields['manual-blood-pressure'] is defined %}
+                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['manual-blood-pressure'], i) }}
+                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['manual-heart-rate'], i) }}
+                                {% endif %}
                             </div>
                         </div>
                     </div>
