@@ -470,11 +470,11 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             block.find('.modification-select').show();
         }
         if (modification === 'refusal' || modification === 'colostomy-bag') {
-            block.find('.modification-affected input, .modification-affected select').each(function() {
+            block.find('.modification-affected input, .modification-affected select, .modification-manual input:checkbox').each(function() {
                 $(this).attr('disabled', true);
             });
         } else {
-            block.find('.modification-affected input, .modification-affected select').each(function() {
+            block.find('.modification-affected input, .modification-affected select, .modification-manual input:checkbox').each(function() {
                 if (!self.finalized) {
                     $(this).attr('disabled', false);
                 }

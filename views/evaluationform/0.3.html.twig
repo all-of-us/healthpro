@@ -32,8 +32,10 @@
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-protocol-modification-notes'], i) }}
                                 </div>
                                 {% if schema.fields['manual-blood-pressure'] is defined %}
-                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['manual-blood-pressure'], i) }}
-                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['manual-heart-rate'], i) }}
+                                    <div class="modification-manual">
+                                        {{ metrics.form_row_replicate(evaluationForm, schema.fields['manual-blood-pressure'], i) }}
+                                        {{ metrics.form_row_replicate(evaluationForm, schema.fields['manual-heart-rate'], i) }}
+                                    </div>
                                 {% endif %}
                             </div>
                         </div>
