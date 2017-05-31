@@ -266,21 +266,20 @@ class Fhir
 
     protected function protocolModificationManual($metric, $replicate = null)
     {
-        $codeDisplay = "Protocol modifications: Blood pressure";
+        $codeDisplay = "Protocol modifications: " . ucfirst(str_replace('-', ' ', $metric));
+        $conceptCode = 'manual-'.$metric;
         if (is_null($replicate)) {
-            $conceptCode = $metric;
             $urnKey = $metric;
         } else {
-            $conceptCode = $metric;
             $urnKey = $metric .'-'. $replicate;
         }
-        $conceptDisplay = ucfirst(str_replace('-', ' ', $metric));
+        $conceptDisplay = ucfirst(str_replace('-', ' ', $conceptCode));
         return [
             'fullUrl' => $this->metricUrns[$urnKey],
             'resource' => [
                 'code' => [
                     'coding' => [[
-                        'code' => "protocol-modifications-blood-pressure",
+                        'code' => "protocol-modifications-{$metric}",
                         'display' => $codeDisplay,
                         'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
                     ]],
@@ -574,12 +573,12 @@ class Fhir
 
     protected function manualbloodpressure($replicate)
     {
-        return $this->protocolModificationManual('manual-blood-pressure', $replicate);
+        return $this->protocolModificationManual('blood-pressure', $replicate);
     }
 
     protected function manualheartrate($replicate)
     {
-        return $this->protocolModificationManual('manual-heart-rate', $replicate);
+        return $this->protocolModificationManual('heart-rate', $replicate);
     }
 
     protected function hipcircumferenceprotocolmodification($replicate)
