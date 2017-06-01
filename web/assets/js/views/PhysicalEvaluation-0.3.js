@@ -460,7 +460,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     },
     handleProtocolModificationBlock: function(block) {
         var modification = block.find('.modification-select select').val();
-        var manualMeasurement = block.find('.modification-select input').is(':checked');
+        var manualMeasurement = block.find('.modification-manual input:checkbox').is(':checked');
         var self = this;
         if (modification === '' && manualMeasurement === false) {
             block.find('.modification-select').hide();
