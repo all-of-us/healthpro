@@ -63,6 +63,8 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertSame(null, $this->app['session']->get('isLogin'));
         $client = $this->createClient();
         $client->followRedirects();
+        $crawler = $client->request('GET', '/dashboard');
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
         $crawler = $client->request('GET', '/dashboard/');
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
     }
@@ -75,6 +77,8 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertSame(null, $this->app['session']->get('isLogin'));
         $client = $this->createClient();
         $client->followRedirects();
+        $crawler = $client->request('GET', '/dashboard');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $crawler = $client->request('GET', '/dashboard/');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
