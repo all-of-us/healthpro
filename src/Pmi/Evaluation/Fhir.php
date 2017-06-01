@@ -135,12 +135,12 @@ class Fhir
             ]
         ];
         if ($this->parentRdr) {
-            $composition['resource']['extension'] = [
+            $composition['resource']['extension'] = [[
                 'url' => 'http://terminology.pmi-ops.org/StructureDefinition/amends',
                 'valueReference' => [
                     'reference' => "PhysicalMeasurements/{$this->parentRdr}"
                 ]
-            ];
+            ]];
         }
         return $composition;
     }
