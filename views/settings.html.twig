@@ -13,3 +13,17 @@
         </div>
     </div>
 {% endblock %}
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    var userTimeZone = '{{app.getUserTimezone(false)}}';
+    if (userTimeZone != '') {
+        var browserTimeZone = jstz.determine().name();
+        if (userTimeZone != browserTimeZone) {
+            var html = '<div class="alert alert-warning">Your computer\'s time zone "'+browserTimeZone+'" does not appear to match your HealthPro time zone preference "'+userTimeZone+'".</div>';
+            $('#flash-notices').html(html);
+        }
+    }
+});
+</script>
+{% endblock %}
