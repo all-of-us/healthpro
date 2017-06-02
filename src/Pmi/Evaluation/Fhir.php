@@ -269,9 +269,9 @@ class Fhir
         $codeDisplay = "Protocol modifications: " . ucfirst(str_replace('-', ' ', $metric));
         $conceptCode = 'manual-'.$metric;
         if (is_null($replicate)) {
-            $urnKey = $metric;
+            $urnKey = $conceptCode;
         } else {
-            $urnKey = $metric .'-'. $replicate;
+            $urnKey = $conceptCode .'-'. $replicate;
         }
         $conceptDisplay = ucfirst(str_replace('-', ' ', $conceptCode));
         return [
