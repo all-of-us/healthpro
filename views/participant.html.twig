@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block title %}Participant {{ participant.id }} - {% endblock %}
 {% block body %}
-{% if hasNoParticipantAccess == true %}
+{% if hasNoParticipantAccess %}
     <div class="row">
         <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
             <div class="panel panel-danger">
@@ -46,6 +46,37 @@
         </div>
     </div>
     {% if participant.status %}
+        <div id="participant-consent-status">
+            <div class="status-block">
+                <strong>General Consent</strong>
+                {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
+                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                    {{ participant.consentForStudyEnrollmentTime ? participant.consentForStudyEnrollmentTime|date('n/j/Y') }}
+                {% else %}
+                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                {% endif %}
+            </div>
+            <div class="status-block">
+                <strong>EHR Consent</strong>
+                {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
+                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                    {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y') }}
+                {% else %}
+                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y') : '(not completed)' }}
+                {% endif %}
+            </div>
+            <div class="status-block">
+                <strong>CABoR Consent</strong> <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
+                {% if participant.consentForCABoR == 'SUBMITTED' %}
+                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                    {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('n/j/Y') }}
+                {% else %}
+                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('n/j/Y') : '(not completed)' }}
+                {% endif %}
+            </div>
+        </div>
         <div class="row">
             <div class="col-sm-6">
                 <div class="panel panel-default">
