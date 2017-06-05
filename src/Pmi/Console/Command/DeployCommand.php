@@ -38,7 +38,8 @@ class DeployCommand extends Command {
     /** Restrict access by IP using dos.yaml */
     private static $IPRESTRICT_APP_IDS = [
         'healthpro-prod',
-        'pmi-hpo-test'
+        'pmi-hpo-test',
+        'pmi-hpo-dev'
     ];
 
     /** Create release tag when deploying these application IDs. */

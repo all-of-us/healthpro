@@ -1,6 +1,14 @@
 blacklist:
     -
-        subnet: 0.0.0.0/3
+        subnet: 1.0.0.0/8
+    -
+        subnet: 2.0.0.0/7
+    -
+        subnet: 4.0.0.0/6
+    -
+        subnet: 8.0.0.0/5
+    -
+        subnet: 16.0.0.0/4
     -
         subnet: 32.0.0.0/5
     -

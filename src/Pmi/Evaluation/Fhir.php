@@ -135,12 +135,12 @@ class Fhir
             ]
         ];
         if ($this->parentRdr) {
-            $composition['resource']['extension'] = [
+            $composition['resource']['extension'] = [[
                 'url' => 'http://terminology.pmi-ops.org/StructureDefinition/amends',
                 'valueReference' => [
                     'reference' => "PhysicalMeasurements/{$this->parentRdr}"
                 ]
-            ];
+            ]];
         }
         return $composition;
     }
@@ -259,6 +259,45 @@ class Fhir
                         'system' => "http://terminology.pmi-ops.org/CodeSystem/{$conceptCode}"
                     ]],
                     'text' => ($conceptCode === 'other' && !empty($notes)) ? $notes : $conceptDisplay
+                ]
+            ]
+        ];
+    }
+
+    protected function protocolModificationManual($metric, $replicate = null)
+    {
+        $codeDisplay = "Protocol modifications: " . ucfirst(str_replace('-', ' ', $metric));
+        $conceptCode = 'manual-'.$metric;
+        if (is_null($replicate)) {
+            $urnKey = $conceptCode;
+        } else {
+            $urnKey = $conceptCode .'-'. $replicate;
+        }
+        $conceptDisplay = ucfirst(str_replace('-', ' ', $conceptCode));
+        return [
+            'fullUrl' => $this->metricUrns[$urnKey],
+            'resource' => [
+                'code' => [
+                    'coding' => [[
+                        'code' => "protocol-modifications-{$metric}",
+                        'display' => $codeDisplay,
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+                    ]],
+                    'text' => $codeDisplay
+                ],
+                'effectiveDateTime' => $this->date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->patient}"
+                ],
+                'valueCodeableConcept' => [
+                    'coding' => [[
+                        'code' => $conceptCode,
+                        'display' => $conceptDisplay,
+                        'system' => "http://terminology.pmi-ops.org/CodeSystem/{$conceptCode}"
+                    ]],
+                    'text' => $conceptDisplay
                 ]
             ]
         ];
@@ -389,6 +428,7 @@ class Fhir
                 'valueCodeableConcept' => $concept
             ]];
             $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
+            $modificationMetricManual = 'manual-heart-rate-' . $replicate;
             if (array_key_exists($modificationMetric, $this->metricUrns)) {
                 $entry['resource']['related'] = [[
                     'type' => 'qualified-by',
@@ -396,6 +436,19 @@ class Fhir
                         'reference' => $this->metricUrns[$modificationMetric]
                     ]
                 ]];
+            }
+            if (array_key_exists($modificationMetricManual, $this->metricUrns)) {
+                $qualifiedBy = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns[$modificationMetricManual]
+                    ]
+                ];
+                if (empty($entry['resource']['related'])) {
+                    $entry['resource']['related'] = [$qualifiedBy];
+                } else {
+                    $entry['resource']['related'][] = $qualifiedBy;
+                }
             }
         }
 
@@ -488,6 +541,7 @@ class Fhir
             ]
         ];
         $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
+        $modificationMetricManual = 'manual-blood-pressure-' . $replicate;
         if (array_key_exists($modificationMetric, $this->metricUrns)) {
             $entry['resource']['related'] = [[
                 'type' => 'qualified-by',
@@ -496,12 +550,35 @@ class Fhir
                 ]
             ]];
         }
+        if (array_key_exists($modificationMetricManual, $this->metricUrns)) {
+            $qualifiedBy = [
+                'type' => 'qualified-by',
+                'target' => [
+                    'reference' => $this->metricUrns[$modificationMetricManual]
+                ]
+            ];
+            if (empty($entry['resource']['related'])) {
+                $entry['resource']['related'] = [$qualifiedBy];
+            } else {
+                $entry['resource']['related'][] = $qualifiedBy;
+            }
+        }
         return $entry;
     }
 
     protected function bloodpressureprotocolmodification($replicate)
     {
         return $this->protocolModification('blood-pressure', $replicate);
+    }
+
+    protected function manualbloodpressure($replicate)
+    {
+        return $this->protocolModificationManual('blood-pressure', $replicate);
+    }
+
+    protected function manualheartrate($replicate)
+    {
+        return $this->protocolModificationManual('heart-rate', $replicate);
     }
 
     protected function hipcircumferenceprotocolmodification($replicate)

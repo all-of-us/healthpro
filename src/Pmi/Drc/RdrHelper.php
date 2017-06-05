@@ -7,6 +7,7 @@ class RdrHelper
     protected $endpoint = 'https://pmi-drc-api-test.appspot.com/';
     protected $options = [];
     protected $cacheEnabled = true;
+    protected $lastError;
 
     public function __construct(array $options)
     {
@@ -53,13 +54,20 @@ class RdrHelper
 
     public function logException(\Exception $e)
     {
-        syslog(LOG_ERR, $e->getMessage());
+        syslog(LOG_CRIT, $e->getMessage());
+        $this->lastError = $e->getMessage();
         if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
             $response = $e->getResponse();
             $responseCode = $response->getStatusCode();
             $contents = $response->getBody()->getContents();
             syslog(LOG_INFO, "Response code: {$responseCode}");
             syslog(LOG_INFO, "Response body: {$contents}");
+            $this->lastError = $contents;
         }
+    }
+
+    public function getLastError()
+    {
+        return $this->lastError;
     }
 }

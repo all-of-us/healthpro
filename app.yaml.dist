@@ -13,6 +13,7 @@ skip_files:
 - ^(.*/)?\.git$
 - ^(.*/)?nbproject$
 - '^(.*/)?dev_config$'
+- ^(.*/)?external$
 
 error_handlers:
 - error_code: dos_api_denial
