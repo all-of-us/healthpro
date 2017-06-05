@@ -34,6 +34,7 @@ class DefaultController extends AbstractController
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['settings', '/settings', ['method' => 'GET|POST']],
+        ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
     ];
 
     public function homeAction(Application $app, Request $request)
@@ -328,5 +329,15 @@ class DefaultController extends AbstractController
         return $app['twig']->render('settings.html.twig', [
             'settingsForm' => $settingsForm->createView()
         ]);
+    }
+
+    public function hideTZWarningAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('hideTZWarning', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
+        $request->getSession()->set('hideTZWarning', true);
+        return (new JsonResponse())->setData([]);
     }
 }
