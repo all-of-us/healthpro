@@ -460,8 +460,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     },
     handleProtocolModificationBlock: function(block) {
         var modification = block.find('.modification-select select').val();
+        var manualMeasurement = block.find('.modification-manual input:checkbox').is(':checked');
         var self = this;
-        if (modification === '') {
+        if (modification === '' && manualMeasurement === false) {
             block.find('.modification-select').hide();
             block.find('.modification-toggle').show();
         } else {
@@ -469,11 +470,11 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             block.find('.modification-select').show();
         }
         if (modification === 'refusal' || modification === 'colostomy-bag') {
-            block.find('.modification-affected input, .modification-affected select').each(function() {
+            block.find('.modification-affected input, .modification-affected select, .modification-manual input:checkbox').each(function() {
                 $(this).attr('disabled', true);
             });
         } else {
-            block.find('.modification-affected input, .modification-affected select').each(function() {
+            block.find('.modification-affected input, .modification-affected select, .modification-manual input:checkbox').each(function() {
                 if (!self.finalized) {
                     $(this).attr('disabled', false);
                 }
