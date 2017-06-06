@@ -114,6 +114,8 @@ class EvaluationController extends AbstractController
                     $errors = $evaluationService->getFinalizeErrors();
                     if (count($errors) === 0) {
                         $dbArray['finalized_ts'] = $now;
+                        $dbArray['finalized_user_id'] = $app->getUser()->getId();
+                        $dbArray['finalized_site'] = $app->getSiteId();
                         // Send final evaluation to RDR and store resulting id
                         if ($evaluation != null && $evaluation['parent_id'] != null) {
                             $parentEvaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
