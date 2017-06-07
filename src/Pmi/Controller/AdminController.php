@@ -170,7 +170,7 @@ class AdminController extends AbstractController
                 if (!$evaluation) {
                     continue;
                 }
-                $evaluationService->loadFromArray($evaluation);
+                $evaluationService->loadFromArray($evaluation, $app);
                 $parentRdrId = null;
                 if ($evaluation['parent_id']) {
                     $parentEvaluation = $repository->fetchOneBy(['id' => $evaluation['parent_id']]);
