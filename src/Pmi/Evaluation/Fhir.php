@@ -26,12 +26,10 @@ class Fhir
         $date->setTimezone(new \DateTimeZone('UTC'));
         $this->date = $date->format('Y-m-d\TH:i:s\Z');
         $this->parentRdr = $options['parent_rdr'];
-        if (!empty($options['created_user'])) {
-            $this->createdUser = $options['created_user'];
-            $this->createdSite = $options['created_site'];
-            $this->finalizedUser = $options['finalized_user'];
-            $this->finalizedSite = $options['finalized_site'];
-        }
+        $this->createdUser = $options['created_user'];
+        $this->createdSite = $options['created_site'];
+        $this->finalizedUser = $options['finalized_user'];
+        $this->finalizedSite = $options['finalized_site'];
     }
 
     /*
@@ -119,6 +117,14 @@ class Fhir
         $composition = [
             'fullUrl' => 'urn:uuid:' . Util::generateUuid(),
             'resource' => [
+                'createdInfo' => [
+                    'author' => ['system' => "https://www.pmi-ops.org/healthpro-username", 'value' => $this->createdUser],
+                    'site' => ['system' => "https://www.pmi-ops.org/site-id", 'value' => $this->createdSite]
+                ],
+                'finalizedInfo' => [
+                    'author' => ['system' => "https://www.pmi-ops.org/healthpro-username", 'value' => $this->finalizedUser],
+                    'site' => ['system' => "https://www.pmi-ops.org/site-id", 'value' => $this->finalizedSite]
+                ],
                 'date' => $this->date,
                 'resourceType' => 'Composition',
                 'section' => [[
@@ -146,16 +152,6 @@ class Fhir
                     'reference' => "PhysicalMeasurements/{$this->parentRdr}"
                 ]
             ]];
-        }
-        if (!empty($this->createdUser)) {
-            $composition['resource']['createdInfo'] = [
-                'author' => ['system' => "https://www.pmi-ops.org/healthpro-username", 'value' => $this->createdUser],
-                'site' => ['system' => "https://www.pmi-ops.org/site-id", 'value' => $this->createdSite]
-            ];
-            $composition['resource']['finalizedInfo'] = [
-                'author' => ['system' => "https://www.pmi-ops.org/healthpro-username", 'value' => $this->finalizedUser],
-                'site' => ['system' => "https://www.pmi-ops.org/site-id", 'value' => $this->finalizedSite]
-            ];
         }
         return $composition;
     }

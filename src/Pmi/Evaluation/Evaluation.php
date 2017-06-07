@@ -29,7 +29,7 @@ class Evaluation
         $this->normalizeData();
     }
 
-    public function loadFromArray($array, $app = null, $request = null)
+    public function loadFromArray($array, $app)
     {
         if (array_key_exists('version', $array)) {
             $this->version = $array['version'];
@@ -45,30 +45,23 @@ class Evaluation
             $this->locked = true;
         }
         $this->participant = $array['participant_id'];
-        if ($app) {
-            $createdUser = $app['em']->getRepository('users')->fetchOneBy([
-                'id' => $array['user_id']
-            ]);
-            if ($request && $request->request->has('finalize')) {
-                $finalizedUserId = $app->getUser()->getId();
-                $finalizedSite = $app->getSiteId();
-            } else {
-                $finalizedUserId = $array['finalized_user_id'];
-                $finalizedSite = $array['finalized_site'];          
-            }
-            if ($finalizedUserId) {
-                $finalizedUser = $app['em']->getRepository('users')->fetchOneBy([
-                    'id' => $finalizedUserId
-                ]);
-                $finalizedUser = $finalizedUser['email'];
-            } else {
-                $finalizedUser = null;
-            }
-            $this->createdUser = $createdUser['email'];
-            $this->createdSite = $array['site'];
-            $this->finalizedUser = $finalizedUser;
-            $this->finalizedSite = $finalizedSite;
+        $createdUser = $app['em']->getRepository('users')->fetchOneBy([
+            'id' => $array['user_id']
+        ]);
+        if (!$array['finalized_user_id']) {
+            $finalizedUserId = $app->getUser()->getId();
+            $finalizedSite = $app->getSiteId();
+        } else {
+            $finalizedUserId = $array['finalized_user_id'];
+            $finalizedSite = $array['finalized_site'];          
         }
+        $finalizedUser = $app['em']->getRepository('users')->fetchOneBy([
+            'id' => $finalizedUserId
+        ]);
+        $this->createdUser = $createdUser['email'];
+        $this->createdSite = $array['site'];
+        $this->finalizedUser = $finalizedUser['email'];
+        $this->finalizedSite = $finalizedSite;
         $this->loadSchema();
         $this->normalizeData();
     }
@@ -272,24 +265,18 @@ class Evaluation
 
     public function getFhir($datetime, $parentRdr = null)
     {
-        $fhirArray = [
+        $fhir = new Fhir([
             'data' => $this->data,
             'schema' => $this->getAssociativeSchema(),
             'patient' => $this->participant,
             'version' => $this->version,
             'datetime' => $datetime,
-            'parent_rdr' => $parentRdr
-        ];
-        if (!empty($this->createdUser)) {
-            $userSiteArray = [
-                'created_user' => $this->createdUser,
-                'created_site' => $this->createdSite,
-                'finalized_user' => $this->finalizedUser,
-                'finalized_site' => $this->finalizedSite
-            ];
-            $fhirArray = array_merge($fhirArray, $userSiteArray);
-        }
-        $fhir = new Fhir($fhirArray);
+            'parent_rdr' => $parentRdr,
+            'created_user' => $this->createdUser,
+            'created_site' => $this->createdSite,
+            'finalized_user' => $this->finalizedUser,
+            'finalized_site' => $this->finalizedSite
+        ]);
         return $fhir->toObject();
     }
 

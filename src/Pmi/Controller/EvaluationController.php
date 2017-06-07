@@ -96,7 +96,7 @@ class EvaluationController extends AbstractController
             if (!$evaluation) {
                 $app->abort(404);
             }
-            $evaluationService->loadFromArray($evaluation, $app, $request);
+            $evaluationService->loadFromArray($evaluation, $app);
         } else {
             $evaluation = null;
         }
