@@ -29,7 +29,7 @@ class Evaluation
         $this->normalizeData();
     }
 
-    public function loadFromArray($array, $app)
+    public function loadFromArray($array, $app = null)
     {
         if (array_key_exists('version', $array)) {
             $this->version = $array['version'];
@@ -45,23 +45,31 @@ class Evaluation
             $this->locked = true;
         }
         $this->participant = $array['participant_id'];
-        $createdUser = $app['em']->getRepository('users')->fetchOneBy([
-            'id' => $array['user_id']
-        ]);
-        if (!$array['finalized_user_id']) {
-            $finalizedUserId = $array['finalized_ts'] ? $array['user_id'] : $app->getUser()->getId();
-            $finalizedSite = $array['finalized_ts'] ? $array['site'] : $app->getSiteId();
-        } else {
-            $finalizedUserId = $array['finalized_user_id'];
-            $finalizedSite = $array['finalized_site'];          
+        if ($app) {
+            $createdUser = $app['em']->getRepository('users')->fetchOneBy([
+                'id' => $array['user_id']
+            ]);
+            if (!$array['finalized_user_id']) {
+                $finalizedUserId = $array['finalized_ts'] ? $array['user_id'] : $app->getUser()->getId();
+                $finalizedSite = $array['finalized_ts'] ? $array['site'] : $app->getSiteId();
+            } else {
+                $finalizedUserId = $array['finalized_user_id'];
+                $finalizedSite = $array['finalized_site'];          
+            }
+            $finalizedUser = $app['em']->getRepository('users')->fetchOneBy([
+                'id' => $finalizedUserId
+            ]);
+            $this->createdUser = $createdUser['email'];
+            $this->createdSite = $array['site'];
+            $this->finalizedUser = $finalizedUser['email'];
+            $this->finalizedSite = $finalizedSite;
         }
-        $finalizedUser = $app['em']->getRepository('users')->fetchOneBy([
-            'id' => $finalizedUserId
-        ]);
-        $this->createdUser = $createdUser['email'];
-        $this->createdSite = $array['site'];
-        $this->finalizedUser = $finalizedUser['email'];
-        $this->finalizedSite = $finalizedSite;
+        else {
+            $this->createdUser = array_key_exists('created_user', $array) ? $array['created_user'] : null;
+            $this->createdSite = array_key_exists('created_site', $array) ? $array['created_site'] : null;
+            $this->finalizedUser = array_key_exists('finalized_user', $array) ? $array['finalized_user'] : null;
+            $this->finalizedSite = array_key_exists('finalized_site', $array) ? $array['finalized_site'] : null;
+        }
         $this->loadSchema();
         $this->normalizeData();
     }
