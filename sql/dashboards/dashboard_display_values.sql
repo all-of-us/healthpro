@@ -32,7 +32,7 @@ VALUES
 	(18,'Participant.genderIdentity','GenderIdentity_AdditionalOptions','Other/Additional Options'),
 	(19,'Participant.genderIdentity','GenderIdentity_NonBinary','Non-Binary'),
 	(20,'Participant.enrollmentStatus','FULL_PARTICIPANT','Full Participant'),
-	(21,'Participant.enrollmentStatus','INTERESTED','Interested Party'),
+	(21,'Participant.enrollmentStatus','INTERESTED','Registered'),
 	(22,'Participant.enrollmentStatus','MEMBER','Member');
 
 UNLOCK TABLES;
