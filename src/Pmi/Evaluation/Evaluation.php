@@ -49,8 +49,8 @@ class Evaluation
             'id' => $array['user_id']
         ]);
         if (!$array['finalized_user_id']) {
-            $finalizedUserId = $app->getUser()->getId();
-            $finalizedSite = $app->getSiteId();
+            $finalizedUserId = $array['finalized_ts'] ? $array['user_id'] : $app->getUser()->getId();
+            $finalizedSite = $array['finalized_ts'] ? $array['site'] : $app->getSiteId();
         } else {
             $finalizedUserId = $array['finalized_user_id'];
             $finalizedSite = $array['finalized_site'];          
