@@ -55,6 +55,7 @@
                 {% else %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
                 {% endif %}
+                <br />
             </div>
             <div class="status-block">
                 <strong>EHR Consent</strong>
@@ -65,6 +66,7 @@
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
                     {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y') : '(not completed)' }}
                 {% endif %}
+                <br />
             </div>
             <div class="status-block">
                 <strong>CABoR Consent</strong> <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
@@ -75,6 +77,7 @@
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
                     {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('n/j/Y') : '(not completed)' }}
                 {% endif %}
+                <br />
             </div>
         </div>
         <div class="row">
