@@ -6,7 +6,7 @@
     <title>{% block title %}{% endblock %}HealthPro</title>
 </head>
 <body>
-    <nav class="navbar navbar-default{% if isTraining %} navbar-inverse{% endif %}">
+    <nav class="navbar navbar-default{% if isTraining %} navbar-inverse navbar-warning-below{% endif %}">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pmi-navbar-collapse">
@@ -72,7 +72,12 @@
             </div>
         </div>
     </nav>
-
+    {% if isTraining %}
+        <div class="navbar-warning alert alert-warning">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            This portal is to be used for training with fake data only. <strong>No real participant data should ever be entered into this system.</strong>
+        </div>
+    {% endif %}
     <div class="{% block bodycontainer %}container{% endblock %}">
         <div id="flash-notices">
             {% for flashMessage in app.session.flashbag.get('error') %}
