@@ -15,7 +15,8 @@ class DevController extends AbstractController
 
     protected static $routes = [
         ['datastoreInit', '/datastore-init'],
-        ['createParticipant', '/create-participant', ['method' => 'GET|POST']]
+        ['createParticipant', '/create-participant', ['method' => 'GET|POST']],
+        ['mockBiobankSampleProcess', '/mock-biobank-sample-process/{id}']
     ];
 
     public function datastoreInitAction(Application $app, Request $request)
@@ -80,5 +81,13 @@ class DevController extends AbstractController
         return $app['twig']->render('dev/participant.html.twig', [
             'form' => $form->createView()
         ]);
+    }
+
+    public function mockBiobankSampleProcessAction($id, Application $app)
+    {
+        if ($app->isProd()) {
+            return $app->abort(404);
+        }
+        return $app['pmi.drc.participants']->createMockBiobankSamples($id);
     }
 }
