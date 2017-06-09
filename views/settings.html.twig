@@ -17,12 +17,14 @@
 <script>
 $(document).ready(function() {
     if (PMI.isTimeZoneDiff) {
-        var html = '<div class="alert alert-info tz-info"><a id="tz_set">Click Here</a> to set time zone to your computer\'s time zone "'+PMI.timeZones[PMI.browserTimeZone]+'"</div>';
+        var html = '<div class="alert alert-info tz-info">Your computer\'s timezone does not appear to match your HealthPro timezone preference. ';
+            html += '<button type="button" class="btn btn-primary tz-change-btn">Change to '+PMI.timeZones[PMI.browserTimeZone]+'</button>';
+            html += '</div>';
         $('.page-header').after(html);
     }
-    $('#tz_set').on('click', function(){
+    $('.tz-change-btn').on('click', function(){
         $('#form_timezone').val(PMI.browserTimeZone);
-        $('.tz-info').hide();
+        $('form[name=form]').submit();
     });
 });
 </script>

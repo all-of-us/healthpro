@@ -248,30 +248,22 @@ $(document).ready(function()
     // Automatically enable unsaved prompt on forms with warn-unsaved class
     PMI.enableUnsavedPrompt('form.warn-unsaved');
 
-    PMI.timeZones = {
-        "America/New_York": "Eastern Time",
-        "America/Chicago": "Central time",
-        "America/Denver": "Mountain Time",
-        "America/Phoenix": "Mountain Time - Arizona",
-        "America/Los_Angeles": "Pacific Time",
-        "America/Anchorage": "Alaska Time",
-        "Pacific/Honolulu": "Hawaii Time"
-    }
+    var whiteListRoutes = ['dashboard_home', 'settings'];
 
-    if (PMI.userTimeZone != '') {
+    if (PMI.userTimeZone) {
         PMI.browserTimeZone = jstz.determine().name();
         if (PMI.browserTimeZone != null && PMI.browserTimeZone in PMI.timeZones && PMI.userTimeZone != PMI.browserTimeZone) {
             PMI.isTimeZoneDiff = true;
         }
     }
 
-    if (PMI.isTimeZoneDiff && PMI.hideTZWarning != true) {
+    if (PMI.userSite && $.inArray(PMI.currentRoute, whiteListRoutes) == -1 && PMI.isTimeZoneDiff && !PMI.hideTZWarning) {
         var html = '<div class="alert alert-warning">';
         html += '<a href="#" class="close" id="tz_close" data-dismiss="alert" aria-label="close">&times;</a>';
-        html += 'Your computer\'s time zone does not appear to match your HealthPro time zone preference. ';
+        html += 'Your computer\'s timezone does not appear to match your HealthPro timezone preference. ';
         html += '<a href="'+PMI.path.settings+'">Update preference</a>';
         html += '</div>';
-        $('#flash-notices').html(html);
+        $('#flash-notices').append(html);
     }
 
     $('#tz_close').on('click', function(e){

@@ -28,7 +28,10 @@
         "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
         "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }},
         "views": {},
+        "timeZones": {{ app.getTimeZones()|json_encode|raw }},
         "userTimeZone": {{ app.getUserTimezone(false)|json_encode|raw }},
+        "userSite": {{ app.session.get('site')|json_encode|raw }},
+        "currentRoute": {{ global.request.attributes.get('_route')|json_encode|raw }},
         "hideTZWarning": {{ app.session.get('hideTZWarning')|json_encode|raw }}
     };
 </script>
