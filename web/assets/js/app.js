@@ -248,16 +248,14 @@ $(document).ready(function()
     // Automatically enable unsaved prompt on forms with warn-unsaved class
     PMI.enableUnsavedPrompt('form.warn-unsaved');
 
-    var whiteListRoutes = ['dashboard_home', 'settings'];
 
-    if (PMI.userTimeZone) {
-        PMI.browserTimeZone = jstz.determine().name();
-        if (PMI.browserTimeZone != null && PMI.browserTimeZone in PMI.timeZones && PMI.userTimeZone != PMI.browserTimeZone) {
-            PMI.isTimeZoneDiff = true;
-        }
-    }
+    /*************************************************************************
+     * Timezone detection
+     ************************************************************************/
+    PMI.browserTimeZone = jstz.determine().name();
+    PMI.isTimeZoneDiff = PMI.userTimeZone && PMI.browserTimeZone && PMI.browserTimeZone in PMI.timeZones && PMI.userTimeZone != PMI.browserTimeZone;
 
-    if (PMI.userSite && $.inArray(PMI.currentRoute, whiteListRoutes) == -1 && PMI.isTimeZoneDiff && !PMI.hideTZWarning) {
+    if (PMI.userSite && $.inArray(PMI.currentRoute, ['dashboard_home', 'settings']) === -1 && PMI.isTimeZoneDiff && !PMI.hideTZWarning) {
         var html = '<div class="alert alert-warning">';
         html += '<a href="#" class="close" id="tz_close" data-dismiss="alert" aria-label="close">&times;</a>';
         html += 'Your computer\'s timezone does not appear to match your HealthPro timezone preference. ';
