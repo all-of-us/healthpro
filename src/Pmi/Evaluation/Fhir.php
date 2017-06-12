@@ -468,13 +468,17 @@ class Fhir
 
     protected function waistcircumference($replicate)
     {
-        return $this->simpleMetric(
+        $entry = $this->simpleMetric(
             'waist-circumference-' . $replicate,
             $this->data->{'waist-circumference'}[$replicate - 1],
             'Waist circumference',
             '56086-2',
             'cm'
         );
+        if (isset($this->data->{'waist-circumference-location'})) {
+            $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
+        }
+        return $entry;  
     }
 
 
@@ -500,6 +504,20 @@ class Fhir
                 'code' => $locationSnomed,
                 'display' => $locationDisplay,
                 'system' => 'http://snomed.info/sct'
+            ]],
+            'text' => $locationDisplay
+        ];
+    }
+
+    protected function getWaistCircumferenceBodySite()
+    {
+        $locationSnomed = $this->data->{'waist-circumference-location'};
+        $locationDisplay = ucfirst(str_replace('-', ' ', $locationSnomed));
+        return [
+            'coding' => [[
+                'code' => $locationSnomed ,
+                'display' => $locationDisplay ,
+                'system' => 'http://terminology.pmi-ops.org/CodeSystem/waist-circumference-location'
             ]],
             'text' => $locationDisplay
         ];
