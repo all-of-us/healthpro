@@ -477,6 +477,34 @@ class Fhir
         );
     }
 
+
+    protected function getBpBodySite($replicate)
+    {
+        if (is_array($this->data->{'blood-pressure-location'})) {
+            $location = $this->data->{'blood-pressure-location'}[$replicate - 1];
+        } else {
+            $location = $this->data->{'blood-pressure-location'};
+        }
+        switch ($location) {
+            case 'Left arm':
+                $locationSnomed = '368208006';
+                $locationDisplay = 'Left arm';
+                break;
+            default:
+                $locationSnomed = '368209003';
+                $locationDisplay = 'Right arm';
+                break;
+        }
+        return [
+            'coding' => [[
+                'code' => $locationSnomed,
+                'display' => $locationDisplay,
+                'system' => 'http://snomed.info/sct'
+            ]],
+            'text' => $locationDisplay
+        ];
+    }
+
     protected function getBpComponent($component, $replicate)
     {
         switch ($component) {
@@ -540,6 +568,9 @@ class Fhir
                 ]
             ]
         ];
+        if (isset($this->data->{'blood-pressure-location'})) {
+            $entry['resource']['bodySite'] = $this->getBpBodySite($replicate);
+        }
         $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
         $modificationMetricManual = 'manual-blood-pressure-' . $replicate;
         if (array_key_exists($modificationMetric, $this->metricUrns)) {
