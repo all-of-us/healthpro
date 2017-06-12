@@ -306,7 +306,7 @@ class DefaultController extends AbstractController
         $settingsData = ['timezone' => $app->getUserTimezone(false)];
         $settingsForm = $app['form.factory']->createBuilder(FormType::class, $settingsData)
             ->add('timezone', Type\ChoiceType::class, [
-                'label' => 'Timezone',
+                'label' => 'Time zone',
                 'choices' => array_flip($app::$timezoneOptions),
                 'placeholder' => '-- Select your timezone --',
                 'required' => true
