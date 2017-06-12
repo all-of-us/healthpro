@@ -1,7 +1,15 @@
 {
-    "version": "0.3.1",
+    "version": "0.3.2",
     "template": "0.3",
     "fields": [
+        {
+            "name": "blood-pressure-location",
+            "label": "Location",
+            "options": ["Right arm", "Left arm"],
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
         {
             "name": "blood-pressure-systolic",
             "label": "Systolic",
