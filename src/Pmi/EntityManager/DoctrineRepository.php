@@ -25,7 +25,7 @@ class DoctrineRepository
         $query = "SELECT * FROM `{$this->entity}` WHERE " . join(' AND ', $columns);
         $result = $this->dbal->fetchAssoc($query, $parameters);
 
-        // Convert timestamp fields into user's timezone since they're stored as UTC in the database
+        // Convert timestamp fields into user's time zone since they're stored as UTC in the database
         if ($result) {
             $result = $this->parseTimestamps($result);
         }

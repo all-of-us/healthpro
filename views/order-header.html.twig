@@ -62,5 +62,5 @@
 {% if active in ['collect', 'process', 'finalize'] %}
     {% set route = app.request_stack.currentRequest.attributes.get('_route') %}
     {% set return = path(route, params) %}
-    <p><strong>Your timezone</strong>: {{ app.userTimezoneDisplay }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
+    <p><strong>Your time zone</strong>: {{ app.userTimezoneDisplay }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
 {% endif %}

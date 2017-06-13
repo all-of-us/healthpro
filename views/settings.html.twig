@@ -17,7 +17,7 @@
 <script>
 $(document).ready(function() {
     if (PMI.isTimeZoneDiff) {
-        var html = '<div class="alert alert-warning tz-info">Your computer\'s timezone does not appear to match your HealthPro timezone preference. ';
+        var html = '<div class="alert alert-warning tz-info">Your computer\'s time zone does not appear to match your HealthPro time zone preference. ';
             html += '<button type="button" class="btn btn-primary tz-change-btn">Change to '+PMI.timeZones[PMI.browserTimeZone]+'</button>';
             html += '</div>';
         $('.page-header').after(html);

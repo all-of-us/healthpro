@@ -41,7 +41,7 @@ class DefaultController extends AbstractController
     {
         if ($app->hasRole('ROLE_USER')) {
             if (!$app->getUserTimezone(false)) {
-                $app->addFlashNotice('Please select your current timezone');
+                $app->addFlashNotice('Please select your current time zone');
                 return $app->redirectToRoute('settings');
             } else {
                 return $app['twig']->render('index.html.twig');
@@ -308,7 +308,7 @@ class DefaultController extends AbstractController
             ->add('timezone', Type\ChoiceType::class, [
                 'label' => 'Time zone',
                 'choices' => array_flip($app::$timezoneOptions),
-                'placeholder' => '-- Select your timezone --',
+                'placeholder' => '-- Select your time zone --',
                 'required' => true
             ])
             ->getForm();

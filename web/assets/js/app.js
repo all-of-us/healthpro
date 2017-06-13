@@ -250,7 +250,7 @@ $(document).ready(function()
 
 
     /*************************************************************************
-     * Timezone detection
+     * Time zone detection
      ************************************************************************/
     PMI.browserTimeZone = jstz.determine().name();
     PMI.isTimeZoneDiff = PMI.userTimeZone && PMI.browserTimeZone && PMI.browserTimeZone in PMI.timeZones && PMI.userTimeZone != PMI.browserTimeZone;
@@ -258,7 +258,7 @@ $(document).ready(function()
     if (PMI.userSite && $.inArray(PMI.currentRoute, ['dashboard_home', 'settings']) === -1 && PMI.isTimeZoneDiff && !PMI.hideTZWarning) {
         var html = '<div class="alert alert-warning">';
         html += '<a href="#" class="close" id="tz_close" data-dismiss="alert" aria-label="close">&times;</a>';
-        html += 'Your computer\'s timezone does not appear to match your HealthPro timezone preference. ';
+        html += 'Your computer\'s time zone does not appear to match your HealthPro time zone preference. ';
         html += '<a href="'+PMI.path.settings+'">Update preference</a>';
         html += '</div>';
         $('#flash-notices').append(html);
