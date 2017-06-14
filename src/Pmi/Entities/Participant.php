@@ -45,6 +45,12 @@ class Participant
             $this->statusReason = 'withdrawal';
         }
 
+        //Disable users to enter data for test participants in production
+        if (getenv('PMI_ENV') == 'prod' && $participant->hpoId == 'TEST') {
+            $this->status = false;
+            $this->statusReason = 'disable-data-entry';          
+        }
+
         // Map gender identity to gender options for MayoLINK.  TODO: should we switch to using participant sex if populated?
         switch (isset($participant->genderIdentity) ? $participant->genderIdentity : null) {
             case 'GenderIdentity_Woman':

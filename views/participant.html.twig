@@ -123,7 +123,10 @@
             </div>
         </div>
     {% else %}
-        {% if participant.statusReason == 'basics' %}
+        {% if participant.statusReason == 'disable-data-entry' %}
+            {% set errorTitle = 'Data entry disabled' %}
+            {% set errorMessage = 'Data entry for test participants is disabled in production.' %} 
+        {% elseif participant.statusReason == 'basics' %}
             {% set errorTitle = 'The Basics survey not complete' %}
             {% set errorMessage = 'This participant has consented but has not completed "The Basics" survey in the participant app and is therefore ineligible for physical measurements and biospecimen collection. Please direct the participant to complete "The Basics" survey in the participant application to enable in person enrollment or contact the help desk if needed.' %}
         {% elseif participant.statusReason == 'withdrawal' %}
