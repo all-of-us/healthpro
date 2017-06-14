@@ -15,7 +15,7 @@ iframe.pdf {
     box-sizing: border-box;
 }
 #flash-notices {
-    margin-top: -15px;
+    margin-top: -10px;
     margin-bottom: 15px;
 }
 #flash-notices div {
@@ -87,6 +87,16 @@ label.label-normal {
 }
 .navbar-allofus .navbar-nav>.open>a, .navbar-allofus .navbar-nav>.open>a:focus, .navbar-allofus .navbar-nav>.open>a:hover {
     background-color: #161252;
+}
+.navbar-warning-below {
+    margin-bottom: 0;
+}
+.navbar-warning {
+    margin-bottom: 25px;
+    padding: 5px 10px;
+}
+.navbar-warning strong {
+    text-transform: uppercase;
 }
 
 /* Physical evaluation */
@@ -191,4 +201,9 @@ table.table-samples td {
 .help-footer {
     padding-top: 50px;
     padding-bottom: 20px;
+}
+
+.tz-change-btn {
+    padding:2px 6px;
+    font-size:12px;
 }

@@ -20,6 +20,7 @@ var ASSETS = {
         ASSETS_DIR + '/js/parsley-comparison.js',
         ASSETS_DIR + '/js/bootstrap-session-timeout.js',
         ASSETS_DIR + '/js/app.js',
+        ASSETS_DIR + '/js/jstz.min.js',
         ASSETS_DIR + '/js/views/*'
     ],
     'css': [

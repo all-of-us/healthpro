@@ -86,17 +86,17 @@ class HpoApplication extends AbstractApplication
                 [['path' => $anonRegex, 'ips' => $ips], 'IS_AUTHENTICATED_ANONYMOUSLY'],
                 [['path' => $anonRegex], 'ROLE_NO_ACCESS'],
                 
-                [['path' => '^/_dev/.*$', 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
-                [['path' => '^/_dev/.*$'], 'ROLE_NO_ACCESS'],
+                [['path' => '^/_dev($|\/)$', 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
+                [['path' => '^/_dev($|\/)$'], 'ROLE_NO_ACCESS'],
                 
                 [['path' => $commonRegex, 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
                 [['path' => $commonRegex], 'ROLE_NO_ACCESS'],
                 
-                [['path' => '^/dashboard/.*$', 'ips' => $ips], 'ROLE_DASHBOARD'],
-                [['path' => '^/dashboard/.*$'], 'ROLE_NO_ACCESS'],
+                [['path' => '^/dashboard($|\/)', 'ips' => $ips], 'ROLE_DASHBOARD'],
+                [['path' => '^/dashboard($|\/)'], 'ROLE_NO_ACCESS'],
 
-                [['path' => '^/admin/.*$', 'ips' => $ips], 'ROLE_ADMIN'],
-                [['path' => '^/admin/.*$'], 'ROLE_NO_ACCESS'],
+                [['path' => '^/admin($|\/)', 'ips' => $ips], 'ROLE_ADMIN'],
+                [['path' => '^/admin($|\/)'], 'ROLE_NO_ACCESS'],
 
                 [['path' => '^/.*$', 'ips' => $ips], 'ROLE_USER'],
                 [['path' => '^/.*$'], 'ROLE_NO_ACCESS']

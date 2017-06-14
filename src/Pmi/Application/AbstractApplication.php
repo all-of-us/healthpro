@@ -499,4 +499,10 @@ abstract class AbstractApplication extends Application
         $response = new JsonResponse($data, $status, $headers);
         $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
         return $response;
-    }}
+    }
+
+    public function getTimeZones()
+    {
+        return self::$timezoneOptions;
+    }
+}

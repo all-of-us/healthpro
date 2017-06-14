@@ -15,15 +15,23 @@
         "sessionTimeout": {{ app.sessionTimeout|json_encode|raw }},
         "sessionWarning": {{ app.sessionWarning|json_encode|raw }},
         "keepAliveCsrf": {{ csrf_token('keepAlive')|json_encode|raw }},
+        "hideTZWarningCsrf": {{ csrf_token('hideTZWarning')|json_encode|raw }},
         "path": {
             "clientTimeout": {{ path('clientTimeout')|json_encode|raw }},
             "logout": {{ path('logout')|json_encode|raw }},
             "keepAlive": {{ path('keepAlive')|json_encode|raw }},
             "agreeUsage": {{ path('agreeUsage')|json_encode|raw }},
-            "switchSite": {{ path('switchSite', {id: "SITE_ID"})|json_encode|raw }}
+            "switchSite": {{ path('switchSite', {id: "SITE_ID"})|json_encode|raw }},
+            "settings": {{ path('settings')|json_encode|raw }},
+            "hideTZWarning": {{ path('hideTZWarning')|json_encode|raw }}
         },
         "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
         "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }},
-        "views": {}
+        "views": {},
+        "timeZones": {{ app.getTimeZones()|json_encode|raw }},
+        "userTimeZone": {{ app.getUserTimezone(false)|json_encode|raw }},
+        "userSite": {{ app.session.get('site')|json_encode|raw }},
+        "currentRoute": {{ global.request.attributes.get('_route')|json_encode|raw }},
+        "hideTZWarning": {{ app.session.get('hideTZWarning')|json_encode|raw }}
     };
 </script>
