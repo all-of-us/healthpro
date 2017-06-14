@@ -202,3 +202,8 @@ table.table-samples td {
     padding-top: 50px;
     padding-bottom: 20px;
 }
+
+.tz-change-btn {
+    padding:2px 6px;
+    font-size:12px;
+}

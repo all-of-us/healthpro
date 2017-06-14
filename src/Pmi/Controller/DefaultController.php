@@ -34,13 +34,14 @@ class DefaultController extends AbstractController
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['settings', '/settings', ['method' => 'GET|POST']],
+        ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
     ];
 
     public function homeAction(Application $app, Request $request)
     {
         if ($app->hasRole('ROLE_USER')) {
             if (!$app->getUserTimezone(false)) {
-                $app->addFlashNotice('Please select your current timezone');
+                $app->addFlashNotice('Please select your current time zone');
                 return $app->redirectToRoute('settings');
             } else {
                 return $app['twig']->render('index.html.twig');
@@ -305,9 +306,9 @@ class DefaultController extends AbstractController
         $settingsData = ['timezone' => $app->getUserTimezone(false)];
         $settingsForm = $app['form.factory']->createBuilder(FormType::class, $settingsData)
             ->add('timezone', Type\ChoiceType::class, [
-                'label' => 'Timezone',
+                'label' => 'Time zone',
                 'choices' => array_flip($app::$timezoneOptions),
-                'placeholder' => '-- Select your timezone --',
+                'placeholder' => '-- Select your time zone --',
                 'required' => true
             ])
             ->getForm();
@@ -328,5 +329,15 @@ class DefaultController extends AbstractController
         return $app['twig']->render('settings.html.twig', [
             'settingsForm' => $settingsForm->createView()
         ]);
+    }
+
+    public function hideTZWarningAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('hideTZWarning', $request->get('csrf_token')))) {
+            return $app->abort(500);
+        }
+        
+        $request->getSession()->set('hideTZWarning', true);
+        return (new JsonResponse())->setData([]);
     }
 }
