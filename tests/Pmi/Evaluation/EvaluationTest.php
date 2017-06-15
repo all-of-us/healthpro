@@ -76,11 +76,11 @@ class EvaluationTest extends AbstractWebTestCase
         $this->assertSame([
             [
                 'url' => "http://terminology.pmi-ops.org/StructureDefinition/authored-location",
-                'valueReference' => "Location/test-site1"
+                'valueReference' => "Location/".\Pmi\Security\User::SITE_PREFIX."test-site1"
             ],
             [
                 'url' => "http://terminology.pmi-ops.org/StructureDefinition/finalized-location",
-                'valueReference' => "Location/test-site2"
+                'valueReference' => "Location/".\Pmi\Security\User::SITE_PREFIX."test-site2"
             ]
         ], $composition['resource']['extension']);
         $references = [];
