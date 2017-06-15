@@ -123,7 +123,7 @@
             </div>
         </div>
     {% else %}
-        {% if participant.statusReason == 'disable-data-entry' %}
+        {% if participant.statusReason == 'test-participant' %}
             {% set errorTitle = 'This is not a real participant' %}
             {% set errorMessage = 'Data collection and entry for test participants are prohibited in the production environment. You may not create a biobank order or collect physical measurements for this participant.' %} 
         {% elseif participant.statusReason == 'basics' %}

@@ -3,6 +3,7 @@ namespace Pmi\Entities;
 
 use Pmi\Util;
 use Pmi\Drc\CodeBook;
+use Pmi\Application\AbstractApplication as Application;
 
 class Participant
 {
@@ -45,13 +46,13 @@ class Participant
             $this->statusReason = 'withdrawal';
         }
 
-        //Disable users to enter data for test participants in production
-        if (getenv('PMI_ENV') == 'prod' && $participant->hpoId == 'TEST') {
+        // Check for participants associated with TEST organization in prod
+        if (getenv('PMI_ENV') === Application::ENV_PROD && $participant->hpoId === 'TEST') {
             $this->status = false;
-            $this->statusReason = 'disable-data-entry';          
+            $this->statusReason = 'test-participant';
         }
 
-        // Map gender identity to gender options for MayoLINK.  TODO: should we switch to using participant sex if populated?
+        // Map gender identity to gender options for MayoLINK.
         switch (isset($participant->genderIdentity) ? $participant->genderIdentity : null) {
             case 'GenderIdentity_Woman':
                 $this->gender = 'F';
