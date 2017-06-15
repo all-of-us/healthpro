@@ -26,6 +26,10 @@ class Fhir
         $date->setTimezone(new \DateTimeZone('UTC'));
         $this->date = $date->format('Y-m-d\TH:i:s\Z');
         $this->parentRdr = $options['parent_rdr'];
+        $this->createdUser = $options['created_user'];
+        $this->createdSite = $options['created_site'];
+        $this->finalizedUser = $options['finalized_user'];
+        $this->finalizedSite = $options['finalized_site'];
     }
 
     /*
@@ -113,7 +117,22 @@ class Fhir
         $composition = [
             'fullUrl' => 'urn:uuid:' . Util::generateUuid(),
             'resource' => [
-                'author' => [['display' => 'N/A']],
+                'author' => [
+                    [
+                        'reference' => "Practitioner/{$this->createdUser}",
+                        'extension' => [
+                            'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
+                            'valueCode' => "created"
+                        ]
+                    ],
+                    [
+                        'reference' => "Practitioner/{$this->finalizedUser}",
+                        'extension' => [
+                            'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
+                            'valueCode' => "finalized"
+                        ]
+                    ]
+                ],
                 'date' => $this->date,
                 'resourceType' => 'Composition',
                 'section' => [[
@@ -131,16 +150,26 @@ class Fhir
                         'system' => 'http://terminology.pmi-ops.org/CodeSystem/document-type'
                     ]],
                     'text' => "All of Us Intake Evaluation v{$this->version}"
-                ]
+                ],
+                'extension' => [
+                    [
+                        'url' => "http://terminology.pmi-ops.org/StructureDefinition/authored-location",
+                        'valueReference' => 'Location/' . \Pmi\Security\User::SITE_PREFIX . $this->createdSite
+                    ],
+                    [
+                        'url' => "http://terminology.pmi-ops.org/StructureDefinition/finalized-location",
+                        'valueReference' => 'Location/' . \Pmi\Security\User::SITE_PREFIX . $this->finalizedSite
+                    ]
+                ],
             ]
         ];
         if ($this->parentRdr) {
-            $composition['resource']['extension'] = [[
+            $composition['resource']['extension'][] = [
                 'url' => 'http://terminology.pmi-ops.org/StructureDefinition/amends',
                 'valueReference' => [
                     'reference' => "PhysicalMeasurements/{$this->parentRdr}"
                 ]
-            ]];
+            ];
         }
         return $composition;
     }
