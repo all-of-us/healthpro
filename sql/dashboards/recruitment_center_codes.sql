@@ -21,7 +21,6 @@ VALUES
 	('SAN_YSIDRO','San Ysidro Health Center, San Ysidro, California','32.558651','-117.047597','FQHC',NULL),
 	('CAL_PMC','California Precision Medicine Consortium','32.880060','-117.234014','RMC',10000),
 	('COLUMBIA','Columbia University Medical Center, New York City','40.840845','-73.941582','RMC',10000),
-	('GEISINGER','Geisinger Health System, Danville, Pennsylvania','40.967891','-76.605062','RMC',10000),
 	('ILLINOIS','Illinois Precision Medicine Consortium','42.056459','-87.675267','RMC',10000),
 	('NE_PMC','New England Precision Medicine Consortium','42.363176','-71.068830','RMC',10000),
 	('TRANS_AM','Trans-American Consortium for the Health Care Systems Research Network','42.367411','-83.085083','RMC',10000),
