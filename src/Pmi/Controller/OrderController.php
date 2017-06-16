@@ -257,6 +257,8 @@ class OrderController extends AbstractController
         $collectForm->handleRequest($request);
         if ($collectForm->isValid() && !$order->get('finalized_ts')) {
             $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
+            $updateArray['collected_user_id'] = $app->getUser()->getId();
+            $updateArray['collected_site'] = $app->getSiteId();
             if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                 $app->log(Log::ORDER_EDIT, $orderId);
                 $app->addFlashNotice('Order collection updated');
@@ -299,6 +301,8 @@ class OrderController extends AbstractController
                 if (!$order->get('processed_ts')) {
                     $updateArray['processed_ts'] = new \DateTime();
                 }
+                $updateArray['processed_user_id'] = $app->getUser()->getId();
+                $updateArray['processed_site'] = $app->getSiteId();
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                     $app->addFlashNotice('Order processing updated');

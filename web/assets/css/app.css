@@ -163,6 +163,22 @@ label.label-normal {
 #order-overflow-show, #evaluation-overflow-show {
     margin-top: 5px
 }
+#participant-consent-status {
+    text-align: center;
+}
+#participant-consent-status .status-block {
+    display: inline-block;
+    margin: 0 5px 15px 5px;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 3px;
+    text-align: center;
+    min-width: 150px;
+}
+#participant-consent-status .status-block i.fa-check, #participant-consent-status .status-block i.fa-times {
+    display: block;
+    font-size: 36px;
+}
 
 .toggle-help-image {
     cursor: pointer;

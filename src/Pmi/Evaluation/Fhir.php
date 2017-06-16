@@ -26,6 +26,10 @@ class Fhir
         $date->setTimezone(new \DateTimeZone('UTC'));
         $this->date = $date->format('Y-m-d\TH:i:s\Z');
         $this->parentRdr = $options['parent_rdr'];
+        $this->createdUser = $options['created_user'];
+        $this->createdSite = $options['created_site'];
+        $this->finalizedUser = $options['finalized_user'];
+        $this->finalizedSite = $options['finalized_site'];
     }
 
     /*
@@ -113,7 +117,22 @@ class Fhir
         $composition = [
             'fullUrl' => 'urn:uuid:' . Util::generateUuid(),
             'resource' => [
-                'author' => [['display' => 'N/A']],
+                'author' => [
+                    [
+                        'reference' => "Practitioner/{$this->createdUser}",
+                        'extension' => [
+                            'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
+                            'valueCode' => "created"
+                        ]
+                    ],
+                    [
+                        'reference' => "Practitioner/{$this->finalizedUser}",
+                        'extension' => [
+                            'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
+                            'valueCode' => "finalized"
+                        ]
+                    ]
+                ],
                 'date' => $this->date,
                 'resourceType' => 'Composition',
                 'section' => [[
@@ -131,16 +150,26 @@ class Fhir
                         'system' => 'http://terminology.pmi-ops.org/CodeSystem/document-type'
                     ]],
                     'text' => "All of Us Intake Evaluation v{$this->version}"
-                ]
+                ],
+                'extension' => [
+                    [
+                        'url' => "http://terminology.pmi-ops.org/StructureDefinition/authored-location",
+                        'valueReference' => 'Location/' . \Pmi\Security\User::SITE_PREFIX . $this->createdSite
+                    ],
+                    [
+                        'url' => "http://terminology.pmi-ops.org/StructureDefinition/finalized-location",
+                        'valueReference' => 'Location/' . \Pmi\Security\User::SITE_PREFIX . $this->finalizedSite
+                    ]
+                ],
             ]
         ];
         if ($this->parentRdr) {
-            $composition['resource']['extension'] = [[
+            $composition['resource']['extension'][] = [
                 'url' => 'http://terminology.pmi-ops.org/StructureDefinition/amends',
                 'valueReference' => [
                     'reference' => "PhysicalMeasurements/{$this->parentRdr}"
                 ]
-            ]];
+            ];
         }
         return $composition;
     }
@@ -468,13 +497,59 @@ class Fhir
 
     protected function waistcircumference($replicate)
     {
-        return $this->simpleMetric(
+        $entry = $this->simpleMetric(
             'waist-circumference-' . $replicate,
             $this->data->{'waist-circumference'}[$replicate - 1],
             'Waist circumference',
             '56086-2',
             'cm'
         );
+        if (isset($this->data->{'waist-circumference-location'})) {
+            $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
+        }
+        return $entry;  
+    }
+
+
+    protected function getBpBodySite($replicate)
+    {
+        if (is_array($this->data->{'blood-pressure-location'})) {
+            $location = $this->data->{'blood-pressure-location'}[$replicate - 1];
+        } else {
+            $location = $this->data->{'blood-pressure-location'};
+        }
+        switch ($location) {
+            case 'Left arm':
+                $locationSnomed = '368208006';
+                $locationDisplay = 'Left arm';
+                break;
+            default:
+                $locationSnomed = '368209003';
+                $locationDisplay = 'Right arm';
+                break;
+        }
+        return [
+            'coding' => [[
+                'code' => $locationSnomed,
+                'display' => $locationDisplay,
+                'system' => 'http://snomed.info/sct'
+            ]],
+            'text' => $locationDisplay
+        ];
+    }
+
+    protected function getWaistCircumferenceBodySite()
+    {
+        $locationSnomed = $this->data->{'waist-circumference-location'};
+        $locationDisplay = ucfirst(str_replace('-', ' ', $locationSnomed));
+        return [
+            'coding' => [[
+                'code' => $locationSnomed ,
+                'display' => $locationDisplay ,
+                'system' => 'http://terminology.pmi-ops.org/CodeSystem/waist-circumference-location'
+            ]],
+            'text' => $locationDisplay
+        ];
     }
 
     protected function getBpComponent($component, $replicate)
@@ -540,6 +615,9 @@ class Fhir
                 ]
             ]
         ];
+        if (isset($this->data->{'blood-pressure-location'})) {
+            $entry['resource']['bodySite'] = $this->getBpBodySite($replicate);
+        }
         $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
         $modificationMetricManual = 'manual-blood-pressure-' . $replicate;
         if (array_key_exists($modificationMetric, $this->metricUrns)) {
