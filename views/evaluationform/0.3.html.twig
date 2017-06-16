@@ -10,6 +10,15 @@
         </h3>
     </div>
     <div class="panel-body">
+        {% if schema.fields['blood-pressure-location'] is defined %}
+            <div class="well">
+                <div class="row">
+                    <div class="col-sm-4">
+                        {{ metrics.form_row(evaluationForm, schema.fields['blood-pressure-location']) }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
             <div class="col-sm-4">

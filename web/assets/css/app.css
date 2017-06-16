@@ -15,7 +15,7 @@ iframe.pdf {
     box-sizing: border-box;
 }
 #flash-notices {
-    margin-top: -15px;
+    margin-top: -10px;
     margin-bottom: 15px;
 }
 #flash-notices div {
@@ -88,6 +88,16 @@ label.label-normal {
 .navbar-allofus .navbar-nav>.open>a, .navbar-allofus .navbar-nav>.open>a:focus, .navbar-allofus .navbar-nav>.open>a:hover {
     background-color: #161252;
 }
+.navbar-warning-below {
+    margin-bottom: 0;
+}
+.navbar-warning {
+    margin-bottom: 25px;
+    padding: 5px 10px;
+}
+.navbar-warning strong {
+    text-transform: uppercase;
+}
 
 /* Physical evaluation */
 #physicalEvaluation .toggle-help-image {
@@ -153,6 +163,22 @@ label.label-normal {
 #order-overflow-show, #evaluation-overflow-show {
     margin-top: 5px
 }
+#participant-consent-status {
+    text-align: center;
+}
+#participant-consent-status .status-block {
+    display: inline-block;
+    margin: 0 5px 15px 5px;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 3px;
+    text-align: center;
+    min-width: 150px;
+}
+#participant-consent-status .status-block i.fa-check, #participant-consent-status .status-block i.fa-times {
+    display: block;
+    font-size: 36px;
+}
 
 .toggle-help-image {
     cursor: pointer;
@@ -191,4 +217,9 @@ table.table-samples td {
 .help-footer {
     padding-top: 50px;
     padding-bottom: 20px;
+}
+
+.tz-change-btn {
+    padding:2px 6px;
+    font-size:12px;
 }

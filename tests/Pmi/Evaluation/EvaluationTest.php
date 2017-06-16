@@ -41,6 +41,10 @@ class EvaluationTest extends AbstractWebTestCase
                 'weight' => 73,
             ],
             'participant_id' => 'P10000001',
+            'created_user' => 'test-user1@example.com',
+            'finalized_user' => 'test-user2@example.com',
+            'created_site' => 'test-site1',
+            'finalized_site' => 'test-site2',
         ]);
         $fhir = $evaluation->getFhir($finalized);
         $this->assertTrue(is_object($fhir));
@@ -53,6 +57,32 @@ class EvaluationTest extends AbstractWebTestCase
         $this->assertSame('Composition', $composition['resource']['resourceType']);
         $this->assertSame("Patient/P10000001", $composition['resource']['subject']['reference']);
         $this->assertTrue(is_array($composition['resource']['section'][0]['entry']));
+        $this->assertSame([
+            [
+                'reference' => "Practitioner/test-user1@example.com",
+                'extension' => [
+                    'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
+                    'valueCode' => "created"
+                ]
+            ],
+            [
+                'reference' => "Practitioner/test-user2@example.com",
+                'extension' => [
+                    'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
+                    'valueCode' => "finalized"
+                ]
+            ]
+        ], $composition['resource']['author']);
+        $this->assertSame([
+            [
+                'url' => "http://terminology.pmi-ops.org/StructureDefinition/authored-location",
+                'valueReference' => "Location/".\Pmi\Security\User::SITE_PREFIX."test-site1"
+            ],
+            [
+                'url' => "http://terminology.pmi-ops.org/StructureDefinition/finalized-location",
+                'valueReference' => "Location/".\Pmi\Security\User::SITE_PREFIX."test-site2"
+            ]
+        ], $composition['resource']['extension']);
         $references = [];
         foreach ($composition['resource']['section'][0]['entry'] as $refEntry) {
             $references[] = $refEntry['reference'];

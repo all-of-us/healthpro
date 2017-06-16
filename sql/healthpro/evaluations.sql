@@ -7,6 +7,8 @@ CREATE TABLE `evaluations` (
   `parent_id` int(11) NULL DEFAULT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `finalized_user_id` int(11) DEFAULT NULL,
+  `finalized_site` varchar(50) DEFAULT NULL,
   `finalized_ts` TIMESTAMP NULL DEFAULT NULL,
   `version` varchar(10) NOT NULL,
   `data` text NOT NULL,

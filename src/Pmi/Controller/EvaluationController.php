@@ -36,7 +36,7 @@ class EvaluationController extends AbstractController
         if (!$evaluation) {
             $app->abort(404);
         }
-        $evaluationService->loadFromArray($evaluation);
+        $evaluationService->loadFromArray($evaluation, $app);
         if ($evaluation['finalized_ts']) {
             $date = $evaluation['finalized_ts'];
         } else {
@@ -75,7 +75,7 @@ class EvaluationController extends AbstractController
             $app->abort(500, 'rdr_id is not set');
         }
         $rdrEvaluation = $app['pmi.drc.participants']->getEvaluation($participantId, $evaluation['rdr_id']);
-        return $app->json($rdrEvaluation);
+        return $app->jsonPrettyPrint($rdrEvaluation);
     }
 
     public function evaluationAction($participantId, $evalId, Application $app, Request $request)
@@ -96,7 +96,7 @@ class EvaluationController extends AbstractController
             if (!$evaluation) {
                 $app->abort(404);
             }
-            $evaluationService->loadFromArray($evaluation);
+            $evaluationService->loadFromArray($evaluation, $app);
         } else {
             $evaluation = null;
         }
@@ -114,6 +114,8 @@ class EvaluationController extends AbstractController
                     $errors = $evaluationService->getFinalizeErrors();
                     if (count($errors) === 0) {
                         $dbArray['finalized_ts'] = $now;
+                        $dbArray['finalized_user_id'] = $app->getUser()->getId();
+                        $dbArray['finalized_site'] = $app->getSiteId();
                         // Send final evaluation to RDR and store resulting id
                         if ($evaluation != null && $evaluation['parent_id'] != null) {
                             $parentEvaluation = $app['em']->getRepository('evaluations')->fetchOneBy([

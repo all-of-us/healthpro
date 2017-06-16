@@ -122,7 +122,13 @@
                                     width: tpWidth,
                                     height: tpWidth / 1.66,
                                     hovermode: 'closest',
-                                    annotations: progressAnnot
+                                    annotations: progressAnnot,
+                                    yaxis: {
+                                        fixedrange: true
+                                    },
+                                    xaxis : {
+                                        fixedrange: true
+                                    }
                                 };
 
                                 // load column totals if requested
@@ -416,7 +422,11 @@
                                         height: lcWidth / 1.66,
                                         annotations: lcAnnot,
                                         xaxis: {
-                                            tickangle: -45
+                                            tickangle: -45,
+                                            fixedrange: true
+                                        },
+                                        yaxis: {
+                                            fixedrange: true
                                         },
                                         margin: {
                                             b: 150,

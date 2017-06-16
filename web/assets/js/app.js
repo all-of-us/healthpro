@@ -247,4 +247,26 @@ $(document).ready(function()
     };
     // Automatically enable unsaved prompt on forms with warn-unsaved class
     PMI.enableUnsavedPrompt('form.warn-unsaved');
+
+
+    /*************************************************************************
+     * Time zone detection
+     ************************************************************************/
+    PMI.browserTimeZone = jstz.determine().name();
+    PMI.isTimeZoneDiff = PMI.userTimeZone && PMI.browserTimeZone && PMI.browserTimeZone in PMI.timeZones && PMI.userTimeZone != PMI.browserTimeZone;
+
+    if (PMI.userSite && $.inArray(PMI.currentRoute, ['dashboard_home', 'settings']) === -1 && PMI.isTimeZoneDiff && !PMI.hideTZWarning) {
+        var html = '<div class="alert alert-warning">';
+        html += '<a href="#" class="close" id="tz_close" data-dismiss="alert" aria-label="close">&times;</a>';
+        html += 'Your computer\'s time zone does not appear to match your HealthPro time zone preference. ';
+        html += '<a href="'+PMI.path.settings+'">Update preference</a>';
+        html += '</div>';
+        $('#flash-notices').append(html);
+    }
+
+    $('#tz_close').on('click', function(e){
+        $.post(PMI.path.hideTZWarning, {
+            csrf_token:  PMI.hideTZWarningCsrf
+        });
+    });
 });
