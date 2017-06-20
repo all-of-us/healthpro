@@ -334,26 +334,18 @@ class Order
                     'value' => 'PMITEST-' . $this->order['order_id']
                 ];
             }
-            $finalizedUserId = $this->order['finalized_user_id'] ? $this->order['finalized_user_id'] : $this->order['user_id'];
-            $user = $this->app['em']->getRepository('users')->fetchOneBy([
-                'id' => $finalizedUserId
-            ]);
-            $finalizedUserEmail = $user['email'];
-            $obj->author = [
-                'system' => 'https://www.pmi-ops.org/healthpro-username',
-                'value' => $finalizedUserEmail
-            ];
-            $finalizedSite = $this->order['finalized_site'] ? $this->order['finalized_site'] : $this->order['site'];
-            $sourceSiteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $this->order['site'];
-            $finalizedSiteGoogleGroup = \Pmi\Security\User::SITE_PREFIX . $finalizedSite;
-            $obj->sourceSite = [
-                'system' => 'https://www.pmi-ops.org/site-id',
-                'value' => $sourceSiteGoogleGroup
-            ];
-            $obj->finalizedSite = [
-                'system' => 'https://www.pmi-ops.org/site-id',
-                'value' => $finalizedSiteGoogleGroup
-            ];
+            $createdUser = $this->getOrderUser($this->order['user_id'], null);
+            $createdSite = $this->getOrderSite($this->order['site'], null);
+            $collectedUser = $this->getOrderUser($this->order['collected_user_id'], 'collected');
+            $collectedSite = $this->getOrderSite($this->order['collected_site'], 'collected');
+            $processedUser = $this->getOrderUser($this->order['processed_user_id'], 'processed');
+            $processedSite = $this->getOrderSite($this->order['processed_site'], 'processed');
+            $finalizedUser = $this->getOrderUser($this->order['finalized_user_id'], 'finalized');
+            $finalizedSite = $this->getOrderSite($this->order['finalized_site'], 'finalized');
+            $obj->createdInfo = $this->getOrderUserSiteData($createdUser, $createdSite);
+            $obj->collectedInfo = $this->getOrderUserSiteData($collectedUser, $collectedSite);
+            $obj->processedInfo = $this->getOrderUserSiteData($processedUser, $processedSite);
+            $obj->finalizedInfo = $this->getOrderUserSiteData($finalizedUser, $finalizedSite);
         }
         $obj->identifier = $identifiers;
 
@@ -533,5 +525,38 @@ class Order
             default:
                 return array_values($this->getRequestedSamples());
         }
+    }
+
+    protected function getOrderUser($userId, $type)
+    {
+        if ($type) {
+            $userId = $this->order["{$type}_user_id"] ? $this->order["{$type}_user_id"] : $this->order['user_id'];
+        }
+        $user = $this->app['em']->getRepository('users')->fetchOneBy([
+            'id' => $userId
+        ]);
+        return $user['email'];
+    }
+
+    protected function getOrderSite($site, $type)
+    {
+        if ($type) {
+            $site = $this->order["{$type}_site"] ? $this->order["{$type}_site"] : $this->order['site'];
+        }
+        return \Pmi\Security\User::SITE_PREFIX . $site;
+    }
+
+    protected function getOrderUserSiteData($user, $site)
+    {
+        return [
+            'author' => [
+                'system' => 'https://www.pmi-ops.org/healthpro-username',
+                'value' => $user                  
+            ],
+            'site' => [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => $site                    
+            ]
+        ];
     }
 }

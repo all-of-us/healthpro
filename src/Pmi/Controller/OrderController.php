@@ -374,7 +374,7 @@ class OrderController extends AbstractController
             $object = $order->getRdrObject();
         }
 
-        return $app->json($object);
+        return $app->jsonPrettyPrint($object);
     }
 
     /* For dry-run testing reconciliation  */
