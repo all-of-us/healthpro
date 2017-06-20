@@ -336,4 +336,84 @@ class Evaluation
 
         return $errors;
     }
+
+    protected static function cmToFtIn($cm)
+    {
+        $inches = self::cmToIn($cm);
+        $feet = floor($inches / 12);
+        $inches = $inches % 12;
+        return "$feet ft $inches in";
+    }
+
+    protected static function cmToIn($cm)
+    {
+        return $cm * 0.3937;
+    }
+
+    protected static function kgToLb($kg)
+    {
+        return $kg * 2.2046;
+    }
+
+    protected function calculateMean($field)
+    {
+        $secondThirdFields = [
+            'blood-pressure-systolic',
+            'blood-pressure-diastolic',
+            'heart-rate'
+        ];
+        $twoClosestFields = [
+            'hip-circumference',
+            'waist-circumference'
+        ];
+        if (in_array($field, $secondThirdFields)) {
+            $values = [$this->data->{$field}[1], $this->data->{$field}[2]];
+        } else {
+            $values = $this->data->{$field};
+        }
+        $values = array_filter($values);
+        if (count($values) > 0) {
+            if (count($values) === 3 && in_array($field, $twoClosestFields)) {
+                sort($values);
+                if ($values[1] - $values[0] < $values[2] - $values[1]) {
+                    array_pop($values);
+                } elseif ($values[2] - $values[1] < $values[1] - $values[0]) {
+                    array_shift($values);
+                }
+            }
+            return array_sum($values) / count($values);
+        } else {
+            return null;
+        }
+    }
+
+    public function getSummary()
+    {
+        $summary = [];
+        $summary['height'] = [
+            'cm' => $this->data->height,
+            'ftin' => self::cmToFtIn($this->data->height)
+        ];
+        $summary['weight'] = [
+            'kg' => $this->data->weight,
+            'lb' => self::kgToLb($this->data->weight)
+        ];
+        $summary['bmi'] = $this->data->weight / (($this->data->height / 100) * ($this->data->height / 100));
+        $hip = $this->calculateMean('hip-circumference');
+        $summary['hip'] = [
+            'cm' => $hip,
+            'in' => self::cmToIn($hip)
+        ];
+        $waist = $this->calculateMean('waist-circumference');
+        $summary['waist'] = [
+            'cm' => $waist,
+            'in' => self::cmToIn($waist)
+        ];
+        $summary['bloodpressure'] = [
+            'systolic' => $this->calculateMean('blood-pressure-systolic'),
+            'diastolic' => $this->calculateMean('blood-pressure-diastolic'),
+            'heartrate' => $this->calculateMean('heart-rate')
+        ];
+        return $summary;
+    }
 }

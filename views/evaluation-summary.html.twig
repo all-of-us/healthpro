@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {% include 'base-head.html.twig' %}
+    <title>Physical Measurements Summary - HealthPro</title>
+</head>
+<body>
+    <div id="evaluation-summary">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-id-card-o" aria-hidden="true"></i>
+                    Physical Measurements Summary
+                </h3>
+            </div>
+            <div class="panel-body">
+                <p class="lead text-center">Date of Visit: <strong>{{ evaluation.finalized_ts|date('n/j/Y') }}</strong></p>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Height</th>
+                        <td>{{ summary.height.cm|number_format(1) }} cm</td>
+                        <td>{{ summary.height.ftin }}</td>
+                    </tr>
+                    <tr>
+                        <th>Weight</th>
+                        <td>{{ summary.weight.kg|number_format(1) }} kg</td>
+                        <td>{{ summary.weight.lb|number_format(1) }} lb</td>
+                    </tr>
+                    <tr>
+                        <th>BMI</th>
+                        <td colspan="2">{{ summary.bmi|number_format(1) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Hip Circumference</th>
+                        <td>{{ summary.hip.cm|number_format(1) }} cm</td>
+                        <td>{{ summary.hip.in|number_format(1) }} in</td>
+                    </tr>
+                    <tr>
+                        <th>Waist Circumference</th>
+                        <td>{{ summary.waist.cm|number_format(1) }} cm</td>
+                        <td>{{ summary.waist.in|number_format(1) }} in</td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Blood Pressure <small style="font-weight: normal">(systolic / diastolic)</small>
+                        </th>
+                        <td colspan="2">
+                            {{ summary.bloodpressure.systolic|round }} /
+                            {{ summary.bloodpressure.diastolic|round }}
+                            mmHg
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Heart Rate</th>
+                        <td colspan="2">{{ summary.bloodpressure.heartrate|round }} bpm</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
