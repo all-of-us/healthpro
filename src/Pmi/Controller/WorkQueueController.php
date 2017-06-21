@@ -151,6 +151,9 @@ class WorkQueueController extends AbstractController
         }
         $rdrParams = array_merge($rdrParams, $params);
         $rdrParams['hpoId'] = $organization;
+        if (!isset($rdrParams['_count'])) {
+            $rdrParams['_count'] = 1000;
+        }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($rdrParams['ageRange'])) {
@@ -219,7 +222,7 @@ class WorkQueueController extends AbstractController
         }
 
         $params = array_filter($request->query->all());
-
+        $params['_count'] = 5000;
         $participants = $this->participantSummarySearch($organization, $params, $app);
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
