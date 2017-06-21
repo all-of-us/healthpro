@@ -10,6 +10,7 @@ class RdrParticipants
     protected $client;
     protected $cacheEnabled = true;
     protected static $resourceEndpoint = 'rdr/v1/';
+    protected $rdrError = false;
 
     public function __construct(RdrHelper $rdrHelper)
     {
@@ -107,12 +108,14 @@ class RdrParticipants
                 ]);
             } catch (\Exception $e) {
                 $this->rdrHelper->logException($e);
-                throw new Exception\FailedRequestException();
+                $this->rdrError = true;
+                return [];
             }
             $contents = $response->getBody()->getContents();
             $responseObject = json_decode($contents);
             if (!is_object($responseObject)) {
-                throw new Exception\InvalidResponseException();
+                $this->rdrError = true;
+                return [];
             }
             if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
                 return [];
@@ -251,5 +254,10 @@ class RdrParticipants
     public function getLastError()
     {
         return $this->rdrHelper->getLastError();
+    }
+
+    public function getRdrError()
+    {
+        return $this->rdrError;
     }
 }
