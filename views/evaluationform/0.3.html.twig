@@ -4,7 +4,7 @@
     <div class="panel-heading">
         <h3 class="panel-title">
             Blood Pressure
-            <span class="toggle-help-image" data-caption="Help content for blood pressure">
+            <span class="toggle-help-image" data-id="bloodPressureModal">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
             </span>
         </h3>
@@ -93,7 +93,7 @@
     <div class="panel-heading">
         <h3 class="panel-title">
             Height and Weight
-            <span class="toggle-help-image" data-img="{{ asset('img/eval/height.png') }}" data-caption="Help content for height and weight">
+            <span class="toggle-help-image" data-id="heightWeightModal">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
             </span>
         </h3>
@@ -141,7 +141,7 @@
         <div class="pull-right" id="hip-waist-skip"></div>
         <h3 class="panel-title">
             Waist and Hip Circumference
-            <span class="toggle-help-image" data-img="{{ asset('img/eval/waist.png') }}" data-caption="Help content for hip and waist circumference">
+            <span class="toggle-help-image" data-id="waistHipModal">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
             </span>
         </h3>
@@ -237,3 +237,62 @@
         </div>
     </div>
 </div>
+
+<!-- Help placeholder contents -->
+
+<div id="bloodPressureModal" style="display:none">
+    <h4 class="help-header-text">Heart Rate &amp; Blood Pressure</h4>
+    <ul>
+        <li>Participant should relax for five minutes before measurement.</li>
+        <li>Ask participant to sit upright with legs uncrossed and feet flat on the floor for measurement.</li>
+        <li>Perform measurement using the right arm. If right arm cannot be used, the left arm may be used.</li>
+        <li>Participant should breathe in and out slowly.</li>
+        <li>Provider and participant should not talk during measurement.</li>
+        <li>Take measurements three times, one minute apart.</li>
+    </ul>
+    <i>See SOP for special considerations.</i>
+</div>
+
+<div id="heightWeightModal" style="display:none">
+    <h4 class="help-header-text">Height &amp; Weight</h4>
+    <div class="row">
+        <div class="col-md-6">
+            <img src="{{ asset('img/eval/height.png') }}" class="img-responsive" >
+        </div>
+        <div class="col-md-6">
+            <h5>Height</h5>
+            <ul>
+                <li>Ask participant to remove shoes and stand tall, heels against the wall, with feet positioned close together.</li>
+                <li>Lower the stadiometer headplate so it rests firmly on top of participant’s head.</li>
+            </ul>
+            <h5>Weight</h5>
+            <ul>
+                <li>Ask participant to remove heavy outer layers and shoes.</li>
+                <li>Scale should be on firm level ground.</li>
+                <li>Ensure participant stands tall, eyes looking straight ahead.</li>
+            </ul>
+            <i>See SOP for special considerations.</i>
+        </div>
+    </div>
+</div>
+
+<div id="waistHipModal" style="display:none">
+    <h4 class="help-header-text">Waist &amp; Hip Measurements</h4>
+    <div class="row">
+        <div class="col-md-6">
+            <img src="{{ asset('img/eval/waist.png') }}" class="img-responsive" >
+        </div>
+        <div class="col-md-6">
+            <ul>
+                <li>Inform participant it is not necessary to undress, but it would help if any bulky clothing could be lifted up, to allow their waist to be located.</li>
+                <li>Ensure participant stands with feet positioned close together.</li>
+                <li>Ask participant to relax and take a few deep breaths.</li>
+                <li>The tape should fit snugly around the body, but not pulled so tight that it is constricting.</li>
+                <li>Two consecutive waist measurements should be obtained.</li>
+                <li>Two consecutive hip measurements should be obtained.</li>
+            </ul>
+            <i>See SOP for special considerations.</i>
+        </div>
+    </div>
+</div>
+
