@@ -9,6 +9,9 @@ use Pmi\Drc\CodeBook;
 
 class WorkQueueController extends AbstractController
 {
+    const LIMIT_DEFAULT = 1000;
+    const LIMIT_EXPORT = 5000;
+
     protected static $name = 'workqueue';
     protected static $routes = [
         ['index', '/'],
@@ -152,7 +155,7 @@ class WorkQueueController extends AbstractController
         $rdrParams = array_merge($rdrParams, $params);
         $rdrParams['hpoId'] = $organization;
         if (!isset($rdrParams['_count'])) {
-            $rdrParams['_count'] = 1000;
+            $rdrParams['_count'] = self::LIMIT_DEFAULT;
         }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
@@ -222,7 +225,7 @@ class WorkQueueController extends AbstractController
         }
 
         $params = array_filter($request->query->all());
-        $params['_count'] = 5000;
+        $params['_count'] = self::LIMIT_EXPORT;
         $participants = $this->participantSummarySearch($organization, $params, $app);
         $stream = function() use ($participants) {
             $output = fopen('php://output', 'w');
