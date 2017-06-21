@@ -390,30 +390,44 @@ class Evaluation
     public function getSummary()
     {
         $summary = [];
-        $summary['height'] = [
-            'cm' => $this->data->height,
-            'ftin' => self::cmToFtIn($this->data->height)
-        ];
-        $summary['weight'] = [
-            'kg' => $this->data->weight,
-            'lb' => self::kgToLb($this->data->weight)
-        ];
-        $summary['bmi'] = $this->data->weight / (($this->data->height / 100) * ($this->data->height / 100));
-        $hip = $this->calculateMean('hip-circumference');
-        $summary['hip'] = [
-            'cm' => $hip,
-            'in' => self::cmToIn($hip)
-        ];
-        $waist = $this->calculateMean('waist-circumference');
-        $summary['waist'] = [
-            'cm' => $waist,
-            'in' => self::cmToIn($waist)
-        ];
-        $summary['bloodpressure'] = [
-            'systolic' => $this->calculateMean('blood-pressure-systolic'),
-            'diastolic' => $this->calculateMean('blood-pressure-diastolic'),
-            'heartrate' => $this->calculateMean('heart-rate')
-        ];
+        if ($this->data->height) {
+            $summary['height'] = [
+                'cm' => $this->data->height,
+                'ftin' => self::cmToFtIn($this->data->height)
+            ];
+        }
+        if ($this->data->weight) {
+            $summary['weight'] = [
+                'kg' => $this->data->weight,
+                'lb' => self::kgToLb($this->data->weight)
+            ];
+        }
+        if ($this->data->weight && $this->data->height) {
+            $summary['bmi'] = $this->data->weight / (($this->data->height / 100) * ($this->data->height / 100));
+        }
+        if ($hip = $this->calculateMean('hip-circumference')) {
+            $summary['hip'] = [
+                'cm' => $hip,
+                'in' => self::cmToIn($hip)
+            ];
+        }
+        if ($waist = $this->calculateMean('waist-circumference')) {
+            $summary['waist'] = [
+                'cm' => $waist,
+                'in' => self::cmToIn($waist)
+            ];
+        }
+        $systolic = $this->calculateMean('blood-pressure-systolic');
+        $diastolic = $this->calculateMean('blood-pressure-diastolic');
+        if ($systolic && $diastolic) {
+            $summary['bloodpressure'] = [
+                'systolic' => $systolic,
+                'diastolic' => $diastolic
+            ];
+        }
+        if ($heartrate = $this->calculateMean('heart-rate')) {
+            $summary['heartrate'] = $heartrate;
+        }
         return $summary;
     }
 }
