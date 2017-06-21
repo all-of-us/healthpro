@@ -139,6 +139,7 @@ class WorkQueueController extends AbstractController
         '1UR10' => 'Urine 10 mL',
         '1SAL' => 'Saliva'
     ];
+    protected $rdrError = false;
 
     protected function participantSummarySearch($organization, &$params, $app)
     {
@@ -169,12 +170,16 @@ class WorkQueueController extends AbstractController
                 $rdrParams .= '&dateOfBirth=' . rawurlencode($filter);
             }
         }
-        $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams);
         $results = [];
-        foreach ($summaries as $summary) {
-            if (isset($summary->resource)) {
-                $results[] = new Participant($summary->resource);
+        try {
+            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams);
+            foreach ($summaries as $summary) {
+                if (isset($summary->resource)) {
+                    $results[] = new Participant($summary->resource);
+                }
             }
+        } catch (\Exception $e){
+            $this->rdrError = true;
         }
         return $results;
     }
@@ -194,7 +199,8 @@ class WorkQueueController extends AbstractController
             'samples' => self::$samples,
             'participants' => $participants,
             'params' => $params,
-            'organization' => $organization
+            'organization' => $organization,
+            'isRdrError' => $this->rdrError
         ]);
     }
 

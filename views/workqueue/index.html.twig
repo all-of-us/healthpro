@@ -6,6 +6,12 @@
         <h2>Participant Work Queue</h2>
     </div>
 
+    {% if isRdrError %}
+        <div class="alert alert-danger">
+            There was a problem with your request. Please refresh the page to try again.
+        </div>
+    {% endif %}
+
     <div class="well">
         <p><strong>Filters</strong> <small><a href="{{ path('workqueue_index') }}">reset</a></p>
         <form class="form-inline" id="filters">
