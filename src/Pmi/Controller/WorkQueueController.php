@@ -188,7 +188,8 @@ class WorkQueueController extends AbstractController
             'samples' => self::$samples,
             'participants' => $participants,
             'params' => $params,
-            'organization' => $organization
+            'organization' => $organization,
+            'isRdrError' => $app['pmi.drc.participants']->getRdrError()
         ]);
     }
 
