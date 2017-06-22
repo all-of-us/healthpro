@@ -14,6 +14,7 @@ class EvaluationController extends AbstractController
             'method' => 'GET|POST',
             'defaults' => ['evalId' => null]
         ]],
+        ['evaluationSummary', '/participant/{participantId}/measurements/{evalId}/summary'],
         ['evaluationFhir', '/participant/{participantId}/measurements/{evalId}/fhir.json'],
         ['evaluationRdr', '/participant/{participantId}/measurements/{evalId}/rdr.json']
     ];
@@ -76,6 +77,36 @@ class EvaluationController extends AbstractController
         }
         $rdrEvaluation = $app['pmi.drc.participants']->getEvaluation($participantId, $evaluation['rdr_id']);
         return $app->jsonPrettyPrint($rdrEvaluation);
+    }
+
+    public function evaluationSummaryAction($participantId, $evalId, Application $app)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->status) {
+            $app->abort(403);
+        }
+        
+        $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
+            'id' => $evalId,
+            'participant_id' => $participantId
+        ]);
+        if (!$evaluation) {
+            $app->abort(404);
+        }
+
+        if (!$evaluation['finalized_ts']) {
+            $app->abort(403);
+        }
+        $evaluationService = new Evaluation();
+        $evaluationService->loadFromArray($evaluation, $app);
+        return $app['twig']->render('evaluation-summary.html.twig', [
+            'participant' => $participant,
+            'evaluation' => $evaluation,
+            'summary' => $evaluationService->getSummary()
+        ]);
     }
 
     public function evaluationAction($participantId, $evalId, Application $app, Request $request)
