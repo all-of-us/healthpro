@@ -1,15 +1,4 @@
-DROP TABLE IF EXISTS `recruitment_center_codes`;
-
-CREATE TABLE `recruitment_center_codes` (
-  `code` varchar(255) DEFAULT NULL,
-  `label` varchar(255) DEFAULT NULL,
-  `latitude` varchar(255) DEFAULT NULL,
-  `longitude` varchar(255) DEFAULT NULL,
-  `category` varchar(255) DEFAULT NULL,
-  `recruitment_target` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-LOCK TABLES `recruitment_center_codes` WRITE;
+TRUNCATE TABLE `recruitment_center_codes`;
 
 INSERT INTO `recruitment_center_codes` (`code`, `label`, `latitude`, `longitude`, `category`, `recruitment_target`)
 VALUES
@@ -32,6 +21,3 @@ VALUES
 	('QUEST','Quest Labs','33.0000','-71.7000','Direct Volunteer',150000),
 	('EMSI','EMSI','33.0000','-71.8000','Direct Volunteer',150000),
 	('SDBB','SDBB','33.0000','-71.9000','Direct Volunteer',150000);
-
-
-UNLOCK TABLES;
