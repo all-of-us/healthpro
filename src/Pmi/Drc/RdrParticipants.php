@@ -89,37 +89,21 @@ class RdrParticipants
 
     public function listParticipantSummaries($params)
     {
-        if ($this->cacheEnabled) {
-            $memcache = new \Memcache();
-            $memcacheKey = 'rdr_psumm_' . md5(serialize($params));
-            $contents = $memcache->get($memcacheKey);
-            if ($contents) {
-                $responseObject = json_decode($contents);
-                if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
-                    unset($responseObject);
-                }
-            }
+        try {
+            $response = $this->getClient()->request('GET', 'ParticipantSummary', [
+                'query' => $params
+            ]);
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            throw new Exception\FailedRequestException();
         }
-        if (!$this->cacheEnabled || !isset($responseObject)) {
-            try {
-                $response = $this->getClient()->request('GET', 'ParticipantSummary', [
-                    'query' => $params
-                ]);
-            } catch (\Exception $e) {
-                $this->rdrHelper->logException($e);
-                throw new Exception\FailedRequestException();
-            }
-            $contents = $response->getBody()->getContents();
-            $responseObject = json_decode($contents);
-            if (!is_object($responseObject)) {
-                throw new Exception\InvalidResponseException();
-            }
-            if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
-                return [];
-            }
-            if ($this->cacheEnabled) {
-                $memcache->set($memcacheKey, $contents, 0, 300);
-            }
+        $contents = $response->getBody()->getContents();
+        $responseObject = json_decode($contents);
+        if (!is_object($responseObject)) {
+            throw new Exception\InvalidResponseException();
+        }
+        if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
+            return [];
         }
 
         return $responseObject->entry;

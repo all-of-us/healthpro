@@ -158,6 +158,10 @@ label.label-normal {
     color: #337ab7;
     margin-top: 0;
 }
+#evaluation-summary {
+    margin: 20px auto;
+    max-width: 500px;
+}
 
 /* Participant page */
 #order-overflow, #evaluation-overflow {

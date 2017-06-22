@@ -14,6 +14,7 @@ class EvaluationController extends AbstractController
             'method' => 'GET|POST',
             'defaults' => ['evalId' => null]
         ]],
+        ['evaluationSummary', '/participant/{participantId}/measurements/{evalId}/summary'],
         ['evaluationFhir', '/participant/{participantId}/measurements/{evalId}/fhir.json'],
         ['evaluationRdr', '/participant/{participantId}/measurements/{evalId}/rdr.json']
     ];
@@ -78,6 +79,36 @@ class EvaluationController extends AbstractController
         return $app->jsonPrettyPrint($rdrEvaluation);
     }
 
+    public function evaluationSummaryAction($participantId, $evalId, Application $app)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->status) {
+            $app->abort(403);
+        }
+        
+        $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
+            'id' => $evalId,
+            'participant_id' => $participantId
+        ]);
+        if (!$evaluation) {
+            $app->abort(404);
+        }
+
+        if (!$evaluation['finalized_ts']) {
+            $app->abort(403);
+        }
+        $evaluationService = new Evaluation();
+        $evaluationService->loadFromArray($evaluation, $app);
+        return $app['twig']->render('evaluation-summary.html.twig', [
+            'participant' => $participant,
+            'evaluation' => $evaluation,
+            'summary' => $evaluationService->getSummary()
+        ]);
+    }
+
     public function evaluationAction($participantId, $evalId, Application $app, Request $request)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);
@@ -114,6 +145,11 @@ class EvaluationController extends AbstractController
                     $errors = $evaluationService->getFinalizeErrors();
                     if (count($errors) === 0) {
                         $dbArray['finalized_ts'] = $now;
+                        if (!$evaluation) {
+                            $dbArray['participant_id'] = $participant->id;
+                            $dbArray['user_id'] = $app->getUser()->getId();
+                            $dbArray['site'] = $app->getSiteId();
+                        }
                         $dbArray['finalized_user_id'] = $app->getUser()->getId();
                         $dbArray['finalized_site'] = $app->getSiteId();
                         // Send final evaluation to RDR and store resulting id
@@ -123,6 +159,7 @@ class EvaluationController extends AbstractController
                             ]);
                             $fhir = $evaluationService->getFhir($now, $parentEvaluation['rdr_id']);
                         } else {
+                            $evaluationService->loadFromArray($dbArray, $app);
                             $fhir = $evaluationService->getFhir($now);
                         }
                         if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($participant->id, $fhir)) {

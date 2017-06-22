@@ -6,6 +6,12 @@
         <h2>Participant Work Queue</h2>
     </div>
 
+    {% if isRdrError %}
+        <div class="alert alert-danger">
+            There was a problem with your request. Please refresh the page to try again.
+        </div>
+    {% endif %}
+
     <div class="well">
         <p><strong>Filters</strong> <small><a href="{{ path('workqueue_index') }}">reset</a></p>
         <form class="form-inline" id="filters">
@@ -23,7 +29,7 @@
     <p class="text-right">
         <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
     </p>
-    <h4>{{ participants|length == 100 ? '>' }}{{ participants|length|number_format }}{{ params|length > 0 ? ' matching' }} participant{{ participants|length != 1 ? 's'}} ({{ organization }})</h4>
+    <h4>{{ participants|length == constant('Pmi\\Controller\\WorkQueueController::LIMIT_DEFAULT') ? '>' }}{{ participants|length|number_format }}{{ params|length > 0 ? ' matching' }} participant{{ participants|length != 1 ? 's'}} ({{ organization }})</h4>
     <table class="table table-striped table-bordered table-small" id="workqueue" width="100%">
         <thead>
             <tr>
