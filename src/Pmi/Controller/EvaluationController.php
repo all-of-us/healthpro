@@ -159,7 +159,9 @@ class EvaluationController extends AbstractController
                             ]);
                             $fhir = $evaluationService->getFhir($now, $parentEvaluation['rdr_id']);
                         } else {
-                            $evaluationService->loadFromArray($dbArray, $app);
+                            if (!$evaluation) {
+                                $evaluationService->loadFromArray($dbArray, $app);
+                            }
                             $fhir = $evaluationService->getFhir($now);
                         }
                         if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($participant->id, $fhir)) {
