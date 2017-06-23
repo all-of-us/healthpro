@@ -25,46 +25,8 @@ class DashboardController extends AbstractController
         // metrics attributes are hard-coded as we don't have human-readable names in the API yet
         $metrics_attributes = $this->getMetricsDisplayNames();
 
-        try {
-            $center_codes = $this->getMetricsFieldDefinitions($app, 'Participant.hpoId');
-        } catch (\Exception $e) {
-            $center_codes = [];
-        }
+        $recruitment_centers = $this->getCentersList($app);
 
-        // remove UNSET value as we don't care about this for the filters
-        if(($key = array_search('UNSET', $center_codes)) !== false) {
-            unset($center_codes[$key]);
-        }
-
-        $all_centers = array();
-        $recruitment_centers = array();
-        $i = 5;
-
-        // build up array of centers with categories, lat/long and provisional targets
-        foreach($center_codes as $code) {
-            try {
-                $center = $app['db']->fetchAssoc("SELECT * FROM recruitment_center_codes WHERE code = ?", array($code));
-            } catch (\Exception $e) {
-                $center = ['code' => $code, 'label' => $code, 'latitude' => '33.0000', 'longitude' => '-71.' . $i . '000', 'category' => 'Unknown', 'recruitment_target' => 10000];
-                $i++;
-            }
-
-            if (!$center) {
-                // in case center isn't found in DB
-                $center = ['code' => $code, 'label' => $code, 'latitude' => '33.0000', 'longitude' => '-71.' . $i . '000', 'category' => 'Unknown', 'recruitment_target' => 10000];
-                $i++;
-            }
-            array_push($all_centers, $center);
-        }
-
-        foreach($all_centers as $center) {
-            $category = $center['category'];
-            if (!array_key_exists($category, $recruitment_centers)) {
-                $recruitment_centers[$category] = [$center];
-            } else {
-                $recruitment_centers[$category][] = $center;
-            }
-        }
         return $app['twig']->render('dashboard/index.html.twig', [
             'color_profiles' => $color_profiles,
             'metrics_attributes' => $metrics_attributes,
@@ -106,7 +68,7 @@ class DashboardController extends AbstractController
                 // check database to see of there are available display values for the requested metric
                 $raw_display = $app['db']->fetchAll("SELECT * FROM dashboard_display_values WHERE metric = ?", array($filter_by));
                 $display_values = [];
-                foreach($raw_display as $row) {
+                foreach ($raw_display as $row) {
                     $display_values[$row['code']] = $row['display_value'];
                 }
             } catch (\Exception $e) {
@@ -121,7 +83,7 @@ class DashboardController extends AbstractController
         }
 
         // iterate through all requested dates to retrieve data from cache
-        foreach($control_dates as $date) {
+        foreach ($control_dates as $date) {
             if ($this->checkDates($date, $start_date, $end_date, $control_dates)) {
                 // grab date for x axis
                 array_push($dates, $date);
@@ -187,7 +149,7 @@ class DashboardController extends AbstractController
 
         // if we got this far, we have data!
         // assemble data object in Plotly format
-        foreach($entries as $entry) {
+        foreach ($entries as $entry) {
             if ($filter_by == 'Participant') {
                 $trace_name = 'Total Participants';
             } else {
@@ -214,12 +176,12 @@ class DashboardController extends AbstractController
         }
 
         // sort alphabetically by trace name
-        usort($data, function($a, $b){
+        usort($data, function ($a, $b) {
             if ($a['name'] == $b['name']) return 0;
             return ($a['name'] > $b['name']) ? -1 : 1;
         });
         // now apply colors since we're in order
-        for($i = 0; $i < count($data); $i++) {
+        for ($i = 0; $i < count($data); $i++) {
             $data[$i]['marker'] = array(
                 "color" => $this->getColorBrewerVal($i)
             );
@@ -244,9 +206,9 @@ class DashboardController extends AbstractController
         // load custom green color profile for default
         if ($color_profile == 'Custom') {
             $color_profile = [
-                [0, 'rgb(247,252,245)'], [0.125, 'rgb(229,245,224)'],[0.25, 'rgb(199,233,192)'],
-                [0.375, 'rgb(161,217,155)'],[0.5, 'rgb(116,196,118)'], [0.625, 'rgb(65,171,93)'],
-                [0.75, 'rgb(35,139,69)'],[0.875, 'rgb(0,109,44)'],[1, 'rgb(0,68,27)']
+                [0, 'rgb(247,252,245)'], [0.125, 'rgb(229,245,224)'], [0.25, 'rgb(199,233,192)'],
+                [0.375, 'rgb(161,217,155)'], [0.5, 'rgb(116,196,118)'], [0.625, 'rgb(65,171,93)'],
+                [0.75, 'rgb(35,139,69)'], [0.875, 'rgb(0,109,44)'], [1, 'rgb(0,68,27)']
             ];
         };
 
@@ -273,19 +235,19 @@ class DashboardController extends AbstractController
                 }
 
                 // now iterate through states
-                foreach($all_states as $state) {
+                foreach ($all_states as $state) {
                     array_push($state_names, $state['state']);
 
                     $state_lookup = $map_mode . ".PIIState_" . $state['state'];
                     $count = 0;
 
                     // iterate through each center to accumulate a running total to store
-                    foreach($centers as $center) {
+                    foreach ($centers as $center) {
                         $requested_center = [];
                         if ($center == 'ALL') {
                             $requested_center = $metrics[0]['entries'];
                         } else {
-                            foreach($metrics as $metric) {
+                            foreach ($metrics as $metric) {
                                 if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $center) {
                                     $requested_center = $metric['entries'];
                                 }
@@ -298,7 +260,7 @@ class DashboardController extends AbstractController
                     $pct_of_target = round($count / $state['recruitment_target'] * 100, 2);
 
                     // check if max_val needs to be set
-                    if ($pct_of_target > $max_val ) {
+                    if ($pct_of_target > $max_val) {
                         $max_val = $pct_of_target;
                     }
 
@@ -333,14 +295,14 @@ class DashboardController extends AbstractController
                     $census_regions = [];
                 }
 
-                foreach($census_regions as $region) {
+                foreach ($census_regions as $region) {
                     try {
                         $states = $app['db']->fetchAll("SELECT * FROM state_census_regions WHERE census_region_id = ? ORDER BY state", [$region["id"]]);
                     } catch (\Exception $e) {
                         $states = [];
                     }
                     $region_states = [];
-                    foreach($states as $state) {
+                    foreach ($states as $state) {
                         array_push($region_states, $state["state"]);
                     }
 
@@ -349,12 +311,12 @@ class DashboardController extends AbstractController
                     $count = 0;
 
                     // iterate through each center to accumulate a running total to store
-                    foreach($centers as $center) {
+                    foreach ($centers as $center) {
                         $requested_center = [];
                         if ($center == 'ALL') {
                             $requested_center = $metrics[0]['entries'];
                         } else {
-                            foreach($metrics as $metric) {
+                            foreach ($metrics as $metric) {
                                 if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $center) {
                                     $requested_center = $metric['entries'];
                                 }
@@ -367,11 +329,11 @@ class DashboardController extends AbstractController
                     $pct_of_target = round($count / $region['recruitment_target'] * 100, 2);
 
                     // check if max_val needs to be set
-                    if ($pct_of_target > $max_val ) {
+                    if ($pct_of_target > $max_val) {
                         $max_val = $pct_of_target;
                     }
 
-                    foreach($region_states as $state) {
+                    foreach ($region_states as $state) {
                         array_push($states_by_region, $state);
                         array_push($registrations_by_state, $pct_of_target);
                         array_push($region_text, "<b>" . $pct_of_target . "%</b> (" . $count . ")<br><b>" .
@@ -397,21 +359,23 @@ class DashboardController extends AbstractController
                 );
             } else if ($map_mode == 'FullParticipant.hpoId') {
                 $i = 0;
-                try {
-                    $recruitment_centers = $app['db']->fetchAll("SELECT * FROM recruitment_center_codes");
-                } catch (\Exception $e) {
-                    $recruitment_centers = [];
-                }
-                $metrics = $this->getMetricsObject($app, $end_date);
-                foreach($recruitment_centers as $location) {
 
+                $categorized_centers = $this->getCentersList($app);
+                $recruitment_centers = array();
+                foreach($categorized_centers as $categories) {
+                    foreach($categories as $loc) {
+                        array_push($recruitment_centers, $loc);
+                    }
+                }
+
+                $metrics = $this->getMetricsObject($app, $end_date);
+                foreach ($recruitment_centers as $location) {
                     // check if center is requested first before adding to map_data
-                    if ($centers == ['ALL'] || in_array($location['code'], $centers) ) {
+                    if ($centers == ['ALL'] || in_array($location['code'], $centers)) {
                         $hpo_lookup = $map_mode . "." . $location['code'];
                         $count = 0;
-
                         // find appropriate entry
-                        foreach($metrics as $metric) {
+                        foreach ($metrics as $metric) {
                             if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $location['code']) {
                                 $requested_center = $metric['entries'];
                             }
@@ -424,11 +388,11 @@ class DashboardController extends AbstractController
                         $pct_of_target = round($count / $location['recruitment_target'] * 100, 2);
 
                         // check if max_val needs to be set
-                        if ($pct_of_target > $max_val ) {
+                        if ($pct_of_target > $max_val) {
                             $max_val = $pct_of_target;
                         }
 
-                        $label = "{$location["label"]} ({$location['category']}): <br><b>" . $pct_of_target  .
+                        $label = "{$location["label"]} ({$location['category']}): <br><b>" . $pct_of_target .
                             "%</b> (" . $count . ", Target: " . $location['recruitment_target'] . ")";
 
                         $map_data[] = array(
@@ -456,7 +420,7 @@ class DashboardController extends AbstractController
                 $map_coefficient = 100.0 / ($max_val == 0 ? 1 : $max_val);
 
                 // reiterate through entries to recalculate bubble size based on new coefficient
-                foreach($map_data as $index => $map_datum) {
+                foreach ($map_data as $index => $map_datum) {
                     $new_pct = $map_datum['marker']['size'][0] * $map_coefficient;
                     $map_data[$index]['marker']['size'] = [$new_pct];
                 }
@@ -565,7 +529,7 @@ class DashboardController extends AbstractController
 
         $completed_consent = $completed[1];
 
-        foreach($metrics_keys as $index => $val) {
+        foreach ($metrics_keys as $index => $val) {
             if ($val == 'Participant') {
                 $eligible[] = 0;
             } elseif ($val == 'Participant.consentForStudyEnrollment') {
@@ -576,7 +540,7 @@ class DashboardController extends AbstractController
         }
 
         // assemble hover text for completed & eligible traces
-        foreach($completed as $index => $count) {
+        foreach ($completed as $index => $count) {
             $total = $count + $eligible[$index];
             $completed_text[] = $this->calculatePercentText($count, $total);
             $eligible_text[] = $this->calculatePercentText($eligible[$index], $total);
@@ -585,28 +549,28 @@ class DashboardController extends AbstractController
 
         // assemble data
         $pipeline_data = [
-                array(
-                    "x" => $phases,
-                    "y" => $completed,
-                    "text" => $completed_text,
-                    "type" => 'bar',
-                    "hoverinfo" => 'text+name',
-                    "name" => 'Completed',
-                    "marker" => array(
-                        "color" => $this->getColorBrewerVal(1)
-                    )
-                ),
-                array(
-                    "x" => $phases,
-                    "y" => $eligible,
-                    "text" => $eligible_text,
-                    "type" => 'bar',
-                    "hoverinfo" => 'text+name',
-                    "name" => 'Eligible, not completed',
-                    "marker" => array(
-                        "color" => $this->getColorBrewerVal(0)
-                    )
+            array(
+                "x" => $phases,
+                "y" => $completed,
+                "text" => $completed_text,
+                "type" => 'bar',
+                "hoverinfo" => 'text+name',
+                "name" => 'Completed',
+                "marker" => array(
+                    "color" => $this->getColorBrewerVal(1)
                 )
+            ),
+            array(
+                "x" => $phases,
+                "y" => $eligible,
+                "text" => $eligible_text,
+                "type" => 'bar',
+                "hoverinfo" => 'text+name',
+                "name" => 'Eligible, not completed',
+                "marker" => array(
+                    "color" => $this->getColorBrewerVal(0)
+                )
+            )
         ];
         // return json
         return $app->json($pipeline_data);
@@ -618,7 +582,8 @@ class DashboardController extends AbstractController
     // Main method for retrieving metrics from API
     // stores result in memcache with 4 hour expiration
     // each entry is comprised of a single day of all available data & facets
-    private function getMetricsObject(Application $app, $date) {
+    private function getMetricsObject(Application $app, $date)
+    {
         $memcache = new \Memcache();
         $memcacheKey = 'metrics_api_' . $date;
         $metrics = $memcache->get($memcacheKey);
@@ -641,7 +606,8 @@ class DashboardController extends AbstractController
 
     // stores and returns field definitions as controlled vocabulary
     // can return either values for specified field_key or all keys present
-    private function getMetricsFieldDefinitions(Application $app, $field_key) {
+    private function getMetricsFieldDefinitions(Application $app, $field_key)
+    {
         $memcache = new \Memcache();
         $memcacheKey = 'metrics_api_field_definitions';
         $definitions = $memcache->get($memcacheKey);
@@ -656,7 +622,7 @@ class DashboardController extends AbstractController
             }
         }
         $keys = [];
-        foreach($definitions as $entry) {
+        foreach ($definitions as $entry) {
             if (empty($field_key)) {
                 array_push($keys, $entry['name']);
             } else if ($entry['name'] == $field_key) {
@@ -668,7 +634,8 @@ class DashboardController extends AbstractController
     }
 
     // stores display names for metrics attribute field names to be used in selection
-    private function getMetricsDisplayNames() {
+    private function getMetricsDisplayNames()
+    {
         $metrics_attributes = array(
             "Participant" => "Total Registered Participants",
             "Participant.enrollmentStatus" => "Enrollment Status",
@@ -679,16 +646,70 @@ class DashboardController extends AbstractController
         return $metrics_attributes;
     }
 
+    // helper to build up the list of centers for use in filters and maps
+    private function getCentersList($app) {
+
+        // get list of centers from field definitions
+        try {
+            $center_codes = $this->getMetricsFieldDefinitions($app, 'Participant.hpoId');
+        } catch (\Exception $e) {
+            $center_codes = [];
+        }
+
+        $all_centers = array();
+        $recruitment_centers = array();
+        $i = 5;
+
+        // build up array of centers with categories, lat/long and provisional targets
+        foreach($center_codes as $code) {
+            try {
+                $center = $app['db']->fetchAssoc("SELECT * FROM recruitment_center_codes WHERE code = ?", array($code));
+            } catch (\Exception $e) {
+                $center = ['code' => $code, 'label' => $code, 'latitude' => '33.0000', 'longitude' => '-71.' . $i . '000', 'category' => 'Unknown', 'recruitment_target' => 10000];
+                $i++;
+            }
+
+            if (!$center) {
+                // in case center isn't found in DB
+                $center = ['code' => $code, 'label' => $code, 'latitude' => '33.0000', 'longitude' => '-71.' . $i . '000', 'category' => 'Unknown', 'recruitment_target' => 10000];
+                $i++;
+            }
+            array_push($all_centers, $center);
+        }
+
+        // get all categories to sort by
+        $categories = array();
+        foreach($all_centers as $center) {
+            array_push($categories, $center['category']);
+        }
+
+        // sort categories and add to recruitment centers array
+        sort($categories, SORT_STRING);
+        foreach($categories as $category) {
+            $recruitment_centers[$category] = [];
+        }
+
+        // build up array in sort order
+        foreach($all_centers as $center) {
+            $cat = $center['category'];
+            $recruitment_centers[$cat][] = $center;
+        }
+
+        return $recruitment_centers;
+    }
+
     // helper function to check date range cutoffs
-    private function checkDates($date, $start, $end, $controls) {
+    private function checkDates($date, $start, $end, $controls)
+    {
         return strtotime($date) >= strtotime($start) && strtotime($date) <= strtotime($end) && in_array($date, $controls);
     }
 
     // helper function to return array of dates segmented by interval
-    private function getDashboardDates($start_date, $end_date, $interval) {
+    private function getDashboardDates($start_date, $end_date, $interval)
+    {
         $dates = [$end_date];
         $i = 0;
-        while (strtotime($dates[$i]) >= strtotime($start_date)){
+        while (strtotime($dates[$i]) >= strtotime($start_date)) {
             $d = strtotime("-1 $interval", strtotime($dates[$i]));
             array_push($dates, date('Y-m-d', $d));
             $i++;
@@ -698,29 +719,37 @@ class DashboardController extends AbstractController
 
     // helper function for calculating percentages of total for entries
     // returns formatted string for use in Plotly hover text
-    private function calculatePercentText($value, $total) {
+    private function calculatePercentText($value, $total)
+    {
         if ($total == 0) {
             return "0 (0%)";
         } else {
             $percentage = $value / $total;
-            return "<b>{$value}</b> (".number_format( $percentage * 100, 2 ) . '%'.")";
+            return "<b>{$value}</b> (" . number_format($percentage * 100, 2) . '%' . ")";
         }
 
     }
 
     // helper function to return colorbrewer color values (since PHP can't have array constants
-    private function getColorBrewerVal($index) {
+    private function getColorBrewerVal($index)
+    {
         // colorbrewer 20-element qualitative colors
-        $colors = ['rgb(166,206,227)','rgb(31,120,180)','rgb(178,223,138)','rgb(51,160,44)','rgb(251,154,153)',
-            'rgb(227,26,28)', 'rgb(253,191,111)','rgb(255,127,0)','rgb(202,178,214)','rgb(106,61,154)',
-            'rgb(255,255,153)','rgb(177,89,40)','rgb(247,129,191)', 'rgb(153,153,153)', 'rgb(102,194,165)',
+        $colors = ['rgb(166,206,227)', 'rgb(31,120,180)', 'rgb(178,223,138)', 'rgb(51,160,44)', 'rgb(251,154,153)',
+            'rgb(227,26,28)', 'rgb(253,191,111)', 'rgb(255,127,0)', 'rgb(202,178,214)', 'rgb(106,61,154)',
+            'rgb(255,255,153)', 'rgb(177,89,40)', 'rgb(247,129,191)', 'rgb(153,153,153)', 'rgb(102,194,165)',
             'rgb(229,196,148)', 'rgb(85,85,85)', 'rgb(251,128,114)', 'rgb(128,177,211)', 'rgb(188,128,189)'
         ];
-        return $colors[$index];
+        if ($index >= count($colors)) {
+            $adj_index = $index - count($colors);
+            return $colors[$adj_index];
+        } else {
+            return $colors[$index];
+        }
     }
 
     // sanitize url date parameter to prevent SQL injection
-    private function sanitizeDate($date_string) {
+    private function sanitizeDate($date_string)
+    {
         return date('Y-m-d', strtotime($date_string));
     }
 }

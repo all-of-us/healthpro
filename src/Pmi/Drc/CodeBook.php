@@ -22,6 +22,7 @@ class CodeBook
         'SexAtBirth_Female' => 'Female',
         'SexAtBirth_Intersex' => 'Intersex',
         'SexAtBirth_None' => 'Other',
+        'SexAtBirth_SexAtBirthNoneOfThese' => 'Other',
         'GenderIdentity_Man' => 'Man',
         'GenderIdentity_Woman' => 'Woman',
         'GenderIdentity_NonBinary' => 'Non-binary',
