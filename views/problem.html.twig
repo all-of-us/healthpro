@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+{% block title %}Problems - {% endblock %}
+{% block body %}
+    <div class="row" id="problemForm">
+        <div class="col-sm-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#biospecimen" role="tab" data-toggle="tab">Related to Bio-specimen kit</a></li>
+                <li><a href="#reportable" role="tab" data-toggle="tab">Related to reportable occurrences</a></li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="biospecimen"><br/>Mayo</div>
+                <div role="tabpanel" class="tab-pane" id="reportable"><br/>
+                    {{ form_start(problemForm) }}
+                    {{ form_rest(problemForm) }}
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    {{ form_end(problemForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+
+(function ($) {
+
+var ProblemForm = Backbone.View.extend({
+    events: {
+        "click input[name='form[report_type]']": "showHideProblemFields",
+        "change #form_physical_injury_type": 'changeProviderLabel'
+    },
+    showHideProblemFields: function(e) {
+        this.showHideFields($(e.currentTarget).val());
+    },
+    changeProviderLabel: function(e) {
+        if ($(e.currentTarget).val() == 'baseline_related') {
+            this.$('label[for="form_provider_aware_date"]').html('Date provider became aware of event');
+        } else {
+            this.$('label[for="form_provider_aware_date"]').html('Date provider became aware of injury');
+        }
+    },
+    showHideFields: function(report) {
+        if (report == 'physical') {
+            this.$('div.form-group').show();
+            this.changeLabel('Date of Event', 'Description of Event', 'Corrective Action Taken');
+        } else {
+            this.$('div.form-group').show();
+            this.$('div.form-group:eq(1), div.form-group:eq(2), div.form-group:eq(4)').hide();
+            this.changeLabel('Date of Incident', 'Description', 'Action Taken');
+        }
+    },
+    changeLabel: function(date, description, action) {
+        this.$('label[for="form_problem_date"]').html(date);
+        this.$('label[for="form_description"]').html(description);
+        this.$('label[for="form_action_taken"]').html(action);
+    },
+    changeProblemFields() {
+        if ($('input[name="form[report_type]"]').is(':checked')) {
+            this.showHideFields($('input[name="form[report_type]"]:checked').val());
+        } else {
+            this.$('div.form-group').not(':eq(0)').hide();
+        }
+    },
+    initialize: function() { this.render(); },
+    render: function() {
+        this.changeProblemFields();
+        return this;
+    }
+});
+
+$(document).ready(function() {
+    $('#form_problem_date').pmiDateTimePicker();
+    $('#form_provider_aware_date').pmiDateTimePicker();
+    if ($("#problemForm").length > 0) {
+        var test = new ProblemForm({el: $("#problemForm") });
+    }
+});
+
+})(jQuery);
+
+</script>
+{% endblock %}
