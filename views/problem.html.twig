@@ -3,6 +3,17 @@
 {% block body %}
     <div class="row" id="problemForm">
         <div class="col-sm-12">
+            <div class="page-header">
+                <h2>
+                    <i class="fa fa-clipboard" aria-hidden="true"></i>
+                    {% if problem %}
+                        {{ problem.created_ts|date('n/j/Y', app.userTimezone) }}
+                    {% else %}
+                        New Report
+                    {% endif %}
+                    <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+                </h2>
+            </div>
             <ul class="nav nav-tabs" role="tablist">
                 <li class="active"><a href="#biospecimen" role="tab" data-toggle="tab">Related to Bio-specimen kit</a></li>
                 <li><a href="#reportable" role="tab" data-toggle="tab">Related to reportable occurrences</a></li>

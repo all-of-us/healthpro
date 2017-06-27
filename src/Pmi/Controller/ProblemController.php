@@ -77,6 +77,7 @@ class ProblemController extends AbstractController
 
         return $app['twig']->render('problem.html.twig', [
             'problem' => $problem,
+            'participant' => $participant,
             'problemForm' => $problemForm->createView()
         ]);
     }
