@@ -21,9 +21,9 @@
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="biospecimen"><br/>Mayo</div>
                 <div role="tabpanel" class="tab-pane" id="reportable"><br/>
-                    {{ form_start(problemForm) }}
+                    {{ form_start(problemForm, { attr: { class: 'warn-unsaved' } }) }}
                     {{ form_rest(problemForm) }}
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                     {{ form_end(problemForm) }}
                 </div>
             </div>
@@ -85,6 +85,9 @@ $(document).ready(function() {
     $('#form_provider_aware_date').pmiDateTimePicker();
     if ($("#problemForm").length > 0) {
         var test = new ProblemForm({el: $("#problemForm") });
+    }
+    if ($('.form-group.has-error').length >0 ) {
+        $('.nav-tabs a[href="#reportable"]').tab('show');
     }
 });
 
