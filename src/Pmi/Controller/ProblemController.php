@@ -46,33 +46,34 @@ class ProblemController extends AbstractController
         }
         $problemForm = $this->getProblemForm($app, $problem);
         $problemForm->handleRequest($request);
-
-        if ($problemForm->isValid()) {
-            $problemData = $problemForm->getData();
-            if ($problemData['report_type'] !== 'physical') {
-                $problemData['physical_injury_type'] = null;
-                $problemData['provider_aware_date'] = null;
-            }
-            $now = new \DateTime();
-            $problemData['updated_ts'] = $now;
-            if ($problem) {
-                if ($app['em']->getRepository('problems')->update($problemId, $problemData)) {
-                    $app->addFlashNotice('Report updated');
+        if ($problemForm->isSubmitted()) {
+            if ($problemForm->isValid()) {
+                $problemData = $problemForm->getData();
+                if ($problemData['report_type'] !== 'physical') {
+                    $problemData['physical_injury_type'] = null;
+                    $problemData['provider_aware_date'] = null;
                 }
+                $now = new \DateTime();
+                $problemData['updated_ts'] = $now;
+                if ($problem) {
+                    if ($app['em']->getRepository('problems')->update($problemId, $problemData)) {
+                        $app->addFlashNotice('Report updated');
+                    }
+                } else {
+                    $problemData['participant_id'] = $participantId;
+                    $problemData['created_ts'] = $now;
+                    if ($problemId = $app['em']->getRepository('problems')->insert($problemData)) {
+                        $app->addFlashNotice('Report created');
+                    }
+                }
+                return $app->redirectToRoute('problem', [
+                    'participantId' => $participantId,
+                    'problemId' => $problemId
+                ]);
             } else {
-                $problemData['participant_id'] = $participantId;
-                $problemData['created_ts'] = $now;
-                if ($problemId = $app['em']->getRepository('problems')->insert($problemData)) {
-                    $app->addFlashNotice('Report created');
+                if (count($problemForm->getErrors()) == 0) {
+                    $problemForm->addError(new FormError('Please correct the errors below'));
                 }
-            }
-            return $app->redirectToRoute('problem', [
-                'participantId' => $participantId,
-                'problemId' => $problemId
-            ]);
-        } else {
-            if (count($problemForm->getErrors()) == 0) {
-                $problemForm->addError(new FormError('Please correct the errors below'));
             }
         }
 
