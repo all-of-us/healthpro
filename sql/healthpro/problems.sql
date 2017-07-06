@@ -1,6 +1,9 @@
 CREATE TABLE `problems` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `site` varchar(50) NOT NULL,
   `participant_id` varchar(50) NOT NULL,
+  `problem_type` varchar(50) NOT NULL,
   `report_type` ENUM('physical', 'suicidal', 'verbal', 'misconduct'),
   `physical_injury_type` ENUM('baseline_related', 'baseline_unrelated'),
   `investigator_name` varchar(255) DEFAULT NULL,
