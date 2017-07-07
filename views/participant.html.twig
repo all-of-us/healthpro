@@ -169,7 +169,11 @@
                             <a href="{{ path('problem', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
                                 {{ problem.created_ts|date('D n/j/Y g:ia', app.userTimezone) }}<br />
                                 <small class="text-muted">
-                                    <span class="label label-default">Updated</span> {{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                    {% if problem.finalized_ts %}
+                                        <span class="label label-success">Finalized</span> {{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                    {% else %}
+                                        <span class="label label-default">Updated</span> {{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                    {% endif %}
                                 </small>
                             </a>
                         {% endfor %}
