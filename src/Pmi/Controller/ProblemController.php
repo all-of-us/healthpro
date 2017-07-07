@@ -40,9 +40,15 @@ class ProblemController extends AbstractController
                 if ($problem['provider_aware_date']) {
                     $problem['provider_aware_date'] = new \DateTime($problem['provider_aware_date']);
                 }
+                if ($problem['problem_type'] === 'biospecimen') {
+                    $activeTab = ['active', null];
+                } else {
+                    $activeTab = [null, 'active'];
+                }
             }
         } else {
             $problem = null;
+            $activeTab = ['active', null];
         }
         $problemForm = $this->getProblemForm($app, $problem);
         $problemForm->handleRequest($request);
@@ -86,7 +92,8 @@ class ProblemController extends AbstractController
         return $app['twig']->render('problem.html.twig', [
             'problem' => $problem,
             'participant' => $participant,
-            'problemForm' => $problemForm->createView()
+            'problemForm' => $problemForm->createView(),
+            'activeTab' => $activeTab
         ]);
     }
 

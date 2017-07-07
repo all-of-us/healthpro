@@ -15,12 +15,12 @@
                 </h2>
             </div>
             <ul class="nav nav-tabs" role="tablist">
-                <li class="active"><a href="#biospecimen" role="tab" data-toggle="tab">Related to Bio-specimen kit</a></li>
-                <li><a href="#reportable" role="tab" data-toggle="tab">Related to reportable occurrences</a></li>
+                <li class="{{ activeTab[0] }}"><a href="#biospecimen" role="tab" data-toggle="tab">Related to Bio-specimen kit</a></li>
+                <li class="{{ activeTab[1] }}"><a href="#reportable" role="tab" data-toggle="tab">Related to reportable occurrences</a></li>
             </ul>
             <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="biospecimen"><br/>Mayo</div>
-                <div role="tabpanel" class="tab-pane" id="reportable"><br/>
+                <div role="tabpanel" class="tab-pane {{ activeTab[0] }}" id="biospecimen"><br/>Mayo</div>
+                <div role="tabpanel" class="tab-pane {{ activeTab[1] }}" id="reportable"><br/>
                     {{ form_start(problemForm, { attr: { class: 'warn-unsaved' } }) }}
                     {{ form_errors(problemForm) }}
                     {{ form_rest(problemForm) }}
