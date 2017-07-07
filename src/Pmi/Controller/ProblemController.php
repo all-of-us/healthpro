@@ -60,7 +60,14 @@ class ProblemController extends AbstractController
                         $app->addFlashNotice('Report updated');
                     }
                 } else {
+                    $problemData['user_id'] = $app->getUser()->getId();
+                    $problemData['site'] = $app->getSiteId();
                     $problemData['participant_id'] = $participantId;
+                    if ($request->request->has('reportable')) {
+                        $problemData['problem_type'] = 'reportable';
+                    } else {
+                        $problemData['problem_type'] = 'biospecimen';
+                    }
                     $problemData['created_ts'] = $now;
                     if ($problemId = $app['em']->getRepository('problems')->insert($problemData)) {
                         $app->addFlashNotice('Report created');
