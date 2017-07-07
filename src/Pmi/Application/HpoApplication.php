@@ -288,7 +288,6 @@ class HpoApplication extends AbstractApplication
                     $request->attributes->get('_route') !== 'switchSite' &&
                     strpos($request->attributes->get('_route'), 'dashboard_') !== 0 &&
                     !$this->isUpkeepRoute($request)) {
-                $request->request->set('destUrl', $request->getRequestUri());
                 return $this->forwardToRoute('selectSite', $request);
             }
         }

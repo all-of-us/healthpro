@@ -144,7 +144,7 @@ class DefaultController extends AbstractController
     public function switchSiteAction($id, Application $app, Request $request)
     {
         if ($app->switchSite($id)) {
-            return $app->redirect($request->get('destUrl', $app->generateUrl('home')));
+            return $app->redirectToRoute('home');
         } else {
             return $app->abort(403);
         }
@@ -152,8 +152,7 @@ class DefaultController extends AbstractController
     
     public function selectSiteAction(Application $app, Request $request)
     {
-        $destUrl = $request->get('destUrl', $app->generateUrl('home'));
-        return $app['twig']->render('site-select.html.twig', ['destUrl' => $destUrl]);
+        return $app['twig']->render('site-select.html.twig');
     }
 
     public function participantsAction(Application $app, Request $request)
