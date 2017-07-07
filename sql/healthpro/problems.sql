@@ -12,6 +12,9 @@ CREATE TABLE `problems` (
   `description` text DEFAULT NULL,
   `action_taken` varchar(512) DEFAULT NULL,
   `follow_up` varchar(512) DEFAULT NULL,
+  `finalized_user_id` int(11) DEFAULT NULL,
+  `finalized_site` varchar(50) DEFAULT NULL,
+  `finalized_ts` TIMESTAMP NULL DEFAULT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)

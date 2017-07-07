@@ -18,6 +18,8 @@ class ProblemController extends AbstractController
         ]]
     ];
 
+    protected $disabled = false;
+
     public function problemAction($participantId, $problemId, Application $app, Request $request)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);
@@ -45,6 +47,9 @@ class ProblemController extends AbstractController
                 } else {
                     $activeTab = [null, 'active'];
                 }
+                if (!empty($problem['finalized_ts'])) {
+                    $this->disabled = true;
+                }
             }
         } else {
             $problem = null;
@@ -61,22 +66,35 @@ class ProblemController extends AbstractController
                 }
                 $now = new \DateTime();
                 $problemData['updated_ts'] = $now;
+                if ($request->request->has('reportable_finalize') && (!$problem || empty($problem['finalized_ts']))) {
+                    $problemData['finalized_user_id'] = $app->getUser()->getId();
+                    $problemData['finalized_site'] = $app->getSiteId();
+                    $problemData['finalized_ts'] = $now;                       
+                }
                 if ($problem) {
-                    if ($app['em']->getRepository('problems')->update($problemId, $problemData)) {
-                        $app->addFlashNotice('Report updated');
+                    if (empty($problem['finalized_ts']) && $app['em']->getRepository('problems')->update($problemId, $problemData)) {
+                        if ($request->request->has('reportable_finalize')) {
+                            $app->addFlashNotice('Report finalized');
+                        } else {
+                            $app->addFlashNotice('Report updated');
+                        }                       
                     }
                 } else {
                     $problemData['user_id'] = $app->getUser()->getId();
                     $problemData['site'] = $app->getSiteId();
                     $problemData['participant_id'] = $participantId;
-                    if ($request->request->has('reportable')) {
+                    if ($request->request->has('reportable') || $request->request->has('reportable_finalize')) {
                         $problemData['problem_type'] = 'reportable';
                     } else {
                         $problemData['problem_type'] = 'biospecimen';
                     }
                     $problemData['created_ts'] = $now;
                     if ($problemId = $app['em']->getRepository('problems')->insert($problemData)) {
-                        $app->addFlashNotice('Report created');
+                        if ($request->request->has('reportable_finalize')) {
+                            $app->addFlashNotice('Report finalized');
+                        }else {
+                            $app->addFlashNotice('Report created');
+                        }                       
                     }
                 }
                 return $app->redirectToRoute('participant', [
@@ -104,6 +122,7 @@ class ProblemController extends AbstractController
             ->add('report_type', Type\ChoiceType::class, [
                 'label' => 'Report Type',
                 'required' => true,
+                'disabled' => $this->disabled,
                 'choices' => [
                     'Physical Injury' => 'physical',
                     'Indication of suicidal thoughts' => 'suicidal',
@@ -116,6 +135,7 @@ class ProblemController extends AbstractController
             ->add('physical_injury_type', Type\ChoiceType::class, [
                 'label' => 'Physical Injury Type',
                 'required' => true,
+                'disabled' => $this->disabled,
                 'choices' => [
                     'Injury related to baseline appointment' => 'baseline_related',
                     'Injury Unrelated to baseline appointment' => 'baseline_unrelated'
@@ -125,14 +145,15 @@ class ProblemController extends AbstractController
             ])
             ->add('investigator_name', Type\TextType::class, [
                 'label' => 'Investigator Name',
-                'required' => false
+                'required' => false,
+                'disabled' => $this->disabled,
             ])
             ->add("problem_date", Type\DateTimeType::class, [
                 'label' => 'Date of Injury',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'required' => true,
-                'disabled' => false,
+                'disabled' => $this->disabled,
                 'view_timezone' => $app->getUserTimezone(),
                 'model_timezone' => 'UTC',
                 'constraints' => [
@@ -147,7 +168,7 @@ class ProblemController extends AbstractController
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'required' => false,
-                'disabled' => false,
+                'disabled' => $this->disabled,
                 'view_timezone' => $app->getUserTimezone(),
                 'model_timezone' => 'UTC',
                 'constraints' => [
@@ -159,15 +180,18 @@ class ProblemController extends AbstractController
             ])
             ->add('description', Type\TextareaType::class, [
                 'label' => 'Description of event',
-                'required' => false
+                'required' => false,
+                'disabled' => $this->disabled,
             ])
             ->add('action_taken', Type\TextType::class, [
                 'label' => 'Corrective Action taken',
-                'required' => false
+                'required' => false,
+                'disabled' => $this->disabled,
             ])
             ->add('follow_up', Type\TextType::class, [
                 'label' => 'Follow up',
-                'required' => false
+                'required' => false,
+                'disabled' => $this->disabled,
             ])
             ->getForm();
             return $problemForm;    
