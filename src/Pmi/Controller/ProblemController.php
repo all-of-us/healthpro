@@ -73,9 +73,8 @@ class ProblemController extends AbstractController
                         $app->addFlashNotice('Report created');
                     }
                 }
-                return $app->redirectToRoute('problem', [
-                    'participantId' => $participantId,
-                    'problemId' => $problemId
+                return $app->redirectToRoute('participant', [
+                    'id' => $participantId
                 ]);
             } else {
                 if (count($problemForm->getErrors()) == 0) {
