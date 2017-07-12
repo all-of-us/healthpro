@@ -123,6 +123,11 @@ class User implements UserInterface
     {
         return $this->sites;
     }
+
+    public function getAwardees()
+    {
+        return $this->awardees;
+    }
     
     public function getSite($email)
     {

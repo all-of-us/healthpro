@@ -1,4 +1,13 @@
-{% extends 'base.html.twig' %}
+{% if type is defined and type == 'awardee' %}
+    {% set baseHtml = 'awardee/base.html.twig' %}
+    {% set resetPath = 'awardee_workQueue' %}
+    {% set exportPath = 'awardee_export' %}
+{% else %}
+    {% set baseHtml = 'base.html.twig' %}
+    {% set resetPath = 'workqueue_index' %}
+    {% set exportPath = 'workqueue_export' %}
+{% endif %}
+{% extends baseHtml %}
 {% block title %}Participant Work Queue - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
@@ -13,7 +22,7 @@
     {% endif %}
 
     <div class="well">
-        <p><strong>Filters</strong> <small><a href="{{ path('workqueue_index') }}">reset</a></p>
+        <p><strong>Filters</strong> <small><a href="{{ path(resetPath) }}">reset</a></p>
         <form class="form-inline" id="filters">
             {% for name, filter in filters %}
                 <select name="{{ name }}" class="form-control input-sm">
@@ -27,7 +36,7 @@
     </div>
 
     <p class="text-right">
-        <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
+        <button data-href="{{ path(exportPath, params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
     </p>
     <h4>{{ participants|length == constant('Pmi\\Controller\\WorkQueueController::LIMIT_DEFAULT') ? '>' }}{{ participants|length|number_format }}{{ params|length > 0 ? ' matching' }} participant{{ participants|length != 1 ? 's'}} ({{ organization }})</h4>
     <table class="table table-striped table-bordered table-small" id="workqueue" width="100%">

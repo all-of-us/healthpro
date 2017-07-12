@@ -48,6 +48,8 @@ class DefaultController extends AbstractController
             }
         } elseif ($app->hasRole('ROLE_DASHBOARD')) {
             return $app->redirectToRoute('dashboard_home');
+        } elseif ($app->hasRole('ROLE_AWARDEE')) {
+            return $app->redirectToRoute('awardee_workQueue');
         } else {
             return $app->abort(403);
         }

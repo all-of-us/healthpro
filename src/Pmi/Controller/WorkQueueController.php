@@ -225,7 +225,20 @@ class WorkQueueController extends AbstractController
 
     public function exportAction(Application $app, Request $request)
     {
-        $organization = $app->getSiteOrganization();
+        if ($request->get('_route') == 'awardee_export') {
+            $organization = $app['session']->get('awardeeOrganization');
+            $token = $app['security.token_storage']->getToken();
+            $user = $token->getUser();
+            $awardees = $user->getAwardees();
+            $awardeeNames = [];
+            foreach ($awardees as $awardee) {
+                $awardeeNames[] = $awardee->name;
+            }
+            $site = implode(',', $awardeeNames);
+        } else {
+            $organization = $app->getSiteOrganization();
+            $site = $app->getSiteId();
+        }       
         if (!$organization) {
             return $app['twig']->render('workqueue/no-organization.html.twig');
         }
@@ -332,10 +345,10 @@ class WorkQueueController extends AbstractController
             fclose($output);
         };
         $filename = "workqueue_{$organization}_" . date('Ymd-His') . '.csv';
-
+        echo $app->getSiteId();exit;
         $app->log(Log::WORKQUEUE_EXPORT, [
             'filter' => $params,
-            'site' => $app->getSiteId()
+            'site' => $site
         ]);
 
         return $app->stream($stream, 200, [
