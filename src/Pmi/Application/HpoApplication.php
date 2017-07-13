@@ -272,7 +272,7 @@ class HpoApplication extends AbstractApplication
         }
 
         // users with multiple roles must select their initial destination
-        $hasMultiple = (($this->hasRole('ROLE_USER') || $this->hasRole('ROLE_AWARDEE')) && ($this->hasRole('ROLE_USER') || $this->hasRole('ROLE_DASHBOARD')) || ($this->hasRole('ROLE_AWARDEE') || $this->hasRole('ROLE_DASHBOARD')));
+        $hasMultiple = (($this->hasRole('ROLE_USER') && $this->hasRole('ROLE_AWARDEE')) || ($this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD')) || ($this->hasRole('ROLE_AWARDEE') && $this->hasRole('ROLE_DASHBOARD')));
         if ($this['session']->get('isLoginReturn') && $hasMultiple && !$this->isUpkeepRoute($request)) {
             return $this->forwardToRoute('dashSplash', $request);
         }
