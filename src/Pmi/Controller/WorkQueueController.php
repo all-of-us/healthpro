@@ -345,7 +345,7 @@ class WorkQueueController extends AbstractController
             fclose($output);
         };
         $filename = "workqueue_{$organization}_" . date('Ymd-His') . '.csv';
-        echo $app->getSiteId();exit;
+
         $app->log(Log::WORKQUEUE_EXPORT, [
             'filter' => $params,
             'site' => $site
