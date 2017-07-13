@@ -146,9 +146,10 @@ class WorkQueueController extends AbstractController
         $rdrParams = [];
         if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] === 'NO_USE') {
             foreach ($params as $key => $value) {
-                if ($key !== 'withdrawalStatus') {
-                    unset($params[$key]);
+                if ($key === 'withdrawalStatus' || $key === 'organization') {
+                    continue;
                 }
+                unset($params[$key]);
             }
         } else {
             $rdrParams['_sort:desc'] = 'consentForStudyEnrollmentTime';
