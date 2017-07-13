@@ -283,7 +283,7 @@ class HpoApplication extends AbstractApplication
         }
 
         // HPO users must select their site first
-        if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER') && $request->get('_route') != 'awardee_workQueue')
+        if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER'))
         {
             // auto-select since they only have one site
             if (count($user->getSites()) === 1) {
@@ -291,6 +291,7 @@ class HpoApplication extends AbstractApplication
             } elseif ($request->attributes->get('_route') !== 'selectSite' &&
                     $request->attributes->get('_route') !== 'switchSite' &&
                     strpos($request->attributes->get('_route'), 'dashboard_') !== 0 &&
+                    strpos($request->attributes->get('_route'), 'awardee_') !== 0 &&
                     !$this->isUpkeepRoute($request)) {
                 return $this->forwardToRoute('selectSite', $request);
             }
