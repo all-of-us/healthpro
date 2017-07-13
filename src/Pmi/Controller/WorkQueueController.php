@@ -231,11 +231,11 @@ class WorkQueueController extends AbstractController
             $token = $app['security.token_storage']->getToken();
             $user = $token->getUser();
             $awardees = $user->getAwardees();
-            $awardeeNames = [];
+            $awardeeIds = [];
             foreach ($awardees as $awardee) {
-                $awardeeNames[] = $awardee->name;
+                $awardeeIds[] = $awardee->id;
             }
-            $site = implode(',', $awardeeNames);
+            $site = implode(',', $awardeeIds);
         } else {
             $organization = $app->getSiteOrganization();
             $site = $app->getSiteId();
