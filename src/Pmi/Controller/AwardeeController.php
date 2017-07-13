@@ -26,13 +26,13 @@ class AwardeeController extends WorkQueueController
             return $app['twig']->render('workqueue/no-organization.html.twig');
         }
         $organizationsList = [];
-        $organizationsList['selectOrganization']['label'] = 'Organization';
+        $organizationsList['organization']['label'] = 'Organization';
         foreach ($organizations as $org) {
-            $organizationsList['selectOrganization']['options'][$org] = $org;
+            $organizationsList['organization']['options'][$org] = $org;
         }
         $params = array_filter($request->query->all());
-        if (isset($params['selectOrganization'])) {
-            $organization = $params['selectOrganization'];
+        if (isset($params['organization'])) {
+            $organization = $params['organization'];
             $app['session']->set('awardeeOrganization', $organization);
         }
         $participants = $this->participantSummarySearch($organization, $params, $app);
