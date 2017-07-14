@@ -57,7 +57,7 @@ class AwardeeController extends WorkQueueController
         $sitesArray = [];
         foreach ($awardees as $awardee) {
             $sites = $app['em']->getRepository('sites')->fetchBy([
-                'awardee' => $awardee->name
+                'awardee' => $awardee->id
             ]);
             if (!empty($sites)) {
                 $sitesArray = array_merge($sites, $sitesArray);
