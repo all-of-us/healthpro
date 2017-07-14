@@ -32,6 +32,10 @@
             {{ form_errors(finalizeForm.finalized_samples) }}
         </div>
 
+        {% if order.type == 'kit' %}
+            {{ form_row(finalizeForm.fedex_tracking) }}
+        {% endif %}
+
         <div class="form-group{% if not finalizeForm.finalized_notes.vars.valid %} has-error{% endif %}">
             {{ form_label(finalizeForm.finalized_notes) }}
             <span class="toggle-help-image" data-caption="Finalized notes help text placeholder.">

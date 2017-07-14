@@ -199,6 +199,9 @@ class Order
                 $updateArray['processed_samples_ts'] = json_encode([]);
             }
         }
+        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+            $updateArray['fedex_tracking'] = $formData['fedex_tracking'];
+        }
         return $updateArray;
     }
 
@@ -261,25 +264,20 @@ class Order
             ]);
         }
         $formBuilder->add("{$set}_samples", Type\ChoiceType::class, [
-                'expanded' => true,
-                'multiple' => true,
-                'label' => $samplesLabel,
-                'choices' => $samples,
-                'required' => false,
-                'disabled' => $disabled,
-                'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
-                    if (in_array($val, $enabledSamples)) {
-                        return [];
-                    } else {
-                        return ['disabled' => true, 'class' => 'sample-disabled'];
-                    }
+            'expanded' => true,
+            'multiple' => true,
+            'label' => $samplesLabel,
+            'choices' => $samples,
+            'required' => false,
+            'disabled' => $disabled,
+            'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
+                if (in_array($val, $enabledSamples)) {
+                    return [];
+                } else {
+                    return ['disabled' => true, 'class' => 'sample-disabled'];
                 }
-            ])
-            ->add("{$set}_notes", Type\TextareaType::class, [
-                'label' => $notesLabel,
-                'disabled' => $disabled,
-                'required' => false
-            ]);
+            }
+        ]);
         if ($set == 'processed') {
             $formBuilder->add('processed_samples_ts', Type\CollectionType::class, [
                 'entry_type' => Type\DateTimeType::class,
@@ -303,6 +301,18 @@ class Order
                 'required' => false
             ]);
         }
+        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+            $formBuilder->add("fedex_tracking", Type\TextType::class, [
+                'label' => 'FedEx tracking number',
+                'disabled' => $disabled,
+                'required' => false
+            ]);
+        }
+        $formBuilder->add("{$set}_notes", Type\TextareaType::class, [
+            'label' => $notesLabel,
+            'disabled' => $disabled,
+            'required' => false
+        ]);
         $form = $formBuilder->getForm();
         return $form;
     }
@@ -469,6 +479,9 @@ class Order
                     $formData['processed_samples_ts'][$sample] = null;
                 }
             }
+        }
+        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+            $formData['fedex_tracking'] = $this->order['fedex_tracking'];
         }
         return $formData;
     }
