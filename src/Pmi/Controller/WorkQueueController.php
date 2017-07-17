@@ -194,6 +194,7 @@ class WorkQueueController extends AbstractController
 
         $params = array_filter($request->query->all());
         $participants = $this->participantSummarySearch($organization, $params, $app);
+        $isDVType = !empty($this->getSiteType($app));
         return $app['twig']->render('workqueue/index.html.twig', [
             'filters' => self::$filters,
             'surveys' => self::$surveys,
@@ -201,7 +202,8 @@ class WorkQueueController extends AbstractController
             'participants' => $participants,
             'params' => $params,
             'organization' => $organization,
-            'isRdrError' => $this->rdrError
+            'isRdrError' => $this->rdrError,
+            'isDVType' => $isDVType
         ]);
     }
 
@@ -356,5 +358,13 @@ class WorkQueueController extends AbstractController
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
+    }
+
+    public function getSiteType($app) {
+        $site = $app['em']->getRepository('sites')->fetchBy([
+            'google_group' => $app->getSiteId(),
+            'type' => 'DV'
+        ]);
+        return $site;
     }
 }
