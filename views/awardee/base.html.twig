@@ -2,14 +2,7 @@
 <html lang="en">
 <head>
     {% include 'base-head.html.twig' %}
-    <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ app.assetVer }}">
-    <link rel="stylesheet" href="{{ asset('css/jquery-ui.min.css') }}?v=1.12.0" />
-    <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
-    <script src="{{ asset('js/dashboard.js') }}?v={{ app.assetVer }}"></script>
-    <script src="{{ asset('js/jquery-ui.min.js') }}?v=1.12.0"></script>
-    <script src="{{ asset('js/plotly.min.js') }}?v=1.17.3"></script>
-    <script src="{{ asset('js/spin.min.js') }}?v=2.3.2"></script>
+    <title>{% block title %}{% endblock %}HealthPro</title>
 </head>
 <body>
     <nav class="navbar navbar-default">
@@ -21,15 +14,15 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{ path('dashboard_home') }}">Home</a>
+                <a class="navbar-brand" href="{{ path('awardee_workQueue') }}">Home</a>
             </div>
             <div class="collapse navbar-collapse" id="pmi-navbar-collapse">
                 <ul class="nav navbar-nav">
                     {% if is_granted('ROLE_USER') %}
                         <li><a href="{{ path('home') }}">HealthPro</a></li>
                     {% endif %}
-                    {% if is_granted('ROLE_AWARDEE') %}
-                        <li><a href="{{ path('awardee_workQueue') }}">Awardee Work Queue</a></li>
+                    {% if is_granted('ROLE_DASHBOARD') %}
+                        <li><a href="{{ path('dashboard_home') }}">Dashboard</a></li>
                     {% endif %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
@@ -38,8 +31,7 @@
             </div>
         </div>
     </nav>
-
-    <div class="container">
+    <div class="{% block bodycontainer %}container{% endblock %}">
         <div id="flash-notices">
             {% for flashMessage in app.session.flashbag.get('error') %}
                 <div class="alert alert-danger">{{ flashMessage }}</div>
@@ -47,12 +39,19 @@
             {% for flashMessage in app.session.flashbag.get('notice') %}
                 <div class="alert alert-info">{{ flashMessage }}</div>
             {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('success') %}
+                <div class="alert alert-success">{{ flashMessage }}</div>
+            {% endfor %}
         </div>
 
         {% block body %}{% endblock %}
     </div>
 
+    <div id="is-xs" class="visible-xs"></div>
     {% include 'base-body.html.twig' %}
+
+    <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
     {% block pagejs %}{% endblock %}
 </body>
 </html>
+

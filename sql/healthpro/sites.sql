@@ -5,6 +5,8 @@ CREATE TABLE `sites` (
   `mayolink_account` varchar(255) DEFAULT NULL,
   `timezone` varchar(100) DEFAULT NULL,
   `organization` varchar(100) DEFAULT NULL,
+  `type` varchar(100) DEFAULT NULL,
+  `awardee` varchar(100) DEFAULT NULL, 
   `email` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8mb4;

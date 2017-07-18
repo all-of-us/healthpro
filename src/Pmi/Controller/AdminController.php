@@ -108,6 +108,14 @@ class AdminController extends AbstractController
                 'label' => 'Organization',
                 'required' => false
             ])
+            ->add('type', Type\TextType::class, [
+                'label' => 'Type',
+                'required' => false
+            ])
+            ->add('awardee', Type\TextType::class, [
+                'label' => 'Awardee',
+                'required' => false
+            ])
             ->add('email', Type\TextType::class, [
                 'label' => 'Email address(es)',
                 'required' => false,

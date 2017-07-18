@@ -95,6 +95,9 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/dashboard($|\/)', 'ips' => $ips], 'ROLE_DASHBOARD'],
                 [['path' => '^/dashboard($|\/)'], 'ROLE_NO_ACCESS'],
 
+                [['path' => '^/awardee($|\/)', 'ips' => $ips], 'ROLE_AWARDEE'],
+                [['path' => '^/awardee($|\/)'], 'ROLE_NO_ACCESS'],
+
                 [['path' => '^/admin($|\/)', 'ips' => $ips], 'ROLE_ADMIN'],
                 [['path' => '^/admin($|\/)'], 'ROLE_NO_ACCESS'],
 
@@ -269,7 +272,8 @@ class HpoApplication extends AbstractApplication
         }
 
         // users with multiple roles must select their initial destination
-        if ($this['session']->get('isLoginReturn') && $this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD') && !$this->isUpkeepRoute($request)) {
+        $hasMultiple = (($this->hasRole('ROLE_USER') && $this->hasRole('ROLE_AWARDEE')) || ($this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD')) || ($this->hasRole('ROLE_AWARDEE') && $this->hasRole('ROLE_DASHBOARD')));
+        if ($this['session']->get('isLoginReturn') && $hasMultiple && !$this->isUpkeepRoute($request)) {
             return $this->forwardToRoute('dashSplash', $request);
         }
 
@@ -287,6 +291,7 @@ class HpoApplication extends AbstractApplication
             } elseif ($request->attributes->get('_route') !== 'selectSite' &&
                     $request->attributes->get('_route') !== 'switchSite' &&
                     strpos($request->attributes->get('_route'), 'dashboard_') !== 0 &&
+                    strpos($request->attributes->get('_route'), 'awardee_') !== 0 &&
                     !$this->isUpkeepRoute($request)) {
                 return $this->forwardToRoute('selectSite', $request);
             }

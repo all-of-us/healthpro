@@ -6,6 +6,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class User implements UserInterface
 {
     const SITE_PREFIX = 'hpo-site-';
+    const AWARDEE_PREFIX = 'awardee-';
     const DASHBOARD_GROUP = 'admin-dashboard';
     const ADMIN_GROUP = 'site-admin';
     const TWOFACTOR_GROUP = 'mfa_exception';
@@ -14,6 +15,7 @@ class User implements UserInterface
     private $googleUser;
     private $groups;
     private $sites;
+    private $awardess;
     private $dashboardAccess;
     private $adminAccess;
     private $info;
@@ -26,6 +28,7 @@ class User implements UserInterface
         $this->info = $info;
         $this->timezone = $timezone;
         $this->sites = $this->computeSites();
+        $this->awardees = $this->computeAwardees();
         $this->dashboardAccess = $this->computeDashboardAccess();
         $this->adminAccess = $this->computeAdminAccess();
     }
@@ -56,6 +59,24 @@ class User implements UserInterface
             }
         }
         return $sites;
+    }
+
+    private function computeAwardees()
+    {
+        $awardees = [];
+        // awardee membership is determined by the user's groups
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::AWARDEE_PREFIX) === 0) {
+                $id = preg_replace('/@.*$/', '', $group->getEmail());
+                $id = str_replace(self::AWARDEE_PREFIX, '', $id);
+                $awardees[] = (object) [
+                    'email' => $group->getEmail(),
+                    'name' => $group->getName(),
+                    'id' => $id
+                ];
+            }
+        }
+        return $awardees;
     }
 
     private function computeDashboardAccess()
@@ -102,6 +123,11 @@ class User implements UserInterface
     {
         return $this->sites;
     }
+
+    public function getAwardees()
+    {
+        return $this->awardees;
+    }
     
     public function getSite($email)
     {
@@ -137,6 +163,9 @@ class User implements UserInterface
         $roles = [];
         if (count($this->sites) > 0) {
             $roles[] = 'ROLE_USER';
+        }
+        if (count($this->awardees) > 0) {
+            $roles[] = 'ROLE_AWARDEE';
         }
         if ($this->dashboardAccess) {
             $roles[] = 'ROLE_DASHBOARD';

@@ -146,9 +146,10 @@ class WorkQueueController extends AbstractController
         $rdrParams = [];
         if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] === 'NO_USE') {
             foreach ($params as $key => $value) {
-                if ($key !== 'withdrawalStatus') {
-                    unset($params[$key]);
+                if ($key === 'withdrawalStatus' || $key === 'organization') {
+                    continue;
                 }
+                unset($params[$key]);
             }
         } else {
             $rdrParams['_sort:desc'] = 'consentForStudyEnrollmentTime';
@@ -193,6 +194,7 @@ class WorkQueueController extends AbstractController
 
         $params = array_filter($request->query->all());
         $participants = $this->participantSummarySearch($organization, $params, $app);
+        $isDVType = !empty($this->getSiteType($app));
         return $app['twig']->render('workqueue/index.html.twig', [
             'filters' => self::$filters,
             'surveys' => self::$surveys,
@@ -200,7 +202,8 @@ class WorkQueueController extends AbstractController
             'participants' => $participants,
             'params' => $params,
             'organization' => $organization,
-            'isRdrError' => $this->rdrError
+            'isRdrError' => $this->rdrError,
+            'isDVType' => $isDVType
         ]);
     }
 
@@ -225,7 +228,20 @@ class WorkQueueController extends AbstractController
 
     public function exportAction(Application $app, Request $request)
     {
-        $organization = $app->getSiteOrganization();
+        if ($request->get('_route') == 'awardee_export') {
+            $organization = $app['session']->get('awardeeOrganization');
+            $token = $app['security.token_storage']->getToken();
+            $user = $token->getUser();
+            $awardees = $user->getAwardees();
+            $awardeeIds = [];
+            foreach ($awardees as $awardee) {
+                $awardeeIds[] = $awardee->id;
+            }
+            $site = implode(',', $awardeeIds);
+        } else {
+            $organization = $app->getSiteOrganization();
+            $site = $app->getSiteId();
+        }       
         if (!$organization) {
             return $app['twig']->render('workqueue/no-organization.html.twig');
         }
@@ -233,45 +249,54 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $params['_count'] = self::LIMIT_EXPORT;
         $participants = $this->participantSummarySearch($organization, $params, $app);
-        $stream = function() use ($participants) {
+        $isDVType = !empty($this->getSiteType($app));
+        $stream = function() use ($participants, $isDVType) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
             fwrite($output, "\"\"\n");
-            $headers = [
-                'PMI ID',
-                'Biobank ID',
-                'Last Name',
-                'First Name',
-                'Date of Birth',
-                'Language',
-                'General Consent Status',
-                'General Consent Date',
-                'EHR Consent Status',
-                'EHR Consent Date',
-                'CABoR Consent Status',
-                'CABoR Consent Date',
-                'Withdrawal Status',
-                'Withdrawal Date',
-                'Street Address',
-                'City',
-                'State',
-                'ZIP',
-                'Email',
-                'Phone',
-                'Sex',
-                'Gender Identity',
-                'Sexual Orientation',
-                'Race/Ethnicity',
-                'Education',
-                'Income',
-                'Required PPI Surveys Complete',
-                'Completed Surveys'
-            ];
-            foreach (self::$surveys as $survey => $label) {
-                $headers[] = $label . ' PPI Survey Complete';
-                $headers[] = $label . ' PPI Survey Completion Date';
+            if (!$isDVType) {
+                $headers = [
+                    'PMI ID',
+                    'Biobank ID',
+                    'Last Name',
+                    'First Name',
+                    'Date of Birth',
+                    'Language',
+                    'General Consent Status',
+                    'General Consent Date',
+                    'EHR Consent Status',
+                    'EHR Consent Date',
+                    'CABoR Consent Status',
+                    'CABoR Consent Date',
+                    'Withdrawal Status',
+                    'Withdrawal Date',
+                    'Street Address',
+                    'City',
+                    'State',
+                    'ZIP',
+                    'Email',
+                    'Phone',
+                    'Sex',
+                    'Gender Identity',
+                    'Sexual Orientation',
+                    'Race/Ethnicity',
+                    'Education',
+                    'Income',
+                    'Required PPI Surveys Complete',
+                    'Completed Surveys'
+                ];
+                foreach (self::$surveys as $survey => $label) {
+                    $headers[] = $label . ' PPI Survey Complete';
+                    $headers[] = $label . ' PPI Survey Completion Date';
+                }
+            } else {
+                $headers = [
+                    'PMI ID',
+                    'Biobank ID',
+                    'ZIP'
+                ];                
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Physical Measurements Completion Date';
@@ -283,39 +308,47 @@ class WorkQueueController extends AbstractController
             }
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
-                $row = [
-                    $participant->id,
-                    $participant->biobankId,
-                    $participant->lastName,
-                    $participant->firstName,
-                    self::csvDateFromObject($participant->dob),
-                    $participant->language,
-                    self::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-                    self::csvDateFromString($participant->consentForStudyEnrollmentTime),
-                    self::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-                    self::csvDateFromString($participant->consentForElectronicHealthRecordsTime),
-                    self::csvStatusFromSubmitted($participant->consentForconsentForCABoR),
-                    self::csvDateFromString($participant->consentForCABoRTime),
-                    $participant->withdrawalStatus == 'NO_USE' ? '1' : '0',
-                    self::csvDateFromString($participant->withdrawalTime),
-                    $participant->streetAddress,
-                    $participant->city,
-                    $participant->state,
-                    $participant->zipCode,
-                    $participant->email,
-                    $participant->phoneNumber,
-                    $participant->sex,
-                    $participant->genderIdentity,
-                    $participant->sexualOrientation,
-                    $participant->race,
-                    $participant->education,
-                    $participant->income,
-                    $participant->numCompletedBaselinePPIModules == 3 ? '1' : '0',
-                    $participant->numCompletedPPIModules
-                ];
-                foreach (self::$surveys as $survey => $label) {
-                    $row[] = self::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                    $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"});
+                if (!$isDVType) {
+                    $row = [
+                        $participant->id,
+                        $participant->biobankId,
+                        $participant->lastName,
+                        $participant->firstName,
+                        self::csvDateFromObject($participant->dob),
+                        $participant->language,
+                        self::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
+                        self::csvDateFromString($participant->consentForStudyEnrollmentTime),
+                        self::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
+                        self::csvDateFromString($participant->consentForElectronicHealthRecordsTime),
+                        self::csvStatusFromSubmitted($participant->consentForconsentForCABoR),
+                        self::csvDateFromString($participant->consentForCABoRTime),
+                        $participant->withdrawalStatus == 'NO_USE' ? '1' : '0',
+                        self::csvDateFromString($participant->withdrawalTime),
+                        $participant->streetAddress,
+                        $participant->city,
+                        $participant->state,
+                        $participant->zipCode,
+                        $participant->email,
+                        $participant->phoneNumber,
+                        $participant->sex,
+                        $participant->genderIdentity,
+                        $participant->sexualOrientation,
+                        $participant->race,
+                        $participant->education,
+                        $participant->income,
+                        $participant->numCompletedBaselinePPIModules == 3 ? '1' : '0',
+                        $participant->numCompletedPPIModules
+                    ];
+                    foreach (self::$surveys as $survey => $label) {
+                        $row[] = self::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
+                        $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"});
+                    }
+                } else {
+                    $row = [
+                        $participant->id,
+                        $participant->biobankId,
+                        $participant->zipCode,
+                    ];                   
                 }
                 $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
                 $row[] = self::csvDateFromString($participant->physicalMeasurementsTime);
@@ -335,12 +368,20 @@ class WorkQueueController extends AbstractController
 
         $app->log(Log::WORKQUEUE_EXPORT, [
             'filter' => $params,
-            'site' => $app->getSiteId()
+            'site' => $site
         ]);
 
         return $app->stream($stream, 200, [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
+    }
+
+    public function getSiteType($app) {
+        $site = $app['em']->getRepository('sites')->fetchBy([
+            'google_group' => $app->getSiteId(),
+            'type' => 'DV'
+        ]);
+        return $site;
     }
 }
