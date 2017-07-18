@@ -7,6 +7,9 @@
     {% set resetPath = 'workqueue_index' %}
     {% set exportPath = 'workqueue_export' %}
 {% endif %}
+{% if isDVType is not defined  %}
+    {% set isDVType = false %}
+{% endif %}
 {% extends baseHtml %}
 {% block title %}Participant Work Queue - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
