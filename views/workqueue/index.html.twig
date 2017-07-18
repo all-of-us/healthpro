@@ -274,10 +274,15 @@ $(document).ready(function() {
                 { name: 'firstName' },
                 { name: 'dateOfBirth' },
             {% endif %}
-            { name: 'participantId', visible: false },
-            { name: 'biobankId', visible: false },
+            {% if not isDVType %}
+                { name: 'participantId', visible: false },
+                { name: 'biobankId', visible: false },
+            {% else %}
+                { name: 'participantId' },
+                { name: 'biobankId' },
+            {% endif %}
             {% if isDVType %}
-                { name: 'zipCode', visible: false },
+                { name: 'zipCode'},
             {% endif %}
             {% if not isDVType %}
                 { name: 'language', visible: false  },
@@ -315,119 +320,147 @@ $(document).ready(function() {
         ],
         pageLength: 25,
         buttons: [
-            {
-                extend: 'colvisGroup',
-                text: 'Default',
-                show: [
-                    '.col-group-default'
-                ],
-                hide: [
-                    '.col-group-info:not(.col-group-default)',
-                    '.col-group-ppi:not(.col-group-default)',
-                    '.col-group-ppi-time',
-                    '.col-group-inperson:not(.col-group-default)',
-                    '.col-group-inperson-time',
-                    '.col-group-demographics',
-                    '.col-group-contact'
-                ]
-            },
-            {
-                extend: 'colvisGroup',
-                text: 'PPI Surveys',
-                show: [
-                    'dateOfBirth:name',
-                    '.col-group-ppi'
-                ],
-                hide: [
-                    '.col-group-info',
-                    '.col-group-ppi-time',
-                    '.col-group-inperson',
-                    '.col-group-inperson-time',
-                    '.col-group-demographics',
-                    '.col-group-contact'
-                ]
-            },
-            {
-                extend: 'colvisGroup',
-                text: 'PPI Surveys + Dates',
-                show: [
-                    '.col-group-ppi',
-                    '.col-group-ppi-time'
-                ],
-                hide: [
-                    'dateOfBirth:name',
-                    '.col-group-info',
-                    '.col-group-inperson',
-                    '.col-group-inperson-time',
-                    '.col-group-demographics',
-                    '.col-group-contact'
-                ]
-            },
-            {
-                extend: 'colvisGroup',
-                text: 'In-Person',
-                show: [
-                    'dateOfBirth:name',
-                    '.col-group-inperson'
-                ],
-                hide: [
-                    '.col-group-info',
-                    '.col-group-ppi',
-                    '.col-group-ppi-time',
-                    '.col-group-inperson-time',
-                    '.col-group-demographics',
-                    '.col-group-contact'
-                ]
-            },
-            {
-                extend: 'colvisGroup',
-                text: 'In-Person + Sample Dates',
-                show: [
-                    '.col-group-inperson',
-                    '.col-group-inperson-time'
-                ],
-                hide: [
-                    'dateOfBirth:name',
-                    '.col-group-info',
-                    '.col-group-ppi',
-                    '.col-group-ppi-time',
-                    '.col-group-demographics',
-                    '.col-group-contact'
-                ]
-            },
-            {
-                extend: 'colvisGroup',
-                text: 'Demographics',
-                show: [
-                    'dateOfBirth:name',
-                    '.col-group-demographics'
-                ],
-                hide: [
-                    '.col-group-info',
-                    '.col-group-inperson',
-                    '.col-group-inperson-time',
-                    '.col-group-ppi',
-                    '.col-group-ppi-time',
-                    '.col-group-contact'
-                ]
-            },
-            {
-                extend: 'colvisGroup',
-                text: 'Contact',
-                show: [
-                    'dateOfBirth:name',
-                    '.col-group-default',
-                    '.col-group-contact'
-                ],
-                hide: [
-                    '.col-group-demographics',
-                    '.col-group-info:not(.col-group-default)',
-                    '.col-group-inperson',
-                    '.col-group-inperson-time',
-                    '.col-group-ppi',
-                    '.col-group-ppi-time'
-                ]
-            },
+            {% if not isDVType %}
+                {
+                    extend: 'colvisGroup',
+                    text: 'Default',
+                    show: [
+                        '.col-group-default'
+                    ],
+                    hide: [
+                        '.col-group-info:not(.col-group-default)',
+                        '.col-group-ppi:not(.col-group-default)',
+                        '.col-group-ppi-time',
+                        '.col-group-inperson:not(.col-group-default)',
+                        '.col-group-inperson-time',
+                        '.col-group-demographics',
+                        '.col-group-contact'
+                    ]
+                },
+                {
+                    extend: 'colvisGroup',
+                    text: 'PPI Surveys',
+                    show: [
+                        'dateOfBirth:name',
+                        '.col-group-ppi'
+                    ],
+                    hide: [
+                        '.col-group-info',
+                        '.col-group-ppi-time',
+                        '.col-group-inperson',
+                        '.col-group-inperson-time',
+                        '.col-group-demographics',
+                        '.col-group-contact'
+                    ]
+                },
+                {
+                    extend: 'colvisGroup',
+                    text: 'PPI Surveys + Dates',
+                    show: [
+                        '.col-group-ppi',
+                        '.col-group-ppi-time'
+                    ],
+                    hide: [
+                        'dateOfBirth:name',
+                        '.col-group-info',
+                        '.col-group-inperson',
+                        '.col-group-inperson-time',
+                        '.col-group-demographics',
+                        '.col-group-contact'
+                    ]
+                },
+                {
+                    extend: 'colvisGroup',
+                    text: 'In-Person',
+                    show: [
+                        'dateOfBirth:name',
+                        '.col-group-inperson'
+                    ],
+                    hide: [
+                        '.col-group-info',
+                        '.col-group-ppi',
+                        '.col-group-ppi-time',
+                        '.col-group-inperson-time',
+                        '.col-group-demographics',
+                        '.col-group-contact'
+                    ]
+                },
+                {
+                    extend: 'colvisGroup',
+                    text: 'In-Person + Sample Dates',
+                    show: [
+                        '.col-group-inperson',
+                        '.col-group-inperson-time'
+                    ],
+                    hide: [
+                        'dateOfBirth:name',
+                        '.col-group-info',
+                        '.col-group-ppi',
+                        '.col-group-ppi-time',
+                        '.col-group-demographics',
+                        '.col-group-contact'
+                    ]
+                },
+                {
+                    extend: 'colvisGroup',
+                    text: 'Demographics',
+                    show: [
+                        'dateOfBirth:name',
+                        '.col-group-demographics'
+                    ],
+                    hide: [
+                        '.col-group-info',
+                        '.col-group-inperson',
+                        '.col-group-inperson-time',
+                        '.col-group-ppi',
+                        '.col-group-ppi-time',
+                        '.col-group-contact'
+                    ]
+                },
+                {
+                    extend: 'colvisGroup',
+                    text: 'Contact',
+                    show: [
+                        'dateOfBirth:name',
+                        '.col-group-default',
+                        '.col-group-contact'
+                    ],
+                    hide: [
+                        '.col-group-demographics',
+                        '.col-group-info:not(.col-group-default)',
+                        '.col-group-inperson',
+                        '.col-group-inperson-time',
+                        '.col-group-ppi',
+                        '.col-group-ppi-time'
+                    ]
+                },
+            {% else %}
+                {
+                    extend: 'colvisGroup',
+                    text: 'Default',
+                    show: [
+                        '.col-group-info',
+                        '.col-group-default'
+                    ],
+                    hide: [
+                        '.col-group-inperson:not(.col-group-default)',
+                        '.col-group-inperson-time'
+                    ]
+                },
+                {
+                    extend: 'colvisGroup',
+                    text: 'In-Person',
+                    show: [
+                        '.col-group-info',
+                        '.col-group-default',
+                        '.col-group-inperson',
+                        '.col-group-inperson-time'
+                    ],
+                    hide: [
+                        'zipCode:name'
+                    ]
+                },               
+            {% endif %}
             {
                 extend: 'colvisGroup',
                 text: 'Show all',
