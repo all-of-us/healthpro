@@ -21,19 +21,21 @@
         </div>
     {% endif %}
 
-    <div class="well">
-        <p><strong>Filters</strong> <small><a href="{{ path(resetPath) }}">reset</a></p>
-        <form class="form-inline" id="filters">
-            {% for name, filter in filters %}
-                <select name="{{ name }}" class="form-control input-sm">
-                    <option value="">-- {{ filter.label }} --</option>
-                    {% for label, value in filter.options %}
-                        <option value="{{ value }}"{% if params[name]|default(false) == value %} selected="selected"{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            {% endfor %}
-        </form>
-    </div>
+    {% if not isDVType %}
+        <div class="well">
+            <p><strong>Filters</strong> <small><a href="{{ path(resetPath) }}">reset</a></p>
+            <form class="form-inline" id="filters">
+                {% for name, filter in filters %}
+                    <select name="{{ name }}" class="form-control input-sm">
+                        <option value="">-- {{ filter.label }} --</option>
+                        {% for label, value in filter.options %}
+                            <option value="{{ value }}"{% if params[name]|default(false) == value %} selected="selected"{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                {% endfor %}
+            </form>
+        </div>
+    {% endif %}
 
     <p class="text-right">
         <button data-href="{{ path(exportPath, params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
