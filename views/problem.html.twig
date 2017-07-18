@@ -14,28 +14,19 @@
                     <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
                 </h2>
             </div>
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="{{ activeTab[0] }}"><a href="#biospecimen" role="tab" data-toggle="tab">Related to Bio-specimen kit</a></li>
-                <li class="{{ activeTab[1] }}"><a href="#reportable" role="tab" data-toggle="tab">Related to reportable occurrences</a></li>
-            </ul>
-            <div class="tab-content">
-                <div role="tabpanel" class="tab-pane {{ activeTab[0] }}" id="biospecimen"><br/>Coming Soon</div>
-                <div role="tabpanel" class="tab-pane {{ activeTab[1] }}" id="reportable"><br/>
-                    {{ form_start(problemForm, { attr: { class: 'warn-unsaved' } }) }}
-                    {{ form_errors(problemForm) }}
-                    {{ form_rest(problemForm) }}
-                    <p>
-                        {% if problem and problem.finalized_ts %}
-                            <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
-                        {% else %}
-                            <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
-                            <button type="submit" name="reportable" class="btn btn-primary">Save</button>
-                            <button type="submit" name="reportable_finalize" class="btn btn-success pull-right" onclick="return confirm('Are you sure you want to finalize this report?');">Save and Finalize</button>
-                        {% endif %}
-                    </p>
-                    {{ form_end(problemForm) }}
-                </div>
-            </div>
+            {{ form_start(problemForm, { attr: { class: 'warn-unsaved' } }) }}
+            {{ form_errors(problemForm) }}
+            {{ form_rest(problemForm) }}
+            <p>
+                {% if problem and problem.finalized_ts %}
+                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
+                {% else %}
+                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+                    <button type="submit" name="reportable" class="btn btn-primary">Save</button>
+                    <button type="submit" name="reportable_finalize" class="btn btn-success pull-right" onclick="return confirm('Are you sure you want to finalize this report?');">Save and Finalize</button>
+                {% endif %}
+            </p>
+            {{ form_end(problemForm) }}
         </div>
     </div>
 {% endblock %}
