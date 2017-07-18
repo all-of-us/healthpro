@@ -60,13 +60,11 @@
                     <th rowspan="2" class="col-group-default col-group-info">EHR Consent</th>
                     <th rowspan="2" class="col-group-info">CABoR Consent <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></th>
                     <th rowspan="2" class="col-group-default col-group-info">Withdrawal</th>
-
                     <th colspan="4" class="topheader multiheader-contact">Contact</th>
-
                     <th colspan="{{ 2 * (surveys|length) + 2 }}" class="topheader multiheader-survey">PPI Survey Completion</th>
-
+                {% endif %}
                     <th colspan="{{ 2 * (samples|length) + 3 }}" class="topheader multiheader-inperson">In-Person Enrollment</th>
-
+                {% if not isDVType %}
                     <th colspan="7" class="topheader multiheader-demographics">Demographics</th>
                 {% endif %}
                 </tr>
@@ -76,7 +74,6 @@
                         <th class="secondaryheader col-group-contact multiheader-contact">Address</th>
                         <th class="secondaryheader col-group-contact multiheader-contact">Email</th>
                         <th class="secondaryheader col-group-contact multiheader-contact">Phone</th>
-
                         <th class="secondaryheader col-group-ppi col-group-default multiheader-survey">Required Complete?</th>
                         <th class="secondaryheader col-group-ppi col-group-default multiheader-survey">Completed Surveys</th>
                         {% for field, label in surveys %}
