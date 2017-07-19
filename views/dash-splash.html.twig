@@ -9,30 +9,18 @@
             </div>
             
             <div id="dashSplashSelector" class="list-group">
-                {% if is_granted('ROLE_USER') %}
-                    <a href="{{ path('home') }}" class="list-group-item">
-                        <h3 class="list-group-item-heading text-center">
-                            <span class="glyphicon glyphicon-star"></span>
-                            HealthPro
-                        </h3>
-                    </a>
-                {% endif %}
-                {% if is_granted('ROLE_DASHBOARD') %}
-                    <a href="{{ path('dashboard_home') }}" class="list-group-item">
-                        <h3 class="list-group-item-heading text-center">
-                            <span class="glyphicon glyphicon-dashboard"></span>
-                            Dashboard
-                        </h3>
-                    </a>
-                {% endif %}
-                {% if is_granted('ROLE_AWARDEE') %}
-                    <a href="{{ path('awardee_workQueue') }}" class="list-group-item">
-                        <h3 class="list-group-item-heading text-center">
-                            <span class="glyphicon glyphicon-list-alt"></span>
-                            Awardee Workqueue
-                        </h3>
-                    </a>
-                {% endif %}
+                <a href="{{ path('home') }}" class="list-group-item">
+                    <h3 class="list-group-item-heading text-center">
+                        <span class="glyphicon glyphicon-star"></span>
+                        HealthPro
+                    </h3>
+                </a>
+                <a href="{{ path('dashboard_home') }}" class="list-group-item">
+                    <h3 class="list-group-item-heading text-center">
+                        <span class="glyphicon glyphicon-dashboard"></span>
+                        Dashboard
+                    </h3>
+                </a>
             </div>
         </div>
     </div>

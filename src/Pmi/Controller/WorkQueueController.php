@@ -228,14 +228,7 @@ class WorkQueueController extends AbstractController
     {
         if ($request->get('_route') == 'awardee_export') {
             $organization = $app['session']->get('awardeeOrganization');
-            $token = $app['security.token_storage']->getToken();
-            $user = $token->getUser();
-            $awardees = $user->getAwardees();
-            $awardeeIds = [];
-            foreach ($awardees as $awardee) {
-                $awardeeIds[] = $awardee->id;
-            }
-            $site = implode(',', $awardeeIds);
+            $site = $app->getAwardeeId();
         } else {
             $organization = $app->getSiteOrganization();
             $site = $app->getSiteId();

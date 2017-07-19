@@ -15,7 +15,7 @@ class AwardeeController extends WorkQueueController
 
     public function workQueueAction(Application $app, Request $request)
     {
-        $organizations = $this->getAwardeeOrganizations($app);
+        $organizations = $app->getAwardeeOrganization();
         if (!empty($organizations)) {
             $organization = $organizations[0];
             $app['session']->set('awardeeOrganization', $organization);
@@ -48,28 +48,6 @@ class AwardeeController extends WorkQueueController
             'isRdrError' => $this->rdrError,
             'type' => 'awardee'
         ]);
-    }
-
-    public function getAwardeeOrganizations($app) {
-        $token = $app['security.token_storage']->getToken();
-        $user = $token->getUser();
-        $awardees = $user->getAwardees();
-        $sitesArray = [];
-        foreach ($awardees as $awardee) {
-            $sites = $app['em']->getRepository('sites')->fetchBy([
-                'awardee' => $awardee->id
-            ]);
-            if (!empty($sites)) {
-                $sitesArray = array_merge($sites, $sitesArray);
-            }           
-        }
-        $organizations = [];
-        foreach ($sitesArray as $site) {
-            if (!empty($site['organization'])) {
-                $organizations[] = $site['organization'];
-            }
-        }
-        return $organizations;
     }
     
 }

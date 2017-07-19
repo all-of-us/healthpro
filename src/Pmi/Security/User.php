@@ -140,12 +140,36 @@ class User implements UserInterface
         }
         return $site;
     }
+
+    public function getAwardee($email)
+    {
+        $awardee = null;
+        foreach ($this->awardees as $a) {
+            if ($a->email === $email) {
+                $awardee = $a;
+                break;
+            }
+        }
+        return $awardee;
+    }
     
     public function belongsToSite($email)
     {
         $belongs = false;
         foreach ($this->sites as $site) {
             if ($site->email === $email) {
+                $belongs = true;
+                break;
+            }
+        }
+        return $belongs;
+    }
+
+    public function belongsToAwardee($email)
+    {
+        $belongs = false;
+        foreach ($this->awardees as $awardee) {
+            if ($awardee->email === $email) {
                 $belongs = true;
                 break;
             }

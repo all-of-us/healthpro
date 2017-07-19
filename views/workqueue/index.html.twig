@@ -1,13 +1,11 @@
 {% if type is defined and type == 'awardee' %}
-    {% set baseHtml = 'awardee/base.html.twig' %}
     {% set resetPath = 'awardee_workQueue' %}
     {% set exportPath = 'awardee_export' %}
 {% else %}
-    {% set baseHtml = 'base.html.twig' %}
     {% set resetPath = 'workqueue_index' %}
     {% set exportPath = 'workqueue_export' %}
 {% endif %}
-{% extends baseHtml %}
+{% extends 'base.html.twig' %}
 {% block title %}Participant Work Queue - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}

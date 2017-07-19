@@ -14,6 +14,9 @@
                         {% for site in app.user.sites %}
                             <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : ''}} >{{ site.name }}</option>
                         {% endfor %}
+                        {% for awardee in app.user.awardees %}
+                            <option value="{{ awardee.email }}"{{ (app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary site-submit">Continue</button>
