@@ -101,13 +101,10 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/awardee($|\/)', 'ips' => $ips], 'ROLE_AWARDEE'],
                 [['path' => '^/awardee($|\/)'], 'ROLE_NO_ACCESS'],
 
-                [['path' => '^/site($|\/)', 'ips' => $ips], 'ROLE_AWARDEE'],
+                [['path' => '^/site($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_AWARDEE']],
                 [['path' => '^/site($|\/)'], 'ROLE_NO_ACCESS'],
 
-                [['path' => '^/home($|\/)', 'ips' => $ips], 'ROLE_AWARDEE'],
-                [['path' => '^/home($|\/)'], 'ROLE_NO_ACCESS'],
-
-                [['path' => '^/help($|\/)', 'ips' => $ips], 'ROLE_AWARDEE'],
+                [['path' => '^/help($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_AWARDEE']],
                 [['path' => '^/help($|\/)'], 'ROLE_NO_ACCESS'],
 
                 [['path' => '^/.*$', 'ips' => $ips], 'ROLE_USER'],
