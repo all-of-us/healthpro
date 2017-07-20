@@ -148,3 +148,82 @@ function togglePlotlyTraces(div) {
     $('#toggle-traces .toggle-switch').toggleClass('fa-toggle-on fa-toggle-off');
 
 }
+
+// function to assemble and html table of raw data from bar charts
+function loadTableData(tableTarget, sourceData, colTitle) {
+    tableTarget.empty();
+    var tableId = tableTarget.attr('id');
+    tableTarget.html("<table class='table table-striped table-condensed raw-data-table'><thead><tr id='" + tableId + "-headers'><th>" + colTitle + "</th></tr></thead><tbody id='" + tableId + "-body'></tbody></table>");
+    var headerRow = $('#' + tableId + '-headers');
+    $(sourceData[0]['x']).each(function(i, date) {
+        headerRow.append("<th>" + date + "</th>");
+    });
+    headerRow.append("</tr>");
+
+    // load scores
+    var tableBody = $('#' + tableId + '-body');
+    $($(sourceData).get().reverse()).each(function(index, row) {
+        var newRow = "<tr><td>" + row['name'] + "</td>";
+        $(row['y']).each(function(i, count) {
+            newRow += "<td>" + count + "</td>";
+        });
+        newRow += "</tr>";
+        tableBody.append(newRow);
+    });
+}
+
+// function to assemble and html table of raw data from geo data
+function loadRegionTableData(tableTarget, sourceData, plotType, rowLabel) {
+    tableTarget.empty();
+    var tableId = tableTarget.attr('id');
+    tableTarget.html("<table class='table table-striped table-condensed raw-data-table'><thead><tr id='" + tableId + "-headers'><th></th></tr></thead><tbody id='" + tableId + "-body'></tbody></table>");
+    if (plotType === 'FullParticipant.state') {
+        var headerRow = $('#' + tableId + '-headers');
+        $(sourceData[0]['locations']).each(function (i, state) {
+            headerRow.append("<th>" + state + "</th>");
+        });
+        headerRow.append("</tr>");
+
+        // load scores
+        var tableBody = $('#' + tableId + '-body');
+        $($(sourceData).get().reverse()).each(function (index, row) {
+            var newRow = "<tr><td>" + rowLabel + " totals</td>";
+            $(row['z']).each(function (i, count) {
+                newRow += "<td>" + count + "</td>";
+            });
+            newRow += "</tr>";
+            tableBody.append(newRow);
+        });
+    } else if (plotType === 'FullParticipant.censusRegion') {
+        var headerRow = $('#' + tableId + '-headers');
+        $(sourceData[0]['regions']).each(function (i, region) {
+            headerRow.append("<th>" + region + "</th>");
+        });
+        headerRow.append("</tr>");
+        // load scores
+        var tableBody = $('#' + tableId + '-body');
+        var countRow = "<tr><td>" + rowLabel + " totals</td>";
+        $(sourceData[0]['counts']).each(function (i, count) {
+            countRow += "<td>" + count + "</td>";
+        });
+        countRow += "</tr>";
+        tableBody.append(countRow);
+    } else if (plotType === 'FullParticipant.hpoId') {
+        var headerRow = $('#' + tableId + '-headers');
+        $($(sourceData).get().reverse()).each(function(index, row) {
+            var loc = row['name'];
+            headerRow.append("<th>" + loc + "</th>");
+        });
+        headerRow.append("</tr>");
+
+        // load scores
+        var tableBody = $('#' + tableId + '-body');
+        var countRow = "<tr><td>" + rowLabel + " totals</td>";
+        $($(sourceData).get().reverse()).each(function(index, row) {
+            countRow += "<td>" + row['count'] + "</td>";
+        });
+        countRow += "</tr>";
+        tableBody.append(countRow);
+    }
+
+}

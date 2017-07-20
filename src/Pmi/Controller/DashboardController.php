@@ -175,11 +175,19 @@ class DashboardController extends AbstractController
             array_push($data, $trace);
         }
 
-        // sort alphabetically by trace name
-        usort($data, function ($a, $b) {
-            if ($a['name'] == $b['name']) return 0;
-            return ($a['name'] > $b['name']) ? -1 : 1;
-        });
+        // sort alphabetically by trace name, unless looking at registration status (then do reverse sort)
+        if ($filter_by == 'Participant.enrollmentStatus') {
+            usort($data, function ($a, $b) {
+                if ($a['name'] == $b['name']) return 0;
+                return ($a['name'] > $b['name']) ? 1 : -1;
+            });
+        } else {
+            usort($data, function ($a, $b) {
+                if ($a['name'] == $b['name']) return 0;
+                return ($a['name'] > $b['name']) ? -1 : 1;
+            });
+        }
+
         // now apply colors since we're in order
         for ($i = 0; $i < count($data); $i++) {
             $data[$i]['marker'] = array(
@@ -289,6 +297,8 @@ class DashboardController extends AbstractController
                 $states_by_region = [];
                 $registrations_by_state = [];
                 $region_text = [];
+                $total_counts = [];
+                $census_region_names = [];
                 try {
                     $census_regions = $app['db']->fetchAll("SELECT * FROM census_regions");
                 } catch (\Exception $e) {
@@ -301,6 +311,8 @@ class DashboardController extends AbstractController
                     } catch (\Exception $e) {
                         $states = [];
                     }
+                    // grab name for table data
+                    array_push($census_region_names, $region['label']);
                     $region_states = [];
                     foreach ($states as $state) {
                         array_push($region_states, $state["state"]);
@@ -328,6 +340,9 @@ class DashboardController extends AbstractController
                     }
                     $pct_of_target = round($count / $region['recruitment_target'] * 100, 2);
 
+                    // grab count for table data
+                    array_push($total_counts, $count);
+
                     // check if max_val needs to be set
                     if ($pct_of_target > $max_val) {
                         $max_val = $pct_of_target;
@@ -347,6 +362,8 @@ class DashboardController extends AbstractController
                     'locations' => $states_by_region,
                     'z' => $registrations_by_state,
                     'text' => $region_text,
+                    'counts' => $total_counts,
+                    'regions' => $census_region_names,
                     "colorscale" => $color_profile,
                     "zmin" => 0,
                     // set floor on max accordingly
@@ -400,6 +417,7 @@ class DashboardController extends AbstractController
                             'locationmode' => 'USA-states',
                             'lat' => [$location['latitude']],
                             'lon' => [$location['longitude']],
+                            'count' => $count,
                             'name' => $location['code'] . " (" . $location['category'] . ")",
                             'hoverinfo' => 'text',
                             'text' => [$label],

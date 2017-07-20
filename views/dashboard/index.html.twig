@@ -69,9 +69,15 @@
 
                     </div>
                 </div>
-                <div id="plotly-total-progress" class="col-md-9 plotly-div">
+                <div id="plotly-total-progress" class="col-md-9 plotly-div"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="text-center">Raw Data</h4>
+                    <div class="table-responsive">
+                        <div id="total-progress-table"></div>
+                    </div>
                 </div>
-
             </div>
             <script type="text/javascript">
                 // function to grab current filter values and load JSON from load_map_data REST endpoint
@@ -135,6 +141,10 @@
                                 if (showAnnot) {
                                     loadBarChartAnnotations(data, progressAnnot);
                                 }
+
+                                // load table data
+                                var tpTable = $('#total-progress-table');
+                                loadTableData(tpTable, data, metricTitle);
 
                                 // empty div contents in case there had been an error message before
                                 $('#' + spinnerLoc).empty();
@@ -248,114 +258,126 @@
                     </div>
                 </div>
                 <div id="plotly-participants-by-region" class="col-md-9 plotly-div"></div>
-
-                <script type="text/javascript">
-                    // function to grab current filter values and load JSON from load_map_data REST endpoint
-                    // success handler calls Plotly.newplot()
-                    function renderMapPlot(dialogType) {
-                        var regionCenters = loadRecruitmentFilters('participants-by-region');
-                        if (regionCenters.length == 0) {
-                            alert('You must select at least one recruitment center to plot results');
-                            return false;
-                        } else {
-                            var spinnerLoc = 'plotly-participants-by-region';
-                            if (dialogType == 'spinner') {
-                                launchSpinner(spinnerLoc);
-                            } else if (dialogType == 'modal' ) {
-                                spinnerLoc = 'modal-spinner-target';
-                                // empty target in case there was an error message beforehand
-                                $('#' + spinnerLoc).empty();
-                                launchSpinner(spinnerLoc);
-                                $('#loading-modal').modal('show');
-                            }
-                            console.log('calling renderMapPlot()');
-                            // gather params
-                            var mapWidth = $('#plotly-participants-by-region').width() - 30;
-                            var mapCutoff = $('#region-plot-end-date').val();
-                            var mapMode = $('#map-mode').val();
-                            var mapModeText = $('#map-mode option:selected').text();
-                            var mapColor = $('#map-color-profile').val();
-                            if (regionCenters.length == $('#participants-by-region .center-filter').length) {
-                                regionCenters = ['ALL'];
-                            }
-
-                            if (mapMode == 'Participant.hpoId') {
-                                $('#map-color-profile').prop('disabled', true);
-                            } else {
-                                $('#map-color-profile').prop('disabled', false);
-                            }
-
-                            // load data from metrics API
-                            $.getJSON('/dashboard/metrics_load_region?csrf_token={{ csrf_token('dashboard') }}&map_mode=' + mapMode + '&end_date=' + mapCutoff + '&centers=' + regionCenters + '&color_profile=' + mapColor, function (data) {
-                                if (data.length != 0) {
-                                    if (mapModeText != 'Recruitment Origin') {
-                                        mapModeText += ' of residence'
-                                    }
-                                    var mapLayout = {
-                                        title: "Percentage of target <b>full participants</b> by <b>" + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
-                                        font: PLOTLY_LABEL_FONT,
-                                        width: mapWidth,
-                                        height: mapWidth / 1.66,
-                                        geo: GEO_OPTS
-                                    };
-
-                                    // empty div contents in case there had been an error message before
-                                    $('#' + spinnerLoc).empty();
-
-                                    // render plot and stop spinner
-                                    Plotly.newPlot('plotly-participants-by-region', data, mapLayout, PLOTLY_OPTS);
-                                    removePlotlyLink('plotly-participants-by-region');
-                                    stopSpinner(spinnerLoc);
-
-                                    if (dialogType == 'modal') {
-                                        $('#loading-modal').modal('hide');
-                                    }
-
-                                    console.log('renderMapPlot() complete');
-                                } else {
-                                    setMetricsError(spinnerLoc);
-                                    console.log('error in renderMapPlot()');
-                                }
-                            });
-                        }
-                    }
-
-                    var now = new Date().toISOString().split('T')[0];
-                    $('#region-plot-end-date').val(now);
-
-                    // load plot on tab show (to save loading time)
-                    $('#participants-by-region-nav').on('shown.bs.tab', function (e) {
-                        console.log('Showing region plots');
-                        // if plot has not been shown yet, render and then store state
-                        // this will prevent points render calls once map has been initialized
-                        if (!PLOTS_SHOWN['participants-by-region-nav']) {
-                            renderMapPlot('spinner');
-                            PLOTS_SHOWN['participants-by-region-nav'] = true;
-                        }
-                    });
-
-                    // re-render on filter change
-                    $('.region-plot-control').change(function() {
-                        renderMapPlot('spinner');
-                    });
-
-                    // re-render on filter change with modal (for time changes, may need new metrics)
-                    $('.region-plot-time-control').change(function() {
-                        renderMapPlot('modal');
-                    });
-
-                    // re-render on window resizeEnd if tab is visible
-                    $( window ).on('resizeEnd', function() {
-                        if ($('#plotly-participants-by-region').is(':visible')) {
-                            renderMapPlot('');
-                        }
-                    });
-
-                    $('#participants-by-region').find('.redraw-plotly').click(function() {
-                        renderMapPlot('spinner');
-                    });
-                </script>
             </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="text-center">Raw Data</h4>
+                    <div class="table-responsive">
+                        <div id="participants-by-region-table"></div>
+                    </div>
+                </div>
+            </div>
+
+            <script type="text/javascript">
+                // function to grab current filter values and load JSON from load_map_data REST endpoint
+                // success handler calls Plotly.newplot()
+                function renderMapPlot(dialogType) {
+                    var regionCenters = loadRecruitmentFilters('participants-by-region');
+                    if (regionCenters.length == 0) {
+                        alert('You must select at least one recruitment center to plot results');
+                        return false;
+                    } else {
+                        var spinnerLoc = 'plotly-participants-by-region';
+                        if (dialogType == 'spinner') {
+                            launchSpinner(spinnerLoc);
+                        } else if (dialogType == 'modal' ) {
+                            spinnerLoc = 'modal-spinner-target';
+                            // empty target in case there was an error message beforehand
+                            $('#' + spinnerLoc).empty();
+                            launchSpinner(spinnerLoc);
+                            $('#loading-modal').modal('show');
+                        }
+                        console.log('calling renderMapPlot()');
+                        // gather params
+                        var mapWidth = $('#plotly-participants-by-region').width() - 30;
+                        var mapCutoff = $('#region-plot-end-date').val();
+                        var mapMode = $('#map-mode').val();
+                        var mapModeText = $('#map-mode option:selected').text();
+                        var mapColor = $('#map-color-profile').val();
+                        if (regionCenters.length == $('#participants-by-region .center-filter').length) {
+                            regionCenters = ['ALL'];
+                        }
+
+                        if (mapMode == 'FullParticipant.hpoId') {
+                            $('#map-color-profile').prop('disabled', true);
+                        } else {
+                            $('#map-color-profile').prop('disabled', false);
+                        }
+
+                        // load data from metrics API
+                        $.getJSON('/dashboard/metrics_load_region?csrf_token={{ csrf_token('dashboard') }}&map_mode=' + mapMode + '&end_date=' + mapCutoff + '&centers=' + regionCenters + '&color_profile=' + mapColor, function (data) {
+                            if (data.length != 0) {
+                                if (mapModeText != 'Recruitment Origin') {
+                                    mapModeText += ' of residence'
+                                }
+                                var mapLayout = {
+                                    title: "Percentage of target <b>full participants</b> by <b>" + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
+                                    font: PLOTLY_LABEL_FONT,
+                                    width: mapWidth,
+                                    height: mapWidth / 1.66,
+                                    geo: GEO_OPTS
+                                };
+
+                                // empty div contents in case there had been an error message before
+                                $('#' + spinnerLoc).empty();
+
+                                // load table data
+                                var regionTable = $('#participants-by-region-table');
+                                loadRegionTableData(regionTable, data, mapMode, mapModeText);
+
+                                // render plot and stop spinner
+                                Plotly.newPlot('plotly-participants-by-region', data, mapLayout, PLOTLY_OPTS);
+                                removePlotlyLink('plotly-participants-by-region');
+                                stopSpinner(spinnerLoc);
+
+                                if (dialogType == 'modal') {
+                                    $('#loading-modal').modal('hide');
+                                }
+
+                                console.log('renderMapPlot() complete');
+                            } else {
+                                setMetricsError(spinnerLoc);
+                                console.log('error in renderMapPlot()');
+                            }
+                        });
+                    }
+                }
+
+                var now = new Date().toISOString().split('T')[0];
+                $('#region-plot-end-date').val(now);
+
+                // load plot on tab show (to save loading time)
+                $('#participants-by-region-nav').on('shown.bs.tab', function (e) {
+                    console.log('Showing region plots');
+                    // if plot has not been shown yet, render and then store state
+                    // this will prevent points render calls once map has been initialized
+                    if (!PLOTS_SHOWN['participants-by-region-nav']) {
+                        renderMapPlot('spinner');
+                        PLOTS_SHOWN['participants-by-region-nav'] = true;
+                    }
+                });
+
+                // re-render on filter change
+                $('.region-plot-control').change(function() {
+                    renderMapPlot('spinner');
+                });
+
+                // re-render on filter change with modal (for time changes, may need new metrics)
+                $('.region-plot-time-control').change(function() {
+                    renderMapPlot('modal');
+                });
+
+                // re-render on window resizeEnd if tab is visible
+                $( window ).on('resizeEnd', function() {
+                    if ($('#plotly-participants-by-region').is(':visible')) {
+                        renderMapPlot('');
+                    }
+                });
+
+                $('#participants-by-region').find('.redraw-plotly').click(function() {
+                    renderMapPlot('spinner');
+                });
+            </script>
         </div>
         <div id="participants-by-lifecycle" class="tab-pane pad fade">
             <div class="row">
@@ -381,118 +403,131 @@
                     </div>
                 </div>
                 <div class="col-md-9 plotly-div" id="plotly-participants-by-lifecycle"></div>
-
-                <script type="text/javascript">
-                    // function to grab current filter values and load JSON from load_map_data REST endpoint
-                    // success handler calls Plotly.newplot()
-                    function renderLcPlot(dialogType) {
-                        var lifecycleCenters = loadRecruitmentFilters('participants-by-lifecycle');
-                        if (lifecycleCenters.length == 0) {
-                            alert('You must select at least one recruitment center to plot results');
-                            return false;
-                        } else {
-                            var lcWidth = $('#plotly-participants-by-lifecycle').width() - 30;
-                            var spinnerLoc = 'plotly-participants-by-lifecycle';
-                            if (dialogType == 'spinner') {
-                                launchSpinner(spinnerLoc);
-                            } else if (dialogType == 'modal') {
-                                spinnerLoc = 'modal-spinner-target';
-                                // empty target in case there was an error message beforehand
-                                $('#' + spinnerLoc).empty();
-                                launchSpinner(spinnerLoc);
-                                $('#loading-modal').modal('show');
-                            }
-                            console.log('calling renderLcPlot()');
-                            var lcEndDate = $('#lifecycle-end-date').val();
-                            var lcShowAnnot = $('#lifecycle-plot-show-annot').is(':checked');
-
-                            if (lifecycleCenters.length == $('#participants-by-lifecycle .center-filter').length) {
-                                lifecycleCenters = ['ALL'];
-                            }
-
-                            $.getJSON('/dashboard/metrics_load_lifecycle?csrf_token={{ csrf_token('dashboard') }}&end_date=' + lcEndDate + '&centers=' + lifecycleCenters, function (data) {
-                                if (data.length != 0) {
-                                    var lcAnnot = [];
-                                    var lcTitle = 'Participant registrations by <b>lifecycle phase</b> as of ' + lcEndDate;
-                                    var lcLayout = {
-                                        title: lcTitle,
-                                        font: PLOTLY_LABEL_FONT,
-                                        barmode: 'stack',
-                                        width: lcWidth,
-                                        height: lcWidth / 1.66,
-                                        annotations: lcAnnot,
-                                        xaxis: {
-                                            tickangle: -45,
-                                            fixedrange: true
-                                        },
-                                        yaxis: {
-                                            fixedrange: true
-                                        },
-                                        margin: {
-                                            b: 150,
-                                            pad: 5
-                                        }
-                                    };
-
-                                    // load column totals if requested
-                                    if (lcShowAnnot) {
-                                        loadBarChartAnnotations(data, lcAnnot);
-                                    }
-
-                                    // render plot, remove plotly link and stop spinner
-                                    Plotly.newPlot('plotly-participants-by-lifecycle', data, lcLayout, PLOTLY_OPTS);
-                                    removePlotlyLink('plotly-participants-by-lifecycle');
-                                    stopSpinner(spinnerLoc);
-
-                                    if (dialogType == 'modal') {
-                                        $('#loading-modal').modal('hide');
-                                    }
-                                    console.log('renderLcPlot() complete');
-                                } else {
-                                    setMetricsError(spinnerLoc);
-                                    console.log('error in renderLcPlot()');
-                                }
-                            });
-                        }
-                    }
-
-
-                    var now = new Date().toISOString().split('T')[0];
-                    $('#lifecycle-end-date').val(now);
-
-                    // load plot on tab show (to save loading time)
-                    $('#participants-by-lifecycle-nav').on('shown.bs.tab', function (e) {
-                        console.log('Showing lifecycle plot');
-                        // if plot has not been shown yet, render and then store state
-                        // this will prevent points render calls once map has been initialized
-                        if (!PLOTS_SHOWN['participants-by-lifecycle-nav']) {
-                            renderLcPlot('spinner');
-                            PLOTS_SHOWN['participants-by-lifecycle-nav'] = true;
-                        }
-                    });
-
-                    // re-render on filter change
-                    $('.lifecycle-plot-control').change(function() {
-                        renderLcPlot('spinner');
-                    });
-
-                    // re-render on filter change with modal (for time changes, may need new metrics)
-                    $('.lifecycle-time-control').change(function() {
-                        renderLcPlot('modal');
-                    });
-
-                    // re-render on window resizeEnd if tab is visible
-                    $( window ).on('resizeEnd', function() {
-                        if ($('#plotly-participants-by-lifecycle').is(':visible')) {
-                            renderLcPlot('');
-                        }
-                    });
-
-                    $('#participants-by-lifecycle').find('.redraw-plotly').click(function() {
-                        renderLcPlot('spinner');
-                    });
-                </script>
             </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="text-center">Raw Data</h4>
+                    <div class="table-responsive">
+                        <div id="participants-by-lifecycle-table"></div>
+                    </div>
+                </div>
+            </div>
+
+            <script type="text/javascript">
+                // function to grab current filter values and load JSON from load_map_data REST endpoint
+                // success handler calls Plotly.newplot()
+                function renderLcPlot(dialogType) {
+                    var lifecycleCenters = loadRecruitmentFilters('participants-by-lifecycle');
+                    if (lifecycleCenters.length == 0) {
+                        alert('You must select at least one recruitment center to plot results');
+                        return false;
+                    } else {
+                        var lcWidth = $('#plotly-participants-by-lifecycle').width() - 30;
+                        var spinnerLoc = 'plotly-participants-by-lifecycle';
+                        if (dialogType == 'spinner') {
+                            launchSpinner(spinnerLoc);
+                        } else if (dialogType == 'modal') {
+                            spinnerLoc = 'modal-spinner-target';
+                            // empty target in case there was an error message beforehand
+                            $('#' + spinnerLoc).empty();
+                            launchSpinner(spinnerLoc);
+                            $('#loading-modal').modal('show');
+                        }
+                        console.log('calling renderLcPlot()');
+                        var lcEndDate = $('#lifecycle-end-date').val();
+                        var lcShowAnnot = $('#lifecycle-plot-show-annot').is(':checked');
+
+                        if (lifecycleCenters.length == $('#participants-by-lifecycle .center-filter').length) {
+                            lifecycleCenters = ['ALL'];
+                        }
+
+                        $.getJSON('/dashboard/metrics_load_lifecycle?csrf_token={{ csrf_token('dashboard') }}&end_date=' + lcEndDate + '&centers=' + lifecycleCenters, function (data) {
+                            if (data.length != 0) {
+                                var lcAnnot = [];
+                                var lcTitle = 'Participant registrations by <b>lifecycle phase</b> as of ' + lcEndDate;
+                                var lcLayout = {
+                                    title: lcTitle,
+                                    font: PLOTLY_LABEL_FONT,
+                                    barmode: 'stack',
+                                    width: lcWidth,
+                                    height: lcWidth / 1.66,
+                                    annotations: lcAnnot,
+                                    xaxis: {
+                                        tickangle: -45,
+                                        fixedrange: true
+                                    },
+                                    yaxis: {
+                                        fixedrange: true
+                                    },
+                                    margin: {
+                                        b: 150,
+                                        pad: 5
+                                    }
+                                };
+
+                                // load column totals if requested
+                                if (lcShowAnnot) {
+                                    loadBarChartAnnotations(data, lcAnnot);
+                                }
+
+                                // load table data
+                                var lcTable = $('#participants-by-lifecycle-table');
+                                loadTableData(lcTable, data, 'Status');
+
+                                // render plot, remove plotly link and stop spinner
+                                Plotly.newPlot('plotly-participants-by-lifecycle', data, lcLayout, PLOTLY_OPTS);
+                                removePlotlyLink('plotly-participants-by-lifecycle');
+                                stopSpinner(spinnerLoc);
+
+                                if (dialogType == 'modal') {
+                                    $('#loading-modal').modal('hide');
+                                }
+                                console.log('renderLcPlot() complete');
+                            } else {
+                                setMetricsError(spinnerLoc);
+                                console.log('error in renderLcPlot()');
+                            }
+                        });
+                    }
+                }
+
+
+                var now = new Date().toISOString().split('T')[0];
+                $('#lifecycle-end-date').val(now);
+
+                // load plot on tab show (to save loading time)
+                $('#participants-by-lifecycle-nav').on('shown.bs.tab', function (e) {
+                    console.log('Showing lifecycle plot');
+                    // if plot has not been shown yet, render and then store state
+                    // this will prevent points render calls once map has been initialized
+                    if (!PLOTS_SHOWN['participants-by-lifecycle-nav']) {
+                        renderLcPlot('spinner');
+                        PLOTS_SHOWN['participants-by-lifecycle-nav'] = true;
+                    }
+                });
+
+                // re-render on filter change
+                $('.lifecycle-plot-control').change(function() {
+                    renderLcPlot('spinner');
+                });
+
+                // re-render on filter change with modal (for time changes, may need new metrics)
+                $('.lifecycle-time-control').change(function() {
+                    renderLcPlot('modal');
+                });
+
+                // re-render on window resizeEnd if tab is visible
+                $( window ).on('resizeEnd', function() {
+                    if ($('#plotly-participants-by-lifecycle').is(':visible')) {
+                        renderLcPlot('');
+                    }
+                });
+
+                $('#participants-by-lifecycle').find('.redraw-plotly').click(function() {
+                    renderLcPlot('spinner');
+                });
+            </script>
+
         </div>
     </div>
     {% include 'dashboard/dashboard_help.html.twig' %}
