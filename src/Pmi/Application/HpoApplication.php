@@ -245,8 +245,10 @@ class HpoApplication extends AbstractApplication
                 unset($roles[$key]);
             }
         }
-        $token = new PostAuthenticationGuardToken($this['security.token_storage']->getToken()->getUser(), 'main', $roles);
-        $this['security.token_storage']->setToken($token);
+        if ($roles != $user->getRoles()) {
+            $token = new PostAuthenticationGuardToken($this['security.token_storage']->getToken()->getUser(), 'main', $roles);
+            $this['security.token_storage']->setToken($token);
+        }
     }
     
     /** Returns the user's currently selected HPO site. */
