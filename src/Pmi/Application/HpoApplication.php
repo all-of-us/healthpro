@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Pmi\Entities\Configuration;
 use Pmi\Security\UserProvider;
 use Pmi\Audit\Log;
+use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
 class HpoApplication extends AbstractApplication
 {
@@ -219,14 +220,33 @@ class HpoApplication extends AbstractApplication
         if ($user && $user->belongsToSite($email)) {
             $this['session']->set('site', $user->getSite($email));
             $this['session']->remove('awardee');
+            $this->setNewRoles($user);
             return true;
         } elseif ($user && $user->belongsToAwardee($email)) {
             $this['session']->set('awardee', $user->getAwardee($email));
             $this['session']->remove('site');
+            $this->setNewRoles($user);
             return true;
         } else {
             return false;
         }
+    }
+
+    public function setNewRoles($user)
+    {
+        $roles = $user->getRoles();
+        if ($this['session']->has('site')) {
+            if(($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+        }
+        if ($this['session']->has('awardee')) {
+            if(($key = array_search('ROLE_USER', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+        }
+        $token = new PostAuthenticationGuardToken($this['security.token_storage']->getToken()->getUser(), 'main', $roles);
+        $this['security.token_storage']->setToken($token);
     }
     
     /** Returns the user's currently selected HPO site. */
