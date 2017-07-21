@@ -292,9 +292,8 @@ class DefaultController extends AbstractController
             ['participant_id' => $id],
             ['updated_ts' => 'DESC', 'id' => 'DESC']
         );
-        $problems = $app['em']->getRepository('problems')->fetchBySql(
-            'participant_id = ? AND created_ts >= ?',
-            [$id, (new \DateTime('-1 day'))->format('Y-m-d H:i:s')],
+        $problems = $app['em']->getRepository('problems')->fetchBy(
+            ['participant_id' => $id],
             ['updated_ts' => 'DESC', 'id' => 'DESC']
         );
         return $app['twig']->render('participant.html.twig', [

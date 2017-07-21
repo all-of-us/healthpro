@@ -30,14 +30,13 @@ class ProblemController extends AbstractController
             $app->abort(403);
         }
         if ($problemId) {
-            $problem = $app['em']->getRepository('problems')->fetchBySql(
-                'id = ? AND created_ts >= ?',
-                [$problemId, (new \DateTime('-1 day'))->format('Y-m-d H:i:s')]
-            );
+            $problem = $app['em']->getRepository('problems')->fetchOneBy([
+                'id' => $problemId,
+                'participant_id' => $participantId
+            ]);
             if (!$problem) {
                 $app->abort(404);;
             } else {
-                $problem = $problem[0];
                 $problem['problem_date'] = new \DateTime($problem['problem_date']);
                 if ($problem['provider_aware_date']) {
                     $problem['provider_aware_date'] = new \DateTime($problem['provider_aware_date']);
