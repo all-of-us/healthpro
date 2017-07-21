@@ -337,6 +337,14 @@ class HpoApplication extends AbstractApplication
             }
         }
     }
+
+    public function isDVType() {
+        $site = $this['em']->getRepository('sites')->fetchBy([
+            'google_group' => $this->getSiteId(),
+            'type' => 'DV'
+        ]);
+        return !empty($site);
+    }
     
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {

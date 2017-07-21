@@ -81,7 +81,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-6 col-lg-4">
+            <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h3>
@@ -121,7 +121,7 @@
                 </div>
             </div>
 
-            <div class="col-sm-6 col-lg-4">
+            <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
@@ -155,46 +155,47 @@
                     </div>
                 </div>
             </div>
-
-            <div class="col-sm-6 col-lg-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Document Unanticipated Events</h3>
-                    </div>
-                    <div class="panel-body">
-                        {% for problem in problems %}
-                            {% if loop.index == 6 %}
-                                <div id="evaluation-overflow">
+            {% if app.isDVType %}
+                <div class="col-sm-6 col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Document Unanticipated Events</h3>
+                        </div>
+                        <div class="panel-body">
+                            {% for problem in problems %}
+                                {% if loop.index == 6 %}
+                                    <div id="evaluation-overflow">
+                                {% endif %}
+                                <a href="{{ path('problem', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
+                                    {{ problem.created_ts|date('D n/j/Y g:ia', app.userTimezone) }}<br />
+                                    <small class="text-muted">
+                                        {% if problem.finalized_ts %}
+                                            <span class="label label-success">Finalized</span> {{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                        {% else %}
+                                            <span class="label label-default">Updated</span> {{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                        {% endif %}
+                                    </small>
+                                </a>
+                            {% endfor %}
+                            {% if problems|length > 5 %}
+                                </div>
+                                <a href="#" class="btn btn-block btn-lg btn-default" id="evaluation-overflow-show">
+                                    <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
+                                </a>
                             {% endif %}
-                            <a href="{{ path('problem', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
-                                {{ problem.created_ts|date('D n/j/Y g:ia', app.userTimezone) }}<br />
-                                <small class="text-muted">
-                                    {% if problem.finalized_ts %}
-                                        <span class="label label-success">Finalized</span> {{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                    {% else %}
-                                        <span class="label label-default">Updated</span> {{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                    {% endif %}
-                                </small>
+                            <a href="{{ path('problem', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
+                                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                {% if problems|length > 0 %}
+                                    New
+                                {% else %}
+                                    Start
+                                {% endif %}
+                                    Unanticipated Event
                             </a>
-                        {% endfor %}
-                        {% if problems|length > 5 %}
-                            </div>
-                            <a href="#" class="btn btn-block btn-lg btn-default" id="evaluation-overflow-show">
-                                <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
-                            </a>
-                        {% endif %}
-                        <a href="{{ path('problem', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
-                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                            {% if problems|length > 0 %}
-                                New
-                            {% else %}
-                                Start
-                            {% endif %}
-                                Unanticipated Event
-                        </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     {% else %}
         {% if participant.statusReason == 'test-participant' %}

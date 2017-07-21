@@ -22,6 +22,9 @@ class ProblemController extends AbstractController
 
     public function problemAction($participantId, $problemId, Application $app, Request $request)
     {
+        if (!$app->isDVType()) {
+            $app->abort(404);
+        }
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
