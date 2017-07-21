@@ -291,10 +291,15 @@ class DefaultController extends AbstractController
             ['participant_id' => $id],
             ['updated_ts' => 'DESC', 'id' => 'DESC']
         );
+        $problems = $app['em']->getRepository('problems')->fetchBy(
+            ['participant_id' => $id],
+            ['updated_ts' => 'DESC', 'id' => 'DESC']
+        );
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
             'evaluations' => $evaluations,
+            'problems' => $problems,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView()
         ]);

@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+{% block title %}Problems - {% endblock %}
+{% block body %}
+    <div class="row" id="problemForm">
+        <div class="col-sm-12">
+            <div class="page-header">
+                <h2>
+                    <i class="fa fa-clipboard" aria-hidden="true"></i>
+                    {% if problem %}
+                        {{ problem.created_ts|date('n/j/Y', app.userTimezone) }}
+                    {% else %}
+                        New Report
+                    {% endif %}
+                    <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+                </h2>
+            </div>
+            {{ form_start(problemForm, { attr: { class: 'warn-unsaved' } }) }}
+            {{ form_errors(problemForm) }}
+            {{ form_rest(problemForm) }}
+            <p>
+                {% if problem and problem.finalized_ts %}
+                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
+                {% else %}
+                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+                    <button type="submit" name="reportable" class="btn btn-primary">Save</button>
+                    <button type="submit" name="reportable_finalize" class="btn btn-success pull-right" onclick="return confirm('Are you sure you want to finalize this report?');">Save and Finalize</button>
+                {% endif %}
+            </p>
+            {{ form_end(problemForm) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+
+(function ($) {
+
+var ProblemForm = Backbone.View.extend({
+    events: {
+        "click input[name='form[report_type]']": "showHideProblemFields",
+        "change #form_physical_injury_type": 'changeProviderLabel'
+    },
+    showHideProblemFields: function(e) {
+        this.showHideFields($(e.currentTarget).val());
+    },
+    changeProviderLabel: function(e) {
+        if ($(e.currentTarget).val() == 'baseline_related') {
+            this.$('label[for="form_provider_aware_date"]').html('Date provider became aware of event');
+        } else {
+            this.$('label[for="form_provider_aware_date"]').html('Date provider became aware of injury');
+        }
+    },
+    showHideFields: function(report) {
+        if (report == 'physical') {
+            this.$('div.form-group').show();
+            this.changeLabel('Date of Event', 'Description of Event', 'Corrective Action Taken');
+        } else {
+            this.$('div.form-group').show();
+            this.$('div.form-group:eq(1), div.form-group:eq(2), div.form-group:eq(4)').hide();
+            this.changeLabel('Date of Incident', 'Description', 'Action Taken');
+        }
+    },
+    changeLabel: function(date, description, action) {
+        this.$('label[for="form_problem_date"]').html(date);
+        this.$('label[for="form_description"]').html(description);
+        this.$('label[for="form_action_taken"]').html(action);
+    },
+    changeProblemFields() {
+        if ($('input[name="form[report_type]"]').is(':checked')) {
+            this.showHideFields($('input[name="form[report_type]"]:checked').val());
+        } else {
+            this.$('div.form-group').not(':eq(0)').hide();
+        }
+    },
+    initialize: function() { this.render(); },
+    render: function() {
+        this.changeProblemFields();
+        return this;
+    }
+});
+
+$(document).ready(function() {
+    $('#form_problem_date').pmiDateTimePicker();
+    $('#form_provider_aware_date').pmiDateTimePicker();
+    if ($("#problemForm").length > 0) {
+        var test = new ProblemForm({el: $("#problemForm") });
+    }
+    if ($('.form-group.has-error').length >0 ) {
+        $('.nav-tabs a[href="#reportable"]').tab('show');
+    }
+});
+
+})(jQuery);
+
+</script>
+{% endblock %}
