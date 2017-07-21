@@ -32,7 +32,7 @@
                         {% endif %}
                     {% endif %}
                     {% if is_granted('ROLE_AWARDEE') and app.session.get('awardee') and app.awardeeOrganization %}
-                        <li><a href="{{ path('awardee_workQueue') }}">Awardee Work Queue</a></li>
+                        <li><a href="{{ path('workqueue_index') }}">Work Queue</a></li>
                     {% endif %}
                     {% if is_granted('ROLE_DASHBOARD') %}
                         <li><a href="{{ path('dashboard_home') }}">Dashboard</a></li>

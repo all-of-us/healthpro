@@ -99,8 +99,8 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/admin($|\/)', 'ips' => $ips], 'ROLE_ADMIN'],
                 [['path' => '^/admin($|\/)'], 'ROLE_NO_ACCESS'],
 
-                [['path' => '^/awardee($|\/)', 'ips' => $ips], 'ROLE_AWARDEE'],
-                [['path' => '^/awardee($|\/)'], 'ROLE_NO_ACCESS'],
+                [['path' => '^/workqueue($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_AWARDEE']],
+                [['path' => '^/workqueue($|\/)'], 'ROLE_NO_ACCESS'],
 
                 [['path' => '^/site($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_AWARDEE']],
                 [['path' => '^/site($|\/)'], 'ROLE_NO_ACCESS'],

@@ -187,15 +187,37 @@ class WorkQueueController extends AbstractController
 
     public function indexAction(Application $app, Request $request)
     {
-        $organization = $app->getSiteOrganization();
-        if (!$organization) {
+        if ($app->hasRole('ROLE_USER')) {
+            $organization = $app->getSiteOrganization();
+        }
+        if ($app->hasRole('ROLE_AWARDEE')) {
+            $organizations = $app->getAwardeeOrganization();
+            if (!empty($organizations)) {
+                $organization = $organizations[0];
+                $app['session']->set('awardeeOrganization', $organization);
+            }
+        }
+        if (empty($organization)) {
             return $app['twig']->render('workqueue/no-organization.html.twig');
         }
 
         $params = array_filter($request->query->all());
+        $filters = self::$filters;
+        if ($app->hasRole('ROLE_AWARDEE')) {
+            $organizationsList = [];
+            $organizationsList['organization']['label'] = 'Organization';
+            foreach ($organizations as $org) {
+                $organizationsList['organization']['options'][$org] = $org;
+            }
+            $filters = array_merge($filters, $organizationsList);
+            if (isset($params['organization'])) {
+                $organization = $params['organization'];
+                $app['session']->set('awardeeOrganization', $organization);
+            }
+        }
         $participants = $this->participantSummarySearch($organization, $params, $app);
         return $app['twig']->render('workqueue/index.html.twig', [
-            'filters' => self::$filters,
+            'filters' => $filters,
             'surveys' => self::$surveys,
             'samples' => self::$samples,
             'participants' => $participants,
@@ -226,7 +248,7 @@ class WorkQueueController extends AbstractController
 
     public function exportAction(Application $app, Request $request)
     {
-        if ($request->get('_route') == 'awardee_export') {
+        if ($app->hasRole('ROLE_AWARDEE')) {
             $organization = $app['session']->get('awardeeOrganization');
             $site = $app->getAwardeeId();
         } else {
