@@ -215,8 +215,8 @@
 $(document).ready(function() {
     var checkFilters = function () {
         if ($('select[name=withdrawalStatus]').val() == 'NO_USE') {
-            $('select').not('[name=withdrawalStatus]').val('');
-            $('select').not('[name=withdrawalStatus]').prop('disabled', true);
+            $('select').not('[name=withdrawalStatus], [name=organization]').val('');
+            $('select').not('[name=withdrawalStatus], [name=organization]').prop('disabled', true);
         } else {
             $('select').prop('disabled', false);
         }
