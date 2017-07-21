@@ -159,7 +159,7 @@
             <div class="col-sm-6 col-lg-4">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Document Reportable Events</h3>
+                        <h3 class="panel-title"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Document Unanticipated Events</h3>
                     </div>
                     <div class="panel-body">
                         {% for problem in problems %}
@@ -185,12 +185,12 @@
                         {% endif %}
                         <a href="{{ path('problem', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
                             <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                            {% if evaluations|length > 0 %}
+                            {% if problems|length > 0 %}
                                 New
                             {% else %}
                                 Start
                             {% endif %}
-                                Report
+                                Unanticipated Event
                         </a>
                     </div>
                 </div>
