@@ -127,6 +127,8 @@ class OrderController extends AbstractController
             if ($confirmForm->isValid()) {
                 if ($app->getConfig('ml_mock_order')) {
                     $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
+                } elseif ($orderData['type'] === 'kit') {
+                    $orderData['mayo_id'] = $orderData['order_id'];
                 } else {
                     // set collected time to today at midnight local time
                     $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
