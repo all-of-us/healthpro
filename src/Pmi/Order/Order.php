@@ -302,10 +302,26 @@ class Order
             ]);
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
-            $formBuilder->add("fedex_tracking", Type\TextType::class, [
-                'label' => 'FedEx tracking number',
+            $formBuilder->add('fedex_tracking', Type\RepeatedType::class, [
+                'type' => Type\TextType::class,
                 'disabled' => $disabled,
-                'required' => false
+                'invalid_message' => 'FedEx tracking numbers must match.',
+                'first_options' => [
+                    'label' => 'FedEx tracking number'
+                ],
+                'second_options' => [
+                    'label' => 'Verify FedEx tracking number',
+                ],
+                'required' => false,
+                'error_mapping' => [
+                    '.' => 'second' // target the second (repeated) field for non-matching error
+                ],
+                'constraints' => [
+                    new Constraints\Regex([
+                        'pattern' => '/^\d{12}$/',
+                        'message' => 'FedEx tracking numbers must be a string of 12 digits'
+                    ])
+                ]
             ]);
         }
         $formBuilder->add("{$set}_notes", Type\TextareaType::class, [

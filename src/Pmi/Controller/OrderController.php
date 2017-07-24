@@ -338,7 +338,7 @@ class OrderController extends AbstractController
                 !empty($finalizeForm['finalized_ts']->getData()) &&
                 empty($finalizeForm['fedex_tracking']->getData()))
             {
-                $finalizeForm['fedex_tracking']->addError(new FormError('Please specify FedEx tracking number'));
+                $finalizeForm['fedex_tracking']['first']->addError(new FormError('Please specify FedEx tracking number'));
             }
             if ($finalizeForm->isValid()) {
                 $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
