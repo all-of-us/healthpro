@@ -32,7 +32,28 @@
         </div>
 
         {% if finalizeForm.fedex_tracking is defined %}
-            {{ form_row(finalizeForm.fedex_tracking) }}
+            <div class="text-right">
+                <a href="#" class="btn btn-xs btn-default" id="enable-scan">
+                    <i class="fa fa-barcode" aria-hidden="true"></i>
+                    Scan barcode
+                </a>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6" id="fedex-barcode" style="display:none">
+                    <div class="form-group">
+                        <label class="control-label" for="fedex_barcode_first">FedEx barcode</label>
+                        <input type="text" id="fedex_barcode_first" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="fedex_barcode_second">Verify FedEx barcode</label>
+                        <input type="text" id="fedex_barcode_second" class="form-control">
+                    </div>
+                </div>
+                <div class="col-xs-12" id="fedex-number">
+                    {{ form_row(finalizeForm.fedex_tracking) }}
+                </div>
+            </div>
         {% endif %}
 
         <div class="form-group{% if not finalizeForm.finalized_notes.vars.valid %} has-error{% endif %}">
@@ -72,6 +93,38 @@ $(document).ready(function () {
     $('#form_finalized_ts').pmiDateTimePicker();
     var orderView = new PMI.views['OrderSubPage']({
         el: $("body")
+    });
+
+    $('#enable-scan').on('click', function() {
+        if ($('#fedex-barcode').is(':visible')) {
+            $('#enable-scan').removeClass('active');
+            $('#fedex-barcode').hide();
+            $('#fedex-number').removeClass('col-xs-6').addClass('col-xs-12');
+            $('#fedex-number input').attr('readonly', false);
+        } else {
+            $('#enable-scan').addClass('active');
+            $('#fedex-barcode').show();
+            $('#fedex-number').removeClass('col-xs-12').addClass('col-xs-6');
+            $('#fedex-number input').attr('readonly', true);
+        }
+        $('#enable-scan').blur();
+        return false;
+    });
+    $('#fedex_barcode_first, #fedex_barcode_second').on('change keyup', function() {
+        var target;
+        if ($(this).attr('id') === 'fedex_barcode_second') {
+            target = $('#form_fedex_tracking_second');
+        } else {
+            target = $('#form_fedex_tracking_first');
+        }
+        var barcode = $(this).val().trim();
+        if (barcode.match(/^[0-9]{34}$/)) { // 34 digit barcode
+            var fedexTracking = barcode.substring(20);
+            fedexTracking = fedexTracking.replace(/^0{1,2}/, ''); // trim up to two leading 0's
+            target.val(fedexTracking);
+        } else {
+            target.val('');
+        }
     });
 });
 </script>
