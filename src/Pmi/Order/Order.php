@@ -318,8 +318,8 @@ class Order
                 ],
                 'constraints' => [
                     new Constraints\Regex([
-                        'pattern' => '/^\d{12}$/',
-                        'message' => 'FedEx tracking numbers must be a string of 12 digits'
+                        'pattern' => '/^\d{12,14}$/',
+                        'message' => 'FedEx tracking numbers must be a string of 12-14 digits'
                     ])
                 ]
             ]);
