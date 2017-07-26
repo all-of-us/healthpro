@@ -101,15 +101,21 @@ class ProblemController extends AbstractController
         if (!empty($problem['finalized_ts'])) {
             $problemCommentForm = $this->getProblemCommentForm($app);
             $problemCommentForm = $problemCommentForm->createView();
+            $problemComments = $app['em']->getRepository('problem_comments')->fetchBy(
+                ['problem_id' => $problemId],
+                ['created_ts' => 'DESC']
+            );
         } else {
             $problemCommentForm = null;
+            $problemComments = null;
         }
 
         return $app['twig']->render('problem.html.twig', [
             'problem' => $problem,
             'participant' => $participant,
             'problemForm' => $problemForm->createView(),
-            'problemCommentForm' => $problemCommentForm
+            'problemCommentForm' => $problemCommentForm,
+            'problemComments' => $problemComments
         ]);
     }
 

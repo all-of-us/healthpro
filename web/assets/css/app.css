@@ -164,11 +164,11 @@ label.label-normal {
 }
 
 /* Participant page */
-#order-overflow, #evaluation-overflow {
+#order-overflow, #evaluation-overflow, #problem-overflow, #comment-overflow {
     display: none;
     margin-top: 5px;
 }
-#order-overflow-show, #evaluation-overflow-show {
+#order-overflow-show, #evaluation-overflow-show, #problem-overflow-show, #comment-overflow-show {
     margin-top: 5px
 }
 #participant-consent-status {

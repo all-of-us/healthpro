@@ -164,7 +164,7 @@
                         <div class="panel-body">
                             {% for problem in problems %}
                                 {% if loop.index == 6 %}
-                                    <div id="evaluation-overflow">
+                                    <div id="problem-overflow">
                                 {% endif %}
                                 <a href="{{ path('problem', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
                                     {{ problem.created_ts|date('D n/j/Y g:ia', app.userTimezone) }}<br />
@@ -179,7 +179,7 @@
                             {% endfor %}
                             {% if problems|length > 5 %}
                                 </div>
-                                <a href="#" class="btn btn-block btn-lg btn-default" id="evaluation-overflow-show">
+                                <a href="#" class="btn btn-block btn-lg btn-default" id="problem-overflow-show">
                                     <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
                                 </a>
                             {% endif %}
@@ -238,6 +238,11 @@ $(document).ready(function() {
     $('#evaluation-overflow-show').on('click', function(e) {
         $(this).hide();
         $('#evaluation-overflow').show();
+        e.preventDefault();
+    });
+    $('#problem-overflow-show').on('click', function(e) {
+        $(this).hide();
+        $('#problem-overflow').show();
         e.preventDefault();
     });
     JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
