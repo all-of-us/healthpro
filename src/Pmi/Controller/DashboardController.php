@@ -613,7 +613,7 @@ class DashboardController extends AbstractController
                 if (!$metrics) {
                     return false;
                 } else {
-                    $memcache->set($memcacheKey, $metrics, 0, 86400);
+                    $memcache->set($memcacheKey, $metrics, 0, 14400);
                 }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
@@ -634,7 +634,7 @@ class DashboardController extends AbstractController
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
                 $definitions = $metricsApi->metricsFields();
                 // set expiration to four hours
-                $memcache->set($memcacheKey, $definitions, 0, 86400);
+                $memcache->set($memcacheKey, $definitions, 0, 14400);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
             }
