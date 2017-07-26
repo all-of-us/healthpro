@@ -32,13 +32,17 @@
         </div>
 
         {% if finalizeForm.fedex_tracking is defined %}
-            <div class="text-right">
-                <a href="#" class="btn btn-xs btn-default" id="enable-scan">
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#" id="enable-number">
+                    <i class="fa fa-keyboard-o" aria-hidden="true"></i>
+                    Enter tracking number
+                </a></li>
+                <li role="presentation"><a href="#" id="enable-barcode">
                     <i class="fa fa-barcode" aria-hidden="true"></i>
                     Scan barcode
-                </a>
-            </div>
-
+                </a></li>
+            </ul>
+            <br />
             <div class="row">
                 <div class="col-xs-6" id="fedex-barcode" style="display:none">
                     <div class="form-group">
@@ -54,6 +58,7 @@
                     {{ form_row(finalizeForm.fedex_tracking) }}
                 </div>
             </div>
+            <hr />
         {% endif %}
 
         <div class="form-group{% if not finalizeForm.finalized_notes.vars.valid %} has-error{% endif %}">
@@ -95,21 +100,23 @@ $(document).ready(function () {
         el: $("body")
     });
 
-    $('#enable-scan').on('click', function() {
-        if ($('#fedex-barcode').is(':visible')) {
-            $('#enable-scan').removeClass('active');
-            $('#fedex-barcode').hide();
-            $('#fedex-number').removeClass('col-xs-6').addClass('col-xs-12');
-            $('#fedex-number input').attr('readonly', false);
-        } else {
-            $('#enable-scan').addClass('active');
-            $('#fedex-barcode').show();
-            $('#fedex-number').removeClass('col-xs-12').addClass('col-xs-6');
-            $('#fedex-number input').attr('readonly', true);
-        }
-        $('#enable-scan').blur();
+    $('#enable-number').on('click', function() {
+        $('#enable-number').parent().addClass('active');
+        $('#enable-barcode').parent().removeClass('active');
+        $('#fedex-barcode').hide();
+        $('#fedex-number').removeClass('col-xs-6').addClass('col-xs-12');
+        $('#fedex-number input').attr('readonly', false);
         return false;
     });
+    $('#enable-barcode').on('click', function() {
+        $('#enable-barcode').parent().addClass('active');
+        $('#enable-number').parent().removeClass('active');
+        $('#fedex-barcode').show();
+        $('#fedex-number').removeClass('col-xs-12').addClass('col-xs-6');
+        $('#fedex-number input').attr('readonly', true);
+        return false;
+    });
+
     $('#fedex_barcode_first, #fedex_barcode_second').on('change keyup', function() {
         var target;
         if ($(this).attr('id') === 'fedex_barcode_second') {
@@ -117,13 +124,20 @@ $(document).ready(function () {
         } else {
             target = $('#form_fedex_tracking_first');
         }
+        target.attr('placeholder', '');
+        target.parent().removeClass('has-error').removeClass('has-success');
         var barcode = $(this).val().trim();
         if (barcode.match(/^[0-9]{34}$/)) { // 34 digit barcode
             var fedexTracking = barcode.substring(20);
             fedexTracking = fedexTracking.replace(/^0{1,2}/, ''); // trim up to two leading 0's
             target.val(fedexTracking);
+            target.parent().addClass('has-success');
         } else {
             target.val('');
+            if (barcode) {
+                target.attr('placeholder', 'Invalid barcode');
+                target.parent().addClass('has-error');
+            }
         }
     });
 });
