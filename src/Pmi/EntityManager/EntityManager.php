@@ -11,7 +11,8 @@ class EntityManager
         'evaluations' => 'doctrine',
         'sites' => 'doctrine',
         'withdrawal_log' => 'doctrine',
-        'problems' => 'doctrine'
+        'problems' => 'doctrine',
+        'problem_comments' => 'doctrine'
     ];
 
     protected $timezone;

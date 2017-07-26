@@ -12,13 +12,16 @@ use Symfony\Component\Validator\Constraints;
 class ProblemController extends AbstractController
 {
     const RELATED_BASELINE = 'related_baseline';
-    const UNRELATED_BASELINE = 'unrelated_baselines';
+    const UNRELATED_BASELINE = 'unrelated_baseline';
     const OTHER = 'other';
 
     protected static $routes = [
-        ['problem', '/participant/{participantId}/problems/{problemId}', [
+        ['problem', '/participant/{participantId}/problem/{problemId}', [
             'method' => 'GET|POST',
             'defaults' => ['problemId' => null]
+        ]],
+        ['problemComment', '/participant/{participantId}/problem/{problemId}/comment', [
+            'method' => 'POST'
         ]]
     ];
 
@@ -95,12 +98,61 @@ class ProblemController extends AbstractController
                 }
             }
         }
+        if (!empty($problem['finalized_ts'])) {
+            $problemCommentForm = $this->getProblemCommentForm($app);
+            $problemCommentForm = $problemCommentForm->createView();
+        } else {
+            $problemCommentForm = null;
+        }
 
         return $app['twig']->render('problem.html.twig', [
             'problem' => $problem,
             'participant' => $participant,
-            'problemForm' => $problemForm->createView()
+            'problemForm' => $problemForm->createView(),
+            'problemCommentForm' => $problemCommentForm
         ]);
+    }
+
+    public function problemCommentAction($participantId, $problemId, Application $app, Request $request)
+    {
+        if (!$app->isDVType()) {
+            $app->abort(404);
+        }
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->status) {
+            $app->abort(403);
+        }
+        if ($problemId) {
+            $problem = $app['em']->getRepository('problems')->fetchOneBy([
+                'id' => $problemId,
+                'participant_id' => $participantId
+            ]);
+            if (!$problem && !$problem['finalized_ts']) {
+                $app->abort(404);;
+            }
+        }
+        $problemCommentForm = $this->getProblemCommentForm($app);
+        $problemCommentForm->handleRequest($request);
+        if ($problemCommentForm->isSubmitted()) {
+            if ($problemCommentForm->isValid()) {
+                $problemCommentData = $problemCommentForm->getData();
+                $now = new \DateTime();
+                $problemCommentData['problem_id'] = $problemId;
+                $problemCommentData['user_id'] = $app->getUser()->getId();
+                $problemCommentData['site'] = $app->getSiteId();
+                $problemCommentData['created_ts'] = $now;
+                if ($problemCommentId = $app['em']->getRepository('problem_comments')->insert($problemCommentData)) {
+                    $app->addFlashNotice('Comment saved');
+                    return $app->redirectToRoute('participant', [
+                        'id' => $participantId
+                    ]);
+
+                }
+            }
+        }
     }
 
     public function getProblemForm(Application $app, $problem)
@@ -172,4 +224,20 @@ class ProblemController extends AbstractController
             ->getForm();
             return $problemForm;    
     }
+
+    public function getProblemCommentForm(Application $app)
+    {
+        $problemCommentForm = $app['form.factory']->createBuilder(Type\FormType::class, null)
+            ->add('staff_name', Type\TextType::class, [
+                'label' => 'Staff Name',
+                'required' => true
+            ])
+            ->add('comment', Type\TextareaType::class, [
+                'label' => 'Comment',
+                'required' => true
+            ])
+            ->getForm();
+            return $problemCommentForm;    
+    }
+
 }
