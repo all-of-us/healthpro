@@ -6,5 +6,7 @@ CREATE TABLE `problem_comments` (
   `staff_name` varchar(255) DEFAULT NULL,
   `comment` text DEFAULT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`problem_id`)
+  REFERENCES problems(`id`)
 ) DEFAULT CHARSET=utf8mb4;
