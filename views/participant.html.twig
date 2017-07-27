@@ -167,12 +167,19 @@
                                     <div id="problem-overflow">
                                 {% endif %}
                                 <a href="{{ path('problem', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
-                                    {{ problem.created_ts|date('D n/j/Y g:ia', app.userTimezone) }}<br />
+                                    {{ problem.updated_ts|date('D n/j/Y g:ia', app.userTimezone) }}
+                                    {% if problem.finalized_ts and problem.comment_count > 0 %}
+                                        <span class="badge">{{ problem.comment_count }}</span>
+                                    {% endif %}
+                                    <br />
                                     <small class="text-muted">
                                         {% if problem.finalized_ts %}
-                                            <span class="label label-success">Finalized</span> {{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                        {% else %}
-                                            <span class="label label-default">Updated</span> {{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                            <span class="label label-success">Finalized</span>
+                                            {% if problem.comment_count > 0 %}
+                                                <small> Last commented on {{ problem.last_comment_ts|date('n/j/Y g:ia', app.userTimezone) }} </small>
+                                            {% else %}
+                                                {{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                            {% endif %}
                                         {% endif %}
                                     </small>
                                 </a>

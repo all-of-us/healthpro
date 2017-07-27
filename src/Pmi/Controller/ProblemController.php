@@ -81,12 +81,14 @@ class ProblemController extends AbstractController
                     $problemData['site'] = $app->getSiteId();
                     $problemData['participant_id'] = $participantId;
                     $problemData['created_ts'] = $now;
-                    if ($problemId = $app['em']->getRepository('problems')->insert($problemData)) {
+                    if ($app['em']->getRepository('problems')->insert($problemData)) {
                         if ($request->request->has('reportable_finalize')) {
                             $app->addFlashNotice('Report finalized');
                         }else {
                             $app->addFlashNotice('Report saved');
                         }                       
+                    } else {
+                        $app->addFlashError('Failed to create new report');
                     }
                 }
                 return $app->redirectToRoute('participant', [
@@ -150,12 +152,13 @@ class ProblemController extends AbstractController
                 $problemCommentData['user_id'] = $app->getUser()->getId();
                 $problemCommentData['site'] = $app->getSiteId();
                 $problemCommentData['created_ts'] = $now;
-                if ($problemCommentId = $app['em']->getRepository('problem_comments')->insert($problemCommentData)) {
+                if ($app['em']->getRepository('problem_comments')->insert($problemCommentData)) {
                     $app->addFlashNotice('Comment saved');
                     return $app->redirectToRoute('participant', [
                         'id' => $participantId
                     ]);
-
+                } else {
+                   $app->addFlashError('Failed to create new comment'); 
                 }
             }
         }

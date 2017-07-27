@@ -32,7 +32,7 @@
                     {% endif %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                        <strong>{{ problemComment.staff_name }}</strong> <span class="text-muted">Commented on {{ problemComment.created_ts|date('D n/j/Y g:ia', app.userTimezone) }}</span>
+                        <strong>{{ problemComment.staff_name }}</strong> <small class="text-muted">Commented on {{ problemComment.created_ts|date('D n/j/Y g:ia', app.userTimezone) }}</small>
                         </div>
                         <div class="panel-body">
                         {{ problemComment.comment }}

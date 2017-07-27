@@ -107,6 +107,11 @@ class DoctrineRepository
         return $this->dbal->fetchAll($query, $parameters);
     }
 
+    public function fetchByRawSQL($query)
+    {
+        return $this->dbal->fetchAll($query);
+    }
+
     public function insert($data)
     {
         $data = $this->dateTimesToStrings($data);
