@@ -1,31 +1,21 @@
 {% extends 'base.html.twig' %}
 {% block title %}Problems - {% endblock %}
 {% block body %}
-    <div class="row" id="problemForm">
-        <div class="col-sm-12">
-            <div class="page-header">
-                <h2>
-                    <i class="fa fa-clipboard" aria-hidden="true"></i>
-                    {% if problem %}
-                        {{ problem.created_ts|date('n/j/Y', app.userTimezone) }}
-                    {% else %}
-                        New Report
-                    {% endif %}
-                    <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
-                </h2>
-            </div>
-            {{ form_start(problemForm, { attr: { class: 'warn-unsaved' } }) }}
-            {{ form_errors(problemForm) }}
-            {{ form_rest(problemForm) }}
-            {% if problemCommentForm is null %}
-                <p>
-                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
-                    <button type="submit" name="reportable" class="btn btn-primary">Save</button>
-                    <button type="submit" name="reportable_finalize" class="btn btn-success pull-right" onclick="return confirm('Are you sure you want to finalize this report?');">Save and Finalize</button>
-                </p>
-            {% endif %}       
-            {{ form_end(problemForm) }}
-            {% if problemCommentForm %}
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-clipboard" aria-hidden="true"></i>
+            {% if problem %}
+                {{ problem.created_ts|date('n/j/Y', app.userTimezone) }}
+            {% else %}
+                New Report
+            {% endif %}
+            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+        </h2>
+    </div>
+
+    <div class="row" >
+        {% if problemCommentForm %}
+            <div class="col-sm-4">
                 {% for problemComment in problemComments %}
                     {% if loop.index == 6 %}
                         <div id="comment-overflow">
@@ -54,7 +44,22 @@
                     <button type="submit" name="reportable" class="btn btn-primary">Save</button>
                 </p>
                 {{ form_end(problemCommentForm) }}
-            {% endif %}    
+
+                <hr class="visible-xs" />
+            </div>
+        {% endif %}
+        <div class="col-sm-{{ problemCommentForm ? '8' : '12' }}" id="problemForm">
+            {{ form_start(problemForm, { attr: { class: 'warn-unsaved' } }) }}
+            {{ form_errors(problemForm) }}
+            {{ form_rest(problemForm) }}
+            {% if problemCommentForm is null %}
+                <p>
+                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+                    <button type="submit" name="reportable" class="btn btn-primary">Save</button>
+                    <button type="submit" name="reportable_finalize" class="btn btn-success pull-right" onclick="return confirm('Are you sure you want to finalize this report?');">Save and Finalize</button>
+                </p>
+            {% endif %}       
+            {{ form_end(problemForm) }}
         </div>
     </div>
 {% endblock %}
