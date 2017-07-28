@@ -127,6 +127,8 @@ class OrderController extends AbstractController
             if ($confirmForm->isValid()) {
                 if ($app->getConfig('ml_mock_order')) {
                     $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
+                } elseif ($orderData['type'] === 'kit') {
+                    $orderData['mayo_id'] = $orderData['order_id'];
                 } else {
                     // set collected time to today at midnight local time
                     $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
@@ -334,19 +336,31 @@ class OrderController extends AbstractController
         $finalizeForm = $order->createOrderForm('finalized', $app['form.factory']);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isValid()) {
-            $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
-            $updateArray['finalized_user_id'] = $app->getUser()->getId();
-            $updateArray['finalized_site'] = $app->getSiteId();
-            if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                $app->log(Log::ORDER_EDIT, $orderId);
-                $order = $this->loadOrder($participantId, $orderId, $app);
-                $order->sendToRdr();
-                $app->addFlashNotice('Order finalization updated');
+            if ($order->get('type') === 'kit' &&
+                !empty($finalizeForm['finalized_ts']->getData()) &&
+                empty($finalizeForm['fedex_tracking']->getData()))
+            {
+                $finalizeForm['fedex_tracking']['first']->addError(new FormError('Please specify FedEx tracking number'));
+            }
+            if ($finalizeForm->isValid()) {
+                $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
+                $updateArray['finalized_user_id'] = $app->getUser()->getId();
+                $updateArray['finalized_site'] = $app->getSiteId();
+                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                    $app->log(Log::ORDER_EDIT, $orderId);
+                    $order = $this->loadOrder($participantId, $orderId, $app);
+                    if (empty($order->get('finalized_ts'))) {
+                        $app->addFlashNotice('Order updated but not finalized');
+                    } else {
+                        $order->sendToRdr();
+                        $app->addFlashSuccess('Order finalized');
+                    }
 
-                return $app->redirectToRoute('orderFinalize', [
-                    'participantId' => $participantId,
-                    'orderId' => $orderId
-                ]);
+                    return $app->redirectToRoute('orderFinalize', [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId
+                    ]);
+                }
             }
         }
         return $app['twig']->render('order-finalize.html.twig', [
