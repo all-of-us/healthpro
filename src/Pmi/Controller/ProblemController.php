@@ -70,6 +70,7 @@ class ProblemController extends AbstractController
                 }
                 if ($problem) {
                     if (empty($problem['finalized_ts']) && $app['em']->getRepository('problems')->update($problemId, $problemData)) {
+                        $app->log(Log::PROBLEM_EDIT, $problemId);
                         if ($request->request->has('reportable_finalize')) {
                             $app->addFlashNotice('Report finalized');
                         } else {
@@ -81,7 +82,8 @@ class ProblemController extends AbstractController
                     $problemData['site'] = $app->getSiteId();
                     $problemData['participant_id'] = $participantId;
                     $problemData['created_ts'] = $now;
-                    if ($app['em']->getRepository('problems')->insert($problemData)) {
+                    if ($problemId = $app['em']->getRepository('problems')->insert($problemData)) {
+                        $app->log(Log::PROBLEM_CREATE, $problemId); 
                         if ($request->request->has('reportable_finalize')) {
                             $app->addFlashNotice('Report finalized');
                         }else {
@@ -152,7 +154,8 @@ class ProblemController extends AbstractController
                 $problemCommentData['user_id'] = $app->getUser()->getId();
                 $problemCommentData['site'] = $app->getSiteId();
                 $problemCommentData['created_ts'] = $now;
-                if ($app['em']->getRepository('problem_comments')->insert($problemCommentData)) {
+                if ($commentId = $app['em']->getRepository('problem_comments')->insert($problemCommentData)) {
+                    $app->log(Log::PROBLEM_COMMENT_CREATE, $commentId);
                     $app->addFlashNotice('Comment saved');
                     return $app->redirectToRoute('participant', [
                         'id' => $participantId
