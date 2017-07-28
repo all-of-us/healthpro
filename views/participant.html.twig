@@ -164,33 +164,32 @@
                         <div class="panel-body">
                             {% for problem in problems %}
                                 {% if loop.index == 6 %}
-                                    <div id="evaluation-overflow">
+                                    <div id="problem-overflow">
                                 {% endif %}
                                 <a href="{{ path('problem', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
-                                    {{ problem.created_ts|date('D n/j/Y g:ia', app.userTimezone) }}<br />
+                                    {{ problem.updated_ts|date('D n/j/Y', app.userTimezone) }}
+                                    <br />
                                     <small class="text-muted">
                                         {% if problem.finalized_ts %}
-                                            <span class="label label-success">Finalized</span> {{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                        {% else %}
-                                            <span class="label label-default">Updated</span> {{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                            <span class="label label-success">Finalized</span>
+                                            {{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                            <br />
+                                            {% if problem.comment_count > 0 %}
+                                                <span class="label label-default">{{ problem.comment_count }} comment{{ problem.comment_count > 1 ? 's' }}</span> {{ problem.last_comment_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                            {% endif %}
                                         {% endif %}
                                     </small>
                                 </a>
                             {% endfor %}
                             {% if problems|length > 5 %}
                                 </div>
-                                <a href="#" class="btn btn-block btn-lg btn-default" id="evaluation-overflow-show">
+                                <a href="#" class="btn btn-block btn-lg btn-default" id="problem-overflow-show">
                                     <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
                                 </a>
                             {% endif %}
                             <a href="{{ path('problem', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
                                 <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                                {% if problems|length > 0 %}
-                                    New
-                                {% else %}
-                                    Start
-                                {% endif %}
-                                    Unanticipated Event
+                                New Unanticipated Event
                             </a>
                         </div>
                     </div>
@@ -238,6 +237,11 @@ $(document).ready(function() {
     $('#evaluation-overflow-show').on('click', function(e) {
         $(this).hide();
         $('#evaluation-overflow').show();
+        e.preventDefault();
+    });
+    $('#problem-overflow-show').on('click', function(e) {
+        $(this).hide();
+        $('#problem-overflow').show();
         e.preventDefault();
     });
     JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {

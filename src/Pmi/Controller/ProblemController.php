@@ -11,10 +11,17 @@ use Symfony\Component\Validator\Constraints;
 
 class ProblemController extends AbstractController
 {
+    const RELATED_BASELINE = 'related_baseline';
+    const UNRELATED_BASELINE = 'unrelated_baseline';
+    const OTHER = 'other';
+
     protected static $routes = [
-        ['problem', '/participant/{participantId}/problems/{problemId}', [
+        ['problem', '/participant/{participantId}/problem/{problemId}', [
             'method' => 'GET|POST',
             'defaults' => ['problemId' => null]
+        ]],
+        ['problemComment', '/participant/{participantId}/problem/{problemId}/comment', [
+            'method' => 'POST'
         ]]
     ];
 
@@ -41,31 +48,19 @@ class ProblemController extends AbstractController
                 $app->abort(404);;
             } else {
                 $problem['problem_date'] = new \DateTime($problem['problem_date']);
-                if ($problem['provider_aware_date']) {
-                    $problem['provider_aware_date'] = new \DateTime($problem['provider_aware_date']);
-                }
-                if ($problem['problem_type'] === 'biospecimen') {
-                    $activeTab = ['active', null];
-                } else {
-                    $activeTab = [null, 'active'];
-                }
+                $problem['provider_aware_date'] = new \DateTime($problem['provider_aware_date']);
                 if (!empty($problem['finalized_ts'])) {
                     $this->disabled = true;
                 }
             }
         } else {
             $problem = null;
-            $activeTab = ['active', null];
         }
         $problemForm = $this->getProblemForm($app, $problem);
         $problemForm->handleRequest($request);
         if ($problemForm->isSubmitted()) {
             if ($problemForm->isValid()) {
                 $problemData = $problemForm->getData();
-                if ($problemData['report_type'] !== 'physical') {
-                    $problemData['physical_injury_type'] = null;
-                    $problemData['provider_aware_date'] = null;
-                }
                 $now = new \DateTime();
                 $problemData['updated_ts'] = $now;
                 if ($request->request->has('reportable_finalize') && (!$problem || empty($problem['finalized_ts']))) {
@@ -75,6 +70,7 @@ class ProblemController extends AbstractController
                 }
                 if ($problem) {
                     if (empty($problem['finalized_ts']) && $app['em']->getRepository('problems')->update($problemId, $problemData)) {
+                        $app->log(Log::PROBLEM_EDIT, $problemId);
                         if ($request->request->has('reportable_finalize')) {
                             $app->addFlashNotice('Report finalized');
                         } else {
@@ -85,18 +81,16 @@ class ProblemController extends AbstractController
                     $problemData['user_id'] = $app->getUser()->getId();
                     $problemData['site'] = $app->getSiteId();
                     $problemData['participant_id'] = $participantId;
-                    if ($request->request->has('reportable') || $request->request->has('reportable_finalize')) {
-                        $problemData['problem_type'] = 'reportable';
-                    } else {
-                        $problemData['problem_type'] = 'biospecimen';
-                    }
                     $problemData['created_ts'] = $now;
                     if ($problemId = $app['em']->getRepository('problems')->insert($problemData)) {
+                        $app->log(Log::PROBLEM_CREATE, $problemId); 
                         if ($request->request->has('reportable_finalize')) {
                             $app->addFlashNotice('Report finalized');
                         }else {
-                            $app->addFlashNotice('Report created');
+                            $app->addFlashNotice('Report saved');
                         }                       
+                    } else {
+                        $app->addFlashError('Failed to create new report');
                     }
                 }
                 return $app->redirectToRoute('participant', [
@@ -108,50 +102,99 @@ class ProblemController extends AbstractController
                 }
             }
         }
+        if (!empty($problem['finalized_ts'])) {
+            $problemCommentForm = $this->getProblemCommentForm($app);
+            $problemCommentForm = $problemCommentForm->createView();
+            $problemComments = $app['em']->getRepository('problem_comments')->fetchBy(
+                ['problem_id' => $problemId],
+                ['created_ts' => 'DESC']
+            );
+        } else {
+            $problemCommentForm = null;
+            $problemComments = null;
+        }
 
         return $app['twig']->render('problem.html.twig', [
             'problem' => $problem,
             'participant' => $participant,
             'problemForm' => $problemForm->createView(),
-            'activeTab' => $activeTab
+            'problemCommentForm' => $problemCommentForm,
+            'problemComments' => $problemComments
         ]);
+    }
+
+    public function problemCommentAction($participantId, $problemId, Application $app, Request $request)
+    {
+        if (!$app->isDVType()) {
+            $app->abort(404);
+        }
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->status) {
+            $app->abort(403);
+        }
+        if ($problemId) {
+            $problem = $app['em']->getRepository('problems')->fetchOneBy([
+                'id' => $problemId,
+                'participant_id' => $participantId
+            ]);
+            if (!$problem && !$problem['finalized_ts']) {
+                $app->abort(404);;
+            }
+        }
+        $problemCommentForm = $this->getProblemCommentForm($app);
+        $problemCommentForm->handleRequest($request);
+        if ($problemCommentForm->isSubmitted()) {
+            if ($problemCommentForm->isValid()) {
+                $problemCommentData = $problemCommentForm->getData();
+                $now = new \DateTime();
+                $problemCommentData['problem_id'] = $problemId;
+                $problemCommentData['user_id'] = $app->getUser()->getId();
+                $problemCommentData['site'] = $app->getSiteId();
+                $problemCommentData['created_ts'] = $now;
+                if ($commentId = $app['em']->getRepository('problem_comments')->insert($problemCommentData)) {
+                    $app->log(Log::PROBLEM_COMMENT_CREATE, $commentId);
+                    $app->addFlashNotice('Comment saved');
+                    return $app->redirectToRoute('participant', [
+                        'id' => $participantId
+                    ]);
+                } else {
+                   $app->addFlashError('Failed to create new comment'); 
+                }
+            }
+        }
     }
 
     public function getProblemForm(Application $app, $problem)
     {
         $constraintDateTime = new \DateTime('+5 minutes');
         $problemForm = $app['form.factory']->createBuilder(Type\FormType::class, $problem)
-            ->add('report_type', Type\ChoiceType::class, [
-                'label' => 'Report Type',
+            ->add('problem_type', Type\ChoiceType::class, [
+                'label' => 'Unanticipated problem type',
                 'required' => true,
                 'disabled' => $this->disabled,
                 'choices' => [
-                    'Physical Injury' => 'physical',
-                    'Indication of suicidal thoughts' => 'suicidal',
-                    'Verbal and non-verbal indications individual may be victim of emotional or physical abuse' => 'verbal',
-                    'Misconduct on part of participant that negatively impacts the center/clinic or its patrons' => 'misconduct'
+                    'Physical injury related to baseline appointment' => self::RELATED_BASELINE,
+                    'Physical injury unrelated to baseline appointment' => self::UNRELATED_BASELINE,
+                    'Other' => self::OTHER
                 ],
                 'multiple' => false,
                 'expanded' => true
             ])
-            ->add('physical_injury_type', Type\ChoiceType::class, [
-                'label' => 'Physical Injury Type',
+            ->add('enrollment_site', Type\TextType::class, [
+                'label' => 'Name of enrollment site where provider became aware of event',
                 'required' => true,
                 'disabled' => $this->disabled,
-                'choices' => [
-                    'Injury related to baseline appointment' => 'baseline_related',
-                    'Injury Unrelated to baseline appointment' => 'baseline_unrelated'
-                ],
-                'multiple' => false,
-                'expanded' => false
             ])
-            ->add('investigator_name', Type\TextType::class, [
-                'label' => 'Investigator Name',
-                'required' => false,
+            ->add('staff_name', Type\TextType::class, [
+                'label' => 'Name of staff recording the event',
+                'required' => true,
                 'disabled' => $this->disabled,
             ])
             ->add("problem_date", Type\DateTimeType::class, [
-                'label' => 'Date of Injury',
+                'label' => 'Date of Event',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'required' => true,
@@ -169,7 +212,7 @@ class ProblemController extends AbstractController
                 'label' => 'Date provider became aware of event',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
-                'required' => false,
+                'required' => true,
                 'disabled' => $this->disabled,
                 'view_timezone' => $app->getUserTimezone(),
                 'model_timezone' => 'UTC',
@@ -182,20 +225,31 @@ class ProblemController extends AbstractController
             ])
             ->add('description', Type\TextareaType::class, [
                 'label' => 'Description of event',
-                'required' => false,
+                'required' => true,
                 'disabled' => $this->disabled,
             ])
             ->add('action_taken', Type\TextType::class, [
                 'label' => 'Corrective Action taken',
-                'required' => false,
-                'disabled' => $this->disabled,
-            ])
-            ->add('follow_up', Type\TextType::class, [
-                'label' => 'Follow up',
-                'required' => false,
+                'required' => true,
                 'disabled' => $this->disabled,
             ])
             ->getForm();
             return $problemForm;    
     }
+
+    public function getProblemCommentForm(Application $app)
+    {
+        $problemCommentForm = $app['form.factory']->createBuilder(Type\FormType::class, null)
+            ->add('staff_name', Type\TextType::class, [
+                'label' => 'Staff Name',
+                'required' => true
+            ])
+            ->add('comment', Type\TextareaType::class, [
+                'label' => 'Comment',
+                'required' => true
+            ])
+            ->getForm();
+            return $problemCommentForm;    
+    }
+
 }

@@ -291,10 +291,8 @@ class DefaultController extends AbstractController
             ['participant_id' => $id],
             ['updated_ts' => 'DESC', 'id' => 'DESC']
         );
-        $problems = $app['em']->getRepository('problems')->fetchBy(
-            ['participant_id' => $id],
-            ['updated_ts' => 'DESC', 'id' => 'DESC']
-        );
+        $query = "SELECT p.id, p.updated_ts, p.finalized_ts, MAX(pc.created_ts) as last_comment_ts, count(pc.comment) as comment_count FROM problems p LEFT JOIN problem_comments pc on p.id = pc.problem_id GROUP BY p.id ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC";
+        $problems = $app['em']->getRepository('problems')->fetchByRawSQL($query);
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
