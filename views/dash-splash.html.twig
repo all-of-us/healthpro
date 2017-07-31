@@ -1,5 +1,10 @@
 {% extends 'base.html.twig' %}
 {% block title %}Choose Destination - {% endblock %}
+{% if not is_granted('ROLE_USER') and is_granted('ROLE_DV_ADMIN')%}
+    {% set path = 'problem_reports' %}
+{% else %}
+    {% set path = 'home' %}
+{% endif %}
 {% block body %}
     <div class="row">
         <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
@@ -9,7 +14,7 @@
             </div>
             
             <div id="dashSplashSelector" class="list-group">
-                <a href="{{ path('home') }}" class="list-group-item">
+                <a href="{{ path(path) }}" class="list-group-item">
                     <h3 class="list-group-item-heading text-center">
                         <span class="glyphicon glyphicon-star"></span>
                         HealthPro

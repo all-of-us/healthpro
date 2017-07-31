@@ -46,6 +46,8 @@ class DefaultController extends AbstractController
             } else {
                 return $app['twig']->render('index.html.twig');
             }
+        } elseif ($app->hasRole('ROLE_DV_ADMIN')) {
+            return $app->redirectToRoute('problem_reports');
         } elseif ($app->hasRole('ROLE_DASHBOARD')) {
             return $app->redirectToRoute('dashboard_home');
         } else {

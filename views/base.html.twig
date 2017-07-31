@@ -40,6 +40,9 @@
                     {% if is_granted('ROLE_ADMIN') %}
                         <li><a href="{{ path('admin_home') }}">Admin</a></li>
                     {% endif %}
+                    {% if is_granted('ROLE_DV_ADMIN') %}
+                        <li><a href="{{ path('problem_reports') }}">Problem Reports</a></li>
+                    {% endif %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
