@@ -184,17 +184,17 @@ class ProblemController extends AbstractController
                 'expanded' => true
             ])
             ->add('enrollment_site', Type\TextType::class, [
-                'label' => 'Name of enrollment site where provider became aware of event',
+                'label' => 'Name of enrollment site where provider became aware of problem',
                 'required' => true,
                 'disabled' => $this->disabled,
             ])
             ->add('staff_name', Type\TextType::class, [
-                'label' => 'Name of staff recording the event',
+                'label' => 'Name of staff recording the problem',
                 'required' => true,
                 'disabled' => $this->disabled,
             ])
             ->add("problem_date", Type\DateTimeType::class, [
-                'label' => 'Date of Event',
+                'label' => 'Date of Problem',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'required' => true,
@@ -209,7 +209,7 @@ class ProblemController extends AbstractController
                 ]
             ])
             ->add("provider_aware_date", Type\DateTimeType::class, [
-                'label' => 'Date provider became aware of event',
+                'label' => 'Date provider became aware of problem',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'required' => true,
@@ -224,7 +224,7 @@ class ProblemController extends AbstractController
                 ]
             ])
             ->add('description', Type\TextareaType::class, [
-                'label' => 'Description of event',
+                'label' => 'Description of problem',
                 'required' => true,
                 'disabled' => $this->disabled,
             ])
