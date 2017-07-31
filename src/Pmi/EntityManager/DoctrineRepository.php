@@ -107,7 +107,7 @@ class DoctrineRepository
         return $this->dbal->fetchAll($query, $parameters);
     }
 
-    public function fetchByRawSQL($query, $parameters)
+    public function fetchByRawSQL($query, $parameters = [])
     {
         return $this->dbal->fetchAll($query, $parameters);
     }

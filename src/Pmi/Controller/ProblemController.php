@@ -14,6 +14,9 @@ class ProblemController extends AbstractController
     const RELATED_BASELINE = 'related_baseline';
     const UNRELATED_BASELINE = 'unrelated_baseline';
     const OTHER = 'other';
+    const RELATED_BASELINE_TEXT = 'Physical injury related to baseline appointment';
+    const UNRELATED_BASELINE_TEXT = 'Physical injury unrelated to baseline appointment';
+    const OTHER_TEXT = 'Other';
 
     protected static $routes = [
         ['problem', '/participant/{participantId}/problem/{problemId}', [
@@ -176,9 +179,9 @@ class ProblemController extends AbstractController
                 'required' => true,
                 'disabled' => $this->disabled,
                 'choices' => [
-                    'Physical injury related to baseline appointment' => self::RELATED_BASELINE,
-                    'Physical injury unrelated to baseline appointment' => self::UNRELATED_BASELINE,
-                    'Other' => self::OTHER
+                    self::RELATED_BASELINE_TEXT => self::RELATED_BASELINE,
+                    self::UNRELATED_BASELINE_TEXT => self::UNRELATED_BASELINE,
+                    self::OTHER_TEXT => self::OTHER
                 ],
                 'multiple' => false,
                 'expanded' => true
