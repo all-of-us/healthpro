@@ -140,7 +140,6 @@ class DashboardController extends AbstractController
             }
         }
 
-
         // look to see if any values were recorded at all
         // will return empty data array to trigger error message in UI
         if ($error_check == 0) {
@@ -232,6 +231,7 @@ class DashboardController extends AbstractController
         if (!empty($metrics)) {
             if ($map_mode == 'FullParticipant.state') {
                 $state_registrations = [];
+                $total_counts = [];
                 $hover_text = [];
                 $state_names = [];
 
@@ -265,12 +265,16 @@ class DashboardController extends AbstractController
                             $count += $requested_center[$state_lookup];
                         }
                     }
+
                     $pct_of_target = round($count / $state['recruitment_target'] * 100, 2);
 
                     // check if max_val needs to be set
                     if ($pct_of_target > $max_val) {
                         $max_val = $pct_of_target;
                     }
+
+                    // keep track of raw number for table data
+                    array_push($total_counts, $count);
 
                     array_push($state_registrations, $pct_of_target);
                     array_push($hover_text, "<b>" . $pct_of_target . "</b>% (" . $count . ")<br><b>" . $state['state']
@@ -282,6 +286,7 @@ class DashboardController extends AbstractController
                     'locationmode' => 'USA-states',
                     'locations' => $state_names,
                     'z' => $state_registrations,
+                    'counts' => $total_counts,
                     'text' => $hover_text,
                     "colorscale" => $color_profile,
                     "zmin" => 0,
@@ -745,7 +750,6 @@ class DashboardController extends AbstractController
             $percentage = $value / $total;
             return "<b>{$value}</b> (" . number_format($percentage * 100, 2) . '%' . ")";
         }
-
     }
 
     // helper function to return colorbrewer color values (since PHP can't have array constants

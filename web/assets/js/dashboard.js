@@ -87,7 +87,7 @@ function removePlotlyLink(divId) {
 // value of stacked bar columns
 function loadBarChartAnnotations(plotlyData, annotationsArray, interval) {
     var fontSize = 12;
-    if (interval == 'weeks') {
+    if (interval === 'weeks') {
         fontSize = 10;
     }
     for (var i = 0; i < plotlyData[0]['x'].length ; i++){
@@ -156,18 +156,17 @@ function loadTableData(tableTarget, sourceData, colTitle) {
     tableTarget.html("<table class='table table-striped table-condensed raw-data-table'><thead><tr id='" + tableId + "-headers'><th>" + colTitle + "</th></tr></thead><tbody id='" + tableId + "-body'></tbody></table>");
     var headerRow = $('#' + tableId + '-headers');
     $(sourceData[0]['x']).each(function(i, date) {
-        headerRow.append("<th>" + date + "</th>");
+        headerRow.append($("<th>").text(date));
     });
-    headerRow.append("</tr>");
 
     // load scores
     var tableBody = $('#' + tableId + '-body');
     $($(sourceData).get().reverse()).each(function(index, row) {
-        var newRow = "<tr><td>" + row['name'] + "</td>";
+        var newRow = $('<tr>');
+        newRow.append($('<td>').text(row['name']));
         $(row['y']).each(function(i, count) {
-            newRow += "<td>" + count + "</td>";
+            newRow.append($('<td>').text(count));
         });
-        newRow += "</tr>";
         tableBody.append(newRow);
     });
 }
@@ -176,54 +175,35 @@ function loadTableData(tableTarget, sourceData, colTitle) {
 function loadRegionTableData(tableTarget, sourceData, plotType, rowLabel) {
     tableTarget.empty();
     var tableId = tableTarget.attr('id');
-    tableTarget.html("<table class='table table-striped table-condensed raw-data-table'><thead><tr id='" + tableId + "-headers'><th></th></tr></thead><tbody id='" + tableId + "-body'></tbody></table>");
-    if (plotType === 'FullParticipant.state') {
-        var headerRow = $('#' + tableId + '-headers');
-        $(sourceData[0]['locations']).each(function (i, state) {
-            headerRow.append("<th>" + state + "</th>");
-        });
-        headerRow.append("</tr>");
+    tableTarget.html("<table class='table table-striped table-condensed raw-data-table'><thead><tr id='" + tableId + "-headers'></tr></thead><tbody id='" + tableId + "-body'></tbody></table>");
+    var headerRow = $('#' + tableId + '-headers');
+    headerRow.append($('<th>').text(rowLabel));
+    headerRow.append($('<th>').text('Count'));
+    var tableBody = $('#' + tableId + '-body');
 
-        // load scores
-        var tableBody = $('#' + tableId + '-body');
-        $($(sourceData).get().reverse()).each(function (index, row) {
-            var newRow = "<tr><td>" + rowLabel + " totals</td>";
-            $(row['z']).each(function (i, count) {
-                newRow += "<td>" + count + "</td>";
-            });
-            newRow += "</tr>";
+    if (plotType === 'FullParticipant.state') {
+        // since there are flat arrays of data, grab the location array and use index to keep position
+        $(sourceData[0]['locations']).each(function (i, state) {
+            newRow = $('<tr>');
+            newRow.append($('<td>').text(state));
+            newRow.append($('<td>').text(sourceData[0]['counts'][i]));
             tableBody.append(newRow);
         });
     } else if (plotType === 'FullParticipant.censusRegion') {
-        var headerRow = $('#' + tableId + '-headers');
-        $(sourceData[0]['regions']).each(function (i, region) {
-            headerRow.append("<th>" + region + "</th>");
+        // since there are flat arrays of data, grab the location array and use index to keep position
+        $(sourceData[0]['regions']).each(function (i, state) {
+            newRow = $('<tr>');
+            newRow.append($('<td>').text(state));
+            newRow.append($('<td>').text(sourceData[0]['counts'][i]));
+            tableBody.append(newRow);
         });
-        headerRow.append("</tr>");
-        // load scores
-        var tableBody = $('#' + tableId + '-body');
-        var countRow = "<tr><td>" + rowLabel + " totals</td>";
-        $(sourceData[0]['counts']).each(function (i, count) {
-            countRow += "<td>" + count + "</td>";
-        });
-        countRow += "</tr>";
-        tableBody.append(countRow);
     } else if (plotType === 'FullParticipant.hpoId') {
-        var headerRow = $('#' + tableId + '-headers');
-        $($(sourceData).get().reverse()).each(function(index, row) {
-            var loc = row['name'];
-            headerRow.append("<th>" + loc + "</th>");
-        });
-        headerRow.append("</tr>");
-
         // load scores
-        var tableBody = $('#' + tableId + '-body');
-        var countRow = "<tr><td>" + rowLabel + " totals</td>";
-        $($(sourceData).get().reverse()).each(function(index, row) {
-            countRow += "<td>" + row['count'] + "</td>";
+        $(sourceData).each(function(index, row) {
+            newRow = $('<tr>');
+            newRow.append($('<td>').text(row['name']));
+            newRow.append($('<td>').text(row['count']));
+            tableBody.append(newRow);
         });
-        countRow += "</tr>";
-        tableBody.append(countRow);
     }
-
 }
