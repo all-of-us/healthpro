@@ -193,8 +193,12 @@ class WorkQueueController extends AbstractController
         if ($app->hasRole('ROLE_AWARDEE')) {
             $organizations = $app->getAwardeeOrganization();
             if (!empty($organizations)) {
-                $organization = $organizations[0];
-                $app['session']->set('awardeeOrganization', $organization);
+                if (($sessionOrganization = $app['session']->get('awardeeOrganization')) && in_array($sessionOrganization, $organizations)) {
+                    $organization = $sessionOrganization;
+                } else {
+                    // Default to first organization
+                    $organization = $organizations[0];
+                }
             }
         }
         if (empty($organization)) {
@@ -204,16 +208,20 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $filters = self::$filters;
         if ($app->hasRole('ROLE_AWARDEE')) {
+            // Add organizations to filters
             $organizationsList = [];
             $organizationsList['organization']['label'] = 'Organization';
             foreach ($organizations as $org) {
                 $organizationsList['organization']['options'][$org] = $org;
             }
             $filters = array_merge($filters, $organizationsList);
+
+            // Set to selected organization
             if (isset($params['organization'])) {
                 $organization = $params['organization'];
-                $app['session']->set('awardeeOrganization', $organization);
             }
+            // Save selected (or default) organization in session
+            $app['session']->set('awardeeOrganization', $organization);
         }
         $participants = $this->participantSummarySearch($organization, $params, $app);
         return $app['twig']->render('workqueue/index.html.twig', [
