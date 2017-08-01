@@ -194,7 +194,7 @@ class ProblemController extends AbstractController
                 'disabled' => $this->disabled,
             ])
             ->add("problem_date", Type\DateTimeType::class, [
-                'label' => 'Date of Problem',
+                'label' => 'Date of problem',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'required' => true,
@@ -229,7 +229,7 @@ class ProblemController extends AbstractController
                 'disabled' => $this->disabled,
             ])
             ->add('action_taken', Type\TextType::class, [
-                'label' => 'Corrective Action taken',
+                'label' => 'Description of corrective action taken',
                 'required' => true,
                 'disabled' => $this->disabled,
             ])
