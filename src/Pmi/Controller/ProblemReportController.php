@@ -9,7 +9,8 @@ class problemReportController extends ProblemController
 {
     protected static $name = 'problem';
     protected static $routes = [
-        ['reports', '/reports']
+        ['reports', '/reports'],
+        ['details', '/details/{problemId}']
     ];
     protected $related = self::RELATED_BASELINE;
     protected $unrelated = self::UNRELATED_BASELINE;
@@ -32,6 +33,33 @@ class problemReportController extends ProblemController
 
         return $app['twig']->render('problem-reports.html.twig', [
             'problems' => $problems
+        ]);
+    }
+
+    public function detailsAction($problemId, Application $app, Request $request)
+    {
+        $problem = $app['em']->getRepository('problems')->fetchOneBy([
+            'id' => $problemId
+        ]);
+        if (!$problem) {
+            $app->abort(404);
+        }
+        if ($problem['problem_type'] == $this->related) {
+            $problem['problem_type'] = $this->problemTypeOptions[0];
+        } elseif ($problem['problem_type'] == $this->unrelated) {
+            $problem['problem_type'] = $this->problemTypeOptions[1];
+        } else {
+            $problem['problem_type'] = $this->problemTypeOptions[2];
+        }
+
+        $comments = $app['em']->getRepository('problem_comments')->fetchBy(
+            ['problem_id' => $problemId],
+            ['id' => 'DESC']
+        );
+
+        return $app['twig']->render('problem-details.html.twig', [
+            'problem' => $problem,
+            'comments' => $comments
         ]);
     }
 }

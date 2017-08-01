@@ -162,6 +162,9 @@ label.label-normal {
     margin: 20px auto;
     max-width: 500px;
 }
+#problem-details {
+    margin: 20px auto;
+}
 
 /* Participant page */
 #order-overflow, #evaluation-overflow, #problem-overflow, #comment-overflow {

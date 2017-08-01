@@ -13,30 +13,28 @@
                 <th>Enrollment Site</th>
                 <th>Staff Name</th>
                 <th>Problem Date</th>
-                <th>Date provider became aware of problem</th>
                 <th>Action Taken</th>
                 <th>Created</th>
-                <th>Updated</th>
                 <th>Finalized</th>
                 <th>Comments</th>
                 <th>Last Comment</th>
+                <th class="no-sort"></th>
             </tr>
         </thead>
         <tbody>
             {% for problem in problems %}
                 <tr>
-                    <td><a data-target="#myModal" href="{{ path('problem', { participantId: problem.participant_id, problemId: problem.id }) }}">{{ problem.id }}</a></td>
+                    <td><a href="{{ path('problem_details', {problemId: problem.id }) }}" target="_blank">{{ problem.id }}</a></td>
                     <td>{{ problem.problem_type }}</td>
                     <td>{{ problem.enrollment_site }}</td>
                     <td>{{ problem.staff_name }}</td>
                     <td>{{ problem.problem_date ? problem.problem_date|date('m/d/Y') }}</td>
-                    <td>{{ problem.provider_aware_date ? problem.provider_aware_date|date('m/d/Y') }}</td>
                     <td>{{ problem.action_taken }}</td>
                     <td>{{ problem.created_ts ? problem.created_ts|date('m/d/Y') }}</td>
-                    <td>{{ problem.updated_ts ? problem.updated_ts|date('m/d/Y') }}</td>
                     <td>{{ problem.finalized_ts ? problem.finalized_ts|date('m/d/Y') }}</td>
-                    <td><a href="{{ path('problem', { participantId: problem.participant_id, problemId: problem.id }) }}">{{ problem.comment_count }}</a></td>
+                    <td>{{ problem.comment_count }}</td>
                     <td>{{ problem.last_comment_ts ? problem.last_comment_ts|date('m/d/Y') }}</td>
+                    <td><a href="{{ path('problem_details', {problemId: problem.id }) }}" target="_blank">View Details</a></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -48,7 +46,10 @@
 $(document).ready(function() {
     var table = $('#problem_reports').DataTable({
         order: [],
-        pageLength: 25
+        pageLength: 25,
+        columnDefs: [
+            { orderable: false, targets: -1 }
+        ]
     });
 });
 </script>
