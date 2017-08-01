@@ -1,10 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-    {% include 'base-head.html.twig' %}
-    <title>Unanticipatd Problem Details</title>
-</head>
-<body>
+{% extends 'base.html.twig' %}
+{% block title %}Unanticipated Problem Details - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
+{% block body %}
     <div class="container-fluid" id="problem-details">
         <div class="row">
             <div class="col-sm-{{ comments ? '8' : '12' }}">
@@ -87,7 +84,9 @@
             {% endif %}
         </div>
     </div>
-<script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
+{% endblock %}
+
+{% block pagejs %}
 <script>
 $(document).ready(function() {
     $('#comment-overflow-show').on('click', function(e) {
@@ -97,5 +96,4 @@ $(document).ready(function() {
     });
 });
 </script>
-</body>
-</html>
+{% endblock %}

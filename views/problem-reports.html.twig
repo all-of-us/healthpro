@@ -24,7 +24,7 @@
         <tbody>
             {% for problem in problems %}
                 <tr>
-                    <td><a href="{{ path('problem_details', {problemId: problem.id }) }}" target="_blank">{{ problem.id }}</a></td>
+                    <td><a href="{{ path('problem_details', {problemId: problem.id }) }}">{{ problem.id }}</a></td>
                     <td>{{ problem.problem_type }}</td>
                     <td>{{ problem.enrollment_site }}</td>
                     <td>{{ problem.staff_name }}</td>
@@ -34,7 +34,7 @@
                     <td>{{ problem.finalized_ts ? problem.finalized_ts|date('m/d/Y') }}</td>
                     <td>{{ problem.comment_count }}</td>
                     <td>{{ problem.last_comment_ts ? problem.last_comment_ts|date('m/d/Y') }}</td>
-                    <td><a href="{{ path('problem_details', {problemId: problem.id }) }}" target="_blank">View Details</a></td>
+                    <td><a href="{{ path('problem_details', {problemId: problem.id }) }}">View Details</a></td>
                 </tr>
             {% endfor %}
         </tbody>
