@@ -14,15 +14,17 @@
 
     <div class="well">
         <form id="filters">
-            <p><strong>Organization</strong></p>
-            <div class="form-inline">
-                <select name="organization" class="form-control input-sm">
-                    {% for label, value in filters.organization.options %}
-                        <option value="{{ value }}"{% if organization == value %} selected="selected"{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <br />
+            {% if filters.organization is defined %}
+                <p><strong>Organization</strong></p>
+                <div class="form-inline">
+                    <select name="organization" class="form-control input-sm">
+                        {% for label, value in filters.organization.options %}
+                            <option value="{{ value }}"{% if organization == value %} selected="selected"{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br />
+            {% endif %}
             <p><strong>Filters</strong> <small><a href="{{ path('workqueue_index') }}">reset</a></p>
             <div class="form-inline">
                 {% for name, filter in filters if name != 'organization' %}
