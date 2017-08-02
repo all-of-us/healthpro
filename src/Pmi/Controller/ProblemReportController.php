@@ -16,9 +16,10 @@ class problemReportController extends ProblemController
     public function reportsAction(Application $app, Request $request)
     {
         $query = "SELECT p.*,
-                    MAX(pc.created_ts) AS last_comment_ts,
+                    IFNULL(MAX(pc.created_ts), updated_ts) AS last_update_ts,
                     count(pc.comment) AS comment_count
                     FROM problems p LEFT JOIN problem_comments pc ON p.id = pc.problem_id
+                    WHERE p.finalized_ts IS NOT NULL
                     GROUP BY p.id
                     ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC";
         $problems = $app['db']->fetchAll($query);

@@ -16,7 +16,7 @@
                 <th>Created</th>
                 <th>Finalized</th>
                 <th>Comments</th>
-                <th>Last Comment</th>
+                <th>Last Updated</th>
                 <th class="no-sort"></th>
             </tr>
         </thead>
@@ -39,7 +39,7 @@
                     <td>{{ problem.created_ts ? problem.created_ts|date('m/d/Y') }}</td>
                     <td>{{ problem.finalized_ts ? problem.finalized_ts|date('m/d/Y') }}</td>
                     <td>{{ problem.comment_count }}</td>
-                    <td>{{ problem.last_comment_ts ? problem.last_comment_ts|date('m/d/Y') }}</td>
+                    <td>{{ problem.last_update_ts ? problem.last_update_ts|date('m/d/Y') }}</td>
                     <td><a href="{{ path('problem_details', {problemId: problem.id }) }}">View Details</a></td>
                 </tr>
             {% endfor %}
