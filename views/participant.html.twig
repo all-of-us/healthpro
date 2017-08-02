@@ -177,6 +177,9 @@
                                             {% if problem.comment_count > 0 %}
                                                 <span class="label label-default">{{ problem.comment_count }} comment{{ problem.comment_count > 1 ? 's' }}</span> {{ problem.last_comment_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                             {% endif %}
+                                        {% else %}
+                                            <span class="label label-danger">Draft</span>
+                                            {{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                         {% endif %}
                                     </small>
                                 </a>

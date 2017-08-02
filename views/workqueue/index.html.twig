@@ -13,16 +13,29 @@
     {% endif %}
 
     <div class="well">
-        <p><strong>Filters</strong> <small><a href="{{ path('workqueue_index') }}">reset</a></p>
-        <form class="form-inline" id="filters">
-            {% for name, filter in filters %}
-                <select name="{{ name }}" class="form-control input-sm">
-                    <option value="">-- {{ filter.label }} --</option>
-                    {% for label, value in filter.options %}
-                        <option value="{{ value }}"{% if params[name]|default(false) == value %} selected="selected"{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            {% endfor %}
+        <form id="filters">
+            {% if filters.organization is defined %}
+                <p><strong>Organization</strong></p>
+                <div class="form-inline">
+                    <select name="organization" class="form-control input-sm">
+                        {% for label, value in filters.organization.options %}
+                            <option value="{{ value }}"{% if organization == value %} selected="selected"{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br />
+            {% endif %}
+            <p><strong>Filters</strong> <small><a href="{{ path('workqueue_index') }}">reset</a></p>
+            <div class="form-inline">
+                {% for name, filter in filters if name != 'organization' %}
+                    <select name="{{ name }}" class="form-control input-sm">
+                        <option value="">-- {{ filter.label }} --</option>
+                        {% for label, value in filter.options %}
+                            <option value="{{ value }}"{% if params[name]|default(false) == value %} selected="selected"{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                {% endfor %}
+            </div>
         </form>
     </div>
 
@@ -87,8 +100,20 @@
             {% for participant in participants %}
                 <tr>
                     {# Identifiers and status #}
-                    <td data-order="{{ participant.lastName }}"><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}</a></td>
-                    <td data-order="{{ participant.firstName }}"><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a></td>
+                    <td data-order="{{ participant.lastName }}">
+                        {% if is_granted('ROLE_USER') %}
+                            <a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}</a>
+                        {% else %}
+                            {{ participant.lastName }}
+                        {% endif %}
+                    </td>
+                    <td data-order="{{ participant.firstName }}">
+                        {% if is_granted('ROLE_USER') %}
+                            <a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a>
+                        {% else %}
+                            {{ participant.firstName }}
+                        {% endif %}
+                    </td>
                     <td data-order="{{ participant.dob ? participant.dob|date('Y-m-d') }}">{{ participant.dob ? participant.dob|date('m/d/Y') }}</td>
                     <td>{{ participant.id }}</td>
                     <td>{{ participant.biobankId }}</td>
