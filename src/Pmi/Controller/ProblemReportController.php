@@ -29,7 +29,7 @@ class problemReportController extends ProblemController
                     FROM problems p LEFT JOIN problem_comments pc ON p.id = pc.problem_id
                     GROUP BY p.id
                     ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC";
-        $problems = $app['em']->getRepository('problems')->fetchByRawSQL($query);
+        $problems = $app['db']->fetchAll($query);
 
         return $app['twig']->render('problem-reports.html.twig', [
             'problems' => $problems
