@@ -5,7 +5,7 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Pmi\Audit\Log;
 
-class problemReportController extends ProblemController
+class ProblemReportController extends ProblemController
 {
     protected static $name = 'problem';
     protected static $routes = [
