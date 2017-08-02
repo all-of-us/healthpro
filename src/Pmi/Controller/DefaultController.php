@@ -39,23 +39,21 @@ class DefaultController extends AbstractController
 
     public function homeAction(Application $app, Request $request)
     {
-        if ($app->hasRole('ROLE_USER')) {
-            if (!$app->getUserTimezone(false)) {
-                $app->addFlashNotice('Please select your current time zone');
-                return $app->redirectToRoute('settings');
-            } else {
-                return $app['twig']->render('index.html.twig');
-            }
-        } elseif ($app->hasRole('ROLE_AWARDEE') && $app->hasRole('ROLE_DV_ADMIN')) {
+        $checkTimeZone = $app->hasRole('ROLE_USER') || $app->hasRole('ROLE_ADMIN') || $app->hasRole('ROLE_AWARDEE') || $app->hasRole('ROLE_DV_ADMIN');
+        if ($checkTimeZone && !$app->getUserTimezone(false)) {
+            $app->addFlashNotice('Please select your current time zone');
+            return $app->redirectToRoute('settings');
+        }
+        if ($app->hasRole('ROLE_USER') || ($app->hasRole('ROLE_AWARDEE') && $app->hasRole('ROLE_DV_ADMIN'))) {
             return $app['twig']->render('index.html.twig');
         } elseif ($app->hasRole('ROLE_AWARDEE')) {
             return $app->redirectToRoute('workqueue_index');
         } elseif ($app->hasRole('ROLE_DV_ADMIN')) {
             return $app->redirectToRoute('problem_reports');
-        } elseif ($app->hasRole('ROLE_DASHBOARD')) {
-            return $app->redirectToRoute('dashboard_home');
         } elseif ($app->hasRole('ROLE_ADMIN')) {
             return $app->redirectToRoute('admin_home');
+        } elseif ($app->hasRole('ROLE_DASHBOARD')) {
+            return $app->redirectToRoute('dashboard_home');
         } else {
             return $app->abort(403);
         }
