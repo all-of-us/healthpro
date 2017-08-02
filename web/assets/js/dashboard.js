@@ -87,7 +87,7 @@ function removePlotlyLink(divId) {
 // value of stacked bar columns
 function loadBarChartAnnotations(plotlyData, annotationsArray, interval) {
     var fontSize = 12;
-    if (interval == 'weeks') {
+    if (interval === 'weeks') {
         fontSize = 10;
     }
     for (var i = 0; i < plotlyData[0]['x'].length ; i++){
@@ -147,4 +147,63 @@ function togglePlotlyTraces(div) {
     // toggle class of toggle glyph
     $('#toggle-traces .toggle-switch').toggleClass('fa-toggle-on fa-toggle-off');
 
+}
+
+// function to assemble and html table of raw data from bar charts
+function loadTableData(tableTarget, sourceData, colTitle) {
+    tableTarget.empty();
+    var tableId = tableTarget.attr('id');
+    tableTarget.html("<table class='table table-striped table-condensed raw-data-table'><thead><tr id='" + tableId + "-headers'><th>" + colTitle + "</th></tr></thead><tbody id='" + tableId + "-body'></tbody></table>");
+    var headerRow = $('#' + tableId + '-headers');
+    $(sourceData[0]['x']).each(function(i, date) {
+        headerRow.append($("<th>").text(date));
+    });
+
+    // load scores
+    var tableBody = $('#' + tableId + '-body');
+    $($(sourceData).get().reverse()).each(function(index, row) {
+        var newRow = $('<tr>');
+        newRow.append($('<td>').text(row['name']));
+        $(row['y']).each(function(i, count) {
+            newRow.append($('<td>').text(count));
+        });
+        tableBody.append(newRow);
+    });
+}
+
+// function to assemble and html table of raw data from geo data
+function loadRegionTableData(tableTarget, sourceData, plotType, rowLabel) {
+    tableTarget.empty();
+    var tableId = tableTarget.attr('id');
+    tableTarget.html("<table class='table table-striped table-condensed raw-data-table'><thead><tr id='" + tableId + "-headers'></tr></thead><tbody id='" + tableId + "-body'></tbody></table>");
+    var headerRow = $('#' + tableId + '-headers');
+    headerRow.append($('<th>').text(rowLabel));
+    headerRow.append($('<th>').text('Count'));
+    var tableBody = $('#' + tableId + '-body');
+
+    if (plotType === 'FullParticipant.state') {
+        // since there are flat arrays of data, grab the location array and use index to keep position
+        $(sourceData[0]['locations']).each(function (i, state) {
+            newRow = $('<tr>');
+            newRow.append($('<td>').text(state));
+            newRow.append($('<td>').text(sourceData[0]['counts'][i]));
+            tableBody.append(newRow);
+        });
+    } else if (plotType === 'FullParticipant.censusRegion') {
+        // since there are flat arrays of data, grab the location array and use index to keep position
+        $(sourceData[0]['regions']).each(function (i, state) {
+            newRow = $('<tr>');
+            newRow.append($('<td>').text(state));
+            newRow.append($('<td>').text(sourceData[0]['counts'][i]));
+            tableBody.append(newRow);
+        });
+    } else if (plotType === 'FullParticipant.hpoId') {
+        // load scores
+        $(sourceData).each(function(index, row) {
+            newRow = $('<tr>');
+            newRow.append($('<td>').text(row['name']));
+            newRow.append($('<td>').text(row['count']));
+            tableBody.append(newRow);
+        });
+    }
 }

@@ -18,3 +18,6 @@
     z-index: 999 !important;
 }
 
+.raw-data-table th, .raw-data-table td {
+    white-space: nowrap;
+}
