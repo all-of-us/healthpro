@@ -12,18 +12,10 @@ class problemReportController extends ProblemController
         ['reports', '/reports'],
         ['details', '/details/{problemId}']
     ];
-    protected $related = self::RELATED_BASELINE;
-    protected $unrelated = self::UNRELATED_BASELINE;
-    protected $other = self::OTHER;
 
     public function reportsAction(Application $app, Request $request)
     {
         $query = "SELECT p.*,
-                    CASE 
-                        WHEN p.problem_type = '{$this->related}' THEN '{$this->problemTypeOptions[0]}'
-                        WHEN p.problem_type = '{$this->unrelated}' THEN '{$this->problemTypeOptions[1]}'
-                        ELSE '{$this->problemTypeOptions[2]}'
-                    END AS problem_type,
                     MAX(pc.created_ts) AS last_comment_ts,
                     count(pc.comment) AS comment_count
                     FROM problems p LEFT JOIN problem_comments pc ON p.id = pc.problem_id
@@ -32,7 +24,9 @@ class problemReportController extends ProblemController
         $problems = $app['db']->fetchAll($query);
 
         return $app['twig']->render('problem-reports.html.twig', [
-            'problems' => $problems
+            'problems' => $problems,
+            'optionsValue' => [self::RELATED_BASELINE, self::UNRELATED_BASELINE, self::OTHER],
+            'optionsText' => $this->problemTypeOptions
         ]);
     }
 
@@ -44,9 +38,9 @@ class problemReportController extends ProblemController
         if (!$problem) {
             $app->abort(404);
         }
-        if ($problem['problem_type'] == $this->related) {
+        if ($problem['problem_type'] == self::RELATED_BASELINE) {
             $problem['problem_type'] = $this->problemTypeOptions[0];
-        } elseif ($problem['problem_type'] == $this->unrelated) {
+        } elseif ($problem['problem_type'] == self::UNRELATED_BASELINE) {
             $problem['problem_type'] = $this->problemTypeOptions[1];
         } else {
             $problem['problem_type'] = $this->problemTypeOptions[2];
