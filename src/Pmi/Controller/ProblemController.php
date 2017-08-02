@@ -16,7 +16,7 @@ class ProblemController extends AbstractController
     const OTHER = 'other';
 
     protected static $routes = [
-        ['problem', '/participant/{participantId}/problem/{problemId}', [
+        ['problemForm', '/participant/{participantId}/problem/{problemId}', [
             'method' => 'GET|POST',
             'defaults' => ['problemId' => null]
         ]],
@@ -29,7 +29,7 @@ class ProblemController extends AbstractController
 
     protected $problemTypeOptions = ['Physical injury related to baseline appointment', 'Physical injury unrelated to baseline appointment', 'Other'];
 
-    public function problemAction($participantId, $problemId, Application $app, Request $request)
+    public function problemFormAction($participantId, $problemId, Application $app, Request $request)
     {
         if (!$app->isDVType()) {
             $app->abort(404);
