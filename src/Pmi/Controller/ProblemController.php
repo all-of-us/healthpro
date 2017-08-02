@@ -27,6 +27,8 @@ class ProblemController extends AbstractController
 
     protected $disabled = false;
 
+    protected $problemTypeOptions = ['Physical injury related to baseline appointment', 'Physical injury unrelated to baseline appointment', 'Other'];
+
     public function problemAction($participantId, $problemId, Application $app, Request $request)
     {
         if (!$app->isDVType()) {
@@ -176,9 +178,9 @@ class ProblemController extends AbstractController
                 'required' => true,
                 'disabled' => $this->disabled,
                 'choices' => [
-                    'Physical injury related to baseline appointment' => self::RELATED_BASELINE,
-                    'Physical injury unrelated to baseline appointment' => self::UNRELATED_BASELINE,
-                    'Other' => self::OTHER
+                    $this->problemTypeOptions[0]=> self::RELATED_BASELINE,
+                    $this->problemTypeOptions[1] => self::UNRELATED_BASELINE,
+                    $this->problemTypeOptions[2] => self::OTHER
                 ],
                 'multiple' => false,
                 'expanded' => true

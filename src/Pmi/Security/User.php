@@ -11,6 +11,7 @@ class User implements UserInterface
     const ADMIN_GROUP = 'site-admin';
     const TWOFACTOR_GROUP = 'mfa_exception';
     const TWOFACTOR_PREFIX = 'x-site-';
+    const ADMIN_DV = 'dv-admin';
     
     private $googleUser;
     private $groups;
@@ -31,6 +32,7 @@ class User implements UserInterface
         $this->awardees = $this->computeAwardees();
         $this->dashboardAccess = $this->computeDashboardAccess();
         $this->adminAccess = $this->computeAdminAccess();
+        $this->adminDvAccess = $this->computeAdminDvAccess();
     }
     
     public function getGroups()
@@ -95,6 +97,17 @@ class User implements UserInterface
         $hasAccess = false;
         foreach ($this->groups as $group) {
             if (strpos($group->getEmail(), self::ADMIN_GROUP . '@') === 0) {
+                $hasAccess = true;
+            }
+        }
+        return $hasAccess;
+    }
+
+    private function computeAdminDvAccess()
+    {
+        $hasAccess = false;
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::ADMIN_DV . '@') === 0) {
                 $hasAccess = true;
             }
         }
@@ -196,6 +209,9 @@ class User implements UserInterface
         }
         if ($this->adminAccess) {
             $roles[] = 'ROLE_ADMIN';
+        }
+        if ($this->adminDvAccess) {
+            $roles[] = 'ROLE_DV_ADMIN';
         }
         return $roles;
     }

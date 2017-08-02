@@ -34,6 +34,7 @@ $app
     ->mount('/admin', new Controller\AdminController())
     ->mount('/help', new Controller\HelpController())
     ->mount('/workqueue', new Controller\WorkQueueController())
+    ->mount('/problem', new Controller\problemReportController())
 ;
 
 $app->run();

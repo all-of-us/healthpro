@@ -102,11 +102,17 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/workqueue($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_AWARDEE']],
                 [['path' => '^/workqueue($|\/)'], 'ROLE_NO_ACCESS'],
 
+                [['path' => '^/problem($|\/)', 'ips' => $ips], ['ROLE_DV_ADMIN']],
+                [['path' => '^/problem($|\/)'], 'ROLE_NO_ACCESS'],
+
                 [['path' => '^/site($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_AWARDEE']],
                 [['path' => '^/site($|\/)'], 'ROLE_NO_ACCESS'],
 
-                [['path' => '^/help($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_AWARDEE']],
+                [['path' => '^/help($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
                 [['path' => '^/help($|\/)'], 'ROLE_NO_ACCESS'],
+
+                [['path' => '^/settings($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
+                [['path' => '^/settings($|\/)'], 'ROLE_NO_ACCESS'],
 
                 [['path' => '^/.*$', 'ips' => $ips], 'ROLE_USER'],
                 [['path' => '^/.*$'], 'ROLE_NO_ACCESS']
@@ -361,7 +367,7 @@ class HpoApplication extends AbstractApplication
         }
 
         // users with multiple roles must select their initial destination
-        $hasMultiple = (($this->hasRole('ROLE_USER') && $this->hasRole('ROLE_AWARDEE')) || ($this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD')) || ($this->hasRole('ROLE_AWARDEE') && $this->hasRole('ROLE_DASHBOARD')));
+        $hasMultiple = ($this->hasRole('ROLE_DASHBOARD') && ($this->hasRole('ROLE_USER') || $this->hasRole('ROLE_ADMIN') || $this->hasRole('ROLE_AWARDEE') || $this->hasRole('ROLE_DV_ADMIN')));
         if ($this['session']->get('isLoginReturn') && $hasMultiple && !$this->isUpkeepRoute($request)) {
             return $this->forwardToRoute('dashSplash', $request);
         }
@@ -382,6 +388,7 @@ class HpoApplication extends AbstractApplication
             } elseif ($request->attributes->get('_route') !== 'selectSite' &&
                     $request->attributes->get('_route') !== 'switchSite' &&
                     strpos($request->attributes->get('_route'), 'dashboard_') !== 0 &&
+                    strpos($request->attributes->get('_route'), 'problem_') !== 0 &&
                     !$this->isUpkeepRoute($request)) {
                 return $this->forwardToRoute('selectSite', $request);
             }
