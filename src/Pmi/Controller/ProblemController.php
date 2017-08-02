@@ -230,7 +230,7 @@ class ProblemController extends AbstractController
                 'required' => true,
                 'disabled' => $this->disabled,
             ])
-            ->add('action_taken', Type\TextType::class, [
+            ->add('action_taken', Type\TextareaType::class, [
                 'label' => 'Description of corrective action taken',
                 'required' => true,
                 'disabled' => $this->disabled,

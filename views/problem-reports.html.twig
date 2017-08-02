@@ -13,7 +13,6 @@
                 <th>Enrollment Site</th>
                 <th>Staff Name</th>
                 <th>Problem Date</th>
-                <th>Action Taken</th>
                 <th>Created</th>
                 <th>Finalized</th>
                 <th>Comments</th>
@@ -37,7 +36,6 @@
                     <td>{{ problem.enrollment_site }}</td>
                     <td>{{ problem.staff_name }}</td>
                     <td>{{ problem.problem_date ? problem.problem_date|date('m/d/Y') }}</td>
-                    <td>{{ problem.action_taken }}</td>
                     <td>{{ problem.created_ts ? problem.created_ts|date('m/d/Y') }}</td>
                     <td>{{ problem.finalized_ts ? problem.finalized_ts|date('m/d/Y') }}</td>
                     <td>{{ problem.comment_count }}</td>

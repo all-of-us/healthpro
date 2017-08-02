@@ -9,7 +9,7 @@ CREATE TABLE `problems` (
   `problem_date` timestamp NULL DEFAULT NULL,
   `provider_aware_date` timestamp NULL DEFAULT NULL,
   `description` text DEFAULT NULL,
-  `action_taken` varchar(255) DEFAULT NULL,
+  `action_taken` text DEFAULT NULL,
   `finalized_user_id` int(11) DEFAULT NULL,
   `finalized_site` varchar(50) DEFAULT NULL,
   `finalized_ts` TIMESTAMP NULL DEFAULT NULL,
