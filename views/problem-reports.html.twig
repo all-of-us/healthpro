@@ -9,6 +9,7 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Participant Id</th>
                 <th>Problem Type</th>
                 <th>Enrollment Site</th>
                 <th>Staff Name</th>
@@ -24,6 +25,7 @@
             {% for problem in problems %}
                 <tr>
                     <td><a href="{{ path('problem_details', {problemId: problem.id }) }}">{{ problem.id }}</a></td>
+                    <td>{{ problem.participant_id }}</td>
                     <td>
                         {% if problem.problem_type == optionsValue[0] %}
                             {{ optionsText[0] }}
