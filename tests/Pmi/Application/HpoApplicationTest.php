@@ -152,6 +152,48 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertEquals(1, count($crawler->filter('#dashSplashSelector')));
     }
 
+    public function testDashSplashAwardee()
+    {
+        $email = 'testDashSplashAwardee@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [
+            new GoogleGroup('awardee-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
+        ]);
+        $client = $this->createClient();
+        $client->followRedirects();
+        $crawler = $client->request('GET', '/');
+        $this->assertEquals(1, count($crawler->filter('#dashSplashSelector')));
+    }
+
+    public function testDashSplashAdmin()
+    {
+        $email = 'testDashSplashAdmin@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [
+            new GoogleGroup(User::ADMIN_GROUP . '@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
+        ]);
+        $client = $this->createClient();
+        $client->followRedirects();
+        $crawler = $client->request('GET', '/');
+        $this->assertEquals(1, count($crawler->filter('#dashSplashSelector')));
+    }
+
+    public function testDashSplashDvAdmin()
+    {
+        $email = 'testDashSplashDvAdmin@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        AppsClient::setGroups($email, [
+            new GoogleGroup(User::ADMIN_DV . '@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
+        ]);
+        $client = $this->createClient();
+        $client->followRedirects();
+        $crawler = $client->request('GET', '/');
+        $this->assertEquals(1, count($crawler->filter('#dashSplashSelector')));
+    }
+
     public function testUsageAgreement()
     {
         $email = 'testUsageAgreement@example.com';
