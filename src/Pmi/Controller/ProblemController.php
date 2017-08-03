@@ -27,6 +27,8 @@ class ProblemController extends AbstractController
 
     protected $disabled = false;
 
+    protected $constraint = false;
+
     protected $problemTypeOptions = ['Physical injury related to baseline appointment', 'Physical injury unrelated to baseline appointment', 'Other'];
 
     public function problemFormAction($participantId, $problemId, Application $app, Request $request)
@@ -49,14 +51,17 @@ class ProblemController extends AbstractController
             if (!$problem) {
                 $app->abort(404);;
             } else {
-                $problem['problem_date'] = new \DateTime($problem['problem_date']);
-                $problem['provider_aware_date'] = new \DateTime($problem['provider_aware_date']);
+                $problem['problem_date'] = $problem['problem_date'] ? new \DateTime($problem['problem_date']) : NULL;
+                $problem['provider_aware_date'] = $problem['provider_aware_date'] ? new \DateTime($problem['provider_aware_date']) : NULL;
                 if (!empty($problem['finalized_ts'])) {
                     $this->disabled = true;
                 }
             }
         } else {
             $problem = null;
+        }
+        if ($request->request->has('reportable_finalize')) {
+            $this->constraint = true;
         }
         $problemForm = $this->getProblemForm($app, $problem);
         $problemForm->handleRequest($request);
@@ -172,69 +177,84 @@ class ProblemController extends AbstractController
     public function getProblemForm(Application $app, $problem)
     {
         $constraintDateTime = new \DateTime('+5 minutes');
+        $problemTypeAttributes = [
+            'label' => 'Unanticipated problem type',
+            'required' => true,
+            'disabled' => $this->disabled,
+            'choices' => [
+                $this->problemTypeOptions[0]=> self::RELATED_BASELINE,
+                $this->problemTypeOptions[1] => self::UNRELATED_BASELINE,
+                $this->problemTypeOptions[2] => self::OTHER
+            ],
+            'multiple' => false,
+            'expanded' => true
+        ];
+        $siteAttributes = [
+            'label' => 'Name of enrollment site where provider became aware of problem',
+            'required' => false,
+            'disabled' => $this->disabled
+        ];
+        $staffAttributes = [
+            'label' => 'Name of staff recording the problem',
+            'required' => false,
+            'disabled' => $this->disabled
+        ];
+        $problemDateAttributes = [
+            'label' => 'Date of problem',
+            'widget' => 'single_text',
+            'format' => 'M/d/yyyy h:mm a',
+            'required' => false,
+            'disabled' => $this->disabled,
+            'view_timezone' => $app->getUserTimezone(),
+            'model_timezone' => 'UTC',
+            'constraints' => [
+                new Constraints\LessThanOrEqual([
+                    'value' => $constraintDateTime,
+                    'message' => 'Timestamp cannot be in the future'
+                ])
+            ]
+        ];
+        $providerAwareDateAttributes = [
+            'label' => 'Date provider became aware of problem',
+            'widget' => 'single_text',
+            'format' => 'M/d/yyyy h:mm a',
+            'required' => false,
+            'disabled' => $this->disabled,
+            'view_timezone' => $app->getUserTimezone(),
+            'model_timezone' => 'UTC',
+            'constraints' => [
+                new Constraints\LessThanOrEqual([
+                    'value' => $constraintDateTime,
+                    'message' => 'Timestamp cannot be in the future'
+                ])
+            ]
+        ];
+        $descriptionAttributes = [
+            'label' => 'Description of problem',
+            'required' => false,
+            'disabled' => $this->disabled
+        ];
+        $actionTakenAttributes = [
+            'label' => 'Description of corrective action taken',
+            'required' => false,
+            'disabled' => $this->disabled
+        ];
+        if ($this->constraint) {
+            $siteAttributes['constraints'] = new Constraints\NotBlank();
+            $staffAttributes['constraints'] = new Constraints\NotBlank();
+            $problemDateAttributes['constraints'][] = new Constraints\NotBlank();
+            $providerAwareDateAttributes['constraints'][] = new Constraints\NotBlank();
+            $descriptionAttributes['constraints'] = new Constraints\NotBlank();
+            $actionTakenAttributes['constraints'] = new Constraints\NotBlank();
+        }
         $problemForm = $app['form.factory']->createBuilder(Type\FormType::class, $problem)
-            ->add('problem_type', Type\ChoiceType::class, [
-                'label' => 'Unanticipated problem type',
-                'required' => true,
-                'disabled' => $this->disabled,
-                'choices' => [
-                    $this->problemTypeOptions[0]=> self::RELATED_BASELINE,
-                    $this->problemTypeOptions[1] => self::UNRELATED_BASELINE,
-                    $this->problemTypeOptions[2] => self::OTHER
-                ],
-                'multiple' => false,
-                'expanded' => true
-            ])
-            ->add('enrollment_site', Type\TextType::class, [
-                'label' => 'Name of enrollment site where provider became aware of problem',
-                'required' => true,
-                'disabled' => $this->disabled,
-            ])
-            ->add('staff_name', Type\TextType::class, [
-                'label' => 'Name of staff recording the problem',
-                'required' => true,
-                'disabled' => $this->disabled,
-            ])
-            ->add("problem_date", Type\DateTimeType::class, [
-                'label' => 'Date of problem',
-                'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
-                'required' => true,
-                'disabled' => $this->disabled,
-                'view_timezone' => $app->getUserTimezone(),
-                'model_timezone' => 'UTC',
-                'constraints' => [
-                    new Constraints\LessThanOrEqual([
-                        'value' => $constraintDateTime,
-                        'message' => 'Timestamp cannot be in the future'
-                    ])
-                ]
-            ])
-            ->add("provider_aware_date", Type\DateTimeType::class, [
-                'label' => 'Date provider became aware of problem',
-                'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
-                'required' => true,
-                'disabled' => $this->disabled,
-                'view_timezone' => $app->getUserTimezone(),
-                'model_timezone' => 'UTC',
-                'constraints' => [
-                    new Constraints\LessThanOrEqual([
-                        'value' => $constraintDateTime,
-                        'message' => 'Timestamp cannot be in the future'
-                    ])
-                ]
-            ])
-            ->add('description', Type\TextareaType::class, [
-                'label' => 'Description of problem',
-                'required' => true,
-                'disabled' => $this->disabled,
-            ])
-            ->add('action_taken', Type\TextareaType::class, [
-                'label' => 'Description of corrective action taken',
-                'required' => true,
-                'disabled' => $this->disabled,
-            ])
+            ->add('problem_type', Type\ChoiceType::class, $problemTypeAttributes)
+            ->add('enrollment_site', Type\TextType::class, $siteAttributes)
+            ->add('staff_name', Type\TextType::class, $staffAttributes)
+            ->add("problem_date", Type\DateTimeType::class, $problemDateAttributes)
+            ->add("provider_aware_date", Type\DateTimeType::class, $providerAwareDateAttributes)
+            ->add('description', Type\TextareaType::class, $descriptionAttributes)
+            ->add('action_taken', Type\TextareaType::class, $actionTakenAttributes)
             ->getForm();
             return $problemForm;    
     }

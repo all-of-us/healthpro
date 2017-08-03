@@ -9,6 +9,7 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Participant Id</th>
                 <th>Problem Type</th>
                 <th>Enrollment Site</th>
                 <th>Staff Name</th>
@@ -16,7 +17,7 @@
                 <th>Created</th>
                 <th>Finalized</th>
                 <th>Comments</th>
-                <th>Last Comment</th>
+                <th>Last Updated</th>
                 <th class="no-sort"></th>
             </tr>
         </thead>
@@ -24,6 +25,7 @@
             {% for problem in problems %}
                 <tr>
                     <td><a href="{{ path('problem_details', {problemId: problem.id }) }}">{{ problem.id }}</a></td>
+                    <td>{{ problem.participant_id }}</td>
                     <td>
                         {% if problem.problem_type == optionsValue[0] %}
                             {{ optionsText[0] }}
@@ -37,9 +39,15 @@
                     <td>{{ problem.staff_name }}</td>
                     <td>{{ problem.problem_date ? problem.problem_date|date('m/d/Y') }}</td>
                     <td>{{ problem.created_ts ? problem.created_ts|date('m/d/Y') }}</td>
-                    <td>{{ problem.finalized_ts ? problem.finalized_ts|date('m/d/Y') }}</td>
+                    <td>
+                        {% if problem.finalized_ts %}
+                            {{ problem.finalized_ts|date('m/d/Y') }}
+                        {% else %}
+                            <span class="label label-danger">Draft</span>
+                        {% endif %}
+                    </td>
                     <td>{{ problem.comment_count }}</td>
-                    <td>{{ problem.last_comment_ts ? problem.last_comment_ts|date('m/d/Y') }}</td>
+                    <td>{{ problem.last_update_ts ? problem.last_update_ts|date('m/d/Y') }}</td>
                     <td><a href="{{ path('problem_details', {problemId: problem.id }) }}">View Details</a></td>
                 </tr>
             {% endfor %}

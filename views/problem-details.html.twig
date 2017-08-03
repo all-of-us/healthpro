@@ -28,11 +28,11 @@
                             </tr>
                             <tr>
                                 <th>Problem Date</th>
-                                <td>{{ problem.problem_date|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                <td>{{ problem.problem_date ? problem.problem_date|date('n/j/Y g:ia', app.userTimezone) }}</td>
                             </tr>
                             <tr>
                                 <th>Date provider became aware of problem</th>
-                                <td>{{ problem.provider_aware_date|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                <td>{{ problem.provider_aware_date ? problem.provider_aware_date|date('n/j/Y g:ia', app.userTimezone) }}</td>
                             </tr>
                             <tr>
                                 <th>Problem Description</th>
@@ -44,15 +44,15 @@
                             </tr>
                             <tr>
                                 <th>Created</th>
-                                <td>{{ problem.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                <td>{{ problem.created_ts ? problem.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
                             </tr>
                             <tr>
                                 <th>Updated</th>
-                                <td>{{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                <td>{{ problem.updated_ts ? problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
                             </tr>
                             <tr>
                                 <th>Finalized</th>
-                                <td>{{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                <td>{{ problem.finalized_ts ? problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
                             </tr>
                         </table>
                     </div>
