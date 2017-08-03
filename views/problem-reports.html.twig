@@ -39,9 +39,15 @@
                     <td>{{ problem.staff_name }}</td>
                     <td>{{ problem.problem_date ? problem.problem_date|date('m/d/Y') }}</td>
                     <td>{{ problem.created_ts ? problem.created_ts|date('m/d/Y') }}</td>
-                    <td>{{ problem.finalized_ts ? problem.finalized_ts|date('m/d/Y') }}</td>
+                    <td>
+                        {% if problem.finalized_ts %}
+                            {{ problem.finalized_ts|date('m/d/Y') }}
+                        {% else %}
+                            <span class="label label-danger">Draft</span>
+                        {% endif %}
+                    </td>
                     <td>{{ problem.comment_count }}</td>
-                    <td>{{ problem.last_update_ts ? problem.last_update_ts|date('m/d/Y') }}</td>
+                    <td>{{ problem.last_update_ts ? problem.last_update_ts|date('m/d/Y g:ia', app.userTimezone) }}</td>
                     <td><a href="{{ path('problem_details', {problemId: problem.id }) }}">View Details</a></td>
                 </tr>
             {% endfor %}
