@@ -194,17 +194,11 @@ class ProblemController extends AbstractController
             'required' => false,
             'disabled' => $this->disabled
         ];
-        if ($this->constraint) {
-            $siteAttributes['constraints'] = new Constraints\NotBlank();
-        }
         $staffAttributes = [
             'label' => 'Name of staff recording the problem',
             'required' => false,
             'disabled' => $this->disabled
         ];
-        if ($this->constraint) {
-            $staffAttributes['constraints'] = new Constraints\NotBlank();
-        }
         $problemDateAttributes = [
             'label' => 'Date of problem',
             'widget' => 'single_text',
@@ -220,9 +214,6 @@ class ProblemController extends AbstractController
                 ])
             ]
         ];
-        if ($this->constraint) {
-            $problemDateAttributes['constraints'][] = new Constraints\NotBlank();
-        }
         $providerAwareDateAttributes = [
             'label' => 'Date provider became aware of problem',
             'widget' => 'single_text',
@@ -238,23 +229,22 @@ class ProblemController extends AbstractController
                 ])
             ]
         ];
-        if ($this->constraint) {
-            $providerAwareDateAttributes['constraints'][] = new Constraints\NotBlank();
-        }
         $descriptionAttributes = [
             'label' => 'Description of problem',
             'required' => false,
             'disabled' => $this->disabled
         ];
-        if ($this->constraint) {
-            $descriptionAttributes['constraints'] = new Constraints\NotBlank();
-        }
         $actionTakenAttributes = [
             'label' => 'Description of corrective action taken',
             'required' => false,
             'disabled' => $this->disabled
         ];
         if ($this->constraint) {
+            $siteAttributes['constraints'] = new Constraints\NotBlank();
+            $staffAttributes['constraints'] = new Constraints\NotBlank();
+            $problemDateAttributes['constraints'][] = new Constraints\NotBlank();
+            $providerAwareDateAttributes['constraints'][] = new Constraints\NotBlank();
+            $descriptionAttributes['constraints'] = new Constraints\NotBlank();
             $actionTakenAttributes['constraints'] = new Constraints\NotBlank();
         }
         $problemForm = $app['form.factory']->createBuilder(Type\FormType::class, $problem)
