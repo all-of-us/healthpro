@@ -26,6 +26,7 @@ CREATE TABLE `orders` (
   `finalized_ts` timestamp NULL DEFAULT NULL,
   `finalized_samples` varchar(255) DEFAULT NULL,
   `finalized_notes` text,
+  `fedex_tracking` varchar(50) NULL DEFAULT NULL,
   `type` varchar(20) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `participant_id` (`participant_id`),

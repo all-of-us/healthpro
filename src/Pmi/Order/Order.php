@@ -199,6 +199,9 @@ class Order
                 $updateArray['processed_samples_ts'] = json_encode([]);
             }
         }
+        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+            $updateArray['fedex_tracking'] = $formData['fedex_tracking'];
+        }
         return $updateArray;
     }
 
@@ -261,25 +264,20 @@ class Order
             ]);
         }
         $formBuilder->add("{$set}_samples", Type\ChoiceType::class, [
-                'expanded' => true,
-                'multiple' => true,
-                'label' => $samplesLabel,
-                'choices' => $samples,
-                'required' => false,
-                'disabled' => $disabled,
-                'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
-                    if (in_array($val, $enabledSamples)) {
-                        return [];
-                    } else {
-                        return ['disabled' => true, 'class' => 'sample-disabled'];
-                    }
+            'expanded' => true,
+            'multiple' => true,
+            'label' => $samplesLabel,
+            'choices' => $samples,
+            'required' => false,
+            'disabled' => $disabled,
+            'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
+                if (in_array($val, $enabledSamples)) {
+                    return [];
+                } else {
+                    return ['disabled' => true, 'class' => 'sample-disabled'];
                 }
-            ])
-            ->add("{$set}_notes", Type\TextareaType::class, [
-                'label' => $notesLabel,
-                'disabled' => $disabled,
-                'required' => false
-            ]);
+            }
+        ]);
         if ($set == 'processed') {
             $formBuilder->add('processed_samples_ts', Type\CollectionType::class, [
                 'entry_type' => Type\DateTimeType::class,
@@ -303,6 +301,34 @@ class Order
                 'required' => false
             ]);
         }
+        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+            $formBuilder->add('fedex_tracking', Type\RepeatedType::class, [
+                'type' => Type\TextType::class,
+                'disabled' => $disabled,
+                'invalid_message' => 'FedEx tracking numbers must match.',
+                'first_options' => [
+                    'label' => 'FedEx tracking number'
+                ],
+                'second_options' => [
+                    'label' => 'Verify FedEx tracking number',
+                ],
+                'required' => false,
+                'error_mapping' => [
+                    '.' => 'second' // target the second (repeated) field for non-matching error
+                ],
+                'constraints' => [
+                    new Constraints\Regex([
+                        'pattern' => '/^\d{12,14}$/',
+                        'message' => 'FedEx tracking numbers must be a string of 12-14 digits'
+                    ])
+                ]
+            ]);
+        }
+        $formBuilder->add("{$set}_notes", Type\TextareaType::class, [
+            'label' => $notesLabel,
+            'disabled' => $disabled,
+            'required' => false
+        ]);
         $form = $formBuilder->getForm();
         return $form;
     }
@@ -322,6 +348,16 @@ class Order
             'system' => 'https://www.pmi-ops.org',
             'value' => $this->order['order_id']
         ];
+        if ($this->order['type'] === 'kit') {
+            $identifiers[] = [
+                'system' => 'https://orders.mayomedicallaboratories.com/kit-id',
+                'value' => $this->order['order_id']
+            ];
+            $identifiers[] = [
+                'system' => 'https://orders.mayomedicallaboratories.com/tracking-number',
+                'value' => $this->order['fedex_tracking']
+            ];
+        }
         if ($this->app) {
             if (!$this->app->getConfig('ml_mock_order') && $this->order['mayo_id'] != 'pmitest') {
                 $identifiers[] =[
@@ -469,6 +505,9 @@ class Order
                     $formData['processed_samples_ts'][$sample] = null;
                 }
             }
+        }
+        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+            $formData['fedex_tracking'] = $this->order['fedex_tracking'];
         }
         return $formData;
     }

@@ -6,14 +6,17 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class User implements UserInterface
 {
     const SITE_PREFIX = 'hpo-site-';
+    const AWARDEE_PREFIX = 'awardee-';
     const DASHBOARD_GROUP = 'admin-dashboard';
     const ADMIN_GROUP = 'site-admin';
     const TWOFACTOR_GROUP = 'mfa_exception';
     const TWOFACTOR_PREFIX = 'x-site-';
+    const ADMIN_DV = 'dv-admin';
     
     private $googleUser;
     private $groups;
     private $sites;
+    private $awardess;
     private $dashboardAccess;
     private $adminAccess;
     private $info;
@@ -26,8 +29,10 @@ class User implements UserInterface
         $this->info = $info;
         $this->timezone = $timezone;
         $this->sites = $this->computeSites();
+        $this->awardees = $this->computeAwardees();
         $this->dashboardAccess = $this->computeDashboardAccess();
         $this->adminAccess = $this->computeAdminAccess();
+        $this->adminDvAccess = $this->computeAdminDvAccess();
     }
     
     public function getGroups()
@@ -58,6 +63,24 @@ class User implements UserInterface
         return $sites;
     }
 
+    private function computeAwardees()
+    {
+        $awardees = [];
+        // awardee membership is determined by the user's groups
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::AWARDEE_PREFIX) === 0) {
+                $id = preg_replace('/@.*$/', '', $group->getEmail());
+                $id = str_replace(self::AWARDEE_PREFIX, '', $id);
+                $awardees[] = (object) [
+                    'email' => $group->getEmail(),
+                    'name' => $group->getName(),
+                    'id' => $id
+                ];
+            }
+        }
+        return $awardees;
+    }
+
     private function computeDashboardAccess()
     {
         $hasAccess = false;
@@ -74,6 +97,17 @@ class User implements UserInterface
         $hasAccess = false;
         foreach ($this->groups as $group) {
             if (strpos($group->getEmail(), self::ADMIN_GROUP . '@') === 0) {
+                $hasAccess = true;
+            }
+        }
+        return $hasAccess;
+    }
+
+    private function computeAdminDvAccess()
+    {
+        $hasAccess = false;
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::ADMIN_DV . '@') === 0) {
                 $hasAccess = true;
             }
         }
@@ -102,6 +136,11 @@ class User implements UserInterface
     {
         return $this->sites;
     }
+
+    public function getAwardees()
+    {
+        return $this->awardees;
+    }
     
     public function getSite($email)
     {
@@ -114,12 +153,36 @@ class User implements UserInterface
         }
         return $site;
     }
+
+    public function getAwardee($email)
+    {
+        $awardee = null;
+        foreach ($this->awardees as $a) {
+            if ($a->email === $email) {
+                $awardee = $a;
+                break;
+            }
+        }
+        return $awardee;
+    }
     
     public function belongsToSite($email)
     {
         $belongs = false;
         foreach ($this->sites as $site) {
             if ($site->email === $email) {
+                $belongs = true;
+                break;
+            }
+        }
+        return $belongs;
+    }
+
+    public function belongsToAwardee($email)
+    {
+        $belongs = false;
+        foreach ($this->awardees as $awardee) {
+            if ($awardee->email === $email) {
                 $belongs = true;
                 break;
             }
@@ -138,11 +201,17 @@ class User implements UserInterface
         if (count($this->sites) > 0) {
             $roles[] = 'ROLE_USER';
         }
+        if (count($this->awardees) > 0) {
+            $roles[] = 'ROLE_AWARDEE';
+        }
         if ($this->dashboardAccess) {
             $roles[] = 'ROLE_DASHBOARD';
         }
         if ($this->adminAccess) {
             $roles[] = 'ROLE_ADMIN';
+        }
+        if ($this->adminDvAccess) {
+            $roles[] = 'ROLE_DV_ADMIN';
         }
         return $roles;
     }
