@@ -271,6 +271,58 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertSame($groupEmail, $this->app->getSite()->email);
     }
 
+    public function testAwardeeAutoselect()
+    {
+        $email = 'testAwardeeAutoselect@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        $groupEmail = 'awardee-1@gapps.com';
+        AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
+        $client = $this->createClient();
+        $client->followRedirects();
+        $this->assertSame(null, $this->app->getSite());
+        $crawler = $client->request('GET', '/workqueue');
+        $this->assertSame($groupEmail, $this->app->getAwardee()->email);
+    }
+
+    public function testDvAdminAutoselect()
+    {
+        $email = 'testDvAdminAutoselect@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        $groupEmail = User::ADMIN_DV . '@gapps.com';
+        AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
+        $client = $this->createClient();
+        $client->followRedirects();
+        $this->assertSame(null, $this->app->getSite());
+        $crawler = $client->request('GET', '/problem/reports');
+        $this->assertEquals(1, count($crawler->filter('#problem_reports')));
+    }
+
+    public function testAdminAutoselect()
+    {
+        $email = 'testAdminAutoselect@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        $groupEmail = User::ADMIN_GROUP . '@gapps.com';
+        AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
+        $client = $this->createClient();
+        $client->followRedirects();
+        $this->assertSame(null, $this->app->getSite());
+        $crawler = $client->request('GET', '/admin');
+        $this->assertEquals(1, count($crawler->filterXPath('//a[@href="/admin/sites"]')));
+    }
+
+    public function testDashboardAutoselect()
+    {
+        $email = 'testDashboardAutoselect@example.com';
+        GoogleUserService::switchCurrentUser($email);
+        $groupEmail = User::DASHBOARD_GROUP . '@gapps.com';
+        AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
+        $client = $this->createClient();
+        $client->followRedirects();
+        $this->assertSame(null, $this->app->getSite());
+        $crawler = $client->request('GET', '/dashboard');
+        $this->assertEquals(1, count($crawler->filter('#participants-by-region-nav')));
+    }
+
     public function testHeaders()
     {
         $client = $this->createClient();
