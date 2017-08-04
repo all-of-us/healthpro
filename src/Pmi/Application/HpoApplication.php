@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Pmi\Entities\Configuration;
 use Pmi\Security\UserProvider;
 use Pmi\Audit\Log;
+use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
 class HpoApplication extends AbstractApplication
 {
@@ -97,6 +98,21 @@ class HpoApplication extends AbstractApplication
 
                 [['path' => '^/admin($|\/)', 'ips' => $ips], 'ROLE_ADMIN'],
                 [['path' => '^/admin($|\/)'], 'ROLE_NO_ACCESS'],
+
+                [['path' => '^/workqueue($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_AWARDEE']],
+                [['path' => '^/workqueue($|\/)'], 'ROLE_NO_ACCESS'],
+
+                [['path' => '^/problem($|\/)', 'ips' => $ips], ['ROLE_DV_ADMIN']],
+                [['path' => '^/problem($|\/)'], 'ROLE_NO_ACCESS'],
+
+                [['path' => '^/site($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_AWARDEE']],
+                [['path' => '^/site($|\/)'], 'ROLE_NO_ACCESS'],
+
+                [['path' => '^/help($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
+                [['path' => '^/help($|\/)'], 'ROLE_NO_ACCESS'],
+
+                [['path' => '^/settings($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
+                [['path' => '^/settings($|\/)'], 'ROLE_NO_ACCESS'],
 
                 [['path' => '^/.*$', 'ips' => $ips], 'ROLE_USER'],
                 [['path' => '^/.*$'], 'ROLE_NO_ACCESS']
@@ -209,9 +225,35 @@ class HpoApplication extends AbstractApplication
         $user = $this->getUser();
         if ($user && $user->belongsToSite($email)) {
             $this['session']->set('site', $user->getSite($email));
+            $this['session']->remove('awardee');
+            $this->setNewRoles($user);
+            return true;
+        } elseif ($user && $user->belongsToAwardee($email)) {
+            $this['session']->set('awardee', $user->getAwardee($email));
+            $this['session']->remove('site');
+            $this->setNewRoles($user);
             return true;
         } else {
             return false;
+        }
+    }
+
+    public function setNewRoles($user)
+    {
+        $roles = $user->getRoles();
+        if ($this['session']->has('site')) {
+            if(($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+        }
+        if ($this['session']->has('awardee')) {
+            if(($key = array_search('ROLE_USER', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+        }
+        if ($roles != $user->getRoles()) {
+            $token = new PostAuthenticationGuardToken($this['security.token_storage']->getToken()->getUser(), 'main', $roles);
+            $this['security.token_storage']->setToken($token);
         }
     }
     
@@ -221,10 +263,24 @@ class HpoApplication extends AbstractApplication
         return $this['session']->get('site');
     }
 
+    public function getAwardee()
+    {
+        return $this['session']->get('awardee');
+    }
+
     public function getSiteId()
     {
         if ($site = $this->getSite()) {
             return $site->id;
+        } else {
+            return null;
+        }
+    }
+
+    public function getAwardeeId()
+    {
+        if ($awardee = $this->getAwardee()) {
+            return $awardee->id;
         } else {
             return null;
         }
@@ -241,6 +297,17 @@ class HpoApplication extends AbstractApplication
             ->fetchOneBy(['google_group' => $googleGroup]);
     }
 
+    public function getAwardeeEntity()
+    {
+        $googleGroup = $this->getAwardeeId();
+        if (!$googleGroup) {
+            return null;
+        }
+        return $this['em']
+            ->getRepository('sites')
+            ->fetchBy(['awardee' => $googleGroup]);
+    }
+
     public function getSiteOrganization()
     {
         if ($this['isUnitTest']) {
@@ -252,6 +319,37 @@ class HpoApplication extends AbstractApplication
         } else {
             return $site['organization'];
         }
+    }
+
+    public function getAwardeeOrganization()
+    {
+        if ($this['isUnitTest']) {
+            return null;
+        }
+        $sites = $this->getAwardeeEntity();
+        if (!$sites) {
+            return null;
+        } else {
+            $organizations = [];
+            foreach ($sites as $site) {
+                if (!empty($site['organization'])) {
+                    $organizations[] = $site['organization'];
+                }
+            }
+            if (empty($organizations)) {
+                return null;
+            } else {
+                return $organizations;
+            }
+        }
+    }
+
+    public function isDVType() {
+        $site = $this['em']->getRepository('sites')->fetchBy([
+            'google_group' => $this->getSiteId(),
+            'type' => 'DV'
+        ]);
+        return !empty($site);
     }
     
     protected function beforeCallback(Request $request, AbstractApplication $app)
@@ -269,7 +367,8 @@ class HpoApplication extends AbstractApplication
         }
 
         // users with multiple roles must select their initial destination
-        if ($this['session']->get('isLoginReturn') && $this->hasRole('ROLE_USER') && $this->hasRole('ROLE_DASHBOARD') && !$this->isUpkeepRoute($request)) {
+        $hasMultiple = ($this->hasRole('ROLE_DASHBOARD') && ($this->hasRole('ROLE_USER') || $this->hasRole('ROLE_ADMIN') || $this->hasRole('ROLE_AWARDEE') || $this->hasRole('ROLE_DV_ADMIN')));
+        if ($this['session']->get('isLoginReturn') && $hasMultiple && !$this->isUpkeepRoute($request)) {
             return $this->forwardToRoute('dashSplash', $request);
         }
 
@@ -279,16 +378,18 @@ class HpoApplication extends AbstractApplication
         }
 
         // HPO users must select their site first
-        if (!$this->getSite() && $this->isLoggedIn() && $this['security.authorization_checker']->isGranted('ROLE_USER'))
+        if (!$this->getSite() && !$this->getAwardee() && $this->isLoggedIn() && ($this['security.authorization_checker']->isGranted('ROLE_USER') || $this['security.authorization_checker']->isGranted('ROLE_AWARDEE')))
         {
             // auto-select since they only have one site
-            if (count($user->getSites()) === 1) {
+            if (count($user->getSites()) === 1 && empty($user->getAwardees())) {
                 $this->switchSite($user->getSites()[0]->email);
+            } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
+                $this->switchSite($user->getAwardees()[0]->email);
             } elseif ($request->attributes->get('_route') !== 'selectSite' &&
                     $request->attributes->get('_route') !== 'switchSite' &&
                     strpos($request->attributes->get('_route'), 'dashboard_') !== 0 &&
+                    strpos($request->attributes->get('_route'), 'problem_') !== 0 &&
                     !$this->isUpkeepRoute($request)) {
-                $request->request->set('destUrl', $request->getRequestUri());
                 return $this->forwardToRoute('selectSite', $request);
             }
         }

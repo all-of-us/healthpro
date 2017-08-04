@@ -18,7 +18,6 @@
             {{ form_errors(finalizeForm.finalized_ts) }}
         </div>
 
-
         <div class="form-group{% if not finalizeForm.finalized_samples.vars.valid %} has-error{% endif %}">
             {{ form_label(finalizeForm.finalized_samples) }}
             <span class="toggle-help-image" data-caption="Finalized samples help text placeholder.">
@@ -31,6 +30,36 @@
             {% endif %}
             {{ form_errors(finalizeForm.finalized_samples) }}
         </div>
+
+        {% if finalizeForm.fedex_tracking is defined %}
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#" id="enable-number">
+                    <i class="fa fa-keyboard-o" aria-hidden="true"></i>
+                    Enter tracking number
+                </a></li>
+                <li role="presentation"><a href="#" id="enable-barcode">
+                    <i class="fa fa-barcode" aria-hidden="true"></i>
+                    Scan barcode
+                </a></li>
+            </ul>
+            <br />
+            <div class="row">
+                <div class="col-xs-6" id="fedex-barcode" style="display:none">
+                    <div class="form-group">
+                        <label class="control-label" for="fedex_barcode_first">FedEx barcode</label>
+                        <input type="text" id="fedex_barcode_first" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="fedex_barcode_second">Verify FedEx barcode</label>
+                        <input type="text" id="fedex_barcode_second" class="form-control">
+                    </div>
+                </div>
+                <div class="col-xs-12" id="fedex-number">
+                    {{ form_row(finalizeForm.fedex_tracking) }}
+                </div>
+            </div>
+            <hr />
+        {% endif %}
 
         <div class="form-group{% if not finalizeForm.finalized_notes.vars.valid %} has-error{% endif %}">
             {{ form_label(finalizeForm.finalized_notes) }}
@@ -69,6 +98,47 @@ $(document).ready(function () {
     $('#form_finalized_ts').pmiDateTimePicker();
     var orderView = new PMI.views['OrderSubPage']({
         el: $("body")
+    });
+
+    $('#enable-number').on('click', function() {
+        $('#enable-number').parent().addClass('active');
+        $('#enable-barcode').parent().removeClass('active');
+        $('#fedex-barcode').hide();
+        $('#fedex-number').removeClass('col-xs-6').addClass('col-xs-12');
+        $('#fedex-number input').attr('readonly', false);
+        return false;
+    });
+    $('#enable-barcode').on('click', function() {
+        $('#enable-barcode').parent().addClass('active');
+        $('#enable-number').parent().removeClass('active');
+        $('#fedex-barcode').show();
+        $('#fedex-number').removeClass('col-xs-12').addClass('col-xs-6');
+        $('#fedex-number input').attr('readonly', true);
+        return false;
+    });
+
+    $('#fedex_barcode_first, #fedex_barcode_second').on('change keyup', function() {
+        var target;
+        if ($(this).attr('id') === 'fedex_barcode_second') {
+            target = $('#form_fedex_tracking_second');
+        } else {
+            target = $('#form_fedex_tracking_first');
+        }
+        target.attr('placeholder', '');
+        target.parent().removeClass('has-error').removeClass('has-success');
+        var barcode = $(this).val().trim();
+        if (barcode.match(/^[0-9]{34}$/)) { // 34 digit barcode
+            var fedexTracking = barcode.substring(20);
+            fedexTracking = fedexTracking.replace(/^0{1,2}/, ''); // trim up to two leading 0's
+            target.val(fedexTracking);
+            target.parent().addClass('has-success');
+        } else {
+            target.val('');
+            if (barcode) {
+                target.attr('placeholder', 'Invalid barcode');
+                target.parent().addClass('has-error');
+            }
+        }
     });
 });
 </script>

@@ -140,7 +140,6 @@ class DashboardController extends AbstractController
             }
         }
 
-
         // look to see if any values were recorded at all
         // will return empty data array to trigger error message in UI
         if ($error_check == 0) {
@@ -175,11 +174,19 @@ class DashboardController extends AbstractController
             array_push($data, $trace);
         }
 
-        // sort alphabetically by trace name
-        usort($data, function ($a, $b) {
-            if ($a['name'] == $b['name']) return 0;
-            return ($a['name'] > $b['name']) ? -1 : 1;
-        });
+        // sort alphabetically by trace name, unless looking at registration status (then do reverse sort)
+        if ($filter_by == 'Participant.enrollmentStatus') {
+            usort($data, function ($a, $b) {
+                if ($a['name'] == $b['name']) return 0;
+                return ($a['name'] > $b['name']) ? 1 : -1;
+            });
+        } else {
+            usort($data, function ($a, $b) {
+                if ($a['name'] == $b['name']) return 0;
+                return ($a['name'] > $b['name']) ? -1 : 1;
+            });
+        }
+
         // now apply colors since we're in order
         for ($i = 0; $i < count($data); $i++) {
             $data[$i]['marker'] = array(
@@ -224,6 +231,7 @@ class DashboardController extends AbstractController
         if (!empty($metrics)) {
             if ($map_mode == 'FullParticipant.state') {
                 $state_registrations = [];
+                $total_counts = [];
                 $hover_text = [];
                 $state_names = [];
 
@@ -257,12 +265,16 @@ class DashboardController extends AbstractController
                             $count += $requested_center[$state_lookup];
                         }
                     }
+
                     $pct_of_target = round($count / $state['recruitment_target'] * 100, 2);
 
                     // check if max_val needs to be set
                     if ($pct_of_target > $max_val) {
                         $max_val = $pct_of_target;
                     }
+
+                    // keep track of raw number for table data
+                    array_push($total_counts, $count);
 
                     array_push($state_registrations, $pct_of_target);
                     array_push($hover_text, "<b>" . $pct_of_target . "</b>% (" . $count . ")<br><b>" . $state['state']
@@ -274,6 +286,7 @@ class DashboardController extends AbstractController
                     'locationmode' => 'USA-states',
                     'locations' => $state_names,
                     'z' => $state_registrations,
+                    'counts' => $total_counts,
                     'text' => $hover_text,
                     "colorscale" => $color_profile,
                     "zmin" => 0,
@@ -289,6 +302,8 @@ class DashboardController extends AbstractController
                 $states_by_region = [];
                 $registrations_by_state = [];
                 $region_text = [];
+                $total_counts = [];
+                $census_region_names = [];
                 try {
                     $census_regions = $app['db']->fetchAll("SELECT * FROM census_regions");
                 } catch (\Exception $e) {
@@ -301,6 +316,8 @@ class DashboardController extends AbstractController
                     } catch (\Exception $e) {
                         $states = [];
                     }
+                    // grab name for table data
+                    array_push($census_region_names, $region['label']);
                     $region_states = [];
                     foreach ($states as $state) {
                         array_push($region_states, $state["state"]);
@@ -328,6 +345,9 @@ class DashboardController extends AbstractController
                     }
                     $pct_of_target = round($count / $region['recruitment_target'] * 100, 2);
 
+                    // grab count for table data
+                    array_push($total_counts, $count);
+
                     // check if max_val needs to be set
                     if ($pct_of_target > $max_val) {
                         $max_val = $pct_of_target;
@@ -347,6 +367,8 @@ class DashboardController extends AbstractController
                     'locations' => $states_by_region,
                     'z' => $registrations_by_state,
                     'text' => $region_text,
+                    'counts' => $total_counts,
+                    'regions' => $census_region_names,
                     "colorscale" => $color_profile,
                     "zmin" => 0,
                     // set floor on max accordingly
@@ -400,6 +422,7 @@ class DashboardController extends AbstractController
                             'locationmode' => 'USA-states',
                             'lat' => [$location['latitude']],
                             'lon' => [$location['longitude']],
+                            'count' => $count,
                             'name' => $location['code'] . " (" . $location['category'] . ")",
                             'hoverinfo' => 'text',
                             'text' => [$label],
@@ -595,7 +618,7 @@ class DashboardController extends AbstractController
                 if (!$metrics) {
                     return false;
                 } else {
-                    $memcache->set($memcacheKey, $metrics, 0, 86400);
+                    $memcache->set($memcacheKey, $metrics, 0, 14400);
                 }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
@@ -616,7 +639,7 @@ class DashboardController extends AbstractController
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
                 $definitions = $metricsApi->metricsFields();
                 // set expiration to four hours
-                $memcache->set($memcacheKey, $definitions, 0, 86400);
+                $memcache->set($memcacheKey, $definitions, 0, 14400);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
             }
@@ -727,7 +750,6 @@ class DashboardController extends AbstractController
             $percentage = $value / $total;
             return "<b>{$value}</b> (" . number_format($percentage * 100, 2) . '%' . ")";
         }
-
     }
 
     // helper function to return colorbrewer color values (since PHP can't have array constants

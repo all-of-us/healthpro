@@ -39,13 +39,19 @@ class DefaultController extends AbstractController
 
     public function homeAction(Application $app, Request $request)
     {
-        if ($app->hasRole('ROLE_USER')) {
-            if (!$app->getUserTimezone(false)) {
-                $app->addFlashNotice('Please select your current time zone');
-                return $app->redirectToRoute('settings');
-            } else {
-                return $app['twig']->render('index.html.twig');
-            }
+        $checkTimeZone = $app->hasRole('ROLE_USER') || $app->hasRole('ROLE_ADMIN') || $app->hasRole('ROLE_AWARDEE') || $app->hasRole('ROLE_DV_ADMIN');
+        if ($checkTimeZone && !$app->getUserTimezone(false)) {
+            $app->addFlashNotice('Please select your current time zone');
+            return $app->redirectToRoute('settings');
+        }
+        if ($app->hasRole('ROLE_USER') || ($app->hasRole('ROLE_AWARDEE') && $app->hasRole('ROLE_DV_ADMIN'))) {
+            return $app['twig']->render('index.html.twig');
+        } elseif ($app->hasRole('ROLE_AWARDEE')) {
+            return $app->redirectToRoute('workqueue_index');
+        } elseif ($app->hasRole('ROLE_DV_ADMIN')) {
+            return $app->redirectToRoute('problem_reports');
+        } elseif ($app->hasRole('ROLE_ADMIN')) {
+            return $app->redirectToRoute('admin_home');
         } elseif ($app->hasRole('ROLE_DASHBOARD')) {
             return $app->redirectToRoute('dashboard_home');
         } else {
@@ -144,7 +150,7 @@ class DefaultController extends AbstractController
     public function switchSiteAction($id, Application $app, Request $request)
     {
         if ($app->switchSite($id)) {
-            return $app->redirect($request->get('destUrl', $app->generateUrl('home')));
+            return $app->redirectToRoute('home');
         } else {
             return $app->abort(403);
         }
@@ -152,8 +158,7 @@ class DefaultController extends AbstractController
     
     public function selectSiteAction(Application $app, Request $request)
     {
-        $destUrl = $request->get('destUrl', $app->generateUrl('home'));
-        return $app['twig']->render('site-select.html.twig', ['destUrl' => $destUrl]);
+        return $app['twig']->render('site-select.html.twig');
     }
 
     public function participantsAction(Application $app, Request $request)
@@ -292,10 +297,13 @@ class DefaultController extends AbstractController
             ['participant_id' => $id],
             ['updated_ts' => 'DESC', 'id' => 'DESC']
         );
+        $query = "SELECT p.id, p.updated_ts, p.finalized_ts, MAX(pc.created_ts) as last_comment_ts, count(pc.comment) as comment_count FROM problems p LEFT JOIN problem_comments pc on p.id = pc.problem_id WHERE p.participant_id = ? GROUP BY p.id ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC";
+        $problems = $app['db']->fetchAll($query, [$id]);
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
             'evaluations' => $evaluations,
+            'problems' => $problems,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView()
         ]);

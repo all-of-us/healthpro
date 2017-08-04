@@ -27,12 +27,14 @@ $app
     ->mount('/', new Controller\DefaultController())
     ->mount('/', new Controller\OrderController())
     ->mount('/', new Controller\EvaluationController())
+    ->mount('/', new Controller\ProblemController())
     ->mount('/_dev', new Controller\DevController())
     ->mount('/cron', new Controller\CronController())
     ->mount('/dashboard', new Controller\DashboardController())
     ->mount('/admin', new Controller\AdminController())
     ->mount('/help', new Controller\HelpController())
     ->mount('/workqueue', new Controller\WorkQueueController())
+    ->mount('/problem', new Controller\ProblemReportController())
 ;
 
 $app->run();
