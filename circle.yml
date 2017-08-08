@@ -4,3 +4,9 @@ dependencies:
 test:
   override:
     - ./ci/test.sh
+machine:
+  services:
+    - mysql
+database:
+  pre:
+    - mysql -u ubuntu -e "SHOW DATABASES"
