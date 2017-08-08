@@ -9,4 +9,4 @@ machine:
     - mysql
 database:
   pre:
-    - mysql -u ubuntu -e "SHOW DATABASES"
+    - ./ci/database.sh

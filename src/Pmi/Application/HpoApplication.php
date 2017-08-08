@@ -137,8 +137,9 @@ class HpoApplication extends AbstractApplication
             }
         }
 
+        // circle ci db configurations
         $circleConfigFile = $appDir . '/ci/config.yml';
-        if ($this['isUnitTest'] && !$this->isLocal() && file_exists($circleConfigFile)) {
+        if ($this['isUnitTest'] && file_exists($circleConfigFile)) {
             $yaml = new \Symfony\Component\Yaml\Parser();
             $configs = $yaml->parse(file_get_contents($circleConfigFile));
             if (is_array($configs) || count($configs) > 0) {
