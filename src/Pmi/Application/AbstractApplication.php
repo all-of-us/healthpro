@@ -346,13 +346,6 @@ abstract class AbstractApplication extends Application
 
         // Set error callback using error template
         $this->error(function (Exception $e, $request, $code) {
-            // run application-specific error callback
-            if (method_exists($this, 'onErrorCallback')) {
-                $response = $this->onErrorCallback($e, $code);
-                if ($response) {
-                    return $response;
-                }
-            }
 
             // syslog 500 errors
             if ($code >= 500) {
