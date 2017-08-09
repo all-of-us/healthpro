@@ -1,6 +1,8 @@
 <?php
 namespace Pmi\Drc;
 
+use Psr\Http\Message\RequestInterface;
+
 class RdrHelper
 {
     protected $client;
@@ -42,8 +44,15 @@ class RdrHelper
         } else {
             $endpoint = $this->endpoint;
         }
+
+        $stack = new \GuzzleHttp\HandlerStack();
+        $stack->setHandler(new \GuzzleHttp\Handler\StreamHandler());
+        $stack->push($this->removeHeader('Host'));
+
         return $googleClient->authorize(new \GuzzleHttp\Client([
-            'base_uri' => $endpoint
+            'base_uri' => $endpoint,
+            'verify' => false,
+            'handler' => $stack
         ]));
     }
 
@@ -69,5 +78,18 @@ class RdrHelper
     public function getLastError()
     {
         return $this->lastError;
+    }
+
+    public function removeHeader($header)
+    {
+        return function (callable $handler) use ($header) {
+            return function (
+                RequestInterface $request,
+                array $options
+            ) use ($handler, $header) {
+                $request = $request->withoutHeader($header);
+                return $handler($request, $options);
+            };
+        };
     }
 }
