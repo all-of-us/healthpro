@@ -1,6 +1,9 @@
 {% extends 'base.html.twig' %}
 {% block title %}Choose Site - {% endblock %}
 {% block body %}
+{% if siteEmail is not defined %}
+    {% set siteEmail = app.session.get('site') ? app.session.get('site').email : '' %}
+{% endif %}
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <div class="alert alert-info">
@@ -12,7 +15,7 @@
                     <label>Choose Site</label>
                     <select class="form-control site-id">
                         {% for site in app.user.sites %}
-                            <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : ''}} >{{ site.name }}</option>
+                            <option value="{{ site.email }}"{{ (siteEmail == site.email) ? ' selected' : ''}} >{{ site.name }}</option>
                         {% endfor %}
                         {% for awardee in app.user.awardees %}
                             <option value="{{ awardee.email }}"{{ (app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>

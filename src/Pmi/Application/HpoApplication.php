@@ -381,7 +381,7 @@ class HpoApplication extends AbstractApplication
         if (!$this->getSite() && !$this->getAwardee() && $this->isLoggedIn() && ($this['security.authorization_checker']->isGranted('ROLE_USER') || $this['security.authorization_checker']->isGranted('ROLE_AWARDEE')))
         {
             // auto-select since they only have one site
-            if (count($user->getSites()) === 1 && empty($user->getAwardees())) {
+            if (count($user->getSites()) === 1 && empty($user->getAwardees()) && $this->isAdminSite($user->getSites()[0]->email)) {
                 $this->switchSite($user->getSites()[0]->email);
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
                 $this->switchSite($user->getAwardees()[0]->email);
@@ -411,5 +411,20 @@ class HpoApplication extends AbstractApplication
                 $this['session']->set('isLoginReturn', false);
             }
         }
+    }
+
+    public function isAdminSite($email)
+    {
+        $user = $this->getUser();
+        if ($this->isProd() && $user && $user->belongsToSite($email)) {
+            $site = $user->getSite($email);
+            $sites = $this['em']->getRepository('sites')->fetchBy([
+                'google_group' => $site->id
+            ]);
+            if (empty($sites)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
