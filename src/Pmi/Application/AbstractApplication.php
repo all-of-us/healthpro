@@ -350,6 +350,7 @@ abstract class AbstractApplication extends Application
             // syslog 500 errors
             if ($code >= 500) {
                 syslog(LOG_CRIT, $e->getMessage());
+                syslog(LOG_INFO, substr($e->getTraceAsString(), 0, 5120)); // log the first 5KB of the stack trace
             }
 
             // If in not in debug mode or error is < 500, render the error template
