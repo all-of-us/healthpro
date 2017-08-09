@@ -1,6 +1,8 @@
 <?php
 namespace Pmi\Drc;
 
+use Pmi\HttpClient;
+
 class RdrHelper
 {
     protected $client;
@@ -42,7 +44,7 @@ class RdrHelper
         } else {
             $endpoint = $this->endpoint;
         }
-        return $googleClient->authorize(new \GuzzleHttp\Client([
+        return $googleClient->authorize(new HttpClient([
             'base_uri' => $endpoint
         ]));
     }

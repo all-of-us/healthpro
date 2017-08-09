@@ -11,6 +11,9 @@ use Psr\Http\Message\RequestInterface;
  */
 class HttpClient extends Client
 {
+    private static $turnOffVerify = true;
+    private static $removeHost = false;
+
     public function __construct(array $config = [])
     {
         /**
@@ -19,16 +22,20 @@ class HttpClient extends Client
          * an error. Since URL Fetch will always verify SSL, we can safely
          * set verify to false.
          */
-        $config['verify'] = false;
+        if (self::$turnOffVerify) {
+            $config['verify'] = false;
+        }
 
         /**
          * Create a new handler stack to remove the Host header
          * (URL Fetch ignores this header and throws a warning)
          */
-        $stack = new HandlerStack();
-        $stack->setHandler(new StreamHandler());
-        $stack->push($this->removeHeader('Host'));
-        $config['handler'] = $stack;
+        if (self::$removeHost) {
+            $stack = new HandlerStack();
+            $stack->setHandler(new StreamHandler());
+            $stack->push($this->removeHeader('Host'));
+            $config['handler'] = $stack;
+        }
 
         parent::__construct($config);
     }
