@@ -150,7 +150,7 @@ class DefaultController extends AbstractController
     public function switchSiteAction($id, Application $app, Request $request)
     {
         if (!$app->isValidSite($id)) {
-            $app->addFlashError('Selected site doesn\'t exist in admin sites or doesn\'t has a mayolink associated with it. Please check admin site configurations.');
+            $app->addFlashError("Sorry, there is a problem with your site's configuration. Please contact your site administrator.");
             return $app['twig']->render('site-select.html.twig', ['siteEmail' => $id]);
         }
         if ($app->switchSite($id)) {
