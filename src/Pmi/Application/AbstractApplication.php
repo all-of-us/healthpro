@@ -353,7 +353,7 @@ abstract class AbstractApplication extends Application
                 syslog(LOG_INFO, substr($e->getTraceAsString(), 0, 5120)); // log the first 5KB of the stack trace
             }
 
-            // If in not in debug mode or error is < 500, render the error template
+            // If not in debug mode or error is < 500, render the error template
             if (isset($this['errorTemplate']) && (!$this['debug'] || $code < 500)) {
 
                 // display custom page if being denied due to IP whitelist
