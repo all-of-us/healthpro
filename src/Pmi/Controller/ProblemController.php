@@ -97,7 +97,7 @@ class ProblemController extends AbstractController
                         if ($request->request->has('reportable_finalize')) {
                             $app->addFlashNotice('Report finalized');
                             $problemService->sendProblemReportEmail($problemId);
-                        }else {
+                        } else {
                             $app->addFlashNotice('Report saved');
                         }                       
                     } else {
