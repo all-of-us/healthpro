@@ -169,7 +169,7 @@ class ProblemController extends AbstractController
                     $app->log(Log::PROBLEM_COMMENT_CREATE, $commentId);
                     $app->addFlashNotice('Comment saved');
                     $problemService = new ProblemService($app);
-                    $problemService->sendProblemReportEmail($problemId, 'comment');
+                    $problemService->sendProblemReportEmail($problemId);
                     return $app->redirectToRoute('participant', [
                         'id' => $participantId
                     ]);

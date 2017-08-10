@@ -15,20 +15,17 @@ class ProblemService
 
     protected function getDvAdminEmail()
     {
-        return $this->app->getConfig('gaDvAdminEmail');
+        return $this->app->getConfig('dvAdminEmail');
     }
 
-    public function sendProblemReportEmail($problemId, $type = 'report')
+    public function sendProblemReportEmail($problemId)
     {
         $email = $this->getDvAdminEmail();
         if (!empty($email)) {
             $message = new Message($this->app);
             $message
                 ->setTo($email)
-                ->render('problem', [
-                    'problemId' => $problemId,
-                    'type' => $type
-                ])
+                ->render('problem', [])
                 ->send();
             $this->app->log(Log::PROBLEM_NOTIFIY, [
                 'problemId' => $problemId,
