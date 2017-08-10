@@ -18,7 +18,7 @@
                             <option value="{{ site.email }}"{{ (siteEmail == site.email) ? ' selected' : ''}} >{{ site.name }}</option>
                         {% endfor %}
                         {% for awardee in app.user.awardees %}
-                            <option value="{{ awardee.email }}"{{ (app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>
+                            <option value="{{ awardee.email }}"{{ (siteEmail is not defined and app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
