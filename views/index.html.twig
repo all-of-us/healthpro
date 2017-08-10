@@ -17,7 +17,7 @@
                 <a href="{{ path('help_home') }}" class="btn btn-lg btn-default btn-block"><i class="fa fa-question-circle" aria-hidden="true"></i> Help and Training Resources</a>
             </div>
         {% endif %}
-        {% if path_exists('help_home') and is_granted('ROLE_AWARDEE')%}
+        {% if (is_granted('ROLE_USER') and app.session.get('site') and app.siteOrganization) or (is_granted('ROLE_AWARDEE') and app.session.get('awardee') and app.awardeeOrganization )  %}
             <div class="col-sm-6 col-md-4">
                 <a href="{{ path('workqueue_index') }}" class="btn btn-lg btn-default btn-block"><i class="fa fa-table" aria-hidden="true"></i> Work Queue</a>
             </div>
