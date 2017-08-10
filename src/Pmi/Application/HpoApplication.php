@@ -381,7 +381,7 @@ class HpoApplication extends AbstractApplication
         if (!$this->getSite() && !$this->getAwardee() && $this->isLoggedIn() && ($this['security.authorization_checker']->isGranted('ROLE_USER') || $this['security.authorization_checker']->isGranted('ROLE_AWARDEE')))
         {
             // auto-select since they only have one site
-            if (count($user->getSites()) === 1 && empty($user->getAwardees()) && $this->isAdminSite($user->getSites()[0]->email)) {
+            if (count($user->getSites()) === 1 && empty($user->getAwardees()) && $this->isValidSite($user->getSites()[0]->email)) {
                 $this->switchSite($user->getSites()[0]->email);
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
                 $this->switchSite($user->getAwardees()[0]->email);
@@ -414,15 +414,18 @@ class HpoApplication extends AbstractApplication
         }
     }
 
-    public function isAdminSite($email)
+    public function isValidSite($email)
     {
         $user = $this->getUser();
         if ($this->isProd() && $user && $user->belongsToSite($email)) {
             $site = $user->getSite($email);
-            $sites = $this['em']->getRepository('sites')->fetchBy([
-                'google_group' => $site->id
+            $sites = $this['em']->getRepository('sites')->fetchOneBy([
+                'google_group' => $site->id,
             ]);
-            if (empty($sites)) {
+            // check if the site exists and has a mayolink account number
+            if (!empty($sites) && !empty($sites['mayolink_account']) ) {
+                return true;
+            } else {
                 return false;
             }
         }
