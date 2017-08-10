@@ -45,7 +45,8 @@ class RdrHelper
             $endpoint = $this->endpoint;
         }
         return $googleClient->authorize(new HttpClient([
-            'base_uri' => $endpoint
+            'base_uri' => $endpoint,
+            'timeout' => 50
         ]));
     }
 
@@ -56,15 +57,18 @@ class RdrHelper
 
     public function logException(\Exception $e)
     {
-        syslog(LOG_CRIT, $e->getMessage());
         $this->lastError = $e->getMessage();
         if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+            syslog(LOG_CRIT, $e->getMessage());
             $response = $e->getResponse();
             $responseCode = $response->getStatusCode();
             $contents = $response->getBody()->getContents();
             syslog(LOG_INFO, "Response code: {$responseCode}");
             syslog(LOG_INFO, "Response body: {$contents}");
             $this->lastError = $contents;
+        } else {
+            // No response - request probably timed out
+            syslog(LOG_ERR, $e->getMessage());
         }
     }
 
