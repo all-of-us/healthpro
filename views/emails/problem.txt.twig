@@ -1,7 +1,8 @@
-{% if app.getConfig('login_url') %}
-	{% set url = app.getConfig('login_url')~path('problem_reports') %}
+{# Since we cannot rely on url method because of WAF use config loginUrl if exists to generate absolute url #}
+{% if loginUrl %}
+    {% set url = loginUrl~path('problem_reports') %}
 {% else %}
-	{% set url = url('problem_reports') %}
+    {% set url = url('problem_reports') %}
 {% endif %}
 
 Subject: [All of Us] Notice - New or Updated Unanticipated Problem
