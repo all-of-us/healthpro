@@ -25,7 +25,7 @@ class ProblemService
             $message = new Message($this->app);
             $message
                 ->setTo($email)
-                ->render('problem', [])
+                ->render('problem', ['loginUrl' => $this->app->getConfig('login_url')])
                 ->send();
             $this->app->log(Log::PROBLEM_NOTIFIY, [
                 'problemId' => $problemId,
