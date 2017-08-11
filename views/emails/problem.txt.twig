@@ -1,6 +1,12 @@
+{% if app.getConfig('login_url') %}
+	{% set url = app.getConfig('login_url')~path('problem_reports') %}
+{% else %}
+	{% set url = url('problem_reports') %}
+{% endif %}
+
 Subject: [All of Us] Notice - New or Updated Unanticipated Problem
 
-Hello, an unanticipated problem has been recorded or updated by staff in the All of Us Research Program. Please login to HealthPro and check the Unanticipated Problem Report page [{{ url('problem_reports') }}] immediately after receipt of this message to access additional details.
+Hello, an unanticipated problem has been recorded or updated by staff in the All of Us Research Program. Please login to HealthPro and check the Unanticipated Problem Report page [{{ url }}] immediately after receipt of this message to access additional details.
 
 Thank you.
 -The HealthPro Team
