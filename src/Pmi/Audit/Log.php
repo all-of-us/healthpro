@@ -33,6 +33,7 @@ class Log
     const PROBLEM_CREATE = 'PROBLEM_CREATE';
     const PROBLEM_EDIT = 'PROBLEM_EDIT';
     const PROBLEM_COMMENT_CREATE = 'PROBLEM_COMMENT_CREATE';
+    const PROBLEM_NOTIFIY = 'PROBLEM_NOTIFIY';
 
     public function __construct($app, $action, $data)
     {
