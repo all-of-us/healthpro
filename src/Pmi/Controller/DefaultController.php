@@ -149,6 +149,10 @@ class DefaultController extends AbstractController
     
     public function switchSiteAction($id, Application $app, Request $request)
     {
+        if (!$app->isValidSite($id)) {
+            $app->addFlashError("Sorry, there is a problem with your site's configuration. Please contact your site administrator.");
+            return $app['twig']->render('site-select.html.twig', ['siteEmail' => $id]);
+        }
         if ($app->switchSite($id)) {
             return $app->redirectToRoute('home');
         } else {
