@@ -3,11 +3,11 @@
 {% block body %}
     <div class="page-header">
         <h2>
-            <i class="fa fa-clipboard" aria-hidden="true"></i>
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
             {% if problem %}
                 {{ problem.created_ts|date('n/j/Y', app.userTimezone) }}
             {% else %}
-                New Report
+                New Unanticipated Problem
             {% endif %}
             <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
         </h2>
