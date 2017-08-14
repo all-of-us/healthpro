@@ -329,7 +329,7 @@ class DefaultController extends AbstractController
                 'label' => 'Time zone',
                 'choices' => array_flip($app::$timezoneOptions),
                 'placeholder' => '-- Select your time zone --',
-                'required' => true
+                'constraints' => new Constraints\NotBlank()
             ])
             ->getForm();
 
