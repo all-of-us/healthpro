@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
@@ -168,7 +169,10 @@ class DefaultController extends AbstractController
     public function participantsAction(Application $app, Request $request)
     {
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
-            ->add('participantId', TextType::class, ['label' => 'Participant ID'])
+            ->add('participantId', TextType::class, [
+                'label' => 'Participant ID',
+                'constraints' => new Constraints\NotBlank()
+            ])
             ->getForm();
 
         $idForm->handleRequest($request);
@@ -184,7 +188,7 @@ class DefaultController extends AbstractController
 
         $searchForm = $app['form.factory']->createNamedBuilder('search', FormType::class)
             ->add('lastName', TextType::class, [
-                'required' => true,
+                'constraints' => new Constraints\NotBlank(),
                 'attr' => [
                     'placeholder' => 'Doe'
                 ]
@@ -197,7 +201,7 @@ class DefaultController extends AbstractController
             ])
             ->add('dob', TextType::class, [
                 'label' => 'Date of birth',
-                'required' => true,
+                'constraints' => new Constraints\NotBlank(),
                 'attr' => [
                     'placeholder' => '11/1/1980'
                 ]
@@ -227,7 +231,11 @@ class DefaultController extends AbstractController
     public function ordersAction(Application $app, Request $request)
     {
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
-            ->add('mayoId', TextType::class, ['label' => 'Order ID', 'attr' => ['placeholder' => 'Scan barcode']])
+            ->add('mayoId', TextType::class, [
+                'label' => 'Order ID',
+                'attr' => ['placeholder' => 'Scan barcode'],
+                'constraints' => new Constraints\NotBlank()
+            ])
             ->getForm();
 
         $idForm->handleRequest($request);
