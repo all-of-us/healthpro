@@ -381,7 +381,7 @@ class HpoApplication extends AbstractApplication
         if (!$this->getSite() && !$this->getAwardee() && $this->isLoggedIn() && ($this['security.authorization_checker']->isGranted('ROLE_USER') || $this['security.authorization_checker']->isGranted('ROLE_AWARDEE')))
         {
             // auto-select since they only have one site
-            if (count($user->getSites()) === 1 && empty($user->getAwardees())) {
+            if (count($user->getSites()) === 1 && empty($user->getAwardees()) && $this->isValidSite($user->getSites()[0]->email)) {
                 $this->switchSite($user->getSites()[0]->email);
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
                 $this->switchSite($user->getAwardees()[0]->email);
@@ -389,6 +389,7 @@ class HpoApplication extends AbstractApplication
                     $request->attributes->get('_route') !== 'switchSite' &&
                     strpos($request->attributes->get('_route'), 'dashboard_') !== 0 &&
                     strpos($request->attributes->get('_route'), 'problem_') !== 0 &&
+                    strpos($request->attributes->get('_route'), 'admin_') !== 0 &&
                     !$this->isUpkeepRoute($request)) {
                 return $this->forwardToRoute('selectSite', $request);
             }
@@ -411,5 +412,23 @@ class HpoApplication extends AbstractApplication
                 $this['session']->set('isLoginReturn', false);
             }
         }
+    }
+
+    public function isValidSite($email)
+    {
+        $user = $this->getUser();
+        if ($this->isProd() && $user && $user->belongsToSite($email)) {
+            $site = $user->getSite($email);
+            $sites = $this['em']->getRepository('sites')->fetchOneBy([
+                'google_group' => $site->id,
+            ]);
+            // check if the site exists and has a mayolink account number
+            if (!empty($sites) && !empty($sites['mayolink_account']) ) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 }

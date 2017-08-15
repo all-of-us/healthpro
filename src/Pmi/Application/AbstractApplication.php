@@ -346,29 +346,25 @@ abstract class AbstractApplication extends Application
 
         // Set error callback using error template
         $this->error(function (Exception $e, $request, $code) {
-            // run application-specific error callback
-            if (method_exists($this, 'onErrorCallback')) {
-                $response = $this->onErrorCallback($e, $code);
-                if ($response) {
-                    return $response;
-                }
+
+            // syslog 500 errors
+            if ($code >= 500) {
+                syslog(LOG_CRIT, $e->getMessage());
+                syslog(LOG_INFO, substr($e->getTraceAsString(), 0, 5120)); // log the first 5KB of the stack trace
             }
-            
+
+            // If not in debug mode or error is < 500, render the error template
             if (isset($this['errorTemplate']) && (!$this['debug'] || $code < 500)) {
-                // so we have a way of viewing production exceptions
-                if ($code >= 500) {
-                    error_log($e);
-                }
-                
+
+                // display custom page if being denied due to IP whitelist
                 if ($e instanceof AccessDeniedHttpException && $code === 403) {
-                    // display custom page if being denied due to IP whitelist
                     $ips = $this->getIpWhitelist();
                     if (is_array($ips) && count($ips) > 0 && !IpUtils::checkIp($request->getClientIp(), $ips)) {
                         $this->log(Log::INVALID_IP);
                         return $this['twig']->render('error-ip.html.twig', ['code' => $code]);
                     }
                 }
-                
+
                 return $this['twig']->render($this['errorTemplate'], ['code' => $code]);
             } else {
                 return;

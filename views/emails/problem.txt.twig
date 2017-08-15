@@ -1,0 +1,13 @@
+Subject: [All of Us] Notice - New or Updated Unanticipated Problem
+
+{# Since we cannot rely on url method because of WAF use config loginUrl if exists to generate absolute url #}
+{% if loginUrl %}
+    {% set url = loginUrl~path('problem_reports') %}
+{% else %}
+    {% set url = url('problem_reports') %}
+{% endif %}
+
+Hello, an unanticipated problem has been recorded or updated by staff in the All of Us Research Program. Please login to HealthPro and check the Unanticipated Problem Report page [{{ url }}] immediately after receipt of this message to access additional details.
+
+Thank you.
+-The HealthPro Team
