@@ -100,7 +100,7 @@ class DefaultController extends AbstractController
     public function keepAliveAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('keepAlive', $request->get('csrf_token')))) {
-            return $app->abort(500);
+            return $app->abort(403);
         }
         
         $request->getSession()->set('pmiLastUsed', time());
@@ -126,7 +126,7 @@ class DefaultController extends AbstractController
     public function agreeUsageAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('agreeUsage', $request->get('csrf_token')))) {
-            return $app->abort(500);
+            return $app->abort(403);
         }
         
         $request->getSession()->set('isUsageAgreed', true);
@@ -354,7 +354,7 @@ class DefaultController extends AbstractController
     public function hideTZWarningAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('hideTZWarning', $request->get('csrf_token')))) {
-            return $app->abort(500);
+            return $app->abort(403);
         }
         
         $request->getSession()->set('hideTZWarning', true);
