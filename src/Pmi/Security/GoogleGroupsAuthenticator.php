@@ -3,6 +3,7 @@ namespace Pmi\Security;
 
 use Pmi\Application\AbstractApplication;
 use Pmi\Audit\Log;
+use Pmi\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -61,6 +62,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         } else {
             $client = new \Google_Client();
         }
+        $client->setHttpClient(new HttpClient());
         $client->setClientId($this->app->getConfig('auth_client_id'));
         $client->setClientSecret($this->app->getConfig('auth_client_secret'));
 
