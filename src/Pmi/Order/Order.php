@@ -598,4 +598,60 @@ class Order
             ]
         ];
     }
+
+    public function checkIdentifiers($notes)
+    {
+        $participant = $this->getParticipant();
+        $dob = $participant->dob;
+        $phone = $participant->phoneNumber;
+        $identifiers = [];
+        $identifiers['name'] = [
+            $participant->firstName.' '.$participant->lastName,
+            $participant->lastName.' '.$participant->firstName
+        ];
+        if ($dob) {
+            $identifiers['dob'] = [
+                $dob->format('m/d/y'),
+                $dob->format('m-d-y'),
+                $dob->format('m.d.y'),
+                $dob->format('m/d/Y'),
+                $dob->format('m-d-Y'),
+                $dob->format('m.d.Y'),
+                $dob->format('d/m/y'),
+                $dob->format('d-m-y'),
+                $dob->format('d.m.y'),
+                $dob->format('d/m/Y'),
+                $dob->format('d-m-Y'),
+                $dob->format('d.m.Y')
+            ];
+        }
+        if ($phone) {
+            $num1 = substr($phone, 1, 3);
+            $num2 = substr($phone, 6, 3);
+            $num3 = explode('-', $phone)[1];
+            $identifiers['phone'] = [
+                $phone,
+                $num1.'-'.$num2.'-'.$num3,
+                $num1.$num2.$num3,
+                '('.$num1.') '.$num2.'.'.$num3,
+                $num1.'.'.$num2.'.'.$num3
+            ];
+        }
+        $identifiers['address'] = $participant->streetAddress;
+        $identifiers['email'] = $participant->email;
+        foreach ($identifiers as $key => $identifier) {
+            if (is_array($identifier)) {
+                foreach ($identifier as $value) {
+                    if (stripos($notes, $value) !== false) {
+                        return $key;
+                    }
+                }
+            } else {
+                if (stripos($notes, $identifier) !== false) {
+                    return $key;
+                }
+            }
+        }
+        return false;
+    }
 }

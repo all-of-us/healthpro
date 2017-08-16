@@ -256,17 +256,21 @@ class OrderController extends AbstractController
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
         if ($collectForm->isValid() && !$order->get('finalized_ts')) {
-            $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
-            $updateArray['collected_user_id'] = $app->getUser()->getId();
-            $updateArray['collected_site'] = $app->getSiteId();
-            if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                $app->log(Log::ORDER_EDIT, $orderId);
-                $app->addFlashNotice('Order collection updated');
+            if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
+                $app->addFlashError('Identifier found in notes "'. $type.'"');
+            } else {
+                $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
+                $updateArray['collected_user_id'] = $app->getUser()->getId();
+                $updateArray['collected_site'] = $app->getSiteId();
+                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                    $app->log(Log::ORDER_EDIT, $orderId);
+                    $app->addFlashNotice('Order collection updated');
 
-                return $app->redirectToRoute('orderCollect', [
-                    'participantId' => $participantId,
-                    'orderId' => $orderId
-                ]);
+                    return $app->redirectToRoute('orderCollect', [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId
+                    ]);
+                }
             }
         }
         return $app['twig']->render('order-collect.html.twig', [
