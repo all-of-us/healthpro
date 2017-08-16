@@ -605,10 +605,11 @@ class Order
         $dob = $participant->dob;
         $phone = $participant->phoneNumber;
         $identifiers = [];
-        $identifiers['name'] = [
-            $participant->firstName.' '.$participant->lastName,
-            $participant->lastName.' '.$participant->firstName
-        ];
+        $fName = preg_quote($participant->firstName);
+        $lName = preg_quote($participant->lastName);
+        if (preg_match("/{$fName}[\s]*{$lName}/i", $notes) || preg_match("/{$lName}[\s]*{$fName}/i", $notes)) {
+            return 'name';
+        }
         if ($dob) {
             $identifiers['dob'] = [
                 $dob->format('m/d/y'),
