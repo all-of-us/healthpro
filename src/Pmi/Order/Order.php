@@ -610,14 +610,33 @@ class Order
     public function checkIdentifiers($notes)
     {
         $participant = $this->getParticipant();
-        $dob = $participant->dob;
-        $phone = $participant->phoneNumber;
-        $identifiers = [];
         $fName = preg_quote($participant->firstName);
         $lName = preg_quote($participant->lastName);
-        if (preg_match("/{$fName}[\s]*{$lName}/i", $notes) || preg_match("/{$lName}[\s]*{$fName}/i", $notes)) {
+
+        // Detect name
+        if (preg_match("/{$fName}[\s,-.]*{$lName}/i", $notes) || preg_match("/{$lName}[\s,-.]*{$fName}/i", $notes)) {
             return 'name';
         }
+
+        if ($participant->streetAddress) {
+            $address = preg_split('/[\s]/', $participant->streetAddress);
+            $pattern = '/';
+            foreach ($address as $value) {
+                if ($value == end($address)) {
+                    $pattern .= "{$value}/i";
+                } else {
+                    $pattern .= "{$value}[\s,-.]*";
+                }
+            }
+        }
+
+        // Detect address
+        if (preg_match($pattern, $notes)) {
+            return 'address';
+        }
+
+        $identifiers = [];
+        $dob = $participant->dob;
         if ($dob) {
             $identifiers['dob'] = [
                 $dob->format('m/d/y'),
@@ -634,6 +653,7 @@ class Order
                 $dob->format('d.m.Y')
             ];
         }
+        $phone = $participant->phoneNumber;
         if ($phone) {
             $num1 = substr($phone, 1, 3);
             $num2 = substr($phone, 6, 3);
@@ -646,8 +666,9 @@ class Order
                 $num1.'.'.$num2.'.'.$num3
             ];
         }
-        $identifiers['address'] = $participant->streetAddress;
         $identifiers['email'] = $participant->email;
+
+        // Detect dob, phone and email
         foreach ($identifiers as $key => $identifier) {
             if (is_array($identifier)) {
                 foreach ($identifier as $value) {
