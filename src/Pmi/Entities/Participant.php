@@ -142,4 +142,78 @@ class Participant
     {
         return true;
     }
+
+    public function checkIdentifiers($notes)
+    {
+        $identifiers = [];
+        $dob = $this->dob;
+        if ($dob) {
+            $identifiers['dob'] = [
+                $dob->format('m/d/y'),
+                $dob->format('m-d-y'),
+                $dob->format('m.d.y'),
+                $dob->format('m/d/Y'),
+                $dob->format('m-d-Y'),
+                $dob->format('m.d.Y'),
+                $dob->format('d/m/y'),
+                $dob->format('d-m-y'),
+                $dob->format('d.m.y'),
+                $dob->format('d/m/Y'),
+                $dob->format('d-m-Y'),
+                $dob->format('d.m.Y')
+            ];
+        }
+        $phone = $this->phoneNumber;
+        if ($phone) {
+            $num1 = substr($phone, 1, 3);
+            $num2 = substr($phone, 6, 3);
+            $num3 = explode('-', $phone)[1];
+            $identifiers['phone'] = [
+                $phone,
+                $num1.'-'.$num2.'-'.$num3,
+                $num1.$num2.$num3,
+                '('.$num1.') '.$num2.'.'.$num3,
+                $num1.'.'.$num2.'.'.$num3
+            ];
+        }
+        if ($this->email) {
+            $identifiers['email'] = [$this->email];
+        }
+
+        // Detect dob, phone and email
+        foreach ($identifiers as $key => $identifier) {
+            foreach ($identifier as $value) {
+                if (stripos($notes, $value) !== false) {
+                    return $key;
+                }
+            }
+        }
+
+        $fName = preg_quote($this->firstName);
+        $lName = preg_quote($this->lastName);
+
+        // Detect name
+        if (preg_match("/{$fName}[\s,-.]*{$lName}/i", $notes) || preg_match("/{$lName}[\s,-.]*{$fName}/i", $notes)) {
+            return 'name';
+        }
+
+        if ($this->streetAddress) {
+            $address = preg_split('/[\s]/', $this->streetAddress);
+            $pattern = '/';
+            foreach ($address as $key => $value) {
+                $value = preg_quote($value);
+                if ($key == count($address)-1) {
+                    $pattern .= "{$value}/i";
+                } else {
+                    $pattern .= "{$value}[\s,-.]*";
+                }
+            }
+        }
+
+        // Detect address
+        if (preg_match($pattern, $notes)) {
+            return 'address';
+        }
+        return false;
+    }
 }
