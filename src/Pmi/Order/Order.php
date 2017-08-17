@@ -69,6 +69,14 @@ class Order
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SAL'];
 
+    public static $identifierLabel = [
+        'name' => 'Name',
+        'dob' => 'DOB',
+        'phone' => 'Phone Number',
+        'address' => 'Address',
+        'email' => 'Email'
+    ];
+
     public function loadOrder($participantId, $orderId, Application $app)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);

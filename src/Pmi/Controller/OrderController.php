@@ -257,8 +257,11 @@ class OrderController extends AbstractController
         $collectForm->handleRequest($request);
         if ($collectForm->isValid() && !$order->get('finalized_ts')) {
             if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
-                $app->addFlashError('Identifier found in notes "'. $type.'"');
-            } else {
+                $label = Order::$identifierLabel[$type];
+                $collectForm['collected_notes']->addError(new FormError("Please remove participant \"$label\""));
+                $app->addFlashError("Identifier found participant \"$label\" in notes");
+            }
+            if ($collectForm->isValid()) {
                 $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
                 $updateArray['collected_user_id'] = $app->getUser()->getId();
                 $updateArray['collected_site'] = $app->getSiteId();
