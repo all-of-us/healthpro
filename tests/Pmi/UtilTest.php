@@ -29,4 +29,10 @@ class UtilTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(Util::versionIsAtLeast('1.1.2', '2.0.0'));
         $this->assertFalse(Util::versionIsAtLeast('1.1.2', '1.1.12'));
     }
+
+    // temporary test
+    public function testEnvironmentVariable()
+    {
+        $this->assertSame('true', getenv('CI'));
+    }
 }
