@@ -200,19 +200,13 @@ class Participant
         if ($this->streetAddress) {
             $address = preg_split('/[\s]/', $this->streetAddress);
             $pattern = '/';
-            foreach ($address as $key => $value) {
-                $value = preg_quote($value);
-                if ($key == count($address)-1) {
-                    $pattern .= "{$value}/i";
-                } else {
-                    $pattern .= "{$value}[\s,-.]*";
-                }
-            }
-        }
+            $pattern .= join('[\s,-.]*', $address);
+            $pattern .= '/i';
 
-        // Detect address
-        if (preg_match($pattern, $notes)) {
-            return 'address';
+            // Detect address
+            if (preg_match($pattern, $notes)) {
+                return 'address';
+            }
         }
         return false;
     }
