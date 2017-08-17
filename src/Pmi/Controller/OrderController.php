@@ -257,8 +257,8 @@ class OrderController extends AbstractController
         $collectForm->handleRequest($request);
         if ($collectForm->isValid() && !$order->get('finalized_ts')) {
             if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
-                $label = Order::$identifierLabel[$type];
-                $collectForm['collected_notes']->addError(new FormError("Please remove participant \"$label\""));
+                $label = Order::$identifierLabel[$type[0]];
+                $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 $app->addFlashError("Identifier detected");
             }
             if ($collectForm->isValid()) {
@@ -297,8 +297,8 @@ class OrderController extends AbstractController
         $processForm->handleRequest($request);
         if ($processForm->isValid() && !$order->get('finalized_ts')) {
             if ($type = $order->checkIdentifiers($processForm['processed_notes']->getData())) {
-                $label = Order::$identifierLabel[$type];
-                $processForm['processed_notes']->addError(new FormError("Please remove participant \"$label\""));
+                $label = Order::$identifierLabel[$type[0]];
+                $processForm['processed_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 $app->addFlashError("Identifier detected");
             }
             $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
@@ -347,8 +347,8 @@ class OrderController extends AbstractController
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isValid()) {
             if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
-                $label = Order::$identifierLabel[$type];
-                $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant \"$label\""));
+                $label = Order::$identifierLabel[$type[0]];
+                $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 $app->addFlashError("Identifier detected");
             }
             if ($order->get('type') === 'kit' &&

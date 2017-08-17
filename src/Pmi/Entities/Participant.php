@@ -184,28 +184,32 @@ class Participant
         foreach ($identifiers as $key => $identifier) {
             foreach ($identifier as $value) {
                 if (stripos($notes, $value) !== false) {
-                    return $key;
+                    return [$key, $value];
                 }
             }
         }
 
-        $fName = preg_quote($this->firstName);
-        $lName = preg_quote($this->lastName);
-
         // Detect name
-        if (preg_match("/{$fName}[\s,-.]*{$lName}/i", $notes) || preg_match("/{$lName}[\s,-.]*{$fName}/i", $notes)) {
-            return 'name';
+        if ($this->firstName && $this->lastName) {
+            $fName = preg_quote($this->firstName);
+            $lName = preg_quote($this->lastName);
+            if (preg_match("/{$fName}[\s,-.]*{$lName}/i", $notes, $matches) || preg_match("/{$lName}[\s,-.]*{$fName}/i", $notes)) {
+                return ['name', $lName.', '. $fName];
+            }
         }
 
         if ($this->streetAddress) {
             $address = preg_split('/[\s]/', $this->streetAddress);
+            $address = array_map(function($value){
+                return preg_quote($value);
+            }, $address);
             $pattern = '/';
             $pattern .= join('[\s,-.]*', $address);
             $pattern .= '/i';
 
             // Detect address
             if (preg_match($pattern, $notes)) {
-                return 'address';
+                return ['address', $this->streetAddress];
             }
         }
         return false;

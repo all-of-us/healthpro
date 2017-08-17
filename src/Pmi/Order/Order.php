@@ -70,11 +70,11 @@ class Order
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SAL'];
 
     public static $identifierLabel = [
-        'name' => 'Name',
-        'dob' => 'DOB',
-        'phone' => 'Phone Number',
-        'address' => 'Address',
-        'email' => 'Email'
+        'name' => 'name',
+        'dob' => 'dob',
+        'phone' => 'phone number',
+        'address' => 'street address',
+        'email' => 'email'
     ];
 
     public function loadOrder($participantId, $orderId, Application $app)
