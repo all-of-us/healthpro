@@ -296,6 +296,11 @@ class OrderController extends AbstractController
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
         if ($processForm->isValid() && !$order->get('finalized_ts')) {
+            if ($type = $order->checkIdentifiers($processForm['processed_notes']->getData())) {
+                $label = Order::$identifierLabel[$type];
+                $processForm['processed_notes']->addError(new FormError("Please remove participant \"$label\""));
+                $app->addFlashError("Identifier found participant \"$label\" in notes");
+            }
             $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
             foreach ($processForm->get('processed_samples')->getData() as $sample) {
                 if (empty($processedSampleTimes[$sample])) {
@@ -341,6 +346,11 @@ class OrderController extends AbstractController
         $finalizeForm = $order->createOrderForm('finalized', $app['form.factory']);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isValid()) {
+            if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
+                $label = Order::$identifierLabel[$type];
+                $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant \"$label\""));
+                $app->addFlashError("Identifier found participant \"$label\" in notes");
+            }
             if ($order->get('type') === 'kit' &&
                 !empty($finalizeForm['finalized_ts']->getData()) &&
                 empty($finalizeForm['fedex_tracking']->getData()))
