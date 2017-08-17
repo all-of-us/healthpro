@@ -8,6 +8,7 @@ use Pmi\Audit\Log;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
+use Pmi\Service\ProblemService;
 
 class ProblemController extends AbstractController
 {
@@ -62,6 +63,7 @@ class ProblemController extends AbstractController
         }
         if ($request->request->has('reportable_finalize')) {
             $this->constraint = true;
+            $problemService = new ProblemService($app);
         }
         $problemForm = $this->getProblemForm($app, $problem);
         $problemForm->handleRequest($request);
@@ -80,6 +82,7 @@ class ProblemController extends AbstractController
                         $app->log(Log::PROBLEM_EDIT, $problemId);
                         if ($request->request->has('reportable_finalize')) {
                             $app->addFlashNotice('Report finalized');
+                            $problemService->sendProblemReportEmail($problemId);
                         } else {
                             $app->addFlashNotice('Report updated');
                         }                       
@@ -93,7 +96,8 @@ class ProblemController extends AbstractController
                         $app->log(Log::PROBLEM_CREATE, $problemId); 
                         if ($request->request->has('reportable_finalize')) {
                             $app->addFlashNotice('Report finalized');
-                        }else {
+                            $problemService->sendProblemReportEmail($problemId);
+                        } else {
                             $app->addFlashNotice('Report saved');
                         }                       
                     } else {
@@ -164,6 +168,8 @@ class ProblemController extends AbstractController
                 if ($commentId = $app['em']->getRepository('problem_comments')->insert($problemCommentData)) {
                     $app->log(Log::PROBLEM_COMMENT_CREATE, $commentId);
                     $app->addFlashNotice('Comment saved');
+                    $problemService = new ProblemService($app);
+                    $problemService->sendProblemReportEmail($problemId);
                     return $app->redirectToRoute('participant', [
                         'id' => $participantId
                     ]);

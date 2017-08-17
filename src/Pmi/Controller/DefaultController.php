@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
@@ -99,7 +100,7 @@ class DefaultController extends AbstractController
     public function keepAliveAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('keepAlive', $request->get('csrf_token')))) {
-            return $app->abort(500);
+            return $app->abort(403);
         }
         
         $request->getSession()->set('pmiLastUsed', time());
@@ -125,7 +126,7 @@ class DefaultController extends AbstractController
     public function agreeUsageAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('agreeUsage', $request->get('csrf_token')))) {
-            return $app->abort(500);
+            return $app->abort(403);
         }
         
         $request->getSession()->set('isUsageAgreed', true);
@@ -149,6 +150,10 @@ class DefaultController extends AbstractController
     
     public function switchSiteAction($id, Application $app, Request $request)
     {
+        if (!$app->isValidSite($id)) {
+            $app->addFlashError("Sorry, there is a problem with your site's configuration. Please contact your site administrator.");
+            return $app['twig']->render('site-select.html.twig', ['siteEmail' => $id]);
+        }
         if ($app->switchSite($id)) {
             return $app->redirectToRoute('home');
         } else {
@@ -164,7 +169,10 @@ class DefaultController extends AbstractController
     public function participantsAction(Application $app, Request $request)
     {
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
-            ->add('participantId', TextType::class, ['label' => 'Participant ID'])
+            ->add('participantId', TextType::class, [
+                'label' => 'Participant ID',
+                'constraints' => new Constraints\NotBlank()
+            ])
             ->getForm();
 
         $idForm->handleRequest($request);
@@ -180,7 +188,7 @@ class DefaultController extends AbstractController
 
         $searchForm = $app['form.factory']->createNamedBuilder('search', FormType::class)
             ->add('lastName', TextType::class, [
-                'required' => true,
+                'constraints' => new Constraints\NotBlank(),
                 'attr' => [
                     'placeholder' => 'Doe'
                 ]
@@ -193,7 +201,7 @@ class DefaultController extends AbstractController
             ])
             ->add('dob', TextType::class, [
                 'label' => 'Date of birth',
-                'required' => true,
+                'constraints' => new Constraints\NotBlank(),
                 'attr' => [
                     'placeholder' => '11/1/1980'
                 ]
@@ -223,7 +231,11 @@ class DefaultController extends AbstractController
     public function ordersAction(Application $app, Request $request)
     {
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
-            ->add('mayoId', TextType::class, ['label' => 'Order ID', 'attr' => ['placeholder' => 'Scan barcode']])
+            ->add('mayoId', TextType::class, [
+                'label' => 'Order ID',
+                'attr' => ['placeholder' => 'Scan barcode'],
+                'constraints' => new Constraints\NotBlank()
+            ])
             ->getForm();
 
         $idForm->handleRequest($request);
@@ -317,7 +329,7 @@ class DefaultController extends AbstractController
                 'label' => 'Time zone',
                 'choices' => array_flip($app::$timezoneOptions),
                 'placeholder' => '-- Select your time zone --',
-                'required' => true
+                'constraints' => new Constraints\NotBlank()
             ])
             ->getForm();
 
@@ -342,7 +354,7 @@ class DefaultController extends AbstractController
     public function hideTZWarningAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('hideTZWarning', $request->get('csrf_token')))) {
-            return $app->abort(500);
+            return $app->abort(403);
         }
         
         $request->getSession()->set('hideTZWarning', true);

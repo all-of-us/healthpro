@@ -1,0 +1,12 @@
+--- php_cli.py	2017-07-06 12:41:38.000000000 -0500
++++ php_cli_new.py	2017-08-17 14:56:39.000000000 -0500
+@@ -229,6 +229,9 @@
+              APPLICATION_ROOT=os.path.dirname(php_script))
+   if 'SYSTEMROOT' in os.environ:
+     env['SYSTEMROOT'] = os.environ['SYSTEMROOT']
++  for key, value in os.environ.iteritems():
++    if key == 'CI' or key.startswith('CI_'):
++      env[key] = value
+ 
+   php_process = subprocess.Popen(php_args, env=env)
+   script_return = php_process.wait()

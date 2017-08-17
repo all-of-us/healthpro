@@ -2,6 +2,7 @@
 namespace Pmi\Order\Mayolink;
 
 use Silex\Application;
+use Pmi\HttpClient;
 
 class MayolinkOrder
 {
@@ -53,7 +54,7 @@ class MayolinkOrder
 
     public function __construct(Application $app)
     {
-        $this->client = new \GuzzleHttp\Client(['cookies' => true]);
+        $this->client = new HttpClient(['cookies' => true]);
         $configurationMapping = [
             'ordersEndpoint' => 'ml_orders_endpoint',
             'authEndpoint' => 'ml_auth_endpoint',
