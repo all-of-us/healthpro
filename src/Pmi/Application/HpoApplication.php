@@ -431,4 +431,9 @@ class HpoApplication extends AbstractApplication
         }
         return true;
     }
+
+    public function getReportKitUrl()
+    {
+        return $this->getConfig('reportKitUrl');
+    }
 }

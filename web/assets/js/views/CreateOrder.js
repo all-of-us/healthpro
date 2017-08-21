@@ -45,6 +45,18 @@ $(document).ready(function() {
     if ($("#createOrder").length > 0) {
         new CreateOrder({el: $("#createOrder") });
     }
+    $('button.reportKit').click(function() {
+        var location = $(this).data('href');
+        new PmiConfirmModal({
+            title: 'Attention',
+            msg: 'You are leaving the DRC HealthPro web application and accessing a non-FISMA destination. *Entering of participant information is prohibited at the destination.*This external link provides additional information that is consistent with the intended purpose of HealthPro. DRC cannot attest to the accuracy of a non-DRC site. <br/><br/> Linking to a non-DRC site does not constitute endorsement by DRC or any of its employees of the sponsors or information and products presented on the site. You will be subject to the destination site\'s privacy policy when you follow the link.',
+            isHTML: true,
+            onTrue: function() {
+                window.open(location, '_blank');
+            },
+            btnTextTrue: 'Continue'
+        });
+    });
 });
 
 })(jQuery); // END wrapper
