@@ -183,33 +183,33 @@ class Participant
         // Detect dob, phone and email
         foreach ($identifiers as $key => $identifier) {
             foreach ($identifier as $value) {
-                if (stripos($notes, $value) !== false) {
-                    return [$key, $value];
+                if (preg_match('/(?:\W|^)' . preg_quote($value, '/') . '(?:\W|$)/i', $notes, $matches)) {
+                    return [$key, $matches[0]];
                 }
             }
         }
 
         // Detect name
         if ($this->firstName && $this->lastName) {
-            $fName = preg_quote($this->firstName);
-            $lName = preg_quote($this->lastName);
-            if (preg_match("/{$fName}[\s,-.]*{$lName}/i", $notes, $matches) || preg_match("/{$lName}[\s,-.]*{$fName}/i", $notes)) {
-                return ['name', $lName.', '. $fName];
+            $fName = preg_quote($this->firstName, '/');
+            $lName = preg_quote($this->lastName, '/');
+            if (preg_match("/(?:\W|^)({$fName}\W*{$lName}|{$lName}\W*{$fName})(?:\W|$)/i", $notes, $matches)) {
+                return ['name', $matches[1]];
             }
         }
 
         if ($this->streetAddress) {
             $address = preg_split('/[\s]/', $this->streetAddress);
             $address = array_map(function($value){
-                return preg_quote($value);
+                return preg_quote($value, '/');
             }, $address);
             $pattern = '/';
             $pattern .= join('[\s,-.]*', $address);
             $pattern .= '/i';
 
             // Detect address
-            if (preg_match($pattern, $notes)) {
-                return ['address', $this->streetAddress];
+            if (preg_match($pattern, $notes, $matches)) {
+                return ['address', $matches[0]];
             }
         }
         return false;
