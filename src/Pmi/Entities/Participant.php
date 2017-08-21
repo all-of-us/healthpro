@@ -163,28 +163,15 @@ class Participant
                 $dob->format('d.m.Y')
             ];
         }
-        $phone = $this->phoneNumber;
-        if ($phone) {
-            $num1 = substr($phone, 1, 3);
-            $num2 = substr($phone, 6, 3);
-            $num3 = explode('-', $phone)[1];
-            $identifiers['phone'] = [
-                $phone,
-                $num1.'-'.$num2.'-'.$num3,
-                $num1.$num2.$num3,
-                '('.$num1.') '.$num2.'.'.$num3,
-                $num1.'.'.$num2.'.'.$num3
-            ];
-        }
         if ($this->email) {
             $identifiers['email'] = [$this->email];
         }
 
-        // Detect dob, phone and email
+        // Detect dob and email
         foreach ($identifiers as $key => $identifier) {
             foreach ($identifier as $value) {
-                if (preg_match('/(?:\W|^)' . preg_quote($value, '/') . '(?:\W|$)/i', $notes, $matches)) {
-                    return [$key, $matches[0]];
+                if (stripos($notes, $value) !== false) {
+                    return [$key, $value];
                 }
             }
         }
@@ -198,18 +185,32 @@ class Participant
             }
         }
 
+        // Detect address
         if ($this->streetAddress) {
             $address = preg_split('/[\s]/', $this->streetAddress);
             $address = array_map(function($value){
                 return preg_quote($value, '/');
             }, $address);
-            $pattern = '/';
-            $pattern .= join('[\s,-.]*', $address);
-            $pattern .= '/i';
+            $pattern = '/(?:\W|^)';
+            $pattern .= join('\W*', $address);
+            $pattern .= '(?:\W|$)/i';
 
-            // Detect address
             if (preg_match($pattern, $notes, $matches)) {
                 return ['address', $matches[0]];
+            }
+        }
+
+        // Detect phone number
+        $phone = preg_replace('/\D/', '', $this->phoneNumber);
+        if ($phone) {
+            $identifiers['phone'] = [$phone];
+            if (strlen($phone) === 10) {
+                $num1 = preg_quote(substr($phone, 0, 3));
+                $num2 = preg_quote(substr($phone, 3, 3));
+                $num3 = preg_quote(substr($phone, 6));
+            }
+            if (preg_match("/(\W*{$num1}\W*{$num2}\W*{$num3})/i", $notes, $matches)) {
+                return ['phone', $matches[1]];
             }
         }
         return false;
