@@ -71,10 +71,10 @@ class Order
 
     public static $identifierLabel = [
         'name' => 'name',
-        'dob' => 'dob',
+        'dob' => 'date of birth',
         'phone' => 'phone number',
         'address' => 'street address',
-        'email' => 'email'
+        'email' => 'email address'
     ];
 
     public function loadOrder($participantId, $orderId, Application $app)

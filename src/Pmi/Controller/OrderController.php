@@ -259,7 +259,7 @@ class OrderController extends AbstractController
             if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
-                $app->addFlashError("Identifier detected");
+                $app->addFlashError("Participant identifying information detected in notes field");
             }
             if ($collectForm->isValid()) {
                 $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
@@ -299,7 +299,7 @@ class OrderController extends AbstractController
             if ($type = $order->checkIdentifiers($processForm['processed_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $processForm['processed_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
-                $app->addFlashError("Identifier detected");
+                $app->addFlashError("Participant identifying information detected in notes field");
             }
             $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
             foreach ($processForm->get('processed_samples')->getData() as $sample) {
@@ -349,7 +349,7 @@ class OrderController extends AbstractController
             if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
-                $app->addFlashError("Identifier detected");
+                $app->addFlashError("Participant identifying information detected in notes field");
             }
             if ($order->get('type') === 'kit' &&
                 !empty($finalizeForm['finalized_ts']->getData()) &&
