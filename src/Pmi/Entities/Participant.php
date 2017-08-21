@@ -160,7 +160,19 @@ class Participant
                 $dob->format('d.m.y'),
                 $dob->format('d/m/Y'),
                 $dob->format('d-m-Y'),
-                $dob->format('d.m.Y')
+                $dob->format('d.m.Y'),
+                $dob->format('n/j/y'),
+                $dob->format('n-j-y'),
+                $dob->format('n.j.y'),
+                $dob->format('n/j/Y'),
+                $dob->format('n-j-Y'),
+                $dob->format('n.j.Y'),
+                $dob->format('j/n/y'),
+                $dob->format('j-n-y'),
+                $dob->format('j.n.y'),
+                $dob->format('j/n/Y'),
+                $dob->format('j-n-Y'),
+                $dob->format('j.n.Y')
             ];
         }
         if ($this->email) {

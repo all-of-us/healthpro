@@ -23,7 +23,8 @@ class OrderNotesIdentifierTest extends \PHPUnit_Framework_TestCase
             'Doe   John',
             'john doe',
             "john\ndoe",
-            "john \n doe"
+            "john \n doe",
+            "JohnDoe"
         ];
         $stringsWithoutIdentifiers = [
             'John',
@@ -59,25 +60,37 @@ class OrderNotesIdentifierTest extends \PHPUnit_Framework_TestCase
     public function testDob()
     {
         $participant = new Participant((object)[
-            'dateOfBirth' => '1970-05-20'
+            'dateOfBirth' => '1970-05-02'
         ]);
 
         $stringsWithIdentifiers = [
-            '05.20.70',
-            '05-20-70',
-            '05.20.70',
-            '05/20/1970',
-            '05-20-1970',
-            '05.20.1970',
-            '20/05/70',
-            '20-05-70',
-            '20.05.70',
-            '20/05/1970',
-            '20-05-1970',
-            '20.05.1970'
+            '05.02.70',
+            '05-02-70',
+            '05.02.70',
+            '05/02/1970',
+            '05-02-1970',
+            '05.02.1970',
+            '02/05/70',
+            '02-05-70',
+            '02.05.70',
+            '02/05/1970',
+            '02-05-1970',
+            '02.05.1970',
+            '5.2.70',
+            '5-2-70',
+            '5.2.70',
+            '5/2/1970',
+            '5-2-1970',
+            '5.2.1970',
+            '2/5/70',
+            '2-5-70',
+            '2.5.70',
+            '2/5/1970',
+            '2-5-1970',
+            '2.5.1970'
         ];
         $stringsWithoutIdentifiers = [
-            '06/20/1970'
+            '06/02/1970'
         ];
 
         foreach ($stringsWithIdentifiers as $string) {
