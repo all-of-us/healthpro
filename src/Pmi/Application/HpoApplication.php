@@ -137,6 +137,18 @@ class HpoApplication extends AbstractApplication
             }
         }
 
+        // circle ci db configurations
+        $circleConfigFile = $appDir . '/ci/config.yml';
+        if (getenv('CI') && $this['isUnitTest'] && file_exists($circleConfigFile)) {
+            $yaml = new \Symfony\Component\Yaml\Parser();
+            $configs = $yaml->parse(file_get_contents($circleConfigFile));
+            if (is_array($configs) || count($configs) > 0) {
+                foreach ($configs as $key => $val) {
+                    $this->configuration[$key] = $val;
+                }
+            }            
+        }
+
         // unit tests don't have access to Datastore
         if (!$this['isUnitTest']) {
             $configs = Configuration::fetchBy([]);

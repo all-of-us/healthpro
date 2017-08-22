@@ -1,7 +1,7 @@
 <?php
 namespace Pmi\Controller;
 
-use GuzzleHttp\Client;
+use Pmi\HttpClient;
 use Silex\Application;
 
 class HelpController extends AbstractController
@@ -160,7 +160,7 @@ class HelpController extends AbstractController
         }
         $url = $this->getStoragePath($app) . '/' . rawurlencode($document['filename']);
         try {
-            $client = new Client();
+            $client = new HttpClient();
             $response = $client->get($url, ['stream' => true]);
             $responseBody = $response->getBody();
             $stream = function () use ($responseBody) {

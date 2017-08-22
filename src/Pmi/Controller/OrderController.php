@@ -256,17 +256,24 @@ class OrderController extends AbstractController
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
         if ($collectForm->isValid() && !$order->get('finalized_ts')) {
-            $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
-            $updateArray['collected_user_id'] = $app->getUser()->getId();
-            $updateArray['collected_site'] = $app->getSiteId();
-            if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                $app->log(Log::ORDER_EDIT, $orderId);
-                $app->addFlashNotice('Order collection updated');
+            if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
+                $label = Order::$identifierLabel[$type[0]];
+                $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+                $app->addFlashError("Participant identifying information detected in notes field");
+            }
+            if ($collectForm->isValid()) {
+                $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
+                $updateArray['collected_user_id'] = $app->getUser()->getId();
+                $updateArray['collected_site'] = $app->getSiteId();
+                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                    $app->log(Log::ORDER_EDIT, $orderId);
+                    $app->addFlashNotice('Order collection updated');
 
-                return $app->redirectToRoute('orderCollect', [
-                    'participantId' => $participantId,
-                    'orderId' => $orderId
-                ]);
+                    return $app->redirectToRoute('orderCollect', [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId
+                    ]);
+                }
             }
         }
         return $app['twig']->render('order-collect.html.twig', [
@@ -289,6 +296,11 @@ class OrderController extends AbstractController
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
         if ($processForm->isValid() && !$order->get('finalized_ts')) {
+            if ($type = $order->checkIdentifiers($processForm['processed_notes']->getData())) {
+                $label = Order::$identifierLabel[$type[0]];
+                $processForm['processed_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+                $app->addFlashError("Participant identifying information detected in notes field");
+            }
             $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
             foreach ($processForm->get('processed_samples')->getData() as $sample) {
                 if (empty($processedSampleTimes[$sample])) {
@@ -334,6 +346,11 @@ class OrderController extends AbstractController
         $finalizeForm = $order->createOrderForm('finalized', $app['form.factory']);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isValid()) {
+            if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
+                $label = Order::$identifierLabel[$type[0]];
+                $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+                $app->addFlashError("Participant identifying information detected in notes field");
+            }
             if ($order->get('type') === 'kit' &&
                 !empty($finalizeForm['finalized_ts']->getData()) &&
                 empty($finalizeForm['fedex_tracking']->getData()))

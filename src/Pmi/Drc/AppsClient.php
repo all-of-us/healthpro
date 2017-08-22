@@ -2,6 +2,7 @@
 namespace Pmi\Drc;
 
 use Pmi\Application\HpoApplication;
+use Pmi\HttpClient;
 
 /**
  * Used to access data from Google Apps.
@@ -31,6 +32,7 @@ class AppsClient
     {
         $this->domain = $domain;
         $this->client = new \Google_Client();
+        $this->client->setHttpClient(new HttpClient());
         $this->client->setApplicationName($appName);
         $this->client->setAuthConfig(json_decode($authJson, true));
         $this->client->setSubject($adminEmail);
