@@ -5,8 +5,8 @@
 </h2>
 <p class="lead">
     Order ID: <strong>{{ order.order_id }}</strong>
-    {% if order.type == 'kit' %}
-        <button type="button" data-href="{{ app.getReportKitUrl() }}" class="btn btn-danger pull-right reportKit">Report Kit Problem</button>
+    {% if app.isDVType and app.reportKitUrl and order.type == 'kit' %}
+        <button type="button" data-href="{{ app.reportKitUrl }}" class="btn btn-danger pull-right reportKit">Report Kit Problem</button>
     {% endif %}
 </p>
 
