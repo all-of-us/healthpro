@@ -270,7 +270,7 @@ $(document).ready(function()
         });
     });
 
-    $('button.reportKit').click(function() {
+    $('.reportKit').click(function() {
         var location = $(this).data('href');
         var msg = 'You are leaving the DRC HealthPro web application and accessing a non-FISMA destination.';
         msg += '<ul>';
