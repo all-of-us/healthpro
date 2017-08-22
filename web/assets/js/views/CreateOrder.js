@@ -47,9 +47,15 @@ $(document).ready(function() {
     }
     $('button.reportKit').click(function() {
         var location = $(this).data('href');
+        var msg = 'You are leaving the DRC HealthPro web application and accessing a non-FISMA destination.';
+        msg += '<ul>';
+        msg += '<li>Entering of participant information is prohibited at the destination.</li>';
+        msg += '<li>This external link provides additional information that is consistent with the intended purpose of HealthPro. DRC cannot attest to the accuracy of a non-DRC site.</li>';
+        msg += '</ul>';
+        msg += 'Linking to a non-DRC site does not constitute endorsement by DRC or any of its employees of the sponsors or information and products presented on the site. You will be subject to the destination site\'s privacy policy when you follow the link.'
         new PmiConfirmModal({
             title: 'Attention',
-            msg: 'You are leaving the DRC HealthPro web application and accessing a non-FISMA destination. *Entering of participant information is prohibited at the destination.*This external link provides additional information that is consistent with the intended purpose of HealthPro. DRC cannot attest to the accuracy of a non-DRC site. <br/><br/> Linking to a non-DRC site does not constitute endorsement by DRC or any of its employees of the sponsors or information and products presented on the site. You will be subject to the destination site\'s privacy policy when you follow the link.',
+            msg: msg,
             isHTML: true,
             onTrue: function() {
                 window.open(location, '_blank');
