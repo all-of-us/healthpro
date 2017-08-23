@@ -29,7 +29,8 @@ class WorkQueueController extends AbstractController
             'label' => 'EHR Consent Status',
             'options' => [
                 'Consented' => 'SUBMITTED',
-                'Not consented' => 'UNSET'
+                'Refused consent' => 'SUBMITTED_NO_CONSENT',
+                'Consent not completed' => 'UNSET'
             ]
         ],
         'ageRange' => [
