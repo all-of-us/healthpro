@@ -37,6 +37,9 @@
                     {% if is_granted('ROLE_DV_ADMIN') %}
                         <li><a href="{{ path('problem_reports') }}">Problem Reports</a></li>
                     {% endif %}
+                    {% if is_granted('ROLE_USER') and app.session.get('site') and app.isDvType and app.reportKitUrl %}
+                        <li><a data-href="{{ app.reportKitUrl }}" class="external-link">Report Kit Problem</a></li>
+                    {% endif %}
                     {% if is_granted('ROLE_ADMIN') %}
                         <li><a href="{{ path('admin_home') }}">Admin</a></li>
                     {% endif %}
