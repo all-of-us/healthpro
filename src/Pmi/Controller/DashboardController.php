@@ -38,7 +38,7 @@ class DashboardController extends AbstractController
     public function metrics_loadAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
-            return $app->abort(500);
+            return $app->abort(403);
         }
 
         // get request attributes
@@ -201,7 +201,7 @@ class DashboardController extends AbstractController
     public function metrics_load_regionAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
-            return $app->abort(500);
+            return $app->abort(403);
         }
 
         // get request attributes
@@ -457,7 +457,7 @@ class DashboardController extends AbstractController
     public function metrics_load_lifecycleAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
-            return $app->abort(500);
+            return $app->abort(403);
         }
 
         // get request attributes

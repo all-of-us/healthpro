@@ -1,0 +1,5 @@
+# MySQL connection
+mysql_schema: circle_test
+mysql_user: ubuntu
+mysql_password: 
+mysql_host: 127.0.0.1

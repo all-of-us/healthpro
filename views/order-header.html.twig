@@ -3,7 +3,12 @@
     {{ order.created_ts|date('n/j/Y', app.userTimezone) }}
     <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
 </h2>
-<p class="lead">Order ID: <strong>{{ order.order_id }}</strong></p>
+<p class="lead">
+    Order ID: <strong>{{ order.order_id }}</strong>
+    {% if app.isDVType and app.reportKitUrl and order.type == 'kit' %}
+        <button type="button" data-href="{{ app.reportKitUrl }}" class="btn btn-danger pull-right external-link">Report Kit Problem</button>
+    {% endif %}
+</p>
 
 <dl class="dl-horizontal">
     <dt>Name</dt>
