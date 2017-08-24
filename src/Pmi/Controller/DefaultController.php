@@ -270,7 +270,11 @@ class DefaultController extends AbstractController
 
     public function participantAction($id, Application $app, Request $request)
     {
-        $participant = $app['pmi.drc.participants']->getById($id);
+        $refresh = null;
+        if ($request->query->has('refresh')) {
+            $refresh = $request->query->get('refresh');
+        }
+        $participant = $app['pmi.drc.participants']->getById($id, $refresh);
         if (!$participant) {
             $app->abort(404);
         }
@@ -311,13 +315,17 @@ class DefaultController extends AbstractController
         );
         $query = "SELECT p.id, p.updated_ts, p.finalized_ts, MAX(pc.created_ts) as last_comment_ts, count(pc.comment) as comment_count FROM problems p LEFT JOIN problem_comments pc on p.id = pc.problem_id WHERE p.participant_id = ? GROUP BY p.id ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC";
         $problems = $app['db']->fetchAll($query, [$id]);
+        if (empty($participant->cacheTime)) {
+            $participant->cacheTime = new \DateTime();
+        }
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
             'evaluations' => $evaluations,
             'problems' => $problems,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
-            'agreeForm' => $agreeForm->createView()
+            'agreeForm' => $agreeForm->createView(),
+            'cacheEnabled' => $app['pmi.drc.participants']->cacheEnabled
         ]);
     }
 

@@ -8,7 +8,7 @@ class RdrParticipants
 {
     protected $rdrHelper;
     protected $client;
-    protected $cacheEnabled = true;
+    public $cacheEnabled = true;
     protected static $resourceEndpoint = 'rdr/v1/';
 
     public function __construct(RdrHelper $rdrHelper)
@@ -109,18 +109,19 @@ class RdrParticipants
         return $responseObject->entry;
     }
 
-    public function getById($id)
+    public function getById($id, $refresh = null)
     {
         if ($this->cacheEnabled) {
             $memcache = new \Memcache();
             $memcacheKey = 'rdr_participant_' . $id;
-            $participant = $memcache->get($memcacheKey);
+            $participant = $refresh != 1 ? $memcache->get($memcacheKey) : null;
         }
         if (!$this->cacheEnabled || !$participant) {
             try {
                 $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
                 $participant = json_decode($response->getBody()->getContents());
                 if ($this->cacheEnabled) {
+                    $participant->cacheTime = new \DateTime();
                     $memcache->set($memcacheKey, $participant, 0, 300);
                 }
             } catch (\GuzzleHttp\Exception\ClientException $e) {

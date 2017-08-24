@@ -44,6 +44,12 @@
         <div class="col-sm-6 text-center">
             <svg id="participant-barcode"></svg>
         </div>
+        {% if cacheEnabled %}
+            <div class="pull-right">
+                <small>Last Updated: {{ participant.cacheTime ? participant.cacheTime|date('n/j/Y g:ia', app.userTimezone) }}</small>
+                <a href="{{ path('participant', { id: participant.id, refresh: 1 }) }}" class="btn btn-primary btn-xs">Refresh</a>
+            </div>
+        {% endif %}
     </div>
     {% if participant.status %}
         <div id="participant-consent-status">

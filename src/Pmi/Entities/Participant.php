@@ -10,11 +10,17 @@ class Participant
     public $status = true;
     public $statusReason;
     public $id;
+    public $gender;
+    public $dob;
     protected $rdrData;
 
     public function __construct($rdrParticipant = null)
     {
         if (is_object($rdrParticipant)) {
+            if (!empty($rdrParticipant->cacheTime)) {
+                $this->cacheTime = $rdrParticipant->cacheTime;
+                unset($rdrParticipant->cacheTime);
+            }
             $this->rdrData = $rdrParticipant;
             $this->parseRdrParticipant($rdrParticipant);
         }
