@@ -49,8 +49,8 @@
         <div class="row">
             <div class="col-sm-12 text-center">
                 <small>
-                    Last Updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.userTimezone) }}
-                    <a href="{{ path('participant', { id: participant.id, refresh: 1 }) }}">Refresh</a>
+                    Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.userTimezone) }}
+                    <a href="{{ path('participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px"><i class="fa fa-refresh" aria-hidden="true"></i> refresh</a>
                 </small>
             </div>
         </div>
