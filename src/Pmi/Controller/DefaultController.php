@@ -270,11 +270,13 @@ class DefaultController extends AbstractController
 
     public function participantAction($id, Application $app, Request $request)
     {
-        $refresh = null;
-        if ($request->query->has('refresh')) {
-            $refresh = $request->query->get('refresh');
-        }
+        $refresh = $request->query->get('refresh');
         $participant = $app['pmi.drc.participants']->getById($id, $refresh);
+        if ($refresh) {
+            return $app->redirectToRoute('participant', [
+                'id' => $id
+            ]);           
+        }
         if (!$participant) {
             $app->abort(404);
         }
@@ -325,7 +327,7 @@ class DefaultController extends AbstractController
             'problems' => $problems,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
-            'cacheEnabled' => $app['pmi.drc.participants']->cacheEnabled
+            'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled()
         ]);
     }
 

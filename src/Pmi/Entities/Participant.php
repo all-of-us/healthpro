@@ -12,6 +12,7 @@ class Participant
     public $id;
     public $gender;
     public $dob;
+    public $cacheTime;
     protected $rdrData;
 
     public function __construct($rdrParticipant = null)

@@ -8,7 +8,7 @@ class RdrParticipants
 {
     protected $rdrHelper;
     protected $client;
-    public $cacheEnabled = true;
+    protected $cacheEnabled = true;
     protected static $resourceEndpoint = 'rdr/v1/';
 
     public function __construct(RdrHelper $rdrHelper)
@@ -236,5 +236,10 @@ class RdrParticipants
     public function getLastError()
     {
         return $this->rdrHelper->getLastError();
+    }
+
+    public function getCacheEnabled()
+    {
+        return $this->cacheEnabled;
     }
 }
