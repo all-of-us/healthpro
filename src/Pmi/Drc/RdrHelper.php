@@ -9,6 +9,7 @@ class RdrHelper
     protected $endpoint = 'https://pmi-drc-api-test.appspot.com/';
     protected $options = [];
     protected $cacheEnabled = true;
+    protected $cacheTime = 300;
     protected $lastError;
 
     public function __construct(array $options)
@@ -19,6 +20,9 @@ class RdrHelper
             }
             if (!empty($options['disable_cache']) && $options['disable_cache']) {
                 $this->cacheEnabled = false;
+            }
+            if (!empty($options['cache_time'])) {
+                $this->cacheTime  = $options['cache_time'];
             }
             $this->options = $options;
         }
@@ -53,6 +57,11 @@ class RdrHelper
     public function isCacheEnabled()
     {
         return $this->cacheEnabled;
+    }
+
+    public function getCacheTime()
+    {
+        return $this->cacheTime;
     }
 
     public function logException(\Exception $e)

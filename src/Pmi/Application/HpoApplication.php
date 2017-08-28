@@ -33,6 +33,9 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('rdr_disable_cache')) {
             $rdrOptions['disable_cache'] = true;
         }
+        if ($this->getConfig('cache_time')) {
+            $rdrOptions['cache_time'] = $this->getConfig('cache_time');
+        }
 
         $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
         if ($this->participantSource == 'mock') {

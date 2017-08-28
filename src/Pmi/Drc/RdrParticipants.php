@@ -15,6 +15,7 @@ class RdrParticipants
     {
         $this->rdrHelper = $rdrHelper;
         $this->cacheEnabled = $rdrHelper->isCacheEnabled();
+        $this->cacheTime = $rdrHelper->getCacheTime();
     }
 
     protected function getClient()
@@ -122,7 +123,7 @@ class RdrParticipants
                 $participant = json_decode($response->getBody()->getContents());
                 if ($this->cacheEnabled) {
                     $participant->cacheTime = new \DateTime();
-                    $memcache->set($memcacheKey, $participant, 0, 300);
+                    $memcache->set($memcacheKey, $participant, 0, $this->cacheTime);
                 }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
