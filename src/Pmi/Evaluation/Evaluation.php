@@ -341,18 +341,18 @@ class Evaluation
     {
         $inches = self::cmToIn($cm);
         $feet = floor($inches / 12);
-        $inches = $inches % 12;
+        $inches = round(fmod($inches, 12));
         return "$feet ft $inches in";
     }
 
     protected static function cmToIn($cm)
     {
-        return $cm * 0.3937;
+        return round($cm * 0.3937, 1);
     }
 
     protected static function kgToLb($kg)
     {
-        return $kg * 2.2046;
+        return round($kg * 2.2046, 1);
     }
 
     protected function calculateMean($field)
