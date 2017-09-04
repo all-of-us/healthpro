@@ -6,8 +6,11 @@
 
 Prerequisites:
 
-* [Google App Engine SDK for PHP](https://cloud.google.com/appengine/docs/standard/php/download)  
-**Important** - Download the App Engine SDK by clicking on the "Or, you can download the original App Engine SDK for PHP" link
+* [Google Cloud and App Engine SDK](https://cloud.google.com/appengine/docs/standard/php/download)
+    1. Download Google Cloud SDK
+    2. Run `install.sh` so that `gcloud` is available from path
+    3. Run `gcloud init`
+    4. Run `gcloud components install app-engine-php` to install App Engine PHP SDK
 * [NodeJS](https://nodejs.org/) (latest LTS should be fine)
 * [MySQL](https://dev.mysql.com/downloads/mysql/) (version 5.7 used by Google Cloud SQL)
 * [Composer](https://getcomposer.org/doc/00-intro.md#globally)
@@ -30,13 +33,7 @@ Initialize assets and recompile on the fly as assets change:
 
 Run local App Engine dev server:
 
-`./bin/deploy --local` (but you probably want to specify the datastoreDir as explained in the next section)
- 
-### Datastore persistence
-By default, the local server stores Datastore data in a temporary location that can be wiped out at any time.  In order to maintain persistent Datastore locally, create a directory to store the data in, and specify the `datastoreDir` parameter:
-
-`./bin/deploy --local --datastoreDir=~/datastore`
-
+`./bin/console pmi:deploy --local`
 
 ## Credentials and configuration
 
