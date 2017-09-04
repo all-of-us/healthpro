@@ -199,7 +199,7 @@ class DeployCommand extends Command {
             }
             $cmd .= " {$this->appDir}/app.yaml";
         } else {
-            $cmd = "gcloud app deploy --project={$this->appId} --version=1 {$this->appDir}/app.yaml";
+            $cmd = "gcloud app deploy --quiet --project={$this->appId} --version=1 {$this->appDir}/app.yaml";
         }
         $output->writeln('');
         $output->writeln("Deploy command: <info>{$cmd}</info>");
@@ -350,7 +350,7 @@ class DeployCommand extends Command {
         $dumper = new Dumper();
         file_put_contents($configFile, $dumper->dump($config, PHP_INT_MAX));
     }
-    
+
     /** Generate IP whitelisting config. */
     private function generateIpWhitelistConfig()
     {
@@ -410,7 +410,7 @@ class DeployCommand extends Command {
 
         file_put_contents($configFile, $ini);
     }
-    
+
     /** Generate cron configuration. */
     private function generateCronConfig()
     {
@@ -447,7 +447,7 @@ class DeployCommand extends Command {
         $dumper = new Dumper();
         file_put_contents($configFile, count($crons) ? $dumper->dump($config, PHP_INT_MAX) : 'cron:');
     }
-    
+
     private function checkCronBackups($config)
     {
         $cronKinds = [];
@@ -488,7 +488,7 @@ class DeployCommand extends Command {
             $config['handlers'][$idx]['login'] = 'admin';
         }
     }
-    
+
     /** Tell all handlers to require Google login. */
     private function requireGoogleLogin(&$config)
     {
@@ -558,7 +558,7 @@ class DeployCommand extends Command {
             }
         }
     }
-    
+
     private function runJsSecurityCheck()
     {
         $this->out->writeln("Running RetireJS scanner...");
