@@ -59,10 +59,8 @@ class DeployCommand extends Command {
     ];
 
     /**#@+ Config settings set by execute(). */
-    private $sdkDir;
     private $appDir;
     private $appId;
-    private $index;
     private $local;
     private $port;
     private $in;
@@ -75,13 +73,6 @@ class DeployCommand extends Command {
         $this
             ->setName('pmi:deploy')
             ->setDescription('PMI Build and Deploy')
-            ->addOption(
-                'sdkDir',
-                's',
-                InputOption::VALUE_OPTIONAL,
-                'Path to the GAE SDK',
-                '/usr/local/google_appengine'
-            )
             ->addOption(
                 'appDir',
                 'a',
@@ -100,12 +91,6 @@ class DeployCommand extends Command {
                 'i',
                 InputOption::VALUE_OPTIONAL,
                 'Google project application ID'
-            )
-            ->addOption(
-                'index',
-                'x',
-                InputOption::VALUE_NONE,
-                'Deploy only the indexing defined in index.yaml'
             )
             ->addOption(
                 'local',
@@ -142,7 +127,6 @@ class DeployCommand extends Command {
         $this->out = $output;
         $this->out->setFormatter(new OutputFormatter(true)); // color output
         $this->appId = $input->getOption('appId');
-        $this->index = (boolean) $input->getOption('index');
         $this->local = (boolean) $input->getOption('local');
         $this->port = (integer) $input->getOption('port');
         $this->release = $input->getOption('release');
@@ -150,12 +134,6 @@ class DeployCommand extends Command {
 
         if (!$this->appId && !$this->local) {
             throw new InvalidOptionException('Please specify --appId (-i) or --local');
-        }
-        $this->sdkDir = preg_replace('%[\\/]*$%', '', $input->getOption('sdkDir'));
-        $deploy = $this->sdkDir . DIRECTORY_SEPARATOR .
-            ($this->local ? 'dev_appserver.py' : 'appcfg.py');
-        if (!file_exists($deploy)) {
-            throw new InvalidOptionException("$deploy does not exist!");
         }
 
         $this->appDir = preg_replace('%[\\/]*$%', '', $input->getOption('appDir'));
@@ -175,7 +153,7 @@ class DeployCommand extends Command {
         $this->generateCronConfig();
 
         // If not local, compile assets. Run ./bin/gulp when developing locally.
-        if (!$this->local && !$this->index) {
+        if (!$this->local) {
             // ensure that we are up-to-date with the latest NPM dependencies
             $output->writeln('');
             $output->writeln("Checking NPM dependencies...");
@@ -210,7 +188,7 @@ class DeployCommand extends Command {
         }
 
         if ($this->local) {
-            $cmd = "{$deploy} --port={$this->port} --skip_sdk_update_check=yes";
+            $cmd = "dev_appserver.py -A pmi-hpo-dev --port={$this->port}";
             if ($this->phpCgiPath) {
                 $cmd .= " --php_executable_path {$this->phpCgiPath}";
             }
@@ -219,10 +197,9 @@ class DeployCommand extends Command {
                 $dsDir .= '/datastore.db';
                 $cmd .= " --datastore_path={$dsDir}";
             }
-            $cmd .= " {$this->appDir}";
+            $cmd .= " {$this->appDir}/app.yaml";
         } else {
-            $method = $this->index ? 'update_indexes' : 'update';
-            $cmd = "{$deploy} -A {$this->appId} {$method} {$this->appDir}";
+            $cmd = "gcloud app deploy --quiet --project={$this->appId} --version=1 {$this->appDir}/app.yaml";
         }
         $output->writeln('');
         $output->writeln("Deploy command: <info>{$cmd}</info>");
@@ -244,7 +221,7 @@ class DeployCommand extends Command {
             false, '/^(y|yes)$/');
         if ($this->local || $question->ask($input, $output, $reallyDeploy)) {
             $this->exec($cmd);
-            if ($this->isTaggable() && !$this->index) {
+            if ($this->isTaggable()) {
                 $this->tagRelease();
             }
             $output->writeln('');
@@ -373,7 +350,7 @@ class DeployCommand extends Command {
         $dumper = new Dumper();
         file_put_contents($configFile, $dumper->dump($config, PHP_INT_MAX));
     }
-    
+
     /** Generate IP whitelisting config. */
     private function generateIpWhitelistConfig()
     {
@@ -433,7 +410,7 @@ class DeployCommand extends Command {
 
         file_put_contents($configFile, $ini);
     }
-    
+
     /** Generate cron configuration. */
     private function generateCronConfig()
     {
@@ -470,7 +447,7 @@ class DeployCommand extends Command {
         $dumper = new Dumper();
         file_put_contents($configFile, count($crons) ? $dumper->dump($config, PHP_INT_MAX) : 'cron:');
     }
-    
+
     private function checkCronBackups($config)
     {
         $cronKinds = [];
@@ -511,7 +488,7 @@ class DeployCommand extends Command {
             $config['handlers'][$idx]['login'] = 'admin';
         }
     }
-    
+
     /** Tell all handlers to require Google login. */
     private function requireGoogleLogin(&$config)
     {
@@ -571,7 +548,7 @@ class DeployCommand extends Command {
         } else {
             $formatter = new SimpleFormatter($this->getHelper('formatter'));
             $formatter->displayResults($this->out, $composerLockFile, $vulnerabilities);
-            if (!$this->local && !$this->index) {
+            if (!$this->local) {
                 throw new \Exception('Fix security vulnerablities before deploying');
             } else {
                 $helper = $this->getHelper('question');
@@ -581,7 +558,7 @@ class DeployCommand extends Command {
             }
         }
     }
-    
+
     private function runJsSecurityCheck()
     {
         $this->out->writeln("Running RetireJS scanner...");
