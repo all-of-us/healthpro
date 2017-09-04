@@ -12,12 +12,11 @@ $app['errorTemplate'] = 'error.html.twig';
 $app['sessionTimeout'] = $app->isLocal() ? 3600 * 24 : 30 * 60;
 // Display warning 2 minutes before timeout
 $app['sessionWarning'] = 2 * 60;
+$app['sessionHandler'] = 'datastore';
 
-if (true) { // for now, use twig memcache everywhere
-    $app['sessionHandler'] = 'datastore';
+if ($app->isLocal()) {
     $app['twigCacheHandler'] = 'memcache';
 } else {
-    $app['sessionHandler'] = 'datastore';
     $app['cacheDirectory'] = realpath(__DIR__ . '/../cache');
     $app['twigCacheHandler'] = 'file';
 }

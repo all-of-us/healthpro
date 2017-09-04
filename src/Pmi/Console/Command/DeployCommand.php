@@ -172,9 +172,7 @@ class DeployCommand extends Command {
             // warmup twig cache
             $output->writeln('');
             $output->writeln('Warming up Twig cache...');
-            $command = $this->getApplication()->find('pmi:twig');
-            $twigInput = new ArrayInput(['command' => 'pmi:twig']);
-            $command->run($twigInput, $output);
+            $this->exec("{$this->appDir}/bin/phpcli bin/console pmi:twig");
         }
         
         // security checks
