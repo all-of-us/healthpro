@@ -3,7 +3,6 @@ namespace Pmi\Order\Mayolink;
 
 use Silex\Application;
 use Pmi\HttpClient;
-use Symfony\Component\HttpFoundation\Response;
 
 class MockMayoLinkApi
 {
@@ -27,18 +26,7 @@ class MockMayoLinkApi
                             </patient>
                         </order>
                     </orders>';      
-      return $xml;
-    }
-
-    public function labelsResponse()
-    {
-        $xml = '<?xml version="1.0" encoding=“UTF-8"?>
-                    <orders xmlns="http://orders.mayomedicallaboratories.com">
-                        <order>
-                            labels>JVBERi0xLjEKJcKl[...]CjU2NQolJUVPRgo=</labels>
-                        </order>
-                    </orders>';     
-      return $xml;
+        return $xml;
     }
 
 }

@@ -9,8 +9,8 @@ class MayolinkOrder
     protected $ordersEndpoint = 'https://orders.mayomedicallaboratories.com';
     protected $authEndpoint = 'https://profile.mayomedicallaboratories.com/authn';
     protected $providerName = 'www.mayomedicallaboratories.com';
-    protected $labelPdf = '/en/orders/{id}/label-set';
-    protected $requisitionPdf = '/en/orders/{id}/requisition';
+    protected $labelPdf = '/orders/labels.xml';
+    protected $requisitionPdf = '/orders/requisition.xml';
 
     protected static $tests = [
         '1SST8' => [
@@ -148,21 +148,53 @@ class MayolinkOrder
         return $matches[1];
     }
 
-    public function getPdf($id, $type)
+    public function getPdf($type, $options)
     {
+        $body = [
+            'order[collected]' => $options['collected_at'],
+            'order[account]' => $options['mayoClientId'],
+            'order[number]' => $options['order_id'],
+            'order[patient][medical_record_number]' => $options['patient_id'],
+            'order[patient][first_name]' => $options['first_name'],
+            'order[patient][last_name]' => $options['last_name'],
+            'order[patient][middle_name]' => 'None',
+            'order[patient][birth_date]' => $options['birth_date']->format('Y-m-d'),
+            'order[patient][gender]' => $options['gender']
+        ];
+        if ($options['requested_samples']) {
+            $samples = json_decode($options['requested_samples']);
+            foreach ($samples as $key => $sample) {
+                $body["order[tests][{$key}][test][code]"] = $sample;
+                $body["order[tests][{$key}][test][name]"] = self::$tests[$sample]['specimen'];
+            }
+        } else {
+            $i = 0;
+            foreach (self::$tests as $key => $sample) {
+                $body["order[tests][{$i}][test][code]"] = $key;
+                $body["order[tests][{$i}][test][name]"] = $sample['specimen'];
+                $i++;
+            }
+        }
         if ($type == 'labels') {
-            $path = str_replace('{id}', $id, $this->labelPdf);
+            $path = $this->labelPdf;
         } elseif ($type == 'requisition') {
-            $path = str_replace('{id}', $id, $this->requisitionPdf);
+            $path = $this->requisitionPdf;
         } else {
             return false;
         }
-        $response = $this->client->request('GET', "{$this->ordersEndpoint}{$path}");
+
+        $response = $this->client->request('GET', "{$this->ordersEndpoint}/{$path}", [
+            'form_params' => $body,
+            'allow_redirects' => false
+        ]);
+
         if ($response->getStatusCode() !== 200) {
             return false;
         }
-        $stream = $response->getBody();
-        return $stream->getContents();
+        $xml = $response->getBody();
+        $xmlObj = simplexml_load_string($xml);
+        $pdf = base64_decode($xmlObj->order->labels);
+        return $pdf;
     }
 
     public function loginAndCreateOrder($username, $password, $options)
@@ -174,10 +206,10 @@ class MayolinkOrder
         }
     }
 
-    public function loginAndGetPdf($username, $password, $id, $type)
+    public function loginAndGetPdf($username, $password, $type, $options)
     {
         if ($this->login($username, $password)) {
-            return $this->getPdf($id, $type);
+            return $this->getPdf($type, $options);
         } else {
             return false;
         }

@@ -213,11 +213,31 @@ class OrderController extends AbstractController
             }
         } else {
             $mlOrder = new MayolinkOrder($app);
+            $participant = $app['pmi.drc.participants']->getById($participantId);
+            $order = $this->loadOrder($participantId, $orderId, $app);
+            $orderData = $order->toArray();
+            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                $mayoClientId = $site['mayolink_account'];
+            } else {
+                $mayoClientId = null;
+            }
+            $options = [
+                'type' => $orderData['type'],
+                'patient_id' => $participant->biobankId,
+                'gender' => $participant->gender,
+                'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
+                'order_id' => $orderData['order_id'],
+                'collected_at' => $orderData['created_ts'],
+                'mayoClientId' => $mayoClientId,
+                'first_name' => $participant->firstName,
+                'last_name' => $participant->lastName,
+                'requested_samples' => $orderData['requested_samples']
+            ];
             $pdf = $mlOrder->loginAndGetPdf(
                 $app->getConfig('ml_username'),
                 $app->getConfig('ml_password'),
-                $order->get('mayo_id'),
-                $type
+                $type,
+                $options
             );
 
             if ($pdf) {
