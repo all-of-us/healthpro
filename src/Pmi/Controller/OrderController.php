@@ -18,7 +18,7 @@ class OrderController extends AbstractController
     protected static $routes = [
         ['orderCheck', '/participant/{participantId}/order/check'],
         ['orderCreate', '/participant/{participantId}/order/create', ['method' => 'GET|POST']],
-        ['orderPdf', '/participant/{participantId}/order/{orderId}-{type}.pdf'],
+        ['orderPdf', '/participant/{participantId}/order/{orderId}/labels.pdf'],
         ['order', '/participant/{participantId}/order/{orderId}'],
         ['orderPrint', '/participant/{participantId}/order/{orderId}/print'],
         ['orderCollect', '/participant/{participantId}/order/{orderId}/collect', ['method' => 'GET|POST']],
@@ -160,11 +160,8 @@ class OrderController extends AbstractController
         ]);
     }
 
-    public function orderPdfAction($type, $participantId, $orderId, Application $app, Request $request)
+    public function orderPdfAction($participantId, $orderId, Application $app, Request $request)
     {
-        if (!in_array($type, ['labels', 'requisition'])) {
-            $app->abort(404);
-        }
         $order = $this->loadOrder($participantId, $orderId, $app);
         if ($order->get('finalized_ts')) {
             $app->abort(403);
@@ -173,11 +170,7 @@ class OrderController extends AbstractController
             $app->abort(404);
         }
         if ($app->getConfig('ml_mock_order')) {
-            if ($type == 'labels') {
-                return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
-            } else {
-                return $app->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
-            }
+            return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
         } else {
             $mlOrder = new MayolinkOrder($app);
             $participant = $app['pmi.drc.participants']->getById($participantId);
@@ -203,7 +196,6 @@ class OrderController extends AbstractController
             $pdf = $mlOrder->loginAndGetPdf(
                 $app->getConfig('ml_username'),
                 $app->getConfig('ml_password'),
-                $type,
                 $options
             );
 

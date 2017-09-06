@@ -3,26 +3,7 @@
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'print' } %}
     <div class="row">
-        <div class="col-sm-6 col-md-7">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Requisition</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="text-center">
-                        <p id="requisition-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
-                        <p id="requisition-loaded">
-                            <a href="javascript:window.requisition.print();" class="btn btn-primary btn-sm">
-                                <i class="fa fa-print" aria-hidden="true"></i> Print
-                            </a>
-                        </p>
-                    </div>
-                    <iframe name="requisition" class="pdf pdf-requisition" src="{{ path('orderPdf', { participantId: participant.id, orderId: order.id, type: 'requisition' }) }}#view=FitH"></iframe>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-sm-6 col-md-5">
+        <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Labels</h3>
@@ -36,7 +17,7 @@
                             </a>
                         </p>
                     </div>
-                    <iframe name="labels" class="pdf pdf-labels" src="{{ path('orderPdf', { participantId: participant.id, orderId: order.id, type: 'labels' }) }}#view=FitH"></iframe>
+                    <iframe name="labels" class="pdf pdf-labels" src="{{ path('orderPdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>
                 </div>
             </div>
         </div>
@@ -46,12 +27,6 @@
 {% block pagejs %}
 <script>
 $(document).ready(function() {
-    $('#requisition-loaded').hide();
-    $('iframe[name=requisition]').on('load', function() {
-        $('#requisition-loading').hide();
-        $('#requisition-loaded').show();
-    });
-
     $('#labels-loaded').hide();
     $('iframe[name=labels]').on('load', function() {
         $('#labels-loading').hide();

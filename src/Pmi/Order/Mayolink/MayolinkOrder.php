@@ -148,7 +148,7 @@ class MayolinkOrder
         return $matches[1];
     }
 
-    public function getPdf($type, $options)
+    public function getPdf($options)
     {
         $body = [
             'order[collected]' => $options['collected_at'],
@@ -175,15 +175,8 @@ class MayolinkOrder
                 $i++;
             }
         }
-        if ($type == 'labels') {
-            $path = $this->labelPdf;
-        } elseif ($type == 'requisition') {
-            $path = $this->requisitionPdf;
-        } else {
-            return false;
-        }
 
-        $response = $this->client->request('GET', "{$this->ordersEndpoint}/{$path}", [
+        $response = $this->client->request('GET', "{$this->ordersEndpoint}/{$this->labelPdf}", [
             'form_params' => $body,
             'allow_redirects' => false
         ]);
@@ -206,10 +199,10 @@ class MayolinkOrder
         }
     }
 
-    public function loginAndGetPdf($username, $password, $type, $options)
+    public function loginAndGetPdf($username, $password, $options)
     {
         if ($this->login($username, $password)) {
-            return $this->getPdf($type, $options);
+            return $this->getPdf($options);
         } else {
             return false;
         }
