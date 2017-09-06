@@ -15,6 +15,7 @@ class RdrParticipants
     {
         $this->rdrHelper = $rdrHelper;
         $this->cacheEnabled = $rdrHelper->isCacheEnabled();
+        $this->cacheTime = $rdrHelper->getCacheTime();
     }
 
     protected function getClient()
@@ -109,19 +110,20 @@ class RdrParticipants
         return $responseObject->entry;
     }
 
-    public function getById($id)
+    public function getById($id, $refresh = null)
     {
         if ($this->cacheEnabled) {
             $memcache = new \Memcache();
             $memcacheKey = 'rdr_participant_' . $id;
-            $participant = $memcache->get($memcacheKey);
+            $participant = $refresh != 1 ? $memcache->get($memcacheKey) : null;
         }
         if (!$this->cacheEnabled || !$participant) {
             try {
                 $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
                 $participant = json_decode($response->getBody()->getContents());
                 if ($this->cacheEnabled) {
-                    $memcache->set($memcacheKey, $participant, 0, 300);
+                    $participant->cacheTime = new \DateTime();
+                    $memcache->set($memcacheKey, $participant, 0, $this->cacheTime);
                 }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
@@ -235,5 +237,10 @@ class RdrParticipants
     public function getLastError()
     {
         return $this->rdrHelper->getLastError();
+    }
+
+    public function getCacheEnabled()
+    {
+        return $this->cacheEnabled;
     }
 }
