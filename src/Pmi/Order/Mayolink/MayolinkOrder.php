@@ -161,15 +161,20 @@ class MayolinkOrder
             'order[patient][birth_date]' => $options['birth_date']->format('Y-m-d'),
             'order[patient][gender]' => $options['gender']
         ];
+        if (isset($options['type']) && $options['type'] === 'saliva') {
+            $tests = self::$salivaTests;
+        } else {
+            $tests = self::$tests;
+        }
         if ($options['requested_samples']) {
             $samples = json_decode($options['requested_samples']);
             foreach ($samples as $key => $sample) {
                 $body["order[tests][{$key}][test][code]"] = $sample;
-                $body["order[tests][{$key}][test][name]"] = self::$tests[$sample]['specimen'];
+                $body["order[tests][{$key}][test][name]"] = $tests[$sample]['specimen'];
             }
         } else {
             $i = 0;
-            foreach (self::$tests as $key => $sample) {
+            foreach ($tests as $key => $sample) {
                 $body["order[tests][{$i}][test][code]"] = $key;
                 $body["order[tests][{$i}][test][name]"] = $sample['specimen'];
                 $i++;
