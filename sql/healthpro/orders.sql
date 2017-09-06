@@ -7,7 +7,7 @@ CREATE TABLE `orders` (
   `biobank_id` varchar(50) NOT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `order_id` varchar(100) NOT NULL,
-  `mayo_id` varchar(100) NOT NULL,
+  `mayo_id` varchar(100) NULL DEFAULT NULL,
   `requested_samples` VARCHAR(255) NULL DEFAULT NULL,
   `printed_ts` timestamp NULL DEFAULT NULL,
   `collected_user_id` int(11) DEFAULT NULL,

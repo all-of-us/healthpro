@@ -125,51 +125,18 @@ class OrderController extends AbstractController
                 }
             }
             if ($confirmForm->isValid()) {
-                if ($app->getConfig('ml_mock_order')) {
-                    $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
-                } else {
-                    // set collected time to today at midnight local time
-                    $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
-                    $order = new MayolinkOrder($app);
-
-                    if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
-                        $mayoClientId = $site['mayolink_account'];
-                    } else {
-                        $mayoClientId = null;
-                    }
-                    $options = [
-                        'type' => $orderData['type'],
-                        'patient_id' => $participant->biobankId,
-                        'gender' => $participant->gender,
-                        'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
-                        'order_id' => $orderData['order_id'],
-                        'collected_at' => $collectedAt,
-                        'mayoClientId' => $mayoClientId
-                    ];
-
-                    if (isset($requestedSamples) && is_array($requestedSamples)) {
-                        $options['tests'] = $requestedSamples;
-                    }
-                    $orderData['mayo_id'] = $order->loginAndCreateOrder(
-                        $app->getConfig('ml_username'),
-                        $app->getConfig('ml_password'),
-                        $options
-                    );
-                }
-                if ($orderData['mayo_id']) {
-                    $orderData['user_id'] = $app->getUser()->getId();
-                    $orderData['site'] = $app->getSiteId();
-                    $orderData['participant_id'] = $participant->id;
-                    $orderData['biobank_id'] = $participant->biobankId;
-                    $orderData['created_ts'] = new \DateTime();
-                    $orderId = $app['em']->getRepository('orders')->insert($orderData);
-                    if ($orderId) {
-                        $app->log(Log::ORDER_CREATE, $orderId);
-                        return $app->redirectToRoute('order', [
-                            'participantId' => $participant->id,
-                            'orderId' => $orderId
-                        ]);
-                    }
+                $orderData['user_id'] = $app->getUser()->getId();
+                $orderData['site'] = $app->getSiteId();
+                $orderData['participant_id'] = $participant->id;
+                $orderData['biobank_id'] = $participant->biobankId;
+                $orderData['created_ts'] = new \DateTime();
+                $orderId = $app['em']->getRepository('orders')->insert($orderData);
+                if ($orderId) {
+                    $app->log(Log::ORDER_CREATE, $orderId);
+                    return $app->redirectToRoute('order', [
+                        'participantId' => $participant->id,
+                        'orderId' => $orderId
+                    ]);
                 }
                 $app->addFlashError('Failed to create order.');
             }

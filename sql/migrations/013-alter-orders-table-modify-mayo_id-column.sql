@@ -1,0 +1,1 @@
+ALTER TABLE `orders` MODIFY COLUMN `mayo_id` varchar(100) NULL DEFAULT NULL;
