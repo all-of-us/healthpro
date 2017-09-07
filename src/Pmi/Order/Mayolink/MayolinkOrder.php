@@ -11,6 +11,7 @@ class MayolinkOrder
     protected $providerName = 'www.mayomedicallaboratories.com';
     protected $labelPdf = '/orders/labels.xml';
     protected $requisitionPdf = '/orders/requisition.xml';
+    protected $createOrder = '/orders/create.xml';
 
     protected static $tests = [
         '1SST8' => [
@@ -102,50 +103,47 @@ class MayolinkOrder
     public function create($options)
     {
         $body = [
-            'authenticity_token' => $this->csrfToken,
-            'order[reference_number]' => $options['order_id'],
-            'order[patient_attributes][medical_record_number]' => $options['patient_id'],
-            'order[patient_attributes][first_name]' => '*',
-            'order[patient_attributes][last_name]' => $options['patient_id'],
-            'order[patient_attributes][gender]' => $options['gender'],
-            'order[patient_attributes][birth_date]' => $options['birth_date']->format('Y-m-d'),
-            'order[physician_name]' => 'None',
-            'order[physician_phone]' => 'None',
-            'order[collected_at(1i)]' => $options['collected_at']->format('Y'),
-            'order[collected_at(2i)]' => $options['collected_at']->format('n'),
-            'order[collected_at(3i)]' => $options['collected_at']->format('j'),
-            'order[collected_at(4i)]' => $options['collected_at']->format('H'),
-            'order[collected_at(5i)]' => $options['collected_at']->format('i')
+            'order[collected]' => $options['collected_at'],
+            'order[account]' => $options['mayoClientId'],
+            'order[number]' => $options['order_id'],
+            'order[patient][medical_record_number]' => $options['patient_id'],
+            'order[patient][birth_date]' => $options['birth_date']->format('Y-m-d'),
+            'order[patient][gender]' => $options['gender'],
+            'order[physician][name]' => $options['siteId'],
+            'order[physician][phone]' => $options['organizationId']
         ];
-        $i = 0;
         if (isset($options['type']) && $options['type'] === 'saliva') {
             $tests = self::$salivaTests;
         } else {
             $tests = self::$tests;
         }
-        foreach ($tests as $test => $testOptions) {
-            if (isset($options['tests']) && !in_array($test, $options['tests'])) {
-                continue;
+        if ($options['finalized_samples']) {
+            $samples = json_decode($options['finalized_samples']);
+            foreach ($samples as $key => $sample) {
+                $body["order[tests][{$key}][test][code]"] = $sample;
+                $body["order[tests][{$key}][test][name]"] = $tests[$sample]['specimen'];
             }
-            $body["order[test_requests_attributes][{$i}][test_code]"] = $test;
-            $body["temperatures[{$test}][{$testOptions['specimen']}]"] = $testOptions['temperature'];
-            $i++;
+        } else {
+            $i = 0;
+            foreach ($tests as $key => $sample) {
+                $body["order[tests][{$i}][test][code]"] = $key;
+                $body["order[tests][{$i}][test][name]"] = $sample['specimen'];
+                $i++;
+            }
         }
-        if (!empty($options['mayoClientId'])) {
-            $body['account'] = $options['mayoClientId'];
-        }
-        $response = $this->client->request('POST', "{$this->ordersEndpoint}/en/orders", [
+        echo '<pre>'; print_r($body); exit;
+        $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$createOrder}", [
             'form_params' => $body,
             'allow_redirects' => false
         ]);
         if ($response->getStatusCode() !== 302 || empty($response->getHeader('Location'))) {
             return false;
         }
-        $location = $response->getHeader('Location')[0];
-        if (!preg_match('/orders\/(.*)$/', $location, $matches)) {
-            return false;
-        }
-        return $matches[1];
+
+        $xml = $response->getBody();
+        $xmlObj = simplexml_load_string($xml);
+        $mayoId = $xmlObj->order->reference_number;
+        return $mayoId;
     }
 
     public function getPdf($options)

@@ -346,6 +346,41 @@ class OrderController extends AbstractController
                     if (empty($order->get('finalized_ts'))) {
                         $app->addFlashNotice('Order updated but not finalized');
                     } else {
+                        if ($app->getConfig('ml_mock_order')) {
+                            $mayoId = $app->getConfig('ml_mock_order');
+                        } else {
+                            // set collected time to today at midnight local time
+                            $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
+                            $orderData = $order->toArray();
+                            $participant = $app['pmi.drc.participants']->getById($participantId);
+                            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                                $mayoClientId = $site['mayolink_account'];
+                            } else {
+                                $mayoClientId = null;
+                            }
+                            $options = [
+                                'type' => $orderData['type'],
+                                'patient_id' => $participant->biobankId,
+                                'gender' => $participant->gender,
+                                'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
+                                'order_id' => $orderData['order_id'],
+                                'collected_at' => $collectedAt,
+                                'mayoClientId' => $mayoClientId,
+                                'gender' => $participant->gender,
+                                'siteId' => $app->getSiteId(),
+                                'organizationId' => $app->getSiteOrganization(),
+                                'finalized_samples' => $orderData['finalized_samples']
+                            ];
+                            $order = new MayolinkOrder($app);
+                            $mayoId = $order->loginAndCreateOrder(
+                                $app->getConfig('ml_username'),
+                                $app->getConfig('ml_password'),
+                                $options
+                            );                           
+                        }
+                        if ($mayoId) {
+                            $app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId]);
+                        }
                         $order->sendToRdr();
                         $app->addFlashSuccess('Order finalized');
                     }
