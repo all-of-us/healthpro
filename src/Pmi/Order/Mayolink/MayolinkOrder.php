@@ -190,6 +190,17 @@ class MayolinkOrder
         return $pdf;
     }
 
+    public function getRequisitionPdf($id)
+    {
+        $response = $this->client->request('GET', "{$this->ordersEndpoint}/{$id}.xml", [
+            'allow_redirects' => false
+        ]);
+        $xml = $response->getBody();
+        $xmlObj = simplexml_load_string($xml);
+        $pdf = base64_decode($xmlObj->order->requisition);
+        return $pdf;          
+    }
+
     public function loginAndCreateOrder($username, $password, $options)
     {
         if ($this->login($username, $password)) {
@@ -203,6 +214,15 @@ class MayolinkOrder
     {
         if ($this->login($username, $password)) {
             return $this->getPdf($options);
+        } else {
+            return false;
+        }
+    }
+
+    public function loginAndGetRequisitionPdf($id)
+    {
+        if ($this->login($username, $password)) {
+            return $this->getRequisitionPdf($id);
         } else {
             return false;
         }

@@ -19,11 +19,13 @@ class OrderController extends AbstractController
         ['orderCheck', '/participant/{participantId}/order/check'],
         ['orderCreate', '/participant/{participantId}/order/create', ['method' => 'GET|POST']],
         ['orderPdf', '/participant/{participantId}/order/{orderId}/labels.pdf'],
+        ['orderRequisitionPdf', '/participant/{participantId}/order/{orderId}/requisition.pdf'],
         ['order', '/participant/{participantId}/order/{orderId}'],
         ['orderPrint', '/participant/{participantId}/order/{orderId}/print'],
         ['orderCollect', '/participant/{participantId}/order/{orderId}/collect', ['method' => 'GET|POST']],
         ['orderProcess', '/participant/{participantId}/order/{orderId}/process', ['method' => 'GET|POST']],
         ['orderFinalize', '/participant/{participantId}/order/{orderId}/finalize', ['method' => 'GET|POST']],
+        ['orderRequisitionPrint', '/participant/{participantId}/order/{orderId}/requisition/print'],
         ['orderJson', '/participant/{participantId}/order/{orderId}/order.json'],
         ['orderExport', '/orders/export.csv']
     ];
@@ -398,6 +400,19 @@ class OrderController extends AbstractController
         ]);
     }
 
+    public function orderRequisitionPrintAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        if (!in_array('requisitionPrint', $order->getAvailableSteps())) {
+            // 404 because print is not a valid route for kit orders regardless of state
+            $app->abort(404);
+        }
+        return $app['twig']->render('order-requisition-print.html.twig', [
+            'participant' => $order->getParticipant(),
+            'order' => $order->toArray()
+        ]);
+    }
+
     /* For debugging generated JSON representation - only allowed in local dev */
     public function orderJsonAction($participantId, $orderId, Application $app, Request $request)
     {
@@ -459,5 +474,30 @@ class OrderController extends AbstractController
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
+    }
+
+    public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        if (!in_array('requisitionPrint', $order->getAvailableSteps())) {
+            $app->abort(404);
+        }
+        if ($app->getConfig('ml_mock_order')) {
+            return $app->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
+        } else {
+            if ($mayoId = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                $mlOrder = new MayolinkOrder($app);
+                $pdf = $mlOrder->loginAndGetRequisitionPdf(
+                    $app->getConfig('ml_username'),
+                    $app->getConfig('ml_password'),
+                    $mayoId
+                );
+            }
+            if (!empty($pdf)) {
+                return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+            } else {
+                $app->abort(500, 'Failed to load PDF');
+            }
+        }
     }
 }
