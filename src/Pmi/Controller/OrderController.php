@@ -189,8 +189,6 @@ class OrderController extends AbstractController
                 'order_id' => $orderData['order_id'],
                 'collected_at' => $orderData['created_ts'],
                 'mayoClientId' => $mayoClientId,
-                'first_name' => $participant->firstName,
-                'last_name' => $participant->lastName,
                 'requested_samples' => $orderData['requested_samples']
             ];
             $pdf = $mlOrder->loginAndGetPdf(

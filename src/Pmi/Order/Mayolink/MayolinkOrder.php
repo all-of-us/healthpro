@@ -153,9 +153,6 @@ class MayolinkOrder
             'order[account]' => $options['mayoClientId'],
             'order[number]' => $options['order_id'],
             'order[patient][medical_record_number]' => $options['patient_id'],
-            'order[patient][first_name]' => $options['first_name'],
-            'order[patient][last_name]' => $options['last_name'],
-            'order[patient][middle_name]' => 'None',
             'order[patient][birth_date]' => $options['birth_date']->format('Y-m-d'),
             'order[patient][gender]' => $options['gender']
         ];
