@@ -383,6 +383,10 @@ class OrderController extends AbstractController
                         }
                         $order->sendToRdr();
                         $app->addFlashSuccess('Order finalized');
+                        return $app->redirectToRoute('orderPrintRequisition', [
+                            'participantId' => $participantId,
+                            'orderId' => $orderId
+                        ]);
                     }
 
                     return $app->redirectToRoute('orderFinalize', [
