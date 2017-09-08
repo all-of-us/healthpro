@@ -21,8 +21,8 @@
     </dl>
     <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#">Safety Check</a></li>
-        {% for step in ['create', 'print', 'collect', 'process', 'finalize'] %}
-            <li role="presentation" class="disabled"><a href="#">{{ step|capitalize }}</a></li>
+        {% for step in ['Create', 'Print', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
+            <li role="presentation" class="disabled"><a href="#">{{ step }}</a></li>
         {% endfor %}
     </ul>
     <br />

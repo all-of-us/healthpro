@@ -135,10 +135,12 @@ class Order
             'print' => 'printed',
             'collect' => 'collected',
             'process' => 'processed',
-            'finalize' => 'finalized'
+            'finalize' => 'finalized',
+            'printRequisition' => 'finalized'
         ];
         if ($this->order['type'] === 'kit') {
             unset($columns['print']);
+            unset($columns['printRequisition']);
         }
         $step = 'finalize';
         foreach ($columns as $name => $column) {
@@ -157,7 +159,7 @@ class Order
             'collect' => 'collected',
             'process' => 'processed',
             'finalize' => 'finalized',
-            'printRequisition' => 'printed_requisition'
+            'printRequisition' => 'finalized'
         ];
         if ($this->order['type'] === 'kit') {
             unset($columns['print']);
@@ -166,7 +168,7 @@ class Order
         $steps = [];
         foreach ($columns as $name => $column) {
             $steps[] = $name;
-            if ($name != 'printRequisition' && !$this->order["{$column}_ts"]) {
+            if (!$this->order["{$column}_ts"]) {
                 break;
             }
         }

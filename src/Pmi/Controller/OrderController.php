@@ -404,6 +404,12 @@ class OrderController extends AbstractController
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
+            return $app->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
+        }
+        if (!in_array('printRequisition', $order->getAvailableSteps())) {
             // 404 because print is not a valid route for kit orders regardless of state
             $app->abort(404);
         }
