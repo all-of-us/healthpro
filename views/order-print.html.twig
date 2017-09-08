@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Print - Order {{ order.order_id }} - {% endblock %}
+{% block title %}Print Labels - Order {{ order.order_id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'print' } %}
     <div class="row">
@@ -17,7 +17,7 @@
                             </a>
                         </p>
                     </div>
-                    <iframe name="labels" class="pdf pdf-labels" src="{{ path('orderPdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>
+                    <iframe name="labels" class="pdf pdf-labels" src="{{ path('orderLabelsPdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>
                 </div>
             </div>
         </div>

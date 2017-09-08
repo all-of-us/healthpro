@@ -132,14 +132,14 @@ class Order
     public function getCurrentStep()
     {
         $columns = [
-            'print' => 'printed',
+            'printLabels' => 'printed',
             'collect' => 'collected',
             'process' => 'processed',
             'finalize' => 'finalized',
             'printRequisition' => 'finalized'
         ];
         if ($this->order['type'] === 'kit') {
-            unset($columns['print']);
+            unset($columns['printLabels']);
             unset($columns['printRequisition']);
         }
         $step = 'finalize';
@@ -155,14 +155,14 @@ class Order
     public function getAvailableSteps()
     {
         $columns = [
-            'print' => 'printed',
+            'printLabels' => 'printed',
             'collect' => 'collected',
             'process' => 'processed',
             'finalize' => 'finalized',
             'printRequisition' => 'finalized'
         ];
         if ($this->order['type'] === 'kit') {
-            unset($columns['print']);
+            unset($columns['printLabels']);
             unset($columns['printRequisition']);
         }
         $steps = [];

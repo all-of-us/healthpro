@@ -18,10 +18,10 @@ class OrderController extends AbstractController
     protected static $routes = [
         ['orderCheck', '/participant/{participantId}/order/check'],
         ['orderCreate', '/participant/{participantId}/order/create', ['method' => 'GET|POST']],
-        ['orderPdf', '/participant/{participantId}/order/{orderId}/labels.pdf'],
+        ['orderLabelsPdf', '/participant/{participantId}/order/{orderId}/labels.pdf'],
         ['orderRequisitionPdf', '/participant/{participantId}/order/{orderId}/requisition.pdf'],
         ['order', '/participant/{participantId}/order/{orderId}'],
-        ['orderPrint', '/participant/{participantId}/order/{orderId}/print'],
+        ['orderPrintLabels', '/participant/{participantId}/order/{orderId}/print/labels'],
         ['orderCollect', '/participant/{participantId}/order/{orderId}/collect', ['method' => 'GET|POST']],
         ['orderProcess', '/participant/{participantId}/order/{orderId}/process', ['method' => 'GET|POST']],
         ['orderFinalize', '/participant/{participantId}/order/{orderId}/finalize', ['method' => 'GET|POST']],
@@ -162,13 +162,13 @@ class OrderController extends AbstractController
         ]);
     }
 
-    public function orderPdfAction($participantId, $orderId, Application $app, Request $request)
+    public function orderLabelsPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
         if ($order->get('finalized_ts')) {
             $app->abort(403);
         }
-        if (!in_array('print', $order->getAvailableSteps())) {
+        if (!in_array('printLabels', $order->getAvailableSteps())) {
             $app->abort(404);
         }
         if ($app->getConfig('ml_mock_order')) {
@@ -207,13 +207,13 @@ class OrderController extends AbstractController
         }
     }
 
-    public function orderPrintAction($participantId, $orderId, Application $app, Request $request)
+    public function orderPrintLabelsAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
         if ($order->get('finalized_ts')) {
             $app->abort(403);
         }
-        if (!in_array('print', $order->getAvailableSteps())) {
+        if (!in_array('printLabels', $order->getAvailableSteps())) {
             // 404 because print is not a valid route for kit orders regardless of state
             $app->abort(404);
         }
