@@ -64,7 +64,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
     public function testOrderStep()
     {
         $order = $this->createOrder();
-        $this->assertSame('print', $order->getCurrentStep());
+        $this->assertSame('printLabels', $order->getCurrentStep());
 
         $order = $this->createOrder([
             'created_ts' => new \DateTime('2016-01-01 08:00:00'),
