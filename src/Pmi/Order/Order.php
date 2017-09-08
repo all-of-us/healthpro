@@ -157,16 +157,16 @@ class Order
             'collect' => 'collected',
             'process' => 'processed',
             'finalize' => 'finalized',
-            'requisitionPrint' => 'requisitionPrinted'
+            'printRequisition' => 'printed_requisition'
         ];
         if ($this->order['type'] === 'kit') {
             unset($columns['print']);
-            unset($columns['requisitionPrint']);
+            unset($columns['printRequisition']);
         }
         $steps = [];
         foreach ($columns as $name => $column) {
             $steps[] = $name;
-            if ($name != 'requisitionPrint' && !$this->order["{$column}_ts"]) {
+            if ($name != 'printRequisition' && !$this->order["{$column}_ts"]) {
                 break;
             }
         }

@@ -131,7 +131,6 @@ class MayolinkOrder
                 $i++;
             }
         }
-        echo '<pre>'; print_r($body); exit;
         $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$createOrder}", [
             'form_params' => $body,
             'allow_redirects' => false

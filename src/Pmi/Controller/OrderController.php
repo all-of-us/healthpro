@@ -25,7 +25,7 @@ class OrderController extends AbstractController
         ['orderCollect', '/participant/{participantId}/order/{orderId}/collect', ['method' => 'GET|POST']],
         ['orderProcess', '/participant/{participantId}/order/{orderId}/process', ['method' => 'GET|POST']],
         ['orderFinalize', '/participant/{participantId}/order/{orderId}/finalize', ['method' => 'GET|POST']],
-        ['orderRequisitionPrint', '/participant/{participantId}/order/{orderId}/requisition/print'],
+        ['orderPrintRequisition', '/participant/{participantId}/order/{orderId}/print/requisition'],
         ['orderJson', '/participant/{participantId}/order/{orderId}/order.json'],
         ['orderExport', '/orders/export.csv']
     ];
@@ -400,14 +400,14 @@ class OrderController extends AbstractController
         ]);
     }
 
-    public function orderRequisitionPrintAction($participantId, $orderId, Application $app, Request $request)
+    public function orderPrintRequisitionAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if (!in_array('requisitionPrint', $order->getAvailableSteps())) {
+        if (!in_array('printRequisition', $order->getAvailableSteps())) {
             // 404 because print is not a valid route for kit orders regardless of state
             $app->abort(404);
         }
-        return $app['twig']->render('order-requisition-print.html.twig', [
+        return $app['twig']->render('order-print-requisition.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray()
         ]);
@@ -479,7 +479,7 @@ class OrderController extends AbstractController
     public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if (!in_array('requisitionPrint', $order->getAvailableSteps())) {
+        if (!in_array('printRequisition', $order->getAvailableSteps())) {
             $app->abort(404);
         }
         if ($app->getConfig('ml_mock_order')) {
