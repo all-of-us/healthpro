@@ -223,7 +223,7 @@ class OrderController extends AbstractController
                 'printed_ts' => new \DateTime()
             ]);
         }
-        return $app['twig']->render('order-print.html.twig', [
+        return $app['twig']->render('order-print-labels.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray()
         ]);
