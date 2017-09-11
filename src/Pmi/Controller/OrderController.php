@@ -135,7 +135,7 @@ class OrderController extends AbstractController
                 $orderId = $app['em']->getRepository('orders')->insert($orderData);
                 if ($orderId) {
                     $app->log(Log::ORDER_CREATE, $orderId);
-                    return $app->redirectToRoute('order', [
+                    return $app->redirectToRoute('orderPrintLabels', [
                         'participantId' => $participant->id,
                         'orderId' => $orderId
                     ]);
