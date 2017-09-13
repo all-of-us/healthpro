@@ -351,7 +351,7 @@ class OrderController extends AbstractController
                 $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 $app->addFlashError("Participant identifying information detected in notes field");
             }
-            if (!empty($finalizeForm['fedex_tracking']->getData())) {
+            if ($order->get('type') === 'kit' && $finalizeForm->has('fedex_tracking') && !empty($finalizeForm['finalized_ts']->getData())) {
                 $duplicateFedexTracking = $app['em']->getRepository('orders')->fetchBySql('fedex_tracking = ? and id != ?', [
                     $finalizeForm['fedex_tracking']->getData(),
                     $orderId
