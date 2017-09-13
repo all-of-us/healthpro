@@ -22,6 +22,15 @@
             {{ form_errors(processForm.processed_samples) }}
         </div>
 
+        <div class="form-group{% if not processForm.processed_centrifuge_type.vars.valid %} has-error{% endif %}">
+            {{ form_label(processForm.processed_centrifuge_type) }}
+            <span class="toggle-help-image" data-caption="Centrifuge type help text placeholder.">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
+            {{ form_widget(processForm.processed_centrifuge_type) }}
+            {{ form_errors(processForm.processed_centrifuge_type) }}
+        </div>
+
         <div class="form-group{% if not processForm.processed_notes.vars.valid %} has-error{% endif %}">
             {{ form_label(processForm.processed_notes) }}
             <span class="toggle-help-image" data-caption="Processed notes help text placeholder.">

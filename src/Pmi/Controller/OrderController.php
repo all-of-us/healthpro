@@ -294,6 +294,7 @@ class OrderController extends AbstractController
                 }
                 $updateArray['processed_user_id'] = $app->getUser()->getId();
                 $updateArray['processed_site'] = $app->getSiteId();
+                $updateArray['processed_centrifuge_type'] = $processForm['processed_centrifuge_type']->getData();
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                     $app->addFlashNotice('Order processing updated');

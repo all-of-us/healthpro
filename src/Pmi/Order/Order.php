@@ -210,6 +210,11 @@ class Order
             } else {
                 $updateArray['processed_samples_ts'] = json_encode([]);
             }
+            if ($formData["processed_centrifuge_type"]) {
+                $updateArray["processed_centrifuge_type"] = $formData["processed_centrifuge_type"];
+            } else {
+                $updateArray["processed_centrifuge_type"] = null;
+            }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
             $updateArray['fedex_tracking'] = $formData['fedex_tracking'];
@@ -311,6 +316,20 @@ class Order
                     ]
                 ],
                 'required' => false
+            ]);
+            $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
+                'label' => 'Centrifuge type',
+                'required' => true,
+                'disabled' => $disabled,
+                'choices' => [
+                    '-- Select centrifuge type --' => null,
+                    'Fixed Angle'=> 'fixed_angle',
+                    'Swinging Bucket' => 'swinging_bucket'
+                ],
+                'multiple' => false,
+                'constraints' => new Constraints\NotBlank([
+                    'message' => 'Please select centrifuge type'
+                ])
             ]);
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
@@ -516,6 +535,9 @@ class Order
                 } else {
                     $formData['processed_samples_ts'][$sample] = null;
                 }
+            }
+            if ($this->order["processed_centrifuge_type"]) {
+                $formData["processed_centrifuge_type"] = $this->order["processed_centrifuge_type"];
             }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
