@@ -361,10 +361,12 @@ class Order
                 'system' => 'https://orders.mayomedicallaboratories.com/kit-id',
                 'value' => $this->order['order_id']
             ];
-            $identifiers[] = [
-                'system' => 'https://orders.mayomedicallaboratories.com/tracking-number',
-                'value' => $this->order['fedex_tracking']
-            ];
+            if (!empty($this->order['fedex_tracking'])) {
+                $identifiers[] = [
+                    'system' => 'https://orders.mayomedicallaboratories.com/tracking-number',
+                    'value' => $this->order['fedex_tracking']
+                ];
+            }
         }
         if ($this->app) {
             if (!$this->app->getConfig('ml_mock_order') && $this->order['mayo_id'] != 'pmitest') {
