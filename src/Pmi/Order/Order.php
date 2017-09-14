@@ -12,7 +12,8 @@ class Order
     protected $app;
     protected $order;
     protected $participant;
-
+    const FIXED_ANGLE = 'fixed_angle';
+    const SWINGING_BUCKET = 'swinging_bucket';
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
     public static $samples = [
@@ -323,8 +324,8 @@ class Order
                 'disabled' => $disabled,
                 'choices' => [
                     '-- Select centrifuge type --' => null,
-                    'Fixed Angle'=> 'fixed_angle',
-                    'Swinging Bucket' => 'swinging_bucket'
+                    'Fixed Angle'=> self::FIXED_ANGLE,
+                    'Swinging Bucket' => self::SWINGING_BUCKET
                 ],
                 'multiple' => false,
                 'constraints' => new Constraints\NotBlank([
