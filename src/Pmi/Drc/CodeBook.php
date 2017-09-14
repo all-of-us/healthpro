@@ -93,7 +93,7 @@ class CodeBook
         'AnnualIncome_25k35k' => '$25,000- $34,999',
         'AnnualIncome_35k50k' => '$35,000- $49,999',
         'AnnualIncome_50k75k' => '$50,000- $74,999',
-        'AnnualIncome_75k100k' => '$75,000-$99,999$',
+        'AnnualIncome_75k100k' => '$75,000- $99,999',
         'AnnualIncome_100k150k' => '$100,000- $149,999',
         'AnnualIncome_150k200k' => '$150,000- $199,999',
         'AnnualIncome_more200k' => '$200,000 or more',
