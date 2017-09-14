@@ -34,7 +34,8 @@ class TwigCacheWarmerCommand extends Command
             'templatesDirectory' => $viewDir,
             'cacheDirectory' => $cacheDir,
             'twigCacheHandler' => 'file',
-            'isUnitTest' => true
+            'isUnitTest' => true,
+            'debug' => false
         ]);
         $app->setup();
 

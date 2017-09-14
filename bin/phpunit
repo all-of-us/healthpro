@@ -3,13 +3,7 @@
 # Script to run phpunit using GAE's PHP environment
 #
 
-APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
-GAE_PHP_OSX="/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/php55/php"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+APP_DIR="$DIR/.."
 
-if [ -f "$GAE_PHP_OSX" ]; then
-    PHP=$GAE_PHP_OSX
-else
-    PHP=$(which php)
-fi
-
-php_cli.py --php_executable_path="$PHP" $APP_DIR/vendor/phpunit/phpunit/phpunit $APP_DIR/tests/Pmi -c $APP_DIR/phpunit.xml
+$DIR/phpcli $APP_DIR/vendor/phpunit/phpunit/phpunit $APP_DIR/tests/Pmi -c $APP_DIR/phpunit.xml
