@@ -135,7 +135,7 @@ class OrderController extends AbstractController
                 $orderId = $app['em']->getRepository('orders')->insert($orderData);
                 if ($orderId) {
                     $app->log(Log::ORDER_CREATE, $orderId);
-                    return $app->redirectToRoute('orderPrintLabels', [
+                    return $app->redirectToRoute('order', [
                         'participantId' => $participant->id,
                         'orderId' => $orderId
                     ]);
@@ -387,10 +387,12 @@ class OrderController extends AbstractController
                         }
                         $order->sendToRdr();
                         $app->addFlashSuccess('Order finalized');
-                        return $app->redirectToRoute('orderPrintRequisition', [
-                            'participantId' => $participantId,
-                            'orderId' => $orderId
-                        ]);
+                        if ($order->get('type') !== 'kit') {
+                            return $app->redirectToRoute('orderPrintRequisition', [
+                                'participantId' => $participantId,
+                                'orderId' => $orderId
+                            ]);
+                        }
                     }
 
                     return $app->redirectToRoute('orderFinalize', [
