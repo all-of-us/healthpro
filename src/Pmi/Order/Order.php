@@ -315,7 +315,7 @@ class Order
                 'disabled' => $disabled,
                 'invalid_message' => 'FedEx tracking numbers must match.',
                 'first_options' => [
-                    'label' => 'FedEx tracking number'
+                    'label' => 'FedEx tracking number (optional)'
                 ],
                 'second_options' => [
                     'label' => 'Verify FedEx tracking number',
