@@ -67,8 +67,9 @@ class OrderController extends AbstractController
         if (!$participant->status) {
             $app->abort(403);
         }
-        $confirmForm = $app['form.factory']->createBuilder(FormType::class)
-            ->add('kitId', Type\RepeatedType::class, [
+        $formBuilder = $app['form.factory']->createBuilder(FormType::class);
+        if ($app->isDVType()) {
+            $formBuilder->add('kitId', Type\RepeatedType::class, [
                 'type' => Type\TextType::class,
                 'invalid_message' => 'The kit order ID fields must match.',
                 'first_options' => [
@@ -90,15 +91,18 @@ class OrderController extends AbstractController
                         'message' => 'Must be in the format of KIT-12345678 ("KIT-" followed by 8 digits)'
                     ])
                 ]
-            ])
-            ->add('samples', Type\ChoiceType::class, [
+            ]);
+        }
+        if (!$app->isDVType()) {
+            $formBuilder->add('samples', Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Select requested samples',
                 'choices' => Order::$samples,
                 'required' => false
-            ])
-            ->getForm();
+            ]);
+        }
+        $confirmForm = $formBuilder->getForm();
         $showCustom = false;
         $confirmForm->handleRequest($request);
         if ($confirmForm->isValid()) {
