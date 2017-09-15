@@ -211,10 +211,8 @@ class Order
             } else {
                 $updateArray['processed_samples_ts'] = json_encode([]);
             }
-            if ($formData["processed_centrifuge_type"]) {
+            if ($this->order['type'] !== 'saliva' && !empty($formData["processed_centrifuge_type"])) {
                 $updateArray["processed_centrifuge_type"] = $formData["processed_centrifuge_type"];
-            } else {
-                $updateArray["processed_centrifuge_type"] = null;
             }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
@@ -318,20 +316,22 @@ class Order
                 ],
                 'required' => false
             ]);
-            $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
-                'label' => 'Centrifuge type',
-                'required' => true,
-                'disabled' => $disabled,
-                'choices' => [
-                    '-- Select centrifuge type --' => null,
-                    'Fixed Angle'=> self::FIXED_ANGLE,
-                    'Swinging Bucket' => self::SWINGING_BUCKET
-                ],
-                'multiple' => false,
-                'constraints' => new Constraints\NotBlank([
-                    'message' => 'Please select centrifuge type'
-                ])
-            ]);
+            if ($this->order['type'] !== 'saliva') {
+                $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
+                    'label' => 'Centrifuge type',
+                    'required' => true,
+                    'disabled' => $disabled,
+                    'choices' => [
+                        '-- Select centrifuge type --' => null,
+                        'Fixed Angle'=> self::FIXED_ANGLE,
+                        'Swinging Bucket' => self::SWINGING_BUCKET
+                    ],
+                    'multiple' => false,
+                    'constraints' => new Constraints\NotBlank([
+                        'message' => 'Please select centrifuge type'
+                    ])
+                ]);
+            }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
             $formBuilder->add('fedex_tracking', Type\RepeatedType::class, [
