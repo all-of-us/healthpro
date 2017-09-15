@@ -302,10 +302,8 @@ class WorkQueueController extends AbstractController
                     'Phone',
                     'Sex',
                     'Gender Identity',
-                    'Sexual Orientation',
                     'Race/Ethnicity',
                     'Education',
-                    'Income',
                     'Required PPI Surveys Complete',
                     'Completed Surveys'
                 ];
@@ -354,10 +352,8 @@ class WorkQueueController extends AbstractController
                         $participant->phoneNumber,
                         $participant->sex,
                         $participant->genderIdentity,
-                        $participant->sexualOrientation,
                         $participant->race,
                         $participant->education,
-                        $participant->income,
                         $participant->numCompletedBaselinePPIModules == 3 ? '1' : '0',
                         $participant->numCompletedPPIModules
                     ];
