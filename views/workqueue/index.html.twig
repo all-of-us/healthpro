@@ -64,7 +64,7 @@
 
                 <th colspan="{{ 2 * (samples|length) + 3 }}" class="topheader multiheader-inperson">In-Person Enrollment</th>
 
-                <th colspan="7" class="topheader multiheader-demographics">Demographics</th>
+                <th colspan="5" class="topheader multiheader-demographics">Demographics</th>
             </tr>
             <tr>
                 <th class="secondaryheader col-group-contact multiheader-contact">Contact Method</th>
@@ -90,10 +90,8 @@
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Age</th>
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Sex</th>
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Gender Identity</th>
-                <th class="secondaryheader col-group-demographics multiheader-demographics">Sexual Orientation</th>
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Race/Ethnicity</th>
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Education</th>
-                <th class="secondaryheader col-group-demographics multiheader-demographics">Income</th>
             </tr>
         </thead>
         <tbody>
@@ -222,10 +220,8 @@
                     <td>{{ participant.getAge() }}</td>
                     <td>{{ participant.sex }}</td>
                     <td>{{ participant.genderIdentity }}</td>
-                    <td>{{ participant.sexualOrientation }}</td>
                     <td>{{ participant.race }}</td>
                     <td>{{ participant.education }}</td>
-                    <td>{{ participant.income }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -297,10 +293,8 @@ $(document).ready(function() {
             { name: 'age', visible: false },
             { name: 'sex', visible: false },
             { name: 'genderIdentity', visible: false },
-            { name: 'sexualOrientation', visible: false },
             { name: 'race', visible: false },
-            { name: 'education', visible: false },
-            { name: 'income', visible: false }
+            { name: 'education', visible: false }
         ],
         pageLength: 25,
         buttons: [
