@@ -61,14 +61,13 @@ class UserProvider implements UserProviderInterface
                 $userInfo = $this->app['em']->getRepository('users')->fetchOneBy([
                     'email' => $googleUser->getEmail()
                 ]);
+                break;
             } catch (\Exception $e) {
                 if ($attempts == 2) {
                     sleep(1);
                 }
                 $attempts++;
-                continue;
             }
-            break;
         } while ($attempts < $maxAttempts);
         if (!$userInfo) {
             $userInfo = [
