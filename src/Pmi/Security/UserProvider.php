@@ -54,9 +54,22 @@ class UserProvider implements UserProviderInterface
                 'google_id' => $googleUser->getUserId(),
             ];
         }
-        $userInfo = $this->app['em']->getRepository('users')->fetchOneBy([
-            'email' => $googleUser->getEmail()
-        ]);
+        $attempts = 0;
+        $maxAttempts = 3;
+        do {
+            try {
+                $userInfo = $this->app['em']->getRepository('users')->fetchOneBy([
+                    'email' => $googleUser->getEmail()
+                ]);
+            } catch (\Exception $e) {
+                if ($attempts == 2) {
+                    sleep(1);
+                }
+                $attempts++;
+                continue;
+            }
+            break;
+        } while ($attempts < $maxAttempts);
         if (!$userInfo) {
             $userInfo = [
                 'email' => $googleUser->getEmail(),
