@@ -186,6 +186,8 @@ class OrderController extends AbstractController
             $options = [
                 'type' => $orderData['type'],
                 'patient_id' => $participant->biobankId,
+                'first_name' => $participant->firstName,
+                'last_name' => $participant->lastName,
                 'gender' => $participant->gender,
                 'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
                 'order_id' => $orderData['order_id'],
@@ -193,7 +195,7 @@ class OrderController extends AbstractController
                 'mayoClientId' => $mayoClientId,
                 'requested_samples' => $orderData['requested_samples']
             ];
-            $pdf = $mlOrder->loginAndGetPdf(
+            $pdf = $mlOrder->getLabelsPdf(
                 $app->getConfig('ml_username'),
                 $app->getConfig('ml_password'),
                 $options
@@ -367,18 +369,19 @@ class OrderController extends AbstractController
                             $options = [
                                 'type' => $orderData['type'],
                                 'patient_id' => $participant->biobankId,
+                                'first_name' => $participant->firstName,
+                                'last_name' => $participant->lastName,
                                 'gender' => $participant->gender,
                                 'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
                                 'order_id' => $orderData['order_id'],
                                 'collected_at' => $collectedAt,
                                 'mayoClientId' => $mayoClientId,
-                                'gender' => $participant->gender,
                                 'siteId' => $app->getSiteId(),
                                 'organizationId' => $app->getSiteOrganization(),
                                 'finalized_samples' => $orderData['finalized_samples']
                             ];
-                            $order = new MayolinkOrder($app);
-                            $mayoId = $order->loginAndCreateOrder(
+                            $mayoOrder = new MayolinkOrder($app);
+                            $mayoId = $mayoOrder->createOrder(
                                 $app->getConfig('ml_username'),
                                 $app->getConfig('ml_password'),
                                 $options
@@ -386,14 +389,17 @@ class OrderController extends AbstractController
                         }
                         if ($mayoId) {
                             $app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId]);
-                        }
-                        $order->sendToRdr();
-                        $app->addFlashSuccess('Order finalized');
-                        if ($order->get('type') !== 'kit') {
-                            return $app->redirectToRoute('orderPrintRequisition', [
-                                'participantId' => $participantId,
-                                'orderId' => $orderId
-                            ]);
+                            $order = $this->loadOrder($participantId, $orderId, $app);
+                            $order->sendToRdr();
+                            $app->addFlashSuccess('Order finalized');
+                            if ($order->get('type') !== 'kit') {
+                                return $app->redirectToRoute('orderPrintRequisition', [
+                                    'participantId' => $participantId,
+                                    'orderId' => $orderId
+                                ]);
+                            }
+                        } else {
+                            $app->addFlashError('Failed to finalize order');
                         }
                     }
 
@@ -503,12 +509,12 @@ class OrderController extends AbstractController
         if ($app->getConfig('ml_mock_order')) {
             return $app->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
         } else {
-            if ($mayoId = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+            if ($order->get('mayo_id')) {
                 $mlOrder = new MayolinkOrder($app);
-                $pdf = $mlOrder->loginAndGetRequisitionPdf(
+                $pdf = $mlOrder->getRequisitionPdf(
                     $app->getConfig('ml_username'),
                     $app->getConfig('ml_password'),
-                    $mayoId
+                    $order->get('mayo_id')
                 );
             }
             if (!empty($pdf)) {
