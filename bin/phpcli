@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# Script to run PHP script using GAE php_cli.py
+#
+
+GCLOUD_PATH=$(which gcloud)
+
+if [ -z "$GCLOUD_PATH" ]; then
+    echo "gcloud must be installed (and available from PATH)"
+    echo
+    exit 1
+fi
+
+GCLOUD_DIR=${GCLOUD_PATH%/bin/gcloud}
+
+PHP_CLI_PATH="$GCLOUD_DIR/platform/google_appengine/php_cli.py"
+if [ ! -f "$PHP_CLI_PATH" ]; then
+    echo "app-engine-php component must be installed. Run:"
+    echo
+    echo "    gcloud components install app-engine-php"
+    echo
+    exit 1
+fi
+
+
+GAE_PHP="$GCLOUD_DIR/platform/php55/php"
+
+if [ -f "$GAE_PHP" ]; then
+    PHP=$GAE_PHP
+else
+    PHP=$(which php)
+fi
+
+$PHP_CLI_PATH --php_executable_path="$PHP" "$@"

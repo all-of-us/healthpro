@@ -5,10 +5,13 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # install composer dependencies
 composer install
 
+# chmod to allow gcloud to install components
+# gcloud lives at /opt and wants to make a .staging directory
+# when upgrading or installing new components.
+sudo chmod o+w /opt
+
 # install App Engine SDK
-cd ~
-wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.57.zip
-unzip -q google_appengine_1.9.57.zip
+gcloud components install app-engine-php --quiet
 
 # patch php_cli.py to make our CI environment variables available
-patch google_appengine/google/appengine/tools/php_cli.py $DIR/php_cli.patch
+patch /opt/google-cloud-sdk/platform/google_appengine/google/appengine/tools/php_cli.py $DIR/php_cli.patch
