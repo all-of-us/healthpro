@@ -18,12 +18,14 @@ class OrderController extends AbstractController
     protected static $routes = [
         ['orderCheck', '/participant/{participantId}/order/check'],
         ['orderCreate', '/participant/{participantId}/order/create', ['method' => 'GET|POST']],
-        ['orderPdf', '/participant/{participantId}/order/{orderId}-{type}.pdf'],
+        ['orderLabelsPdf', '/participant/{participantId}/order/{orderId}/labels.pdf'],
+        ['orderRequisitionPdf', '/participant/{participantId}/order/{orderId}/requisition.pdf'],
         ['order', '/participant/{participantId}/order/{orderId}'],
-        ['orderPrint', '/participant/{participantId}/order/{orderId}/print'],
+        ['orderPrintLabels', '/participant/{participantId}/order/{orderId}/print/labels'],
         ['orderCollect', '/participant/{participantId}/order/{orderId}/collect', ['method' => 'GET|POST']],
         ['orderProcess', '/participant/{participantId}/order/{orderId}/process', ['method' => 'GET|POST']],
         ['orderFinalize', '/participant/{participantId}/order/{orderId}/finalize', ['method' => 'GET|POST']],
+        ['orderPrintRequisition', '/participant/{participantId}/order/{orderId}/print/requisition'],
         ['orderJson', '/participant/{participantId}/order/{orderId}/order.json'],
         ['orderExport', '/orders/export.csv']
     ];
@@ -125,51 +127,18 @@ class OrderController extends AbstractController
                 }
             }
             if ($confirmForm->isValid()) {
-                if ($app->getConfig('ml_mock_order')) {
-                    $orderData['mayo_id'] = $app->getConfig('ml_mock_order');
-                } else {
-                    // set collected time to today at midnight local time
-                    $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
-                    $order = new MayolinkOrder($app);
-
-                    if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
-                        $mayoClientId = $site['mayolink_account'];
-                    } else {
-                        $mayoClientId = null;
-                    }
-                    $options = [
-                        'type' => $orderData['type'],
-                        'patient_id' => $participant->biobankId,
-                        'gender' => $participant->gender,
-                        'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
-                        'order_id' => $orderData['order_id'],
-                        'collected_at' => $collectedAt,
-                        'mayoClientId' => $mayoClientId
-                    ];
-
-                    if (isset($requestedSamples) && is_array($requestedSamples)) {
-                        $options['tests'] = $requestedSamples;
-                    }
-                    $orderData['mayo_id'] = $order->loginAndCreateOrder(
-                        $app->getConfig('ml_username'),
-                        $app->getConfig('ml_password'),
-                        $options
-                    );
-                }
-                if ($orderData['mayo_id']) {
-                    $orderData['user_id'] = $app->getUser()->getId();
-                    $orderData['site'] = $app->getSiteId();
-                    $orderData['participant_id'] = $participant->id;
-                    $orderData['biobank_id'] = $participant->biobankId;
-                    $orderData['created_ts'] = new \DateTime();
-                    $orderId = $app['em']->getRepository('orders')->insert($orderData);
-                    if ($orderId) {
-                        $app->log(Log::ORDER_CREATE, $orderId);
-                        return $app->redirectToRoute('order', [
-                            'participantId' => $participant->id,
-                            'orderId' => $orderId
-                        ]);
-                    }
+                $orderData['user_id'] = $app->getUser()->getId();
+                $orderData['site'] = $app->getSiteId();
+                $orderData['participant_id'] = $participant->id;
+                $orderData['biobank_id'] = $participant->biobankId;
+                $orderData['created_ts'] = new \DateTime();
+                $orderId = $app['em']->getRepository('orders')->insert($orderData);
+                if ($orderId) {
+                    $app->log(Log::ORDER_CREATE, $orderId);
+                    return $app->redirectToRoute('order', [
+                        'participantId' => $participant->id,
+                        'orderId' => $orderId
+                    ]);
                 }
                 $app->addFlashError('Failed to create order.');
             }
@@ -193,31 +162,45 @@ class OrderController extends AbstractController
         ]);
     }
 
-    public function orderPdfAction($type, $participantId, $orderId, Application $app, Request $request)
+    public function orderLabelsPdfAction($participantId, $orderId, Application $app, Request $request)
     {
-        if (!in_array($type, ['labels', 'requisition'])) {
-            $app->abort(404);
-        }
         $order = $this->loadOrder($participantId, $orderId, $app);
         if ($order->get('finalized_ts')) {
             $app->abort(403);
         }
-        if (!in_array('print', $order->getAvailableSteps())) {
+        if (!in_array('printLabels', $order->getAvailableSteps())) {
             $app->abort(404);
         }
         if ($app->getConfig('ml_mock_order')) {
-            if ($type == 'labels') {
-                return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
-            } else {
-                return $app->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
-            }
+            return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
         } else {
             $mlOrder = new MayolinkOrder($app);
-            $pdf = $mlOrder->loginAndGetPdf(
+            $participant = $app['pmi.drc.participants']->getById($participantId);
+            $order = $this->loadOrder($participantId, $orderId, $app);
+            $orderData = $order->toArray();
+            // set collected time to created date at midnight local time
+            $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'));
+            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                $mayoClientId = $site['mayolink_account'];
+            } else {
+                $mayoClientId = null;
+            }
+            $options = [
+                'type' => $orderData['type'],
+                'patient_id' => $participant->biobankId,
+                'first_name' => $participant->firstName,
+                'last_name' => $participant->lastName,
+                'gender' => $participant->gender,
+                'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
+                'order_id' => $orderData['order_id'],
+                'collected_at' => $collectedAt,
+                'mayoClientId' => $mayoClientId,
+                'requested_samples' => $orderData['requested_samples']
+            ];
+            $pdf = $mlOrder->getLabelsPdf(
                 $app->getConfig('ml_username'),
                 $app->getConfig('ml_password'),
-                $order->get('mayo_id'),
-                $type
+                $options
             );
 
             if ($pdf) {
@@ -228,13 +211,13 @@ class OrderController extends AbstractController
         }
     }
 
-    public function orderPrintAction($participantId, $orderId, Application $app, Request $request)
+    public function orderPrintLabelsAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
         if ($order->get('finalized_ts')) {
             $app->abort(403);
         }
-        if (!in_array('print', $order->getAvailableSteps())) {
+        if (!in_array('printLabels', $order->getAvailableSteps())) {
             // 404 because print is not a valid route for kit orders regardless of state
             $app->abort(404);
         }
@@ -244,7 +227,7 @@ class OrderController extends AbstractController
                 'printed_ts' => new \DateTime()
             ]);
         }
-        return $app['twig']->render('order-print.html.twig', [
+        return $app['twig']->render('order-print-labels.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray()
         ]);
@@ -315,6 +298,9 @@ class OrderController extends AbstractController
                 }
                 $updateArray['processed_user_id'] = $app->getUser()->getId();
                 $updateArray['processed_site'] = $app->getSiteId();
+                if ($order->get('type') !== 'saliva' && $processForm->has('processed_centrifuge_type')) {
+                    $updateArray['processed_centrifuge_type'] = $processForm['processed_centrifuge_type']->getData();
+                }
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                     $app->addFlashNotice('Order processing updated');
@@ -370,8 +356,53 @@ class OrderController extends AbstractController
                     if (empty($order->get('finalized_ts'))) {
                         $app->addFlashNotice('Order updated but not finalized');
                     } else {
-                        $order->sendToRdr();
-                        $app->addFlashSuccess('Order finalized');
+                        if ($app->getConfig('ml_mock_order')) {
+                            $mayoId = $app->getConfig('ml_mock_order');
+                        } else {
+                            // set collected time to created date at midnight local time
+                            $collectedAt = new \DateTime($order->get('created_ts')->format('Y-m-d'));
+                            $orderData = $order->toArray();
+                            $participant = $app['pmi.drc.participants']->getById($participantId);
+                            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                                $mayoClientId = $site['mayolink_account'];
+                            } else {
+                                $mayoClientId = null;
+                            }
+                            $options = [
+                                'type' => $orderData['type'],
+                                'patient_id' => $participant->biobankId,
+                                'first_name' => $participant->firstName,
+                                'last_name' => $participant->lastName,
+                                'gender' => $participant->gender,
+                                'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
+                                'order_id' => $orderData['order_id'],
+                                'collected_at' => $collectedAt,
+                                'mayoClientId' => $mayoClientId,
+                                'siteId' => $app->getSiteId(),
+                                'organizationId' => $app->getSiteOrganization(),
+                                'finalized_samples' => $orderData['finalized_samples']
+                            ];
+                            $mayoOrder = new MayolinkOrder($app);
+                            $mayoId = $mayoOrder->createOrder(
+                                $app->getConfig('ml_username'),
+                                $app->getConfig('ml_password'),
+                                $options
+                            );                           
+                        }
+                        if ($mayoId) {
+                            $app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId]);
+                            $order = $this->loadOrder($participantId, $orderId, $app);
+                            $order->sendToRdr();
+                            $app->addFlashSuccess('Order finalized');
+                            if ($order->get('type') !== 'kit') {
+                                return $app->redirectToRoute('orderPrintRequisition', [
+                                    'participantId' => $participantId,
+                                    'orderId' => $orderId
+                                ]);
+                            }
+                        } else {
+                            $app->addFlashError('Failed to finalize order');
+                        }
                     }
 
                     return $app->redirectToRoute('orderFinalize', [
@@ -386,6 +417,25 @@ class OrderController extends AbstractController
             'order' => $order->toArray(),
             'finalizeForm' => $finalizeForm->createView(),
             'samplesInfo' => Order::$samplesInformation
+        ]);
+    }
+
+    public function orderPrintRequisitionAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        if (!in_array('printRequisition', $order->getAvailableSteps())) {
+            return $app->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
+        }
+        if (!in_array('printRequisition', $order->getAvailableSteps())) {
+            // 404 because print is not a valid route for kit orders regardless of state
+            $app->abort(404);
+        }
+        return $app['twig']->render('order-print-requisition.html.twig', [
+            'participant' => $order->getParticipant(),
+            'order' => $order->toArray()
         ]);
     }
 
@@ -450,5 +500,30 @@ class OrderController extends AbstractController
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
+    }
+
+    public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        if (!in_array('printRequisition', $order->getAvailableSteps())) {
+            $app->abort(404);
+        }
+        if ($app->getConfig('ml_mock_order')) {
+            return $app->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
+        } else {
+            if ($order->get('mayo_id')) {
+                $mlOrder = new MayolinkOrder($app);
+                $pdf = $mlOrder->getRequisitionPdf(
+                    $app->getConfig('ml_username'),
+                    $app->getConfig('ml_password'),
+                    $order->get('mayo_id')
+                );
+            }
+            if (!empty($pdf)) {
+                return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+            } else {
+                $app->abort(500, 'Failed to load PDF');
+            }
+        }
     }
 }

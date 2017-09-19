@@ -6,11 +6,9 @@ use Pmi\HttpClient;
 
 class MayolinkOrder
 {
-    protected $ordersEndpoint = 'https://orders.mayomedicallaboratories.com';
-    protected $authEndpoint = 'https://profile.mayomedicallaboratories.com/authn';
-    protected $providerName = 'www.mayomedicallaboratories.com';
-    protected $labelPdf = '/en/orders/{id}/label-set';
-    protected $requisitionPdf = '/en/orders/{id}/requisition';
+    protected $ordersEndpoint = 'https://test.orders.mayomedicallaboratories.com';
+    protected $labelPdf = 'orders/labels.xml';
+    protected $createOrder = 'orders/create.xml';
 
     protected static $tests = [
         '1SST8' => [
@@ -55,131 +53,153 @@ class MayolinkOrder
     public function __construct(Application $app)
     {
         $this->client = new HttpClient(['cookies' => true]);
-        $configurationMapping = [
-            'ordersEndpoint' => 'ml_orders_endpoint',
-            'authEndpoint' => 'ml_auth_endpoint',
-            'providerName' => 'ml_provider_name',
-            'labelPdf' => 'ml_label_pdf',
-            'requisitionPdf' => 'ml_requisition_pdf'
-        ];
-
-        foreach ($configurationMapping as $variable => $configName) {
-            if ($value = $app->getConfig($configName)) {
-                $this->$variable = $value;
-            }
+        if ($app->getConfig('ml_orders_endpoint')) {
+            $this->ordersEndpoint = $app->getConfig('ml_orders_endpoint');
         }
     }
 
-    /**
-     * Attempts to login and retrieve CSRF token
-     */
-    public function login($username, $password)
+    public function createOrder($username, $password, $options)
     {
-        $body = [
-            'SAMLRequest' => base64_encode(Saml::generateAuthnRequest($this->providerName)),
-            'RelayState' => base64_encode("{$this->ordersEndpoint}/en/login"),
-            'username' => $username,
-            'password' => $password
-        ];
-        try {
-            $response = $this->client->request('POST', $this->authEndpoint, [
-                'form_params' => $body
-            ]);
-            if ($response->getStatusCode() !== 200) {
-                return false;
-            }
-            $body = $response->getBody()->getContents();
-            if (!preg_match('/name="authenticity_token" value="([^"]+)"/', $body, $matches)) {
-                return false;
-            }
-            $this->csrfToken = $matches[1];
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    public function create($options)
-    {
-        $body = [
-            'authenticity_token' => $this->csrfToken,
-            'order[reference_number]' => $options['order_id'],
-            'order[patient_attributes][medical_record_number]' => $options['patient_id'],
-            'order[patient_attributes][first_name]' => '*',
-            'order[patient_attributes][last_name]' => $options['patient_id'],
-            'order[patient_attributes][gender]' => $options['gender'],
-            'order[patient_attributes][birth_date]' => $options['birth_date']->format('Y-m-d'),
-            'order[physician_name]' => 'None',
-            'order[physician_phone]' => 'None',
-            'order[collected_at(1i)]' => $options['collected_at']->format('Y'),
-            'order[collected_at(2i)]' => $options['collected_at']->format('n'),
-            'order[collected_at(3i)]' => $options['collected_at']->format('j'),
-            'order[collected_at(4i)]' => $options['collected_at']->format('H'),
-            'order[collected_at(5i)]' => $options['collected_at']->format('i')
-        ];
-        $i = 0;
+        $xml = '<?xml version="1.0" encoding="utf-8"?>';
+        $xml .= '<orders xmlns="'.$this->ordersEndpoint.'">';
+        $xml .= '<order>';
+        $xml .= '<collected>'.$options['collected_at']->format('c').'</collected>';
+        $xml .= '<account>'.$options['mayoClientId'].'</account>';
+        $xml .= '<number>'.$options['order_id'].'</number>';
+        $xml .= '<patient>';
+        $xml .= '<medical_record_number>'.$options['patient_id'].'</medical_record_number>';
+        $xml .= '<first_name>'.$options['first_name'].'</first_name>';
+        $xml .= '<last_name>'.$options['last_name'].'</last_name>';
+        $xml .= '<middle_name/>';
+        $xml .= '<birth_date>'.$options['birth_date']->format('Y-m-d').'</birth_date>';
+        $xml .= '<gender>'.$options['gender'].'</gender>';
+        $xml .= '<address1/>';
+        $xml .= '<address2/>';
+        $xml .= '<city/>';
+        $xml .= '<state/>';
+        $xml .= '<postal_code/>';
+        $xml .= '<phone/>';
+        $xml .= '<account_number/>';
+        $xml .= '<race/>';
+        $xml .= '<ethnic_group/>';
+        $xml .= '</patient>';
+        $xml .= '<physician>';
+        $xml .= '<name>'.$options['siteId'].'</name>';
+        $xml .= '<phone>'.$options['organizationId'].'</phone>';
+        $xml .= '<npi/>';
+        $xml .= '</physician>';
+        $xml .= '<report_notes/>';
+        $xml .= '<tests>';
         if (isset($options['type']) && $options['type'] === 'saliva') {
             $tests = self::$salivaTests;
         } else {
             $tests = self::$tests;
         }
-        foreach ($tests as $test => $testOptions) {
-            if (isset($options['tests']) && !in_array($test, $options['tests'])) {
-                continue;
+        if ($options['finalized_samples']) {
+            $samples = json_decode($options['finalized_samples']);
+            foreach ($samples as $key => $sample) {
+                $xml .= '<test>';
+                $xml .= '<code>'.$sample.'</code>';
+                $xml .= '<name>'.$tests[$sample]['specimen'].'</name>';
+                $xml .= '<comments/>';
+                $xml .= '</test>';
             }
-            $body["order[test_requests_attributes][{$i}][test_code]"] = $test;
-            $body["temperatures[{$test}][{$testOptions['specimen']}]"] = $testOptions['temperature'];
-            $i++;
+        } else {
+            $i = 0;
+            foreach ($tests as $key => $sample) {
+                $xml .= '<test>';
+                $xml .= '<code>'.$key.'</code>';
+                $xml .= '<name>'.$sample['specimen'].'</name>';
+                $xml .= '<comments/>';
+                $xml .= '</test>';
+                $i++;
+            }
         }
-        if (!empty($options['mayoClientId'])) {
-            $body['account'] = $options['mayoClientId'];
-        }
-        $response = $this->client->request('POST', "{$this->ordersEndpoint}/en/orders", [
-            'form_params' => $body,
-            'allow_redirects' => false
+        $xml .= '</tests>';
+        $xml .= '<comments/>';
+        $xml .= '</order>';
+        $xml .= '</orders>';
+
+        $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->createOrder}", [
+            'auth' => [$username, $password],
+            'body' => $xml
         ]);
-        if ($response->getStatusCode() !== 302 || empty($response->getHeader('Location'))) {
+        if ($response->getStatusCode() !== 201) {
             return false;
         }
-        $location = $response->getHeader('Location')[0];
-        if (!preg_match('/orders\/(.*)$/', $location, $matches)) {
-            return false;
-        }
-        return $matches[1];
+
+        $xmlResponse = $response->getBody();
+        $xmlObj = simplexml_load_string($xmlResponse);
+        $mayoId = $xmlObj->order->number;
+        return $mayoId;
     }
 
-    public function getPdf($id, $type)
+    public function getLabelsPdf($username, $password, $options)
     {
-        if ($type == 'labels') {
-            $path = str_replace('{id}', $id, $this->labelPdf);
-        } elseif ($type == 'requisition') {
-            $path = str_replace('{id}', $id, $this->requisitionPdf);
+        $xml = '<?xml version="1.0" encoding="utf-8"?>';
+        $xml .= '<orders xmlns="'.$this->ordersEndpoint.'">';
+        $xml .= '<order>';
+        $xml .= '<collected>'.$options['collected_at']->format('c').'</collected>';
+        $xml .= '<account>'.$options['mayoClientId'].'</account>';
+        $xml .= '<number>'.$options['order_id'].'</number>';
+        $xml .= '<patient>';
+        $xml .= '<medical_record_number>'.$options['patient_id'].'</medical_record_number>';
+        $xml .= '<first_name>'.$options['first_name'].'</first_name>';
+        $xml .= '<last_name>'.$options['last_name'].'</last_name>';
+        $xml .= '<middle_name/>';
+        $xml .= '<birth_date>'.$options['birth_date']->format('Y-m-d').'</birth_date>';
+        $xml .= '<gender>'.$options['gender'].'</gender>';
+        $xml .= '</patient>';
+        $xml .= '<tests>';
+        if (isset($options['type']) && $options['type'] === 'saliva') {
+            $tests = self::$salivaTests;
         } else {
-            return false;
+            $tests = self::$tests;
         }
-        $response = $this->client->request('GET', "{$this->ordersEndpoint}{$path}");
+        if ($options['requested_samples']) {
+            $samples = json_decode($options['requested_samples']);
+            foreach ($samples as $key => $sample) {
+                $xml .= '<test>';
+                $xml .= '<code>'.$sample.'</code>';
+                $xml .= '<name>'.$tests[$sample]['specimen'].'</name>';
+                $xml .= '</test>';
+            }
+        } else {
+            $i = 0;
+            foreach ($tests as $key => $sample) {
+                $xml .= '<test>';
+                $xml .= '<code>'.$key.'</code>';
+                $xml .= '<name>'.$sample['specimen'].'</name>';
+                $xml .= '</test>';
+                $i++;
+            }
+        }
+        $xml .= '</tests>';
+        $xml .= '</order>';
+        $xml .= '</orders>';
+
+        $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->labelPdf}", [
+            'auth' => [$username, $password],
+            'body' => $xml
+        ]);
+
         if ($response->getStatusCode() !== 200) {
             return false;
         }
-        $stream = $response->getBody();
-        return $stream->getContents();
+        $xmlResponse = $response->getBody();
+        $xmlObj = simplexml_load_string($xmlResponse);
+        $pdf = base64_decode($xmlObj->order->labels);
+        return $pdf;
     }
 
-    public function loginAndCreateOrder($username, $password, $options)
+    public function getRequisitionPdf($username, $password, $id)
     {
-        if ($this->login($username, $password)) {
-            return $this->create($options);
-        } else {
-            return false;
-        }
-    }
-
-    public function loginAndGetPdf($username, $password, $id, $type)
-    {
-        if ($this->login($username, $password)) {
-            return $this->getPdf($id, $type);
-        } else {
-            return false;
-        }
+        $response = $this->client->request('GET', "{$this->ordersEndpoint}/orders/{$id}.xml", [
+            'auth' => [$username, $password]
+        ]);
+        $xmlResponse = $response->getBody();
+        $xmlObj = simplexml_load_string($xmlResponse);
+        $pdf = base64_decode($xmlObj->order->requisition);
+        return $pdf;          
     }
 }

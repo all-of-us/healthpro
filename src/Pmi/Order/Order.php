@@ -12,7 +12,8 @@ class Order
     protected $app;
     protected $order;
     protected $participant;
-
+    const FIXED_ANGLE = 'fixed_angle';
+    const SWINGING_BUCKET = 'swinging_bucket';
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
     public static $samples = [
@@ -132,13 +133,15 @@ class Order
     public function getCurrentStep()
     {
         $columns = [
-            'print' => 'printed',
+            'printLabels' => 'printed',
             'collect' => 'collected',
             'process' => 'processed',
-            'finalize' => 'finalized'
+            'finalize' => 'finalized',
+            'printRequisition' => 'finalized'
         ];
         if ($this->order['type'] === 'kit') {
-            unset($columns['print']);
+            unset($columns['printLabels']);
+            unset($columns['printRequisition']);
         }
         $step = 'finalize';
         foreach ($columns as $name => $column) {
@@ -153,13 +156,15 @@ class Order
     public function getAvailableSteps()
     {
         $columns = [
-            'print' => 'printed',
+            'printLabels' => 'printed',
             'collect' => 'collected',
             'process' => 'processed',
-            'finalize' => 'finalized'
+            'finalize' => 'finalized',
+            'printRequisition' => 'finalized'
         ];
         if ($this->order['type'] === 'kit') {
-            unset($columns['print']);
+            unset($columns['printLabels']);
+            unset($columns['printRequisition']);
         }
         $steps = [];
         foreach ($columns as $name => $column) {
@@ -205,6 +210,9 @@ class Order
                 $updateArray['processed_samples_ts'] = json_encode($processedSampleTimes);
             } else {
                 $updateArray['processed_samples_ts'] = json_encode([]);
+            }
+            if ($this->order['type'] !== 'saliva' && !empty($formData["processed_centrifuge_type"])) {
+                $updateArray["processed_centrifuge_type"] = $formData["processed_centrifuge_type"];
             }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
@@ -308,6 +316,22 @@ class Order
                 ],
                 'required' => false
             ]);
+            if ($this->order['type'] !== 'saliva') {
+                $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
+                    'label' => 'Centrifuge type',
+                    'required' => true,
+                    'disabled' => $disabled,
+                    'choices' => [
+                        '-- Select centrifuge type --' => null,
+                        'Fixed Angle'=> self::FIXED_ANGLE,
+                        'Swinging Bucket' => self::SWINGING_BUCKET
+                    ],
+                    'multiple' => false,
+                    'constraints' => new Constraints\NotBlank([
+                        'message' => 'Please select centrifuge type'
+                    ])
+                ]);
+            }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
             $formBuilder->add('fedex_tracking', Type\RepeatedType::class, [
@@ -514,6 +538,9 @@ class Order
                 } else {
                     $formData['processed_samples_ts'][$sample] = null;
                 }
+            }
+            if ($this->order["processed_centrifuge_type"]) {
+                $formData["processed_centrifuge_type"] = $this->order["processed_centrifuge_type"];
             }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {

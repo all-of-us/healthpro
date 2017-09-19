@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+{% block title %}Print Labels - Order {{ order.order_id }} - {% endblock %}
+{% block body %}
+    {% include 'order-header.html.twig' with { active: 'printLabels' } %}
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Labels</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="text-center">
+                        <p id="labels-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
+                        <p id="labels-loaded">
+                            <a href="javascript:window.labels.print();" class="btn btn-primary btn-sm">
+                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                            </a>
+                        </p>
+                    </div>
+                    <iframe name="labels" class="pdf pdf-labels" src="{{ path('orderLabelsPdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    $('#labels-loaded').hide();
+    $('iframe[name=labels]').on('load', function() {
+        $('#labels-loading').hide();
+        $('#labels-loaded').show();
+    });
+});
+</script>
+{% endblock %}
