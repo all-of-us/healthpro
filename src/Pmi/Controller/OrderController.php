@@ -178,6 +178,8 @@ class OrderController extends AbstractController
             $participant = $app['pmi.drc.participants']->getById($participantId);
             $order = $this->loadOrder($participantId, $orderId, $app);
             $orderData = $order->toArray();
+            // set collected time to created date at midnight local time
+            $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'));
             if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
                 $mayoClientId = $site['mayolink_account'];
             } else {
@@ -191,7 +193,7 @@ class OrderController extends AbstractController
                 'gender' => $participant->gender,
                 'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
                 'order_id' => $orderData['order_id'],
-                'collected_at' => $orderData['created_ts'],
+                'collected_at' => $collectedAt,
                 'mayoClientId' => $mayoClientId,
                 'requested_samples' => $orderData['requested_samples']
             ];
@@ -357,8 +359,8 @@ class OrderController extends AbstractController
                         if ($app->getConfig('ml_mock_order')) {
                             $mayoId = $app->getConfig('ml_mock_order');
                         } else {
-                            // set collected time to today at midnight local time
-                            $collectedAt = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
+                            // set collected time to created date at midnight local time
+                            $collectedAt = new \DateTime($order->get('created_ts')->format('Y-m-d'));
                             $orderData = $order->toArray();
                             $participant = $app['pmi.drc.participants']->getById($participantId);
                             if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
