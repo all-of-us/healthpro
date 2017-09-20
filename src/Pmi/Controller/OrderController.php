@@ -210,7 +210,8 @@ class OrderController extends AbstractController
             if ($pdf) {
                 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
             } else {
-                $app->abort(500, 'Failed to load PDF');
+                echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Labels pdf file could not be loaded</strong></body></html>';
+                exit;
             }
         }
     }
@@ -526,7 +527,8 @@ class OrderController extends AbstractController
             if (!empty($pdf)) {
                 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
             } else {
-                $app->abort(500, 'Failed to load PDF');
+                echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Requisition pdf file could not be loaded</strong></body></html>';
+                exit;
             }
         }
     }

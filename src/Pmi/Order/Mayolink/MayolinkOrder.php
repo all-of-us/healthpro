@@ -170,10 +170,15 @@ class MayolinkOrder
         $xml .= '</tests>';
         $xml .= '</order>';
         $xml .= '</orders>';
-        $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->labelPdf}", [
-            'auth' => [$username, $password],
-            'body' => $xml
-        ]);
+        try {
+            $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->labelPdf}", [
+                'auth' => [$username, $password],
+                'body' => $xml
+            ]);            
+        } catch (\Exception $e) {
+            syslog(LOG_CRIT, $e->getMessage());
+            return false;
+        }
         if ($response->getStatusCode() !== 200) {
             return false;
         }
@@ -185,9 +190,14 @@ class MayolinkOrder
 
     public function getRequisitionPdf($username, $password, $id)
     {
-        $response = $this->client->request('GET', "{$this->ordersEndpoint}/orders/{$id}.xml", [
-            'auth' => [$username, $password]
-        ]);
+        try {
+            $response = $this->client->request('GET', "{$this->ordersEndpoint}/orders/{$id}.xml", [
+                'auth' => [$username, $password]
+            ]);            
+        } catch (\Exception $e) {
+            syslog(LOG_CRIT, $e->getMessage());
+            return false;       
+        }
         if ($response->getStatusCode() !== 200) {
             return false;
         }
