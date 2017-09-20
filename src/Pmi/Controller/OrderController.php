@@ -355,47 +355,49 @@ class OrderController extends AbstractController
                 $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
                 $updateArray['finalized_user_id'] = $app->getUser()->getId();
                 $updateArray['finalized_site'] = $app->getSiteId();
+                $finalized_ts = $updateArray['finalized_ts'];
+                unset($updateArray['finalized_ts']);
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
-                    $order = $this->loadOrder($participantId, $orderId, $app);
-                    if (empty($order->get('finalized_ts'))) {
-                        $app->addFlashNotice('Order updated but not finalized');
+                }
+                $order = $this->loadOrder($participantId, $orderId, $app);
+                if (empty($order->get('finalized_ts'))) {
+                    if ($app->getConfig('ml_mock_order')) {
+                        $mayoId = $app->getConfig('ml_mock_order');
                     } else {
-                        if ($app->getConfig('ml_mock_order')) {
-                            $mayoId = $app->getConfig('ml_mock_order');
+                        // set collected time to created date at midnight local time
+                        $collectedAt = new \DateTime($order->get('created_ts')->format('Y-m-d'));
+                        $orderData = $order->toArray();
+                        $participant = $app['pmi.drc.participants']->getById($participantId);
+                        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                            $mayoClientId = $site['mayolink_account'];
                         } else {
-                            // set collected time to created date at midnight local time
-                            $collectedAt = new \DateTime($order->get('created_ts')->format('Y-m-d'));
-                            $orderData = $order->toArray();
-                            $participant = $app['pmi.drc.participants']->getById($participantId);
-                            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
-                                $mayoClientId = $site['mayolink_account'];
-                            } else {
-                                $mayoClientId = null;
-                            }
-                            $options = [
-                                'type' => $orderData['type'],
-                                'patient_id' => $participant->biobankId,
-                                'first_name' => $participant->firstName,
-                                'last_name' => $participant->lastName,
-                                'gender' => $participant->gender,
-                                'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
-                                'order_id' => $orderData['order_id'],
-                                'collected_at' => $collectedAt,
-                                'mayoClientId' => $mayoClientId,
-                                'siteId' => $app->getSiteId(),
-                                'organizationId' => $app->getSiteOrganization(),
-                                'finalized_samples' => $orderData['finalized_samples']
-                            ];
-                            $mayoOrder = new MayolinkOrder($app);
-                            $mayoId = $mayoOrder->createOrder(
-                                $app->getConfig('ml_username'),
-                                $app->getConfig('ml_password'),
-                                $options
-                            );                           
+                            $mayoClientId = null;
                         }
-                        if ($mayoId) {
-                            $app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId]);
+                        $options = [
+                            'type' => $orderData['type'],
+                            'patient_id' => $participant->biobankId,
+                            'first_name' => $participant->firstName,
+                            'last_name' => $participant->lastName,
+                            'gender' => $participant->gender,
+                            'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
+                            'order_id' => $orderData['order_id'],
+                            'collected_at' => $collectedAt,
+                            'mayoClientId' => $mayoClientId,
+                            'siteId' => $app->getSiteId(),
+                            'organizationId' => $app->getSiteOrganization(),
+                            'finalized_samples' => $orderData['finalized_samples']
+                        ];
+                        $mayoOrder = new MayolinkOrder($app);
+                        $mayoId = $mayoOrder->createOrder(
+                            $app->getConfig('ml_username'),
+                            $app->getConfig('ml_password'),
+                            $options
+                        );                           
+                    }
+                    if ($mayoId) {
+                        if ($app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId, 'finalized_ts' => $finalized_ts])) {
+                            $app->log(Log::ORDER_EDIT, $orderId);
                             $order = $this->loadOrder($participantId, $orderId, $app);
                             $order->sendToRdr();
                             $app->addFlashSuccess('Order finalized');
@@ -405,16 +407,15 @@ class OrderController extends AbstractController
                                     'orderId' => $orderId
                                 ]);
                             }
-                        } else {
-                            $app->addFlashError('Failed to finalize order');
                         }
+                    } else {
+                        $app->addFlashError('Failed to finalize order');
                     }
-
-                    return $app->redirectToRoute('orderFinalize', [
-                        'participantId' => $participantId,
-                        'orderId' => $orderId
-                    ]);
                 }
+                return $app->redirectToRoute('orderFinalize', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId
+                ]);
             }
         }
         return $app['twig']->render('order-finalize.html.twig', [

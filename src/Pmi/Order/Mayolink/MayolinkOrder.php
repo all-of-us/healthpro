@@ -116,10 +116,15 @@ class MayolinkOrder
         $xml .= '<comments/>';
         $xml .= '</order>';
         $xml .= '</orders>';
-        $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->createOrder}", [
-            'auth' => [$username, $password],
-            'body' => $xml
-        ]);
+        try {
+            $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->createOrder}", [
+                'auth' => [$username, $password],
+                'body' => $xml
+            ]);            
+        } catch (\Exception $e) {
+            syslog(LOG_CRIT, $e->getMessage());
+            return false;
+        }
         if ($response->getStatusCode() !== 201) {
             return false;
         }
