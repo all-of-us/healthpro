@@ -48,7 +48,6 @@ class MayolinkOrder
     ];
 
     private $client;
-    private $csrfToken;
 
     public function __construct(Application $app)
     {
@@ -105,21 +104,18 @@ class MayolinkOrder
                 $xml .= '</test>';
             }
         } else {
-            $i = 0;
             foreach ($tests as $key => $sample) {
                 $xml .= '<test>';
                 $xml .= '<code>'.$key.'</code>';
                 $xml .= '<name>'.$sample['specimen'].'</name>';
                 $xml .= '<comments/>';
                 $xml .= '</test>';
-                $i++;
             }
         }
         $xml .= '</tests>';
         $xml .= '<comments/>';
         $xml .= '</order>';
         $xml .= '</orders>';
-
         $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->createOrder}", [
             'auth' => [$username, $password],
             'body' => $xml
@@ -127,7 +123,6 @@ class MayolinkOrder
         if ($response->getStatusCode() !== 201) {
             return false;
         }
-
         $xmlResponse = $response->getBody();
         $xmlObj = simplexml_load_string($xmlResponse);
         $mayoId = $xmlObj->order->number;
@@ -165,24 +160,20 @@ class MayolinkOrder
                 $xml .= '</test>';
             }
         } else {
-            $i = 0;
             foreach ($tests as $key => $sample) {
                 $xml .= '<test>';
                 $xml .= '<code>'.$key.'</code>';
                 $xml .= '<name>'.$sample['specimen'].'</name>';
                 $xml .= '</test>';
-                $i++;
             }
         }
         $xml .= '</tests>';
         $xml .= '</order>';
         $xml .= '</orders>';
-
         $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->labelPdf}", [
             'auth' => [$username, $password],
             'body' => $xml
         ]);
-
         if ($response->getStatusCode() !== 200) {
             return false;
         }
@@ -197,9 +188,12 @@ class MayolinkOrder
         $response = $this->client->request('GET', "{$this->ordersEndpoint}/orders/{$id}.xml", [
             'auth' => [$username, $password]
         ]);
+        if ($response->getStatusCode() !== 200) {
+            return false;
+        }
         $xmlResponse = $response->getBody();
         $xmlObj = simplexml_load_string($xmlResponse);
         $pdf = base64_decode($xmlObj->order->requisition);
-        return $pdf;          
+        return $pdf;
     }
 }
