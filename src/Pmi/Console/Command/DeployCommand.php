@@ -32,6 +32,7 @@ class DeployCommand extends Command {
     /** GAE application IDs for staging. */
     private static $STAGING_APP_IDS = [
         'pmi-hpo-staging', // dry run environment
+        'healthpro-beta', // beta environment
         'healthpro-staging' // staging environment
     ];
 
