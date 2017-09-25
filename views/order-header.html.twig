@@ -53,7 +53,7 @@
                 <a href="{{ path('order'~path, params) }}">
                     {% if attribute(order, column[1]~'_ts') %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
-                    {% elseif step != 'printLabels' %} {# since the printed_ts is set automatically after the first page load, don't disable to next tab #}
+                    {% else %} {# since the printed_ts is set automatically after the first page load, don't disable to next tab #}
                         {% set nextEnabled = false %}
                     {% endif %}
                     {{ column[0] }}

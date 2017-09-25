@@ -178,40 +178,12 @@ class OrderController extends AbstractController
         if ($app->getConfig('ml_mock_order')) {
             return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
         } else {
-            $mlOrder = new MayolinkOrder($app);
-            $participant = $app['pmi.drc.participants']->getById($participantId);
-            $order = $this->loadOrder($participantId, $orderId, $app);
-            $orderData = $order->toArray();
-            // set collected time to created date at midnight local time
-            $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'));
-            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
-                $mayoClientId = $site['mayolink_account'];
-            } else {
-                $mayoClientId = null;
-            }
-            $options = [
-                'type' => $orderData['type'],
-                'patient_id' => $participant->biobankId,
-                'first_name' => $participant->firstName,
-                'last_name' => $participant->lastName,
-                'gender' => $participant->gender,
-                'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
-                'order_id' => $orderData['order_id'],
-                'collected_at' => $collectedAt,
-                'mayoClientId' => $mayoClientId,
-                'requested_samples' => $orderData['requested_samples']
-            ];
-            $pdf = $mlOrder->getLabelsPdf(
-                $app->getConfig('ml_username'),
-                $app->getConfig('ml_password'),
-                $options
-            );
-
+            $pdf = $this->getLabelsPdf($participantId, $orderId, $app);
             if ($pdf) {
                 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
             } else {
-                echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Labels pdf file could not be loaded</strong></body></html>';
-                exit;
+                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Labels pdf file could not be loaded</strong></body></html>';
+                return new Response($html, 200, array('Content-Type' => 'text/html'));
             }
         }
     }
@@ -226,11 +198,12 @@ class OrderController extends AbstractController
             // 404 because print is not a valid route for kit orders regardless of state
             $app->abort(404);
         }
-        if (!$order->get('printed_ts')) {
+        if (!$order->get('printed_ts') && $this->getLabelsPdf($participantId, $orderId, $app)) {
             $app->log(Log::ORDER_EDIT, $orderId);
             $app['em']->getRepository('orders')->update($orderId, [
                 'printed_ts' => new \DateTime()
             ]);
+            $order = $this->loadOrder($participantId, $orderId, $app);
         }
         return $app['twig']->render('order-print-labels.html.twig', [
             'participant' => $order->getParticipant(),
@@ -241,6 +214,12 @@ class OrderController extends AbstractController
     public function orderCollectAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if (!in_array('collect', $order->getAvailableSteps())) {
+            return $app->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
+        }
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
         if ($collectForm->isValid() && !$order->get('finalized_ts')) {
@@ -528,9 +507,46 @@ class OrderController extends AbstractController
             if (!empty($pdf)) {
                 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
             } else {
-                echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Requisition pdf file could not be loaded</strong></body></html>';
-                exit;
+                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Requisition pdf file could not be loaded</strong></body></html>';
+                return new Response($html, 200, array('Content-Type' => 'text/html'));
             }
+        }
+    }
+
+    public function getLabelsPdf($participantId, $orderId, $app)
+    {
+        if ($app->getConfig('ml_mock_order')) {
+            return true;
+        } else {
+            $mlOrder = new MayolinkOrder($app);
+            $participant = $app['pmi.drc.participants']->getById($participantId);
+            $order = $this->loadOrder($participantId, $orderId, $app);
+            $orderData = $order->toArray();
+            // set collected time to created date at midnight local time
+            $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'));
+            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                $mayoClientId = $site['mayolink_account'];
+            } else {
+                $mayoClientId = null;
+            }
+            $options = [
+                'type' => $orderData['type'],
+                'patient_id' => $participant->biobankId,
+                'first_name' => $participant->firstName,
+                'last_name' => $participant->lastName,
+                'gender' => $participant->gender,
+                'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
+                'order_id' => $orderData['order_id'],
+                'collected_at' => $collectedAt,
+                'mayoClientId' => $mayoClientId,
+                'requested_samples' => $orderData['requested_samples']
+            ];
+            $pdf = $mlOrder->getLabelsPdf(
+                $app->getConfig('ml_username'),
+                $app->getConfig('ml_password'),
+                $options
+            );
+            return $pdf;
         }
     }
 }
