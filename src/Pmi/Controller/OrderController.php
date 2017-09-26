@@ -340,7 +340,7 @@ class OrderController extends AbstractController
                     $app->log(Log::ORDER_EDIT, $orderId);
                 }
                 $order = $this->loadOrder($participantId, $orderId, $app);
-                if (empty($order->get('finalized_ts'))) {
+                if ($finalized_ts && empty($order->get('finalized_ts'))) {
                     if ($app->getConfig('ml_mock_order')) {
                         $mayoId = $app->getConfig('ml_mock_order');
                     } else {
@@ -390,6 +390,8 @@ class OrderController extends AbstractController
                     } else {
                         $app->addFlashError('Failed to finalize order');
                     }
+                } else {
+                    $app->addFlashNotice('Order updated but not finalized');
                 }
                 return $app->redirectToRoute('orderFinalize', [
                     'participantId' => $participantId,
