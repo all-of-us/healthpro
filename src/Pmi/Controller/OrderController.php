@@ -268,11 +268,13 @@ class OrderController extends AbstractController
                 $processForm['processed_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 $app->addFlashError("Participant identifying information detected in notes field");
             }
-            $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
-            foreach ($processForm->get('processed_samples')->getData() as $sample) {
-                if (empty($processedSampleTimes[$sample])) {
-                    $processForm->get('processed_samples')->addError(new FormError('Please specify time of blood processing completion for each sample'));
-                    break;
+            if ($processForm->has('processed_samples')) {
+                $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
+                foreach ($processForm->get('processed_samples')->getData() as $sample) {
+                    if (empty($processedSampleTimes[$sample])) {
+                        $processForm->get('processed_samples')->addError(new FormError('Please specify time of blood processing completion for each sample'));
+                        break;
+                    }
                 }
             }
             if ($processForm->isValid()) {

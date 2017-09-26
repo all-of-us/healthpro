@@ -192,27 +192,29 @@ class Order
                 $updateArray["{$set}_ts"] = null;
             }
         }
-        $hasSampleArray = $formData["{$set}_samples"] && is_array($formData["{$set}_samples"]);
-        if ($hasSampleArray) {
-            $updateArray["{$set}_samples"] = json_encode(array_values($formData["{$set}_samples"]));
-        } else {
-            $updateArray["{$set}_samples"] = json_encode([]);
-        }
-        if ($set == 'processed') {
-            $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
-            if ($hasSampleArray && $hasSampleTimeArray) {
-                $processedSampleTimes = [];
-                foreach ($formData['processed_samples_ts'] as $sample => $dateTime) {
-                    if ($dateTime && in_array($sample, $formData["{$set}_samples"])) {
-                        $processedSampleTimes[$sample] = $dateTime->getTimestamp();
-                    }
-                }
-                $updateArray['processed_samples_ts'] = json_encode($processedSampleTimes);
+        if (!empty($formData["{$set}_samples"])) {
+            $hasSampleArray = $formData["{$set}_samples"] && is_array($formData["{$set}_samples"]);
+            if ($hasSampleArray) {
+                $updateArray["{$set}_samples"] = json_encode(array_values($formData["{$set}_samples"]));
             } else {
-                $updateArray['processed_samples_ts'] = json_encode([]);
+                $updateArray["{$set}_samples"] = json_encode([]);
             }
-            if ($this->order['type'] !== 'saliva' && !empty($formData["processed_centrifuge_type"])) {
-                $updateArray["processed_centrifuge_type"] = $formData["processed_centrifuge_type"];
+            if ($set == 'processed') {
+                $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
+                if ($hasSampleArray && $hasSampleTimeArray) {
+                    $processedSampleTimes = [];
+                    foreach ($formData['processed_samples_ts'] as $sample => $dateTime) {
+                        if ($dateTime && in_array($sample, $formData["{$set}_samples"])) {
+                            $processedSampleTimes[$sample] = $dateTime->getTimestamp();
+                        }
+                    }
+                    $updateArray['processed_samples_ts'] = json_encode($processedSampleTimes);
+                } else {
+                    $updateArray['processed_samples_ts'] = json_encode([]);
+                }
+                if ($this->order['type'] !== 'saliva' && !empty($formData["processed_centrifuge_type"])) {
+                    $updateArray["processed_centrifuge_type"] = $formData["processed_centrifuge_type"];
+                }
             }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
@@ -318,7 +320,7 @@ class Order
                 ],
                 'required' => false
             ]);
-            if ($this->order['type'] !== 'saliva') {
+            if ($this->order['type'] !== 'saliva' && !empty($enabledSamples)) {
                 $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
                     'label' => 'Centrifuge type',
                     'required' => true,

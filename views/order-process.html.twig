@@ -22,7 +22,7 @@
                 {{ form_errors(processForm.processed_samples) }}
             </div>
         {% endif %}
-        {% if order.type != 'saliva' %}
+        {% if order.type != 'saliva' and processForm.processed_centrifuge_type is defined %}
             <div class="form-group{% if not processForm.processed_centrifuge_type.vars.valid %} has-error{% endif %}">
                 {{ form_label(processForm.processed_centrifuge_type) }}
                 <span class="toggle-help-image" data-caption="Centrifuge type help text placeholder.">
