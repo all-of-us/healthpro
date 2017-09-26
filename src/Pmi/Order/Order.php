@@ -279,21 +279,23 @@ class Order
                 ]
             ]);
         }
-        $formBuilder->add("{$set}_samples", Type\ChoiceType::class, [
-            'expanded' => true,
-            'multiple' => true,
-            'label' => $samplesLabel,
-            'choices' => $samples,
-            'required' => false,
-            'disabled' => $disabled,
-            'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
-                if (in_array($val, $enabledSamples)) {
-                    return [];
-                } else {
-                    return ['disabled' => true, 'class' => 'sample-disabled'];
+        if (!empty($samples)) {
+            $formBuilder->add("{$set}_samples", Type\ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => true,
+                'label' => $samplesLabel,
+                'choices' => $samples,
+                'required' => false,
+                'disabled' => $disabled,
+                'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
+                    if (in_array($val, $enabledSamples)) {
+                        return [];
+                    } else {
+                        return ['disabled' => true, 'class' => 'sample-disabled'];
+                    }
                 }
-            }
-        ]);
+            ]);
+        }
         if ($set == 'processed') {
             $formBuilder->add('processed_samples_ts', Type\CollectionType::class, [
                 'entry_type' => Type\DateTimeType::class,
