@@ -9,6 +9,7 @@ class MayolinkOrder
     protected $ordersEndpoint = 'https://test.orders.mayomedicallaboratories.com';
     protected $labelPdf = 'orders/labels.xml';
     protected $createOrder = 'orders/create.xml';
+    protected $app;
 
     protected static $tests = [
         '1SST8' => [
@@ -51,6 +52,7 @@ class MayolinkOrder
 
     public function __construct(Application $app)
     {
+        $this->app = $app;
         $this->client = new HttpClient(['cookies' => true]);
         if ($app->getConfig('ml_orders_endpoint')) {
             $this->ordersEndpoint = $app->getConfig('ml_orders_endpoint');
@@ -59,63 +61,10 @@ class MayolinkOrder
 
     public function createOrder($username, $password, $options)
     {
-        $xml = '<?xml version="1.0" encoding="utf-8"?>';
-        $xml .= '<orders xmlns="'.$this->ordersEndpoint.'">';
-        $xml .= '<order>';
-        $xml .= '<collected>'.$options['collected_at']->format('c').'</collected>';
-        $xml .= '<account>'.$options['mayoClientId'].'</account>';
-        $xml .= '<number>'.$options['order_id'].'</number>';
-        $xml .= '<patient>';
-        $xml .= '<medical_record_number>'.$options['patient_id'].'</medical_record_number>';
-        $xml .= '<first_name>'.$options['first_name'].'</first_name>';
-        $xml .= '<last_name>'.$options['last_name'].'</last_name>';
-        $xml .= '<middle_name/>';
-        $xml .= '<birth_date>'.$options['birth_date']->format('Y-m-d').'</birth_date>';
-        $xml .= '<gender>'.$options['gender'].'</gender>';
-        $xml .= '<address1/>';
-        $xml .= '<address2/>';
-        $xml .= '<city/>';
-        $xml .= '<state/>';
-        $xml .= '<postal_code/>';
-        $xml .= '<phone/>';
-        $xml .= '<account_number/>';
-        $xml .= '<race/>';
-        $xml .= '<ethnic_group/>';
-        $xml .= '</patient>';
-        $xml .= '<physician>';
-        $xml .= '<name>'.$options['siteId'].'</name>';
-        $xml .= '<phone>'.$options['organizationId'].'</phone>';
-        $xml .= '<npi/>';
-        $xml .= '</physician>';
-        $xml .= '<report_notes/>';
-        $xml .= '<tests>';
-        if (isset($options['type']) && $options['type'] === 'saliva') {
-            $tests = self::$salivaTests;
-        } else {
-            $tests = self::$tests;
-        }
-        if ($options['finalized_samples']) {
-            $samples = json_decode($options['finalized_samples']);
-            foreach ($samples as $key => $sample) {
-                $xml .= '<test>';
-                $xml .= '<code>'.$sample.'</code>';
-                $xml .= '<name>'.$tests[$sample]['specimen'].'</name>';
-                $xml .= '<comments/>';
-                $xml .= '</test>';
-            }
-        } else {
-            foreach ($tests as $key => $sample) {
-                $xml .= '<test>';
-                $xml .= '<code>'.$key.'</code>';
-                $xml .= '<name>'.$sample['specimen'].'</name>';
-                $xml .= '<comments/>';
-                $xml .= '</test>';
-            }
-        }
-        $xml .= '</tests>';
-        $xml .= '<comments/>';
-        $xml .= '</order>';
-        $xml .= '</orders>';
+        $samples = $this->getSamples('finalized', $options);
+        $parameters = ['mayoUrl' => $this->ordersEndpoint, 'options' => $options, 'samples' => $samples];
+        $xmlFile = "mayolink/order-create.xml.twig";
+        $xml = $this->app['twig']->render($xmlFile, $parameters);
         try {
             $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->createOrder}", [
                 'auth' => [$username, $password],
@@ -136,45 +85,10 @@ class MayolinkOrder
 
     public function getLabelsPdf($username, $password, $options)
     {
-        $xml = '<?xml version="1.0" encoding="utf-8"?>';
-        $xml .= '<orders xmlns="'.$this->ordersEndpoint.'">';
-        $xml .= '<order>';
-        $xml .= '<collected>'.$options['collected_at']->format('c').'</collected>';
-        $xml .= '<account>'.$options['mayoClientId'].'</account>';
-        $xml .= '<number>'.$options['order_id'].'</number>';
-        $xml .= '<patient>';
-        $xml .= '<medical_record_number>'.$options['patient_id'].'</medical_record_number>';
-        $xml .= '<first_name>'.$options['first_name'].'</first_name>';
-        $xml .= '<last_name>'.$options['last_name'].'</last_name>';
-        $xml .= '<middle_name/>';
-        $xml .= '<birth_date>'.$options['birth_date']->format('Y-m-d').'</birth_date>';
-        $xml .= '<gender>'.$options['gender'].'</gender>';
-        $xml .= '</patient>';
-        $xml .= '<tests>';
-        if (isset($options['type']) && $options['type'] === 'saliva') {
-            $tests = self::$salivaTests;
-        } else {
-            $tests = self::$tests;
-        }
-        if ($options['requested_samples']) {
-            $samples = json_decode($options['requested_samples']);
-            foreach ($samples as $key => $sample) {
-                $xml .= '<test>';
-                $xml .= '<code>'.$sample.'</code>';
-                $xml .= '<name>'.$tests[$sample]['specimen'].'</name>';
-                $xml .= '</test>';
-            }
-        } else {
-            foreach ($tests as $key => $sample) {
-                $xml .= '<test>';
-                $xml .= '<code>'.$key.'</code>';
-                $xml .= '<name>'.$sample['specimen'].'</name>';
-                $xml .= '</test>';
-            }
-        }
-        $xml .= '</tests>';
-        $xml .= '</order>';
-        $xml .= '</orders>';
+        $samples = $this->getSamples('requested', $options);
+        $parameters = ['mayoUrl' => $this->ordersEndpoint, 'options' => $options, 'samples' => $samples];
+        $xmlFile = "mayolink/order-labels.xml.twig";
+        $xml = $this->app['twig']->render($xmlFile, $parameters);
         try {
             $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->labelPdf}", [
                 'auth' => [$username, $password],
@@ -210,5 +124,26 @@ class MayolinkOrder
         $xmlObj = simplexml_load_string($xmlResponse);
         $pdf = base64_decode($xmlObj->order->requisition);
         return $pdf;
+    }
+
+    public function getSamples($type, $options)
+    {
+        if (isset($options['type']) && $options['type'] === 'saliva') {
+            $tests = self::$salivaTests;
+        } else {
+            $tests = self::$tests;
+        }
+        $mayoSamples = [];
+        if ($options["{$type}_samples"]) {
+            $samples = json_decode($options["{$type}_samples"]);
+            foreach ($samples as $key => $sample) {
+                $mayoSamples[] = ['code' => $sample, 'name' => $tests[$sample]['specimen']];
+            }
+        } else {
+            foreach ($tests as $key => $sample) {
+                $mayoSamples[] = ['code' => $key, 'name' => $sample['specimen']];
+            }
+        }
+        return $mayoSamples;
     }
 }

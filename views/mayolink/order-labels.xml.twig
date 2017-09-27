@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orders xmlns="{{ mayoUrl }}">
+	<order>
+		<collected>{{ options.collected_at|date('c') }}</collected>
+		<account>{{ options.mayoClientId }}</account>
+		<number>{{ options.order_id }}</number>
+		<patient>
+			<medical_record_number>{{ options.patient_id }}</medical_record_number>
+			<first_name>{{ options.first_name }}</first_name>
+			<last_name>{{ options.last_name }}</last_name>
+			<middle_name/>
+			<birth_date>{{ options.birth_date|date('Y-m-d') }}</birth_date>
+			<gender>{{ options.gender }}</gender>
+		</patient>
+		<tests>
+			{% for sample in samples %}
+				<test>
+					<code>{{ sample.code }}</code>
+					<name>{{ sample.name}}</name>
+				</test>
+			{% endfor %}
+		</tests>
+	</order>
+</orders>
