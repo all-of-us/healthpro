@@ -152,84 +152,86 @@ class Participant
 
     public function checkIdentifiers($notes)
     {
-        $identifiers = [];
-        $dob = $this->dob;
-        if ($dob) {
-            $identifiers['dob'] = [
-                $dob->format('m/d/y'),
-                $dob->format('m-d-y'),
-                $dob->format('m.d.y'),
-                $dob->format('m/d/Y'),
-                $dob->format('m-d-Y'),
-                $dob->format('m.d.Y'),
-                $dob->format('d/m/y'),
-                $dob->format('d-m-y'),
-                $dob->format('d.m.y'),
-                $dob->format('d/m/Y'),
-                $dob->format('d-m-Y'),
-                $dob->format('d.m.Y'),
-                $dob->format('n/j/y'),
-                $dob->format('n-j-y'),
-                $dob->format('n.j.y'),
-                $dob->format('n/j/Y'),
-                $dob->format('n-j-Y'),
-                $dob->format('n.j.Y'),
-                $dob->format('j/n/y'),
-                $dob->format('j-n-y'),
-                $dob->format('j.n.y'),
-                $dob->format('j/n/Y'),
-                $dob->format('j-n-Y'),
-                $dob->format('j.n.Y')
-            ];
-        }
-        if ($this->email) {
-            $identifiers['email'] = [$this->email];
-        }
+        if (!empty($notes)) {
+            $identifiers = [];
+            $dob = $this->dob;
+            if ($dob) {
+                $identifiers['dob'] = [
+                    $dob->format('m/d/y'),
+                    $dob->format('m-d-y'),
+                    $dob->format('m.d.y'),
+                    $dob->format('m/d/Y'),
+                    $dob->format('m-d-Y'),
+                    $dob->format('m.d.Y'),
+                    $dob->format('d/m/y'),
+                    $dob->format('d-m-y'),
+                    $dob->format('d.m.y'),
+                    $dob->format('d/m/Y'),
+                    $dob->format('d-m-Y'),
+                    $dob->format('d.m.Y'),
+                    $dob->format('n/j/y'),
+                    $dob->format('n-j-y'),
+                    $dob->format('n.j.y'),
+                    $dob->format('n/j/Y'),
+                    $dob->format('n-j-Y'),
+                    $dob->format('n.j.Y'),
+                    $dob->format('j/n/y'),
+                    $dob->format('j-n-y'),
+                    $dob->format('j.n.y'),
+                    $dob->format('j/n/Y'),
+                    $dob->format('j-n-Y'),
+                    $dob->format('j.n.Y')
+                ];
+            }
+            if ($this->email) {
+                $identifiers['email'] = [$this->email];
+            }
 
-        // Detect dob and email
-        foreach ($identifiers as $key => $identifier) {
-            foreach ($identifier as $value) {
-                if (stripos($notes, $value) !== false) {
-                    return [$key, $value];
+            // Detect dob and email
+            foreach ($identifiers as $key => $identifier) {
+                foreach ($identifier as $value) {
+                    if (stripos($notes, $value) !== false) {
+                        return [$key, $value];
+                    }
                 }
             }
-        }
 
-        // Detect name
-        if ($this->firstName && $this->lastName) {
-            $fName = preg_quote($this->firstName, '/');
-            $lName = preg_quote($this->lastName, '/');
-            if (preg_match("/(?:\W|^)({$fName}\W*{$lName}|{$lName}\W*{$fName})(?:\W|$)/i", $notes, $matches)) {
-                return ['name', $matches[1]];
+            // Detect name
+            if ($this->firstName && $this->lastName) {
+                $fName = preg_quote($this->firstName, '/');
+                $lName = preg_quote($this->lastName, '/');
+                if (preg_match("/(?:\W|^)({$fName}\W*{$lName}|{$lName}\W*{$fName})(?:\W|$)/i", $notes, $matches)) {
+                    return ['name', $matches[1]];
+                }
             }
-        }
 
-        // Detect address
-        if ($this->streetAddress) {
-            $address = preg_split('/[\s]/', $this->streetAddress);
-            $address = array_map(function($value){
-                return preg_quote($value, '/');
-            }, $address);
-            $pattern = '/(?:\W|^)';
-            $pattern .= join('\W*', $address);
-            $pattern .= '(?:\W|$)/i';
+            // Detect address
+            if ($this->streetAddress) {
+                $address = preg_split('/[\s]/', $this->streetAddress);
+                $address = array_map(function($value){
+                    return preg_quote($value, '/');
+                }, $address);
+                $pattern = '/(?:\W|^)';
+                $pattern .= join('\W*', $address);
+                $pattern .= '(?:\W|$)/i';
 
-            if (preg_match($pattern, $notes, $matches)) {
-                return ['address', $matches[0]];
+                if (preg_match($pattern, $notes, $matches)) {
+                    return ['address', $matches[0]];
+                }
             }
-        }
 
-        // Detect phone number
-        $phone = preg_replace('/\D/', '', $this->phoneNumber);
-        if ($phone) {
-            $identifiers['phone'] = [$phone];
-            if (strlen($phone) === 10) {
-                $num1 = preg_quote(substr($phone, 0, 3));
-                $num2 = preg_quote(substr($phone, 3, 3));
-                $num3 = preg_quote(substr($phone, 6));
-            }
-            if (preg_match("/(\W*{$num1}\W*{$num2}\W*{$num3})/i", $notes, $matches)) {
-                return ['phone', $matches[1]];
+            // Detect phone number
+            if ($this->phoneNumber) {
+                $phone = preg_replace('/\D/', '', $this->phoneNumber);
+                $identifiers['phone'] = [$phone];
+                if (strlen($phone) === 10) {
+                    $num1 = preg_quote(substr($phone, 0, 3));
+                    $num2 = preg_quote(substr($phone, 3, 3));
+                    $num3 = preg_quote(substr($phone, 6));
+                }
+                if (preg_match("/(\W*{$num1}\W*{$num2}\W*{$num3})/i", $notes, $matches)) {
+                    return ['phone', $matches[1]];
+                }
             }
         }
         return false;
