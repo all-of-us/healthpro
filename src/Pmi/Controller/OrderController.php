@@ -355,14 +355,18 @@ class OrderController extends AbstractController
                         } else {
                             $mayoClientId = null;
                         }
+                        $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+                        if ($birthDate) {
+                            $birthDate = $birthDate->format('Y-m-d');
+                        }
                         $options = [
                             'type' => $orderData['type'],
                             'biobank_id' => $participant->biobankId,
                             'first_name' => '*',
                             'gender' => $participant->gender,
-                            'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
+                            'birth_date' => $birthDate,
                             'order_id' => $orderData['order_id'],
-                            'collected_at' => $collectedAt,
+                            'collected_at' => $collectedAt->format('c'),
                             'mayoClientId' => $mayoClientId,
                             'siteId' => $app->getSiteId(),
                             'organizationId' => $app->getSiteOrganization(),
@@ -532,14 +536,18 @@ class OrderController extends AbstractController
             } else {
                 $mayoClientId = null;
             }
+            $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+            if ($birthDate) {
+                $birthDate = $birthDate->format('Y-m-d');
+            }
             $options = [
                 'type' => $orderData['type'],
                 'biobank_id' => $participant->biobankId,
                 'first_name' => '*',
                 'gender' => $participant->gender,
-                'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
+                'birth_date' => $birthDate,
                 'order_id' => $orderData['order_id'],
-                'collected_at' => $collectedAt,
+                'collected_at' => $collectedAt->format('c'),
                 'mayoClientId' => $mayoClientId,
                 'requested_samples' => $orderData['requested_samples']
             ];

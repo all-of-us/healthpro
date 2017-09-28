@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <orders xmlns="{{ mayoUrl }}">
 	<order>
-		<collected>{{ options.collected_at|date('c') }}</collected>
+		<collected>{{ options.collected_at }}</collected>
 		<account>{{ options.mayoClientId }}</account>
 		<number>{{ options.order_id }}</number>
 		<patient>
@@ -9,7 +9,7 @@
 			<first_name>{{ options.first_name }}</first_name>
 			<last_name>{{ options.biobank_id }}</last_name>
 			<middle_name/>
-			<birth_date>{{ options.birth_date|date('Y-m-d') }}</birth_date>
+			<birth_date>{{ options.birth_date }}</birth_date>
 			<gender>{{ options.gender }}</gender>
 			<address1/>
 			<address2/>
