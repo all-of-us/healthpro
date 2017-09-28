@@ -357,9 +357,8 @@ class OrderController extends AbstractController
                         }
                         $options = [
                             'type' => $orderData['type'],
-                            'patient_id' => $participant->biobankId,
-                            'first_name' => $participant->firstName,
-                            'last_name' => $participant->lastName,
+                            'biobank_id' => $participant->biobankId,
+                            'first_name' => '*',
                             'gender' => $participant->gender,
                             'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
                             'order_id' => $orderData['order_id'],
@@ -535,9 +534,8 @@ class OrderController extends AbstractController
             }
             $options = [
                 'type' => $orderData['type'],
-                'patient_id' => $participant->biobankId,
-                'first_name' => $participant->firstName,
-                'last_name' => $participant->lastName,
+                'biobank_id' => $participant->biobankId,
+                'first_name' => '*',
                 'gender' => $participant->gender,
                 'birth_date' => $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob(),
                 'order_id' => $orderData['order_id'],
