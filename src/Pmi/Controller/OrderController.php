@@ -347,7 +347,7 @@ class OrderController extends AbstractController
                         $mayoId = $app->getConfig('ml_mock_order');
                     } else {
                         // set collected time to created date at midnight local time
-                        $collectedAt = new \DateTime($order->get('created_ts')->format('Y-m-d'));
+                        $collectedAt = new \DateTime($order->get('created_ts')->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
                         $orderData = $order->toArray();
                         $participant = $app['pmi.drc.participants']->getById($participantId);
                         if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
@@ -527,7 +527,7 @@ class OrderController extends AbstractController
             $order = $this->loadOrder($participantId, $orderId, $app);
             $orderData = $order->toArray();
             // set collected time to created date at midnight local time
-            $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'));
+            $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
             if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
                 $mayoClientId = $site['mayolink_account'];
             } else {
