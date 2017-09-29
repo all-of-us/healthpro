@@ -12,6 +12,7 @@ skip_files:
 - ^(.*/)?nbproject$
 - '^(.*/)?dev_config$'
 - ^(.*/)?external$
+- ^deploy_.*\.txt$
 
 error_handlers:
 - error_code: dos_api_denial
