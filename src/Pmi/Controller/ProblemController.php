@@ -198,12 +198,18 @@ class ProblemController extends AbstractController
         $siteAttributes = [
             'label' => 'Name of enrollment site where provider became aware of problem',
             'required' => false,
-            'disabled' => $this->disabled
+            'disabled' => $this->disabled,
+            'constraints' => [
+                new Constraints\Type('string')
+            ]
         ];
         $staffAttributes = [
             'label' => 'Name of staff recording the problem',
             'required' => false,
-            'disabled' => $this->disabled
+            'disabled' => $this->disabled,
+            'constraints' => [
+                new Constraints\Type('string')
+            ]
         ];
         $problemDateAttributes = [
             'label' => 'Date of problem',
@@ -238,20 +244,26 @@ class ProblemController extends AbstractController
         $descriptionAttributes = [
             'label' => 'Description of problem',
             'required' => false,
-            'disabled' => $this->disabled
+            'disabled' => $this->disabled,
+            'constraints' => [
+                new Constraints\Type('string')
+            ]
         ];
         $actionTakenAttributes = [
             'label' => 'Description of corrective action taken',
             'required' => false,
-            'disabled' => $this->disabled
+            'disabled' => $this->disabled,
+            'constraints' => [
+                new Constraints\Type('string')
+            ]
         ];
         if ($this->constraint) {
-            $siteAttributes['constraints'] = new Constraints\NotBlank();
-            $staffAttributes['constraints'] = new Constraints\NotBlank();
+            $siteAttributes['constraints'][] = new Constraints\NotBlank();
+            $staffAttributes['constraints'][] = new Constraints\NotBlank();
             $problemDateAttributes['constraints'][] = new Constraints\NotBlank();
             $providerAwareDateAttributes['constraints'][] = new Constraints\NotBlank();
-            $descriptionAttributes['constraints'] = new Constraints\NotBlank();
-            $actionTakenAttributes['constraints'] = new Constraints\NotBlank();
+            $descriptionAttributes['constraints'][] = new Constraints\NotBlank();
+            $actionTakenAttributes['constraints'][] = new Constraints\NotBlank();
         }
         $problemForm = $app['form.factory']->createBuilder(Type\FormType::class, $problem)
             ->add('problem_type', Type\ChoiceType::class, $problemTypeAttributes)
