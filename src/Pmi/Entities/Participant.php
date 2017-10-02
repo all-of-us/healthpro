@@ -152,6 +152,9 @@ class Participant
 
     public function checkIdentifiers($notes)
     {
+        if (empty($notes)) {
+            return false;
+        }
         $identifiers = [];
         $dob = $this->dob;
         if ($dob) {
@@ -227,9 +230,9 @@ class Participant
                 $num1 = preg_quote(substr($phone, 0, 3));
                 $num2 = preg_quote(substr($phone, 3, 3));
                 $num3 = preg_quote(substr($phone, 6));
-            }
-            if (preg_match("/(\W*{$num1}\W*{$num2}\W*{$num3})/i", $notes, $matches)) {
-                return ['phone', $matches[1]];
+                if (preg_match("/(\W*{$num1}\W*{$num2}\W*{$num3})/i", $notes, $matches)) {
+                    return ['phone', $matches[1]];
+                }
             }
         }
         return false;

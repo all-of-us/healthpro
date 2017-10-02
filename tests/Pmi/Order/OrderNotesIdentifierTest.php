@@ -116,6 +116,10 @@ class OrderNotesIdentifierTest extends \PHPUnit_Framework_TestCase
             'phoneNumber' => '(987) 654-3210'
         ]);
 
+        //Pariticipant with phone number greater than 10 digits
+        $participant2 = new Participant((object)[
+            'phoneNumber' => '(987) 654-32109'
+        ]);
         $stringsWithIdentifiers = [
             '(987) 654-3210',
             '987-654-3210',
@@ -139,10 +143,17 @@ class OrderNotesIdentifierTest extends \PHPUnit_Framework_TestCase
             $match = $participant->checkIdentifiers($string);
             $this->assertSame('phone', $match[0], $stringWithOtherWords);
             $this->assertSame($string, $match[1], $stringWithOtherWords);
+
+            $match = $participant2->checkIdentifiers($string);
+            $this->assertFalse($match, $string);
+            $this->assertFalse($match, $stringWithOtherWords);
         }
 
         foreach ($stringsWithoutIdentifiers as $string) {
             $match = $participant->checkIdentifiers($string);
+            $this->assertFalse($match, $string);
+
+            $match = $participant2->checkIdentifiers($string);
             $this->assertFalse($match, $string);
         }
     }
