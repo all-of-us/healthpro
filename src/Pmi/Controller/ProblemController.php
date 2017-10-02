@@ -173,11 +173,11 @@ class ProblemController extends AbstractController
                     return $app->redirectToRoute('participant', [
                         'id' => $participantId
                     ]);
-                } else {
-                   $app->addFlashError('Failed to create new comment'); 
                 }
             }
         }
+        $app->addFlashError('Failed to create new comment');
+        return $app->redirectToRoute('problemForm', ['participantId' => $participantId, 'problemId' => $problemId]);
     }
 
     public function getProblemForm(Application $app, $problem)
@@ -282,11 +282,19 @@ class ProblemController extends AbstractController
         $problemCommentForm = $app['form.factory']->createBuilder(Type\FormType::class, null)
             ->add('staff_name', Type\TextType::class, [
                 'label' => 'Staff Name',
-                'required' => true
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ]
             ])
             ->add('comment', Type\TextareaType::class, [
                 'label' => 'Comment',
-                'required' => true
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ]
             ])
             ->getForm();
             return $problemCommentForm;    
