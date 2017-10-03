@@ -140,8 +140,10 @@ class MayolinkOrder
                 $mayoSamples[] = ['code' => $sample, 'name' => $tests[$sample]['specimen']];
             }
         } else {
-            foreach ($tests as $key => $sample) {
-                $mayoSamples[] = ['code' => $key, 'name' => $sample['specimen']];
+            if ($type !== 'finalized') {
+                foreach ($tests as $key => $sample) {
+                    $mayoSamples[] = ['code' => $key, 'name' => $sample['specimen']];
+                }
             }
         }
         return $mayoSamples;
