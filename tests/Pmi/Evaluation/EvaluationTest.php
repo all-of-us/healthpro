@@ -29,7 +29,7 @@ class EvaluationTest extends AbstractWebTestCase
         $this->assertInstanceOf(Form::class, $form);
     }
 
-    public function testFhir()
+    public function testFhir1()
     {
         $finalized = new \DateTime();
         $evaluation = new Evaluation();
@@ -127,5 +127,37 @@ class EvaluationTest extends AbstractWebTestCase
             'unit' => 'kg/m2',
             'value' => 23.8
         ], $entries[5]['resource']['valueQuantity']);
+    }
+
+    protected function generateNormalizedUrnMap($fhir)
+    {
+        $map = [];
+        $map[$fhir->entry[0]['fullUrl']] = 'uuid:composition';
+        foreach ($fhir->entry[0]['resource']['section'][0]['entry'] as $k => $entry) {
+            $map[$entry['reference']] = 'uuid:' . ($k+1);
+        }
+        return $map;
+    }
+
+    public function testFhir2()
+    {
+        $jsonData = '{"blood-pressure-location":"Right arm","blood-pressure-systolic":[100,101,102],"blood-pressure-diastolic":[80,81,82],"heart-rate":[85,88,90],"irregular-heart-rate":[false,false,false],"blood-pressure-protocol-modification":["","",""],"manual-blood-pressure":[false,false,false],"manual-heart-rate":[false,false,false],"blood-pressure-protocol-modification-notes":[null,null,null],"pregnant":false,"wheelchair":false,"height":180,"height-protocol-modification":"","height-protocol-modification-notes":null,"weight":65,"weight-prepregnancy":null,"weight-protocol-modification":"","weight-protocol-modification-notes":null,"hip-circumference":[90,91,null],"hip-circumference-protocol-modification":["","",""],"hip-circumference-protocol-modification-notes":[null,null,null],"waist-circumference":[85,88,87],"waist-circumference-location":"smallest-part-of-trunk","waist-circumference-protocol-modification":["","",""],"waist-circumference-protocol-modification-notes":[null,null,null],"notes":null}';
+
+        $finalized = new \DateTime('2017-01-01', new \DateTimeZone('UTC'));
+        $evaluation = new Evaluation();
+        $evaluation->loadFromArray([
+            'data' => json_decode($jsonData),
+            'participant_id' => 'P10000001',
+            'created_user' => 'test-user1@example.com',
+            'finalized_user' => 'test-user2@example.com',
+            'created_site' => 'test-site1',
+            'finalized_site' => 'test-site2',
+        ]);
+        $fhir = $evaluation->getFhir($finalized);
+        $urnMap = $this->generateNormalizedUrnMap($fhir);
+        $json = json_encode($fhir, JSON_PRETTY_PRINT);
+        $json = str_replace(array_keys($urnMap), array_values($urnMap), $json);
+        // using string to string method so that diff is output (file to string just shows entire object)
+        $this->assertJsonStringEqualsJsonString(file_get_contents(__DIR__ . '/fhir2.json'), $json);
     }
 }
