@@ -223,12 +223,14 @@ class OrderController extends AbstractController
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
-            if ($collectForm->isValid() && !$order->get('finalized_ts')) {
-                if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
-                    $label = Order::$identifierLabel[$type[0]];
-                    $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
-                }
-                if ($collectForm->isValid()) {
+            if ($order->get('finalized_ts')) {
+                $app->abort(403);
+            }
+            if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
+                $label = Order::$identifierLabel[$type[0]];
+                $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+            }
+            if ($collectForm->isValid()) {
                     $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
                     $updateArray['collected_user_id'] = $app->getUser()->getId();
                     $updateArray['collected_site'] = $app->getSiteId();
@@ -241,7 +243,6 @@ class OrderController extends AbstractController
                             'orderId' => $orderId
                         ]);
                     }
-                }
             }
             if ($collectForm->getErrors(true)) {
                 $collectForm->addError(new FormError('Please correct the errors below'));
@@ -267,39 +268,40 @@ class OrderController extends AbstractController
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
         if ($processForm->isSubmitted()) {
-            if ($processForm->isValid() && !$order->get('finalized_ts')) {
-                if ($type = $order->checkIdentifiers($processForm['processed_notes']->getData())) {
-                    $label = Order::$identifierLabel[$type[0]];
-                    $processForm['processed_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
-                }
-                if ($processForm->has('processed_samples')) {
-                    $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
-                    foreach ($processForm->get('processed_samples')->getData() as $sample) {
-                        if (empty($processedSampleTimes[$sample])) {
-                            $processForm->get('processed_samples')->addError(new FormError('Please specify time of blood processing completion for each sample'));
-                            break;
-                        }
+            if ($order->get('finalized_ts')) {
+                $app->abort(403);
+            }
+            if ($processForm->has('processed_samples')) {
+                $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
+                foreach ($processForm->get('processed_samples')->getData() as $sample) {
+                    if (empty($processedSampleTimes[$sample])) {
+                        $processForm->get('processed_samples')->addError(new FormError('Please specify time of blood processing completion for each sample'));
+                        break;
                     }
                 }
-                if ($processForm->isValid()) {
-                    $updateArray = $order->getOrderUpdateFromForm('processed', $processForm);
-                    if (!$order->get('processed_ts')) {
-                        $updateArray['processed_ts'] = new \DateTime();
-                    }
-                    $updateArray['processed_user_id'] = $app->getUser()->getId();
-                    $updateArray['processed_site'] = $app->getSiteId();
-                    if ($order->get('type') !== 'saliva' && $processForm->has('processed_centrifuge_type')) {
-                        $updateArray['processed_centrifuge_type'] = $processForm['processed_centrifuge_type']->getData();
-                    }
-                    if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                        $app->log(Log::ORDER_EDIT, $orderId);
-                        $app->addFlashNotice('Order processing updated');
+            }
+            if ($type = $order->checkIdentifiers($processForm['processed_notes']->getData())) {
+                $label = Order::$identifierLabel[$type[0]];
+                $processForm['processed_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+            }
+            if ($processForm->isValid()) {
+                $updateArray = $order->getOrderUpdateFromForm('processed', $processForm);
+                if (!$order->get('processed_ts')) {
+                    $updateArray['processed_ts'] = new \DateTime();
+                }
+                $updateArray['processed_user_id'] = $app->getUser()->getId();
+                $updateArray['processed_site'] = $app->getSiteId();
+                if ($order->get('type') !== 'saliva' && $processForm->has('processed_centrifuge_type')) {
+                    $updateArray['processed_centrifuge_type'] = $processForm['processed_centrifuge_type']->getData();
+                }
+                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                    $app->log(Log::ORDER_EDIT, $orderId);
+                    $app->addFlashNotice('Order processing updated');
 
-                        return $app->redirectToRoute('orderProcess', [
-                            'participantId' => $participantId,
-                            'orderId' => $orderId
-                        ]);
-                    }
+                    return $app->redirectToRoute('orderProcess', [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId
+                    ]);
                 }
             }
             if ($processForm->getErrors(true)) {
@@ -326,91 +328,92 @@ class OrderController extends AbstractController
         $finalizeForm = $order->createOrderForm('finalized', $app['form.factory']);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {
+            if ($order->get('finalized_ts')) {
+                $app->abort(403);
+            }
+            if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
+                $label = Order::$identifierLabel[$type[0]];
+                $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+            }
+            if ($order->get('type') === 'kit' && $finalizeForm->has('fedex_tracking') && !empty($finalizeForm['fedex_tracking']->getData())) {
+                $duplicateFedexTracking = $app['em']->getRepository('orders')->fetchBySql('fedex_tracking = ? and id != ?', [
+                    $finalizeForm['fedex_tracking']->getData(),
+                    $orderId
+                ]);
+                if ($duplicateFedexTracking) {
+                    $finalizeForm['fedex_tracking']['first']->addError(new FormError('This FedEx tracking number has already been used for another order.'));
+                }
+            }
             if ($finalizeForm->isValid()) {
-                if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
-                    $label = Order::$identifierLabel[$type[0]];
-                    $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+                $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
+                $updateArray['finalized_user_id'] = $app->getUser()->getId();
+                $updateArray['finalized_site'] = $app->getSiteId();
+                $finalized_ts = $updateArray['finalized_ts'];
+                unset($updateArray['finalized_ts']);
+                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                    $app->log(Log::ORDER_EDIT, $orderId);
                 }
-                if ($order->get('type') === 'kit' && $finalizeForm->has('fedex_tracking') && !empty($finalizeForm['fedex_tracking']->getData())) {
-                    $duplicateFedexTracking = $app['em']->getRepository('orders')->fetchBySql('fedex_tracking = ? and id != ?', [
-                        $finalizeForm['fedex_tracking']->getData(),
-                        $orderId
-                    ]);
-                    if ($duplicateFedexTracking) {
-                        $finalizeForm['fedex_tracking']['first']->addError(new FormError('This FedEx tracking number has already been used for another order.'));
-                    }
-                }
-                if ($finalizeForm->isValid()) {
-                    $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
-                    $updateArray['finalized_user_id'] = $app->getUser()->getId();
-                    $updateArray['finalized_site'] = $app->getSiteId();
-                    $finalized_ts = $updateArray['finalized_ts'];
-                    unset($updateArray['finalized_ts']);
-                    if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                        $app->log(Log::ORDER_EDIT, $orderId);
-                    }
-                    $order = $this->loadOrder($participantId, $orderId, $app);
-                    if ($finalized_ts && empty($order->get('finalized_ts'))) {
-                        if ($app->getConfig('ml_mock_order')) {
-                            $mayoId = $app->getConfig('ml_mock_order');
+                $order = $this->loadOrder($participantId, $orderId, $app);
+                if ($finalized_ts && empty($order->get('finalized_ts'))) {
+                    if ($app->getConfig('ml_mock_order')) {
+                        $mayoId = $app->getConfig('ml_mock_order');
+                    } else {
+                        // set collected time to created date at midnight local time
+                        $collectedAt = new \DateTime($order->get('created_ts')->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
+                        $orderData = $order->toArray();
+                        $participant = $app['pmi.drc.participants']->getById($participantId);
+                        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                            $mayoClientId = $site['mayolink_account'];
                         } else {
-                            // set collected time to created date at midnight local time
-                            $collectedAt = new \DateTime($order->get('created_ts')->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
-                            $orderData = $order->toArray();
-                            $participant = $app['pmi.drc.participants']->getById($participantId);
-                            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
-                                $mayoClientId = $site['mayolink_account'];
-                            } else {
-                                $mayoClientId = null;
-                            }
-                            $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
-                            if ($birthDate) {
-                                $birthDate = $birthDate->format('Y-m-d');
-                            }
-                            $options = [
-                                'type' => $orderData['type'],
-                                'biobank_id' => $participant->biobankId,
-                                'first_name' => '*',
-                                'gender' => $participant->gender,
-                                'birth_date' => $birthDate,
-                                'order_id' => $orderData['order_id'],
-                                'collected_at' => $collectedAt->format('c'),
-                                'mayoClientId' => $mayoClientId,
-                                'siteId' => $app->getSiteId(),
-                                'organizationId' => $app->getSiteOrganization(),
-                                'finalized_samples' => $orderData['finalized_samples']
-                            ];
-                            $mayoOrder = new MayolinkOrder($app);
-                            $mayoId = $mayoOrder->createOrder(
-                                $app->getConfig('ml_username'),
-                                $app->getConfig('ml_password'),
-                                $options
-                            );                           
+                            $mayoClientId = null;
                         }
-                        if ($mayoId) {
-                            if ($app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId, 'finalized_ts' => $finalized_ts])) {
-                                $app->log(Log::ORDER_EDIT, $orderId);
-                                $order = $this->loadOrder($participantId, $orderId, $app);
-                                $order->sendToRdr();
-                                $app->addFlashSuccess('Order finalized');
-                                if ($order->get('type') !== 'kit') {
-                                    return $app->redirectToRoute('orderPrintRequisition', [
-                                        'participantId' => $participantId,
-                                        'orderId' => $orderId
-                                    ]);
-                                }
+                        $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+                        if ($birthDate) {
+                            $birthDate = $birthDate->format('Y-m-d');
+                        }
+                        $options = [
+                            'type' => $orderData['type'],
+                            'biobank_id' => $participant->biobankId,
+                            'first_name' => '*',
+                            'gender' => $participant->gender,
+                            'birth_date' => $birthDate,
+                            'order_id' => $orderData['order_id'],
+                            'collected_at' => $collectedAt->format('c'),
+                            'mayoClientId' => $mayoClientId,
+                            'siteId' => $app->getSiteId(),
+                            'organizationId' => $app->getSiteOrganization(),
+                            'finalized_samples' => $orderData['finalized_samples']
+                        ];
+                        $mayoOrder = new MayolinkOrder($app);
+                        $mayoId = $mayoOrder->createOrder(
+                            $app->getConfig('ml_username'),
+                            $app->getConfig('ml_password'),
+                            $options
+                        );                           
+                    }
+                    if ($mayoId) {
+                        if ($app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId, 'finalized_ts' => $finalized_ts])) {
+                            $app->log(Log::ORDER_EDIT, $orderId);
+                            $order = $this->loadOrder($participantId, $orderId, $app);
+                            $order->sendToRdr();
+                            $app->addFlashSuccess('Order finalized');
+                            if ($order->get('type') !== 'kit') {
+                                return $app->redirectToRoute('orderPrintRequisition', [
+                                    'participantId' => $participantId,
+                                    'orderId' => $orderId
+                                ]);
                             }
-                        } else {
-                            $app->addFlashError('Failed to finalize order');
                         }
                     } else {
-                        $app->addFlashNotice('Order updated but not finalized');
+                        $app->addFlashError('Failed to finalize order');
                     }
-                    return $app->redirectToRoute('orderFinalize', [
-                        'participantId' => $participantId,
-                        'orderId' => $orderId
-                    ]);
+                } else {
+                    $app->addFlashNotice('Order updated but not finalized');
                 }
+                return $app->redirectToRoute('orderFinalize', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId
+                ]);
             }
             if ($finalizeForm->getErrors(true)) {
                 $finalizeForm->addError(new FormError('Please correct the errors below'));
