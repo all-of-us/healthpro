@@ -222,25 +222,29 @@ class OrderController extends AbstractController
         }
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
-        if ($collectForm->isValid() && !$order->get('finalized_ts')) {
-            if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
-                $label = Order::$identifierLabel[$type[0]];
-                $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
-                $app->addFlashError("Participant identifying information detected in notes field");
-            }
-            if ($collectForm->isValid()) {
-                $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
-                $updateArray['collected_user_id'] = $app->getUser()->getId();
-                $updateArray['collected_site'] = $app->getSiteId();
-                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                    $app->log(Log::ORDER_EDIT, $orderId);
-                    $app->addFlashNotice('Order collection updated');
-
-                    return $app->redirectToRoute('orderCollect', [
-                        'participantId' => $participantId,
-                        'orderId' => $orderId
-                    ]);
+        if ($collectForm->isSubmitted()) {
+            if ($collectForm->isValid() && !$order->get('finalized_ts')) {
+                if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
+                    $label = Order::$identifierLabel[$type[0]];
+                    $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
+                if ($collectForm->isValid()) {
+                    $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
+                    $updateArray['collected_user_id'] = $app->getUser()->getId();
+                    $updateArray['collected_site'] = $app->getSiteId();
+                    if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                        $app->log(Log::ORDER_EDIT, $orderId);
+                        $app->addFlashNotice('Order collection updated');
+
+                        return $app->redirectToRoute('orderCollect', [
+                            'participantId' => $participantId,
+                            'orderId' => $orderId
+                        ]);
+                    }
+                }
+            }
+            if ($collectForm->getErrors(true)) {
+                $collectForm->addError(new FormError('Please correct the errors below'));
             }
         }
         return $app['twig']->render('order-collect.html.twig', [
@@ -262,40 +266,44 @@ class OrderController extends AbstractController
         }
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
-        if ($processForm->isValid() && !$order->get('finalized_ts')) {
-            if ($type = $order->checkIdentifiers($processForm['processed_notes']->getData())) {
-                $label = Order::$identifierLabel[$type[0]];
-                $processForm['processed_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
-                $app->addFlashError("Participant identifying information detected in notes field");
-            }
-            if ($processForm->has('processed_samples')) {
-                $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
-                foreach ($processForm->get('processed_samples')->getData() as $sample) {
-                    if (empty($processedSampleTimes[$sample])) {
-                        $processForm->get('processed_samples')->addError(new FormError('Please specify time of blood processing completion for each sample'));
-                        break;
+        if ($processForm->isSubmitted()) {
+            if ($processForm->isValid() && !$order->get('finalized_ts')) {
+                if ($type = $order->checkIdentifiers($processForm['processed_notes']->getData())) {
+                    $label = Order::$identifierLabel[$type[0]];
+                    $processForm['processed_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+                }
+                if ($processForm->has('processed_samples')) {
+                    $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
+                    foreach ($processForm->get('processed_samples')->getData() as $sample) {
+                        if (empty($processedSampleTimes[$sample])) {
+                            $processForm->get('processed_samples')->addError(new FormError('Please specify time of blood processing completion for each sample'));
+                            break;
+                        }
+                    }
+                }
+                if ($processForm->isValid()) {
+                    $updateArray = $order->getOrderUpdateFromForm('processed', $processForm);
+                    if (!$order->get('processed_ts')) {
+                        $updateArray['processed_ts'] = new \DateTime();
+                    }
+                    $updateArray['processed_user_id'] = $app->getUser()->getId();
+                    $updateArray['processed_site'] = $app->getSiteId();
+                    if ($order->get('type') !== 'saliva' && $processForm->has('processed_centrifuge_type')) {
+                        $updateArray['processed_centrifuge_type'] = $processForm['processed_centrifuge_type']->getData();
+                    }
+                    if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                        $app->log(Log::ORDER_EDIT, $orderId);
+                        $app->addFlashNotice('Order processing updated');
+
+                        return $app->redirectToRoute('orderProcess', [
+                            'participantId' => $participantId,
+                            'orderId' => $orderId
+                        ]);
                     }
                 }
             }
-            if ($processForm->isValid()) {
-                $updateArray = $order->getOrderUpdateFromForm('processed', $processForm);
-                if (!$order->get('processed_ts')) {
-                    $updateArray['processed_ts'] = new \DateTime();
-                }
-                $updateArray['processed_user_id'] = $app->getUser()->getId();
-                $updateArray['processed_site'] = $app->getSiteId();
-                if ($order->get('type') !== 'saliva' && $processForm->has('processed_centrifuge_type')) {
-                    $updateArray['processed_centrifuge_type'] = $processForm['processed_centrifuge_type']->getData();
-                }
-                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                    $app->log(Log::ORDER_EDIT, $orderId);
-                    $app->addFlashNotice('Order processing updated');
-
-                    return $app->redirectToRoute('orderProcess', [
-                        'participantId' => $participantId,
-                        'orderId' => $orderId
-                    ]);
-                }
+            if ($processForm->getErrors(true)) {
+                $processForm->addError(new FormError('Please correct the errors below'));
             }
         }
         return $app['twig']->render('order-process.html.twig', [
@@ -404,7 +412,7 @@ class OrderController extends AbstractController
                     ]);
                 }
             }
-            if ($app->getFormErrors($finalizeForm)) {
+            if ($finalizeForm->getErrors(true)) {
                 $finalizeForm->addError(new FormError('Please correct the errors below'));
             }
         }
