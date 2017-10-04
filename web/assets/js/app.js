@@ -183,7 +183,14 @@ $(document).ready(function()
             sideBySide: true,
             showTodayButton: true,
             showClear: true,
-            showClose: true
+            showClose: true,
+            keyBinds: {
+                up: null,
+                down: null,
+                left: null,
+                right: null,
+                'delete': null
+            }
         };
         var selector = this.selector;
         $(selector).datetimepicker(pickerOptions);
