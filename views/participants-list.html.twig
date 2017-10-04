@@ -9,7 +9,7 @@
 
     {% if participants %}
         <table class="table table-striped">
-            <thead><tr><th>Last Name</th><th>First Name</th><th>Date of Birth</th><th>ZIP Code</th><th>Basics Complete</th><th></th></tr></thead>
+            <thead><tr><th>Last Name</th><th>First Name</th><th>Date of Birth</th><th>ZIP Code</th><th>Participant Paired Location</th><th>Basics Complete</th><th></th></tr></thead>
             <tbody>
                 {% for participant in participants %}
                     <tr>
@@ -17,6 +17,7 @@
                         <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a></td>
                         <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.dob ? participant.dob|date('n/j/Y') }}</a></td>
                         <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.zipCode }}</a></td>
+                        <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.hpoId }}</a></td>
                         <td>
                             {% if not participant.status and participant.statusReason == 'basics' %}
                                 <i class="fa fa-times-circle text-danger" aria-hidden="true"></i>
