@@ -243,8 +243,7 @@ class OrderController extends AbstractController
                             'orderId' => $orderId
                         ]);
                     }
-            }
-            if ($collectForm->getErrors(true)) {
+            } else {
                 $collectForm->addError(new FormError('Please correct the errors below'));
             }
         }
@@ -303,8 +302,7 @@ class OrderController extends AbstractController
                         'orderId' => $orderId
                     ]);
                 }
-            }
-            if ($processForm->getErrors(true)) {
+            } else {
                 $processForm->addError(new FormError('Please correct the errors below'));
             }
         }
@@ -414,8 +412,7 @@ class OrderController extends AbstractController
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
-            }
-            if ($finalizeForm->getErrors(true)) {
+            } else {
                 $finalizeForm->addError(new FormError('Please correct the errors below'));
             }
         }
