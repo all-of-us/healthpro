@@ -192,7 +192,7 @@ class Order
                 $updateArray["{$set}_ts"] = null;
             }
         }
-        if (!empty($formData["{$set}_samples"])) {
+        if ($form->has("{$set}_samples")) {
             $hasSampleArray = $formData["{$set}_samples"] && is_array($formData["{$set}_samples"]);
             if ($hasSampleArray) {
                 $updateArray["{$set}_samples"] = json_encode(array_values($formData["{$set}_samples"]));
