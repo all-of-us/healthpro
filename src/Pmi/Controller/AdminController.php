@@ -63,19 +63,40 @@ class AdminController extends AbstractController
 
         $siteEditForm = $this->getSiteEditForm($app, $site);
         $siteEditForm->handleRequest($request);
-        if ($siteEditForm->isValid()) {
-            if ($site) {
-                if ($app['em']->getRepository('sites')->update($siteId, $siteEditForm->getData())) {
-                    $app->log(Log::SITE_EDIT, $siteId);
-                    $app->addFlashNotice('Site updated');
+        if ($siteEditForm->isSubmitted()) {
+            if ($siteEditForm->isValid()) {
+                if ($site) {
+                    $duplicateGoogleGroup = $app['em']->getRepository('sites')->fetchBySql('google_group = ? and id != ?', [
+                        $siteEditForm['google_group']->getData(),
+                        $siteId
+                    ]);
+                } else {
+                    $duplicateGoogleGroup = $app['em']->getRepository('sites')->fetchBySql('google_group = ?', [
+                        $siteEditForm['google_group']->getData()
+                    ]);
                 }
-            } else {
-                if ($siteId = $app['em']->getRepository('sites')->insert($siteEditForm->getData())) {
-                    $app->log(Log::SITE_ADD, $siteId);
-                    $app->addFlashNotice('Site added');
+                if ($duplicateGoogleGroup) {
+                    $siteEditForm['google_group']->addError(new FormError('This google group has already been used for another site.'));
                 }
             }
-            return $app->redirectToRoute('admin_sites');
+            if ($siteEditForm->isValid()) {
+                if ($site) {
+                    if ($app['em']->getRepository('sites')->update($siteId, $siteEditForm->getData())) {
+                        $app->log(Log::SITE_EDIT, $siteId);
+                        $app->addFlashNotice('Site updated');
+                    }
+                } else {
+                    if ($siteId = $app['em']->getRepository('sites')->insert($siteEditForm->getData())) {
+                        $app->log(Log::SITE_ADD, $siteId);
+                        $app->addFlashNotice('Site added');
+                    }
+                }
+                return $app->redirectToRoute('admin_sites');
+            } else {
+                if (count($siteEditForm->getErrors()) == 0) {
+                    $siteEditForm->addError(new FormError('Please correct the errors below'));
+                }
+            }
         }
 
         return $app['twig']->render('admin/sites/edit.html.twig', [
