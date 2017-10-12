@@ -113,7 +113,8 @@ class AdminController extends AbstractController
             ])
             ->add('organization', Type\TextType::class, [
                 'label' => 'Organization',
-                'required' => false
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('type', Type\TextType::class, [
                 'label' => 'Type',
