@@ -17,7 +17,8 @@ class CronController extends AbstractController
 
     protected static $routes = [
         ['pingTest', '/ping-test'],
-        ['withdrawal', '/withdrawal']
+        ['withdrawal', '/withdrawal'],
+        ['generateEvaluationsQueue', '/generate-evaluations-queue']
     ];
     
     /**
@@ -57,6 +58,15 @@ class CronController extends AbstractController
             error_log('Cron ping test requested by Appengine-Cron');
         }
         
+        return (new JsonResponse())->setData(true);
+    }
+
+    public function generateEvaluationsQueueAction(Application $app, Request $request)
+    {
+        $queueFinalizeTime = $app->getConfig('queue_finalize_ts');
+        if (!$app['db']->query("INSERT INTO evaluations_queue (evaluation_id, evaluation_parent_id, old_rdr_id) SELECT id, parent_id, rdr_id FROM evaluations WHERE id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL) AND rdr_id IS NOT NULL AND finalized_ts < '{$queueFinalizeTime}'")) {
+            error_log('Failed generating evaluations queue');
+        }
         return (new JsonResponse())->setData(true);
     }
 }
