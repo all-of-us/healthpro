@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Pmi\Service\WithdrawalService;
+use Pmi\Service\EvaluationsQueueService;
 
 /**
  * NOTE: all /cron routes should be protected by `login: admin` in app.yaml
@@ -18,7 +19,8 @@ class CronController extends AbstractController
     protected static $routes = [
         ['pingTest', '/ping-test'],
         ['withdrawal', '/withdrawal'],
-        ['generateEvaluationsQueue', '/generate-evaluations-queue']
+        ['generateEvaluationsQueue', '/generate-evaluations-queue'],
+        ['resendEvaluationsToRdr', '/resend-evaluations-rdr']
     ];
     
     /**
@@ -63,10 +65,21 @@ class CronController extends AbstractController
 
     public function generateEvaluationsQueueAction(Application $app, Request $request)
     {
-        $queueFinalizeTime = $app->getConfig('queue_finalize_ts');
-        if (!$app['db']->query("INSERT INTO evaluations_queue (evaluation_id, evaluation_parent_id, old_rdr_id) SELECT id, parent_id, rdr_id FROM evaluations WHERE id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL) AND rdr_id IS NOT NULL AND finalized_ts < '{$queueFinalizeTime}'")) {
-            error_log('Failed generating evaluations queue');
+        if (!$this->isAdmin($request)) {
+            throw new AccessDeniedHttpException();
         }
+        $withdrawal = new EvaluationsQueueService($app);
+        $withdrawal->generateEvaluationsQueueTable();
+        return (new JsonResponse())->setData(true);
+    }
+
+    public function resendEvaluationsToRdrAction(Application $app, Request $request)
+    {
+        if (!$this->isAdmin($request)) {
+            throw new AccessDeniedHttpException();
+        }
+        $withdrawal = new EvaluationsQueueService($app);
+        $withdrawal->resendEvaluationsToRdr();
         return (new JsonResponse())->setData(true);
     }
 }
