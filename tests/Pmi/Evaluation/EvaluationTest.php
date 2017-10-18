@@ -148,17 +148,26 @@ class EvaluationTest extends AbstractWebTestCase
         return json_decode($json);
     }
 
-    public function testFhir2()
+    public function measurementsProvider()
     {
-        $jsonData = '{"blood-pressure-location":"Right arm","blood-pressure-systolic":[100,101,102],"blood-pressure-diastolic":[80,81,82],"heart-rate":[85,88,90],"irregular-heart-rate":[false,false,false],"blood-pressure-protocol-modification":["","",""],"manual-blood-pressure":[false,false,false],"manual-heart-rate":[false,false,false],"blood-pressure-protocol-modification-notes":[null,null,null],"pregnant":false,"wheelchair":false,"height":180,"height-protocol-modification":"","height-protocol-modification-notes":null,"weight":65,"weight-prepregnancy":null,"weight-protocol-modification":"","weight-protocol-modification-notes":null,"hip-circumference":[90,91,null],"hip-circumference-protocol-modification":["","",""],"hip-circumference-protocol-modification-notes":[null,null,null],"waist-circumference":[85,88,87],"waist-circumference-location":"smallest-part-of-trunk","waist-circumference-protocol-modification":["","",""],"waist-circumference-protocol-modification-notes":[null,null,null],"notes":null}';
+        return [
+            ['fhir2.json', '{"blood-pressure-location":"Right arm","blood-pressure-systolic":[100,101,102],"blood-pressure-diastolic":[80,81,82],"heart-rate":[85,88,90],"irregular-heart-rate":[false,false,false],"blood-pressure-protocol-modification":["","",""],"manual-blood-pressure":[false,false,false],"manual-heart-rate":[false,false,false],"blood-pressure-protocol-modification-notes":[null,null,null],"pregnant":false,"wheelchair":false,"height":180,"height-protocol-modification":"","height-protocol-modification-notes":null,"weight":65,"weight-prepregnancy":null,"weight-protocol-modification":"","weight-protocol-modification-notes":null,"hip-circumference":[90,91,null],"hip-circumference-protocol-modification":["","",""],"hip-circumference-protocol-modification-notes":[null,null,null],"waist-circumference":[85,88,87],"waist-circumference-location":"smallest-part-of-trunk","waist-circumference-protocol-modification":["","",""],"waist-circumference-protocol-modification-notes":[null,null,null],"notes":null}'],
+            ['fhir3.json', '{"blood-pressure-location":"Right arm","blood-pressure-systolic":[100,null,102],"blood-pressure-diastolic":[80,null,82],"heart-rate":[85,null,90],"irregular-heart-rate":[true,false,false],"blood-pressure-protocol-modification":["","refusal","other"],"manual-blood-pressure":[false,false,true],"manual-heart-rate":[false,false,true],"blood-pressure-protocol-modification-notes":[null,null,"Some reason"],"pregnant":true,"wheelchair":true,"height":180,"height-protocol-modification":"wheelchair-bound","height-protocol-modification-notes":null,"weight":65,"weight-prepregnancy":55,"weight-protocol-modification":"wheelchair-bound","weight-protocol-modification-notes":null,"hip-circumference":[null,null,null],"hip-circumference-protocol-modification":["","",""],"hip-circumference-protocol-modification-notes":[null,null,null],"waist-circumference":[null,null,null],"waist-circumference-location":null,"waist-circumference-protocol-modification":["","",""],"waist-circumference-protocol-modification-notes":[null,null,null],"notes":"Some notes"}']
+        ];
+    }
 
+    /**
+     * @dataProvider measurementsProvider
+     */
+    public function testFhir2($filename, $jsonData)
+    {
         $finalized = new \DateTime('2017-01-01', new \DateTimeZone('UTC'));
         $evaluation = new Evaluation();
         $evaluation->loadFromArray([
             'data' => json_decode($jsonData),
             'participant_id' => 'P10000001',
-            'created_user' => 'test-user1@example.com',
-            'finalized_user' => 'test-user2@example.com',
+            'created_user' => 'test@example.com',
+            'finalized_user' => 'test@example.com',
             'created_site' => 'test-site1',
             'finalized_site' => 'test-site2',
         ]);
@@ -166,6 +175,6 @@ class EvaluationTest extends AbstractWebTestCase
         $json = json_encode($fhir, JSON_PRETTY_PRINT);
 
         // using string to string method so that diff is output (file to string just shows entire object)
-        $this->assertJsonStringEqualsJsonString(file_get_contents(__DIR__ . '/fhir2.json'), $json);
+        $this->assertJsonStringEqualsJsonString(file_get_contents(__DIR__ . '/' . $filename), $json);
     }
 }
