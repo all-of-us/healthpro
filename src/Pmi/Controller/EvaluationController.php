@@ -20,8 +20,9 @@ class EvaluationController extends AbstractController
     ];
 
     /* For debugging generated FHIR bundle - only allowed in dev */
-    public function evaluationFhirAction($participantId, $evalId, Application $app)
+    public function evaluationFhirAction($participantId, $evalId, Application $app, Request $request)
     {
+        $isTest = $request->query->has('test');
         if (!$app->isLocal()) {
             $app->abort(404);
         }
@@ -36,6 +37,13 @@ class EvaluationController extends AbstractController
         ]);
         if (!$evaluation) {
             $app->abort(404);
+        }
+        if ($isTest) {
+            $evaluation['site'] = 'test-site1';
+            $evaluation['finalized_site'] = 'test-site2';
+            $evaluation['participant_id'] = 'P10000001';
+            $evaluation['finalized_ts'] = new \DateTime('2017-01-01', new \DateTimeZone('UTC'));
+            $evaluation['finalized_user_id'] = $evaluation['user_id'];
         }
         $evaluationService->loadFromArray($evaluation, $app);
         if ($evaluation['finalized_ts']) {
@@ -52,7 +60,13 @@ class EvaluationController extends AbstractController
                 $parentRdrId = $parentEvaluation['rdr_id'];
             }
         }
-        return $app->jsonPrettyPrint($evaluationService->getFhir($date, $parentRdrId));
+        if ($isTest) {
+            $fhir = $evaluationService->getFhir($date, $parentRdrId);
+            $fhir = \Tests\Pmi\Evaluation\EvaluationTest::getNormalizedFhir($fhir);
+            return $app->jsonPrettyPrint($fhir);
+        } else {
+            return $app->jsonPrettyPrint($evaluationService->getFhir($date, $parentRdrId));
+        }
     }
 
     /* For debugging evaluation object pushed to RDR - only allowed in dev */

@@ -1,4 +1,6 @@
 <?php
+namespace Tests\Pmi\Evaluation;
+
 use Pmi\Evaluation\Evaluation;
 use Pmi\Evaluation\MissingSchemaException;
 use Symfony\Component\Form\Form;
@@ -129,14 +131,21 @@ class EvaluationTest extends AbstractWebTestCase
         ], $entries[5]['resource']['valueQuantity']);
     }
 
-    protected function generateNormalizedUrnMap($fhir)
+    /**
+     * Normalize FHIR bundle URNs
+     *
+     * Replaces each unique URN UUID with uuid:n in order for easier test comparsion
+     **/
+    public static function getNormalizedFhir($fhir)
     {
         $map = [];
         $map[$fhir->entry[0]['fullUrl']] = 'uuid:composition';
         foreach ($fhir->entry[0]['resource']['section'][0]['entry'] as $k => $entry) {
             $map[$entry['reference']] = 'uuid:' . ($k+1);
         }
-        return $map;
+        $json = json_encode($fhir);
+        $json = str_replace(array_keys($map), array_values($map), $json);
+        return json_decode($json);
     }
 
     public function testFhir2()
@@ -153,10 +162,9 @@ class EvaluationTest extends AbstractWebTestCase
             'created_site' => 'test-site1',
             'finalized_site' => 'test-site2',
         ]);
-        $fhir = $evaluation->getFhir($finalized);
-        $urnMap = $this->generateNormalizedUrnMap($fhir);
+        $fhir = self::getNormalizedFhir($evaluation->getFhir($finalized));
         $json = json_encode($fhir, JSON_PRETTY_PRINT);
-        $json = str_replace(array_keys($urnMap), array_values($urnMap), $json);
+
         // using string to string method so that diff is output (file to string just shows entire object)
         $this->assertJsonStringEqualsJsonString(file_get_contents(__DIR__ . '/fhir2.json'), $json);
     }
