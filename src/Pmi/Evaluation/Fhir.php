@@ -174,17 +174,13 @@ class Fhir
         return $composition;
     }
 
-    protected function simpleMetric($metric, $value, $display, $code, $unit, $system = 'http://loinc.org')
+    protected function simpleMetric($metric, $value, $display, $unit, $codes)
     {
         $entry = [
             'fullUrl' => $this->metricUrns[$metric],
             'resource' => [
                 'code' => [
-                    'coding' => [[
-                        'code' => $code,
-                        'display' => $display,
-                        'system' => $system
-                    ]],
+                    'coding' => $codes,
                     'text' => $display
                 ],
                 'effectiveDateTime' => $this->date,
@@ -338,8 +334,12 @@ class Fhir
             'height',
             $this->data->height,
             'Body height',
-            '8302-2',
-            'cm'
+            'cm',
+            [[
+                'code' => '8302-2',
+                'display' => 'Body height',
+                'system' => 'http://loinc.org'
+            ]]
         );
     }
 
@@ -349,8 +349,12 @@ class Fhir
             'weight',
             $this->data->weight,
             'Body weight',
-            '29463-7',
-            'kg'
+            'kg',
+            [[
+                'code' => '29463-7',
+                'display' => 'Body weight',
+                'system' => 'http://loinc.org'
+            ]]
         );
     }
 
@@ -360,9 +364,12 @@ class Fhir
             'weight-prepregnancy',
             $this->data->{'weight-prepregnancy'},
             'Approximate pre-pregnancy weight',
-            'pre-pregnancy-weight',
             'kg',
-            'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+            [[
+                'code' => 'pre-pregnancy-weight',
+                'display' => 'Approximate pre-pregnancy weight',
+                'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+            ]]
         );
     }
 
@@ -407,8 +414,12 @@ class Fhir
             'bmi',
             $bmi,
             'Body mass index',
-            '39156-5',
-            'kg/m2'
+            'kg/m2',
+            [[
+                'code' => '39156-5',
+                'display' => 'Body mass index',
+                'system' => 'http://loinc.org'
+            ]]
         );
     }
 
@@ -422,8 +433,12 @@ class Fhir
             is_null($replicate) ? 'heart-rate' : 'heart-rate-' . $replicate,
             is_null($replicate) ? $this->data->{'heart-rate'} : $this->data->{'heart-rate'}[$replicate - 1],
             'Heart rate',
-            '8867-4',
-            '/min'
+            '/min',
+            [[
+                'code' => '8867-4',
+                'display' => 'Heart rate',
+                'system' => 'http://loinc.org'
+            ]]
         );
         if ($replicate) {
             if ($this->data->{'irregular-heart-rate'}[$replicate - 1]) {
@@ -490,8 +505,12 @@ class Fhir
             'hip-circumference-' . $replicate,
             $this->data->{'hip-circumference'}[$replicate - 1],
             'Hip circumference',
-            '62409-8',
-            'cm'
+            'cm',
+            [[
+                'code' => '62409-8',
+                'display' => 'Hip circumference',
+                'system' => 'http://loinc.org'
+            ]]
         );
     }
 
@@ -501,8 +520,12 @@ class Fhir
             'waist-circumference-' . $replicate,
             $this->data->{'waist-circumference'}[$replicate - 1],
             'Waist circumference',
-            '56086-2',
-            'cm'
+            'cm',
+            [[
+                'code' => '56086-2',
+                'display' => 'Waist circumference',
+                'system' => 'http://loinc.org'
+            ]]
         );
         if (isset($this->data->{'waist-circumference-location'})) {
             $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
