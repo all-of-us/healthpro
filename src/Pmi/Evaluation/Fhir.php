@@ -215,17 +215,13 @@ class Fhir
         return $entry;
     }
 
-    protected function valueMetric($metric, $value, $display, $codeCode, $valueCode, $codeSystem = 'http://loinc.org', $valueSystem = 'http://loinc.org')
+    protected function valueMetric($metric, $value, $display, $codeCodes, $valueCodes)
     {
         return [
             'fullUrl' => $this->metricUrns[$metric],
             'resource' => [
                 'code' => [
-                    'coding' => [[
-                        'code' => $codeCode,
-                        'display' => $display,
-                        'system' => $codeSystem
-                    ]],
+                    'coding' => $codeCodes,
                     'text' => $display
                 ],
                 'effectiveDateTime' => $this->date,
@@ -235,11 +231,7 @@ class Fhir
                     'reference' => "Patient/{$this->patient}"
                 ],
                 'valueCodeableConcept' => [
-                    'coding' => [[
-                        'code' => $valueCode,
-                        'display' => $value,
-                        'system' => $valueSystem
-                    ]],
+                    'coding' => $valueCodes,
                     'text' => $value
                 ]
             ]
@@ -382,8 +374,16 @@ class Fhir
             'pregnant',
             'Yes (pregnant)',
             'Are you currently pregnant?',
-            '66174-4',
-            'LA33-6'
+            [[
+                'code' => '66174-4',
+                'display' => 'Are you currently pregnant?',
+                'system' => 'http://loinc.org'
+            ]],
+            [[
+                'code' => 'LA33-6',
+                'display' => 'Yes (pregnant)',
+                'system' => 'http://loinc.org'
+            ]]
         );
     }
 
@@ -396,10 +396,16 @@ class Fhir
             'wheelchair',
             'Wheelchair bound',
             'Are you wheelchair-bound?',
-            'wheelchair-bound-status',
-            'wheelchair-bound',
-            'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation',
-            'http://terminology.pmi-ops.org/CodeSystem/wheelchair-bound-status'
+            [[
+                'code' => 'wheelchair-bound-status',
+                'display' => 'Are you wheelchair-bound?',
+                'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+            ]],
+            [[
+                'code' => 'wheelchair-bound',
+                'display' => 'Wheelchair bound',
+                'system' => 'http://terminology.pmi-ops.org/CodeSystem/wheelchair-bound-status'
+            ]]
         );
     }
 
