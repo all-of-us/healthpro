@@ -618,7 +618,7 @@ class DashboardController extends AbstractController
                 if (!$metrics) {
                     return false;
                 } else {
-                    $memcache->set($memcacheKey, $metrics, 0, 14400);
+                    $memcache->set($memcacheKey, $metrics, 0, 3600);
                 }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
