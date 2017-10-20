@@ -1,5 +1,10 @@
 /* Styles for dashboard interface */
 
+#dashboard-heading {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
 .plotly-div {
     margin-top: 15px;
 }
