@@ -660,11 +660,11 @@ class DashboardController extends AbstractController
     private function getMetricsDisplayNames()
     {
         $metrics_attributes = array(
-            "Participant" => "Total Registered Participants",
             "Participant.enrollmentStatus" => "Enrollment Status",
             "Participant.genderIdentity" => "Gender Identity",
             "Participant.ageRange" => "Age Range",
-            "Participant.race" => "Race"
+            "Participant.race" => "Race",
+            "Participant" => "Total Registered Participants"
         );
         return $metrics_attributes;
     }
