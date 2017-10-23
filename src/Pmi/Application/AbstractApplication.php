@@ -374,6 +374,13 @@ abstract class AbstractApplication extends Application
         // Register custom Twig asset function
         $this['twig']->addFunction(new Twig_SimpleFunction('asset', function($asset) {
             $basePath = $this['request_stack']->getCurrentRequest()->getBasepath();
+            if ($basePath === '/web') {
+                // The combination of GAE's routing handlers and the Symfony Request object
+                // base path logic results in an incorrect basepath for requests that start
+                // with /web because the prefix is the same as the web root's directory name.
+                // To account for this, we clear the basePath if it is "/web"
+                $basePath = '';
+            }
             $basePath .= '/assets/';
             return $basePath . ltrim($asset, '/');
         }));

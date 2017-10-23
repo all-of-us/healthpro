@@ -366,6 +366,13 @@ class HpoApplication extends AbstractApplication
         ]);
         return !empty($site);
     }
+
+    protected function earlyBeforeCallback(Request $request, AbstractApplication $app)
+    {
+        if ($request->getBasePath() === '/web') {
+            return $this->abort(404);
+        }
+    }
     
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {

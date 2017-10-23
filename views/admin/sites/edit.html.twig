@@ -7,6 +7,7 @@
     <div class="row">
         <div class="col-sm-6 col-sm-offset-3">
             {{ form_start(siteForm) }}
+            {{ form_errors(siteForm) }}
             {{ form_rest(siteForm) }}
             <button type="submit" class="btn btn-primary">Save Site</button>
             <a class="btn btn-default" href="{{ path('admin_sites') }}">Cancel</a>
