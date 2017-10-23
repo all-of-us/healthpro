@@ -320,17 +320,14 @@ class Order
                 ],
                 'required' => false
             ]);
-            if ($this->order['type'] !== 'saliva' && !empty($enabledSamples)) {
-                $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
-                    'google_group' => $this->app->getSiteId()
-                ]);
-                $centrifugeType = $sites ? $sites['centrifuge_type'] : null;
-                $centrifugeType = !empty($formData['processed_centrifuge_type']) ? $formData['processed_centrifuge_type'] : $centrifugeType;
+            $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
+                'google_group' => $this->app->getSiteId()
+            ]);
+            if ($this->order['type'] !== 'saliva' && !empty($enabledSamples) && empty($sites['centrifuge_type'])) {
                 $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
                     'label' => 'Centrifuge type',
                     'required' => true,
                     'disabled' => $disabled,
-                    'data' => $centrifugeType,
                     'choices' => [
                         '-- Select centrifuge type --' => null,
                         'Fixed Angle'=> self::FIXED_ANGLE,

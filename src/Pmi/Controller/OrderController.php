@@ -290,8 +290,15 @@ class OrderController extends AbstractController
                 }
                 $updateArray['processed_user_id'] = $app->getUser()->getId();
                 $updateArray['processed_site'] = $app->getSiteId();
-                if ($order->get('type') !== 'saliva' && $processForm->has('processed_centrifuge_type')) {
-                    $updateArray['processed_centrifuge_type'] = $processForm['processed_centrifuge_type']->getData();
+                if ($order->get('type') !== 'saliva') {
+                    $site = $app['em']->getRepository('sites')->fetchOneBy([
+                        'google_group' => $app->getSiteId()
+                    ]);
+                    if ($processForm->has('processed_centrifuge_type')) {
+                        $updateArray['processed_centrifuge_type'] = $processForm['processed_centrifuge_type']->getData();
+                    } elseif (!empty($site['centrifuge_type'])) {
+                        $updateArray['processed_centrifuge_type'] = $site['centrifuge_type'];
+                    }
                 }
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
