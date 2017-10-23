@@ -24,7 +24,12 @@
     <ul class="nav nav-tabs">
         <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
         <li role="presentation" class="active"><a href="#">Create</a></li>
-        {% for step in ['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
+        {% if app.isDvType %}
+            {% set steps = ['Collect', 'Process', 'Finalize'] %}
+        {% else %}
+            {% set steps = ['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
+        {% endif %}
+        {% for step in steps %}
             <li role="presentation" class="disabled"><a href="#">{{ step }}</a></li>
         {% endfor %}
     </ul>
@@ -73,7 +78,7 @@
                     </div>
                 {% endif %}
                 {% if app.isDvType %}
-                    <div class="col-sm-6 col-md-6">
+                    <div class="col-sm-8 col-sm-offset-2">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title text-center">DV Biobank Order</h3>
@@ -94,21 +99,23 @@
                         </div>
                     </div>
                 {% endif %}
-                <div class="col-sm-6 col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title text-center">Saliva Biobank Order</h3>
-                        </div>
-                        <div class="panel-body text-center">
-                            <p>
-                                Order a saliva biospecimen only if the participant is unable to provide any of the three EDTA blood tubes.
-                            </p>
-                            <p>
-                                <button type="submit" name="saliva" class="btn btn-primary">Create</button>
-                            </p>
+                {% if app.isDvType is empty %}
+                    <div class="col-sm-6 col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title text-center">Saliva Biobank Order</h3>
+                            </div>
+                            <div class="panel-body text-center">
+                                <p>
+                                    Order a saliva biospecimen only if the participant is unable to provide any of the three EDTA blood tubes.
+                                </p>
+                                <p>
+                                    <button type="submit" name="saliva" class="btn btn-primary">Create</button>
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
             <p class="text-center">
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>

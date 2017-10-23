@@ -67,6 +67,9 @@ class OrderController extends AbstractController
         if (!$participant->status) {
             $app->abort(403);
         }
+        if ($app->isDVType() && $request->request->has('saliva')) {
+            $app->abort(403);
+        }
         $formBuilder = $app['form.factory']->createBuilder(FormType::class);
         if ($app->isDVType()) {
             $formBuilder->add('kitId', Type\RepeatedType::class, [
