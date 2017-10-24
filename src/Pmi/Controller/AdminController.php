@@ -166,16 +166,13 @@ class AdminController extends AbstractController
             ])
             ->add('centrifuge_type', Type\ChoiceType::class, [
                 'label' => 'Centrifuge type',
-                'required' => true,
+                'required' => false,
                 'choices' => [
                     '-- Select centrifuge type --' => null,
                     'Fixed Angle'=> self::FIXED_ANGLE,
                     'Swinging Bucket' => self::SWINGING_BUCKET
                 ],
-                'multiple' => false,
-                'constraints' => new Constraints\NotBlank([
-                    'message' => 'Please select centrifuge type'
-                ])
+                'multiple' => false
             ])
             ->getForm();
     }
