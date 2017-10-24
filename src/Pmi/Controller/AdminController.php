@@ -17,6 +17,8 @@ use Pmi\Order\Order;
 class AdminController extends AbstractController
 {
     protected static $name = 'admin';
+    const FIXED_ANGLE = 'fixed_angle';
+    const SWINGING_BUCKET = 'swinging_bucket';
 
     protected static $routes = [
         ['home', '/'],
@@ -161,6 +163,19 @@ class AdminController extends AbstractController
                         }
                     })
                 ]
+            ])
+            ->add('centrifuge_type', Type\ChoiceType::class, [
+                'label' => 'Centrifuge type',
+                'required' => true,
+                'choices' => [
+                    '-- Select centrifuge type --' => null,
+                    'Fixed Angle'=> self::FIXED_ANGLE,
+                    'Swinging Bucket' => self::SWINGING_BUCKET
+                ],
+                'multiple' => false,
+                'constraints' => new Constraints\NotBlank([
+                    'message' => 'Please select centrifuge type'
+                ])
             ])
             ->getForm();
     }
