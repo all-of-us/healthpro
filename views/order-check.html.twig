@@ -21,7 +21,12 @@
     </dl>
     <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#">Safety Check</a></li>
-        {% for step in ['Create', 'Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
+        {% if app.isDvType %}
+            {% set steps = ['Create', 'Collect', 'Process', 'Finalize'] %}
+        {% else %}
+            {% set steps = ['Create', 'Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
+        {% endif %}
+        {% for step in steps %}
             <li role="presentation" class="disabled"><a href="#">{{ step }}</a></li>
         {% endfor %}
     </ul>
