@@ -466,6 +466,9 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if ($order->get('finalized_ts')) {
+            $app->abort(403);
+        }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
             return $app->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -548,6 +551,9 @@ class OrderController extends AbstractController
     public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if ($order->get('finalized_ts')) {
+            $app->abort(403);
+        }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
             $app->abort(404);
         }

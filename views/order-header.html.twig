@@ -46,7 +46,7 @@
     {% set previousStep = false %}
     {% for step, column in steps %}
         {% set path = column[0]|replace({' ' : ''}) %}
-        {% if step == 'printLabels' and order.finalized_ts %}
+        {% if (step == 'printLabels' or step == 'printRequisition') and order.finalized_ts %}
             <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> {{ column[0] }}</a></li>
         {% elseif nextEnabled %}
             <li role="presentation"{% if active == step %} class="active"{% endif %}>
