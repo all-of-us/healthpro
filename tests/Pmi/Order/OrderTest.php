@@ -75,7 +75,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $order = $this->createOrder([
             'created_ts' => new \DateTime('2016-01-01 08:00:00'),
             'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
-            'collected_ts' => new \DateTime('2016-01-01 10:00:00')
+            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+            'mayo_id' => 'YZXWVU'
         ]);
         $this->assertSame('process', $order->getCurrentStep());
 
@@ -83,7 +84,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             'created_ts' => new \DateTime('2016-01-01 08:00:00'),
             'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
             'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
-            'processed_ts' => new \DateTime('2016-01-01 11:00:00')
+            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
+            'mayo_id' => 'YZXWVU'
         ]);
         $this->assertSame('finalize', $order->getCurrentStep());
 
@@ -92,9 +94,27 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
             'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
             'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
-            'finalized_ts' => new \DateTime('2016-01-01 12:00:00')
+            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
+            'mayo_id' => 'YZXWVU'
         ]);
         $this->assertSame('finalize', $order->getCurrentStep());
+
+        $order = $this->createOrder([
+            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
+            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+            'processed_ts' => new \DateTime('2016-01-01 11:00:00')
+        ]);
+        $this->assertSame('collect', $order->getCurrentStep());
+
+        $order = $this->createOrder([
+            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
+            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
+            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
+        ]);
+        $this->assertSame('collect', $order->getCurrentStep());
     }
 
     public function testRdrObject()
