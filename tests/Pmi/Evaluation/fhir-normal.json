@@ -106,9 +106,14 @@
                             "code": "55284-4",
                             "display": "Blood pressure systolic and diastolic",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "blood-pressure-1",
+                            "display": "First blood pressure systolic and diastolic",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Blood pressure systolic and diastolic"
+                    "text": "First blood pressure systolic and diastolic"
                 },
                 "component": [
                     {
@@ -118,9 +123,14 @@
                                     "code": "8480-6",
                                     "display": "Systolic blood pressure",
                                     "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-systolic-1",
+                                    "display": "First systolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
-                            "text": "Systolic blood pressure"
+                            "text": "First systolic blood pressure"
                         },
                         "valueQuantity": {
                             "code": "mm[Hg]",
@@ -136,9 +146,14 @@
                                     "code": "8462-4",
                                     "display": "Diastolic blood pressure",
                                     "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-diastolic-1",
+                                    "display": "First diastolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
-                            "text": "Diastolic blood pressure"
+                            "text": "First diastolic blood pressure"
                         },
                         "valueQuantity": {
                             "code": "mm[Hg]",
@@ -160,6 +175,11 @@
                             "code": "368209003",
                             "display": "Right arm",
                             "system": "http:\/\/snomed.info\/sct"
+                        },
+                        {
+                            "code": "right-arm",
+                            "display": "Right arm",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
                         }
                     ],
                     "text": "Right arm"
@@ -175,9 +195,14 @@
                             "code": "55284-4",
                             "display": "Blood pressure systolic and diastolic",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "blood-pressure-1",
+                            "display": "Second blood pressure systolic and diastolic",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Blood pressure systolic and diastolic"
+                    "text": "Second blood pressure systolic and diastolic"
                 },
                 "component": [
                     {
@@ -187,9 +212,14 @@
                                     "code": "8480-6",
                                     "display": "Systolic blood pressure",
                                     "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-systolic-2",
+                                    "display": "Second systolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
-                            "text": "Systolic blood pressure"
+                            "text": "Second systolic blood pressure"
                         },
                         "valueQuantity": {
                             "code": "mm[Hg]",
@@ -205,9 +235,14 @@
                                     "code": "8462-4",
                                     "display": "Diastolic blood pressure",
                                     "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-diastolic-2",
+                                    "display": "Second diastolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
-                            "text": "Diastolic blood pressure"
+                            "text": "Second diastolic blood pressure"
                         },
                         "valueQuantity": {
                             "code": "mm[Hg]",
@@ -229,6 +264,11 @@
                             "code": "368209003",
                             "display": "Right arm",
                             "system": "http:\/\/snomed.info\/sct"
+                        },
+                        {
+                            "code": "right-arm",
+                            "display": "Right arm",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
                         }
                     ],
                     "text": "Right arm"
@@ -244,9 +284,14 @@
                             "code": "55284-4",
                             "display": "Blood pressure systolic and diastolic",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "blood-pressure-3",
+                            "display": "Third blood pressure systolic and diastolic",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Blood pressure systolic and diastolic"
+                    "text": "Third blood pressure systolic and diastolic"
                 },
                 "component": [
                     {
@@ -256,9 +301,14 @@
                                     "code": "8480-6",
                                     "display": "Systolic blood pressure",
                                     "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-systolic-3",
+                                    "display": "Third systolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
-                            "text": "Systolic blood pressure"
+                            "text": "Third systolic blood pressure"
                         },
                         "valueQuantity": {
                             "code": "mm[Hg]",
@@ -274,9 +324,14 @@
                                     "code": "8462-4",
                                     "display": "Diastolic blood pressure",
                                     "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-diastolic-3",
+                                    "display": "Third diastolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
-                            "text": "Diastolic blood pressure"
+                            "text": "Third diastolic blood pressure"
                         },
                         "valueQuantity": {
                             "code": "mm[Hg]",
@@ -298,6 +353,11 @@
                             "code": "368209003",
                             "display": "Right arm",
                             "system": "http:\/\/snomed.info\/sct"
+                        },
+                        {
+                            "code": "right-arm",
+                            "display": "Right arm",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
                         }
                     ],
                     "text": "Right arm"
@@ -313,9 +373,14 @@
                             "code": "8867-4",
                             "display": "Heart rate",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "heart-rate-1",
+                            "display": "First heart rate",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Heart rate"
+                    "text": "First heart rate"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -336,7 +401,7 @@
                                 {
                                     "code": "heart-rhythm-status",
                                     "display": "Heart rhythm status",
-                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
                             "text": "Heart rhythm status"
@@ -364,9 +429,14 @@
                             "code": "8867-4",
                             "display": "Heart rate",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "heart-rate-2",
+                            "display": "Second heart rate",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Heart rate"
+                    "text": "Second heart rate"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -387,7 +457,7 @@
                                 {
                                     "code": "heart-rhythm-status",
                                     "display": "Heart rhythm status",
-                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
                             "text": "Heart rhythm status"
@@ -415,9 +485,14 @@
                             "code": "8867-4",
                             "display": "Heart rate",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "heart-rate-3",
+                            "display": "Third heart rate",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Heart rate"
+                    "text": "Third heart rate"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -438,7 +513,7 @@
                                 {
                                     "code": "heart-rhythm-status",
                                     "display": "Heart rhythm status",
-                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
                             "text": "Heart rhythm status"
@@ -466,9 +541,14 @@
                             "code": "8302-2",
                             "display": "Body height",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "height",
+                            "display": "Height",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Body height"
+                    "text": "Height"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -493,9 +573,14 @@
                             "code": "29463-7",
                             "display": "Body weight",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "weight",
+                            "display": "Weight",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Body weight"
+                    "text": "Weight"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -520,9 +605,14 @@
                             "code": "62409-8",
                             "display": "Hip circumference",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "hip-circumference-1",
+                            "display": "First hip circumference",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Hip circumference"
+                    "text": "First hip circumference"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -547,9 +637,14 @@
                             "code": "62409-8",
                             "display": "Hip circumference",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "hip-circumference-1",
+                            "display": "Second hip circumference",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Hip circumference"
+                    "text": "Second hip circumference"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -574,9 +669,14 @@
                             "code": "56086-2",
                             "display": "Waist circumference",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "waist-circumference-1",
+                            "display": "First waist circumference",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Waist circumference"
+                    "text": "First waist circumference"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -611,9 +711,14 @@
                             "code": "56086-2",
                             "display": "Waist circumference",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "waist-circumference-2",
+                            "display": "Second waist circumference",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Waist circumference"
+                    "text": "Second waist circumference"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -648,9 +753,14 @@
                             "code": "56086-2",
                             "display": "Waist circumference",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "waist-circumference-3",
+                            "display": "Third waist circumference",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Waist circumference"
+                    "text": "Third waist circumference"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -685,9 +795,14 @@
                             "code": "39156-5",
                             "display": "Body mass index",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "bmi",
+                            "display": "Computed body mass index",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Body mass index"
+                    "text": "Computed body mass index"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -700,6 +815,43 @@
                     "system": "http:\/\/unitsofmeasure.org",
                     "unit": "kg\/m2",
                     "value": 20.1
+                }
+            }
+        },
+        {
+            "fullUrl": "uuid:15",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "waist-circumference-mean",
+                            "display": "Computed waist circumference, mean of closest two measures",
+                            "system": "http://terminology.pmi-ops.org/CodeSystem/physical-measurements"
+                        }
+                    ],
+                    "text": "Computed waist circumference, mean of closest two measures"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueQuantity": {
+                    "code": "cm",
+                    "system": "http:\/\/unitsofmeasure.org",
+                    "unit": "cm",
+                    "value": 86.7
+                },
+                "bodySite": {
+                    "coding": [
+                        {
+                            "code": "smallest-part-of-trunk",
+                            "display": "Smallest part of trunk",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/waist-circumference-location"
+                        }
+                    ],
+                    "text": "Smallest part of trunk"
                 }
             }
         }
