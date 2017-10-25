@@ -34,9 +34,9 @@
     {% set steps = {
         printLabels: ['Print Labels', 'printed'],
         collect: ['Collect', 'collected'],
+        printRequisition: ['Print Requisition', 'collected'],
         process: ['Process', 'processed'],
-        finalize: ['Finalize', 'finalized'],
-        printRequisition: ['Print Requisition', 'finalized']
+        finalize: ['Finalize', 'finalized']
     } %}
 {% endif %}
 <ul class="nav nav-tabs">
@@ -51,7 +51,12 @@
         {% elseif nextEnabled %}
             <li role="presentation"{% if active == step %} class="active"{% endif %}>
                 <a href="{{ path('order'~path, params) }}">
-                    {% if attribute(order, column[1]~'_ts') %}
+                    {% if column[1] == 'collected' %}
+                        {% set condition = attribute(order, column[1]~'_ts') and attribute(order, 'mayo_id') %}
+                    {% else %}
+                        {% set condition = attribute(order, column[1]~'_ts') %}
+                    {% endif %}
+                    {% if condition %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                     {% else %} {# since the printed_ts is set automatically after the first page load, don't disable to next tab #}
                         {% set nextEnabled = false %}
@@ -60,7 +65,12 @@
                 </a>
             </li>
         {% else %}
-            <li role="presentation" class="disabled"><a href="#" title="{{ previousStep|capitalize }} time must be set to continue" data-toggle="tooltip" data-placement="bottom">{{ column[0] }}</a></li>
+            {% if column[1] == 'collected' or column[1] == 'processed' %}
+                {% set title = "Order must be sent to continue" %}
+            {% else %}
+                {% set title = previousStep|capitalize ~ " time must be set to continue" %}
+            {% endif %}           
+            <li role="presentation" class="disabled"><a href="#" title="{{ title }}" data-toggle="tooltip" data-placement="bottom">{{ column[0] }}</a></li>
         {% endif %}
         {% set previousStep = column[1] %}
     {% endfor %}

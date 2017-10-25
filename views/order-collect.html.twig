@@ -44,13 +44,10 @@
         {{ form_rest(collectForm) }}
         {% if not order.finalized_ts %}
             <p>
-                <button type="submit" class="btn btn-primary">
-                    {% if order.collected_ts %}
-                        Update
-                    {% else %}
-                        Save and mark as collected
-                    {% endif %}
-                </button>
+                <button type="submit" class="btn btn-primary" name="save">Save</button>
+                {% if not order.mayo_id %}
+                    <button type="submit" class="btn btn-primary" name="send" onclick="return confirm('Are you sure you want to send this order?');">Save and Send Order</button>
+                {% endif %}
             </p>
         {% endif %}
     {{ form_end(collectForm) }}
