@@ -19,6 +19,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             'participant_id' => $particpantId,
             'bioank_id' => $biobankId,
             'order_id' => $orderId,
+            'mayo_id' => null,
             'created_ts' => null,
             'printed_ts' => null,
             'collected_ts' => null,
