@@ -298,9 +298,10 @@ class OrderController extends AbstractController
                                 $app->log(Log::ORDER_EDIT, $orderId);
                                 $order = $this->loadOrder($participantId, $orderId, $app);
                                 $order->sendToRdr();
-                                $app->addFlashNotice('Order collection updated and successfully sent');
+                                $successMsg = 'Order collection updated and successfully sent';
                                 // Redirect to print requisition
                                 if ($order->get('type') !== 'kit') {
+                                    $app->addFlashNotice($successMsg);
                                     return $app->redirectToRoute('orderPrintRequisition', [
                                         'participantId' => $participantId,
                                         'orderId' => $orderId
