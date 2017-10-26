@@ -132,12 +132,16 @@ class Order
 
     public function getCurrentStep()
     {
+        //Return collect step if collected_ts is set and mayo_id is empty
+        if ($this->order["collected_ts"] && !$this->order["mayo_id"]) {
+            return 'collect';
+        }
         $columns = [
             'printLabels' => 'printed',
             'collect' => 'collected',
+            'printRequisition' => 'collected',
             'process' => 'processed',
-            'finalize' => 'finalized',
-            'printRequisition' => 'finalized'
+            'finalize' => 'finalized'           
         ];
         if ($this->order['type'] === 'kit') {
             unset($columns['printLabels']);
@@ -158,9 +162,9 @@ class Order
         $columns = [
             'printLabels' => 'printed',
             'collect' => 'collected',
+            'printRequisition' => 'collected',
             'process' => 'processed',
-            'finalize' => 'finalized',
-            'printRequisition' => 'finalized'
+            'finalize' => 'finalized'
         ];
         if ($this->order['type'] === 'kit') {
             unset($columns['printLabels']);
@@ -169,7 +173,12 @@ class Order
         $steps = [];
         foreach ($columns as $name => $column) {
             $steps[] = $name;
-            if (!$this->order["{$column}_ts"]) {
+            if ($column === 'collected') {
+                $condition = $this->order["{$column}_ts"] && $this->order["mayo_id"];
+            } else {
+                $condition = $this->order["{$column}_ts"];
+            }
+            if (!$condition) {
                 break;
             }
         }
@@ -282,13 +291,18 @@ class Order
             ]);
         }
         if (!empty($samples)) {
+            // Disable collected samples when mayo_id is set
+            $samplesDisabled = $disabled;
+            if ($set === 'collected' && $this->order['mayo_id']) {
+                $samplesDisabled = true;
+            }
             $formBuilder->add("{$set}_samples", Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => $samplesLabel,
                 'choices' => $samples,
                 'required' => false,
-                'disabled' => $disabled,
+                'disabled' => $samplesDisabled,
                 'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
                     if (in_array($val, $enabledSamples)) {
                         return [];

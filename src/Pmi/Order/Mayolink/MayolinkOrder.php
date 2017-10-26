@@ -61,7 +61,7 @@ class MayolinkOrder
 
     public function createOrder($username, $password, $options)
     {
-        $samples = $this->getSamples('finalized', $options);
+        $samples = $this->getSamples('collected', $options);
         $parameters = ['mayoUrl' => $this->ordersEndpoint, 'options' => $options, 'samples' => $samples];
         $xmlFile = "mayolink/order-create.xml.twig";
         $xml = $this->app['twig']->render($xmlFile, $parameters);
@@ -140,7 +140,7 @@ class MayolinkOrder
                 $mayoSamples[] = ['code' => $sample, 'name' => $tests[$sample]['specimen']];
             }
         } else {
-            if ($type !== 'finalized') {
+            if ($type !== 'collected') {
                 foreach ($tests as $key => $sample) {
                     $mayoSamples[] = ['code' => $key, 'name' => $sample['specimen']];
                 }

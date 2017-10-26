@@ -214,6 +214,11 @@ class OrderController extends AbstractController
         ]);
     }
 
+    /**
+     * Save order
+     * When send request is received, send order to mayo and redirect to Print Requisition tab on success
+     * Allow user to save collected_ts and notes fields when mayo_id is set
+     */
     public function orderCollectAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
@@ -233,19 +238,98 @@ class OrderController extends AbstractController
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
+            // Throw error if collected_ts is empty for the order which is already to sent to mayo
+            if (empty($orderData['mayo_id']) && empty($collectForm['collected_ts']->getData())) {
+                $collectForm['collected_ts']->addError(new FormError('Collected time cannot be empty for the order which is already sent'));
+            }
             if ($collectForm->isValid()) {
+                $orderData = $order->toArray();
+                // Check if mayo id is set
+                if (empty($orderData['mayo_id'])) {
                     $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
                     $updateArray['collected_user_id'] = $app->getUser()->getId();
                     $updateArray['collected_site'] = $app->getSiteId();
+                    // Save order
                     if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                         $app->log(Log::ORDER_EDIT, $orderId);
-                        $app->addFlashNotice('Order collection updated');
-
-                        return $app->redirectToRoute('orderCollect', [
-                            'participantId' => $participantId,
-                            'orderId' => $orderId
-                        ]);
+                        $successMsg = 'Order collection updated';
                     }
+                    // Send order to mayo
+                    if ($request->request->has('send')){
+                        $order = $this->loadOrder($participantId, $orderId, $app);
+                        if ($app->getConfig('ml_mock_order')) {
+                            $mayoId = $app->getConfig('ml_mock_order');
+                        } else {
+                            // Set collected time to user local time
+                            $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
+                            $orderData = $order->toArray();
+                            $participant = $app['pmi.drc.participants']->getById($participantId);
+                            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                                $mayoClientId = $site['mayolink_account'];
+                            } else {
+                                $mayoClientId = null;
+                            }
+                            $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+                            if ($birthDate) {
+                                $birthDate = $birthDate->format('Y-m-d');
+                            }
+                            $options = [
+                                'type' => $orderData['type'],
+                                'biobank_id' => $participant->biobankId,
+                                'first_name' => '*',
+                                'gender' => $participant->gender,
+                                'birth_date' => $birthDate,
+                                'order_id' => $orderData['order_id'],
+                                'collected_at' => $collectedAt->format('c'),
+                                'mayoClientId' => $mayoClientId,
+                                'siteId' => $app->getSiteId(),
+                                'organizationId' => $app->getSiteOrganization(),
+                                'collected_samples' => $orderData['collected_samples']
+                            ];
+                            $mayoOrder = new MayolinkOrder($app);
+                            $mayoId = $mayoOrder->createOrder(
+                                $app->getConfig('ml_username'),
+                                $app->getConfig('ml_password'),
+                                $options
+                            );                           
+                        }
+                        if ($mayoId) {
+                            if ($app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId])) {
+                                $app->log(Log::ORDER_EDIT, $orderId);
+                                $order = $this->loadOrder($participantId, $orderId, $app);
+                                $order->sendToRdr();
+                                $app->addFlashNotice('Order collection updated and successfully sent');
+                                // Redirect to print requisition
+                                if ($order->get('type') !== 'kit') {
+                                    return $app->redirectToRoute('orderPrintRequisition', [
+                                        'participantId' => $participantId,
+                                        'orderId' => $orderId
+                                    ]);
+                                }
+                            }
+                        } else {
+                            $errorMsg = 'Failed to send order';
+                        }
+                    }
+                } else {
+                    // Save collected time and notes
+                    $collectedAt = $collectForm['collected_ts']->getData();
+                    $notes = $collectForm['collected_notes']->getData();
+                     if ($app['em']->getRepository('orders')->update($orderId, ['collected_ts' => $collectedAt, 'collected_notes' => $notes])) {
+                        $app->log(Log::ORDER_EDIT, $orderId);
+                        $successMsg = 'Order collection updated';
+                    }
+                }
+                if (!empty($successMsg)) {
+                    $app->addFlashNotice($successMsg);
+                }
+                if (!empty($errorMsg)) {
+                    $app->addFlashError($errorMsg);
+                }
+                return $app->redirectToRoute('orderCollect', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId
+                ]);
             } else {
                 $collectForm->addError(new FormError('Please correct the errors below'));
             }
@@ -324,6 +408,7 @@ class OrderController extends AbstractController
         ]);
     }
 
+    /* Save and send order to RDR */
     public function orderFinalizeAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
@@ -356,67 +441,11 @@ class OrderController extends AbstractController
                 $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
                 $updateArray['finalized_user_id'] = $app->getUser()->getId();
                 $updateArray['finalized_site'] = $app->getSiteId();
-                $finalized_ts = $updateArray['finalized_ts'];
-                unset($updateArray['finalized_ts']);
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
-                }
-                $order = $this->loadOrder($participantId, $orderId, $app);
-                if ($finalized_ts && empty($order->get('finalized_ts'))) {
-                    if ($app->getConfig('ml_mock_order')) {
-                        $mayoId = $app->getConfig('ml_mock_order');
-                    } else {
-                        // set collected time to created date at midnight local time
-                        $collectedAt = new \DateTime($order->get('created_ts')->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
-                        $orderData = $order->toArray();
-                        $participant = $app['pmi.drc.participants']->getById($participantId);
-                        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
-                            $mayoClientId = $site['mayolink_account'];
-                        } else {
-                            $mayoClientId = null;
-                        }
-                        $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
-                        if ($birthDate) {
-                            $birthDate = $birthDate->format('Y-m-d');
-                        }
-                        $options = [
-                            'type' => $orderData['type'],
-                            'biobank_id' => $participant->biobankId,
-                            'first_name' => '*',
-                            'gender' => $participant->gender,
-                            'birth_date' => $birthDate,
-                            'order_id' => $orderData['order_id'],
-                            'collected_at' => $collectedAt->format('c'),
-                            'mayoClientId' => $mayoClientId,
-                            'siteId' => $app->getSiteId(),
-                            'organizationId' => $app->getSiteOrganization(),
-                            'finalized_samples' => $orderData['finalized_samples']
-                        ];
-                        $mayoOrder = new MayolinkOrder($app);
-                        $mayoId = $mayoOrder->createOrder(
-                            $app->getConfig('ml_username'),
-                            $app->getConfig('ml_password'),
-                            $options
-                        );                           
-                    }
-                    if ($mayoId) {
-                        if ($app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId, 'finalized_ts' => $finalized_ts])) {
-                            $app->log(Log::ORDER_EDIT, $orderId);
-                            $order = $this->loadOrder($participantId, $orderId, $app);
-                            $order->sendToRdr();
-                            $app->addFlashSuccess('Order finalized');
-                            if ($order->get('type') !== 'kit') {
-                                return $app->redirectToRoute('orderPrintRequisition', [
-                                    'participantId' => $participantId,
-                                    'orderId' => $orderId
-                                ]);
-                            }
-                        }
-                    } else {
-                        $app->addFlashError('Failed to finalize order');
-                    }
-                } else {
-                    $app->addFlashNotice('Order updated but not finalized');
+                    $order = $this->loadOrder($participantId, $orderId, $app);
+                    $order->sendToRdr();
+                    $app->addFlashSuccess('Order finalized');
                 }
                 return $app->redirectToRoute('orderFinalize', [
                     'participantId' => $participantId,
@@ -437,6 +466,9 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if ($order->get('finalized_ts')) {
+            $app->abort(403);
+        }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
             return $app->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -519,6 +551,9 @@ class OrderController extends AbstractController
     public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if ($order->get('finalized_ts')) {
+            $app->abort(403);
+        }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
             $app->abort(404);
         }
