@@ -675,7 +675,7 @@
                             "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Are you currently pregnant?"
+                    "text": "Participant is pregnant"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -909,9 +909,14 @@
                             "code": "39156-5",
                             "display": "Body mass index",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "bmi",
+                            "display": "Computed body mass index",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Body mass index"
+                    "text": "Computed body mass index"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",

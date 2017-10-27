@@ -651,7 +651,7 @@
                             "system": "http:\/\/loinc.org"
                         },
                         {
-                            "code": "hip-circumference-1",
+                            "code": "hip-circumference-2",
                             "display": "Second hip circumference",
                             "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
