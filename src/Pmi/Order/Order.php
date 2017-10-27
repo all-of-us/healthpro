@@ -278,6 +278,24 @@ class Order
         $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
         if ($set != 'processed') {
+            $constraints = [
+                new Constraints\LessThanOrEqual([
+                    'value' => $constraintDateTime,
+                    'message' => 'Timestamp cannot be in the future'
+                ])
+            ];
+            if ($set === 'finalized') {
+                array_push($constraints,
+                    new Constraints\GreaterThan([
+                        'value' => $this->order['processed_ts'],
+                        'message' => 'Timestamp should be greater than processed time'
+                    ]),
+                    new Constraints\GreaterThan([
+                        'value' => $this->order['collected_ts'],
+                        'message' => 'Timestamp should be greater than collected time'
+                    ])
+                );
+            }
             $formBuilder->add("{$set}_ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
                 'widget' => 'single_text',
@@ -286,12 +304,7 @@ class Order
                 'disabled' => $disabled,
                 'view_timezone' => $this->app->getUserTimezone(),
                 'model_timezone' => 'UTC',
-                'constraints' => [
-                    new Constraints\LessThanOrEqual([
-                        'value' => $constraintDateTime,
-                        'message' => 'Timestamp cannot be in the future'
-                    ])
-                ]
+                'constraints' => $constraints
             ]);
         }
         if (!empty($samples)) {
@@ -333,6 +346,10 @@ class Order
                         new Constraints\LessThanOrEqual([
                             'value' => $constraintDateTime,
                             'message' => 'Timestamp cannot be in the future'
+                        ]),
+                        new Constraints\GreaterThan([
+                            'value' => $this->order['collected_ts'],
+                            'message' => 'Timestamp should be greater than collected time'
                         ])
                     ]
                 ],
