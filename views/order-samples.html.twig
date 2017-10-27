@@ -17,6 +17,9 @@
                     <td><label class="label-normal" for="{{ sample.vars.id }}">{{ sampleInfo.label }}</label></td>
                     <td><label class="label-normal" for="{{ sample.vars.id }}">[{{ sample.vars.value }}]</label></td>
                     <td><label class="label-normal" for="{{ sample.vars.id }}">{{ sampleInfo.color }}</label></td>
+                    {% if global.request.attributes.get('_route') == 'orderProcess' %}
+                        <td><label class="label-normal">(Time into Centrifuge)</label></td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>
