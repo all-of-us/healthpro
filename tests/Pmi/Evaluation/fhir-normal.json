@@ -824,9 +824,191 @@
                 "code": {
                     "coding": [
                         {
+                            "code": "55284-4",
+                            "display": "Blood pressure systolic and diastolic",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "blood-pressure-mean",
+                            "display": "Computed blood pressure systolic and diastolic, mean of 2nd and 3rd measures",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Computed blood pressure systolic and diastolic, mean of 2nd and 3rd measures"
+                },
+                "component": [
+                    {
+                        "code": {
+                            "coding": [
+                                {
+                                    "code": "8480-6",
+                                    "display": "Systolic blood pressure",
+                                    "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-systolic-mean",
+                                    "display": "Computed systolic blood pressure, mean of 2nd and 3rd measures",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                                }
+                            ],
+                            "text": "Computed systolic blood pressure, mean of 2nd and 3rd measures"
+                        },
+                        "valueQuantity": {
+                            "code": "mm[Hg]",
+                            "system": "http:\/\/unitsofmeasure.org",
+                            "unit": "mmHg",
+                            "value": 101.5
+                        }
+                    },
+                    {
+                        "code": {
+                            "coding": [
+                                {
+                                    "code": "8462-4",
+                                    "display": "Diastolic blood pressure",
+                                    "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-diastolic-mean",
+                                    "display": "Computed diastolic blood pressure, mean of 2nd and 3rd measures",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                                }
+                            ],
+                            "text": "Computed diastolic blood pressure, mean of 2nd and 3rd measures"
+                        },
+                        "valueQuantity": {
+                            "code": "mm[Hg]",
+                            "system": "http:\/\/unitsofmeasure.org",
+                            "unit": "mmHg",
+                            "value": 81.5
+                        }
+                    }
+                ],
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "bodySite": {
+                    "coding": [
+                        {
+                            "code": "368209003",
+                            "display": "Right arm",
+                            "system": "http:\/\/snomed.info\/sct"
+                        },
+                        {
+                            "code": "right-arm",
+                            "display": "Right arm",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
+                        }
+                    ],
+                    "text": "Right arm"
+                }
+            }
+        },
+        {
+            "fullUrl": "uuid:16",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "8867-4",
+                            "display": "Heart rate",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "heart-rate-mean",
+                            "display": "Computed heart rate, mean of 2nd and 3rd measures",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Computed heart rate, mean of 2nd and 3rd measures"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueQuantity": {
+                    "code": "\/min",
+                    "system": "http:\/\/unitsofmeasure.org",
+                    "unit": "\/min",
+                    "value": 89
+                },
+                "component": [
+                    {
+                        "code": {
+                            "coding": [
+                                {
+                                    "code": "heart-rhythm-status",
+                                    "display": "Heart rhythm status",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                                }
+                            ],
+                            "text": "Heart rhythm status"
+                        },
+                        "valueCodeableConcept": {
+                            "coding": [
+                                {
+                                    "code": "no-irregularity-detected",
+                                    "display": "No irregularity detected",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/heart-rhythm-status"
+                                }
+                            ],
+                            "text": "No irregularity detected"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "uuid:17",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "62409-8",
+                            "display": "Hip circumference",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "hip-circumference-mean",
+                            "display": "Computed hip circumference, mean of closest two measures",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Computed hip circumference, mean of closest two measures"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueQuantity": {
+                    "code": "cm",
+                    "system": "http:\/\/unitsofmeasure.org",
+                    "unit": "cm",
+                    "value": 90.5
+                }
+            }
+        },
+        {
+            "fullUrl": "uuid:18",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "56086-2",
+                            "display": "Waist circumference",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
                             "code": "waist-circumference-mean",
                             "display": "Computed waist circumference, mean of closest two measures",
-                            "system": "http://terminology.pmi-ops.org/CodeSystem/physical-measurements"
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
                     "text": "Computed waist circumference, mean of closest two measures"
@@ -841,7 +1023,7 @@
                     "code": "cm",
                     "system": "http:\/\/unitsofmeasure.org",
                     "unit": "cm",
-                    "value": 86.7
+                    "value": 87.5
                 },
                 "bodySite": {
                     "coding": [
