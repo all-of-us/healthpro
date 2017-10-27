@@ -118,9 +118,14 @@
                             "code": "55284-4",
                             "display": "Blood pressure systolic and diastolic",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "blood-pressure-1",
+                            "display": "First blood pressure systolic and diastolic",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Blood pressure systolic and diastolic"
+                    "text": "First blood pressure systolic and diastolic"
                 },
                 "component": [
                     {
@@ -130,9 +135,14 @@
                                     "code": "8480-6",
                                     "display": "Systolic blood pressure",
                                     "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-systolic-1",
+                                    "display": "First systolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
-                            "text": "Systolic blood pressure"
+                            "text": "First systolic blood pressure"
                         },
                         "valueQuantity": {
                             "code": "mm[Hg]",
@@ -148,9 +158,14 @@
                                     "code": "8462-4",
                                     "display": "Diastolic blood pressure",
                                     "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-diastolic-1",
+                                    "display": "First diastolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
-                            "text": "Diastolic blood pressure"
+                            "text": "First diastolic blood pressure"
                         },
                         "valueQuantity": {
                             "code": "mm[Hg]",
@@ -172,6 +187,11 @@
                             "code": "368209003",
                             "display": "Right arm",
                             "system": "http:\/\/snomed.info\/sct"
+                        },
+                        {
+                            "code": "right-arm",
+                            "display": "Right arm",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
                         }
                     ],
                     "text": "Right arm"
@@ -187,9 +207,14 @@
                             "code": "55284-4",
                             "display": "Blood pressure systolic and diastolic",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "blood-pressure-2",
+                            "display": "Second blood pressure systolic and diastolic",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Blood pressure systolic and diastolic"
+                    "text": "Second blood pressure systolic and diastolic"
                 },
                 "component": [],
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
@@ -204,6 +229,11 @@
                             "code": "368209003",
                             "display": "Right arm",
                             "system": "http:\/\/snomed.info\/sct"
+                        },
+                        {
+                            "code": "right-arm",
+                            "display": "Right arm",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
                         }
                     ],
                     "text": "Right arm"
@@ -227,9 +257,14 @@
                             "code": "55284-4",
                             "display": "Blood pressure systolic and diastolic",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "blood-pressure-3",
+                            "display": "Third blood pressure systolic and diastolic",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Blood pressure systolic and diastolic"
+                    "text": "Third blood pressure systolic and diastolic"
                 },
                 "component": [
                     {
@@ -239,9 +274,14 @@
                                     "code": "8480-6",
                                     "display": "Systolic blood pressure",
                                     "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-systolic-3",
+                                    "display": "Third systolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
-                            "text": "Systolic blood pressure"
+                            "text": "Third systolic blood pressure"
                         },
                         "valueQuantity": {
                             "code": "mm[Hg]",
@@ -257,9 +297,14 @@
                                     "code": "8462-4",
                                     "display": "Diastolic blood pressure",
                                     "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-diastolic-3",
+                                    "display": "Third diastolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
-                            "text": "Diastolic blood pressure"
+                            "text": "Third diastolic blood pressure"
                         },
                         "valueQuantity": {
                             "code": "mm[Hg]",
@@ -281,6 +326,11 @@
                             "code": "368209003",
                             "display": "Right arm",
                             "system": "http:\/\/snomed.info\/sct"
+                        },
+                        {
+                            "code": "right-arm",
+                            "display": "Right arm",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
                         }
                     ],
                     "text": "Right arm"
@@ -310,9 +360,14 @@
                             "code": "8867-4",
                             "display": "Heart rate",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "heart-rate-1",
+                            "display": "First heart rate",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Heart rate"
+                    "text": "First heart rate"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -333,7 +388,7 @@
                                 {
                                     "code": "heart-rhythm-status",
                                     "display": "Heart rhythm status",
-                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
                             "text": "Heart rhythm status"
@@ -361,9 +416,14 @@
                             "code": "8867-4",
                             "display": "Heart rate",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "heart-rate-2",
+                            "display": "Second heart rate",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Heart rate"
+                    "text": "Second heart rate"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -378,7 +438,7 @@
                                 {
                                     "code": "heart-rhythm-status",
                                     "display": "Heart rhythm status",
-                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
                             "text": "Heart rhythm status"
@@ -414,9 +474,14 @@
                             "code": "8867-4",
                             "display": "Heart rate",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "heart-rate-3",
+                            "display": "Third heart rate",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Heart rate"
+                    "text": "Third heart rate"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -437,7 +502,7 @@
                                 {
                                     "code": "heart-rhythm-status",
                                     "display": "Heart rhythm status",
-                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                                 }
                             ],
                             "text": "Heart rhythm status"
@@ -477,11 +542,11 @@
                     "coding": [
                         {
                             "code": "protocol-modifications-blood-pressure",
-                            "display": "Protocol modifications: Blood pressure",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                            "display": "Blood pressure protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Protocol modifications: Blood pressure"
+                    "text": "Blood pressure protocol modifications"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -494,7 +559,7 @@
                         {
                             "code": "refusal",
                             "display": "Refusal",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/refusal"
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-blood-pressure"
                         }
                     ],
                     "text": "Refusal"
@@ -508,11 +573,11 @@
                     "coding": [
                         {
                             "code": "protocol-modifications-blood-pressure",
-                            "display": "Protocol modifications: Blood pressure",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                            "display": "Blood pressure protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Protocol modifications: Blood pressure"
+                    "text": "Blood pressure protocol modifications"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -525,7 +590,7 @@
                         {
                             "code": "other",
                             "display": "Other",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/other"
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-blood-pressure"
                         }
                     ],
                     "text": "Some reason"
@@ -539,11 +604,11 @@
                     "coding": [
                         {
                             "code": "protocol-modifications-blood-pressure",
-                            "display": "Protocol modifications: Blood pressure",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                            "display": "Blood pressure protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Protocol modifications: Blood pressure"
+                    "text": "Blood pressure protocol modifications"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -556,7 +621,7 @@
                         {
                             "code": "manual-blood-pressure",
                             "display": "Manual blood pressure",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/manual-blood-pressure"
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-blood-pressure"
                         }
                     ],
                     "text": "Manual blood pressure"
@@ -570,11 +635,11 @@
                     "coding": [
                         {
                             "code": "protocol-modifications-heart-rate",
-                            "display": "Protocol modifications: Heart rate",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                            "display": "Heart rate protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Protocol modifications: Heart rate"
+                    "text": "Heart rate protocol modifications"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -587,7 +652,7 @@
                         {
                             "code": "manual-heart-rate",
                             "display": "Manual heart rate",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/manual-heart-rate"
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-heart-rate"
                         }
                     ],
                     "text": "Manual heart rate"
@@ -603,6 +668,11 @@
                             "code": "66174-4",
                             "display": "Are you currently pregnant?",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "pregnancy-status",
+                            "display": "Participant is pregnant",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
                     "text": "Are you currently pregnant?"
@@ -619,9 +689,14 @@
                             "code": "LA33-6",
                             "display": "Yes (pregnant)",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "pregnant",
+                            "display": "Pregnant",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/pregnancy-status"
                         }
                     ],
-                    "text": "Yes (pregnant)"
+                    "text": "Pregnant"
                 }
             }
         },
@@ -632,11 +707,11 @@
                     "coding": [
                         {
                             "code": "wheelchair-bound-status",
-                            "display": "Are you wheelchair-bound?",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                            "display": "Participant is a wheelchair user",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Are you wheelchair-bound?"
+                    "text": "Participant is a wheelchair user"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -665,9 +740,14 @@
                             "code": "8302-2",
                             "display": "Body height",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "height",
+                            "display": "Height",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Body height"
+                    "text": "Height"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -698,11 +778,11 @@
                     "coding": [
                         {
                             "code": "protocol-modifications-height",
-                            "display": "Protocol modifications: Height",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                            "display": "Height protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Protocol modifications: Height"
+                    "text": "Height protocol modifications"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -715,7 +795,7 @@
                         {
                             "code": "wheelchair-bound",
                             "display": "Wheelchair user",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/wheelchair-bound"
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-height"
                         }
                     ],
                     "text": "Wheelchair user"
@@ -731,9 +811,14 @@
                             "code": "29463-7",
                             "display": "Body weight",
                             "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "weight",
+                            "display": "Weight",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Body weight"
+                    "text": "Weight"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -765,7 +850,7 @@
                         {
                             "code": "pre-pregnancy-weight",
                             "display": "Approximate pre-pregnancy weight",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
                     "text": "Approximate pre-pregnancy weight"
@@ -791,11 +876,11 @@
                     "coding": [
                         {
                             "code": "protocol-modifications-weight",
-                            "display": "Protocol modifications: Weight",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-evaluation"
+                            "display": "Weight protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
                     ],
-                    "text": "Protocol modifications: Weight"
+                    "text": "Weight protocol modifications"
                 },
                 "effectiveDateTime": "2017-01-01T00:00:00Z",
                 "resourceType": "Observation",
@@ -808,7 +893,7 @@
                         {
                             "code": "wheelchair-bound",
                             "display": "Wheelchair user",
-                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/wheelchair-bound"
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-weight"
                         }
                     ],
                     "text": "Wheelchair user"
