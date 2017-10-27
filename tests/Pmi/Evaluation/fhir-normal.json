@@ -66,6 +66,18 @@
                             },
                             {
                                 "reference": "uuid:14"
+                            },
+                            {
+                                "reference": "uuid:15"
+                            },
+                            {
+                                "reference": "uuid:16"
+                            },
+                            {
+                                "reference": "uuid:17"
+                            },
+                            {
+                                "reference": "uuid:18"
                             }
                         ]
                     }
@@ -197,7 +209,7 @@
                             "system": "http:\/\/loinc.org"
                         },
                         {
-                            "code": "blood-pressure-1",
+                            "code": "blood-pressure-2",
                             "display": "Second blood pressure systolic and diastolic",
                             "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
                         }
