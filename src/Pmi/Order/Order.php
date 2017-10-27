@@ -270,6 +270,10 @@ class Order
         } else {
             $samples = $this->getRequestedSamples();
         }
+        $nonBloodSample = count($samples) === 1 && (isset($samples['(7) Urine 10 mL [1UR10]']) || isset($samples['Saliva [1SAL]']));
+        if ($set == 'collected' && !$nonBloodSample) {
+            $tsLabel = 'Blood Collection Time';
+        }
         $enabledSamples = $this->getEnabledSamples($set);
         $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
