@@ -115,9 +115,18 @@ class Fhir
         }
         $metrics = array_values($metrics);
 
-        // add computed mean bp
-        if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressre-3', $metrics)) {
+        // add computed means
+        if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
             $metrics[] = 'blood-pressure-mean';
+        }
+        if (in_array('heart-rate-2', $metrics) || in_array('heart-rate-3', $metrics)) {
+            $metrics[] = 'heart-rate-mean';
+        }
+        if (in_array('hip-circumference-1', $metrics) || in_array('hip-circumference-2', $metrics) || in_array('hip-circumference-3', $metrics)) {
+            $metrics[] = 'hip-circumference-mean';
+        }
+        if (in_array('waist-circumference-1', $metrics) || in_array('waist-circumference-2', $metrics) || in_array('waist-circumference-3', $metrics)) {
+            $metrics[] = 'waist-circumference-mean';
         }
 
         // set urns
@@ -610,7 +619,6 @@ class Fhir
         return $entry;  
     }
 
-
     protected function getBpBodySite($location)
     {
         switch ($location) {
@@ -688,8 +696,8 @@ class Fhir
                 throw new \Exception('Invalid blood pressure component');
         }
         if ($replicate === 'mean') {
-            if (isset($summary['bloodpressure']) && isset($summary['bloodpressure'][$component])) {
-                $value = $summary['bloodpressure'][$component];
+            if (isset($this->summary['bloodpressure']) && isset($this->summary['bloodpressure'][$component])) {
+                $value = $this->summary['bloodpressure'][$component];
             } else {
                 $value = null;
             }
@@ -822,13 +830,36 @@ class Fhir
         return $this->protocolModification('weight');
     }
 
+    protected function meanProtocolModifications($replicates, $modificationMetric, $modificationMetricManual = null)
+    {
+        $related = [];
+        foreach ($replicates as $replicate) {
+            $metric = $modificationMetric . $replicate;
+            if (array_key_exists($metric, $this->metricUrns)) {
+                $related[] = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns[$metric]
+                    ]
+                ];
+            }
+            if ($modificationMetricManual) {
+                $metricManual = $modificationMetricManual . $replicate;
+                if (array_key_exists($metricManual, $this->metricUrns)) {
+                    $related[] = [
+                        'type' => 'qualified-by',
+                        'target' => [
+                            'reference' => $this->metricUrns[$metricManual]
+                        ]
+                    ];
+                }
+            }
+        }
+        return $related;
+    }
+
     protected function bloodpressuremean()
     {
-        $hasSecond = array_key_exists('blood-pressure-2', $this->metricUrns);
-        $hasThird = array_key_exists('blood-pressure-3', $this->metricUrns);
-        if (!$hasSecond && !$hasThird) {
-            return;
-        }
         $components = [
             $this->getBpComponent('systolic', 'mean'),
             $this->getBpComponent('diastolic', 'mean')
@@ -864,33 +895,122 @@ class Fhir
         if (isset($this->data->{'blood-pressure-location'})) {
             $entry['resource']['bodySite'] = $this->getBpBodySite($this->data->{'blood-pressure-location'});
         }
-        $related = [];
-        for ($i = 2; $i <=3; $i++) {
-            $modificationMetric = 'blood-pressure-protocol-modification-' . $i;
-            $modificationMetricManual = 'manual-blood-pressure-' . $i;
-            if (array_key_exists($modificationMetric, $this->metricUrns)) {
-                $related[] = [
-                    'type' => 'qualified-by',
-                    'target' => [
-                        'reference' => $this->metricUrns[$modificationMetric]
-                    ]
-                ];
-            }
-            if (array_key_exists($modificationMetricManual, $this->metricUrns)) {
-                $related[] = [
-                    'type' => 'qualified-by',
-                    'target' => [
-                        'reference' => $this->metricUrns[$modificationMetricManual]
-                    ]
-                ];
-            }
-        }
-        if (count($related) > 0) {
+        if ($related = $this->meanProtocolModifications([2,3], 'blood-pressure-protocol-modification-', 'manual-blood-pressure-')) {
             $entry['resource']['related'] = $related;
         }
         return $entry;
     }
 
+    protected function heartratemean()
+    {
+        $entry = $this->simpleMetric(
+            'heart-rate-mean',
+            $this->summary['heartrate'],
+            'Computed heart rate, mean of 2nd and 3rd measures',
+            '/min',
+            [
+                [
+                    'code' => '8867-4',
+                    'display' => 'Heart rate',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'heart-rate-mean',
+                    'display' => 'Computed heart rate, mean of 2nd and 3rd measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if ($this->data->{'irregular-heart-rate'}[1] && $this->data->{'irregular-heart-rate'}[2]) {
+            $concept = [
+                'coding' => [[
+                    'code' => 'irregularity-detected',
+                    'display' => 'Irregularity detected',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
+                ]],
+                'text' => 'Irregularity detected'
+            ];
+        } else {
+            $concept = [
+                'coding' => [[
+                    'code' => 'no-irregularity-detected',
+                    'display' => 'No irregularity detected',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
+                ]],
+                'text' => 'No irregularity detected'
+            ];
+        }
+        $entry['resource']['component'] = [[
+            'code' => [
+                'coding' => [[
+                    'code' => 'heart-rhythm-status',
+                    'display' => 'Heart rhythm status',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]],
+                'text' => 'Heart rhythm status'
+            ],
+            'valueCodeableConcept' => $concept
+        ]];
+        if ($related = $this->meanProtocolModifications([2,3], 'blood-pressure-protocol-modification-', 'manual-heart-rate-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
+    }
+
+    protected function hipcircumferencemean()
+    {
+        $entry = $this->simpleMetric(
+            'hip-circumference-mean',
+            $this->summary['hip']['cm'],
+            'Computed hip circumference, mean of closest two measures',
+            'cm',
+            [
+                [
+                    'code' => '62409-8',
+                    'display' => 'Hip circumference',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'hip-circumference-mean',
+                    'display' => 'Computed hip circumference, mean of closest two measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if ($related = $this->meanProtocolModifications([1,2,3], 'hip-circumference-protocol-modification-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
+    }
+
+    protected function waistcircumferencemean()
+    {
+        $entry = $this->simpleMetric(
+            'waist-circumference-mean',
+            $this->summary['waist']['cm'],
+            'Computed waist circumference, mean of closest two measures',
+            'cm',
+            [
+                [
+                    'code' => '56086-2',
+                    'display' => 'Waist circumference',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'waist-circumference-mean',
+                    'display' => 'Computed waist circumference, mean of closest two measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if (isset($this->data->{'waist-circumference-location'})) {
+            $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
+        }
+        if ($related = $this->meanProtocolModifications([1,2,3], 'waist-circumference-protocol-modification-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;  
+    }
 
     protected function getEntry($metric)
     {

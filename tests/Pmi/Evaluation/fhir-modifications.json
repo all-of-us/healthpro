@@ -78,6 +78,12 @@
                             },
                             {
                                 "reference": "uuid:18"
+                            },
+                            {
+                                "reference": "uuid:19"
+                            },
+                            {
+                                "reference": "uuid:20"
                             }
                         ]
                     }
