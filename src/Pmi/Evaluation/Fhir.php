@@ -474,7 +474,7 @@ class Fhir
         }
         $cm = $this->data->height / 100;
         $bmi = round($this->data->weight / ($cm * $cm), 1);
-        return $this->simpleMetric(
+        $entry = $this->simpleMetric(
             'bmi',
             $bmi,
             'Computed body mass index',
@@ -492,6 +492,21 @@ class Fhir
                 ]
             ]
         );
+        $related = [];
+        foreach (['height-protocol-modification', 'weight-protocol-modification'] as $metric) {
+            if (array_key_exists($metric, $this->metricUrns)) {
+                $related[] = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns[$metric]
+                    ]
+                ];
+            }
+        }
+        if ($related) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
     }
 
     protected function heartrate($replicate = null)
