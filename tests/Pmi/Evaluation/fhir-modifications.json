@@ -84,6 +84,9 @@
                             },
                             {
                                 "reference": "uuid:20"
+                            },
+                            {
+                                "reference": "uuid:21"
                             }
                         ]
                     }
@@ -1135,6 +1138,28 @@
                         }
                     }
                 ]
+            }
+        },
+        {
+            "fullUrl": "uuid:21",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "notes",
+                            "display": "Additional notes",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Additional notes"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueString": "Some notes"
             }
         }
     ],

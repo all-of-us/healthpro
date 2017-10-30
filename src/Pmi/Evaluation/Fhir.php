@@ -113,7 +113,6 @@ class Fhir
                 unset($metrics[$k]);
             }
         }
-        $metrics = array_values($metrics);
 
         // add computed means
         if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
@@ -128,6 +127,15 @@ class Fhir
         if (in_array('waist-circumference-1', $metrics) || in_array('waist-circumference-2', $metrics) || in_array('waist-circumference-3', $metrics)) {
             $metrics[] = 'waist-circumference-mean';
         }
+
+        // move notes to end
+        $notesIndex = array_search('notes', $metrics);
+        if ($notesIndex !== false) {
+            unset($metrics[$notesIndex]);
+            $metrics[] = 'notes';
+        }
+
+        $metrics = array_values($metrics);
 
         // set urns
         $metricUrns = [];
@@ -266,6 +274,29 @@ class Fhir
                 ]
             ]
         ];
+    }
+
+    protected function stringMetric($metric, $value, $display, $codes)
+    {
+        $entry = [
+            'fullUrl' => $this->metricUrns[$metric],
+            'resource' => [
+                'code' => [
+                    'coding' => $codes,
+                    'text' => $display
+                ],
+                'effectiveDateTime' => $this->date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->patient}"
+                ]
+            ]
+        ];
+        if (!is_null($value)) {
+            $entry['resource']['valueString'] = (string)$value;
+        }
+        return $entry;
     }
 
     protected function protocolModification($metric, $replicate = null)
@@ -1025,6 +1056,23 @@ class Fhir
             $entry['resource']['related'] = $related;
         }
         return $entry;  
+    }
+
+    protected function notes()
+    {
+        if (!$this->data->notes) {
+            return;
+        }
+        return $this->stringMetric(
+            'notes',
+            $this->data->notes,
+            'Additional notes',
+            [[
+                'code' =>  'notes',
+                'display' =>  'Additional notes',
+                'system' =>  'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+            ]]
+        );
     }
 
     protected function getEntry($metric)
