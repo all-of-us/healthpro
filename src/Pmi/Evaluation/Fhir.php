@@ -12,6 +12,7 @@ class Fhir
     protected $date;
     protected $metricUrns;
     protected $parentRdr;
+    protected $summary;
 
     public function __construct(array $options)
     {
@@ -30,6 +31,7 @@ class Fhir
         $this->createdSite = $options['created_site'];
         $this->finalizedUser = $options['finalized_user'];
         $this->finalizedSite = $options['finalized_site'];
+        $this->summary = $options['summary'];
     }
 
     protected static function ordinalLabel($text, $replicate)
@@ -112,6 +114,11 @@ class Fhir
             }
         }
         $metrics = array_values($metrics);
+
+        // add computed mean bp
+        if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressre-3', $metrics)) {
+            $metrics[] = 'blood-pressure-mean';
+        }
 
         // set urns
         $metricUrns = [];
@@ -604,24 +611,21 @@ class Fhir
     }
 
 
-    protected function getBpBodySite($replicate)
+    protected function getBpBodySite($location)
     {
-        if (is_array($this->data->{'blood-pressure-location'})) {
-            $location = $this->data->{'blood-pressure-location'}[$replicate - 1];
-        } else {
-            $location = $this->data->{'blood-pressure-location'};
-        }
         switch ($location) {
             case 'Left arm':
                 $locationSnomed = '368208006';
                 $locationPmi = 'left-arm';
                 $locationDisplay = 'Left arm';
                 break;
-            default:
+            case 'Right arm':
                 $locationSnomed = '368209003';
                 $locationPmi = 'right-arm';
                 $locationDisplay = 'Right arm';
                 break;
+            default:
+                return null;
         }
         return [
             'coding' => [
@@ -654,6 +658,9 @@ class Fhir
         ];
     }
 
+    /*
+     * $replicate can be integer for replicate number OR 'mean'
+     */
     protected function getBpComponent($component, $replicate)
     {
         switch ($component) {
@@ -661,18 +668,34 @@ class Fhir
                 $loincCode = '8480-6';
                 $loincDisplay = 'Systolic blood pressure';
                 $pmiCode = 'blood-pressure-systolic-' . $replicate;
-                $pmiDisplay = self::ordinalLabel('systolic blood pressure', $replicate);
+                if ($replicate === 'mean') {
+                    $pmiDisplay = 'Computed systolic blood pressure, mean of 2nd and 3rd measures';
+                } else {
+                    $pmiDisplay = self::ordinalLabel('systolic blood pressure', $replicate);
+                }
                 break;
             case 'diastolic':
                 $loincCode = '8462-4';
                 $loincDisplay = 'Diastolic blood pressure';
                 $pmiCode = 'blood-pressure-diastolic-' . $replicate;
-                $pmiDisplay = self::ordinalLabel('diastolic blood pressure', $replicate);
+                if ($replicate === 'mean') {
+                    $pmiDisplay = 'Computed diastolic blood pressure, mean of 2nd and 3rd measures';
+                } else {
+                    $pmiDisplay = self::ordinalLabel('diastolic blood pressure', $replicate);
+                }
                 break;
             default:
                 throw new \Exception('Invalid blood pressure component');
         }
-        $value = $this->data->{'blood-pressure-' . $component}[$replicate - 1];
+        if ($replicate === 'mean') {
+            if (isset($summary['bloodpressure']) && isset($summary['bloodpressure'][$component])) {
+                $value = $summary['bloodpressure'][$component];
+            } else {
+                $value = null;
+            }
+        } else {
+            $value = $this->data->{'blood-pressure-' . $component}[$replicate - 1];
+        }
         if (is_null($value)) {
             return null;
         }
@@ -736,7 +759,7 @@ class Fhir
             ]
         ];
         if (isset($this->data->{'blood-pressure-location'})) {
-            $entry['resource']['bodySite'] = $this->getBpBodySite($replicate);
+            $entry['resource']['bodySite'] = $this->getBpBodySite($this->data->{'blood-pressure-location'});
         }
         $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
         $modificationMetricManual = 'manual-blood-pressure-' . $replicate;
@@ -798,6 +821,76 @@ class Fhir
     {
         return $this->protocolModification('weight');
     }
+
+    protected function bloodpressuremean()
+    {
+        $hasSecond = array_key_exists('blood-pressure-2', $this->metricUrns);
+        $hasThird = array_key_exists('blood-pressure-3', $this->metricUrns);
+        if (!$hasSecond && !$hasThird) {
+            return;
+        }
+        $components = [
+            $this->getBpComponent('systolic', 'mean'),
+            $this->getBpComponent('diastolic', 'mean')
+        ];
+        $components = array_filter($components); // remove components that return null
+        $entry = [
+            'fullUrl' => $this->metricUrns['blood-pressure-mean'],
+            'resource' => [
+                'code' => [
+                    'coding' => [
+                        [
+                            'code' => '55284-4',
+                            'display' => 'Blood pressure systolic and diastolic',
+                            'system' => 'http://loinc.org'
+                        ],
+                        [
+                            'code' => 'blood-pressure-mean',
+                            'display' => 'Computed blood pressure systolic and diastolic, mean of 2nd and 3rd measures',
+                            'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                        ]
+                    ],
+                    'text' => 'Computed blood pressure systolic and diastolic, mean of 2nd and 3rd measures'
+                ],
+                'component' => $components,
+                'effectiveDateTime' => $this->date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->patient}"
+                ]
+            ]
+        ];
+        if (isset($this->data->{'blood-pressure-location'})) {
+            $entry['resource']['bodySite'] = $this->getBpBodySite($this->data->{'blood-pressure-location'});
+        }
+        $related = [];
+        for ($i = 2; $i <=3; $i++) {
+            $modificationMetric = 'blood-pressure-protocol-modification-' . $i;
+            $modificationMetricManual = 'manual-blood-pressure-' . $i;
+            if (array_key_exists($modificationMetric, $this->metricUrns)) {
+                $related[] = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns[$modificationMetric]
+                    ]
+                ];
+            }
+            if (array_key_exists($modificationMetricManual, $this->metricUrns)) {
+                $related[] = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns[$modificationMetricManual]
+                    ]
+                ];
+            }
+        }
+        if (count($related) > 0) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
+    }
+
 
     protected function getEntry($metric)
     {

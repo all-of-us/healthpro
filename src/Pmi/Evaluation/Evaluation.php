@@ -283,7 +283,8 @@ class Evaluation
             'created_user' => $this->createdUser,
             'created_site' => $this->createdSite,
             'finalized_user' => $this->finalizedUser,
-            'finalized_site' => $this->finalizedSite
+            'finalized_site' => $this->finalizedSite,
+            'summary' => $this->getSummary()
         ]);
         return $fhir->toObject();
     }
