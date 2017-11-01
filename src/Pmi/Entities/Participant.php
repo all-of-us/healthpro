@@ -14,6 +14,8 @@ class Participant
     public $dob;
     public $cacheTime;
     protected $rdrData;
+    public $evaluationFinalizedSite;
+    public $orderCreatedSite;
 
     public function __construct($rdrParticipant = null)
     {
@@ -79,6 +81,15 @@ class Participant
             } catch (\Exception $e) {
                 $this->dob = null;
             }
+        }
+
+        // Remove site prefix
+        if (!empty($participant->physicalMeasurementsFinalizedSite) && $participant->physicalMeasurementsFinalizedSite !== 'UNSET') {
+            $this->evaluationFinalizedSite = $this->getSiteSuffix($participant->physicalMeasurementsFinalizedSite);
+        }
+
+        if (!empty($participant->biospecimenSourceSite) && $participant->biospecimenSourceSite !== 'UNSET') {
+            $this->orderCreatedSite = $this->getSiteSuffix($participant->biospecimenSourceSite);
         }
     }
 
@@ -236,5 +247,11 @@ class Participant
             }
         }
         return false;
+    }
+
+    public function getSiteSuffix($site)
+    {
+        $site = str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
+        return ucfirst($site);
     }
 }
