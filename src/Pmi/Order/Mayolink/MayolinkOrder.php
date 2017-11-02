@@ -6,7 +6,7 @@ use Pmi\HttpClient;
 
 class MayolinkOrder
 {
-    protected $ordersEndpoint = 'https://test.orders.mayomedicallaboratories.com';
+    protected $ordersEndpoint = 'http://test.orders.mayomedicallaboratories.com';
     protected $labelPdf = 'orders/labels.xml';
     protected $createOrder = 'orders/create.xml';
     protected $app;
