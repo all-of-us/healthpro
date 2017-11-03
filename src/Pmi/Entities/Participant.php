@@ -251,7 +251,6 @@ class Participant
 
     public function getSiteSuffix($site)
     {
-        $site = str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
-        return ucfirst($site);
+        return str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
     }
 }
