@@ -371,8 +371,8 @@ class WorkQueueController extends AbstractController
                     ];                   
                 }
                 $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                $row[] = $participant->evaluationFinalizedSite;
                 $row[] = self::csvDateFromString($participant->physicalMeasurementsTime);
+                $row[] = $participant->evaluationFinalizedSite;
                 $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                 $row[] = $participant->numBaselineSamplesArrived;
                 foreach (self::$samples as $sample => $label) {
