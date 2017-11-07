@@ -107,6 +107,7 @@ def main(argv):
         if not DRYRUN:
             user["suspended"]=True
             user["suspensionReason"]="Inactivity"
+            print("User to suspend %s" % user.get('primaryEmail',None))
             dirservice.users().update(userKey=user.get('primaryEmail',None),body=user).execute()
             print("Suspending %s" % user.get('primaryEmail',None))
             continue
