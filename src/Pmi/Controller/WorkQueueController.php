@@ -320,12 +320,14 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Physical Measurements Completion Date';
+            $headers[] = 'Physical Measurements Location';
             $headers[] = 'Samples for DNA Received';
             $headers[] = 'Biospecimens';
             foreach (self::$samples as $sample => $label) {
                 $headers[] = $label . ' Collected';
                 $headers[] = $label . ' Collection Date';
             }
+            $headers[] = 'Biospecimens Location';
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
                 if (!$isDVType) {
@@ -370,12 +372,14 @@ class WorkQueueController extends AbstractController
                 }
                 $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
                 $row[] = self::csvDateFromString($participant->physicalMeasurementsTime);
+                $row[] = $participant->evaluationFinalizedSite;
                 $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                 $row[] = $participant->numBaselineSamplesArrived;
                 foreach (self::$samples as $sample => $label) {
                     $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
                     $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"});
                 }
+                $row[] = $participant->orderCreatedSite;
                 fputcsv($output, $row);
             }
             fwrite($output, "\"\"\n");
