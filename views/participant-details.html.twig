@@ -1,0 +1,233 @@
+{% extends 'base.html.twig' %}
+{% block title %}Participant {{ participant.id }} - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2>{{ participant.lastName }}, {{ participant.firstName }} <small>{{ participant.shortId }}</small></h2>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <dl class="dl-horizontal">
+                <dt>Name</dt>
+                <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
+                <dt>Participant ID</dt>
+                <dd>{{ participant.id }}</dd>
+                <dt>Biobank ID</dt>
+                <dd>{{ participant.biobankId }}</dd>
+                <dt>DOB</dt>
+                <dd>{{ participant.dob ? participant.dob|date('n/j/Y') }}</dd>
+                <dt>Gender Identity</dt>
+                <dd>{{ participant.genderIdentity }}</dd>
+            </dl>
+        </div>
+        <div class="col-sm-6 text-center">
+            <svg id="participant-barcode"></svg>
+        </div>
+    </div>
+    <div id="participant-consent-status">
+        <div class="status-block">
+            <strong>General Consent</strong>
+            {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
+                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                {{ participant.consentForStudyEnrollmentTime ? participant.consentForStudyEnrollmentTime|date('n/j/Y') }}
+            {% else %}
+                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+            {% endif %}
+            <br />
+        </div>
+        <div class="status-block">
+            <strong>EHR Consent</strong>
+            {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
+                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y') }}
+            {% else %}
+                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y') : '(not completed)' }}
+            {% endif %}
+            <br />
+        </div>
+        <div class="status-block">
+            <strong>CABoR Consent</strong> <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
+            {% if participant.consentForCABoR == 'SUBMITTED' %}
+                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('n/j/Y') }}
+            {% else %}
+                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('n/j/Y') : '(not completed)' }}
+            {% endif %}
+            <br />
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Contact</h3>
+                </div>
+                <div class="panel-body">
+                    <dl>
+                        <dt>Language</dt>
+                        <dd>{{ participant.language }}</dd>
+                    </dl>
+                    <dl>
+                        <dt>Contact Method</dt>
+                        <dd>{{ participant.recontactMethod|default('Unspecified') }}</dd>
+                    </dl>
+                    <dl>
+                        <dt>Address</dt>
+                        <dd>{{ participant.getAddress() }}</dd>
+                    </dl>
+                    <dl>
+                        <dt>Email</dt>
+                        <dd>{{ participant.email }}</dd>
+                    </dl>
+                    <dl>
+                        <dt>Phone</dt>
+                        <dd>{{ participant.phoneNumber }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Demographics</h3>
+                </div>
+                <div class="panel-body">
+                    <dl>
+                        <dt>Age</dt>
+                        <dd>{{ participant.getAge() }}</dd>
+                    </dl>
+                    <dl>
+                        <dt>Sex</dt>
+                        <dd>{{ participant.sex }}</dd>
+                    </dl>
+                    <dl>
+                        <dt>Race/Ethnicity</dt>
+                        <dd>{{ participant.race }}</dd>
+                    </dl>
+                    <dl>
+                        <dt>Education</dt>
+                        <dd>{{ participant.education }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">PPI Survey Completion</h3>
+                </div>
+                <div class="panel-body">
+                    <dl class="dl-horizontal">
+                        <dt>Required Complete?</dt>
+                        <dd>
+                            {% if participant.numCompletedBaselinePPIModules == 3 %}
+                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                            {% endif %}
+                        </dd>
+                        <dt>Number Complete</dt>
+                        <dd>{{ participant.numCompletedPPIModules }}</dd>
+                    </dl>
+                    <div class="text-center">
+                        {% for field, label in surveys %}
+                            <div class="participant-detail-status">
+                                <strong>{{ label }}</strong>
+                                {% if attribute(participant, 'questionnaireOn' ~ field) == 'SUBMITTED' %}
+                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                    {% if attribute(participant, 'questionnaireOn' ~ field ~ 'Time') %}
+                                        <small>{{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time')|date('m/d/Y') }}</small>
+                                    {% endif %}
+                                {% else %}
+                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                    <small>(not completed)</small>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">In-Person Enrollment</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="text-center">
+                        <div class="participant-detail-status">
+                            <strong>Physical Measurements</strong>
+                            {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
+                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                {% if participant.physicalMeasurementsTime %}
+                                    <small>{{ participant.physicalMeasurementsTime|date('m/d/Y') }}</small>
+                                {% endif %}
+                            {% else %}
+                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                <small>(not completed)</small>
+                            {% endif %}
+                        </div>
+                        <br />
+                        {% if participant.evaluationFinalizedSite %}
+                            Location: <samp>{{ participant.evaluationFinalizedSite }}</samp>
+                        {% endif %}
+                    </div>
+                    <hr />
+                    <dl class="dl-horizontal dl-horizontal-lg">
+                        <dt>Biospecimens Received</dt>
+                        <dd>
+                            {% if participant.numBaselineSamplesArrived >= 7 %}
+                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                            {% endif %}
+                            {{ participant.numBaselineSamplesArrived }}
+                        </dd>
+                        <dt>Samples for DNA Received?</dt>
+                        <dd>
+                            {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
+                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                    <div class="text-center">
+                        {% for field, label in samples %}
+                            <div class="participant-detail-status">
+                                <strong>{{ label }}</strong>
+                                {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
+                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                    {% if attribute(participant, 'sampleStatus' ~ field ~ 'Time') %}
+                                        <small>{{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y') }}</small>
+                                    {% endif %}
+                                {% else %}
+                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                    <small>(not received)</small>
+                                {% endif %}
+                            </div>
+                        {% endfor %}                    
+                        <br />
+                        {% if participant.orderCreatedSite %}
+                            Location: <samp>{{ participant.orderCreatedSite }}</samp>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
+        width: 2,
+        height: 50,
+        displayValue: true
+    });
+});
+</script>
+{% endblock %}

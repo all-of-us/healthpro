@@ -34,6 +34,7 @@ class DefaultController extends AbstractController
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
+        ['participantDetail', '/participant/{id}/detail'],
         ['settings', '/settings', ['method' => 'GET|POST']],
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
     ];
@@ -290,7 +291,7 @@ class DefaultController extends AbstractController
         if ($refresh) {
             return $app->redirectToRoute('participant', [
                 'id' => $id
-            ]);           
+            ]);
         }
         if (!$participant) {
             $app->abort(404);
@@ -343,6 +344,23 @@ class DefaultController extends AbstractController
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
             'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled()
+        ]);
+    }
+
+    public function participantDetailAction($id, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participants']->getById($id);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if ($participant->hpoId !== $app->getSiteOrganization()) {
+            return $app->redirectToRoute('participant', ['id' => $id]);
+        }
+
+        return $app['twig']->render('participant-details.html.twig', [
+            'participant' => $participant,
+            'samples' => WorkQueueController::$samples,
+            'surveys' => WorkQueueController::$surveys
         ]);
     }
 

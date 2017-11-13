@@ -61,6 +61,15 @@ label.label-normal {
     margin: 0;
     font-weight: normal;
 }
+@media (min-width: 768px) {
+    .dl-horizontal-lg dt {
+        width: 200px;
+    }
+    .dl-horizontal-lg dd {
+        margin-left: 220px;
+    }
+}
+
 /* for bootstrap date picker */
 .form-group {
     position: relative;
@@ -189,6 +198,19 @@ label.label-normal {
 #participant-consent-status .status-block i.fa-check, #participant-consent-status .status-block i.fa-times {
     display: block;
     font-size: 36px;
+}
+.participant-detail-status {
+    display: inline-block;
+    margin: 5px;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 3px;
+    text-align: center;
+    min-width: 150px;
+}
+.participant-detail-status i.fa-check, .participant-detail-status i.fa-times {
+    display: block;
+    font-size: 20px;
 }
 
 .toggle-help-image {
