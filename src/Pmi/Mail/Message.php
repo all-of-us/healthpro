@@ -4,11 +4,13 @@ namespace Pmi\Mail;
 use google\appengine\api\mail\Message as GoogleMessage;
 use google\appengine\api\app_identity\AppIdentityService;
 use Pmi\Application\AbstractApplication;
+use Pmi\Mail\Mandrill;
 
 class Message
 {
     const PHP_MAIL = 0;
     const GOOGLE_MESSAGE = 1;
+    const MANDRILL = 2;
     const TEST_SUB_PREFIX = '[TEST] ';
 
     protected $app;
@@ -84,6 +86,11 @@ class Message
             case self::PHP_MAIL:
                 $to = join(', ', $this->to);
                 mail($to, $this->subject, $this->content, "From: {$from}");
+                break;
+
+            case self::MANDRILL:
+                $mandrill = new Mandrill($this->app->getConfig('mandrill_key'));
+                $mandrill->send($this->to, $from, $this->subject, $this->content);
                 break;
 
             default:
