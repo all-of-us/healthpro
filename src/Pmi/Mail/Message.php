@@ -123,7 +123,11 @@ class Message
 
     protected function getDefaultSender()
     {
-        $applicationId = AppIdentityService::getApplicationId();
-        return "donotreply@{$applicationId}.appspotmail.com";
+        if ($this->method === self::MANDRILL) {
+            return 'donotreply@pmi-ops.org';
+        } else {
+            $applicationId = AppIdentityService::getApplicationId();
+            return "donotreply@{$applicationId}.appspotmail.com";
+        }
     }
 }

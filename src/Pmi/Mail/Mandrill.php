@@ -35,7 +35,7 @@ class Mandrill
     public function send(array $to, $from, $subject, $content)
     {
         $message = [
-            'from' => $from,
+            'from_email' => $from,
             'text' => $content,
             'subject' => $subject,
         ];
