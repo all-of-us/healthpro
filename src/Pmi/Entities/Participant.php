@@ -40,25 +40,24 @@ class Participant
             $this->id = $participant->participantId;
         }
 
+        // Check for participants associated with TEST organization in prod
+        if (getenv('PMI_ENV') === Application::ENV_PROD && $participant->hpoId === 'TEST') {
+            $this->status = false;
+            $this->statusReason = 'test-participant';
+        }
         // HealthPro status is active if participant is consented, has completed basics survey, and is not withdrawn
         if (empty($participant->questionnaireOnTheBasics) || $participant->questionnaireOnTheBasics !== 'SUBMITTED') {
             $this->status = false;
             $this->statusReason = 'basics';
         }
+        // RDR should not be returning participant data for unconsented participants, but adding this check to be safe
         if (empty($participant->consentForStudyEnrollment) || $participant->consentForStudyEnrollment !== 'SUBMITTED') {
-            // RDR should not be returning participant data for unconsented participants, but adding this check to be safe
             $this->status = false;
             $this->statusReason = 'consent';
         }
         if (!empty($participant->withdrawalStatus) && $participant->withdrawalStatus === 'NO_USE') {
             $this->status = false;
             $this->statusReason = 'withdrawal';
-        }
-
-        // Check for participants associated with TEST organization in prod
-        if (getenv('PMI_ENV') === Application::ENV_PROD && $participant->hpoId === 'TEST') {
-            $this->status = false;
-            $this->statusReason = 'test-participant';
         }
 
         // Map gender identity to gender options for MayoLINK.
