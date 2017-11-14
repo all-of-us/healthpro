@@ -69,7 +69,9 @@ label.label-normal {
         margin-left: 220px;
     }
 }
-
+.dl-vertical dd {
+    margin-bottom: 10px;
+}
 /* for bootstrap date picker */
 .form-group {
     position: relative;

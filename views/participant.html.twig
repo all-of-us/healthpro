@@ -268,23 +268,15 @@
                                     <h3 class="panel-title">Contact</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <dl>
+                                    <dl class="dl-vertical">
                                         <dt>Language</dt>
                                         <dd>{{ participant.language }}</dd>
-                                    </dl>
-                                    <dl>
                                         <dt>Contact Method</dt>
                                         <dd>{{ participant.recontactMethod|default('Unspecified') }}</dd>
-                                    </dl>
-                                    <dl>
                                         <dt>Address</dt>
                                         <dd>{{ participant.getAddress() }}</dd>
-                                    </dl>
-                                    <dl>
                                         <dt>Email</dt>
                                         <dd>{{ participant.email }}</dd>
-                                    </dl>
-                                    <dl>
                                         <dt>Phone</dt>
                                         <dd>{{ participant.phoneNumber }}</dd>
                                     </dl>
@@ -296,22 +288,17 @@
                                     <h3 class="panel-title">Demographics</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <dl>
+                                    <dl class="dl-vertical">
                                         <dt>Age</dt>
                                         <dd>{{ participant.getAge() }}</dd>
-                                    </dl>
-                                    <dl>
                                         <dt>Sex</dt>
                                         <dd>{{ participant.sex }}</dd>
-                                    </dl>
-                                    <dl>
+                                        <dt>Gender Identity</dt>
+                                        <dd>{{ participant.genderIdentity }}</dd>
                                         <dt>Race/Ethnicity</dt>
                                         <dd>{{ participant.race }}</dd>
-                                    </dl>
-                                    <dl>
                                         <dt>Education</dt>
                                         <dd>{{ participant.education }}</dd>
-                                    </dl>
                                 </div>
                             </div>
                         </div>
