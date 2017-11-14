@@ -270,11 +270,11 @@
                                 <div class="panel-body">
                                     <dl class="dl-vertical">
                                         <dt>Language</dt>
-                                        <dd>{{ participant.language }}</dd>
+                                        <dd>{{ participant.language|default('--') }}</dd>
                                         <dt>Contact Method</dt>
-                                        <dd>{{ participant.recontactMethod|default('Unspecified') }}</dd>
+                                        <dd>{{ participant.recontactMethod|default('--') }}</dd>
                                         <dt>Address</dt>
-                                        <dd>{{ participant.getAddress() }}</dd>
+                                        <dd>{{ participant.getAddress(true)|nl2br }}</dd>
                                         <dt>Email</dt>
                                         <dd>{{ participant.email }}</dd>
                                         <dt>Phone</dt>

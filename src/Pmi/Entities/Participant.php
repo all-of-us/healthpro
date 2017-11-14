@@ -106,13 +106,17 @@ class Participant
         return new \DateTime('1933-03-03');
     }
 
-    public function getAddress()
+    public function getAddress($multiline = false)
     {
         $address = '';
         if ($this->streetAddress) {
             $address .= $this->streetAddress;
             if ($this->city || $this->state || $this->zipCode) {
-                $address .= ', ';
+                if ($multiline) {
+                    $address .= "\n";
+                } else {
+                    $address .= ', ';
+                }
             }
         }
         if ($this->city) {
