@@ -55,7 +55,8 @@
             </div>
         </div>
     {% endif %}
-    {% if participant.status %}
+
+    {% if participant.status or canViewDetails %}
         <div id="participant-consent-status">
             <div class="status-block">
                 <strong>General Consent</strong>
@@ -90,152 +91,339 @@
                 <br />
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h3>
-                    </div>
-                    <div class="panel-body">
-                        {% for evaluation in evaluations %}
-                            {% if loop.index == 6 %}
-                                <div id="evaluation-overflow">
-                            {% endif %}
-                            <a href="{{ path('evaluation', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg btn-default">
-                                {{ evaluation.created_ts|date('D n/j/Y', app.userTimezone) }}<br />
-                                <small class="text-muted">
-                                    {% if evaluation.finalized_ts %}
-                                        <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                    {% else %}
-                                        <span class="label label-default">Updated</span> {{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                    {% endif %}
-                                </small>
-                            </a>
-                        {% endfor %}
-                        {% if evaluations|length > 5 %}
-                            </div> {# close .evaluation-overflow div above #}
-                            <a href="#" class="btn btn-block btn-lg btn-default" id="evaluation-overflow-show">
-                                <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
-                            </a>
-                        {% endif %}
-                        <a href="{{ path('evaluation', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
-                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                            {% if evaluations|length > 0 %}
-                                New
-                            {% else %}
-                                Start
-                            {% endif %}
-                            Physical Measurements
-                        </a>
-                    </div>
-                </div>
-            </div>
+    {% endif %}
 
-            <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
-                    </div>
-                    <div class="panel-body">
-                        {% for order in orders %}
-                            {% if loop.index == 6 %}
-                                <div id="order-overflow">
-                            {% endif %}
-                            <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
-                                {{ order.created_ts|date('D n/j/Y', app.userTimezone) }} <small class="text-muted"><strong>{{ order.order_id }}</strong></small><br />
-                                <small class="text-muted">
-                                    {% if order.finalized_ts %}
-                                        <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
-                                    {% elseif order.processed_ts %}
-                                        <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
-                                    {% elseif order.collected_ts %}
-                                        <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
-                                    {% else %}
-                                    {% endif %}                                    
-                                </small>
-                            </a>
-                        {% endfor %}
-                        {% if orders|length > 5 %}
-                            </div> {# close .order-overflow div above #}
-                            <a href="#" class="btn btn-block btn-lg btn-default" id="order-overflow-show">
-                                <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
-                            </a>
-                        {% endif %}
-                        <a href="{{ path('orderCheck', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
-                    </div>
-                </div>
-            </div>
-            {% if app.isDVType %}
-                <div class="col-sm-6 col-lg-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Document Unanticipated Problems</h3>
-                        </div>
-                        <div class="panel-body">
-                            {% for problem in problems %}
-                                {% if loop.index == 6 %}
-                                    <div id="problem-overflow">
-                                {% endif %}
-                                <a href="{{ path('problemForm', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
-                                    {{ problem.updated_ts|date('D n/j/Y', app.userTimezone) }}
-                                    <br />
-                                    <small class="text-muted">
-                                        {% if problem.finalized_ts %}
-                                            <span class="label label-success">Finalized</span>
-                                            {{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                            <br />
-                                            {% if problem.comment_count > 0 %}
-                                                <span class="label label-default">{{ problem.comment_count }} comment{{ problem.comment_count > 1 ? 's' }}</span> {{ problem.last_comment_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                            {% endif %}
-                                        {% else %}
-                                            <span class="label label-danger">Draft</span>
-                                            {{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                        {% endif %}
-                                    </small>
-                                </a>
-                            {% endfor %}
-                            {% if problems|length > 5 %}
+    <div role="tabpanel">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#inperson" aria-controls="inperson" role="tab" data-toggle="tab">In-Person Enrollment</a>
+            </li>
+            {% if canViewDetails %}
+                <li role="presentation">
+                    <a href="#details" aria-controls="tab" role="tab" data-toggle="tab">Participant Details</a>
+                </li>
+            {% else %}
+                <li role="presentation" class="disabled">
+                    <a href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-toggle="tooltip" data-placement="bottom">Participant Details</a>
+                </li>
+            {% endif %}
+        </ul>
+        <br />
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="inperson">
+                {% if participant.status %}
+                    <div class="row">
+                        <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h3>
                                 </div>
-                                <a href="#" class="btn btn-block btn-lg btn-default" id="problem-overflow-show">
-                                    <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
-                                </a>
-                            {% endif %}
-                            <a href="{{ path('problemForm', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
-                                <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                                New Unanticipated Problem
-                            </a>
+                                <div class="panel-body">
+                                    {% for evaluation in evaluations %}
+                                        {% if loop.index == 6 %}
+                                            <div id="evaluation-overflow">
+                                        {% endif %}
+                                        <a href="{{ path('evaluation', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg btn-default">
+                                            {{ evaluation.created_ts|date('D n/j/Y', app.userTimezone) }}<br />
+                                            <small class="text-muted">
+                                                {% if evaluation.finalized_ts %}
+                                                    <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                                {% else %}
+                                                    <span class="label label-default">Updated</span> {{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                                {% endif %}
+                                            </small>
+                                        </a>
+                                    {% endfor %}
+                                    {% if evaluations|length > 5 %}
+                                        </div> {# close .evaluation-overflow div above #}
+                                        <a href="#" class="btn btn-block btn-lg btn-default" id="evaluation-overflow-show">
+                                            <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
+                                        </a>
+                                    {% endif %}
+                                    <a href="{{ path('evaluation', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
+                                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                        {% if evaluations|length > 0 %}
+                                            New
+                                        {% else %}
+                                            Start
+                                        {% endif %}
+                                        Physical Measurements
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
+                                </div>
+                                <div class="panel-body">
+                                    {% for order in orders %}
+                                        {% if loop.index == 6 %}
+                                            <div id="order-overflow">
+                                        {% endif %}
+                                        <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
+                                            {{ order.created_ts|date('D n/j/Y', app.userTimezone) }} <small class="text-muted"><strong>{{ order.order_id }}</strong></small><br />
+                                            <small class="text-muted">
+                                                {% if order.finalized_ts %}
+                                                    <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
+                                                {% elseif order.processed_ts %}
+                                                    <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
+                                                {% elseif order.collected_ts %}
+                                                    <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
+                                                {% else %}
+                                                {% endif %}                                    
+                                            </small>
+                                        </a>
+                                    {% endfor %}
+                                    {% if orders|length > 5 %}
+                                        </div> {# close .order-overflow div above #}
+                                        <a href="#" class="btn btn-block btn-lg btn-default" id="order-overflow-show">
+                                            <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
+                                        </a>
+                                    {% endif %}
+                                    <a href="{{ path('orderCheck', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% if app.isDVType %}
+                            <div class="col-sm-6 col-lg-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Document Unanticipated Problems</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        {% for problem in problems %}
+                                            {% if loop.index == 6 %}
+                                                <div id="problem-overflow">
+                                            {% endif %}
+                                            <a href="{{ path('problemForm', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
+                                                {{ problem.updated_ts|date('D n/j/Y', app.userTimezone) }}
+                                                <br />
+                                                <small class="text-muted">
+                                                    {% if problem.finalized_ts %}
+                                                        <span class="label label-success">Finalized</span>
+                                                        {{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                                        <br />
+                                                        {% if problem.comment_count > 0 %}
+                                                            <span class="label label-default">{{ problem.comment_count }} comment{{ problem.comment_count > 1 ? 's' }}</span> {{ problem.last_comment_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <span class="label label-danger">Draft</span>
+                                                        {{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                                    {% endif %}
+                                                </small>
+                                            </a>
+                                        {% endfor %}
+                                        {% if problems|length > 5 %}
+                                            </div>
+                                            <a href="#" class="btn btn-block btn-lg btn-default" id="problem-overflow-show">
+                                                <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
+                                            </a>
+                                        {% endif %}
+                                        <a href="{{ path('problemForm', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
+                                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                            New Unanticipated Problem
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {% if participant.statusReason == 'test-participant' %}
+                        {% set errorTitle = 'This is not a real participant' %}
+                        {% set errorMessage = 'Data collection and entry for test participants are prohibited in the production environment. You may not create a biobank order or collect physical measurements for this participant.' %} 
+                    {% elseif participant.statusReason == 'basics' %}
+                        {% set errorTitle = 'The Basics survey not complete' %}
+                        {% set errorMessage = 'This participant has consented but has not completed "The Basics" survey in the participant app and is therefore ineligible for physical measurements and biospecimen collection. Please direct the participant to complete "The Basics" survey in the participant application to enable in person enrollment or contact the help desk if needed.' %}
+                    {% elseif participant.statusReason == 'withdrawal' %}
+                        {% set errorTitle = 'Withdrawn participant' %}
+                        {% set errorMessage = 'This participant has withdrawn from the All of Us Research Program. No new data can be collected or sent for this participant. Staff must also follow all site-specific SOPs to ensure all All of Us Research Program data are removed from all local systems for this participant.' %}
+                    {% else %}
+                        {% set errorTitle = 'Consent not complete' %}
+                        {% set errorMessage = 'This participant has not completed consent for enrollment.' %}
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                            <div class="panel panel-danger">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> {{ errorTitle }}</h3>
+                                </div>
+                                <div class="panel-body">
+                                    {{ errorMessage }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            {% if canViewDetails %}
+                <div role="tabpanel" class="tab-pane" id="details">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Contact</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <dl>
+                                        <dt>Language</dt>
+                                        <dd>{{ participant.language }}</dd>
+                                    </dl>
+                                    <dl>
+                                        <dt>Contact Method</dt>
+                                        <dd>{{ participant.recontactMethod|default('Unspecified') }}</dd>
+                                    </dl>
+                                    <dl>
+                                        <dt>Address</dt>
+                                        <dd>{{ participant.getAddress() }}</dd>
+                                    </dl>
+                                    <dl>
+                                        <dt>Email</dt>
+                                        <dd>{{ participant.email }}</dd>
+                                    </dl>
+                                    <dl>
+                                        <dt>Phone</dt>
+                                        <dd>{{ participant.phoneNumber }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Demographics</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <dl>
+                                        <dt>Age</dt>
+                                        <dd>{{ participant.getAge() }}</dd>
+                                    </dl>
+                                    <dl>
+                                        <dt>Sex</dt>
+                                        <dd>{{ participant.sex }}</dd>
+                                    </dl>
+                                    <dl>
+                                        <dt>Race/Ethnicity</dt>
+                                        <dd>{{ participant.race }}</dd>
+                                    </dl>
+                                    <dl>
+                                        <dt>Education</dt>
+                                        <dd>{{ participant.education }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">PPI Survey Completion</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <dl class="dl-horizontal">
+                                        <dt>Required Complete?</dt>
+                                        <dd>
+                                            {% if participant.numCompletedBaselinePPIModules == 3 %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                            {% else %}
+                                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                            {% endif %}
+                                        </dd>
+                                        <dt>Number Complete</dt>
+                                        <dd>{{ participant.numCompletedPPIModules }}</dd>
+                                    </dl>
+                                    <div class="text-center">
+                                        {% for field, label in surveys %}
+                                            <div class="participant-detail-status">
+                                                <strong>{{ label }}</strong>
+                                                {% if attribute(participant, 'questionnaireOn' ~ field) == 'SUBMITTED' %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                    {% if attribute(participant, 'questionnaireOn' ~ field ~ 'Time') %}
+                                                        <small>{{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time')|date('m/d/Y') }}</small>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                    <small>(not completed)</small>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">In-Person Enrollment</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="text-center">
+                                        <div class="participant-detail-status">
+                                            <strong>Physical Measurements</strong>
+                                            {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% if participant.physicalMeasurementsTime %}
+                                                    <small>{{ participant.physicalMeasurementsTime|date('m/d/Y') }}</small>
+                                                {% endif %}
+                                            {% else %}
+                                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                <small>(not completed)</small>
+                                            {% endif %}
+                                        </div>
+                                        <br />
+                                        {% if participant.evaluationFinalizedSite %}
+                                            Location: <samp>{{ participant.evaluationFinalizedSite }}</samp>
+                                        {% endif %}
+                                    </div>
+                                    <hr />
+                                    <dl class="dl-horizontal dl-horizontal-lg">
+                                        <dt>Biospecimens Received</dt>
+                                        <dd>
+                                            {% if participant.numBaselineSamplesArrived >= 7 %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                            {% endif %}
+                                            {{ participant.numBaselineSamplesArrived }}
+                                        </dd>
+                                        <dt>Samples for DNA Received?</dt>
+                                        <dd>
+                                            {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                            {% else %}
+                                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                            {% endif %}
+                                        </dd>
+                                    </dl>
+                                    <div class="text-center">
+                                        {% for field, label in samples %}
+                                            <div class="participant-detail-status">
+                                                <strong>{{ label }}</strong>
+                                                {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                    {% if attribute(participant, 'sampleStatus' ~ field ~ 'Time') %}
+                                                        <small>{{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y') }}</small>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                    <small>(not received)</small>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                        <br />
+                                        {% if participant.orderCreatedSite %}
+                                            Location: <samp>{{ participant.orderCreatedSite }}</samp>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             {% endif %}
         </div>
-    {% else %}
-        {% if participant.statusReason == 'test-participant' %}
-            {% set errorTitle = 'This is not a real participant' %}
-            {% set errorMessage = 'Data collection and entry for test participants are prohibited in the production environment. You may not create a biobank order or collect physical measurements for this participant.' %} 
-        {% elseif participant.statusReason == 'basics' %}
-            {% set errorTitle = 'The Basics survey not complete' %}
-            {% set errorMessage = 'This participant has consented but has not completed "The Basics" survey in the participant app and is therefore ineligible for physical measurements and biospecimen collection. Please direct the participant to complete "The Basics" survey in the participant application to enable in person enrollment or contact the help desk if needed.' %}
-        {% elseif participant.statusReason == 'withdrawal' %}
-            {% set errorTitle = 'Withdrawn participant' %}
-            {% set errorMessage = 'This participant has withdrawn from the All of Us Research Program. No new data can be collected or sent for this participant. Staff must also follow all site-specific SOPs to ensure all All of Us Research Program data are removed from all local systems for this participant.' %}
-        {% else %}
-            {% set errorTitle = 'Consent not complete' %}
-            {% set errorMessage = 'This participant has not completed consent for enrollment.' %}
-        {% endif %}
-        <div class="row">
-            <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
-                <div class="panel panel-danger">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> {{ errorTitle }}</h3>
-                    </div>
-                    <div class="panel-body">
-                        {{ errorMessage }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
+    </div>
 {% endif %}
 {% endblock %}
 

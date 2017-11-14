@@ -34,7 +34,6 @@ class DefaultController extends AbstractController
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
-        ['participantDetail', '/participant/{id}/detail'],
         ['settings', '/settings', ['method' => 'GET|POST']],
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
     ];
@@ -311,6 +310,7 @@ class DefaultController extends AbstractController
         }
 
         $isCrossOrg = $participant->hpoId !== $app->getSiteOrganization();
+        $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, ['test-participant', 'basics']));
         $hasNoParticipantAccess = $isCrossOrg && empty($app['session']->get('agreeCrossOrg_'.$id));
         if ($hasNoParticipantAccess) {
             $app->log(Log::CROSS_ORG_PARTICIPANT_ATTEMPT, [
@@ -343,22 +343,8 @@ class DefaultController extends AbstractController
             'problems' => $problems,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
-            'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled()
-        ]);
-    }
-
-    public function participantDetailAction($id, Application $app, Request $request)
-    {
-        $participant = $app['pmi.drc.participants']->getById($id);
-        if (!$participant) {
-            $app->abort(404);
-        }
-        if ($participant->hpoId !== $app->getSiteOrganization()) {
-            return $app->redirectToRoute('participant', ['id' => $id]);
-        }
-
-        return $app['twig']->render('participant-details.html.twig', [
-            'participant' => $participant,
+            'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled(),
+            'canViewDetails' => $canViewDetails,
             'samples' => WorkQueueController::$samples,
             'surveys' => WorkQueueController::$surveys
         ]);
