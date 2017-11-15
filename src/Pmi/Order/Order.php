@@ -334,24 +334,26 @@ class Order
                 ],
                 'required' => false
             ]);
-            $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
-                'google_group' => $this->app->getSiteId()
-            ]);
-            if ($this->order['type'] !== 'saliva' && !empty($enabledSamples) && empty($sites['centrifuge_type'])) {
-                $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
-                    'label' => 'Centrifuge type',
-                    'required' => true,
-                    'disabled' => $disabled,
-                    'choices' => [
-                        '-- Select centrifuge type --' => null,
-                        'Fixed Angle'=> self::FIXED_ANGLE,
-                        'Swinging Bucket' => self::SWINGING_BUCKET
-                    ],
-                    'multiple' => false,
-                    'constraints' => new Constraints\NotBlank([
-                        'message' => 'Please select centrifuge type'
-                    ])
+            if ($this->app->isDVType()) {
+                $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
+                    'google_group' => $this->app->getSiteId()
                 ]);
+                if ($this->order['type'] !== 'saliva' && !empty($enabledSamples) && empty($sites['centrifuge_type'])) {
+                    $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
+                        'label' => 'Centrifuge type',
+                        'required' => true,
+                        'disabled' => $disabled,
+                        'choices' => [
+                            '-- Select centrifuge type --' => null,
+                            'Fixed Angle'=> self::FIXED_ANGLE,
+                            'Swinging Bucket' => self::SWINGING_BUCKET
+                        ],
+                        'multiple' => false,
+                        'constraints' => new Constraints\NotBlank([
+                            'message' => 'Please select centrifuge type'
+                        ])
+                    ]);
+                }
             }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
