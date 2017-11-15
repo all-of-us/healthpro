@@ -116,33 +116,44 @@ class AdminController extends AbstractController
             ->add('name', Type\TextType::class, [
                 'label' => 'Name',
                 'required' => true,
-                'constraints' => new Constraints\NotBlank()
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ]
             ])
             ->add('google_group', Type\TextType::class, [
                 'label' => 'Google Group',
                 'required' => true,
-                'constraints' => new Constraints\NotBlank()
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ]
             ])
             ->add('mayolink_account', Type\TextType::class, [
                 'label' => 'MayoLink Account',
-                'required' => false
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('organization', Type\TextType::class, [
                 'label' => 'Organization',
-                'required' => false
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('type', Type\TextType::class, [
                 'label' => 'Type',
-                'required' => false
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('awardee', Type\TextType::class, [
                 'label' => 'Awardee',
-                'required' => false
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('email', Type\TextType::class, [
                 'label' => 'Email address(es)',
                 'required' => false,
                 'constraints' => [
+                    new Constraints\Type('string'),
                     new Constraints\Length(['max' => 512]),
                     new Constraints\Callback(function($list, $context) {
                         $list = trim($list);
