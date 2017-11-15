@@ -139,6 +139,9 @@ class OrderController extends AbstractController
                 $orderData['participant_id'] = $participant->id;
                 $orderData['biobank_id'] = $participant->biobankId;
                 $orderData['created_ts'] = new \DateTime();
+                if (!$app->isDVType()) {
+                    $orderData['processed_centrifuge_type'] = Order::SWINGING_BUCKET;
+                }
                 $orderId = $app['em']->getRepository('orders')->insert($orderData);
                 if ($orderId) {
                     $app->log(Log::ORDER_CREATE, $orderId);
