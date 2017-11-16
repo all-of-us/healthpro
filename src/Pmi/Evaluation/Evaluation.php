@@ -177,11 +177,14 @@ class Evaluation
                 unset($options['scale']);
                 $class = TextareaType::class;
                 $attributes['rows'] = 4;
+                $constraints[] = new Constraints\Type('string');
             } elseif ($type == 'text') {
                 unset($options['scale']);
                 $class = TextType::class;
+                $constraints[] = new Constraints\Type('string');
             } else {
                 $class = NumberType::class;
+                $constraints[] = new Constraints\Type('numeric');
             }
 
             $options['constraints'] = $constraints;

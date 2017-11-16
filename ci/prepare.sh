@@ -15,3 +15,6 @@ gcloud components install app-engine-php --quiet
 
 # patch php_cli.py to make our CI environment variables available
 patch /opt/google-cloud-sdk/platform/google_appengine/google/appengine/tools/php_cli.py $DIR/php_cli.patch
+
+# make php_cli.py executable
+chmod a+x /opt/google-cloud-sdk/platform/google_appengine/php_cli.py
