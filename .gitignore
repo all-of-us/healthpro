@@ -15,4 +15,3 @@ php.ini
 /bin/GeoLite2-Country.mmdb
 ci/*.secret
 /deploy_*.txt
-.DS_Store
