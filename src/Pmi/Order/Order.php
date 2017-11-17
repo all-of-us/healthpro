@@ -70,12 +70,19 @@ class Order
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SAL'];
 
+    public static $samplesRequiringCentrifugeType = ['1SST8', '1PST8'];
+
     public static $identifierLabel = [
         'name' => 'name',
         'dob' => 'date of birth',
         'phone' => 'phone number',
         'address' => 'street address',
         'email' => 'email address'
+    ];
+
+    public static $centrifugeType = [
+        'swinging_bucket' => 'Swinging Bucket',
+        'fixed_angle' => 'Fixed Angle'
     ];
 
     public function loadOrder($participantId, $orderId, Application $app)

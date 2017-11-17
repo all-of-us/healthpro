@@ -287,7 +287,8 @@ class OrderController extends AbstractController
                                 'mayoClientId' => $mayoClientId,
                                 'siteId' => $app->getSiteId(),
                                 'organizationId' => $app->getSiteOrganization(),
-                                'collected_samples' => $orderData['collected_samples']
+                                'collected_samples' => $orderData['collected_samples'],
+                                'centrifugeType' => $orderData['processed_centrifuge_type']
                             ];
                             $mayoOrder = new MayolinkOrder($app);
                             $mayoId = $mayoOrder->createOrder(

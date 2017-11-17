@@ -3,6 +3,7 @@ namespace Pmi\Order\Mayolink;
 
 use Silex\Application;
 use Pmi\HttpClient;
+use Pmi\Order\Order;
 
 class MayolinkOrder
 {
@@ -137,7 +138,11 @@ class MayolinkOrder
         if ($options["{$type}_samples"]) {
             $samples = json_decode($options["{$type}_samples"]);
             foreach ($samples as $key => $sample) {
-                $mayoSamples[] = ['code' => $sample, 'name' => $tests[$sample]['specimen']];
+                if ($options['centrifugeType'] && in_array($sample, Order::$samplesRequiringCentrifugeType)) {
+                    $mayoSamples[] = ['code' => $sample, 'name' => $tests[$sample]['specimen'], 'centrifuge' => Order::$centrifugeType[$options['centrifugeType']]];
+                } else {
+                    $mayoSamples[] = ['code' => $sample, 'name' => $tests[$sample]['specimen']];
+                }               
             }
         } else {
             if ($type !== 'collected') {
