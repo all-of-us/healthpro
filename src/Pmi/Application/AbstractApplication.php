@@ -5,7 +5,7 @@ use Exception;
 use Memcache;
 use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
-use Silex\Provider\TwigServiceProvider;
+use Pmi\Twig\Provider\TwigServiceProvider;
 use Silex\Application;
 use Silex\Provider\CsrfServiceProvider;
 use Silex\Provider\FormServiceProvider;
