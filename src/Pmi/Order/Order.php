@@ -95,7 +95,7 @@ class Order
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL'];
 
-    public static $samplesRequiringCentrifugeType = ['1SST8', '1PST8', '1SS08', '1PS08'];
+    public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
 
     public static $identifierLabel = [
         'name' => 'name',

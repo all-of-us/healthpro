@@ -46,11 +46,15 @@ class MayolinkOrder
     protected static $tests2 = [
         '1SS08' => [
             'temperature' => 'Refrigerated',
-            'specimen' => 'Serum SST'
+            'specimen' => 'Serum SST',
+            'code' => '1SSTP',
+            'prompt' => 'SST Centrifuge Type'
         ],
         '1PS08' => [
             'temperature' => 'Refrigerated',
-            'specimen' => 'Plasma PST'
+            'specimen' => 'Plasma PST',
+            'code' => '1PSTP',
+            'prompt' => 'PST Centrifuge Type'
         ],
         '1HEP4' => [
             'temperature' => 'Refrigerated',
@@ -169,8 +173,14 @@ class MayolinkOrder
         if ($options["{$type}_samples"]) {
             $samples = json_decode($options["{$type}_samples"]);
             foreach ($samples as $key => $sample) {
-                if ($options['centrifugeType'] && in_array($sample, Order::$samplesRequiringCentrifugeType)) {
-                    $mayoSamples[] = ['code' => $sample, 'name' => $tests[$sample]['specimen'], 'centrifuge' => Order::$centrifugeType[$options['centrifugeType']]];
+                if (!empty($options['centrifugeType']) && in_array($sample, Order::$samplesRequiringCentrifugeType)) {
+                    $mayoSamples[] = [
+                        'code' => $sample,
+                        'name' => $tests[$sample]['specimen'],
+                        'questionCode' => $tests[$sample]['code'],
+                        'questionPrompt' => $tests[$sample]['prompt'],
+                        'questionAnswer' => Order::$centrifugeType[$options['centrifugeType']]
+                    ];
                 } else {
                     $mayoSamples[] = ['code' => $sample, 'name' => $tests[$sample]['specimen']];
                 }               
