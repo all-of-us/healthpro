@@ -12,12 +12,43 @@ class MayolinkOrder
     protected $createOrder = 'orders/create.xml';
     protected $app;
 
-    protected static $tests = [
+    protected static $tests1 = [
         '1SST8' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'Serum SST'
         ],
         '1PST8' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Plasma PST'
+        ],
+        '1HEP4' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'WB Sodium Heparin'
+        ],
+        '1ED04' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '1ED10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '2ED10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Whole Blood EDTA'
+        ],
+        '1UR10' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Urine'
+        ]
+    ];
+
+    protected static $tests2 = [
+        '1SS08' => [
+            'temperature' => 'Refrigerated',
+            'specimen' => 'Serum SST'
+        ],
+        '1PS08' => [
             'temperature' => 'Refrigerated',
             'specimen' => 'Plasma PST'
         ],
@@ -132,7 +163,7 @@ class MayolinkOrder
         if (isset($options['type']) && $options['type'] === 'saliva') {
             $tests = self::$salivaTests;
         } else {
-            $tests = self::$tests;
+            $tests = self::${'tests' . $options['version']};
         }
         $mayoSamples = [];
         if ($options["{$type}_samples"]) {
