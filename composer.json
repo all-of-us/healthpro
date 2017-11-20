@@ -36,11 +36,11 @@
         "phpunit/phpunit": "4.8.*"
     },
     "scripts": {
-        "post-package-install" : [
-            "./bin/cleanVendorTests"
+        "post-install-cmd" : [
+            "./bin/cleanVendor"
         ],
-        "post-package-update" : [
-            "./bin/cleanVendorTests"
+        "post-update-cmd" : [
+            "./bin/cleanVendor"
         ]
     }
 }
