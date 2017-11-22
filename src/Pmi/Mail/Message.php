@@ -14,6 +14,7 @@ class Message
     const TEST_SUB_PREFIX = '[TEST] ';
 
     protected $app;
+    protected $from;
     protected $to;
     protected $subject;
     protected $content;
@@ -23,6 +24,7 @@ class Message
     {
         $this->app = $app;
         $this->method = $method;
+        $this->from = $this->getDefaultSender();
     }
 
     public function setTo($to)
@@ -69,12 +71,10 @@ class Message
 
     public function send()
     {
-        $from = $this->getDefaultSender();
-
         switch ($this->method) {
             case self::GOOGLE_MESSAGE:
                 $googleMessage = new GoogleMessage();
-                $googleMessage->setSender($from);
+                $googleMessage->setSender($this->from);
                 foreach ($this->to as $address) {
                     $googleMessage->addTo($address);
                 }
@@ -85,12 +85,18 @@ class Message
 
             case self::PHP_MAIL:
                 $to = join(', ', $this->to);
-                mail($to, $this->subject, $this->content, "From: {$from}");
+                mail($to, $this->subject, $this->content, "From: {$this->from}");
                 break;
 
             case self::MANDRILL:
+                $this->localLog();
                 $mandrill = new Mandrill($this->app->getConfig('mandrill_key'));
-                $mandrill->send($this->to, $from, $this->subject, $this->content);
+                try {
+                    $mandrill->send($this->to, $this->from, $this->subject, $this->content);
+                } catch (\Exception $e) {
+                    syslog(LOG_ERR, "Error sending Mandrill message");
+                    syslog(LOG_ERR, $e->getMessage());
+                }
                 break;
 
             default:
@@ -128,6 +134,19 @@ class Message
         } else {
             $applicationId = AppIdentityService::getApplicationId();
             return "donotreply@{$applicationId}.appspotmail.com";
+        }
+    }
+
+    protected function localLog()
+    {
+        // Add informational log to mimic GAE mail service logging
+        if ($this->app->isLocal()) {
+            syslog(LOG_INFO, "Sending via Mandrill:\n" . 
+                "\tFrom: {$this->from}\n" . 
+                "\tTo: " . implode(', ', $this->to) . "\n" .
+                "\tSubject: {$this->subject}\n" .
+                "\tBody data length: " . strlen($this->content)
+            );
         }
     }
 }
