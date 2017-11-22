@@ -31,4 +31,4 @@ else
     PHP=$(which php)
 fi
 
-$PHP_CLI_PATH --php_executable_path="$PHP" "$@"
+/usr/bin/env python $PHP_CLI_PATH --php_executable_path="$PHP" "$@"
