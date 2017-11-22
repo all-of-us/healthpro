@@ -20,10 +20,19 @@ class Message
     protected $content;
     protected $method;
 
-    public function __construct(AbstractApplication $app, $method = self::GOOGLE_MESSAGE)
+    public function __construct(AbstractApplication $app)
     {
+        switch ($app->getConfig('mail_method')) {
+            case 'mandrill':
+                $this->method = self::MANDRILL;
+                break;
+            case 'php_mail':
+                $this->method = self::PHP_MAIL;
+                break;
+            default:
+                $this->method = self::GOOGLE_MESSAGE;
+        }
         $this->app = $app;
-        $this->method = $method;
         $this->from = $this->getDefaultSender();
     }
 
