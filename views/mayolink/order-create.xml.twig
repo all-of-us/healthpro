@@ -31,8 +31,17 @@
 			{% for sample in samples %}
 				<test>
 					<code>{{ sample.code }}</code>
-					<name>{{ sample.name}}</name>
+					<name>{{ sample.name }}</name>
 					<comments/>
+					{% if sample.questionCode is defined %}
+						<questions>
+							<question>
+								<code>{{ sample.questionCode }}</code>
+								<prompt>{{ sample.questionPrompt }}</prompt>
+								<answer>{{ sample.questionAnswer }}</answer>
+							</question>
+						</questions>
+					{% endif %}
 				</test>
 			{% endfor %}
 		</tests>

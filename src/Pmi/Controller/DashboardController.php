@@ -603,7 +603,7 @@ class DashboardController extends AbstractController
     // PRIVATE METHODS
 
     // Main method for retrieving metrics from API
-    // stores result in memcache with 4 hour expiration
+    // stores result in memcache with 1 hour expiration
     // each entry is comprised of a single day of all available data & facets
     private function getMetricsObject(Application $app, $date)
     {
@@ -618,7 +618,7 @@ class DashboardController extends AbstractController
                 if (!$metrics) {
                     return false;
                 } else {
-                    $memcache->set($memcacheKey, $metrics, 0, 14400);
+                    $memcache->set($memcacheKey, $metrics, 0, 3600);
                 }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
@@ -638,7 +638,7 @@ class DashboardController extends AbstractController
             try {
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
                 $definitions = $metricsApi->metricsFields();
-                // set expiration to four hours
+                // set expiration to one hour
                 $memcache->set($memcacheKey, $definitions, 0, 3600);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;

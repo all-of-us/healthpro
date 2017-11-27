@@ -14,9 +14,13 @@ class Order
     protected $participant;
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
+
+    // This represents the current version of samples
+    public static $version = 2;
+
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
-    public static $samples = [
+    public static $samples1 = [
         '(1) 8 mL SST [1SST8]' => '1SST8',
         '(2) 8 mL PST [1PST8]' => '1PST8',
         '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
@@ -26,13 +30,23 @@ class Order
         '(7) Urine 10 mL [1UR10]' => '1UR10'
     ];
 
+    public static $samples2 = [
+        '(1) 8 mL SST [1SS08]' => '1SS08',
+        '(2) 8 mL PST [1PS08]' => '1PS08',
+        '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
+        '(4) 4 mL EDTA [1ED04]' => '1ED04',
+        '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
+        '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
+        '(7) Urine 10 mL [1UR10]' => '1UR10'
+    ];
+
     public static $samplesInformation = [
-        '1SST8' => [
+        '1SS08' => [
             'number' => 1,
             'label' => '8 mL SST',
             'color' => 'Red and gray'
         ],
-        '1PST8' => [
+        '1PS08' => [
             'number' => 2,
             'label' => '8 mL PST',
             'color' => 'Green and gray'
@@ -61,14 +75,27 @@ class Order
             'number' => 7,
             'label' => 'Urine 10 mL',
             'color' => 'Yellow'
-        ]
+        ],
+        // Keep old sample codes for backward compatability
+        '1SST8' => [
+            'number' => 1,
+            'label' => '8 mL SST',
+            'color' => 'Red and gray'
+        ],
+        '1PST8' => [
+            'number' => 2,
+            'label' => '8 mL PST',
+            'color' => 'Green and gray'
+        ],
     ];
 
     public static $salivaSamples = [
         'Saliva [1SAL]' => '1SAL'
     ];
 
-    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SAL'];
+    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL'];
+
+    public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
 
     public static $identifierLabel = [
         'name' => 'name',
@@ -76,6 +103,11 @@ class Order
         'phone' => 'phone number',
         'address' => 'street address',
         'email' => 'email address'
+    ];
+
+    public static $centrifugeType = [
+        'swinging_bucket' => 'Swinging Bucket',
+        'fixed_angle' => 'Fixed Angle'
     ];
 
     public function loadOrder($participantId, $orderId, Application $app)
@@ -94,6 +126,9 @@ class Order
         $this->app = $app;
         $this->order = $order;
         $this->participant = $participant;
+        if (empty($order['version'])) {
+            self::$version = 1;
+        }
     }
 
     public function isValid()
@@ -355,24 +390,26 @@ class Order
                 ],
                 'required' => false
             ]);
-            $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
-                'google_group' => $this->app->getSiteId()
-            ]);
-            if ($this->order['type'] !== 'saliva' && !empty($enabledSamples) && empty($sites['centrifuge_type'])) {
-                $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
-                    'label' => 'Centrifuge type',
-                    'required' => true,
-                    'disabled' => $disabled,
-                    'choices' => [
-                        '-- Select centrifuge type --' => null,
-                        'Fixed Angle'=> self::FIXED_ANGLE,
-                        'Swinging Bucket' => self::SWINGING_BUCKET
-                    ],
-                    'multiple' => false,
-                    'constraints' => new Constraints\NotBlank([
-                        'message' => 'Please select centrifuge type'
-                    ])
+            if ($this->app->isDVType()) {
+                $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
+                    'google_group' => $this->app->getSiteId()
                 ]);
+                if ($this->order['type'] !== 'saliva' && !empty($enabledSamples) && empty($sites['centrifuge_type'])) {
+                    $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
+                        'label' => 'Centrifuge type',
+                        'required' => true,
+                        'disabled' => $disabled,
+                        'choices' => [
+                            '-- Select centrifuge type --' => null,
+                            'Fixed Angle'=> self::FIXED_ANGLE,
+                            'Swinging Bucket' => self::SWINGING_BUCKET
+                        ],
+                        'multiple' => false,
+                        'constraints' => new Constraints\NotBlank([
+                            'message' => 'Please select centrifuge type'
+                        ])
+                    ]);
+                }
             }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
@@ -601,9 +638,9 @@ class Order
             is_array($requestedArray) &&
             count($requestedArray) > 0
         ) {
-            return array_intersect(self::$samples, $requestedArray);
+            return array_intersect(self::${'samples' . self::$version}, $requestedArray);
         } else {
-            return self::$samples;
+            return self::${'samples' . self::$version};
         }
     }
 

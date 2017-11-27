@@ -101,7 +101,7 @@ class OrderController extends AbstractController
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Select requested samples',
-                'choices' => Order::$samples,
+                'choices' => Order::${'samples' . Order::$version},
                 'required' => false
             ]);
         }
@@ -139,6 +139,10 @@ class OrderController extends AbstractController
                 $orderData['participant_id'] = $participant->id;
                 $orderData['biobank_id'] = $participant->biobankId;
                 $orderData['created_ts'] = new \DateTime();
+                $orderData['version'] = Order::$version;
+                if (!$app->isDVType()) {
+                    $orderData['processed_centrifuge_type'] = Order::SWINGING_BUCKET;
+                }
                 $orderId = $app['em']->getRepository('orders')->insert($orderData);
                 if ($orderId) {
                     $app->log(Log::ORDER_CREATE, $orderId);
@@ -284,7 +288,9 @@ class OrderController extends AbstractController
                                 'mayoClientId' => $mayoClientId,
                                 'siteId' => $app->getSiteId(),
                                 'organizationId' => $app->getSiteOrganization(),
-                                'collected_samples' => $orderData['collected_samples']
+                                'collected_samples' => $orderData['collected_samples'],
+                                'centrifugeType' => $orderData['processed_centrifuge_type'],
+                                'version' => $orderData['version']
                             ];
                             $mayoOrder = new MayolinkOrder($app);
                             $mayoId = $mayoOrder->createOrder(
@@ -607,7 +613,8 @@ class OrderController extends AbstractController
                 'order_id' => $orderData['order_id'],
                 'collected_at' => $collectedAt->format('c'),
                 'mayoClientId' => $mayoClientId,
-                'requested_samples' => $orderData['requested_samples']
+                'requested_samples' => $orderData['requested_samples'],
+                'version' => $orderData['version']
             ];
             $pdf = $mlOrder->getLabelsPdf(
                 $app->getConfig('ml_username'),
