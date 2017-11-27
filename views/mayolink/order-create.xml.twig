@@ -33,12 +33,12 @@
 					<code>{{ sample.code }}</code>
 					<name>{{ sample.name }}</name>
 					<comments/>
-					{% if sample.centrifuge is defined %}
+					{% if sample.questionCode is defined %}
 						<questions>
 							<question>
-								<code>{{ sample.code }}</code>
-								<prompt>Centrifuge Type</prompt>
-								<answer>{{ sample.centrifuge }}</answer>
+								<code>{{ sample.questionCode }}</code>
+								<prompt>{{ sample.questionPrompt }}</prompt>
+								<answer>{{ sample.questionAnswer }}</answer>
 							</question>
 						</questions>
 					{% endif %}
