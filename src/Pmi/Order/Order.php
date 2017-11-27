@@ -719,4 +719,28 @@ class Order
     {
         return $this->getParticipant()->checkIdentifiers($notes);
     }
+
+    public function checkWarnings()
+    {
+        $warnings = [];
+        $collectedTs = $this->order['collected_ts'];
+        if ($this->order['processed_samples_ts']) {
+            $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+            //Check if SST processing time is less than 30 mins after collection time
+            $collectedTs->modify('+30 minutes');
+            if ($processedSamplesTs['1SS08'] < $collectedTs->getTimestamp()) {
+                $warnings['sst'] = 'SST Specimen Processed Less than 30 minutes after Collection';
+            }
+            //Check if SST processing time is greater than 4 hrs after collection time
+            $collectedTs->modify('+210 minutes');
+            if ($processedSamplesTs['1SS08'] > $collectedTs->getTimestamp()) {
+                $warnings['sst'] = 'Processing Time is Greater than 4 hours after Collection';
+            }
+            //Check if PST processing time is greater than 4 hrs after collection time
+            if ($processedSamplesTs['1PS08'] > $collectedTs->getTimestamp()) {
+                $warnings['pst'] = 'Processing Time is Greater than 4 hours after Collection';
+            }
+        }
+        return $warnings;
+    }
 }
