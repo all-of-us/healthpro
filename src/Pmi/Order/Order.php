@@ -126,8 +126,8 @@ class Order
         $this->app = $app;
         $this->order = $order;
         $this->participant = $participant;
-        if (!empty($order['version'])) {
-            self::$version = $order['version'];
+        if (empty($order['version'])) {
+            self::$version = 1;
         }
     }
 
