@@ -104,6 +104,14 @@ $(document).ready(function () {
             .pmiDateTimePicker();
     });
     $('#form_processed_samples_ts').remove();
+
+    // Display processed samples time warning messages
+    {% if warnings['sst'] is defined %}
+        $('#form_processed_samples :text').eq(0).after('<small class="text-warning">' + {{ warnings['sst']|json_encode|raw }} + '</small>');
+    {% endif %}
+    {% if warnings['pst'] is defined %}
+        $('#form_processed_samples :text').eq(1).after('<small class="text-warning">' + {{ warnings['pst']|json_encode|raw }} + '</small>');
+    {% endif %}
 {% endif %}
 
     var orderView = new PMI.views['OrderSubPage']({

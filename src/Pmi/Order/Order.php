@@ -723,21 +723,24 @@ class Order
     public function checkWarnings()
     {
         $warnings = [];
-        $collectedTs = $this->order['collected_ts'];
-        if ($this->order['processed_samples_ts']) {
+        if ($this->order['type'] !== 'saliva' && !empty($this->order['collected_ts']) && !empty($this->order['processed_samples_ts'])) {
+            $collectedTs = $this->order['collected_ts'];
             $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+            $samples = self::${'samples' . self::$version};
+            $sst = current($samples);
+            $pst = next($samples);
             //Check if SST processing time is less than 30 mins after collection time
             $collectedTs->modify('+30 minutes');
-            if ($processedSamplesTs['1SS08'] < $collectedTs->getTimestamp()) {
+            if (!empty($processedSamplesTs[$sst]) && $processedSamplesTs[$sst] < $collectedTs->getTimestamp()) {
                 $warnings['sst'] = 'SST Specimen Processed Less than 30 minutes after Collection';
             }
             //Check if SST processing time is greater than 4 hrs after collection time
             $collectedTs->modify('+210 minutes');
-            if ($processedSamplesTs['1SS08'] > $collectedTs->getTimestamp()) {
+            if (!empty($processedSamplesTs[$sst]) && $processedSamplesTs[$sst] > $collectedTs->getTimestamp()) {
                 $warnings['sst'] = 'Processing Time is Greater than 4 hours after Collection';
             }
             //Check if PST processing time is greater than 4 hrs after collection time
-            if ($processedSamplesTs['1PS08'] > $collectedTs->getTimestamp()) {
+            if (!empty($processedSamplesTs[$pst]) && $processedSamplesTs[$pst] > $collectedTs->getTimestamp()) {
                 $warnings['pst'] = 'Processing Time is Greater than 4 hours after Collection';
             }
         }
