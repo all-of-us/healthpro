@@ -32,12 +32,13 @@ class Mandrill
         return $result === 'PING!';
     }
 
-    public function send(array $to, $from, $subject, $content)
+    public function send(array $to, $from, $subject, $content, $tags = null)
     {
         $message = [
             'from_email' => $from,
             'text' => $content,
             'subject' => $subject,
+            'tags' => $tags
         ];
         $recipients = [];
         foreach ($to as $email) {

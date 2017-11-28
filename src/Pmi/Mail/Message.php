@@ -19,6 +19,7 @@ class Message
     protected $subject;
     protected $content;
     protected $method;
+    protected $template;
 
     public function __construct(AbstractApplication $app)
     {
@@ -69,6 +70,7 @@ class Message
     public function setContent($content)
     {
         $this->content = $content;
+        $this->template = null;
 
         return $this;
     }
@@ -99,9 +101,16 @@ class Message
 
             case self::MANDRILL:
                 $this->localLog();
+                $tags = [
+                    'healthpro',
+                    $this->app['env']
+                ];
+                if ($this->template) {
+                    $tags[] = $this->template;
+                }
                 $mandrill = new Mandrill($this->app->getConfig('mandrill_key'));
                 try {
-                    $mandrill->send($this->to, $this->from, $this->subject, $this->content);
+                    $mandrill->send($this->to, $this->from, $this->subject, $this->content, $tags);
                 } catch (\Exception $e) {
                     syslog(LOG_ERR, "Error sending Mandrill message");
                     syslog(LOG_ERR, $e->getMessage());
@@ -132,6 +141,7 @@ class Message
         }
         $this->setSubject($subject);
         $this->setContent($content);
+        $this->template = $template;
 
         return $this;
     }
