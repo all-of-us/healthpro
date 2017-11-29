@@ -323,7 +323,7 @@ class Order
                 array_push($constraints,
                     new Constraints\GreaterThan([
                         'value' => $this->order['collected_ts'],
-                        'message' => 'Timestamp should be greater than collected time'
+                        'message' => 'Finalized Time is before Collection Time'
                     ])
                 );
                 $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
@@ -334,7 +334,7 @@ class Order
                     array_push($constraints,
                         new Constraints\GreaterThan([
                             'value' => $processedTs,
-                            'message' => 'Timestamp should be greater than processed time'
+                            'message' => 'Finalized Time is before Processing Time'
                         ])
                     );
                 }
@@ -392,7 +392,7 @@ class Order
                         ]),
                         new Constraints\GreaterThan([
                             'value' => $this->order['collected_ts'],
-                            'message' => 'Timestamp should be greater than collected time'
+                            'message' => 'Processing Time is before Collection Time'
                         ])
                     ]
                 ],
