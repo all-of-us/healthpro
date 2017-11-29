@@ -322,14 +322,22 @@ class Order
             if ($set === 'finalized') {
                 array_push($constraints,
                     new Constraints\GreaterThan([
-                        'value' => $this->order['processed_ts'],
-                        'message' => 'Timestamp should be greater than processed time'
-                    ]),
-                    new Constraints\GreaterThan([
                         'value' => $this->order['collected_ts'],
                         'message' => 'Timestamp should be greater than collected time'
                     ])
                 );
+                $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+                if (!empty($processedSamplesTs)) {
+                    $processedTs = new \DateTime();
+                    $processedTs->setTimestamp(max($processedSamplesTs));
+                    $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                    array_push($constraints,
+                        new Constraints\GreaterThan([
+                            'value' => $processedTs,
+                            'message' => 'Timestamp should be greater than processed time'
+                        ])
+                    );
+                }
             }
             $formBuilder->add("{$set}_ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
