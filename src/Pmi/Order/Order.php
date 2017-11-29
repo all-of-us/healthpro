@@ -305,10 +305,40 @@ class Order
         } else {
             $samples = $this->getRequestedSamples();
         }
+        $nonBloodSample = count($samples) === 1 && (isset($samples['(7) Urine 10 mL [1UR10]']) || isset($samples['Saliva [1SAL]']));
+        if ($set == 'collected' && !$nonBloodSample) {
+            $tsLabel = 'Blood Collection Time';
+        }
         $enabledSamples = $this->getEnabledSamples($set);
         $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
         if ($set != 'processed') {
+            $constraints = [
+                new Constraints\LessThanOrEqual([
+                    'value' => $constraintDateTime,
+                    'message' => 'Timestamp cannot be in the future'
+                ])
+            ];
+            if ($set === 'finalized') {
+                array_push($constraints,
+                    new Constraints\GreaterThan([
+                        'value' => $this->order['collected_ts'],
+                        'message' => 'Finalized Time is before Collection Time'
+                    ])
+                );
+                $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+                if (!empty($processedSamplesTs)) {
+                    $processedTs = new \DateTime();
+                    $processedTs->setTimestamp(max($processedSamplesTs));
+                    $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                    array_push($constraints,
+                        new Constraints\GreaterThan([
+                            'value' => $processedTs,
+                            'message' => 'Finalized Time is before Processing Time'
+                        ])
+                    );
+                }
+            }
             $formBuilder->add("{$set}_ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
                 'widget' => 'single_text',
@@ -317,12 +347,7 @@ class Order
                 'disabled' => $disabled,
                 'view_timezone' => $this->app->getUserTimezone(),
                 'model_timezone' => 'UTC',
-                'constraints' => [
-                    new Constraints\LessThanOrEqual([
-                        'value' => $constraintDateTime,
-                        'message' => 'Timestamp cannot be in the future'
-                    ])
-                ]
+                'constraints' => $constraints
             ]);
         }
         if (!empty($samples)) {
@@ -364,6 +389,10 @@ class Order
                         new Constraints\LessThanOrEqual([
                             'value' => $constraintDateTime,
                             'message' => 'Timestamp cannot be in the future'
+                        ]),
+                        new Constraints\GreaterThan([
+                            'value' => $this->order['collected_ts'],
+                            'message' => 'Processing Time is before Collection Time'
                         ])
                     ]
                 ],
@@ -697,5 +726,32 @@ class Order
     public function checkIdentifiers($notes)
     {
         return $this->getParticipant()->checkIdentifiers($notes);
+    }
+
+    public function checkWarnings()
+    {
+        $warnings = [];
+        if ($this->order['type'] !== 'saliva' && !empty($this->order['collected_ts']) && !empty($this->order['processed_samples_ts'])) {
+            $collectedTs = $this->order['collected_ts'];
+            $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+            $samples = self::${'samples' . self::$version};
+            $sst = current($samples);
+            $pst = next($samples);
+            //Check if SST processing time is less than 30 mins after collection time
+            $collectedTs->modify('+30 minutes');
+            if (!empty($processedSamplesTs[$sst]) && $processedSamplesTs[$sst] < $collectedTs->getTimestamp()) {
+                $warnings['sst'] = 'SST Specimen Processed Less than 30 minutes after Collection';
+            }
+            //Check if SST processing time is greater than 4 hrs after collection time
+            $collectedTs->modify('+210 minutes');
+            if (!empty($processedSamplesTs[$sst]) && $processedSamplesTs[$sst] > $collectedTs->getTimestamp()) {
+                $warnings['sst'] = 'Processing Time is Greater than 4 hours after Collection';
+            }
+            //Check if PST processing time is greater than 4 hrs after collection time
+            if (!empty($processedSamplesTs[$pst]) && $processedSamplesTs[$pst] > $collectedTs->getTimestamp()) {
+                $warnings['pst'] = 'Processing Time is Greater than 4 hours after Collection';
+            }
+        }
+        return $warnings;
     }
 }

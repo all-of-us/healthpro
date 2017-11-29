@@ -411,7 +411,8 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'processForm' => $processForm->createView(),
-            'samplesInfo' => Order::$samplesInformation
+            'samplesInfo' => Order::$samplesInformation,
+            'warnings' => $order->checkWarnings()
         ]);
     }
 
