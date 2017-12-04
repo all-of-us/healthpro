@@ -208,7 +208,7 @@ class Order
         $steps = [];
         foreach ($columns as $name => $column) {
             $steps[] = $name;
-            if ($column === 'collected') {
+            if ($column === 'collected' && $this->order['type'] !== 'kit') {
                 $condition = $this->order["{$column}_ts"] && $this->order["mayo_id"];
             } else {
                 $condition = $this->order["{$column}_ts"];

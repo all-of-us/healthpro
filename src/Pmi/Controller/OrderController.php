@@ -259,46 +259,8 @@ class OrderController extends AbstractController
                         $successMsg = 'Order collection updated';
                     }
                     // Send order to mayo
-                    if ($request->request->has('send')){
-                        $order = $this->loadOrder($participantId, $orderId, $app);
-                        if ($app->getConfig('ml_mock_order')) {
-                            $mayoId = $app->getConfig('ml_mock_order');
-                        } else {
-                            // Set collected time to user local time
-                            $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
-                            $orderData = $order->toArray();
-                            $participant = $app['pmi.drc.participants']->getById($participantId);
-                            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
-                                $mayoClientId = $site['mayolink_account'];
-                            } else {
-                                $mayoClientId = null;
-                            }
-                            $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
-                            if ($birthDate) {
-                                $birthDate = $birthDate->format('Y-m-d');
-                            }
-                            $options = [
-                                'type' => $orderData['type'],
-                                'biobank_id' => $participant->biobankId,
-                                'first_name' => '*',
-                                'gender' => $participant->gender,
-                                'birth_date' => $birthDate,
-                                'order_id' => $orderData['order_id'],
-                                'collected_at' => $collectedAt->format('c'),
-                                'mayoClientId' => $mayoClientId,
-                                'siteId' => $app->getSiteId(),
-                                'organizationId' => $app->getSiteOrganization(),
-                                'collected_samples' => $orderData['collected_samples'],
-                                'centrifugeType' => $orderData['processed_centrifuge_type'],
-                                'version' => $orderData['version']
-                            ];
-                            $mayoOrder = new MayolinkOrder($app);
-                            $mayoId = $mayoOrder->createOrder(
-                                $app->getConfig('ml_username'),
-                                $app->getConfig('ml_password'),
-                                $options
-                            );                           
-                        }
+                    if ($orderData['type'] !== 'kit' && $request->request->has('send')){
+                        $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app);
                         if ($mayoId) {
                             if ($app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId])) {
                                 $app->log(Log::ORDER_EDIT, $orderId);
@@ -446,14 +408,32 @@ class OrderController extends AbstractController
                 }
             }
             if ($finalizeForm->isValid()) {
+                //Send order to mayo for DV kit orders
+                $orderData = $order->toArray();
+                if (empty($orderData['mayo_id']) && $orderData['type'] === 'kit' && !empty($finalizeForm['finalized_ts']->getData())) {
+                    $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                    if ($mayoId && $app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId])) {
+                        $app->log(Log::ORDER_EDIT, $orderId);
+                    }
+                }
                 $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
                 $updateArray['finalized_user_id'] = $app->getUser()->getId();
                 $updateArray['finalized_site'] = $app->getSiteId();
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                     $order = $this->loadOrder($participantId, $orderId, $app);
-                    $order->sendToRdr();
-                    $app->addFlashSuccess('Order finalized');
+                    //Send order to RDR if mayo_id exists
+                    if (!empty($order->get('mayo_id'))) {
+                        //Send order to RDR if finalized_ts is set
+                        if (empty($order->get('finalized_ts'))) {
+                            $app->addFlashNotice('Order updated but not finalized');
+                        } else {
+                            $order->sendToRdr();
+                            $app->addFlashSuccess('Order finalized');
+                        }
+                    } else {
+                        $app->addFlashError('Failed to send order');
+                    }
                 }
                 return $app->redirectToRoute('orderFinalize', [
                     'participantId' => $participantId,
@@ -624,5 +604,49 @@ class OrderController extends AbstractController
             );
             return $pdf;
         }
+    }
+
+    public function sendOrderToMayo($participantId, $orderId, $app, $type = 'collected')
+    {
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        if ($app->getConfig('ml_mock_order')) {
+            $mayoId = $app->getConfig('ml_mock_order');
+        } else {
+            // Set collected time to user local time
+            $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
+            $orderData = $order->toArray();
+            $participant = $app['pmi.drc.participants']->getById($participantId);
+            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+                $mayoClientId = $site['mayolink_account'];
+            } else {
+                $mayoClientId = null;
+            }
+            $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+            if ($birthDate) {
+                $birthDate = $birthDate->format('Y-m-d');
+            }
+            $options = [
+                'type' => $orderData['type'],
+                'biobank_id' => $participant->biobankId,
+                'first_name' => '*',
+                'gender' => $participant->gender,
+                'birth_date' => $birthDate,
+                'order_id' => $orderData['order_id'],
+                'collected_at' => $collectedAt->format('c'),
+                'mayoClientId' => $mayoClientId,
+                'siteId' => $app->getSiteId(),
+                'organizationId' => $app->getSiteOrganization(),
+                'collected_samples' => $orderData["{$type}_samples"],
+                'centrifugeType' => $orderData['processed_centrifuge_type'],
+                'version' => $orderData['version']
+            ];
+            $mayoOrder = new MayolinkOrder($app);
+            $mayoId = $mayoOrder->createOrder(
+                $app->getConfig('ml_username'),
+                $app->getConfig('ml_password'),
+                $options
+            );
+        }
+        return $mayoId;     
     }
 }
