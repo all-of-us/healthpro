@@ -51,7 +51,7 @@
         {% elseif nextEnabled %}
             <li role="presentation"{% if active == step %} class="active"{% endif %}>
                 <a href="{{ path('order'~path, params) }}">
-                    {% if column[1] == 'collected' %}
+                    {% if column[1] == 'collected' and order.type != 'kit' %}
                         {% set condition = attribute(order, column[1]~'_ts') and attribute(order, 'mayo_id') %}
                     {% else %}
                         {% set condition = attribute(order, column[1]~'_ts') %}
