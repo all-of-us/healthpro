@@ -128,7 +128,11 @@ $(document).ready(function () {
         target.attr('placeholder', '');
         target.parent().removeClass('has-error').removeClass('has-success');
         var barcode = $(this).val().trim();
-        if (barcode.match(/^[0-9]{34}$/)) { // 34 digit barcode
+        if (barcode.match(/^[a-zA-Z0-9]{18}$/)) { // 18 digit alphanumeric barcode for UPS
+            target.val(barcode);
+            target.parent().addClass('has-success');
+        }
+        else if (barcode.match(/^[0-9]{34}$/)) { // 34 digit barcode for FedEx
             var fedexTracking = barcode.substring(20);
             fedexTracking = fedexTracking.replace(/^0{1,2}/, ''); // trim up to two leading 0's
             target.val(fedexTracking);
