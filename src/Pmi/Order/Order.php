@@ -424,12 +424,12 @@ class Order
             $formBuilder->add('fedex_tracking', Type\RepeatedType::class, [
                 'type' => Type\TextType::class,
                 'disabled' => $disabled,
-                'invalid_message' => 'FedEx tracking numbers must match.',
+                'invalid_message' => 'Tracking numbers must match.',
                 'first_options' => [
-                    'label' => 'FedEx tracking number (optional)'
+                    'label' => 'FedEx or UPS tracking number (optional)'
                 ],
                 'second_options' => [
-                    'label' => 'Verify FedEx tracking number',
+                    'label' => 'Verify tracking number',
                 ],
                 'required' => false,
                 'error_mapping' => [
@@ -437,8 +437,8 @@ class Order
                 ],
                 'constraints' => [
                     new Constraints\Regex([
-                        'pattern' => '/^\d{12,14}$/',
-                        'message' => 'FedEx tracking numbers must be a string of 12-14 digits'
+                        'pattern' => '/^\d{12,14}$|^[a-zA-Z0-9]{18}$/',
+                        'message' => 'Tracking numbers must be a string of 12 to 14 digits for FedEX and 18 digits for UPS'
                     ])
                 ]
             ]);
