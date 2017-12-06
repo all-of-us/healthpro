@@ -404,7 +404,7 @@ class OrderController extends AbstractController
                     $orderId
                 ]);
                 if ($duplicateFedexTracking) {
-                    $finalizeForm['fedex_tracking']['first']->addError(new FormError('This FedEx tracking number has already been used for another order.'));
+                    $finalizeForm['fedex_tracking']['first']->addError(new FormError('This tracking number has already been used for another order.'));
                 }
             }
             if ($finalizeForm->isValid()) {
