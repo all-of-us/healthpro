@@ -233,7 +233,7 @@ class WorkQueueController extends AbstractController
             'params' => $params,
             'organization' => $organization,
             'isRdrError' => $this->rdrError,
-            'isDownloadDisable' => $this->isDownloadDisable($app)
+            'isDownloadDisabled' => $this->isDownloadDisabled($app)
         ]);
     }
 
@@ -258,7 +258,7 @@ class WorkQueueController extends AbstractController
 
     public function exportAction(Application $app, Request $request)
     {
-        if ($this->isDownloadDisable($app)) {
+        if ($this->isDownloadDisabled($app)) {
             $app->abort(403);
         }
         if ($app->hasRole('ROLE_AWARDEE')) {
@@ -403,7 +403,7 @@ class WorkQueueController extends AbstractController
         ]);
     }
 
-    public function isDownloadDisable($app)
+    public function isDownloadDisabled($app)
     {
         $site = $app->getSiteId();
         $disableSites = $app->getConfig('disable_download_sites');
