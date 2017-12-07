@@ -26,9 +26,9 @@ class MockAppsClient
     {
         // use fixtures when using gaBypass in dev
         if ($userEmail && !self::$app['isUnitTest'] && empty(self::$groups[$userEmail])) {
-            if (is_array(self::$app->getConfig('gaByassGroups'))) {
+            if (is_array(self::$app->getConfig('gaBypassGroups'))) {
                 $groups = [];
-                foreach (self::$app->getConfig('gaByassGroups') as $arr) {
+                foreach (self::$app->getConfig('gaBypassGroups') as $arr) {
                     $groups[] = new Group($arr);
                 }
                 

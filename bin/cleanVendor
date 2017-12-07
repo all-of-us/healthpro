@@ -20,3 +20,12 @@ find $VENDOR_DIR -type d -name "tests" -o -name "Tests" |
     done
     echo "... deleted ${cnt} test directories."
 }
+
+echo "Removing unnecessary Google client services..."
+cd vendor/google/apiclient-services/src/Google
+mv Service ServiceDelete
+mkdir Service
+mv ServiceDelete/Directory* Service
+mv ServiceDelete/Oauth2* Service
+rm -rf ServiceDelete
+echo "... done."
