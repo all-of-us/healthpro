@@ -210,7 +210,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
                 $this->app['session']->set('loginDestUrl', $request->getRequestUri());
             }
             $client = $this->getAuthLoginClient($authState);
-            if (empty($this->app['session']->get('fromGoogleLogin'))) {
+            if (empty($this->app['session']->get('fromGoogleLogin')) && $request->attributes->get('_route') !== 'keepAlive') {
                 $this->app['session']->set('fromGoogleLogin', true);
                 return $this->app->redirect($this->app->getGoogleLogoutUrl());
             }
