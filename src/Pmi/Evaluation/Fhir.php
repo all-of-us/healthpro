@@ -483,17 +483,17 @@ class Fhir
         }
         return $this->valueMetric(
             'wheelchair',
-            'Wheelchair bound',
-            'Participant is a wheelchair user',
+            'Wheelchair user',
+            'Is the participant a wheelchair user?',
             [[
-                'code' => 'wheelchair-bound-status',
-                'display' => 'Participant is a wheelchair user',
+                'code' => 'wheelchair-user-status',
+                'display' => 'Is the participant a wheelchair user?',
                 'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
             ]],
             [[
-                'code' => 'wheelchair-bound',
-                'display' => 'Wheelchair bound',
-                'system' => 'http://terminology.pmi-ops.org/CodeSystem/wheelchair-bound-status'
+                'code' => 'wheelchair-user',
+                'display' => 'Wheelchair user',
+                'system' => 'http://terminology.pmi-ops.org/CodeSystem/wheelchair-user-status'
             ]]
         );
     }
