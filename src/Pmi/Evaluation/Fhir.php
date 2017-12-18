@@ -448,7 +448,7 @@ class Fhir
         return $this->valueMetric(
             'pregnant',
             'Pregnant',
-            'Participant is pregnant',
+            'Is the participant pregnant?',
             [
                 [
                     'code' => '66174-4',
@@ -457,7 +457,7 @@ class Fhir
                 ],
                 [
                     'code' => 'pregnancy-status',
-                    'display' => 'Participant is pregnant',
+                    'display' => 'Is the participant pregnant?',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
