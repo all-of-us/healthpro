@@ -469,7 +469,7 @@ class Fhir
                 ],
                 [
                     'code' => 'pregnant',
-                    'display' => 'Pregnant',
+                    'display' => 'Participant is pregnant',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/pregnancy-status'
                 ]
             ]
@@ -492,7 +492,7 @@ class Fhir
             ]],
             [[
                 'code' => 'wheelchair-user',
-                'display' => 'Wheelchair user',
+                'display' => 'Participant is wheelchair user',
                 'system' => 'http://terminology.pmi-ops.org/CodeSystem/wheelchair-user-status'
             ]]
         );
