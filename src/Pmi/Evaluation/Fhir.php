@@ -951,7 +951,7 @@ class Fhir
     {
         $entry = $this->simpleMetric(
             'heart-rate-mean',
-            $this->summary['heartrate'],
+            isset($this->summary['heartrate']) ? $this->summary['heartrate'] : null,
             'Computed heart rate, mean of 2nd and 3rd measures',
             '/min',
             [
