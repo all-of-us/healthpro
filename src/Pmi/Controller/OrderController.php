@@ -242,12 +242,18 @@ class OrderController extends AbstractController
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
-            // Throw error if collected_ts is empty for the order which is already to sent to mayo
-            if (empty($orderData['mayo_id']) && empty($collectForm['collected_ts']->getData())) {
+            
+            // Throw error if collected_ts is empty when sending an order
+            if ($request->request->has('send') && empty($collectForm['collected_ts']->getData())) {
+                $collectForm['collected_ts']->addError(new FormError('Collected time is required to send order'));
+            }
+
+            $orderData = $order->toArray();
+            // Throw error if collected_ts is empty for the order which is already sent to mayo
+            if (!empty($orderData['mayo_id']) && empty($collectForm['collected_ts']->getData())) {
                 $collectForm['collected_ts']->addError(new FormError('Collected time cannot be empty for the order which is already sent'));
             }
             if ($collectForm->isValid()) {
-                $orderData = $order->toArray();
                 // Check if mayo id is set
                 if (empty($orderData['mayo_id'])) {
                     $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
