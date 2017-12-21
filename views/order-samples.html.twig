@@ -1,17 +1,21 @@
 {% macro form_widget(form, showCheckAll, samplesInfo) %}
     <table id="{{ form.vars.id }}" class="table table-condensed table-auto-width table-samples">
-        {% if showCheckAll %}
+        {% if showCheckAll or global.request.attributes.get('_route') == 'orderFinalize' %}
             <thead>
                 <tr>
-                    <th><input type="checkbox" id="checkall"></th>
+                    <th><input type="checkbox" id="checkall" {% if showCheckAll is empty %} disabled="disabled" {% endif %}></th>
                     <th colspan="4">Check all</th>
+                    {% if global.request.attributes.get('_route') == 'orderFinalize' %}
+                        <th><span class="header-collected">Collected</span></th>
+                        <th>Processed</th>
+                    {% endif %}
                 </tr>
             </thead>
         {% endif %}
         <tbody>
             {% for sample in form.children %}
                 {% set sampleInfo = samplesInfo[sample.vars.value] %}
-                <tr{% if sample.vars.attr.class is defined %} class="{{ sample.vars.attr.class }}"{% endif %}>
+                <tr class="samples {% if sample.vars.attr.class is defined %} {{ sample.vars.attr.class }} {% endif %}">
                     <td>{{ form_widget(sample, { 'label': false }) }}</td>
                     <td><label class="label-normal" for="{{ sample.vars.id }}">({{ sampleInfo.number }})</label></td>
                     <td><label class="label-normal" for="{{ sample.vars.id }}">{{ sampleInfo.label }}</label></td>

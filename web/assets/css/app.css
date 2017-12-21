@@ -248,6 +248,12 @@ table.table-samples {
 table.table-samples td {
     border-top: 0 !important;
 }
+.header-collected {
+    padding-left: 24px;
+}
+.saliva-info {
+    padding-left: 150px;
+}
 
 .help-footer {
     padding-top: 50px;

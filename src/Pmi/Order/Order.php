@@ -110,6 +110,10 @@ class Order
         'fixed_angle' => 'Fixed Angle'
     ];
 
+    public static $sst = ['1SST8', '1SS08'];
+
+    public static $pst = ['1PST8', '1PS08'];
+
     public function loadOrder($participantId, $orderId, Application $app)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);
@@ -363,11 +367,42 @@ class Order
                 'choices' => $samples,
                 'required' => false,
                 'disabled' => $samplesDisabled,
-                'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
+                'choice_attr' => function($val, $key, $index) use ($enabledSamples, $set) {
+                    $attr = [];
+                    if ($set === 'finalized') {
+                        $collectedSamples = json_decode($this->order['collected_samples'], true);
+                        $processedSamples = json_decode($this->order['processed_samples_ts'], true);
+                        if (in_array($val, $collectedSamples)) {
+                            $attr = ['collected' => $this->order['collected_ts']->format('n/j/Y g:ia')];
+                        }
+                        if (!empty($processedSamples[$val])) {
+                            $time = new \DateTime();
+                            $time->setTimestamp($processedSamples[$val]);
+                            $time->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                            $attr['processed'] = $time->format('n/j/Y g:ia');
+                        }
+                        if (in_array($val, self::$samplesRequiringProcessing) && in_array($val, $collectedSamples)) {
+                            $attr['required-processing'] = 'yes';
+                        }
+                    }
+                    if ($set === 'processed' || $set === 'finalized') {
+                        $warnings = $this->checkWarnings();
+                        if (in_array($val, self::$sst)) {
+                            if (!empty($warnings['sst'])) {
+                                $attr['warning'] = $warnings['sst'];
+                            }
+                        } elseif (in_array($val, self::$pst)) {
+                            if (!empty($warnings['pst'])) {
+                                $attr['warning'] = $warnings['pst'];
+                            }
+                        }
+                    }
                     if (in_array($val, $enabledSamples)) {
-                        return [];
+                        return $attr;
                     } else {
-                        return ['disabled' => true, 'class' => 'sample-disabled'];
+                        $attr['disabled'] = true;
+                        $attr['class'] = 'sample-disabled';
+                        return $attr;
                     }
                 }
             ]);
@@ -732,7 +767,7 @@ class Order
     {
         $warnings = [];
         if ($this->order['type'] !== 'saliva' && !empty($this->order['collected_ts']) && !empty($this->order['processed_samples_ts'])) {
-            $collectedTs = $this->order['collected_ts'];
+            $collectedTs = clone $this->order['collected_ts'];
             $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
             $samples = self::${'samples' . self::$version};
             $sst = current($samples);

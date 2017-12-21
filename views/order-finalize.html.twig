@@ -85,13 +85,53 @@
 {% block pagejs %}
 <script>
 $(document).ready(function () {
-{% if order.type == 'saliva' %}
-    $('input.sample-disabled').closest('label').addClass('text-danger');
-    $('input.sample-disabled').closest('div.checkbox').append('<small class="text-muted">was not collected/processed</small>');
-{% else %}
-    $('.sample-disabled label').addClass('text-danger');
-    $('.sample-disabled').find('td:last').append('<small style="margin-left:15px" class="text-muted">was not collected/processed</small>');
-{% endif %}
+    var html;
+    {% if order.type == 'saliva' %}
+        $('input.sample-disabled').closest('label').addClass('text-danger');
+        var collected = $('input[name="form[finalized_samples][]"]').attr('collected');
+        var processed = $('input[name="form[finalized_samples][]"]').attr('processed');
+        if (typeof collected !== 'undefined') {
+            html = '<label><b>Collected: </b></label> <i class="fa fa-check text-success" aria-hidden="true"></i>'+collected+'</span>';
+        } else {
+            html += '<label><b>Collected: </b></label> <span class="label-normal text-danger">Not collected</span></span>';
+        }
+        if (typeof processed !== 'undefined') {
+            html += '<label><b>Processed: </b></label> <i class="fa fa-check text-success" aria-hidden="true"></i>'+processed+'</span>';
+        } else {
+            html += '<label><b>Processed: </b></label> <span class="label-normal text-danger">Not processed</span></span>';
+        }
+        $('input[name="form[finalized_samples][]"]').closest('div.checkbox').append('<span class="saliva-info">'+html+'</span>');
+    {% else %}
+        $('.sample-disabled label').addClass('text-danger');
+        $('.header-collected').append('<br><small>'+{{ order.collected_ts.format('n/j/Y g:ia')|json_encode|raw }}+'</small>');
+        $('.samples').each(function(e) {
+            var collected = $(this).find('input[name="form[finalized_samples][]"]').attr('collected');
+            var processed = $(this).find('input[name="form[finalized_samples][]"]').attr('processed');
+            var requiredProcessing = $(this).find('input[name="form[finalized_samples][]"]').attr('required-processing');
+            var warning = $(this).find('input[name="form[finalized_samples][]"]').attr('warning');
+            if (typeof collected !== 'undefined') {
+                html = '<td align="center"><i class="fa fa-check text-success" aria-hidden="true"></i></td>';
+            } else {
+                html += '<td align="center"><label class="label-normal text-danger">Not collected</label></td>';
+            }
+            if (typeof processed !== 'undefined') {
+                html += '<td align="center">';
+                if (typeof warning !== 'undefined') {
+                    html += '<i class="fa fa-exclamation-triangle text-warning" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+warning+'"></i>';
+                } else {
+                    html += '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+                }
+                html += processed;
+                html += '</td>';
+            } else {
+                if (typeof requiredProcessing !== 'undefined') {
+                    html += '<td align="center"><label class="label-normal text-danger">Not processed</label></td>';
+                }
+            }
+            $(this).find('td:last').after(html);
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+    {% endif %}
 
     $('#checkall').on('change', function() {
         $('#form_finalized_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
