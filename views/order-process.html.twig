@@ -105,11 +105,14 @@ $(document).ready(function () {
     });
     $('#form_processed_samples_ts').remove();
 
-    // Display processed samples time warning messages
+    // Display processed samples time error/warning messages
     $('.samples').each(function(e) {
+        var error = $(this).find('input[name="form[processed_samples][]"]').attr('error');
         var warning = $(this).find('input[name="form[processed_samples][]"]').attr('warning');
-        if (typeof warning !== 'undefined') {
-            $(this).next().find(':text').after('<small class="text-warning">'+warning+'</small>');
+        if (typeof error !== 'undefined') {
+            $(this).next().find(':text').after('<span class="text-danger"><i class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></i> '+error+'</span>');
+        } else if (typeof warning !== 'undefined') {
+            $(this).next().find(':text').after('<span class="text-warning"><i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i> '+warning+'</span>');
         }
     });
 {% endif %}

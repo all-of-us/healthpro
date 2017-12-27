@@ -73,7 +73,7 @@
         {{ form_rest(finalizeForm) }}
         {% if not order.finalized_ts %}
             <p>
-                <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to finalize this order?');">
+                <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to finalize this order?');" {% if hasErrors %} disabled="disabled" {% endif %}>
                     Save and mark as finalized
                 </button>
             </p>
@@ -109,19 +109,21 @@ $(document).ready(function () {
             var processed = $(this).find('input[name="form[finalized_samples][]"]').attr('processed');
             var requiredProcessing = $(this).find('input[name="form[finalized_samples][]"]').attr('required-processing');
             var warning = $(this).find('input[name="form[finalized_samples][]"]').attr('warning');
+            var error = $(this).find('input[name="form[finalized_samples][]"]').attr('error');
             if (typeof collected !== 'undefined') {
                 html = '<td align="center"><i class="fa fa-check text-success" aria-hidden="true"></i></td>';
             } else {
                 html += '<td align="center"><label class="label-normal text-danger">Not collected</label></td>';
             }
             if (typeof processed !== 'undefined') {
-                html += '<td align="center">';
-                if (typeof warning !== 'undefined') {
-                    html += '<i class="fa fa-exclamation-triangle text-warning" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+warning+'"></i>';
-                } else {
-                    html += '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+                html += '<td>';
+                if (typeof error !== 'undefined') {
+                    html += '<span class="text-danger"><i class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+error+'"></i> '+processed+'</span>';
+                } else if (typeof warning !== 'undefined') {
+                    html += '<span class="text-warning"><i class="fa fa-exclamation-triangle text-warning" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+warning+'"></i> '+processed+'</span></i> ';
+                }else {
+                    html += '<i class="fa fa-check text-success" aria-hidden="true"></i> '+processed;
                 }
-                html += processed;
                 html += '</td>';
             } else {
                 if (typeof requiredProcessing !== 'undefined') {

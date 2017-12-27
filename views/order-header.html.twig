@@ -57,7 +57,7 @@
                         {% set condition = attribute(order, column[1]~'_ts') %}
                     {% endif %}
                     {% if condition %}
-                        <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                        <i class="fa fa-check-circle text-success {% if step == 'process' %} tab-process {% endif %}" aria-hidden="true"></i>
                     {% else %} {# since the printed_ts is set automatically after the first page load, don't disable to next tab #}
                         {% set nextEnabled = false %}
                     {% endif %}

@@ -448,11 +448,13 @@ class OrderController extends AbstractController
                 $finalizeForm->addError(new FormError('Please correct the errors below'));
             }
         }
+        $hasErrors = !empty($order->checkErrors()) ? true : false;
         return $app['twig']->render('order-finalize.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'finalizeForm' => $finalizeForm->createView(),
-            'samplesInfo' => Order::$samplesInformation
+            'samplesInfo' => Order::$samplesInformation,
+            'hasErrors' => $hasErrors
         ]);
     }
 
