@@ -399,6 +399,12 @@ class OrderController extends AbstractController
             if ($order->get('finalized_ts')) {
                 $app->abort(403);
             }
+            $errors = $order->checkErrors();
+            if (!empty($errors)) {
+                foreach ($errors as $key => $error) {
+                    $finalizeForm['finalized_samples']->addError(new FormError($error));
+                }
+            }
             if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
