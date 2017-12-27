@@ -78,6 +78,10 @@ $(document).ready(function () {
         $('#form_processed_samples_ts_' + sample)
             .addClass('input-sm')
             .pmiDateTimePicker();
+
+        // Display processed sample time error messages
+        var error = $(this).attr('error');
+        $('input[name="form[processed_samples_ts]['+sample+']"]').after('<span class="text-danger"><i class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></i> '+error+'</span>');
     });
     $('#form_processed_samples_ts').remove();
 {% else %}
