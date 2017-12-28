@@ -402,7 +402,7 @@ class OrderController extends AbstractController
             if ($order->get('finalized_ts')) {
                 $app->abort(403);
             }
-            $errors = $order->checkErrors();
+            $errors = $order->getErrors();
             if (!empty($errors)) {
                 foreach ($errors as $key => $error) {
                     $finalizeForm['finalized_samples']->addError(new FormError($error));
@@ -457,7 +457,7 @@ class OrderController extends AbstractController
                 $finalizeForm->addError(new FormError('Please correct the errors below'));
             }
         }
-        $hasErrors = !empty($order->checkErrors()) ? true : false;
+        $hasErrors = !empty($order->getErrors()) ? true : false;
         return $app['twig']->render('order-finalize.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),

@@ -394,8 +394,8 @@ class Order
                         }
                     }
                     if ($set === 'processed' || $set === 'finalized') {
-                        $warnings = $this->checkWarnings();
-                        $errors = $this->checkErrors();
+                        $warnings = $this->getWarnings();
+                        $errors = $this->getErrors();
                         if (array_key_exists($val, self::$sampleMessageLabels)) {
                             $type = self::$sampleMessageLabels[$val];
                             if (!empty($errors[$type])) {
@@ -767,7 +767,7 @@ class Order
         return $this->getParticipant()->checkIdentifiers($notes);
     }
 
-    public function checkWarnings()
+    public function getWarnings()
     {
         $warnings = [];
         if ($this->order['type'] !== 'saliva' && !empty($this->order['collected_ts']) && !empty($this->order['processed_samples_ts'])) {
@@ -794,7 +794,7 @@ class Order
         return $warnings;
     }
 
-    public function checkErrors()
+    public function getErrors()
     {
         $errors = [];
         if (!empty($this->order['collected_ts']) && !empty($this->order['processed_samples_ts'])) {
@@ -805,15 +805,15 @@ class Order
             $pst = array_values(array_intersect($processedSamples, self::$pst));
             $sal = array_values(array_intersect($processedSamples, self::$salivaSamples));
             //Check if SST processing time is less than collection time
-            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] < $collectedTs->getTimestamp()) {
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] <= $collectedTs->getTimestamp()) {
                 $errors['sst'] = 'SST Processing Time is before Collection Time';
             }
             //Check if PST processing time is less than collection time
-            if (!empty($pst) && !empty($processedSamplesTs[$pst[0]]) && $processedSamplesTs[$pst[0]] < $collectedTs->getTimestamp()) {
+            if (!empty($pst) && !empty($processedSamplesTs[$pst[0]]) && $processedSamplesTs[$pst[0]] <= $collectedTs->getTimestamp()) {
                 $errors['pst'] = 'PST Processing Time is before Collection Time';
             }
             //Check if SAL processing time is less than collection time
-            if (!empty($sal) && !empty($processedSamplesTs[$sal[0]]) && $processedSamplesTs[$sal[0]] < $collectedTs->getTimestamp()) {
+            if (!empty($sal) && !empty($processedSamplesTs[$sal[0]]) && $processedSamplesTs[$sal[0]] <= $collectedTs->getTimestamp()) {
                 $errors['sal'] = 'SAL Processing Time is before Collection Time';
             }
         }
@@ -823,9 +823,9 @@ class Order
     public function getProcessTabClass()
     {
         $class = 'fa fa-check success text-success';
-        if (!empty($this->checkErrors())) {
+        if (!empty($this->getErrors())) {
             $class = 'fa fa-exclamation-circle text-danger';
-        } elseif (!empty($this->checkWarnings())) {
+        } elseif (!empty($this->getWarnings())) {
             $class = 'fa fa-exclamation-triangle text-warning';
         }
         return $class;
