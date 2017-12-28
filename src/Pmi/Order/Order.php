@@ -819,4 +819,15 @@ class Order
         }
         return $errors;        
     }
+
+    public function getProcessTabClass()
+    {
+        $class = 'fa fa-check success text-success';
+        if (!empty($this->checkErrors())) {
+            $class = 'fa fa-exclamation-circle text-danger';
+        } elseif (!empty($this->checkWarnings())) {
+            $class = 'fa fa-exclamation-triangle text-warning';
+        }
+        return $class;
+    }
 }

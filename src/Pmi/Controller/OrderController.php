@@ -214,7 +214,8 @@ class OrderController extends AbstractController
         }
         return $app['twig']->render('order-print-labels.html.twig', [
             'participant' => $order->getParticipant(),
-            'order' => $order->toArray()
+            'order' => $order->toArray(),
+            'processTabClass' => $order->getProcessTabClass()
         ]);
     }
 
@@ -313,7 +314,8 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'collectForm' => $collectForm->createView(),
-            'samplesInfo' => Order::$samplesInformation
+            'samplesInfo' => Order::$samplesInformation,
+            'processTabClass' => $order->getProcessTabClass()
         ]);
     }
 
@@ -379,7 +381,8 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'processForm' => $processForm->createView(),
-            'samplesInfo' => Order::$samplesInformation
+            'samplesInfo' => Order::$samplesInformation,
+            'processTabClass' => $order->getProcessTabClass()
         ]);
     }
 
@@ -460,7 +463,8 @@ class OrderController extends AbstractController
             'order' => $order->toArray(),
             'finalizeForm' => $finalizeForm->createView(),
             'samplesInfo' => Order::$samplesInformation,
-            'hasErrors' => $hasErrors
+            'hasErrors' => $hasErrors,
+            'processTabClass' => $order->getProcessTabClass()
         ]);
     }
 
@@ -482,7 +486,8 @@ class OrderController extends AbstractController
         }
         return $app['twig']->render('order-print-requisition.html.twig', [
             'participant' => $order->getParticipant(),
-            'order' => $order->toArray()
+            'order' => $order->toArray(),
+            'processTabClass' => $order->getProcessTabClass()
         ]);
     }
 
