@@ -92,18 +92,18 @@ $(document).ready(function () {
         var collected = $('input[name="form[finalized_samples][]"]').attr('collected');
         var processed = $('input[name="form[finalized_samples][]"]').attr('processed');
         if (typeof collected !== 'undefined') {
-            html = '<label><b>Collected: </b></label> <i class="fa fa-check text-success" aria-hidden="true"></i>'+collected+'</span>';
+            html = '<label><b>Collected:</b></label> <i class="fa fa-check text-success" aria-hidden="true"></i>'+collected+'</span>';
         } else {
-            html += '<label><b>Collected: </b></label> <span class="label-normal text-danger">Not collected</span></span>';
+            html += '<label><b>Collected:</b></label> <span class="label-normal text-danger">Not collected</span></span>';
         }
         if (typeof processed !== 'undefined') {
             if (typeof error !== 'undefined') {
-                html += '<label><b>Processed: </b></label> <span class="text-danger"><i class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+error+'"></i>'+processed+'</span>';
+                html += '<label><b>Processed:</b></label> <span class="text-danger"><i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+error+'"></i>'+processed+'</span>';
             } else {
-                html += '<label><b>Processed: </b></label> <i class="fa fa-check text-success" aria-hidden="true"></i>'+processed+'</span>';
+                html += '<label><b>Processed:</b></label> <i class="fa fa-check text-success" aria-hidden="true"></i>'+processed+'</span>';
             }
         } else {
-            html += '<label><b>Processed: </b></label> <span class="label-normal text-danger">Not processed</span></span>';
+            html += '<label><b>Processed:</b></label> <span class="label-normal text-danger">Not processed</span></span>';
         }
         $('input[name="form[finalized_samples][]"]').closest('div.checkbox').append('<span class="saliva-info">'+html+'</span>');
     {% else %}
@@ -124,9 +124,9 @@ $(document).ready(function () {
             if (typeof processed !== 'undefined') {
                 html += '<td>';
                 if (typeof error !== 'undefined') {
-                    html += '<span class="text-danger"><i class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+error+'"></i> '+processed+'</span>';
+                    html += '<span class="text-danger"><i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+error+'"></i> '+processed+'</span>';
                 } else if (typeof warning !== 'undefined') {
-                    html += '<span class="text-warning"><i class="fa fa-exclamation-triangle text-warning" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+warning+'"></i> '+processed+'</span></i> ';
+                    html += '<span class="text-warning"><i class="fa fa-exclamation-triangle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+warning+'"></i> '+processed+'</span></i> ';
                 }else {
                     html += '<i class="fa fa-check text-success" aria-hidden="true"></i> '+processed;
                 }
