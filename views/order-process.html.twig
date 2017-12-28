@@ -80,8 +80,12 @@ $(document).ready(function () {
             .pmiDateTimePicker();
 
         // Display processed sample time error messages
-        var error = $(this).attr('error');
-        $('input[name="form[processed_samples_ts]['+sample+']"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i> '+error+'</span>');
+        if ($('form[name="form"] .alert-danger').length == 0) {
+            var error = $(this).attr('error');
+            if (typeof error !== 'undefined') {
+                $('input[name="form[processed_samples_ts]['+sample+']"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i> '+error+'</span>');
+            }
+        }
     });
     $('#form_processed_samples_ts').remove();
 {% else %}
@@ -110,15 +114,17 @@ $(document).ready(function () {
     $('#form_processed_samples_ts').remove();
 
     // Display processed samples time error/warning messages
-    $('.samples').each(function(e) {
-        var error = $(this).find('input[name="form[processed_samples][]"]').attr('error');
-        var warning = $(this).find('input[name="form[processed_samples][]"]').attr('warning');
-        if (typeof error !== 'undefined') {
-            $(this).next().find(':text').after('<span class="text-danger"><i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i> '+error+'</span>');
-        } else if (typeof warning !== 'undefined') {
-            $(this).next().find(':text').after('<span class="text-warning"><i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i> '+warning+'</span>');
-        }
-    });
+    if ($('form[name="form"] .alert-danger').length == 0) {
+        $('.samples').each(function(e) {
+            var error = $(this).find('input[name="form[processed_samples][]"]').attr('error');
+            var warning = $(this).find('input[name="form[processed_samples][]"]').attr('warning');
+            if (typeof error !== 'undefined') {
+                $(this).next().find(':text').after('<span class="text-danger"><i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i> '+error+'</span>');
+            } else if (typeof warning !== 'undefined') {
+                $(this).next().find(':text').after('<span class="text-warning"><i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i> '+warning+'</span>');
+            }
+        });   
+    }
 {% endif %}
 
     var orderView = new PMI.views['OrderSubPage']({
