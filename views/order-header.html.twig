@@ -57,7 +57,7 @@
                         {% set condition = attribute(order, column[1]~'_ts') %}
                     {% endif %}
                     {% if condition %}
-                        {% if (step == 'process' or step == 'finalize') and processTabClass is defined %}
+                        {% if step == 'process' and processTabClass is defined %}
                             <i class="{{ processTabClass }}" aria-hidden="true"></i>
                         {% else %}
                             <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
