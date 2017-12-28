@@ -822,7 +822,7 @@ class Order
 
     public function getProcessTabClass()
     {
-        $class = 'fa fa-check success text-success';
+        $class = 'fa fa-check-circle text-success';
         if (!empty($this->getErrors())) {
             $class = 'fa fa-exclamation-circle text-danger';
         } elseif (!empty($this->getWarnings())) {
