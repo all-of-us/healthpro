@@ -214,7 +214,8 @@ class OrderController extends AbstractController
         }
         return $app['twig']->render('order-print-labels.html.twig', [
             'participant' => $order->getParticipant(),
-            'order' => $order->toArray()
+            'order' => $order->toArray(),
+            'processTabClass' => $order->getProcessTabClass()
         ]);
     }
 
@@ -242,12 +243,18 @@ class OrderController extends AbstractController
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
-            // Throw error if collected_ts is empty for the order which is already to sent to mayo
-            if (empty($orderData['mayo_id']) && empty($collectForm['collected_ts']->getData())) {
+            
+            // Throw error if collected_ts is empty when sending an order
+            if ($request->request->has('send') && empty($collectForm['collected_ts']->getData())) {
+                $collectForm['collected_ts']->addError(new FormError('Collected time is required to send order'));
+            }
+
+            $orderData = $order->toArray();
+            // Throw error if collected_ts is empty for the order which is already sent to mayo
+            if (!empty($orderData['mayo_id']) && empty($collectForm['collected_ts']->getData())) {
                 $collectForm['collected_ts']->addError(new FormError('Collected time cannot be empty for the order which is already sent'));
             }
             if ($collectForm->isValid()) {
-                $orderData = $order->toArray();
                 // Check if mayo id is set
                 if (empty($orderData['mayo_id'])) {
                     $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
@@ -307,7 +314,8 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'collectForm' => $collectForm->createView(),
-            'samplesInfo' => Order::$samplesInformation
+            'samplesInfo' => Order::$samplesInformation,
+            'processTabClass' => $order->getProcessTabClass()
         ]);
     }
 
@@ -374,7 +382,7 @@ class OrderController extends AbstractController
             'order' => $order->toArray(),
             'processForm' => $processForm->createView(),
             'samplesInfo' => Order::$samplesInformation,
-            'warnings' => $order->checkWarnings()
+            'processTabClass' => $order->getProcessTabClass()
         ]);
     }
 
@@ -393,6 +401,12 @@ class OrderController extends AbstractController
         if ($finalizeForm->isSubmitted()) {
             if ($order->get('finalized_ts')) {
                 $app->abort(403);
+            }
+            $errors = $order->getErrors();
+            if (!empty($errors)) {
+                foreach ($errors as $key => $error) {
+                    $finalizeForm['finalized_samples']->addError(new FormError($error));
+                }
             }
             if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
@@ -443,11 +457,14 @@ class OrderController extends AbstractController
                 $finalizeForm->addError(new FormError('Please correct the errors below'));
             }
         }
+        $hasErrors = !empty($order->getErrors()) ? true : false;
         return $app['twig']->render('order-finalize.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'finalizeForm' => $finalizeForm->createView(),
-            'samplesInfo' => Order::$samplesInformation
+            'samplesInfo' => Order::$samplesInformation,
+            'hasErrors' => $hasErrors,
+            'processTabClass' => $order->getProcessTabClass()
         ]);
     }
 
@@ -469,7 +486,8 @@ class OrderController extends AbstractController
         }
         return $app['twig']->render('order-print-requisition.html.twig', [
             'participant' => $order->getParticipant(),
-            'order' => $order->toArray()
+            'order' => $order->toArray(),
+            'processTabClass' => $order->getProcessTabClass()
         ]);
     }
 

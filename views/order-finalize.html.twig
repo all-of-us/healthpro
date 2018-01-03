@@ -73,7 +73,7 @@
         {{ form_rest(finalizeForm) }}
         {% if not order.finalized_ts %}
             <p>
-                <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to finalize this order?');">
+                <button type="submit" onclick="return confirm('Are you sure you want to finalize this order?');" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                     Save and mark as finalized
                 </button>
             </p>
@@ -85,13 +85,61 @@
 {% block pagejs %}
 <script>
 $(document).ready(function () {
-{% if order.type == 'saliva' %}
-    $('input.sample-disabled').closest('label').addClass('text-danger');
-    $('input.sample-disabled').closest('div.checkbox').append('<small class="text-muted">was not collected/processed</small>');
-{% else %}
-    $('.sample-disabled label').addClass('text-danger');
-    $('.sample-disabled').find('td:last').append('<small style="margin-left:15px" class="text-muted">was not collected/processed</small>');
-{% endif %}
+    var name = 'input[name="form[finalized_samples][]"]';
+    {% if order.type == 'saliva' %}
+        $('input.sample-disabled').closest('label').addClass('text-warning');
+        var html;
+        var collected = $(name).attr('collected');
+        var processed = $(name).attr('processed');
+        var error = $(name).attr('error');
+        if (typeof collected !== 'undefined') {
+            html = '<label><b>Collected:</b></label> <i class="fa fa-check text-success" aria-hidden="true"></i>'+collected+'</span>';
+        } else {
+            html += '<label><b>Collected:</b></label> <span class="label-normal text-danger">Not collected</span></span>';
+        }
+        if (typeof processed !== 'undefined') {
+            if (typeof error !== 'undefined') {
+                html += '<label><b>Processed:</b></label> <span class="text-danger"><i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+error+'"></i>'+processed+'</span>';
+            } else {
+                html += '<label><b>Processed:</b></label> <i class="fa fa-check text-success" aria-hidden="true"></i>'+processed+'</span>';
+            }
+        } else {
+            html += '<label><b>Processed:</b></label> <span class="label-normal text-danger">Not processed</span></span>';
+        }
+        $(name).closest('div.checkbox').append('<span class="saliva-info">'+html+'</span>');
+    {% else %}
+        $('.sample-disabled label').addClass('text-warning');
+        $('.header-collected').append('<br><small>'+{{ order.collected_ts.format('n/j/Y g:ia')|json_encode|raw }}+'</small>');
+        $('.samples').each(function(e) {
+            var html;
+            var collected = $(this).find(name).attr('collected');
+            var processed = $(this).find(name).attr('processed');
+            var requiredProcessing = $(this).find(name).attr('required-processing');
+            var warning = $(this).find(name).attr('warning');
+            var error = $(this).find(name).attr('error');
+            if (typeof collected !== 'undefined') {
+                html = '<td align="center"><i class="fa fa-check text-success" aria-hidden="true"></i></td>';
+            } else {
+                html += '<td align="center"><label class="label-normal text-warning">Not collected</label></td>';
+            }
+            if (typeof processed !== 'undefined') {
+                if (typeof error !== 'undefined') {
+                    html += '<td><span class="text-danger"><i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+error+'"></i> '+processed+'</span></td>';
+                } else if (typeof warning !== 'undefined') {
+                    html += '<td><span class="text-warning"><i class="fa fa-exclamation-triangle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+warning+'"></i> '+processed+'</span></td>';
+                }else {
+                    html += '<td><i class="fa fa-check text-success" aria-hidden="true"></i> '+processed+'</td>';
+                }
+            } else {
+                if (typeof requiredProcessing !== 'undefined') {
+                    html += '<td><label class="label-normal text-warning">Not processed</label></td>';
+                }
+            }
+            $(this).find('td:last').after(html);
+        });
+    {% endif %}
+
+    $('[data-toggle="tooltip"]').tooltip();
 
     $('#checkall').on('change', function() {
         $('#form_finalized_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));

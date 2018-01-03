@@ -110,6 +110,18 @@ class Order
         'fixed_angle' => 'Fixed Angle'
     ];
 
+    public static $sst = ['1SST8', '1SS08'];
+
+    public static $pst = ['1PST8', '1PS08'];
+
+    public static $sampleMessageLabels = [
+        '1SST8' => 'sst',
+        '1SS08' => 'sst',
+        '1PST8' => 'pst',
+        '1PS08' => 'pst',
+        '1SAL' => 'sal'
+    ];
+
     public function loadOrder($participantId, $orderId, Application $app)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);
@@ -363,11 +375,42 @@ class Order
                 'choices' => $samples,
                 'required' => false,
                 'disabled' => $samplesDisabled,
-                'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
+                'choice_attr' => function($val, $key, $index) use ($enabledSamples, $set) {
+                    $attr = [];
+                    if ($set === 'finalized') {
+                        $collectedSamples = json_decode($this->order['collected_samples'], true);
+                        $processedSamples = json_decode($this->order['processed_samples_ts'], true);
+                        if (in_array($val, $collectedSamples)) {
+                            $attr = ['collected' => $this->order['collected_ts']->format('n/j/Y g:ia')];
+                        }
+                        if (!empty($processedSamples[$val])) {
+                            $time = new \DateTime();
+                            $time->setTimestamp($processedSamples[$val]);
+                            $time->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                            $attr['processed'] = $time->format('n/j/Y g:ia');
+                        }
+                        if (in_array($val, self::$samplesRequiringProcessing) && in_array($val, $collectedSamples)) {
+                            $attr['required-processing'] = 'yes';
+                        }
+                    }
+                    if ($set === 'processed' || $set === 'finalized') {
+                        $warnings = $this->getWarnings();
+                        $errors = $this->getErrors();
+                        if (array_key_exists($val, self::$sampleMessageLabels)) {
+                            $type = self::$sampleMessageLabels[$val];
+                            if (!empty($errors[$type])) {
+                                $attr['error'] = $errors[$type];
+                            } elseif (!empty($warnings[$type])) {
+                                $attr['warning'] = $warnings[$type];
+                            }
+                        }
+                    }
                     if (in_array($val, $enabledSamples)) {
-                        return [];
+                        return $attr;
                     } else {
-                        return ['disabled' => true, 'class' => 'sample-disabled'];
+                        $attr['disabled'] = true;
+                        $attr['class'] = 'sample-disabled';
+                        return $attr;
                     }
                 }
             ]);
@@ -389,10 +432,6 @@ class Order
                         new Constraints\LessThanOrEqual([
                             'value' => $constraintDateTime,
                             'message' => 'Timestamp cannot be in the future'
-                        ]),
-                        new Constraints\GreaterThan([
-                            'value' => $this->order['collected_ts'],
-                            'message' => 'Processing Time is before Collection Time'
                         ])
                     ]
                 ],
@@ -728,30 +767,67 @@ class Order
         return $this->getParticipant()->checkIdentifiers($notes);
     }
 
-    public function checkWarnings()
+    public function getWarnings()
     {
         $warnings = [];
         if ($this->order['type'] !== 'saliva' && !empty($this->order['collected_ts']) && !empty($this->order['processed_samples_ts'])) {
-            $collectedTs = $this->order['collected_ts'];
+            $collectedTs = clone $this->order['collected_ts'];
+            $processedSamples = json_decode($this->order['processed_samples'], true);
             $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
-            $samples = self::${'samples' . self::$version};
-            $sst = current($samples);
-            $pst = next($samples);
+            $sst = array_values(array_intersect($processedSamples, self::$sst));
+            $pst = array_values(array_intersect($processedSamples, self::$pst));
             //Check if SST processing time is less than 30 mins after collection time
             $collectedTs->modify('+30 minutes');
-            if (!empty($processedSamplesTs[$sst]) && $processedSamplesTs[$sst] < $collectedTs->getTimestamp()) {
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] < $collectedTs->getTimestamp()) {
                 $warnings['sst'] = 'SST Specimen Processed Less than 30 minutes after Collection';
             }
             //Check if SST processing time is greater than 4 hrs after collection time
             $collectedTs->modify('+210 minutes');
-            if (!empty($processedSamplesTs[$sst]) && $processedSamplesTs[$sst] > $collectedTs->getTimestamp()) {
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] > $collectedTs->getTimestamp()) {
                 $warnings['sst'] = 'Processing Time is Greater than 4 hours after Collection';
             }
             //Check if PST processing time is greater than 4 hrs after collection time
-            if (!empty($processedSamplesTs[$pst]) && $processedSamplesTs[$pst] > $collectedTs->getTimestamp()) {
+            if (!empty($pst) && !empty($processedSamplesTs[$pst[0]]) && $processedSamplesTs[$pst[0]] > $collectedTs->getTimestamp()) {
                 $warnings['pst'] = 'Processing Time is Greater than 4 hours after Collection';
             }
         }
         return $warnings;
+    }
+
+    public function getErrors()
+    {
+        $errors = [];
+        if (!empty($this->order['collected_ts']) && !empty($this->order['processed_samples_ts'])) {
+            $collectedTs = clone $this->order['collected_ts'];
+            $processedSamples = json_decode($this->order['processed_samples'], true);
+            $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+            $sst = array_values(array_intersect($processedSamples, self::$sst));
+            $pst = array_values(array_intersect($processedSamples, self::$pst));
+            $sal = array_values(array_intersect($processedSamples, self::$salivaSamples));
+            //Check if SST processing time is less than collection time
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] <= $collectedTs->getTimestamp()) {
+                $errors['sst'] = 'SST Processing Time is before Collection Time';
+            }
+            //Check if PST processing time is less than collection time
+            if (!empty($pst) && !empty($processedSamplesTs[$pst[0]]) && $processedSamplesTs[$pst[0]] <= $collectedTs->getTimestamp()) {
+                $errors['pst'] = 'PST Processing Time is before Collection Time';
+            }
+            //Check if SAL processing time is less than collection time
+            if (!empty($sal) && !empty($processedSamplesTs[$sal[0]]) && $processedSamplesTs[$sal[0]] <= $collectedTs->getTimestamp()) {
+                $errors['sal'] = 'SAL Processing Time is before Collection Time';
+            }
+        }
+        return $errors;        
+    }
+
+    public function getProcessTabClass()
+    {
+        $class = 'fa fa-check-circle text-success';
+        if (!empty($this->getErrors())) {
+            $class = 'fa fa-exclamation-circle text-danger';
+        } elseif (!empty($this->getWarnings())) {
+            $class = 'fa fa-exclamation-triangle text-warning';
+        }
+        return $class;
     }
 }
