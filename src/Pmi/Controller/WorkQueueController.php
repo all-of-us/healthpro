@@ -277,13 +277,14 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $params['_count'] = self::LIMIT_EXPORT;
         $participants = $this->participantSummarySearch($organization, $params, $app);
-        $stream = function() use ($participants, $siteWorkQueueDownload) {
+        $hasFullDataAcess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
+        $stream = function() use ($participants, $hasFullDataAcess) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
             fwrite($output, "\"\"\n");
-            if ($siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS) {
+            if ($hasFullDataAcess) {
                 $headers = [
                     'PMI ID',
                     'Biobank ID',
@@ -335,7 +336,7 @@ class WorkQueueController extends AbstractController
             $headers[] = 'Biospecimens Location';
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
-                if ($siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS) {
+                if ($hasFullDataAcess) {
                     $row = [
                         $participant->id,
                         $participant->biobankId,
