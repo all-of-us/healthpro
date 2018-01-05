@@ -19,7 +19,6 @@ class CronController extends AbstractController
     protected static $routes = [
         ['pingTest', '/ping-test'],
         ['withdrawal', '/withdrawal'],
-        ['generateEvaluationsQueue', '/generate-evaluations-queue'],
         ['resendEvaluationsToRdr', '/resend-evaluations-rdr']
     ];
     
@@ -60,16 +59,6 @@ class CronController extends AbstractController
             error_log('Cron ping test requested by Appengine-Cron');
         }
         
-        return (new JsonResponse())->setData(true);
-    }
-
-    public function generateEvaluationsQueueAction(Application $app, Request $request)
-    {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
-        }
-        $withdrawal = new EvaluationsQueueService($app);
-        $withdrawal->generateEvaluationsQueueTable();
         return (new JsonResponse())->setData(true);
     }
 

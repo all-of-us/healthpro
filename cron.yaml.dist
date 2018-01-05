@@ -7,10 +7,6 @@ cron:
   url: /cron/withdrawal
   schedule: every day 07:00
   timezone: America/Chicago
-- description: "Generate evaluations queue"
-  url: /cron/generate-evaluations-queue
-  schedule: 29 of feb 00:00
-  timezone: America/Chicago
 - description: "Resend evaluations to RDR"
   url: /cron/resend-evaluations-rdr
   schedule: 29 of feb 00:00
