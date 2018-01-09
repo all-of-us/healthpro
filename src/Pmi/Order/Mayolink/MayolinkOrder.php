@@ -46,7 +46,8 @@ class MayolinkOrder
         ],
         '1UR10' => [
             'temperature' => 'Refrigerated',
-            'specimen' => 'Urine'
+            'specimen' => 'Urine',
+            'labelCount' => 2
         ]
     ];
     protected static $salivaTests = [
@@ -55,8 +56,6 @@ class MayolinkOrder
             'specimen' => 'Saliva'
         ]
     ];
-
-    protected static $doublePrint = '1UR10';
 
     private $client;
 
@@ -98,7 +97,7 @@ class MayolinkOrder
     public function getLabelsPdf($options)
     {
         $samples = $this->getSamples('requested', $options);
-        $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples, 'doublePrint' => self::$doublePrint];
+        $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples];
         $xmlFile = "mayolink/order-labels.xml.twig";
         $xml = $this->app['twig']->render($xmlFile, $parameters);
         try {
@@ -158,13 +157,23 @@ class MayolinkOrder
                         'questionAnswer' => Order::$centrifugeType[$options['centrifugeType']]
                     ];
                 } else {
-                    $mayoSamples[] = ['code' => $sample, 'name' => $tests[$sample]['specimen']];
+                    $sampleItems['code'] = $sample;
+                    $sampleItems['name'] = $tests[$sample]['specimen'];
+                    if (!empty($tests[$sample]['labelCount'])) {
+                        $sampleItems['labelCount'] = $tests[$sample]['labelCount'];
+                    }
+                    $mayoSamples[] = $sampleItems;
                 }               
             }
         } else {
             if ($type !== 'collected') {
                 foreach ($tests as $key => $sample) {
-                    $mayoSamples[] = ['code' => $key, 'name' => $sample['specimen']];
+                    $sampleItems['code'] = $key;
+                    $sampleItems['name'] = $sample['specimen'];
+                    if (!empty($sample['labelCount'])) {
+                        $sampleItems['labelCount'] = $sample['labelCount'];
+                    }
+                    $mayoSamples[] = $sampleItems;
                 }
             }
         }

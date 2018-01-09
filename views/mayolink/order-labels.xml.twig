@@ -14,8 +14,8 @@
 		</patient>
 		<tests>
 			{% for sample in samples %}
-				{% if sample.code == doublePrint %}
-					<test label-count="2">
+				{% if sample.labelCount is defined %}
+					<test label-count="{{ sample.labelCount }}">
 				{% else %}
 					<test>
 				{% endif %}
