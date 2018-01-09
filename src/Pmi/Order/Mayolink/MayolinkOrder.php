@@ -8,8 +8,11 @@ use Pmi\Order\Order;
 class MayolinkOrder
 {
     protected $ordersEndpoint = 'http://test.orders.mayomedicallaboratories.com';
+    protected $nameSpace = 'http://orders.mayomedicallaboratories.com';
     protected $labelPdf = 'orders/labels.xml';
     protected $createOrder = 'orders/create.xml';
+    protected $userName;
+    protected $password;
     protected $app;
 
     protected static $tests = [
@@ -43,7 +46,8 @@ class MayolinkOrder
         ],
         '1UR10' => [
             'temperature' => 'Refrigerated',
-            'specimen' => 'Urine'
+            'specimen' => 'Urine',
+            'labelCount' => 2
         ]
     ];
     protected static $salivaTests = [
@@ -62,17 +66,19 @@ class MayolinkOrder
         if ($app->getConfig('ml_orders_endpoint')) {
             $this->ordersEndpoint = $app->getConfig('ml_orders_endpoint');
         }
+        $this->userName = $app->getConfig('ml_username');
+        $this->password = $app->getConfig('ml_password');
     }
 
-    public function createOrder($username, $password, $options)
+    public function createOrder($options)
     {
         $samples = $this->getSamples('collected', $options);
-        $parameters = ['mayoUrl' => $this->ordersEndpoint, 'options' => $options, 'samples' => $samples];
+        $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples];
         $xmlFile = "mayolink/order-create.xml.twig";
         $xml = $this->app['twig']->render($xmlFile, $parameters);
         try {
             $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->createOrder}", [
-                'auth' => [$username, $password],
+                'auth' => [$this->userName, $this->password],
                 'body' => $xml
             ]);            
         } catch (\Exception $e) {
@@ -88,15 +94,15 @@ class MayolinkOrder
         return $mayoId;
     }
 
-    public function getLabelsPdf($username, $password, $options)
+    public function getLabelsPdf($options)
     {
         $samples = $this->getSamples('requested', $options);
-        $parameters = ['mayoUrl' => $this->ordersEndpoint, 'options' => $options, 'samples' => $samples];
+        $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples];
         $xmlFile = "mayolink/order-labels.xml.twig";
         $xml = $this->app['twig']->render($xmlFile, $parameters);
         try {
             $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->labelPdf}", [
-                'auth' => [$username, $password],
+                'auth' => [$this->userName, $this->password],
                 'body' => $xml
             ]);            
         } catch (\Exception $e) {
@@ -112,11 +118,11 @@ class MayolinkOrder
         return $pdf;
     }
 
-    public function getRequisitionPdf($username, $password, $id)
+    public function getRequisitionPdf($id)
     {
         try {
             $response = $this->client->request('GET', "{$this->ordersEndpoint}/orders/{$id}.xml", [
-                'auth' => [$username, $password]
+                'auth' => [$this->userName, $this->password]
             ]);            
         } catch (\Exception $e) {
             syslog(LOG_CRIT, $e->getMessage());
@@ -151,13 +157,23 @@ class MayolinkOrder
                         'questionAnswer' => Order::$centrifugeType[$options['centrifugeType']]
                     ];
                 } else {
-                    $mayoSamples[] = ['code' => $sample, 'name' => $tests[$sample]['specimen']];
+                    $sampleItems['code'] = $sample;
+                    $sampleItems['name'] = $tests[$sample]['specimen'];
+                    if (!empty($tests[$sample]['labelCount'])) {
+                        $sampleItems['labelCount'] = $tests[$sample]['labelCount'];
+                    }
+                    $mayoSamples[] = $sampleItems;
                 }               
             }
         } else {
             if ($type !== 'collected') {
                 foreach ($tests as $key => $sample) {
-                    $mayoSamples[] = ['code' => $key, 'name' => $sample['specimen']];
+                    $sampleItems['code'] = $key;
+                    $sampleItems['name'] = $sample['specimen'];
+                    if (!empty($sample['labelCount'])) {
+                        $sampleItems['labelCount'] = $sample['labelCount'];
+                    }
+                    $mayoSamples[] = $sampleItems;
                 }
             }
         }

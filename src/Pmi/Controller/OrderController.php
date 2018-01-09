@@ -568,11 +568,7 @@ class OrderController extends AbstractController
         } else {
             if ($order->get('mayo_id')) {
                 $mlOrder = new MayolinkOrder($app);
-                $pdf = $mlOrder->getRequisitionPdf(
-                    $app->getConfig('ml_username'),
-                    $app->getConfig('ml_password'),
-                    $order->get('mayo_id')
-                );
+                $pdf = $mlOrder->getRequisitionPdf($order->get('mayo_id'));
             }
             if (!empty($pdf)) {
                 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
@@ -615,11 +611,7 @@ class OrderController extends AbstractController
                 'requested_samples' => $orderData['requested_samples'],
                 'version' => $orderData['version']
             ];
-            $pdf = $mlOrder->getLabelsPdf(
-                $app->getConfig('ml_username'),
-                $app->getConfig('ml_password'),
-                $options
-            );
+            $pdf = $mlOrder->getLabelsPdf($options);
             return $pdf;
         }
     }
@@ -659,11 +651,7 @@ class OrderController extends AbstractController
                 'version' => $orderData['version']
             ];
             $mayoOrder = new MayolinkOrder($app);
-            $mayoId = $mayoOrder->createOrder(
-                $app->getConfig('ml_username'),
-                $app->getConfig('ml_password'),
-                $options
-            );
+            $mayoId = $mayoOrder->createOrder($options);
         }
         return $mayoId;     
     }

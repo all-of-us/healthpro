@@ -14,7 +14,11 @@
 		</patient>
 		<tests>
 			{% for sample in samples %}
-				<test>
+				{% if sample.labelCount is defined %}
+					<test label-count="{{ sample.labelCount }}">
+				{% else %}
+					<test>
+				{% endif %}
 					<code>{{ sample.code }}</code>
 					<name>{{ sample.name }}</name>
 				</test>
