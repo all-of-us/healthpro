@@ -14,7 +14,11 @@
 		</patient>
 		<tests>
 			{% for sample in samples %}
-				<test>
+				{% if sample.code == doublePrint %}
+					<test label-count="2">
+				{% else %}
+					<test>
+				{% endif %}
 					<code>{{ sample.code }}</code>
 					<name>{{ sample.name }}</name>
 				</test>

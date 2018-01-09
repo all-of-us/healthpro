@@ -54,6 +54,8 @@ class MayolinkOrder
         ]
     ];
 
+    protected static $doublePrint = '1UR10';
+
     private $client;
 
     public function __construct(Application $app)
@@ -92,7 +94,7 @@ class MayolinkOrder
     public function getLabelsPdf($username, $password, $options)
     {
         $samples = $this->getSamples('requested', $options);
-        $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples];
+        $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples, 'doublePrint' => self::$doublePrint];
         $xmlFile = "mayolink/order-labels.xml.twig";
         $xml = $this->app['twig']->render($xmlFile, $parameters);
         try {
