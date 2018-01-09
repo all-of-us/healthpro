@@ -11,6 +11,8 @@ class MayolinkOrder
     protected $nameSpace = 'http://orders.mayomedicallaboratories.com';
     protected $labelPdf = 'orders/labels.xml';
     protected $createOrder = 'orders/create.xml';
+    protected $userName;
+    protected $password;
     protected $app;
 
     protected static $tests = [
@@ -65,9 +67,11 @@ class MayolinkOrder
         if ($app->getConfig('ml_orders_endpoint')) {
             $this->ordersEndpoint = $app->getConfig('ml_orders_endpoint');
         }
+        $this->userName = $app->getConfig('ml_username');
+        $this->password = $app->getConfig('ml_password');
     }
 
-    public function createOrder($username, $password, $options)
+    public function createOrder($options)
     {
         $samples = $this->getSamples('collected', $options);
         $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples];
@@ -75,7 +79,7 @@ class MayolinkOrder
         $xml = $this->app['twig']->render($xmlFile, $parameters);
         try {
             $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->createOrder}", [
-                'auth' => [$username, $password],
+                'auth' => [$this->userName, $this->password],
                 'body' => $xml
             ]);            
         } catch (\Exception $e) {
@@ -91,7 +95,7 @@ class MayolinkOrder
         return $mayoId;
     }
 
-    public function getLabelsPdf($username, $password, $options)
+    public function getLabelsPdf($options)
     {
         $samples = $this->getSamples('requested', $options);
         $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples, 'doublePrint' => self::$doublePrint];
@@ -99,7 +103,7 @@ class MayolinkOrder
         $xml = $this->app['twig']->render($xmlFile, $parameters);
         try {
             $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->labelPdf}", [
-                'auth' => [$username, $password],
+                'auth' => [$this->userName, $this->password],
                 'body' => $xml
             ]);            
         } catch (\Exception $e) {
@@ -115,11 +119,11 @@ class MayolinkOrder
         return $pdf;
     }
 
-    public function getRequisitionPdf($username, $password, $id)
+    public function getRequisitionPdf($id)
     {
         try {
             $response = $this->client->request('GET', "{$this->ordersEndpoint}/orders/{$id}.xml", [
-                'auth' => [$username, $password]
+                'auth' => [$this->userName, $this->password]
             ]);            
         } catch (\Exception $e) {
             syslog(LOG_CRIT, $e->getMessage());
