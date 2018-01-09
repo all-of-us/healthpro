@@ -8,6 +8,7 @@ use Pmi\Order\Order;
 class MayolinkOrder
 {
     protected $ordersEndpoint = 'http://test.orders.mayomedicallaboratories.com';
+    protected $nameSpace = 'http://orders.mayomedicallaboratories.com';
     protected $labelPdf = 'orders/labels.xml';
     protected $createOrder = 'orders/create.xml';
     protected $app;
@@ -67,7 +68,7 @@ class MayolinkOrder
     public function createOrder($username, $password, $options)
     {
         $samples = $this->getSamples('collected', $options);
-        $parameters = ['mayoUrl' => $this->ordersEndpoint, 'options' => $options, 'samples' => $samples];
+        $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples];
         $xmlFile = "mayolink/order-create.xml.twig";
         $xml = $this->app['twig']->render($xmlFile, $parameters);
         try {
@@ -91,7 +92,7 @@ class MayolinkOrder
     public function getLabelsPdf($username, $password, $options)
     {
         $samples = $this->getSamples('requested', $options);
-        $parameters = ['mayoUrl' => $this->ordersEndpoint, 'options' => $options, 'samples' => $samples];
+        $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples];
         $xmlFile = "mayolink/order-labels.xml.twig";
         $xml = $this->app['twig']->render($xmlFile, $parameters);
         try {
