@@ -65,6 +65,10 @@ class HelpController extends AbstractController
                     'title' => 'SOP-010 HPO Ordering Supplies from MML',
                     'filename' => 'SOP-010 HPO Ordering Supplies from MML.pdf'
                 ],
+                'SOP-018' => [
+                    'title' => 'SOP-018 HPO Specimen Rejection Criteria',
+                    'filename' => 'SOP-018 HPO Specimen Rejection Criteria.pdf'
+                ],
                 'CHANGES-20170412-HPO' => [
                     'download' => true,
                     'title' => 'HPO SOP Changes Presentation 04-12-2017',
@@ -90,6 +94,10 @@ class HelpController extends AbstractController
                 'SOP-011' => [
                     'title' => 'SOP-011 DV Packaging and Shipping PMI Specimens',
                     'filename' => 'SOP-011 DV Packaging and Shipping PMI Specimens.pdf'
+                ],
+                'SOP-019' => [
+                    'title' => 'SOP-019 DV Specimen Rejection Criteria',
+                    'filename' => 'SOP-019 DV Specimen Rejection Criteria.pdf'
                 ],
                 'CHANGES-20170412-DV' => [
                     'download' => true,
