@@ -73,7 +73,7 @@
         {{ form_rest(finalizeForm) }}
         {% if not order.finalized_ts %}
             <p>
-                <button type="submit" onclick="return confirm('Are you sure you want to finalize this order?');" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
+                <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                     Save and mark as finalized
                 </button>
             </p>
@@ -192,6 +192,19 @@ $(document).ready(function () {
                 target.parent().addClass('has-error');
             }
         }
+    });
+
+    //Display warning message
+    $('button[type="submit"]').on('click', function() {
+        var message = 'Are you sure you want to finalize this order?';
+        $('input[name="form[finalized_samples][]"]').each(function() {
+            //Select samples that are unchecked and not disabled
+            if ($(this).prop('checked') === false && $(this).prop('disabled') === false) {
+                message = 'Warning: At least one sample that was collected and processed (as applicable) was not finalized. Are you sure you wish to continue?';
+                return false;
+            }
+        });
+        return confirm(message);
     });
 });
 </script>
