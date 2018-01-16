@@ -93,6 +93,13 @@ class Fhir
                 $metrics[] = $field->name;
             }
         }
+
+        if (in_array('wheelchair', $metrics) || in_array('pregnant', $metrics)) {
+            $metrics[] = 'hip-circumference-1';
+            $metrics[] = 'hip-circumference-2';
+            $metrics[] = 'waist-circumference-1';
+            $metrics[] = 'waist-circumference-2';
+        }
         // add bmi if height and weight are both included
         if (in_array('height', $metrics) && in_array('weight', $metrics)) {
             $metrics[] = 'bmi';
@@ -249,6 +256,24 @@ class Fhir
                     'reference' => $this->metricUrns[$modificationMetric]
                 ]
             ]];
+        }
+        if (strpos($metric, 'circumference') !== false) {
+            if ($this->data->pregnant) {
+                $entry['resource']['related'][] = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns['pregnant']
+                    ]
+                ];
+            }
+            if ($this->data->wheelchair) {
+                $entry['resource']['related'][] = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns['wheelchair']
+                    ]
+                ];
+            }
         }
         return $entry;
     }
@@ -1007,7 +1032,7 @@ class Fhir
     {
         $entry = $this->simpleMetric(
             'hip-circumference-mean',
-            $this->summary['hip']['cm'],
+            !empty($this->summary['hip']['cm']) ? $this->summary['hip']['cm'] : null,
             'Computed hip circumference, mean of closest two measures',
             'cm',
             [
@@ -1033,7 +1058,7 @@ class Fhir
     {
         $entry = $this->simpleMetric(
             'waist-circumference-mean',
-            $this->summary['waist']['cm'],
+            !empty($this->summary['waist']['cm']) ? $this->summary['waist']['cm'] : null,
             'Computed waist circumference, mean of closest two measures',
             'cm',
             [
