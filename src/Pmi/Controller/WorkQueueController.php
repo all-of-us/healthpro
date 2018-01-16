@@ -243,10 +243,16 @@ class WorkQueueController extends AbstractController
         return is_object($date) ? $date->format('m/d/Y') : '';
     }
 
-    protected static function csvDateFromString($string)
+    protected static function csvDateFromString($string, $timezone)
     {
-        if (!empty($string) && ($time = strtotime($string))) {
-            return date('m/d/Y', $time);
+        if (!empty($string)) {
+            try {
+                $date = new \DateTime($string);
+                $date->setTimezone(new \DateTimeZone($timezone));
+                return $date->format('m/d/Y');
+            } catch (\Exception $e) {
+                return '';
+            }
         } else {
             return '';
         }
@@ -278,7 +284,7 @@ class WorkQueueController extends AbstractController
         $params['_count'] = self::LIMIT_EXPORT;
         $participants = $this->participantSummarySearch($organization, $params, $app);
         $hasFullDataAcess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
-        $stream = function() use ($participants, $hasFullDataAcess) {
+        $stream = function() use ($participants, $hasFullDataAcess, $app) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -345,13 +351,13 @@ class WorkQueueController extends AbstractController
                         self::csvDateFromObject($participant->dob),
                         $participant->language,
                         self::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-                        self::csvDateFromString($participant->consentForStudyEnrollmentTime),
+                        self::csvDateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone()),
                         self::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-                        self::csvDateFromString($participant->consentForElectronicHealthRecordsTime),
+                        self::csvDateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone()),
                         self::csvStatusFromSubmitted($participant->consentForconsentForCABoR),
-                        self::csvDateFromString($participant->consentForCABoRTime),
+                        self::csvDateFromString($participant->consentForCABoRTime, $app->getUserTimezone()),
                         $participant->withdrawalStatus == 'NO_USE' ? '1' : '0',
-                        self::csvDateFromString($participant->withdrawalTime),
+                        self::csvDateFromString($participant->withdrawalTime, $app->getUserTimezone()),
                         $participant->streetAddress,
                         $participant->city,
                         $participant->state,
@@ -367,7 +373,7 @@ class WorkQueueController extends AbstractController
                     ];
                     foreach (self::$surveys as $survey => $label) {
                         $row[] = self::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                        $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"});
+                        $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"}, $app->getUserTimezone());
                     }
                 } else {
                     $row = [
@@ -377,13 +383,13 @@ class WorkQueueController extends AbstractController
                     ];                   
                 }
                 $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                $row[] = self::csvDateFromString($participant->physicalMeasurementsTime);
+                $row[] = self::csvDateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
                 $row[] = $participant->evaluationFinalizedSite;
                 $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                 $row[] = $participant->numBaselineSamplesArrived;
                 foreach (self::$samples as $sample => $label) {
                     $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
-                    $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"});
+                    $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"}, $app->getUserTimezone());
                 }
                 $row[] = $participant->orderCreatedSite;
                 fputcsv($output, $row);
