@@ -239,6 +239,12 @@ class OrderController extends AbstractController
             if ($order->get('finalized_ts')) {
                 $app->abort(403);
             }
+
+            // Throw error if no samples are selected when sending an order
+            if ($request->request->has('send') && empty($collectForm['collected_samples']->getData())) {
+                $collectForm['collected_samples']->addError(new FormError('Please select at least one sample'));
+            }
+
             if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
