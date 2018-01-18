@@ -820,7 +820,7 @@
                 "valueCodeableConcept": {
                     "coding": [
                         {
-                            "code": "wheelchair-bound",
+                            "code": "wheelchair-user",
                             "display": "Wheelchair user",
                             "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-height"
                         }
@@ -918,7 +918,7 @@
                 "valueCodeableConcept": {
                     "coding": [
                         {
-                            "code": "wheelchair-bound",
+                            "code": "wheelchair-user",
                             "display": "Wheelchair user",
                             "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-weight"
                         }
