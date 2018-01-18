@@ -117,12 +117,12 @@
                 "type": {
                     "coding": [
                         {
-                            "code": "intake-exam-v0.3.2",
-                            "display": "All of Us Intake Evaluation v0.3.2",
+                            "code": "intake-exam-v0.3.3",
+                            "display": "All of Us Intake Evaluation v0.3.3",
                             "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/document-type"
                         }
                     ],
-                    "text": "All of Us Intake Evaluation v0.3.2"
+                    "text": "All of Us Intake Evaluation v0.3.3"
                 },
                 "extension": [
                     {
