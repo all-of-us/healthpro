@@ -14,7 +14,7 @@ use Pmi\Util;
 
 class Evaluation
 {
-    const CURRENT_VERSION = '0.3.2';
+    const CURRENT_VERSION = '0.3.3';
     protected $version;
     protected $data;
     protected $schema;
