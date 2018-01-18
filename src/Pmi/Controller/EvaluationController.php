@@ -180,6 +180,7 @@ class EvaluationController extends AbstractController
                         }
                         if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($participant->id, $fhir)) {
                             $dbArray['rdr_id'] = $rdrEvalId;
+                            $dbArray['fhir_version'] = \Pmi\Evaluation\Fhir::CURRENT_VERSION;
                         }
                     } else {
                         foreach ($errors as $field) {
