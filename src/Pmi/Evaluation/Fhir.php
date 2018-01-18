@@ -338,6 +338,10 @@ class Fhir
         }
         $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
         $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
+        // Change wheelchair concept code
+        if ($conceptCode === 'wheelchair-bound') {
+            $conceptCode = 'wheelchair-user';
+        }
         return [
             'fullUrl' => $this->metricUrns[$urnKey],
             'resource' => [
