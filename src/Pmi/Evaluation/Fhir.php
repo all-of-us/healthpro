@@ -5,7 +5,7 @@ use Pmi\Util;
 
 class Fhir
 {
-    const CURRENT_VERSION = '0.1';
+    const CURRENT_VERSION = 2;
     protected $data;
     protected $schema;
     protected $patient;
