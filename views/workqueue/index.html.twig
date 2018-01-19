@@ -123,7 +123,7 @@
                     <td class="text-center" data-order="{{ participant.consentForStudyEnrollment == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForStudyEnrollmentTime }}">
                         {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.consentForStudyEnrollmentTime ? participant.consentForStudyEnrollmentTime|date('m/d/Y') }}
+                            {{ participant.consentForStudyEnrollmentTime ? participant.consentForStudyEnrollmentTime|date('m/d/Y', app.userTimezone) }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
@@ -131,25 +131,25 @@
                     <td class="text-center" data-order="{{ participant.consentForElectronicHealthRecords == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForElectronicHealthRecordsTime }}">
                         {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('m/d/Y') }}
+                            {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('m/d/Y', app.userTimezone) }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('m/d/Y') : '(not completed)' }}
+                            {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('m/d/Y', app.userTimezone) : '(not completed)' }}
                         {% endif %}
                     </td>
                     <td class="text-center" data-order="{{ participant.consentForCABoR == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForCABoRTime }}">
                         {% if participant.consentForCABoR == 'SUBMITTED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('m/d/Y') }}
+                            {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('m/d/Y', app.userTimezone) }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('m/d/Y') : '(not completed)' }}
+                            {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('m/d/Y', app.userTimezone) : '(not completed)' }}
                         {% endif %}
                     </td>
                     <td class="text-center" data-order="{{ participant.withdrawalStatus == 'NO_USE' ? '1' : '0' }}-{{ participant.withdrawalTime }}">
                         {% if participant.withdrawalStatus == 'NO_USE' %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            <span class="text-danger">No Use</span> - {{ participant.withdrawalTime ? participant.withdrawalTime|date('m/d/Y') }}
+                            <span class="text-danger">No Use</span> - {{ participant.withdrawalTime ? participant.withdrawalTime|date('m/d/Y', app.userTimezone) }}
                         {% endif %}
                     </td>
 
@@ -178,7 +178,7 @@
                         </td>
                         <td data-order="{{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time') }}">
                             {% if attribute(participant, 'questionnaireOn' ~ field ~ 'Time') %}
-                                {{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time')|date('m/d/Y') }}
+                                {{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time')|date('m/d/Y', app.userTimezone) }}
                             {% endif %}
                         </td>
                     {% endfor %}
@@ -187,7 +187,7 @@
                     <td class="text-center"  data-order="{{ participant.physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0' }}-{{ participant.physicalMeasurementsTime }}">
                         {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.physicalMeasurementsTime ? participant.physicalMeasurementsTime|date('m/d/Y') }}
+                            {{ participant.physicalMeasurementsTime ? participant.physicalMeasurementsTime|date('m/d/Y', app.userTimezone) }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
@@ -216,7 +216,7 @@
                         </td>
                         <td data-order="{{ attribute(participant, 'sampleStatus' ~ field ~ 'Time') }}">
                             {% if attribute(participant, 'sampleStatus' ~ field ~ 'Time') %}
-                                {{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y') }}
+                                {{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y', app.userTimezone) }}
                             {% endif %}
                         </td>
                     {% endfor %}
