@@ -121,7 +121,7 @@ class WorkQueueController extends AbstractController
             ]
         ]
     ];
-    protected static $surveys = [
+    public static $surveys = [
         'TheBasics' => 'Basics',
         'OverallHealth' => 'Health',
         'Lifestyle' => 'Lifestyle',
@@ -130,7 +130,7 @@ class WorkQueueController extends AbstractController
         'FamilyHealth' => 'Family',
         'HealthcareAccess' => 'Access'
     ];
-    protected static $samples = [
+    public static $samples = [
         '1SST8' => '8 mL SST',
         '1PST8' => '8 mL PST',
         '1HEP4' => '4 mL Na-Hep',
@@ -225,6 +225,7 @@ class WorkQueueController extends AbstractController
             $app['session']->set('awardeeOrganization', $organization);
         }
         $participants = $this->participantSummarySearch($organization, $params, $app);
+        $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
         return $app['twig']->render('workqueue/index.html.twig', [
             'filters' => $filters,
             'surveys' => self::$surveys,
@@ -232,7 +233,8 @@ class WorkQueueController extends AbstractController
             'participants' => $participants,
             'params' => $params,
             'organization' => $organization,
-            'isRdrError' => $this->rdrError
+            'isRdrError' => $this->rdrError,
+            'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload)
         ]);
     }
 
@@ -257,6 +259,10 @@ class WorkQueueController extends AbstractController
 
     public function exportAction(Application $app, Request $request)
     {
+        $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
+        if ($siteWorkQueueDownload === AdminController::DOWNLOAD_DISABLED) {
+            $app->abort(403);
+        }
         if ($app->hasRole('ROLE_AWARDEE')) {
             $organization = $app['session']->get('awardeeOrganization');
             $site = $app->getAwardeeId();
@@ -271,14 +277,14 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $params['_count'] = self::LIMIT_EXPORT;
         $participants = $this->participantSummarySearch($organization, $params, $app);
-        $isDVType = $app->isDVType();
-        $stream = function() use ($participants, $isDVType) {
+        $hasFullDataAcess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
+        $stream = function() use ($participants, $hasFullDataAcess) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
             fwrite($output, "\"\"\n");
-            if (!$isDVType) {
+            if ($hasFullDataAcess) {
                 $headers = [
                     'PMI ID',
                     'Biobank ID',
@@ -330,7 +336,7 @@ class WorkQueueController extends AbstractController
             $headers[] = 'Biospecimens Location';
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
-                if (!$isDVType) {
+                if ($hasFullDataAcess) {
                     $row = [
                         $participant->id,
                         $participant->biobankId,
@@ -397,5 +403,18 @@ class WorkQueueController extends AbstractController
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
+    }
+
+    public function getSiteWorkQueueDownload($app)
+    {
+        $site = $app['em']->getRepository('sites')->fetchOneBy([
+            'google_group' => $app->getSiteId()
+        ]);
+        return !empty($site) ? $site['workqueue_download'] : null;
+    }
+
+    public function isDownloadDisabled($value)
+    {
+        return $value === AdminController::DOWNLOAD_DISABLED;
     }
 }
