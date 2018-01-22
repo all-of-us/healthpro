@@ -171,7 +171,10 @@ class DefaultController extends AbstractController
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
             ->add('participantId', TextType::class, [
                 'label' => 'Participant ID',
-                'constraints' => new Constraints\NotBlank()
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ]
             ])
             ->getForm();
 
@@ -188,12 +191,18 @@ class DefaultController extends AbstractController
 
         $searchForm = $app['form.factory']->createNamedBuilder('search', FormType::class)
             ->add('lastName', TextType::class, [
-                'constraints' => new Constraints\NotBlank(),
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
                 'attr' => [
                     'placeholder' => 'Doe'
                 ]
             ])
             ->add('firstName', TextType::class, [
+                'constraints' => [
+                    new Constraints\Type('string')
+                ],
                 'required' => false,
                 'attr' => [
                     'placeholder' => 'John'
@@ -201,7 +210,10 @@ class DefaultController extends AbstractController
             ])
             ->add('dob', TextType::class, [
                 'label' => 'Date of birth',
-                'constraints' => new Constraints\NotBlank(),
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
                 'attr' => [
                     'placeholder' => '11/1/1980'
                 ]
@@ -234,7 +246,10 @@ class DefaultController extends AbstractController
             ->add('mayoId', TextType::class, [
                 'label' => 'Order ID',
                 'attr' => ['placeholder' => 'Scan barcode'],
-                'constraints' => new Constraints\NotBlank()
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ]
             ])
             ->getForm();
 
@@ -275,7 +290,7 @@ class DefaultController extends AbstractController
         if ($refresh) {
             return $app->redirectToRoute('participant', [
                 'id' => $id
-            ]);           
+            ]);
         }
         if (!$participant) {
             $app->abort(404);
@@ -295,6 +310,7 @@ class DefaultController extends AbstractController
         }
 
         $isCrossOrg = $participant->hpoId !== $app->getSiteOrganization();
+        $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, ['test-participant', 'basics']));
         $hasNoParticipantAccess = $isCrossOrg && empty($app['session']->get('agreeCrossOrg_'.$id));
         if ($hasNoParticipantAccess) {
             $app->log(Log::CROSS_ORG_PARTICIPANT_ATTEMPT, [
@@ -327,7 +343,10 @@ class DefaultController extends AbstractController
             'problems' => $problems,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
-            'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled()
+            'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled(),
+            'canViewDetails' => $canViewDetails,
+            'samples' => WorkQueueController::$samples,
+            'surveys' => WorkQueueController::$surveys
         ]);
     }
 

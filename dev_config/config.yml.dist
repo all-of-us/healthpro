@@ -46,7 +46,7 @@ ml_mock_order: pmitest
 # Bypass Google Apps auth
 gaBypass: 1
 # Google Groups to use when bypassing Google Apps auth
-gaByassGroups:
+gaBypassGroups:
   - email: hpo-site-monroeville@staging.pmi-ops.org
     name: Monroeville
   - email: hpo-site-upmc@staging.pmi-ops.org
@@ -69,3 +69,7 @@ ip_whitelist:
 
 # require user to have two-factor authentication enabled
 enforce2fa: 0
+
+# Mandrill configuration for sending emails
+# mail_method: mandrill
+# mandrill_key: 

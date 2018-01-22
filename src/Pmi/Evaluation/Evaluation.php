@@ -14,7 +14,7 @@ use Pmi\Util;
 
 class Evaluation
 {
-    const CURRENT_VERSION = '0.3.2';
+    const CURRENT_VERSION = '0.3.3';
     protected $version;
     protected $data;
     protected $schema;
@@ -177,11 +177,14 @@ class Evaluation
                 unset($options['scale']);
                 $class = TextareaType::class;
                 $attributes['rows'] = 4;
+                $constraints[] = new Constraints\Type('string');
             } elseif ($type == 'text') {
                 unset($options['scale']);
                 $class = TextType::class;
+                $constraints[] = new Constraints\Type('string');
             } else {
                 $class = NumberType::class;
+                $constraints[] = new Constraints\Type('numeric');
             }
 
             $options['constraints'] = $constraints;
@@ -283,7 +286,8 @@ class Evaluation
             'created_user' => $this->createdUser,
             'created_site' => $this->createdSite,
             'finalized_user' => $this->finalizedUser,
-            'finalized_site' => $this->finalizedSite
+            'finalized_site' => $this->finalizedSite,
+            'summary' => $this->getSummary()
         ]);
         return $fhir->toObject();
     }

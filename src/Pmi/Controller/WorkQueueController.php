@@ -121,7 +121,7 @@ class WorkQueueController extends AbstractController
             ]
         ]
     ];
-    protected static $surveys = [
+    public static $surveys = [
         'TheBasics' => 'Basics',
         'OverallHealth' => 'Health',
         'Lifestyle' => 'Lifestyle',
@@ -130,7 +130,7 @@ class WorkQueueController extends AbstractController
         'FamilyHealth' => 'Family',
         'HealthcareAccess' => 'Access'
     ];
-    protected static $samples = [
+    public static $samples = [
         '1SST8' => '8 mL SST',
         '1PST8' => '8 mL PST',
         '1HEP4' => '4 mL Na-Hep',
@@ -225,6 +225,7 @@ class WorkQueueController extends AbstractController
             $app['session']->set('awardeeOrganization', $organization);
         }
         $participants = $this->participantSummarySearch($organization, $params, $app);
+        $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
         return $app['twig']->render('workqueue/index.html.twig', [
             'filters' => $filters,
             'surveys' => self::$surveys,
@@ -232,7 +233,8 @@ class WorkQueueController extends AbstractController
             'participants' => $participants,
             'params' => $params,
             'organization' => $organization,
-            'isRdrError' => $this->rdrError
+            'isRdrError' => $this->rdrError,
+            'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload)
         ]);
     }
 
@@ -241,10 +243,16 @@ class WorkQueueController extends AbstractController
         return is_object($date) ? $date->format('m/d/Y') : '';
     }
 
-    protected static function csvDateFromString($string)
+    protected static function csvDateFromString($string, $timezone)
     {
-        if (!empty($string) && ($time = strtotime($string))) {
-            return date('m/d/Y', $time);
+        if (!empty($string)) {
+            try {
+                $date = new \DateTime($string);
+                $date->setTimezone(new \DateTimeZone($timezone));
+                return $date->format('m/d/Y');
+            } catch (\Exception $e) {
+                return '';
+            }
         } else {
             return '';
         }
@@ -257,6 +265,10 @@ class WorkQueueController extends AbstractController
 
     public function exportAction(Application $app, Request $request)
     {
+        $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
+        if ($siteWorkQueueDownload === AdminController::DOWNLOAD_DISABLED) {
+            $app->abort(403);
+        }
         if ($app->hasRole('ROLE_AWARDEE')) {
             $organization = $app['session']->get('awardeeOrganization');
             $site = $app->getAwardeeId();
@@ -271,14 +283,14 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $params['_count'] = self::LIMIT_EXPORT;
         $participants = $this->participantSummarySearch($organization, $params, $app);
-        $isDVType = $app->isDVType();
-        $stream = function() use ($participants, $isDVType) {
+        $hasFullDataAcess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
+        $stream = function() use ($participants, $hasFullDataAcess, $app) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
             fwrite($output, "\"\"\n");
-            if (!$isDVType) {
+            if ($hasFullDataAcess) {
                 $headers = [
                     'PMI ID',
                     'Biobank ID',
@@ -320,15 +332,17 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Physical Measurements Completion Date';
+            $headers[] = 'Physical Measurements Location';
             $headers[] = 'Samples for DNA Received';
             $headers[] = 'Biospecimens';
             foreach (self::$samples as $sample => $label) {
                 $headers[] = $label . ' Collected';
                 $headers[] = $label . ' Collection Date';
             }
+            $headers[] = 'Biospecimens Location';
             fputcsv($output, $headers);
             foreach ($participants as $participant) {
-                if (!$isDVType) {
+                if ($hasFullDataAcess) {
                     $row = [
                         $participant->id,
                         $participant->biobankId,
@@ -337,13 +351,13 @@ class WorkQueueController extends AbstractController
                         self::csvDateFromObject($participant->dob),
                         $participant->language,
                         self::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-                        self::csvDateFromString($participant->consentForStudyEnrollmentTime),
+                        self::csvDateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone()),
                         self::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-                        self::csvDateFromString($participant->consentForElectronicHealthRecordsTime),
+                        self::csvDateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone()),
                         self::csvStatusFromSubmitted($participant->consentForconsentForCABoR),
-                        self::csvDateFromString($participant->consentForCABoRTime),
+                        self::csvDateFromString($participant->consentForCABoRTime, $app->getUserTimezone()),
                         $participant->withdrawalStatus == 'NO_USE' ? '1' : '0',
-                        self::csvDateFromString($participant->withdrawalTime),
+                        self::csvDateFromString($participant->withdrawalTime, $app->getUserTimezone()),
                         $participant->streetAddress,
                         $participant->city,
                         $participant->state,
@@ -359,7 +373,7 @@ class WorkQueueController extends AbstractController
                     ];
                     foreach (self::$surveys as $survey => $label) {
                         $row[] = self::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                        $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"});
+                        $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"}, $app->getUserTimezone());
                     }
                 } else {
                     $row = [
@@ -369,13 +383,15 @@ class WorkQueueController extends AbstractController
                     ];                   
                 }
                 $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                $row[] = self::csvDateFromString($participant->physicalMeasurementsTime);
+                $row[] = self::csvDateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
+                $row[] = $participant->evaluationFinalizedSite;
                 $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                 $row[] = $participant->numBaselineSamplesArrived;
                 foreach (self::$samples as $sample => $label) {
                     $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
-                    $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"});
+                    $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"}, $app->getUserTimezone());
                 }
+                $row[] = $participant->orderCreatedSite;
                 fputcsv($output, $row);
             }
             fwrite($output, "\"\"\n");
@@ -393,5 +409,18 @@ class WorkQueueController extends AbstractController
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
+    }
+
+    public function getSiteWorkQueueDownload($app)
+    {
+        $site = $app['em']->getRepository('sites')->fetchOneBy([
+            'google_group' => $app->getSiteId()
+        ]);
+        return !empty($site) ? $site['workqueue_download'] : null;
+    }
+
+    public function isDownloadDisabled($value)
+    {
+        return $value === AdminController::DOWNLOAD_DISABLED;
     }
 }
