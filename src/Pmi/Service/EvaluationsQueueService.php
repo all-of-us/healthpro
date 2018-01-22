@@ -23,7 +23,8 @@ class EvaluationsQueueService
 
     public function resendEvaluationsToRdr()
     {
-        $evaluationsQueue = $this->em->getRepository('evaluations_queue')->fetchBySql('sent_ts is null limit 0,20');
+        $limit = $this->app->getConfig('evaluation_queue_limit');
+        $evaluationsQueue = $this->em->getRepository('evaluations_queue')->fetchBySql("sent_ts is null limit 0, $limit");
         foreach ($evaluationsQueue as $queue) {
             $evalId = $queue['evaluation_id'];
             $evaluationService = new Evaluation();
