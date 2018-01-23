@@ -6,7 +6,7 @@
 {% block title %}Process - Order {{ order.order_id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'process' } %}
-    {{ form_start(processForm, { attr: { class: 'warn-unsaved' } }) }}
+    {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter' } }) }}
         {{ form_errors(processForm) }}
         {% if processForm.processed_samples is defined %}
             <div class="form-group{% if not processForm.processed_samples.vars.valid %} has-error{% endif %}">
