@@ -475,6 +475,7 @@ class Order
                     '.' => 'second' // target the second (repeated) field for non-matching error
                 ],
                 'constraints' => [
+                    new Constraints\Type('string'),
                     new Constraints\Regex([
                         'pattern' => '/^\d{12,14}$|^[a-zA-Z0-9]{18}$/',
                         'message' => 'Tracking numbers must be a string of 12 to 14 digits for FedEX and 18 digits for UPS'
@@ -485,7 +486,8 @@ class Order
         $formBuilder->add("{$set}_notes", Type\TextareaType::class, [
             'label' => $notesLabel,
             'disabled' => $disabled,
-            'required' => false
+            'required' => false,
+            'constraints' => new Constraints\Type('string')
         ]);
         $form = $formBuilder->getForm();
         return $form;
