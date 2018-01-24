@@ -34,7 +34,10 @@
                         <div class="panel-body">
                             <div class="row form-group-sm">
                                 <div class="col-md-12 col-xs-3 form-group form-group-sm">
-                                    <label for="total-progress-metric-attribute">Display Metric</label>
+                                    <label for="total-progress-metric-attribute">
+                                        Display Metric
+                                        <i class="fa fa-question-circle text-info pull-right" style="cursor: pointer;" id="display-metrics-help"></i>
+                                    </label>
                                     <select id="total-progress-metric-attribute" class="form-control total-progress-control">
                                         {% for metric_key, display_val in metrics_attributes %}
                                             <option value="{{ metric_key }}">{{ display_val }}</option>
