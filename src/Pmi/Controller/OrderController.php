@@ -442,17 +442,12 @@ class OrderController extends AbstractController
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                     $order = $this->loadOrder($participantId, $orderId, $app);
-                    //Send order to RDR if mayo_id exists
-                    if (!empty($order->get('mayo_id'))) {
-                        //Send order to RDR if finalized_ts is set
-                        if (empty($order->get('finalized_ts'))) {
-                            $app->addFlashNotice('Order updated but not finalized');
-                        } else {
-                            $order->sendToRdr();
-                            $app->addFlashSuccess('Order finalized');
-                        }
+                    //Send order to RDR if finalized_ts and mayo_id exists
+                    if (!empty($order->get('finalized_ts')) && !empty($order->get('mayo_id'))) {
+                        $order->sendToRdr();
+                        $app->addFlashSuccess('Order finalized');
                     } else {
-                        $app->addFlashError('Failed to send order');
+                        $app->addFlashNotice('Order updated but not finalized');
                     }
                 }
                 return $app->redirectToRoute('orderFinalize', [
