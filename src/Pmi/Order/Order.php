@@ -137,6 +137,7 @@ class Order
         }
         $this->app = $app;
         $this->order = $order;
+        $this->order['freezed'] = $this->isOrderFreezed();
         $this->participant = $participant;
         if (empty($order['version'])) {
             self::$version = 1;
@@ -281,7 +282,7 @@ class Order
 
     public function createOrderForm($set, $formFactory)
     {
-        $disabled = $this->order['finalized_ts'] ? true : false;
+        $disabled = $this->order['finalized_ts'] || $this->order['freezed'] ? true : false;
 
         switch ($set) {
             case 'collected':
@@ -829,5 +830,10 @@ class Order
             $class = 'fa fa-exclamation-triangle text-warning';
         }
         return $class;
+    }
+
+    public function isOrderFreezed()
+    {
+        return empty($this->order['finalized_ts']) && empty($this->order['version']);
     }
 }
