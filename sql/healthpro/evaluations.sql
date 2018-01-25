@@ -11,6 +11,7 @@ CREATE TABLE `evaluations` (
   `finalized_site` varchar(50) DEFAULT NULL,
   `finalized_ts` TIMESTAMP NULL DEFAULT NULL,
   `version` varchar(10) NOT NULL,
+  `fhir_version` int(11) NULL DEFAULT NULL,
   `data` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `participant_id` (`participant_id`)
