@@ -1,3 +1,8 @@
+{% if order.freezed %}
+    <div class="alert alert-danger custom-alert">
+        This order has expired and can no longer be updated. Please create a new order to collect or send samples.
+    </div>
+{% endif %}
 <h2>
     <i class="fa fa-medkit" aria-hidden="true"></i>
     {{ order.created_ts|date('n/j/Y', app.userTimezone) }}

@@ -18,7 +18,7 @@ iframe.pdf {
     margin-top: -10px;
     margin-bottom: 15px;
 }
-#flash-notices div {
+#flash-notices div, .custom-alert {
     padding: 5px;
     text-align: center;
     font-weight: bold;
