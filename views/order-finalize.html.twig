@@ -71,7 +71,7 @@
             {{ form_errors(finalizeForm.finalized_notes) }}
         </div>
         {{ form_rest(finalizeForm) }}
-        {% if not order.finalized_ts and not order.freezed %}
+        {% if not order.finalized_ts and not order.expired %}
             <p>
                 <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                     Save and mark as finalized

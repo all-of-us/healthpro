@@ -43,7 +43,7 @@
         </div>
         {{ form_rest(processForm) }}
 
-        {% if not order.finalized_ts and not order.freezed %}
+        {% if not order.finalized_ts and not order.expired %}
             <p>
                 <button type="submit" class="btn btn-primary">
                     {% if order.processed_ts %}

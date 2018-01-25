@@ -137,7 +137,7 @@ class Order
         }
         $this->app = $app;
         $this->order = $order;
-        $this->order['freezed'] = $this->isOrderFreezed();
+        $this->order['expired'] = $this->isOrderExpired();
         $this->participant = $participant;
         if (empty($order['version'])) {
             self::$version = 1;
@@ -282,7 +282,7 @@ class Order
 
     public function createOrderForm($set, $formFactory)
     {
-        $disabled = $this->order['finalized_ts'] || $this->order['freezed'] ? true : false;
+        $disabled = $this->order['finalized_ts'] || $this->order['expired'] ? true : false;
 
         switch ($set) {
             case 'collected':
@@ -832,7 +832,7 @@ class Order
         return $class;
     }
 
-    public function isOrderFreezed()
+    public function isOrderExpired()
     {
         return empty($this->order['finalized_ts']) && empty($this->order['version']);
     }

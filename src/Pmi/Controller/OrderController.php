@@ -198,7 +198,7 @@ class OrderController extends AbstractController
     public function orderPrintLabelsAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts') || $order->isOrderFreezed()) {
+        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
             $app->abort(403);
         }
         if (!in_array('printLabels', $order->getAvailableSteps())) {
@@ -477,7 +477,7 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts') || $order->isOrderFreezed()) {
+        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
             $app->abort(403);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
