@@ -526,7 +526,7 @@ class DeployCommand extends Command {
     /** Enhance instance class and scaling */
     private function configureScaling(&$config)
     {
-        $config['instance_class'] = 'F2'; // 256MB, 1.2 GHz
+        $config['instance_class'] = 'F4'; // 512MB, 2.4 GHz
         // improve user experience during low traffic
         $config['automatic_scaling']['min_idle_instances'] = 2;
     }
