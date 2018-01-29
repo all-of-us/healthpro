@@ -176,7 +176,7 @@ class OrderController extends AbstractController
     public function orderLabelsPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts')) {
+        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
             $app->abort(403);
         }
         if (!in_array('printLabels', $order->getAvailableSteps())) {
@@ -236,7 +236,7 @@ class OrderController extends AbstractController
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
-            if ($order->get('finalized_ts')) {
+            if ($order->get('finalized_ts') || $order->isOrderExpired()) {
                 $app->abort(403);
             }
 
@@ -337,7 +337,7 @@ class OrderController extends AbstractController
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
         if ($processForm->isSubmitted()) {
-            if ($order->get('finalized_ts')) {
+            if ($order->get('finalized_ts') || $order->isOrderExpired()) {
                 $app->abort(403);
             }
             if ($processForm->has('processed_samples')) {
@@ -405,7 +405,7 @@ class OrderController extends AbstractController
         $finalizeForm = $order->createOrderForm('finalized', $app['form.factory']);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {
-            if ($order->get('finalized_ts')) {
+            if ($order->get('finalized_ts') || $order->isOrderExpired()) {
                 $app->abort(403);
             }
             $errors = $order->getErrors();
@@ -563,7 +563,7 @@ class OrderController extends AbstractController
     public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts')) {
+        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
             $app->abort(403);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
