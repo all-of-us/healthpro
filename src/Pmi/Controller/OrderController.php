@@ -650,8 +650,6 @@ class OrderController extends AbstractController
                 'order_id' => $orderData['order_id'],
                 'collected_at' => $collectedAt->format('c'),
                 'mayoClientId' => $mayoClientId,
-                'siteId' => $app->getSiteId(),
-                'organizationId' => $app->getSiteOrganization(),
                 'collected_samples' => $orderData["{$type}_samples"],
                 'centrifugeType' => $orderData['processed_centrifuge_type'],
                 'version' => $orderData['version']
