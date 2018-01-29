@@ -219,7 +219,12 @@ class WorkQueueController extends AbstractController
 
             // Set to selected organization
             if (isset($params['organization'])) {
+                // Check if the awardee has access to this organization
+                if (!in_array($params['organization'], $app->getAwardeeOrganization())) {
+                    $app->abort(403);
+                }
                 $organization = $params['organization'];
+                unset($params['organization']);
             }
             // Save selected (or default) organization in session
             $app['session']->set('awardeeOrganization', $organization);
