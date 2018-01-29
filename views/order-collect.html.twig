@@ -42,7 +42,7 @@
         </div>
 
         {{ form_rest(collectForm) }}
-        {% if not order.finalized_ts %}
+        {% if not order.finalized_ts and not order.expired %}
             <p>
                 <button type="submit" class="btn btn-primary" name="save">Save</button>
                 {% if not order.mayo_id  and order.type != 'kit' %}
