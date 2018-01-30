@@ -10,6 +10,7 @@ class RdrParticipants
     protected $client;
     protected $cacheEnabled = true;
     protected static $resourceEndpoint = 'rdr/v1/';
+    protected $nextToken;
 
     public function __construct(RdrHelper $rdrHelper)
     {
@@ -88,8 +89,11 @@ class RdrParticipants
         return $results;
     }
 
-    public function listParticipantSummaries($params)
+    public function listParticipantSummaries($params, $next = false)
     {
+        if ($next && $this->nextToken) {
+            $params['_token'] = $this->nextToken;
+        }
         try {
             $response = $this->getClient()->request('GET', 'ParticipantSummary', [
                 'query' => $params
@@ -106,7 +110,18 @@ class RdrParticipants
         if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
             return [];
         }
-
+        if (isset($responseObject->link) && is_array($responseObject->link)) {
+            foreach ($responseObject->link as $link) {
+                if ($link->relation === 'next') {
+                    $queryString = parse_url($link->url, PHP_URL_QUERY);
+                    parse_str($queryString, $nextParameters);
+                    if (isset($nextParameters['_token'])) {
+                        $this->nextToken = $nextParameters['_token'];
+                    }
+                    break;
+                }
+            }
+        }
         return $responseObject->entry;
     }
 
