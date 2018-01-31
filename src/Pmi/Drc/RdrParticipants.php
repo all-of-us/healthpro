@@ -94,6 +94,7 @@ class RdrParticipants
         if ($next && $this->nextToken) {
             $params['_token'] = $this->nextToken;
         }
+        $this->nextToken = null;
         try {
             $response = $this->getClient()->request('GET', 'ParticipantSummary', [
                 'query' => $params
@@ -123,6 +124,11 @@ class RdrParticipants
             }
         }
         return $responseObject->entry;
+    }
+
+    public function getNextToken()
+    {
+        return $this->nextToken;
     }
 
     public function getById($id, $refresh = null)
