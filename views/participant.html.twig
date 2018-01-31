@@ -386,6 +386,12 @@
                                     </dl>
                                     <div class="text-center">
                                         {% for field, label in samples %}
+                                            {% if attribute(samplesAlias, field) is defined %}
+                                                {% set sampleAlias = attribute(samplesAlias, field) %}
+                                                {% if attribute(participant, 'sampleStatus' ~ sampleAlias) == 'RECEIVED' %}
+                                                    {% set field = sampleAlias %}
+                                                {% endif %}
+                                            {% endif %}
                                             <div class="participant-detail-status">
                                                 <strong>{{ label }}</strong>
                                                 {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
