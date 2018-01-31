@@ -381,6 +381,12 @@ class WorkQueueController extends AbstractController
                 $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                 $row[] = $participant->numBaselineSamplesArrived;
                 foreach (self::$samples as $sample => $label) {
+                    if (array_key_exists($sample, self::$samplesAlias)) {
+                        $sampleAlias = self::$samplesAlias[$sample];
+                        if ($participant->{"sampleStatus{$sampleAlias}"} == 'RECEIVED') {
+                            $sample = $sampleAlias;
+                        }
+                    }
                     $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
                     $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"});
                 }
