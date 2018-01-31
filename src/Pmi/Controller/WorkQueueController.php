@@ -140,6 +140,10 @@ class WorkQueueController extends AbstractController
         '1UR10' => 'Urine 10 mL',
         '1SAL' => 'Saliva'
     ];
+    public static $samplesAlias = [
+        '1SST8' => '1SS08',
+        '1PST8' => '1PS08'
+    ];
     protected $rdrError = false;
 
     protected function participantSummarySearch($organization, &$params, $app)
@@ -232,7 +236,8 @@ class WorkQueueController extends AbstractController
             'participants' => $participants,
             'params' => $params,
             'organization' => $organization,
-            'isRdrError' => $this->rdrError
+            'isRdrError' => $this->rdrError,
+            'samplesAlias' => self::$samplesAlias
         ]);
     }
 

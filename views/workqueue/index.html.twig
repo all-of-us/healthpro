@@ -205,6 +205,12 @@
                         {{ participant.numBaselineSamplesArrived }}
                     </td>
                     {% for field, label in samples %}
+                        {% if attribute(samplesAlias, field) is defined %}
+                            {% set sampleAlias = attribute(samplesAlias, field) %}
+                            {% if attribute(participant, 'sampleStatus' ~ sampleAlias) == 'RECEIVED' %}
+                                {% set field = sampleAlias %}
+                            {% endif %}
+                        {% endif %}
                         <td class="text-center" data-order="{{ attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' ? '1' : '0' }}">
                             {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
