@@ -9,5 +9,6 @@ CREATE TABLE `sites` (
   `awardee` varchar(100) DEFAULT NULL, 
   `email` varchar(512) DEFAULT NULL,
   `centrifuge_type` varchar(50) NULL DEFAULT NULL,
+  `workqueue_download` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8mb4;

@@ -17,8 +17,12 @@ use Pmi\Order\Order;
 class AdminController extends AbstractController
 {
     protected static $name = 'admin';
+
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
+    const FULL_DATA_ACCESS = 'full_data';
+    const LIMITED_DATA_ACCESS = 'limited_data';
+    const DOWNLOAD_DISABLED = 'disabled';
 
     protected static $routes = [
         ['home', '/'],
@@ -184,6 +188,20 @@ class AdminController extends AbstractController
                     'Swinging Bucket' => self::SWINGING_BUCKET
                 ],
                 'multiple' => false
+            ])
+            ->add('workqueue_download', Type\ChoiceType::class, [
+                'label' => 'Work Qeue Download',
+                'required' => true,
+                'choices' => [
+                    'Full Data Access'=> self::FULL_DATA_ACCESS,
+                    'Limited Data Access (No PII)' => self::LIMITED_DATA_ACCESS,
+                    'Download Disabled' => self::DOWNLOAD_DISABLED
+                ],
+                'multiple' => false,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ]
             ])
             ->getForm();
     }

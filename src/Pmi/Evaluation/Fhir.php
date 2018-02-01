@@ -5,6 +5,7 @@ use Pmi\Util;
 
 class Fhir
 {
+    const CURRENT_VERSION = 2;
     protected $data;
     protected $schema;
     protected $patient;
@@ -12,6 +13,7 @@ class Fhir
     protected $date;
     protected $metricUrns;
     protected $parentRdr;
+    protected $summary;
 
     public function __construct(array $options)
     {
@@ -30,6 +32,21 @@ class Fhir
         $this->createdSite = $options['created_site'];
         $this->finalizedUser = $options['finalized_user'];
         $this->finalizedSite = $options['finalized_site'];
+        $this->summary = $options['summary'];
+    }
+
+    protected static function ordinalLabel($text, $replicate)
+    {
+        switch ($replicate) {
+            case 1:
+                return 'First ' . $text;
+            case 2:
+                return 'Second ' . $text;
+            case 3:
+                return 'Third ' . $text;
+            default:
+                return ucfirst($text);
+        }
     }
 
     /*
@@ -77,6 +94,13 @@ class Fhir
                 $metrics[] = $field->name;
             }
         }
+
+        if (in_array('wheelchair', $metrics) || in_array('pregnant', $metrics)) {
+            $metrics[] = 'hip-circumference-1';
+            $metrics[] = 'hip-circumference-2';
+            $metrics[] = 'waist-circumference-1';
+            $metrics[] = 'waist-circumference-2';
+        }
         // add bmi if height and weight are both included
         if (in_array('height', $metrics) && in_array('weight', $metrics)) {
             $metrics[] = 'bmi';
@@ -97,6 +121,28 @@ class Fhir
                 unset($metrics[$k]);
             }
         }
+
+        // add computed means
+        if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
+            $metrics[] = 'blood-pressure-mean';
+        }
+        if (in_array('heart-rate-2', $metrics) || in_array('heart-rate-3', $metrics)) {
+            $metrics[] = 'heart-rate-mean';
+        }
+        if (in_array('hip-circumference-1', $metrics) || in_array('hip-circumference-2', $metrics) || in_array('hip-circumference-3', $metrics)) {
+            $metrics[] = 'hip-circumference-mean';
+        }
+        if (in_array('waist-circumference-1', $metrics) || in_array('waist-circumference-2', $metrics) || in_array('waist-circumference-3', $metrics)) {
+            $metrics[] = 'waist-circumference-mean';
+        }
+
+        // move notes to end
+        $notesIndex = array_search('notes', $metrics);
+        if ($notesIndex !== false) {
+            unset($metrics[$notesIndex]);
+            $metrics[] = 'notes';
+        }
+
         $metrics = array_values($metrics);
 
         // set urns
@@ -174,17 +220,13 @@ class Fhir
         return $composition;
     }
 
-    protected function simpleMetric($metric, $value, $display, $code, $unit, $system = 'http://loinc.org')
+    protected function simpleMetric($metric, $value, $display, $unit, $codes)
     {
         $entry = [
             'fullUrl' => $this->metricUrns[$metric],
             'resource' => [
                 'code' => [
-                    'coding' => [[
-                        'code' => $code,
-                        'display' => $display,
-                        'system' => $system
-                    ]],
+                    'coding' => $codes,
                     'text' => $display
                 ],
                 'effectiveDateTime' => $this->date,
@@ -216,20 +258,34 @@ class Fhir
                 ]
             ]];
         }
+        if (strpos($metric, 'circumference') !== false) {
+            if ($this->data->pregnant) {
+                $entry['resource']['related'][] = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns['pregnant']
+                    ]
+                ];
+            }
+            if ($this->data->wheelchair) {
+                $entry['resource']['related'][] = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns['wheelchair']
+                    ]
+                ];
+            }
+        }
         return $entry;
     }
 
-    protected function valueMetric($metric, $value, $display, $codeCode, $valueCode, $codeSystem = 'http://loinc.org', $valueSystem = 'http://loinc.org')
+    protected function valueMetric($metric, $value, $display, $codeCodes, $valueCodes)
     {
         return [
             'fullUrl' => $this->metricUrns[$metric],
             'resource' => [
                 'code' => [
-                    'coding' => [[
-                        'code' => $codeCode,
-                        'display' => $display,
-                        'system' => $codeSystem
-                    ]],
+                    'coding' => $codeCodes,
                     'text' => $display
                 ],
                 'effectiveDateTime' => $this->date,
@@ -239,20 +295,39 @@ class Fhir
                     'reference' => "Patient/{$this->patient}"
                 ],
                 'valueCodeableConcept' => [
-                    'coding' => [[
-                        'code' => $valueCode,
-                        'display' => $value,
-                        'system' => $valueSystem
-                    ]],
+                    'coding' => $valueCodes,
                     'text' => $value
                 ]
             ]
         ];
     }
 
+    protected function stringMetric($metric, $value, $display, $codes)
+    {
+        $entry = [
+            'fullUrl' => $this->metricUrns[$metric],
+            'resource' => [
+                'code' => [
+                    'coding' => $codes,
+                    'text' => $display
+                ],
+                'effectiveDateTime' => $this->date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->patient}"
+                ]
+            ]
+        ];
+        if (!is_null($value)) {
+            $entry['resource']['valueString'] = (string)$value;
+        }
+        return $entry;
+    }
+
     protected function protocolModification($metric, $replicate = null)
     {
-        $codeDisplay = "Protocol modifications: " . ucfirst(str_replace('-', ' ', $metric));
+        $codeDisplay = ucfirst(str_replace('-', ' ', $metric)) . ' protocol modifications';
         if (is_null($replicate)) {
             $conceptCode = $this->data->{"{$metric}-protocol-modification"};
             $urnKey = $metric . '-protocol-modification';
@@ -264,6 +339,10 @@ class Fhir
         }
         $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
         $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
+        // Change wheelchair concept code
+        if ($conceptCode === 'wheelchair-bound') {
+            $conceptCode = 'wheelchair-user';
+        }
         return [
             'fullUrl' => $this->metricUrns[$urnKey],
             'resource' => [
@@ -271,7 +350,7 @@ class Fhir
                     'coding' => [[
                         'code' => "protocol-modifications-{$metric}",
                         'display' => $codeDisplay,
-                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                     ]],
                     'text' => $codeDisplay
                 ],
@@ -285,7 +364,7 @@ class Fhir
                     'coding' => [[
                         'code' => $conceptCode,
                         'display' => $conceptDisplay,
-                        'system' => "http://terminology.pmi-ops.org/CodeSystem/{$conceptCode}"
+                        'system' => "http://terminology.pmi-ops.org/CodeSystem/protocol-modifications-{$metric}"
                     ]],
                     'text' => ($conceptCode === 'other' && !empty($notes)) ? $notes : $conceptDisplay
                 ]
@@ -295,7 +374,7 @@ class Fhir
 
     protected function protocolModificationManual($metric, $replicate = null)
     {
-        $codeDisplay = "Protocol modifications: " . ucfirst(str_replace('-', ' ', $metric));
+        $codeDisplay = ucfirst(str_replace('-', ' ', $metric)) . ' protocol modifications';
         $conceptCode = 'manual-'.$metric;
         if (is_null($replicate)) {
             $urnKey = $conceptCode;
@@ -310,7 +389,7 @@ class Fhir
                     'coding' => [[
                         'code' => "protocol-modifications-{$metric}",
                         'display' => $codeDisplay,
-                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                     ]],
                     'text' => $codeDisplay
                 ],
@@ -324,7 +403,7 @@ class Fhir
                     'coding' => [[
                         'code' => $conceptCode,
                         'display' => $conceptDisplay,
-                        'system' => "http://terminology.pmi-ops.org/CodeSystem/{$conceptCode}"
+                        'system' => "http://terminology.pmi-ops.org/CodeSystem/protocol-modifications-{$metric}"
                     ]],
                     'text' => $conceptDisplay
                 ]
@@ -337,9 +416,20 @@ class Fhir
         return $this->simpleMetric(
             'height',
             $this->data->height,
-            'Body height',
-            '8302-2',
-            'cm'
+            'Height',
+            'cm',
+            [
+                [
+                    'code' => '8302-2',
+                    'display' => 'Body height',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'height',
+                    'display' => 'Height',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
         );
     }
 
@@ -348,9 +438,20 @@ class Fhir
         return $this->simpleMetric(
             'weight',
             $this->data->weight,
-            'Body weight',
-            '29463-7',
-            'kg'
+            'Weight',
+            'kg',
+            [
+                [
+                    'code' => '29463-7',
+                    'display' => 'Body weight',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'weight',
+                    'display' => 'Weight',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
         );
     }
 
@@ -360,9 +461,12 @@ class Fhir
             'weight-prepregnancy',
             $this->data->{'weight-prepregnancy'},
             'Approximate pre-pregnancy weight',
-            'pre-pregnancy-weight',
             'kg',
-            'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
+            [[
+                'code' => 'pre-pregnancy-weight',
+                'display' => 'Approximate pre-pregnancy weight',
+                'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+            ]]
         );
     }
 
@@ -373,10 +477,32 @@ class Fhir
         }
         return $this->valueMetric(
             'pregnant',
-            'Yes (pregnant)',
-            'Are you currently pregnant?',
-            '66174-4',
-            'LA33-6'
+            'Pregnant',
+            'Is the participant pregnant?',
+            [
+                [
+                    'code' => '66174-4',
+                    'display' => 'Are you currently pregnant?',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'pregnancy-status',
+                    'display' => 'Is the participant pregnant?',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            [
+                [
+                    'code' => 'LA33-6',
+                    'display' => 'Yes (pregnant)',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'pregnant',
+                    'display' => 'Participant is pregnant',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/pregnancy-status'
+                ]
+            ]
         );
     }
 
@@ -387,12 +513,18 @@ class Fhir
         }
         return $this->valueMetric(
             'wheelchair',
-            'Wheelchair bound',
-            'Are you wheelchair-bound?',
-            'wheelchair-bound-status',
-            'wheelchair-bound',
-            'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation',
-            'http://terminology.pmi-ops.org/CodeSystem/wheelchair-bound-status'
+            'Wheelchair user',
+            'Is the participant a wheelchair user?',
+            [[
+                'code' => 'wheelchair-user-status',
+                'display' => 'Is the participant a wheelchair user?',
+                'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+            ]],
+            [[
+                'code' => 'wheelchair-user',
+                'display' => 'Participant is wheelchair user',
+                'system' => 'http://terminology.pmi-ops.org/CodeSystem/wheelchair-user-status'
+            ]]
         );
     }
 
@@ -403,81 +535,112 @@ class Fhir
         }
         $cm = $this->data->height / 100;
         $bmi = round($this->data->weight / ($cm * $cm), 1);
-        return $this->simpleMetric(
+        $entry = $this->simpleMetric(
             'bmi',
             $bmi,
-            'Body mass index',
-            '39156-5',
-            'kg/m2'
+            'Computed body mass index',
+            'kg/m2',
+            [
+                [
+                    'code' => '39156-5',
+                    'display' => 'Body mass index',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'bmi',
+                    'display' => 'Computed body mass index',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
         );
+        $related = [];
+        foreach (['height-protocol-modification', 'weight-protocol-modification'] as $metric) {
+            if (array_key_exists($metric, $this->metricUrns)) {
+                $related[] = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns[$metric]
+                    ]
+                ];
+            }
+        }
+        if ($related) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
     }
 
-    /*
-     * Heart rate was made a replicate metric starting in 0.1.3
-     * this method is backwards compatible to handle both
-     */
     protected function heartrate($replicate = null)
     {
         $entry = $this->simpleMetric(
-            is_null($replicate) ? 'heart-rate' : 'heart-rate-' . $replicate,
-            is_null($replicate) ? $this->data->{'heart-rate'} : $this->data->{'heart-rate'}[$replicate - 1],
-            'Heart rate',
-            '8867-4',
-            '/min'
-        );
-        if ($replicate) {
-            if ($this->data->{'irregular-heart-rate'}[$replicate - 1]) {
-                $concept = [
-                    'coding' => [[
-                        'code' => 'irregularity-detected',
-                        'display' => 'Irregularity detected',
-                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
-                    ]],
-                    'text' => 'Irregularity detected'
-                ];
-            } else {
-                $concept = [
-                    'coding' => [[
-                        'code' => 'no-irregularity-detected',
-                        'display' => 'No irregularity detected',
-                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
-                    ]],
-                    'text' => 'No irregularity detected'
-                ];
-            }
-            $entry['resource']['component'] = [[
-                'code' => [
-                    'coding' => [[
-                        'code' => 'heart-rhythm-status',
-                        'display' => 'Heart rhythm status',
-                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-evaluation'
-                    ]],
-                    'text' => 'Heart rhythm status'
+            'heart-rate-' . $replicate,
+            $this->data->{'heart-rate'}[$replicate - 1],
+            self::ordinalLabel('heart rate', $replicate),
+            '/min',
+            [
+                [
+                    'code' => '8867-4',
+                    'display' => 'Heart rate',
+                    'system' => 'http://loinc.org'
                 ],
-                'valueCodeableConcept' => $concept
+                [
+                    'code' => 'heart-rate-' . $replicate,
+                    'display' => self::ordinalLabel('heart rate', $replicate),
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if ($this->data->{'irregular-heart-rate'}[$replicate - 1]) {
+            $concept = [
+                'coding' => [[
+                    'code' => 'irregularity-detected',
+                    'display' => 'Irregularity detected',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
+                ]],
+                'text' => 'Irregularity detected'
+            ];
+        } else {
+            $concept = [
+                'coding' => [[
+                    'code' => 'no-irregularity-detected',
+                    'display' => 'No irregularity detected',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
+                ]],
+                'text' => 'No irregularity detected'
+            ];
+        }
+        $entry['resource']['component'] = [[
+            'code' => [
+                'coding' => [[
+                    'code' => 'heart-rhythm-status',
+                    'display' => 'Heart rhythm status',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]],
+                'text' => 'Heart rhythm status'
+            ],
+            'valueCodeableConcept' => $concept
+        ]];
+        $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
+        $modificationMetricManual = 'manual-heart-rate-' . $replicate;
+        if (array_key_exists($modificationMetric, $this->metricUrns)) {
+            $entry['resource']['related'] = [[
+                'type' => 'qualified-by',
+                'target' => [
+                    'reference' => $this->metricUrns[$modificationMetric]
+                ]
             ]];
-            $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
-            $modificationMetricManual = 'manual-heart-rate-' . $replicate;
-            if (array_key_exists($modificationMetric, $this->metricUrns)) {
-                $entry['resource']['related'] = [[
-                    'type' => 'qualified-by',
-                    'target' => [
-                        'reference' => $this->metricUrns[$modificationMetric]
-                    ]
-                ]];
-            }
-            if (array_key_exists($modificationMetricManual, $this->metricUrns)) {
-                $qualifiedBy = [
-                    'type' => 'qualified-by',
-                    'target' => [
-                        'reference' => $this->metricUrns[$modificationMetricManual]
-                    ]
-                ];
-                if (empty($entry['resource']['related'])) {
-                    $entry['resource']['related'] = [$qualifiedBy];
-                } else {
-                    $entry['resource']['related'][] = $qualifiedBy;
-                }
+        }
+        if (array_key_exists($modificationMetricManual, $this->metricUrns)) {
+            $qualifiedBy = [
+                'type' => 'qualified-by',
+                'target' => [
+                    'reference' => $this->metricUrns[$modificationMetricManual]
+                ]
+            ];
+            if (empty($entry['resource']['related'])) {
+                $entry['resource']['related'] = [$qualifiedBy];
+            } else {
+                $entry['resource']['related'][] = $qualifiedBy;
             }
         }
 
@@ -489,9 +652,20 @@ class Fhir
         return $this->simpleMetric(
             'hip-circumference-' . $replicate,
             $this->data->{'hip-circumference'}[$replicate - 1],
-            'Hip circumference',
-            '62409-8',
-            'cm'
+            self::ordinalLabel('hip circumference', $replicate),
+            'cm',
+            [
+                [
+                    'code' => '62409-8',
+                    'display' => 'Hip circumference',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'hip-circumference-' . $replicate,
+                    'display' => self::ordinalLabel('hip circumference', $replicate),
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
         );
     }
 
@@ -500,9 +674,20 @@ class Fhir
         $entry = $this->simpleMetric(
             'waist-circumference-' . $replicate,
             $this->data->{'waist-circumference'}[$replicate - 1],
-            'Waist circumference',
-            '56086-2',
-            'cm'
+            self::ordinalLabel('waist circumference', $replicate),
+            'cm',
+            [
+                [
+                    'code' => '56086-2',
+                    'display' => 'Waist circumference',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'waist-circumference-' . $replicate,
+                    'display' => self::ordinalLabel('waist circumference', $replicate),
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
         );
         if (isset($this->data->{'waist-circumference-location'})) {
             $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
@@ -510,30 +695,35 @@ class Fhir
         return $entry;  
     }
 
-
-    protected function getBpBodySite($replicate)
+    protected function getBpBodySite($location)
     {
-        if (is_array($this->data->{'blood-pressure-location'})) {
-            $location = $this->data->{'blood-pressure-location'}[$replicate - 1];
-        } else {
-            $location = $this->data->{'blood-pressure-location'};
-        }
         switch ($location) {
             case 'Left arm':
                 $locationSnomed = '368208006';
+                $locationPmi = 'left-arm';
                 $locationDisplay = 'Left arm';
                 break;
-            default:
+            case 'Right arm':
                 $locationSnomed = '368209003';
+                $locationPmi = 'right-arm';
                 $locationDisplay = 'Right arm';
                 break;
+            default:
+                return null;
         }
         return [
-            'coding' => [[
-                'code' => $locationSnomed,
-                'display' => $locationDisplay,
-                'system' => 'http://snomed.info/sct'
-            ]],
+            'coding' => [
+                [
+                    'code' => $locationSnomed,
+                    'display' => $locationDisplay,
+                    'system' => 'http://snomed.info/sct'
+                ],
+                [
+                    'code' => $locationPmi,
+                    'display' => $locationDisplay,
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/blood-pressure-location'
+                ]
+            ],
             'text' => $locationDisplay
         ];
     }
@@ -552,32 +742,62 @@ class Fhir
         ];
     }
 
+    /*
+     * $replicate can be integer for replicate number OR 'mean'
+     */
     protected function getBpComponent($component, $replicate)
     {
         switch ($component) {
             case 'systolic':
-                $loinc = '8480-6';
-                $display = 'Systolic blood pressure';
+                $loincCode = '8480-6';
+                $loincDisplay = 'Systolic blood pressure';
+                $pmiCode = 'blood-pressure-systolic-' . $replicate;
+                if ($replicate === 'mean') {
+                    $pmiDisplay = 'Computed systolic blood pressure, mean of 2nd and 3rd measures';
+                } else {
+                    $pmiDisplay = self::ordinalLabel('systolic blood pressure', $replicate);
+                }
                 break;
             case 'diastolic':
-                $loinc = '8462-4';
-                $display = 'Diastolic blood pressure';
+                $loincCode = '8462-4';
+                $loincDisplay = 'Diastolic blood pressure';
+                $pmiCode = 'blood-pressure-diastolic-' . $replicate;
+                if ($replicate === 'mean') {
+                    $pmiDisplay = 'Computed diastolic blood pressure, mean of 2nd and 3rd measures';
+                } else {
+                    $pmiDisplay = self::ordinalLabel('diastolic blood pressure', $replicate);
+                }
                 break;
             default:
                 throw new \Exception('Invalid blood pressure component');
         }
-        $value = $this->data->{'blood-pressure-' . $component}[$replicate - 1];
+        if ($replicate === 'mean') {
+            if (isset($this->summary['bloodpressure']) && isset($this->summary['bloodpressure'][$component])) {
+                $value = $this->summary['bloodpressure'][$component];
+            } else {
+                $value = null;
+            }
+        } else {
+            $value = $this->data->{'blood-pressure-' . $component}[$replicate - 1];
+        }
         if (is_null($value)) {
             return null;
         }
         return [
             'code' => [
-                'coding' => [[
-                    'code' => $loinc,
-                    'display' => $display,
-                    'system' => 'http://loinc.org'
-                ]],
-                'text' => $display
+                'coding' => [
+                    [
+                        'code' => $loincCode,
+                        'display' => $loincDisplay,
+                        'system' => 'http://loinc.org'
+                    ],
+                    [
+                        'code' => $pmiCode,
+                        'display' => $pmiDisplay,
+                        'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                    ]
+                ],
+                'text' => $pmiDisplay
             ],
             'valueQuantity' => [
                 'code' => 'mm[Hg]',
@@ -599,12 +819,19 @@ class Fhir
             'fullUrl' => $this->metricUrns['blood-pressure-' . $replicate],
             'resource' => [
                 'code' => [
-                    'coding' => [[
-                        'code' => '55284-4',
-                        'display' => 'Blood pressure systolic and diastolic',
-                        'system' => 'http://loinc.org'
-                    ]],
-                    'text' => 'Blood pressure systolic and diastolic'
+                    'coding' => [
+                        [
+                            'code' => '55284-4',
+                            'display' => 'Blood pressure systolic and diastolic',
+                            'system' => 'http://loinc.org'
+                        ],
+                        [
+                            'code' => 'blood-pressure-' . $replicate,
+                            'display' => self::ordinalLabel('blood pressure systolic and diastolic', $replicate),
+                            'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                        ]
+                    ],
+                    'text' => self::ordinalLabel('blood pressure systolic and diastolic', $replicate)
                 ],
                 'component' => $components,
                 'effectiveDateTime' => $this->date,
@@ -616,7 +843,7 @@ class Fhir
             ]
         ];
         if (isset($this->data->{'blood-pressure-location'})) {
-            $entry['resource']['bodySite'] = $this->getBpBodySite($replicate);
+            $entry['resource']['bodySite'] = $this->getBpBodySite($this->data->{'blood-pressure-location'});
         }
         $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
         $modificationMetricManual = 'manual-blood-pressure-' . $replicate;
@@ -677,6 +904,205 @@ class Fhir
     protected function weightprotocolmodification()
     {
         return $this->protocolModification('weight');
+    }
+
+    protected function meanProtocolModifications($replicates, $modificationMetric, $modificationMetricManual = null)
+    {
+        $related = [];
+        foreach ($replicates as $replicate) {
+            $metric = $modificationMetric . $replicate;
+            if (array_key_exists($metric, $this->metricUrns)) {
+                $related[] = [
+                    'type' => 'qualified-by',
+                    'target' => [
+                        'reference' => $this->metricUrns[$metric]
+                    ]
+                ];
+            }
+            if ($modificationMetricManual) {
+                $metricManual = $modificationMetricManual . $replicate;
+                if (array_key_exists($metricManual, $this->metricUrns)) {
+                    $related[] = [
+                        'type' => 'qualified-by',
+                        'target' => [
+                            'reference' => $this->metricUrns[$metricManual]
+                        ]
+                    ];
+                }
+            }
+        }
+        return $related;
+    }
+
+    protected function bloodpressuremean()
+    {
+        $components = [
+            $this->getBpComponent('systolic', 'mean'),
+            $this->getBpComponent('diastolic', 'mean')
+        ];
+        $components = array_filter($components); // remove components that return null
+        $entry = [
+            'fullUrl' => $this->metricUrns['blood-pressure-mean'],
+            'resource' => [
+                'code' => [
+                    'coding' => [
+                        [
+                            'code' => '55284-4',
+                            'display' => 'Blood pressure systolic and diastolic',
+                            'system' => 'http://loinc.org'
+                        ],
+                        [
+                            'code' => 'blood-pressure-mean',
+                            'display' => 'Computed blood pressure systolic and diastolic, mean of 2nd and 3rd measures',
+                            'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                        ]
+                    ],
+                    'text' => 'Computed blood pressure systolic and diastolic, mean of 2nd and 3rd measures'
+                ],
+                'component' => $components,
+                'effectiveDateTime' => $this->date,
+                'resourceType' => 'Observation',
+                'status' => 'final',
+                'subject' => [
+                    'reference' => "Patient/{$this->patient}"
+                ]
+            ]
+        ];
+        if (isset($this->data->{'blood-pressure-location'})) {
+            $entry['resource']['bodySite'] = $this->getBpBodySite($this->data->{'blood-pressure-location'});
+        }
+        if ($related = $this->meanProtocolModifications([2,3], 'blood-pressure-protocol-modification-', 'manual-blood-pressure-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
+    }
+
+    protected function heartratemean()
+    {
+        $entry = $this->simpleMetric(
+            'heart-rate-mean',
+            isset($this->summary['heartrate']) ? $this->summary['heartrate'] : null,
+            'Computed heart rate, mean of 2nd and 3rd measures',
+            '/min',
+            [
+                [
+                    'code' => '8867-4',
+                    'display' => 'Heart rate',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'heart-rate-mean',
+                    'display' => 'Computed heart rate, mean of 2nd and 3rd measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if ($this->data->{'irregular-heart-rate'}[1] && $this->data->{'irregular-heart-rate'}[2]) {
+            $concept = [
+                'coding' => [[
+                    'code' => 'irregularity-detected',
+                    'display' => 'Irregularity detected',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
+                ]],
+                'text' => 'Irregularity detected'
+            ];
+        } else {
+            $concept = [
+                'coding' => [[
+                    'code' => 'no-irregularity-detected',
+                    'display' => 'No irregularity detected',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/heart-rhythm-status'
+                ]],
+                'text' => 'No irregularity detected'
+            ];
+        }
+        $entry['resource']['component'] = [[
+            'code' => [
+                'coding' => [[
+                    'code' => 'heart-rhythm-status',
+                    'display' => 'Heart rhythm status',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]],
+                'text' => 'Heart rhythm status'
+            ],
+            'valueCodeableConcept' => $concept
+        ]];
+        if ($related = $this->meanProtocolModifications([2,3], 'blood-pressure-protocol-modification-', 'manual-heart-rate-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
+    }
+
+    protected function hipcircumferencemean()
+    {
+        $entry = $this->simpleMetric(
+            'hip-circumference-mean',
+            !empty($this->summary['hip']['cm']) ? $this->summary['hip']['cm'] : null,
+            'Computed hip circumference, mean of closest two measures',
+            'cm',
+            [
+                [
+                    'code' => '62409-8',
+                    'display' => 'Hip circumference',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'hip-circumference-mean',
+                    'display' => 'Computed hip circumference, mean of closest two measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if ($related = $this->meanProtocolModifications([1,2,3], 'hip-circumference-protocol-modification-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
+    }
+
+    protected function waistcircumferencemean()
+    {
+        $entry = $this->simpleMetric(
+            'waist-circumference-mean',
+            !empty($this->summary['waist']['cm']) ? $this->summary['waist']['cm'] : null,
+            'Computed waist circumference, mean of closest two measures',
+            'cm',
+            [
+                [
+                    'code' => '56086-2',
+                    'display' => 'Waist circumference',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'waist-circumference-mean',
+                    'display' => 'Computed waist circumference, mean of closest two measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if (isset($this->data->{'waist-circumference-location'})) {
+            $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
+        }
+        if ($related = $this->meanProtocolModifications([1,2,3], 'waist-circumference-protocol-modification-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;  
+    }
+
+    protected function notes()
+    {
+        if (!$this->data->notes) {
+            return;
+        }
+        return $this->stringMetric(
+            'notes',
+            $this->data->notes,
+            'Additional notes',
+            [[
+                'code' =>  'notes',
+                'display' =>  'Additional notes',
+                'system' =>  'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+            ]]
+        );
     }
 
     protected function getEntry($metric)

@@ -29,11 +29,16 @@
                 <p>This plot will show various participant metrics and their associated values grouped over time. The available
                 metrics include:</p>
                 <ul>
-                    <li><strong>Total Participants</strong> (registered)</li>
-                    <li><strong>Registration Status</strong> (interested vs. registered vs. full participants)</li>
+                    <li><strong>Enrollment Status</strong>:</li>
+                    <ul>
+                        <li><strong>Registered</strong>: a person who has created an account by entering their name, email address, chosen a language preference, but has not yet completed the informed consent process.</li>
+                        <li><strong>Member</strong>: a registered individual who has completed primary consent and EHR consent</li>
+                        <li><strong>Full Participant</strong>: a member who has completed all baseline PPI modules and physical measurements, and for whom samples to isolate DNA have been received by the Biobank.</li>
+                    </ul>
                     <li><strong>Gender Identity</strong></li>
                     <li><strong>Age Range</strong></li>
                     <li><strong>Race</strong></li>
+                    <li><strong>Total Registered Participants</strong></li>
                 </ul>
                 <p>The Total Progress to date plot has an additional start date to specify a discrete range of dates to calculate
                     (this defaults to one week from the current date). You can also choose to see of rollup of values bucketed
@@ -83,8 +88,41 @@
     </div>
 </div>
 
+<div class="modal fade" id="display-metrics-help-modal" tabindex="-1" role="dialog" aria-labelledby="loading-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-center">Display Metrics Help</h2>
+            </div>
+            <div class="modal-body">
+                <p>This plot will show various participant metrics and their associated values grouped over time. The available
+                    metrics include:</p>
+                <ul>
+                    <li><strong>Enrollment Status</strong>:</li>
+                    <ul>
+                        <li><strong>Registered</strong>: a person who has created an account by entering their name, email address, chosen a language preference, but has not yet completed the informed consent process.</li>
+                        <li><strong>Member</strong>: a registered individual who has completed primary consent and EHR consent</li>
+                        <li><strong>Full Participant</strong>: a member who has completed all baseline PPI modules and physical measurements, and for whom samples to isolate DNA have been received by the Biobank.</li>
+                    </ul>
+                    <li><strong>Gender Identity</strong></li>
+                    <li><strong>Age Range</strong></li>
+                    <li><strong>Race</strong></li>
+                    <li><strong>Total Registered Participants</strong></li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button class="close" data-dismiss="modal">×</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     $('#dashboard-help').click(function() {
        $('#dashboad-help-modal').modal('show');
+    });
+
+    $('#display-metrics-help').click(function() {
+      $('#display-metrics-help-modal').modal('show');
     });
 </script>

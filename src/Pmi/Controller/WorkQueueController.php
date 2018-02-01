@@ -10,7 +10,8 @@ use Pmi\Drc\CodeBook;
 class WorkQueueController extends AbstractController
 {
     const LIMIT_DEFAULT = 1000;
-    const LIMIT_EXPORT = 5000;
+    const LIMIT_EXPORT = 10000;
+    const LIMIT_EXPORT_PAGE_SIZE = 1000;
 
     protected static $name = 'workqueue';
     protected static $routes = [
@@ -178,7 +179,7 @@ class WorkQueueController extends AbstractController
         }
         $results = [];
         try {
-            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams);
+            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, true);
             foreach ($summaries as $summary) {
                 if (isset($summary->resource)) {
                     $results[] = new Participant($summary->resource);
@@ -223,12 +224,18 @@ class WorkQueueController extends AbstractController
 
             // Set to selected organization
             if (isset($params['organization'])) {
+                // Check if the awardee has access to this organization
+                if (!in_array($params['organization'], $app->getAwardeeOrganization())) {
+                    $app->abort(403);
+                }
                 $organization = $params['organization'];
+                unset($params['organization']);
             }
             // Save selected (or default) organization in session
             $app['session']->set('awardeeOrganization', $organization);
         }
         $participants = $this->participantSummarySearch($organization, $params, $app);
+        $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
         return $app['twig']->render('workqueue/index.html.twig', [
             'filters' => $filters,
             'surveys' => self::$surveys,
@@ -237,7 +244,8 @@ class WorkQueueController extends AbstractController
             'params' => $params,
             'organization' => $organization,
             'isRdrError' => $this->rdrError,
-            'samplesAlias' => self::$samplesAlias
+            'samplesAlias' => self::$samplesAlias,
+            'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload)
         ]);
     }
 
@@ -246,10 +254,16 @@ class WorkQueueController extends AbstractController
         return is_object($date) ? $date->format('m/d/Y') : '';
     }
 
-    protected static function csvDateFromString($string)
+    protected static function csvDateFromString($string, $timezone)
     {
-        if (!empty($string) && ($time = strtotime($string))) {
-            return date('m/d/Y', $time);
+        if (!empty($string)) {
+            try {
+                $date = new \DateTime($string);
+                $date->setTimezone(new \DateTimeZone($timezone));
+                return $date->format('m/d/Y');
+            } catch (\Exception $e) {
+                return '';
+            }
         } else {
             return '';
         }
@@ -262,6 +276,10 @@ class WorkQueueController extends AbstractController
 
     public function exportAction(Application $app, Request $request)
     {
+        $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
+        if ($siteWorkQueueDownload === AdminController::DOWNLOAD_DISABLED) {
+            $app->abort(403);
+        }
         if ($app->hasRole('ROLE_AWARDEE')) {
             $organization = $app['session']->get('awardeeOrganization');
             $site = $app->getAwardeeId();
@@ -273,17 +291,18 @@ class WorkQueueController extends AbstractController
             return $app['twig']->render('workqueue/no-organization.html.twig');
         }
 
+        $hasFullDataAcess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
+
         $params = array_filter($request->query->all());
-        $params['_count'] = self::LIMIT_EXPORT;
-        $participants = $this->participantSummarySearch($organization, $params, $app);
-        $isDVType = $app->isDVType();
-        $stream = function() use ($participants, $isDVType) {
+        $params['_count'] = self::LIMIT_EXPORT_PAGE_SIZE;
+
+        $stream = function() use ($app, $params, $organization, $hasFullDataAcess) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
             fwrite($output, "\"\"\n");
-            if (!$isDVType) {
+            if ($hasFullDataAcess) {
                 $headers = [
                     'PMI ID',
                     'Biobank ID',
@@ -334,64 +353,72 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Biospecimens Location';
             fputcsv($output, $headers);
-            foreach ($participants as $participant) {
-                if (!$isDVType) {
-                    $row = [
-                        $participant->id,
-                        $participant->biobankId,
-                        $participant->lastName,
-                        $participant->firstName,
-                        self::csvDateFromObject($participant->dob),
-                        $participant->language,
-                        self::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-                        self::csvDateFromString($participant->consentForStudyEnrollmentTime),
-                        self::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-                        self::csvDateFromString($participant->consentForElectronicHealthRecordsTime),
-                        self::csvStatusFromSubmitted($participant->consentForconsentForCABoR),
-                        self::csvDateFromString($participant->consentForCABoRTime),
-                        $participant->withdrawalStatus == 'NO_USE' ? '1' : '0',
-                        self::csvDateFromString($participant->withdrawalTime),
-                        $participant->streetAddress,
-                        $participant->city,
-                        $participant->state,
-                        $participant->zipCode,
-                        $participant->email,
-                        $participant->phoneNumber,
-                        $participant->sex,
-                        $participant->genderIdentity,
-                        $participant->race,
-                        $participant->education,
-                        $participant->numCompletedBaselinePPIModules == 3 ? '1' : '0',
-                        $participant->numCompletedPPIModules
-                    ];
-                    foreach (self::$surveys as $survey => $label) {
-                        $row[] = self::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                        $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"});
-                    }
-                } else {
-                    $row = [
-                        $participant->id,
-                        $participant->biobankId,
-                        $participant->zipCode,
-                    ];                   
-                }
-                $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                $row[] = self::csvDateFromString($participant->physicalMeasurementsTime);
-                $row[] = $participant->evaluationFinalizedSite;
-                $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
-                $row[] = $participant->numBaselineSamplesArrived;
-                foreach (self::$samples as $sample => $label) {
-                    if (array_key_exists($sample, self::$samplesAlias)) {
-                        $sampleAlias = self::$samplesAlias[$sample];
-                        if ($participant->{"sampleStatus{$sampleAlias}"} == 'RECEIVED') {
-                            $sample = $sampleAlias;
+
+            for ($i = 0; $i < ceil(self::LIMIT_EXPORT / self::LIMIT_EXPORT_PAGE_SIZE); $i++) {
+                $participants = $this->participantSummarySearch($organization, $params, $app);
+                foreach ($participants as $participant) {
+                    if ($hasFullDataAcess) {
+                        $row = [
+                            $participant->id,
+                            $participant->biobankId,
+                            $participant->lastName,
+                            $participant->firstName,
+                            self::csvDateFromObject($participant->dob),
+                            $participant->language,
+                            self::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
+                            self::csvDateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone()),
+                            self::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
+                            self::csvDateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone()),
+                            self::csvStatusFromSubmitted($participant->consentForconsentForCABoR),
+                            self::csvDateFromString($participant->consentForCABoRTime, $app->getUserTimezone()),
+                            $participant->withdrawalStatus == 'NO_USE' ? '1' : '0',
+                            self::csvDateFromString($participant->withdrawalTime, $app->getUserTimezone()),
+                            $participant->streetAddress,
+                            $participant->city,
+                            $participant->state,
+                            $participant->zipCode,
+                            $participant->email,
+                            $participant->phoneNumber,
+                            $participant->sex,
+                            $participant->genderIdentity,
+                            $participant->race,
+                            $participant->education,
+                            $participant->numCompletedBaselinePPIModules == 3 ? '1' : '0',
+                            $participant->numCompletedPPIModules
+                        ];
+                        foreach (self::$surveys as $survey => $label) {
+                            $row[] = self::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
+                            $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"}, $app->getUserTimezone());
                         }
+                    } else {
+                        $row = [
+                            $participant->id,
+                            $participant->biobankId,
+                            $participant->zipCode,
+                        ];                   
                     }
-                    $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
-                    $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"});
+                    $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
+                    $row[] = self::csvDateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
+                    $row[] = $participant->evaluationFinalizedSite;
+                    $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
+                    $row[] = $participant->numBaselineSamplesArrived;
+                    foreach (self::$samples as $sample => $label) {
+                        if (array_key_exists($sample, self::$samplesAlias)) {
+                            $sampleAlias = self::$samplesAlias[$sample];
+                            if ($participant->{"sampleStatus{$sampleAlias}"} == 'RECEIVED') {
+                                $sample = $sampleAlias;
+                            }
+                        }
+                        $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
+                        $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"}, $app->getUserTimezone());
+                    }
+                    $row[] = $participant->orderCreatedSite;
+                    fputcsv($output, $row);
                 }
-                $row[] = $participant->orderCreatedSite;
-                fputcsv($output, $row);
+                unset($participants);
+                if (!$app['pmi.drc.participants']->getNextToken()) {
+                    break;
+                }
             }
             fwrite($output, "\"\"\n");
             fputcsv($output, ['Confidential Information']);
@@ -408,5 +435,18 @@ class WorkQueueController extends AbstractController
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
+    }
+
+    public function getSiteWorkQueueDownload($app)
+    {
+        $site = $app['em']->getRepository('sites')->fetchOneBy([
+            'google_group' => $app->getSiteId()
+        ]);
+        return !empty($site) ? $site['workqueue_download'] : null;
+    }
+
+    public function isDownloadDisabled($value)
+    {
+        return $value === AdminController::DOWNLOAD_DISABLED;
     }
 }
