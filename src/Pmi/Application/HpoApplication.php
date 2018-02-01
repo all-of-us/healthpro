@@ -465,7 +465,7 @@ class HpoApplication extends AbstractApplication
         foreach ($form->getErrors() as $error) {
             $errors[] = $error->getMessage();
         }
-        foreach ($form->all() as $key => $child) {
+        foreach ($form->all() as $child) {
             $childErrors = $this->getFormErrors($child);
             if (count($childErrors) > 0) {
                 $errors = array_merge($errors, $childErrors);

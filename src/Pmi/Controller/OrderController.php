@@ -195,7 +195,7 @@ class OrderController extends AbstractController
         }
     }
 
-    public function orderPrintLabelsAction($participantId, $orderId, Application $app, Request $request)
+    public function orderPrintLabelsAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
         if ($order->get('finalized_ts') || $order->isOrderExpired()) {
@@ -410,7 +410,7 @@ class OrderController extends AbstractController
             }
             $errors = $order->getErrors();
             if (!empty($errors)) {
-                foreach ($errors as $key => $error) {
+                foreach ($errors as $error) {
                     $finalizeForm['finalized_samples']->addError(new FormError($error));
                 }
             }
@@ -469,7 +469,7 @@ class OrderController extends AbstractController
         ]);
     }
 
-    public function orderPrintRequisitionAction($participantId, $orderId, Application $app, Request $request)
+    public function orderPrintRequisitionAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
         if ($order->get('finalized_ts') || $order->isOrderExpired()) {

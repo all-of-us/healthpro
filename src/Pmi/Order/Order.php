@@ -376,7 +376,7 @@ class Order
                 'choices' => $samples,
                 'required' => false,
                 'disabled' => $samplesDisabled,
-                'choice_attr' => function($val, $key, $index) use ($enabledSamples, $set) {
+                'choice_attr' => function($val) use ($enabledSamples, $set) {
                     $attr = [];
                     if ($set === 'finalized') {
                         $collectedSamples = json_decode($this->order['collected_samples'], true);
