@@ -346,7 +346,8 @@ class DefaultController extends AbstractController
             'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled(),
             'canViewDetails' => $canViewDetails,
             'samples' => WorkQueueController::$samples,
-            'surveys' => WorkQueueController::$surveys
+            'surveys' => WorkQueueController::$surveys,
+            'samplesAlias' => WorkQueueController::$samplesAlias,
         ]);
     }
 

@@ -166,13 +166,14 @@
                                         <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
                                             {{ order.created_ts|date('D n/j/Y', app.userTimezone) }} <small class="text-muted"><strong>{{ order.order_id }}</strong></small><br />
                                             <small class="text-muted">
-                                                {% if order.finalized_ts %}
-                                                    <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
+                                                {% if not order.finalized_ts and not order.version %}
+                                                    <span class="label label-danger">Expired</span>
+                                                {% elseif order.finalized_ts %}
+                                                    <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                                 {% elseif order.processed_ts %}
-                                                    <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
+                                                    <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                                 {% elseif order.collected_ts %}
-                                                    <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
-                                                {% else %}
+                                                    <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                                 {% endif %}                                    
                                             </small>
                                         </a>
@@ -385,6 +386,12 @@
                                     </dl>
                                     <div class="text-center">
                                         {% for field, label in samples %}
+                                            {% if attribute(samplesAlias, field) is defined %}
+                                                {% set sampleAlias = attribute(samplesAlias, field) %}
+                                                {% if attribute(participant, 'sampleStatus' ~ sampleAlias) == 'RECEIVED' %}
+                                                    {% set field = sampleAlias %}
+                                                {% endif %}
+                                            {% endif %}
                                             <div class="participant-detail-status">
                                                 <strong>{{ label }}</strong>
                                                 {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}

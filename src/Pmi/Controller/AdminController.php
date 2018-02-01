@@ -17,6 +17,9 @@ use Pmi\Order\Order;
 class AdminController extends AbstractController
 {
     protected static $name = 'admin';
+
+    const FIXED_ANGLE = 'fixed_angle';
+    const SWINGING_BUCKET = 'swinging_bucket';
     const FULL_DATA_ACCESS = 'full_data';
     const LIMITED_DATA_ACCESS = 'limited_data';
     const DOWNLOAD_DISABLED = 'disabled';
@@ -175,6 +178,16 @@ class AdminController extends AbstractController
                         }
                     })
                 ]
+            ])
+            ->add('centrifuge_type', Type\ChoiceType::class, [
+                'label' => 'Centrifuge type',
+                'required' => false,
+                'choices' => [
+                    '-- Select centrifuge type --' => null,
+                    'Fixed Angle'=> self::FIXED_ANGLE,
+                    'Swinging Bucket' => self::SWINGING_BUCKET
+                ],
+                'multiple' => false
             ])
             ->add('workqueue_download', Type\ChoiceType::class, [
                 'label' => 'Work Qeue Download',

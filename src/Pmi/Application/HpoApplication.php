@@ -458,4 +458,19 @@ class HpoApplication extends AbstractApplication
     {
         return $this->getConfig('reportKitUrl');
     }
+
+    public function getFormErrors($form)
+    {
+        $errors = [];
+        foreach ($form->getErrors() as $error) {
+            $errors[] = $error->getMessage();
+        }
+        foreach ($form->all() as $child) {
+            $childErrors = $this->getFormErrors($child);
+            if (count($childErrors) > 0) {
+                $errors = array_merge($errors, $childErrors);
+            }
+        }
+        return $errors;
+    }
 }
