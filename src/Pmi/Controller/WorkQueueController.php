@@ -350,8 +350,6 @@ class WorkQueueController extends AbstractController
             fputcsv($output, $headers);
 
             for ($i = 0; $i < ceil(self::LIMIT_EXPORT / self::LIMIT_EXPORT_PAGE_SIZE); $i++) {
-                $start = microtime(true);
-
                 $participants = $this->participantSummarySearch($organization, $params, $app);
                 foreach ($participants as $participant) {
                     if ($hasFullDataAcess) {
