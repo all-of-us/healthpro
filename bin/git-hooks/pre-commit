@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# Check for credentials in a commit
+#
+
+echo "Checking commit for credential data ..."
+if git rev-parse --verify HEAD >/dev/null 2>&1; then
+    against=HEAD
+else
+    # This is the equivalent of `git hash-object -t tree /dev/null`
+    against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+fi
+
+for FILE in `git diff-index --name-status $against -- | cut -c3-` ; do
+    # Check if the file contains 'BEGIN PRIVATE KEY'
+    if [ "grep 'BEGIN PRIVATE KEY' $FILE" ]
+    then
+        echo $FILE ' contains a private key!'
+        exit 1
+    fi
+    # Check if the file contains 'oauth2client'
+    if [ "grep 'oauth2client' $FILE" ]
+    then
+        echo $FILE ' contains an OAuth2 client key!'
+        exit 1
+    fi
+done
+echo "Sucesss! No credential data found."
+exit 
