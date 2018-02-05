@@ -6,22 +6,32 @@
 {% block title %}Process - Order {{ order.order_id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'process' } %}
-    {{ form_start(processForm, { attr: { class: 'warn-unsaved' } }) }}
+    {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter' } }) }}
         {{ form_errors(processForm) }}
-
-        <div class="form-group{% if not processForm.processed_samples.vars.valid %} has-error{% endif %}">
-            {{ form_label(processForm.processed_samples) }}
-            <span class="toggle-help-image" data-caption="Processed samples help text placeholder.">
-                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-            </span>
-            {% if order.type == 'saliva' %}
-                {{ form_widget(processForm.processed_samples) }}
-            {% else %}
-                {{ samples.form_widget(processForm.processed_samples, false, samplesInfo) }}
-            {% endif %}
-            {{ form_errors(processForm.processed_samples) }}
-        </div>
-
+        {% if processForm.processed_samples is defined %}
+            <div class="form-group{% if not processForm.processed_samples.vars.valid %} has-error{% endif %}">
+                {{ form_label(processForm.processed_samples) }}
+                <span class="toggle-help-image" data-caption="Processed samples help text placeholder.">
+                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                </span>
+                {% if order.type == 'saliva' %}
+                    {{ form_widget(processForm.processed_samples) }}
+                {% else %}
+                    {{ samples.form_widget(processForm.processed_samples, false, samplesInfo) }}
+                {% endif %}
+                {{ form_errors(processForm.processed_samples) }}
+            </div>
+        {% endif %}
+        {% if order.type != 'saliva' and processForm.processed_centrifuge_type is defined %}
+            <div class="form-group{% if not processForm.processed_centrifuge_type.vars.valid %} has-error{% endif %}">
+                {{ form_label(processForm.processed_centrifuge_type) }}
+                <span class="toggle-help-image" data-caption="Centrifuge type help text placeholder.">
+                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                </span>
+                {{ form_widget(processForm.processed_centrifuge_type) }}
+                {{ form_errors(processForm.processed_centrifuge_type) }}
+            </div>
+        {% endif %}
         <div class="form-group{% if not processForm.processed_notes.vars.valid %} has-error{% endif %}">
             {{ form_label(processForm.processed_notes) }}
             <span class="toggle-help-image" data-caption="Processed notes help text placeholder.">
@@ -33,7 +43,7 @@
         </div>
         {{ form_rest(processForm) }}
 
-        {% if not order.finalized_ts %}
+        {% if not order.finalized_ts and not order.expired %}
             <p>
                 <button type="submit" class="btn btn-primary">
                     {% if order.processed_ts %}
@@ -51,7 +61,7 @@
 <script>
 $(document).ready(function () {
 {% if order.type == 'saliva' %}
-    $('input.sample-disabled').closest('label').addClass('text-danger');
+    $('input.sample-disabled').closest('label').addClass('text-warning');
     $('input.sample-disabled').closest('div.checkbox').append('<small class="text-muted">was not collected</small>');
     $('#form_processed_samples input').each(function() {
         {% if not order.finalized_ts %}
@@ -68,10 +78,18 @@ $(document).ready(function () {
         $('#form_processed_samples_ts_' + sample)
             .addClass('input-sm')
             .pmiDateTimePicker();
+
+        // Display processed sample time error messages
+        if ($('form[name="form"] .alert-danger').length == 0) {
+            var error = $(this).attr('error');
+            if (typeof error !== 'undefined') {
+                $('input[name="form[processed_samples_ts]['+sample+']"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i> '+error+'</span>');
+            }
+        }
     });
     $('#form_processed_samples_ts').remove();
 {% else %}
-    $('.sample-disabled label').addClass('text-danger');
+    $('.sample-disabled label').addClass('text-warning');
     $('.sample-disabled').find('td:last').append('<small style="margin-left:15px" class="text-muted">was not collected</small>');
     $('#form_processed_samples input').each(function() {
         {% if not order.finalized_ts %}
@@ -94,6 +112,19 @@ $(document).ready(function () {
             .pmiDateTimePicker();
     });
     $('#form_processed_samples_ts').remove();
+
+    // Display processed samples time error/warning messages
+    if ($('form[name="form"] .alert-danger').length == 0) {
+        $('.samples').each(function(e) {
+            var error = $(this).find('input[name="form[processed_samples][]"]').attr('error');
+            var warning = $(this).find('input[name="form[processed_samples][]"]').attr('warning');
+            if (typeof error !== 'undefined') {
+                $(this).next().find(':text').after('<span class="text-danger"><i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i> '+error+'</span>');
+            } else if (typeof warning !== 'undefined') {
+                $(this).next().find(':text').after('<span class="text-warning"><i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i> '+warning+'</span>');
+            }
+        });   
+    }
 {% endif %}
 
     var orderView = new PMI.views['OrderSubPage']({

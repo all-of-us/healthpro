@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+{% block title %}Print Requisition - Order {{ order.order_id }} - {% endblock %}
+{% block body %}
+    {% include 'order-header.html.twig' with { active: 'printRequisition' } %}
+    <div class="row">
+        <div class="col-sm-10 col-md-offset-1">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Requisition</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="text-center">
+                        <p id="requisition-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
+                        <p id="requisition-loaded">
+                            <a href="javascript:window.requisition.print();" class="btn btn-primary btn-sm">
+                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                            </a>
+                        </p>
+                    </div>
+                    <iframe name="requisition" class="pdf pdf-requisition" src="{{ path('orderRequisitionPdf', { participantId: participant.id, orderId: order.id, type: 'requisition' }) }}#view=FitH"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    $('#requisition-loaded').hide();
+    $('iframe[name=requisition]').on('load', function() {
+        $('#requisition-loading').hide();
+        $('#requisition-loaded').show();
+    });
+});
+</script>
+{% endblock %}

@@ -141,6 +141,10 @@ class WorkQueueController extends AbstractController
         '1UR10' => 'Urine 10 mL',
         '1SAL' => 'Saliva'
     ];
+    public static $samplesAlias = [
+        '1SST8' => '1SS08',
+        '1PST8' => '1PS08'
+    ];
     protected $rdrError = false;
 
     protected function participantSummarySearch($organization, &$params, $app)
@@ -240,6 +244,7 @@ class WorkQueueController extends AbstractController
             'params' => $params,
             'organization' => $organization,
             'isRdrError' => $this->rdrError,
+            'samplesAlias' => self::$samplesAlias,
             'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload)
         ]);
     }
@@ -398,6 +403,12 @@ class WorkQueueController extends AbstractController
                     $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                     $row[] = $participant->numBaselineSamplesArrived;
                     foreach (self::$samples as $sample => $label) {
+                        if (array_key_exists($sample, self::$samplesAlias)) {
+                            $sampleAlias = self::$samplesAlias[$sample];
+                            if ($participant->{"sampleStatus{$sampleAlias}"} == 'RECEIVED') {
+                                $sample = $sampleAlias;
+                            }
+                        }
                         $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
                         $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"}, $app->getUserTimezone());
                     }
