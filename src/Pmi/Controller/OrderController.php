@@ -428,19 +428,19 @@ class OrderController extends AbstractController
                 }
             }
             if ($finalizeForm->isValid()) {
-                //Send order to mayo for DV kit orders
-                $orderData = $order->toArray();
-                if (empty($orderData['mayo_id']) && $orderData['type'] === 'kit' && !empty($finalizeForm['finalized_ts']->getData())) {
-                    $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
-                    if ($mayoId && $app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId])) {
-                        $app->log(Log::ORDER_EDIT, $orderId);
-                    }
-                }
                 $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
                 $updateArray['finalized_user_id'] = $app->getUser()->getId();
                 $updateArray['finalized_site'] = $app->getSiteId();
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
+                    //Send order to mayo for DV kit orders
+                    $orderData = $order->toArray();
+                    if (empty($orderData['mayo_id']) && $orderData['type'] === 'kit' && !empty($finalizeForm['finalized_ts']->getData())) {
+                        $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                        if ($mayoId && $app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId])) {
+                            $app->log(Log::ORDER_EDIT, $orderId);
+                        }
+                    }
                     $order = $this->loadOrder($participantId, $orderId, $app);
                     //Send order to RDR if finalized_ts and mayo_id exists
                     if (!empty($order->get('finalized_ts')) && !empty($order->get('mayo_id'))) {
