@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# Check for credentials in a commit
+#
+
+# Checks file for presense of given pattern
+function check_file() {
+    $(grep -q "$1" $2)
+    if [ $? == 0 ]
+    then
+      echo "[ERROR] Pattern \"$1\" found in $2"
+      exit 1
+    fi
+}
+
+echo "Checking commit for credential data ..."
+if git rev-parse --verify HEAD >/dev/null 2>&1; then
+    against=HEAD
+else
+    # This is the equivalent of `git hash-object -t tree /dev/null`
+    against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+fi
+
+for FILE in `git diff-index --name-status $against -- | cut -c3-` ; do
+    # Defines patterns to search
+    check_file "BEGIN PRIVATE KEY" $FILE
+    check_file "oauth2client" $FILE
+done
+echo "Sucesss! No credential data found."
+exit 0
