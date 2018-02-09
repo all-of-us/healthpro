@@ -28,18 +28,7 @@
 
     <div class="row">
         <div class="col-sm-6">
-            <dl class="dl-horizontal">
-                <dt>Name</dt>
-                <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-                <dt>Participant ID</dt>
-                <dd>{{ participant.id }}</dd>
-                <dt>Biobank ID</dt>
-                <dd>{{ participant.biobankId }}</dd>
-                <dt>DOB</dt>
-                <dd>{{ participant.dob ? participant.dob|date('n/j/Y') }}</dd>
-                <dt>Gender Identity</dt>
-                <dd>{{ participant.genderIdentity }}</dd>
-            </dl>
+          {% include 'partials/participant-dl.html.twig' %}
         </div>
         <div class="col-sm-6 text-center">
             <svg id="participant-barcode"></svg>
@@ -271,15 +260,15 @@
                                 <div class="panel-body">
                                     <dl class="dl-vertical">
                                         <dt>Language</dt>
-                                        <dd>{{ participant.language|default('--') }}</dd>
+                                        <dd>{{ participant.language|default('(not set)') }}</dd>
                                         <dt>Contact Method</dt>
-                                        <dd>{{ participant.recontactMethod|default('--') }}</dd>
+                                        <dd>{{ participant.recontactMethod|default('(not set)') }}</dd>
                                         <dt>Address</dt>
-                                        <dd>{{ participant.getAddress(true)|nl2br }}</dd>
+                                        <dd>{{ participant.getAddress(true)|default('(not set)')|nl2br }}</dd>
                                         <dt>Email</dt>
-                                        <dd>{{ participant.email }}</dd>
+                                        <dd>{{ participant.email|default('(not set)') }}</dd>
                                         <dt>Phone</dt>
-                                        <dd>{{ participant.phoneNumber }}</dd>
+                                        <dd>{{ participant.phoneNumber|default('(not set)') }}</dd>
                                     </dl>
                                 </div>
                             </div>
@@ -291,15 +280,16 @@
                                 <div class="panel-body">
                                     <dl class="dl-vertical">
                                         <dt>Age</dt>
-                                        <dd>{{ participant.getAge() }}</dd>
+                                        <dd>{{ participant.getAge()|default('(not set)') }}</dd>
                                         <dt>Sex</dt>
-                                        <dd>{{ participant.sex }}</dd>
+                                        <dd>{{ participant.sex|default('(not set)') }}</dd>
                                         <dt>Gender Identity</dt>
-                                        <dd>{{ participant.genderIdentity }}</dd>
+                                        <dd>{{ participant.genderIdentity|default('(not set)') }}</dd>
                                         <dt>Race/Ethnicity</dt>
-                                        <dd>{{ participant.race }}</dd>
+                                        <dd>{{ participant.race|default('(not set)') }}</dd>
                                         <dt>Education</dt>
-                                        <dd>{{ participant.education }}</dd>
+                                        <dd>{{ participant.education|default('(not set)') }}</dd>
+                                    </dl>
                                 </div>
                             </div>
                         </div>
