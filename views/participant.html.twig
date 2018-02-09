@@ -260,15 +260,15 @@
                                 <div class="panel-body">
                                     <dl class="dl-vertical">
                                         <dt>Language</dt>
-                                        <dd>{{ participant.language|default('(not set)') }}</dd>
+                                        <dd>{{ participant.language|default('--') }}</dd>
                                         <dt>Contact Method</dt>
-                                        <dd>{{ participant.recontactMethod|default('(not set)') }}</dd>
+                                        <dd>{{ participant.recontactMethod|default('--') }}</dd>
                                         <dt>Address</dt>
-                                        <dd>{{ participant.getAddress(true)|default('(not set)')|nl2br }}</dd>
+                                        <dd>{{ participant.getAddress(true)|default('--')|nl2br }}</dd>
                                         <dt>Email</dt>
-                                        <dd>{{ participant.email|default('(not set)') }}</dd>
+                                        <dd>{{ participant.email|default('--') }}</dd>
                                         <dt>Phone</dt>
-                                        <dd>{{ participant.phoneNumber|default('(not set)') }}</dd>
+                                        <dd>{{ participant.phoneNumber|default('--') }}</dd>
                                     </dl>
                                 </div>
                             </div>
@@ -280,15 +280,15 @@
                                 <div class="panel-body">
                                     <dl class="dl-vertical">
                                         <dt>Age</dt>
-                                        <dd>{{ participant.getAge()|default('(not set)') }}</dd>
+                                        <dd>{{ participant.getAge()|default('--') }}</dd>
                                         <dt>Sex</dt>
-                                        <dd>{{ participant.sex|default('(not set)') }}</dd>
+                                        <dd>{{ participant.sex|default('--') }}</dd>
                                         <dt>Gender Identity</dt>
-                                        <dd>{{ participant.genderIdentity|default('(not set)') }}</dd>
+                                        <dd>{{ participant.genderIdentity|default('--') }}</dd>
                                         <dt>Race/Ethnicity</dt>
-                                        <dd>{{ participant.race|default('(not set)') }}</dd>
+                                        <dd>{{ participant.race|default('--') }}</dd>
                                         <dt>Education</dt>
-                                        <dd>{{ participant.education|default('(not set)') }}</dd>
+                                        <dd>{{ participant.education|default('--') }}</dd>
                                     </dl>
                                 </div>
                             </div>

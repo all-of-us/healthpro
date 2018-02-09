@@ -6,7 +6,7 @@
     <dt>Biobank ID</dt>
     <dd>{{ participant.biobankId }}</dd>
     <dt>DOB</dt>
-    <dd>{{ participant.dob ? participant.dob|date('n/j/Y') : '(not set)' }}</dd>
+    <dd>{{ participant.dob ? participant.dob|date('n/j/Y') : '--' }}</dd>
     <dt>Gender Identity</dt>
-    <dd>{{ participant.genderIdentity|default('(not set)') }}</dd>
+    <dd>{{ participant.genderIdentity|default('--') }}</dd>
 </dl>
