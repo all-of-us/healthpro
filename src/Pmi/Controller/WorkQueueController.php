@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Pmi\Audit\Log;
 use Pmi\Entities\Participant;
 use Pmi\Drc\CodeBook;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class WorkQueueController extends AbstractController
 {
@@ -147,6 +148,12 @@ class WorkQueueController extends AbstractController
     ];
     protected $rdrError = false;
 
+    protected $next = true;
+
+    protected $prev = false;
+
+    protected $ajaxType = false;
+
     protected function participantSummarySearch($organization, &$params, $app)
     {
         $rdrParams = [];
@@ -179,7 +186,7 @@ class WorkQueueController extends AbstractController
         }
         $results = [];
         try {
-            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, true);
+            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $app, $this->next, $this->prev, $this->ajaxType);
             foreach ($summaries as $summary) {
                 if (isset($summary->resource)) {
                     $results[] = new Participant($summary->resource);
@@ -212,6 +219,16 @@ class WorkQueueController extends AbstractController
         }
 
         $params = array_filter($request->query->all());
+        //For ajax requests
+        if (!empty($params['page'])) {
+            $this->ajaxType = true;
+        } else {
+            $app['session']->set('index', 0);
+        }
+        if (!empty($params['page']) && $params['page'] == 'prev'){
+            $this->prev = true;
+            $this->next = false;
+        }
         $filters = self::$filters;
         if ($app->hasRole('ROLE_AWARDEE')) {
             // Add organizations to filters
@@ -235,18 +252,22 @@ class WorkQueueController extends AbstractController
             $app['session']->set('awardeeOrganization', $organization);
         }
         $participants = $this->participantSummarySearch($organization, $params, $app);
-        $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
-        return $app['twig']->render('workqueue/index.html.twig', [
-            'filters' => $filters,
-            'surveys' => self::$surveys,
-            'samples' => self::$samples,
-            'participants' => $participants,
-            'params' => $params,
-            'organization' => $organization,
-            'isRdrError' => $this->rdrError,
-            'samplesAlias' => self::$samplesAlias,
-            'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload)
-        ]);
+        if ($this->ajaxType) {
+            return new JsonResponse($participants);
+        } else {
+            $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
+            return $app['twig']->render('workqueue/index.html.twig', [
+                'filters' => $filters,
+                'surveys' => self::$surveys,
+                'samples' => self::$samples,
+                'participants' => $participants,
+                'params' => $params,
+                'organization' => $organization,
+                'isRdrError' => $this->rdrError,
+                'samplesAlias' => self::$samplesAlias,
+                'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload)
+            ]);
+        }
     }
 
     protected static function csvDateFromObject($date)

@@ -89,10 +89,39 @@ class RdrParticipants
         return $results;
     }
 
-    public function listParticipantSummaries($params, $next = false)
+    public function listParticipantSummaries($params, $app = null, $next = false, $prev = false, $ajaxType = false )
     {
         if ($next && $this->nextToken) {
             $params['_token'] = $this->nextToken;
+        }
+        if ($app) {
+            $tokens = $app['session']->get('tokens');
+            $index = $app['session']->get('index');
+            $lastStep = !empty($app['session']->get('lastStep')) ? $app['session']->get('lastStep') : 'next';    
+            if ($ajaxType) {
+                if ($next) {
+                    $currentStep = 'next';
+                }
+                if ($prev) {
+                    $currentStep = 'prev';
+                }
+                $count = 1;
+                if ($prev && $lastStep != $currentStep) {
+                    $count = 2;
+                }
+                $nextIndex = $index + $count;
+                $previndex = $index - $count;
+                //Pass token if exists       
+                if ($next && !empty($tokens)) {
+                    $params['_token'] = $tokens[$index];
+                    $app['session']->set('lastStep', 'next');
+                } elseif ($prev && !empty($tokens)) {
+                    if ($previndex >= 0) {
+                        $params['_token'] = $tokens[$previndex];
+                    }
+                    $app['session']->set('lastStep', 'prev');
+                }
+            }
         }
         $this->nextToken = null;
         try {
@@ -118,6 +147,24 @@ class RdrParticipants
                     parse_str($queryString, $nextParameters);
                     if (isset($nextParameters['_token'])) {
                         $this->nextToken = $nextParameters['_token'];
+                        // Set next/prev index and token
+                        if ($app) {
+                            if ($ajaxType) {
+                                if ($next) {
+                                    $app['session']->set('index', $nextIndex);
+                                    if (empty($tokens[$nextIndex])) {
+                                        $tokens[$nextIndex] = $this->nextToken;
+                                    }                               
+                                    $app['session']->set('tokens', $tokens);
+                                } elseif ($prev) {
+                                    if ($previndex >= 0) {
+                                       $app['session']->set('index', $previndex); 
+                                    }                               
+                                }
+                            } elseif ($index == 0) {
+                                $app['session']->set('tokens', [$this->nextToken]);
+                            }
+                        }
                     }
                     break;
                 }

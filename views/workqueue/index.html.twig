@@ -238,6 +238,10 @@
             {% endfor %}
         </tbody>
     </table>
+    <div align="center">
+        <button class="btn btn-primary step" data-step="prev">Prev</button>
+        <button class="btn btn-primary step" data-step="next">Next</button>
+    </div>
     {% if isDownloadDisabled == false %}
         <p class="text-right">
             <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
@@ -271,6 +275,19 @@ $(document).ready(function() {
                 window.location = location;
             },
             btnTextTrue: 'Accept'
+        });
+    });
+    $('button.step').click(function() {
+        var step = $(this).attr('data-step');
+        $.ajax({
+            type: "GET",
+            url: '/workqueue?page='+step,
+            data: '',
+            success: function (data) {
+                console.log(data);
+            },
+            dataType: "json",
+            async: false
         });
     });
     var table = $('#workqueue').DataTable({
