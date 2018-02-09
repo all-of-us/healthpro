@@ -5,7 +5,7 @@
 
 # Checks file for presense of given pattern
 function check_file() {
-    $(grep -q "$1" $2)
+    $(git grep -ql --cached "$1" $2)
     if [ $? == 0 ]
     then
       echo "[ERROR] Pattern \"$1\" found in $2"
