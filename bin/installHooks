@@ -1,0 +1,13 @@
+#!/bin/bash
+
+APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
+
+echo "installHooks: adding git hooks for development ..."
+if [ -f "${APP_DIR}/.git/hooks/pre-commit" ]
+then
+  echo "installHooks: pre-commit script already installed."
+else
+  cp ${APP_DIR}/bin/git-hooks/pre-commit ${APP_DIR}/.git/hooks/pre-commit
+  chmod +x ${APP_DIR}/.git/hooks/pre-commit
+  echo "installHooks: done!"
+fi
