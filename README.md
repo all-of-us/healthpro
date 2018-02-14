@@ -19,13 +19,9 @@ Install PHP dependencies via Composer:
 
 `composer install`
 
-Install Gulp dependencies via NPM:
+Install asset and Gulp dependencies via NPM:
 
 `npm install`
-
-Install asset dependencies via Bower:
-
-`./bin/bower install`
 
 Initialize assets and recompile on the fly as assets change:
 
