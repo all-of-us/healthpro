@@ -49,10 +49,12 @@ PMI.views['PhysicalEvaluation-0.1'] = Backbone.View.extend({
         if (count > 0) {
             var mean = (sum / count).toFixed(1);
             this.$('#mean-' + field).html('<span class="label label-primary">Average: ' + mean + '</span>');
+            /* eslint-disable security/detect-object-injection */
             if (this.conversions[field]) {
                 var converted = this.convert(this.conversions[field], mean);
                 this.$('#convert-' + field).html('<small>('+converted+')</small>');
             }
+            /* eslint-enable security/detect-object-injection */
         } else {
             this.$('#mean-' + field).text('');
             this.$('#convert-' + field).text('');
@@ -104,6 +106,7 @@ PMI.views['PhysicalEvaluation-0.1'] = Backbone.View.extend({
             return;
         }
         var field = input.closest('.field').data('field');
+        /* eslint-disable security/detect-object-injection */
         if (this.conversions[field]) {
             var val = parseFloat(input.val());
             if (val) {
@@ -117,6 +120,7 @@ PMI.views['PhysicalEvaluation-0.1'] = Backbone.View.extend({
                 this.$('#convert-' + field).html('');
             }
         }
+        /* eslint-enable security/detect-object-injection */
     },
     displayWarnings: function(e) {
         var input = $(e.currentTarget);
