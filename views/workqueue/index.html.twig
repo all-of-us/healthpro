@@ -239,8 +239,8 @@
         </tbody>
     </table>
     <div align="center">
-        <button class="btn btn-primary step" data-step="prev">Prev</button>
-        <button class="btn btn-primary step" data-step="next">Next</button>
+        <button class="btn btn-primary btn-page" data-page="prev">Prev</button>
+        <button class="btn btn-primary btn-page" data-page="next">Next</button>
     </div>
     {% if isDownloadDisabled == false %}
         <p class="text-right">
@@ -277,12 +277,13 @@ $(document).ready(function() {
             btnTextTrue: 'Accept'
         });
     });
-    $('button.step').click(function() {
-        var step = $(this).attr('data-step');
+    $('button.btn-page').click(function() {
+        var page = $(this).attr('data-page');
+        var url = window.location.href;
         $.ajax({
             type: "GET",
-            url: '/workqueue?page='+step,
-            data: '',
+            url: url,
+            data: { page: page },
             success: function (data) {
                 var html = '';
                 for (var i in data) {
