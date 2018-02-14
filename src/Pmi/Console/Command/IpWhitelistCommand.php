@@ -13,6 +13,7 @@ use Symfony\Component\Yaml\Dumper;
 class IpWhitelistCommand extends Command
 {
     private $appDir;
+    private $output;
     
     protected function configure()
     {
@@ -25,6 +26,7 @@ class IpWhitelistCommand extends Command
     
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->output = $output;
         $output->setFormatter(new OutputFormatter(true)); // color output
         
         $output->writeln("Downloading GeoIP2 country database...");
@@ -93,7 +95,7 @@ class IpWhitelistCommand extends Command
         $run = $mustRun ? 'mustRun' : 'run';
         $process->$run(function($type, $buffer) use ($silent) {
             if (!$silent) {
-                echo $buffer;
+                $this->output->write($buffer);
             }
         });
         return $process;
