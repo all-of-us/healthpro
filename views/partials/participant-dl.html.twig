@@ -1,0 +1,12 @@
+<dl class="dl-horizontal">
+    <dt>Name</dt>
+    <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
+    <dt>Participant ID</dt>
+    <dd>{{ participant.id }}</dd>
+    <dt>Biobank ID</dt>
+    <dd>{{ participant.biobankId }}</dd>
+    <dt>DOB</dt>
+    <dd>{{ participant.dob ? participant.dob|date('n/j/Y') : '--' }}</dd>
+    <dt>Gender Identity</dt>
+    <dd>{{ participant.genderIdentity|default('--') }}</dd>
+</dl>
