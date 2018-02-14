@@ -1,6 +1,9 @@
 /**
  * Physical evaluation form view
  */
+
+/* eslint security/detect-object-injection: "off" */
+
 PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
     events: {
         "click .toggle-help-image": "displayHelpModal",
@@ -89,12 +92,10 @@ PMI.views['PhysicalEvaluation-0.2'] = Backbone.View.extend({
             var sum = _.reduce(values, function(a, b) { return a + b; }, 0);
             var mean = (sum / values.length).toFixed(1);
             this.$('#mean-' + field).html('<strong>' + mean + '</strong>');
-            /* eslint-disable security/detect-object-injection */
             if (this.conversions[field]) {
                 var converted = this.convert(this.conversions[field], mean);
                 this.$('#convert-' + field).html('('+converted+')');
             }
-            /* eslint-enable security/detect-object-injection */
         } else {
             this.$('#mean-' + field).text('--');
             this.$('#convert-' + field).text();

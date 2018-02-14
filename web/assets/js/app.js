@@ -41,8 +41,8 @@ $(document).ready(function()
         if (!_PMITPL.hasOwnProperty(tplId)) {
             _PMITPL[tplId] = _.template($("#" + tplId).html());
         }
-        /* eslint-enable security/detect-object-injection */
         return _PMITPL[tplId];
+        /* eslint-enable security/detect-object-injection */
     };
 
     /*************************************************************************
