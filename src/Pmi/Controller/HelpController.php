@@ -173,7 +173,7 @@ class HelpController extends AbstractController
             $responseBody = $response->getBody();
             $stream = function () use ($responseBody) {
                 while (!$responseBody->eof()) {
-                    echo $responseBody->read(1024);
+                    echo $responseBody->read(1024); // phpcs:ignore WordPress.XSS.EscapeOutput
                 }
             };
             return $app->stream($stream, 200, [
