@@ -224,6 +224,9 @@ class WorkQueueController extends AbstractController
             $this->ajaxType = true;
         } else {
             $app['session']->set('index', 0);
+            $app['session']->set('tokens', []);
+            $app['session']->set('hasPrev', false);
+            $app['session']->set('hasNext', false);
         }
         if (!empty($params['page']) && $params['page'] == 'prev'){
             $this->prev = true;
@@ -253,7 +256,11 @@ class WorkQueueController extends AbstractController
         }
         $participants = $this->participantSummarySearch($organization, $params, $app);
         if ($this->ajaxType) {
-            return new JsonResponse($participants);
+            $ajaxData = [];
+            $ajaxData['hasPrev'] = $app['session']->get('hasPrev');
+            $ajaxData['hasNext'] = $app['session']->get('hasNext');
+            $ajaxData['participants'] = $participants;
+            return new JsonResponse($ajaxData);
         } else {
             $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
             return $app['twig']->render('workqueue/index.html.twig', [

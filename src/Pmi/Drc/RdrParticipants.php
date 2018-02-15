@@ -112,6 +112,11 @@ class RdrParticipants
                         $index = 0;
                     }
                 }
+                if ($index == 0) {
+                    $app['session']->set('hasPrev', false);
+                } else {
+                   $app['session']->set('hasPrev', true); 
+                }
             }
         }
         $this->nextToken = null;
@@ -151,6 +156,11 @@ class RdrParticipants
                             } elseif ($index == 0) {
                                 $app['session']->set('tokens', [$this->nextToken]);
                             }
+                            $app['session']->set('hasNext', true);
+                        }
+                    } else {
+                        if ($app) {
+                            $app['session']->set('hasNext', false); 
                         }
                     }
                     break;

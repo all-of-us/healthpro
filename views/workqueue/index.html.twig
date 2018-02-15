@@ -239,8 +239,8 @@
         </tbody>
     </table>
     <div align="center">
-        <button class="btn btn-primary btn-page" data-page="prev">Prev</button>
-        <button class="btn btn-primary btn-page" data-page="next">Next</button>
+        <button class="btn btn-primary btn-page btn-prev" {% if not app.session.get('hasPrev') %} disabled="true" {% endif %} data-page="prev">Prev</button>
+        <button class="btn btn-primary btn-page btn-next" {% if not app.session.get('hasNext') %} disabled="true" {% endif %} data-page="next">Next</button>
     </div>
     {% if isDownloadDisabled == false %}
         <p class="text-right">
@@ -285,84 +285,96 @@ $(document).ready(function() {
             url: url,
             data: { page: page },
             success: function (data) {
+                if (data['hasPrev']) {
+                    $('.btn-prev').attr('disabled', false);
+                } else {
+                    $('.btn-prev').attr('disabled', true);
+                }
+                if (data['hasNext']) {
+                    $('.btn-next').attr('disabled', false);
+                } else {
+                    $('.btn-next').attr('disabled', true);
+                }
                 var html = '';
-                for (var i in data) {
+                var participants = data['participants'];
+                for (var i in participants) {
+                    participant = participants[i];
                     html += '<tr>';
 
                     //Identifiers and status
                     html += '<td>';
                     {% if is_granted('ROLE_USER') %}
-                        html += '<a href="/participant/'+data[i].id+'">'+data[i].rdrData.lastName+'</a>';
+                        html += '<a href="/participant/'+participant.id+'">'+participant.rdrData.lastName+'</a>';
                     {% else %}
-                        html += data[i].rdrData.lastName;
+                        html += participant.rdrData.lastName;
                     {% endif %}
                     html += '</td>';
                     html += '<td>';
                     {% if is_granted('ROLE_USER') %}
-                        html += '<a href="/participant/'+data[i].id+'">'+data[i].rdrData.firstName+'</a>';
+                        html += '<a href="/participant/'+participant.id+'">'+participant.rdrData.firstName+'</a>';
                     {% else %}
-                        html += data[i].rdrData.firstName;
+                        html += participant.rdrData.firstName;
                     {% endif %}
                     html += '</td>';
-                    html += '<td>'+data[i].rdrData.dob+'</td>';
-                    html += '<td>'+data[i].rdrData.id+'</td>';
-                    html += '<td>'+data[i].rdrData.biobankId+'</td>';
-                    html += '<td>'+data[i].rdrData.language+'</td>';
+                    html += '<td>'+participant.rdrData.dob+'</td>';
+                    html += '<td>'+participant.rdrData.id+'</td>';
+                    html += '<td>'+participant.rdrData.biobankId+'</td>';
+                    html += '<td>'+participant.rdrData.language+'</td>';
                     html += '<td>';
-                    if (data[i].rdrData.consentForStudyEnrollment == 'SUBMITTED') {
+                    if (participant.rdrData.consentForStudyEnrollment == 'SUBMITTED') {
                         html += '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-                        html += data[i].rdrData.consentForStudyEnrollmentTime;
+                        html += participant.rdrData.consentForStudyEnrollmentTime;
                     }
                     else {
                         html += '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
                     }
                     html += '</td>';
                     html += '<td class="text-center">';
-                    if (data[i].rdrData.consentForElectronicHealthRecords == 'SUBMITTED') {
+                    if (participant.rdrData.consentForElectronicHealthRecords == 'SUBMITTED') {
                         html += '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-                        html += data[i].rdrData.consentForElectronicHealthRecordsTime;
+                        html += participant.rdrData.consentForElectronicHealthRecordsTime;
                     }
                     else {
                         html += '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
                     }
                     html += '</td>';
                     html += '<td class="text-center">';
-                    if (data[i].rdrData.consentForCABoR == 'SUBMITTED') {
+                    if (participant.rdrData.consentForCABoR == 'SUBMITTED') {
                         html += '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-                        html += data[i].rdrData.consentForCABoRTime;
+                        html += participant.rdrData.consentForCABoRTime;
                     }
                     else {
                         html += '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
                     }
                     html += '</td>';
                     html += '<td class="text-center">';
-                    if (data[i].rdrData.withdrawalStatus == 'NO_USE') {
+                    if (participant.rdrData.withdrawalStatus == 'NO_USE') {
                         html += '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-                        html += '<span class="text-danger">No Use</span> - '+data[i].rdrData.withdrawalTime;
+                        html += '<span class="text-danger">No Use</span> - '+participant.rdrData.withdrawalTime;
                     }
                     html += '</td>';
 
                     //Contact
-                    html += '<td>'+data[i].rdrData.recontactMethod+'</td>';
-                    html += '<td>'+data[i].rdrData.getAddress+'</td>';
-                    html += '<td>'+data[i].rdrData.email+'</td>';
-                    html += '<td>'+data[i].rdrData.phoneNumber+'</td>';
+                    html += '<td>'+participant.rdrData.recontactMethod+'</td>';
+                    html += '<td>'+participant.rdrData.getAddress+'</td>';
+                    html += '<td>'+participant.rdrData.email+'</td>';
+                    html += '<td>'+participant.rdrData.phoneNumber+'</td>';
 
 
                     //PPI Surveys
                     html += '<td class="text-center">';
-                    if (data[i].rdrData.numCompletedBaselinePPIModules == 3) {
+                    if (participant.rdrData.numCompletedBaselinePPIModules == 3) {
                         html += '<i class="fa fa-check text-success" aria-hidden="true"></i>';
                     }
                     else {
                         html += '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
                     }
                     html += '</td>';
-                    html += '<td class="text-center">'+data[i].rdrData.numCompletedPPIModules+'</td>';
+                    html += '<td class="text-center">'+participant.rdrData.numCompletedPPIModules+'</td>';
                     {% for field, label in surveys %}
                         html += '<td class="text-center">';
                         var field = '{{ field }}';
-                        if (data[i].rdrData['questionnaireOn'+field] == 'SUBMITTED') {
+                        if (participant.rdrData['questionnaireOn'+field] == 'SUBMITTED') {
                             html += '<i class="fa fa-check text-success" aria-hidden="true"></i>';
                         }
                         else {
@@ -370,29 +382,29 @@ $(document).ready(function() {
                             html += '</td>';
                         }
                         html += '<td>';
-                        if (data[i].rdrData['questionnaireOn'+field+'Time'] == 'SUBMITTED') {
-                            html += data[i].rdrData['questionnaireOn'+field+'Time'];
+                        if (participant.rdrData['questionnaireOn'+field+'Time'] == 'SUBMITTED') {
+                            html += participant.rdrData['questionnaireOn'+field+'Time'];
                         }
                         html += '</td>';
                     {% endfor %}
 
                     //In-Person Enrollment
                     html += '<td class="text-center" >';
-                    if (data[i].rdrData.physicalMeasurementsStatus == 'COMPLETED') {
+                    if (participant.rdrData.physicalMeasurementsStatus == 'COMPLETED') {
                         html += '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-                        html += data[i].rdrData.physicalMeasurementsTime;
+                        html += participant.rdrData.physicalMeasurementsTime;
                     }
                     else {
                         html += '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
                     }
                     html += '</td>';
                     html += '<td>';
-                    if (data[i].rdrData.evaluationFinalizedSite) {
-                        html += data[i].rdrData.evaluationFinalizedSite;
+                    if (participant.rdrData.evaluationFinalizedSite) {
+                        html += participant.rdrData.evaluationFinalizedSite;
                     }
                     html += '</td>';
                     html += '<td class="text-center">';
-                    if (data[i].rdrData.samplesToIsolateDNA == 'RECEIVED') {
+                    if (participant.rdrData.samplesToIsolateDNA == 'RECEIVED') {
                         html += '<i class="fa fa-check text-success" aria-hidden="true"></i>';
                     }
                     else {
@@ -400,9 +412,9 @@ $(document).ready(function() {
                     }
                     html += '</td>';
                     html += '<td class="text-center">';
-                    if (data[i].rdrData.numBaselineSamplesArrived >= 7) {
+                    if (participant.rdrData.numBaselineSamplesArrived >= 7) {
                         html += '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-                        html += data[i].rdrData.numBaselineSamplesArrived;
+                        html += participant.rdrData.numBaselineSamplesArrived;
                     }
                     html += '</td>';
                     {% for field, label in samples %}
@@ -410,12 +422,12 @@ $(document).ready(function() {
                         {% if attribute(samplesAlias, field) is defined %}
                             {% set sampleAlias = attribute(samplesAlias, field) %}
                             var sampleAlias = '{{ sampleAlias }}';
-                            if (data[i].rdrData['sampleStatus'+sampleAlias] == 'RECEIVED') {
+                            if (participant.rdrData['sampleStatus'+sampleAlias] == 'RECEIVED') {
                                 field = sampleAlias;
                             }
                         {% endif %}
                         html += '<td class="text-center">';
-                        if (data[i].rdrData['sampleStatus'+field] == 'RECEIVED') {
+                        if (participant.rdrData['sampleStatus'+field] == 'RECEIVED') {
                             html += '<i class="fa fa-check text-success" aria-hidden="true"></i>';
                         }
                         else {
@@ -423,27 +435,27 @@ $(document).ready(function() {
                         }
                         html += '</td>';
                         html += '<td>';
-                        if (data[i].rdrData['sampleStatus'+field+'Time']) {
-                            html += data[i].rdrData['sampleStatus'+field+'Time'];
+                        if (participant.rdrData['sampleStatus'+field+'Time']) {
+                            html += participant.rdrData['sampleStatus'+field+'Time'];
                         }
                         html += '</td>';
                     {% endfor %}
                     html += '<td>';
-                    if (data[i].rdrData.orderCreatedSite) {
-                        html += data[i].rdrData.orderCreatedSite;
+                    if (participant.rdrData.orderCreatedSite) {
+                        html += participant.rdrData.orderCreatedSite;
                     }
                     html += '</td>';
 
                     //Demographics
                     html += '<td>';
-                    if (data[i].age) {
-                        html += data[i].age;
+                    if (participant.age) {
+                        html += participant.age;
                     }
                     html += '</td>';
-                    html += '<td>'+data[i].rdrData.sex+'</td>';
-                    html += '<td>'+data[i].rdrData.genderIdentity+'</td>';
-                    html += '<td>'+data[i].rdrData.race+'</td>';
-                    html += '<td>'+data[i].rdrData.education+'</td>';
+                    html += '<td>'+participant.rdrData.sex+'</td>';
+                    html += '<td>'+participant.rdrData.genderIdentity+'</td>';
+                    html += '<td>'+participant.rdrData.race+'</td>';
+                    html += '<td>'+participant.rdrData.education+'</td>';
 
                     html += '</tr>';
                 }
