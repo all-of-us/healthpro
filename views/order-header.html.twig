@@ -1,3 +1,8 @@
+{% if order.expired %}
+    <div class="alert alert-danger custom-alert">
+        This order has expired and can no longer be updated. Please create a new order to collect or send samples.
+    </div>
+{% endif %}
 <h2>
     <i class="fa fa-medkit" aria-hidden="true"></i>
     {{ order.created_ts|date('n/j/Y', app.userTimezone) }}
@@ -26,16 +31,17 @@
 {% set params = { participantId: participant.id, orderId: order.id } %}
 {% if order.type == 'kit' %}
     {% set steps = {
-        collect: 'collected',
-        process: 'processed',
-        finalize: 'finalized'
+        collect: ['Collect', 'collected'],
+        process: ['Process', 'processed'],
+        finalize: ['Finalize', 'finalized']
     } %}
 {% else %}
     {% set steps = {
-        print: 'printed',
-        collect: 'collected',
-        process: 'processed',
-        finalize: 'finalized'
+        printLabels: ['Print Labels', 'printed'],
+        collect: ['Collect', 'collected'],
+        printRequisition: ['Print Requisition', 'collected'],
+        process: ['Process', 'processed'],
+        finalize: ['Finalize', 'finalized']
     } %}
 {% endif %}
 <ul class="nav nav-tabs">
@@ -44,23 +50,38 @@
     {% set nextEnabled = true %}
     {% set previousStep = false %}
     {% for step, column in steps %}
-        {% if step == 'print' and order.finalized_ts %}
-            <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> {{ step|capitalize }}</a></li>
+        {% set path = column[0]|replace({' ' : ''}) %}
+        {% if (step == 'printLabels' or step == 'printRequisition') and (order.finalized_ts or order.expired) %}
+            <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> {{ column[0] }}</a></li>
         {% elseif nextEnabled %}
             <li role="presentation"{% if active == step %} class="active"{% endif %}>
-                <a href="{{ path('order'~(step|capitalize), params) }}">
-                    {% if attribute(order, column~'_ts') %}
-                        <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
-                    {% elseif step != 'print' %} {# since the printed_ts is set automatically after the first page load, don't disable to next tab #}
+                <a href="{{ path('order'~path, params) }}">
+                    {% if column[1] == 'collected' and order.type != 'kit' %}
+                        {% set condition = attribute(order, column[1]~'_ts') and attribute(order, 'mayo_id') %}
+                    {% else %}
+                        {% set condition = attribute(order, column[1]~'_ts') %}
+                    {% endif %}
+                    {% if condition %}
+                        {% if step == 'process' and processTabClass is defined %}
+                            <i class="{{ processTabClass }}" aria-hidden="true"></i>
+                        {% else %}
+                            <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                        {% endif %}
+                    {% else %} {# since the printed_ts is set automatically after the first page load, don't disable to next tab #}
                         {% set nextEnabled = false %}
                     {% endif %}
-                    {{ step|capitalize }}
+                    {{ column[0] }}
                 </a>
             </li>
         {% else %}
-            <li role="presentation" class="disabled"><a href="#" title="{{ previousStep|capitalize }} time must be set to continue" data-toggle="tooltip" data-placement="bottom">{{ step|capitalize }}</a></li>
+            {% if column[1] == 'collected' or column[1] == 'processed' %}
+                {% set title = "Order must be sent to continue" %}
+            {% else %}
+                {% set title = previousStep|capitalize ~ " time must be set to continue" %}
+            {% endif %}           
+            <li role="presentation" class="disabled"><a href="#" title="{{ title }}" data-toggle="tooltip" data-placement="bottom">{{ column[0] }}</a></li>
         {% endif %}
-        {% set previousStep = column %}
+        {% set previousStep = column[1] %}
     {% endfor %}
 </ul>
 <br />
