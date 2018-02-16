@@ -443,9 +443,10 @@ class OrderController extends AbstractController
                         $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
                         if (!empty($mayoId)) {
                             //Save finalized time
-                            $newUpdateArray = [];
-                            $newUpdateArray['finalized_ts'] = $finalizeForm['finalized_ts']->getData();
-                            $newUpdateArray['mayo_id'] = $mayoId;
+                            $newUpdateArray = [
+                                'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
+                                'mayo_id' => $mayoId
+                            ];
                             if ($app['em']->getRepository('orders')->update($orderId, $newUpdateArray)) {
                                 $app->log(Log::ORDER_EDIT, $orderId);
                             }
