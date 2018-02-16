@@ -274,7 +274,7 @@ class OrderController extends AbstractController
                     // Send order to mayo
                     if ($orderData['type'] !== 'kit' && $request->request->has('send')){
                         $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app);
-                        if ($mayoId) {
+                        if (!empty($mayoId)) {
                             if ($app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId])) {
                                 $app->log(Log::ORDER_EDIT, $orderId);
                                 $order = $this->loadOrder($participantId, $orderId, $app);
@@ -431,14 +431,25 @@ class OrderController extends AbstractController
                 $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
                 $updateArray['finalized_user_id'] = $app->getUser()->getId();
                 $updateArray['finalized_site'] = $app->getSiteId();
+                if ($order->get('type') === 'kit') {
+                    unset($updateArray['finalized_ts']);
+                }
+                // For DV sites finalized time will not be saved at this point
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                     //Send order to mayo for DV kit orders
                     $orderData = $order->toArray();
                     if (empty($orderData['mayo_id']) && $orderData['type'] === 'kit' && !empty($finalizeForm['finalized_ts']->getData())) {
                         $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
-                        if ($mayoId && $app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId])) {
-                            $app->log(Log::ORDER_EDIT, $orderId);
+                        if (!empty($mayoId)) {
+                            //Save finalized time
+                            $newUpdateArray['finalized_ts'] = $finalizeForm['finalized_ts']->getData();
+                            $newUpdateArray['mayo_id'] = $mayoId;
+                            if ($app['em']->getRepository('orders')->update($orderId, $newUpdateArray)) {
+                                $app->log(Log::ORDER_EDIT, $orderId);
+                            }
+                        } else {
+                            $app->addFlashError('Failed to send order');
                         }
                     }
                     $order = $this->loadOrder($participantId, $orderId, $app);
@@ -446,7 +457,7 @@ class OrderController extends AbstractController
                     if (!empty($order->get('finalized_ts')) && !empty($order->get('mayo_id'))) {
                         $order->sendToRdr();
                         $app->addFlashSuccess('Order finalized');
-                    } else {
+                    } elseif (empty($finalizeForm['finalized_ts']->getData())) {               
                         $app->addFlashNotice('Order updated but not finalized');
                     }
                 }
