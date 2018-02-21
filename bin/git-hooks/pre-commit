@@ -5,11 +5,16 @@
 
 # Checks file for presense of given pattern
 function check_file() {
-    $(git grep -ql --cached "$1" $2)
-    if [ $? == 0 ]
+    # File must exist
+    if [ -f $2 ]
     then
-      echo "[ERROR] Pattern \"$1\" found in $2"
-      exit 1
+      # Search for pattern in file
+      $(git grep -ql --cached "$1" $2)
+      if [ $? == 0 ]
+      then
+        echo "[ERROR] Pattern \"$1\" found in $2"
+        exit 1
+      fi
     fi
 }
 
