@@ -32,7 +32,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             'finalized_samples' => null,
             'collected_notes' => null,
             'processed_notes' => null,
-            'finalized_notes' => null
+            'finalized_notes' => null,
+            'processed_centrifuge_type' => null
         ];
         $orderParameters = array_merge($orderParameters, $parameters);
         $order->setOrder($orderParameters);
