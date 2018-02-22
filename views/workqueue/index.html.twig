@@ -100,10 +100,6 @@
         </thead>
         <tbody id="participant_info"></tbody>
     </table>
-    <div align="center">
-        <button class="btn btn-primary btn-page btn-prev" {% if not app.session.get('hasPrev') %} disabled="true" {% endif %} data-page="prev">Prev</button>
-        <button class="btn btn-primary btn-page btn-next" {% if not app.session.get('hasNext') %} disabled="true" {% endif %} data-page="next">Next</button>
-    </div>
     {% if isDownloadDisabled == false %}
         <p class="text-right">
             <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
@@ -141,164 +137,10 @@ $(document).ready(function() {
     });
     var url = window.location.href;
     var table = $('#workqueue').DataTable({
-        ajax: {
-            "url": url+'?page=next',
-            "dataSrc": function ( data ) {
-                var participants = data['participants'];
-                var rows = [];
-                for (var i in participants) {
-                    participant = participants[i];
-                    var row = [];
-
-                    //Identifiers and status
-                    {% if is_granted('ROLE_USER') %}
-                        row['lastName'] = '<a href="/participant/'+participant.id+'">'+participant.rdrData.lastName+'</a>';
-                    {% else %}
-                        row['lastName'] = participant.rdrData.lastName;
-                    {% endif %}
-                    {% if is_granted('ROLE_USER') %}
-                        row['firstName'] = '<a href="/participant/'+participant.id+'">'+participant.rdrData.firstName+'</a>';
-                    {% else %}
-                        row['firstName'] = participant.rdrData.firstName;
-                    {% endif %}
-                    if (participant.rdrData.dob) {
-                        row['dateOfBirth'] = participant.rdrData.dob; 
-                    } else {
-                        row['dateOfBirth'] = '';
-                    }
-                    if (participant.rdrData.id) {
-                        row['participantId'] = participant.rdrData.id;
-                    } else {
-                        row['participantId'] = ''; 
-                    }
-                    row['biobankId'] = participant.rdrData.biobankId;
-                    row['language'] = participant.rdrData.language;
-                    if (participant.rdrData.consentForStudyEnrollment == 'SUBMITTED') {
-                        row['generalConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'+participant.rdrData.consentForStudyEnrollmentTime;
-                    }
-                    else {
-                        row['generalConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-                    }
-                    if (participant.rdrData.consentForElectronicHealthRecords == 'SUBMITTED') {
-                        row['ehrConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'+participant.rdrData.consentForElectronicHealthRecordsTime;
-                    }
-                    else {
-                        row['ehrConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-                    }
-                    if (participant.rdrData.consentForCABoR == 'SUBMITTED') {
-                        row['caborConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'+participant.rdrData.consentForCABoRTime;
-                    }
-                    else {
-                        row['caborConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-                    }
-                    if (participant.rdrData.withdrawalStatus == 'NO_USE') {
-                        row['withdrawal'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i><span class="text-danger">No Use</span> - '+participant.rdrData.withdrawalTime;
-                    } else {
-                       row['withdrawal'] = ''; 
-                    }
-
-                    //Contact
-                    row['contactMethod'] = participant.rdrData.recontactMethod;
-                    if (participant.rdrData.getAddress) {
-                        row['address'] = participant.rdrData.getAddress;
-                    } else {
-                        row['address'] = '';  
-                    }
-                    row['email'] = participant.rdrData.email;
-                    if (participant.rdrData.phoneNumber) {
-                        row['phone'] = participant.rdrData.phoneNumber;
-                    } else {
-                        row['phone'] = '';
-                    }
-
-                    //PPI Surveys
-                    if (participant.rdrData.numCompletedBaselinePPIModules == 3) {
-                        row['ppiStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-                    }
-                    else {
-                        row['ppiStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-                    }
-                    row['ppiSurveys'] = participant.rdrData.numCompletedPPIModules;
-                     {% for field, label in surveys %}
-                        var field = '{{ field }}';
-                        if (participant.rdrData['questionnaireOn'+field] == 'SUBMITTED') {
-                            row['ppi{{ field }}'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-                        }
-                        else {
-                            row['ppi{{ field }}'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-                        }
-                        if (participant.rdrData['questionnaireOn'+field+'Time'] == 'SUBMITTED') {
-                            row['ppi{{ field }}Time'] = participant.rdrData['questionnaireOn'+field+'Time'];
-                        } else {
-                            row['ppi{{ field }}Time'] = '';
-                        }
-                    {% endfor %}
-
-                    //In-Person Enrollment
-                    if (participant.rdrData.physicalMeasurementsStatus == 'COMPLETED') {
-                        row['physicalMeasurementsStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'+participant.rdrData.physicalMeasurementsTime;
-                    }
-                    else {
-                        row['physicalMeasurementsStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-                    }
-                    if (participant.rdrData.evaluationFinalizedSite) {
-                        row['evaluationFinalizedSite'] = participant.rdrData.evaluationFinalizedSite;
-                    } else {
-                        row['evaluationFinalizedSite'] = '';
-                    }
-                    if (participant.rdrData.samplesToIsolateDNA == 'RECEIVED') {
-                        row['biobankDnaStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-                    }
-                    else {
-                        row['biobankDnaStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-                    }
-                    if (participant.rdrData.numBaselineSamplesArrived >= 7) {
-                        row['biobankSamples'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'+participant.rdrData.numBaselineSamplesArrived;
-                    } else {
-                        row['biobankSamples'] = '';
-                    }
-                    {% for field, label in samples %}
-                        var field = '{{ field }}';
-                        {% if attribute(samplesAlias, field) is defined %}
-                            {% set sampleAlias = attribute(samplesAlias, field) %}
-                            var sampleAlias = '{{ sampleAlias }}';
-                            if (participant.rdrData['sampleStatus'+sampleAlias] == 'RECEIVED') {
-                                field = sampleAlias;
-                            }
-                        {% endif %}
-                        if (participant.rdrData['sampleStatus'+field] == 'RECEIVED') {
-                            row['sample{{ field }}'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-                        }
-                        else {
-                            row['sample{{ field }}'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-                        }
-                        if (participant.rdrData['sampleStatus'+field+'Time']) {
-                            row['sample{{ field }}Time'] = participant.rdrData['sampleStatus'+field+'Time'];
-                        } else {
-                            row['sample{{ field }}Time'] = '';
-                        }
-                    {% endfor %}
-                    if (participant.rdrData.orderCreatedSite) {
-                        row['orderCreatedSite'] = participant.rdrData.orderCreatedSite;
-                    } else {
-                        row['orderCreatedSite'] = '';
-                    }
-
-                    //Demographics
-                    if (participant.age) {
-                        row['age'] = participant.age;
-                    } else {
-                        row['age'] = '';
-                    }
-                    row['sex'] = participant.rdrData.sex;
-                    row['genderIdentity'] = participant.rdrData.genderIdentity;
-                    row['race'] = participant.rdrData.race;
-                    row['education'] = participant.rdrData.education;
-                    rows[i] = row;
-                }
-                return rows;
-            }
-        },
+        pagingType: "simple",
+        processing: true,
+        serverSide: true,
+        ajax: url,
         order: [[6, 'desc']],
         dom: 'lBrtip',
         columns: [

@@ -167,7 +167,7 @@ class WorkQueueController extends AbstractController
         } else {
             $rdrParams['_sort:desc'] = 'consentForStudyEnrollmentTime';
         }
-        $rdrParams = array_merge($rdrParams, $params);
+        //$rdrParams = array_merge($rdrParams, $params);
         $rdrParams['hpoId'] = $organization;
         if (!isset($rdrParams['_count'])) {
             $rdrParams['_count'] = self::LIMIT_DEFAULT;
@@ -220,7 +220,7 @@ class WorkQueueController extends AbstractController
 
         $params = array_filter($request->query->all());
         //For ajax requests
-        if (!empty($params['page'])) {
+        if ($request->isXmlHttpRequest()) {
             $this->ajaxType = true;
         } else {
             $app['session']->set('index', 0);
@@ -255,11 +255,11 @@ class WorkQueueController extends AbstractController
             $app['session']->set('awardeeOrganization', $organization);
         }
         $participants = $this->participantSummarySearch($organization, $params, $app);
-        if ($this->ajaxType) {
+        if ($request->isXmlHttpRequest()) {
             $ajaxData = [];
-            $ajaxData['hasPrev'] = $app['session']->get('hasPrev');
-            $ajaxData['hasNext'] = $app['session']->get('hasNext');
-            $ajaxData['participants'] = $participants;
+            $ajaxData['recordsTotal'] = 10000;
+            $ajaxData['recordsFiltered'] = 10000;
+            $ajaxData['data'] = $this->generateWorkqueueTableRows($participants, $app);
             return new JsonResponse($ajaxData);
         } else {
             $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
@@ -275,6 +275,157 @@ class WorkQueueController extends AbstractController
                 'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload)
             ]);
         }
+    }
+
+    public function generateWorkqueueTableRows($participants, $app)
+    {
+        $rows = [];
+        foreach ($participants as $participant) {
+            $row = [];
+            //Identifiers and status
+            if($app->hasRole('ROLE_USER')) {
+                $row['lastName'] = '<a href="/participant/'.$participant->id.'">'.$participant->lastName.'</a>';
+            } else {
+                $row['lastName'] = $participant->lastName;
+            }
+            if ($app->hasRole('ROLE_USER')) {
+                $row['firstName'] = '<a href="/participant/'.$participant->id.'">'.$participant->firstName.'</a>';
+            } else {
+                $row['firstName'] = $participant->firstName;
+            }
+            if ($participant->dob) {
+                $row['dateOfBirth'] = $participant->dob->format('m/d/Y'); 
+            } else {
+                $row['dateOfBirth'] = '';
+            }
+            if ($participant->id) {
+                $row['participantId'] = $participant->id;
+            } else {
+                $row['participantId'] = ''; 
+            }
+            $row['biobankId'] = $participant->biobankId;
+            $row['language'] = $participant->language;
+            if ($participant->consentForStudyEnrollment == 'SUBMITTED') {
+                $row['generalConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$participant->consentForStudyEnrollmentTime;
+            }
+            else {
+                $row['generalConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            if ($participant->consentForElectronicHealthRecords == 'SUBMITTED') {
+                $row['ehrConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$participant->consentForElectronicHealthRecordsTime;
+            }
+            else {
+                $row['ehrConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            if ($participant->consentForCABoR == 'SUBMITTED') {
+                $row['caborConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$participant->consentForCABoRTime;
+            }
+            else {
+                $row['caborConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            if ($participant->withdrawalStatus == 'NO_USE') {
+                $row['withdrawal'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i><span class="text-danger">No Use</span> - '.$participant->withdrawalTime;
+            } else {
+               $row['withdrawal'] = ''; 
+            }
+
+            //Contact
+            $row['contactMethod'] = $participant->recontactMethod;
+            if ($participant->getAddress) {
+                $row['address'] = $participant->getAddress;
+            } else {
+                $row['address'] = '';  
+            }
+            $row['email'] = $participant->email;
+            if ($participant->phoneNumber) {
+                $row['phone'] = $participant->phoneNumber;
+            } else {
+                $row['phone'] = '';
+            }
+
+            //PPI Surveys
+            if ($participant->numCompletedBaselinePPIModules == 3) {
+                $row['ppiStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+            }
+            else {
+                $row['ppiStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            $row['ppiSurveys'] = $participant->numCompletedPPIModules;
+            foreach (self::$surveys as $field => $survey) {
+                if ($participant->{'questionnaireOn'.$field} == 'SUBMITTED') {
+                    $row["ppi{$field}"] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+                }
+                else {
+                    $row["ppi{$field}"] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+                }
+                if ($participant->{'questionnaireOn'.$field.'Time'} == 'SUBMITTED') {
+                    $row["ppi{$field}Time"] = $participant->{'questionnaireOn'.$field.'Time'};
+                } else {
+                    $row["ppi{$field}Time"] = '';
+                }
+            }
+
+            //In-Person Enrollment
+            if ($participant->physicalMeasurementsStatus == 'COMPLETED') {
+                $row['physicalMeasurementsStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$participant->physicalMeasurementsTime;
+            }
+            else {
+                $row['physicalMeasurementsStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            if ($participant->evaluationFinalizedSite) {
+                $row['evaluationFinalizedSite'] = $participant->evaluationFinalizedSite;
+            } else {
+                $row['evaluationFinalizedSite'] = '';
+            }
+            if ($participant->samplesToIsolateDNA == 'RECEIVED') {
+                $row['biobankDnaStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+            }
+            else {
+                $row['biobankDnaStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            if ($participant->numBaselineSamplesArrived >= 7) {
+                $row['biobankSamples'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$participant->numBaselineSamplesArrived;
+            } else {
+                $row['biobankSamples'] = '';
+            }
+            foreach (self::$samples as $field => $label) {
+                if (isset(self::$samplesAlias[$field])) {
+                    $sampleAlias = self::$samplesAlias[$field];
+                    if ($participant->{'sampleStatus'.$sampleAlias} == 'RECEIVED') {
+                        $field = $sampleAlias;
+                    }
+                }
+                if ($participant->{'sampleStatus'.$field} == 'RECEIVED') {
+                    $row["sample{$field}"] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+                }
+                else {
+                    $row["sample{$field}"] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+                }
+                if ($participant->{'sampleStatus'.$field.'Time'}) {
+                    $row["sample{$field}Time"] = $participant->{'sampleStatus'.$field.'Time'};
+                } else {
+                    $row["sample{$field}Time"] = '';
+                }
+            }
+            if ($participant->orderCreatedSite) {
+                $row['orderCreatedSite'] = $participant->orderCreatedSite;
+            } else {
+                $row['orderCreatedSite'] = '';
+            }
+
+            //Demographics
+            if ($participant->age) {
+                $row['age'] = $participant->age;
+            } else {
+                $row['age'] = '';
+            }
+            $row['sex'] = $participant->sex;
+            $row['genderIdentity'] = $participant->genderIdentity;
+            $row['race'] = $participant->race;
+            $row['education'] = $participant->education;
+            array_push($rows, $row);
+        } 
+        return $rows;
     }
 
     protected static function csvDateFromObject($date)
