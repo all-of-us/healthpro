@@ -169,9 +169,8 @@ class WorkQueueController extends AbstractController
         }
         //$rdrParams = array_merge($rdrParams, $params);
         $rdrParams['hpoId'] = $organization;
-        if (!isset($rdrParams['_count'])) {
-            $rdrParams['_count'] = self::LIMIT_DEFAULT;
-        }
+        $rdrParams['start'] = isset($params['start']) ? $params['start'] : 0;
+        $rdrParams['_count'] = isset($params['length']) ? $params['length'] : 10;
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($rdrParams['ageRange'])) {
@@ -186,7 +185,7 @@ class WorkQueueController extends AbstractController
         }
         $results = [];
         try {
-            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $app, $this->next, $this->prev, $this->ajaxType);
+            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $app, $this->next);
             foreach ($summaries as $summary) {
                 if (isset($summary->resource)) {
                     $results[] = new Participant($summary->resource);
@@ -219,19 +218,6 @@ class WorkQueueController extends AbstractController
         }
 
         $params = array_filter($request->query->all());
-        //For ajax requests
-        if ($request->isXmlHttpRequest()) {
-            $this->ajaxType = true;
-        } else {
-            $app['session']->set('index', 0);
-            $app['session']->set('tokens', []);
-            $app['session']->set('hasPrev', false);
-            $app['session']->set('hasNext', false);
-        }
-        if (!empty($params['page']) && $params['page'] == 'prev'){
-            $this->prev = true;
-            $this->next = false;
-        }
         $filters = self::$filters;
         if ($app->hasRole('ROLE_AWARDEE')) {
             // Add organizations to filters
@@ -254,8 +240,12 @@ class WorkQueueController extends AbstractController
             // Save selected (or default) organization in session
             $app['session']->set('awardeeOrganization', $organization);
         }
-        $participants = $this->participantSummarySearch($organization, $params, $app);
+        //For ajax requests
         if ($request->isXmlHttpRequest()) {
+            if (empty($params['start'])) {
+                $app['session']->set('tokens', []);
+            }
+            $participants = $this->participantSummarySearch($organization, $params, $app);
             $ajaxData = [];
             $ajaxData['recordsTotal'] = 10000;
             $ajaxData['recordsFiltered'] = 10000;
@@ -267,7 +257,7 @@ class WorkQueueController extends AbstractController
                 'filters' => $filters,
                 'surveys' => self::$surveys,
                 'samples' => self::$samples,
-                'participants' => $participants,
+                'participants' => [],
                 'params' => $params,
                 'organization' => $organization,
                 'isRdrError' => $this->rdrError,
