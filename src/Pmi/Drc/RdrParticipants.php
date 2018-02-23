@@ -94,13 +94,14 @@ class RdrParticipants
         if ($next && $this->nextToken) {
             $params['_token'] = $this->nextToken;
         }
-        if ($app && $type == 'wQtable') {
+        if ($app && $type == 'wQTable') {
             $tokens = $app['session']->get('tokens');
             $index = $params['start'] + $params['_count'];
             //Pass token if exists
             if (!empty($tokens)) {
                 $params['_token'] = $tokens[$params['start']];
             }
+            unset($params['start']);
         }
         $this->nextToken = null;
         try {
@@ -127,7 +128,7 @@ class RdrParticipants
                     if (isset($nextParameters['_token'])) {
                         $this->nextToken = $nextParameters['_token'];
                         // Store tokens in session
-                        if ($app && $type == 'wQtable') {
+                        if ($app && $type == 'wQTable') {
                             if (empty($tokens[$index])) {
                                 $tokens[$index] = $this->nextToken;
                                 $app['session']->set('tokens', $tokens);                               

@@ -167,12 +167,31 @@ class WorkQueueController extends AbstractController
         } else {
             $rdrParams['_sort:desc'] = 'consentForStudyEnrollmentTime';
         }
-        //$rdrParams = array_merge($rdrParams, $params);
         $rdrParams['hpoId'] = $organization;
-        $rdrParams['start'] = isset($params['start']) ? $params['start'] : 0;
         if (isset($params['_count'])) {
             $rdrParams['_count'] = $params['_count'];
-        } else {
+        }
+
+        //Pass filter params
+        if (!empty($params['withdrawalStatus'])) {
+            $rdrParams['withdrawalStatus'] = $params['withdrawalStatus'];
+        }
+        if (!empty($params['consentForElectronicHealthRecords'])) {
+            $rdrParams['consentForElectronicHealthRecords'] = $params['consentForElectronicHealthRecords'];
+        }
+        if (!empty($params['ageRange'])) {
+            $rdrParams['ageRange'] = $params['ageRange'];
+        }
+        if (!empty($params['genderIdentity'])) {
+            $rdrParams['genderIdentity'] = $params['genderIdentity'];
+        }
+        if (!empty($params['race'])) {
+            $rdrParams['race'] = $params['race'];
+        }
+
+        // Pass table params
+        if ($type == 'wQTable') {
+            $rdrParams['start'] = isset($params['start']) ? $params['start'] : 0;
             $rdrParams['_count'] = isset($params['length']) ? $params['length'] : 10;
         }
 
@@ -249,7 +268,7 @@ class WorkQueueController extends AbstractController
             if (empty($params['start'])) {
                 $app['session']->set('tokens', []);
             }
-            $participants = $this->participantSummarySearch($organization, $params, $app, $type = 'wQtable');
+            $participants = $this->participantSummarySearch($organization, $params, $app, $type = 'wQTable');
             $ajaxData = [];
             $ajaxData['recordsTotal'] = 10000;
             $ajaxData['recordsFiltered'] = 10000;
