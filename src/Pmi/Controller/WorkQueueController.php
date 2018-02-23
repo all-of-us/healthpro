@@ -170,7 +170,11 @@ class WorkQueueController extends AbstractController
         //$rdrParams = array_merge($rdrParams, $params);
         $rdrParams['hpoId'] = $organization;
         $rdrParams['start'] = isset($params['start']) ? $params['start'] : 0;
-        $rdrParams['_count'] = isset($params['length']) ? $params['length'] : 10;
+        if (isset($params['_count'])) {
+            $rdrParams['_count'] = $params['_count'];
+        } else {
+            $rdrParams['_count'] = isset($params['length']) ? $params['length'] : 10;
+        }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($rdrParams['ageRange'])) {
@@ -296,25 +300,25 @@ class WorkQueueController extends AbstractController
             $row['biobankId'] = $participant->biobankId;
             $row['language'] = $participant->language;
             if ($participant->consentForStudyEnrollment == 'SUBMITTED') {
-                $row['generalConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$participant->consentForStudyEnrollmentTime;
+                $row['generalConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$this->dateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone());         
             }
             else {
                 $row['generalConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
             }
             if ($participant->consentForElectronicHealthRecords == 'SUBMITTED') {
-                $row['ehrConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$participant->consentForElectronicHealthRecordsTime;
+                $row['ehrConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$this->dateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone());
             }
             else {
                 $row['ehrConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
             }
             if ($participant->consentForCABoR == 'SUBMITTED') {
-                $row['caborConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$participant->consentForCABoRTime;
+                $row['caborConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$this->dateFromString($participant->consentForCABoRTime, $app->getUserTimezone());
             }
             else {
                 $row['caborConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
             }
             if ($participant->withdrawalStatus == 'NO_USE') {
-                $row['withdrawal'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i><span class="text-danger">No Use</span> - '.$participant->withdrawalTime;
+                $row['withdrawal'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i><span class="text-danger">No Use</span> - '.$this->dateFromString($participant->withdrawalTime, $app->getUserTimezone());
             } else {
                $row['withdrawal'] = ''; 
             }
@@ -349,7 +353,7 @@ class WorkQueueController extends AbstractController
                     $row["ppi{$field}"] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
                 }
                 if ($participant->{'questionnaireOn'.$field.'Time'} == 'SUBMITTED') {
-                    $row["ppi{$field}Time"] = $participant->{'questionnaireOn'.$field.'Time'};
+                    $row["ppi{$field}Time"] = $this->dateFromString($participant->{'questionnaireOn'.$field.'Time'}, $app->getUserTimezone());
                 } else {
                     $row["ppi{$field}Time"] = '';
                 }
@@ -357,7 +361,7 @@ class WorkQueueController extends AbstractController
 
             //In-Person Enrollment
             if ($participant->physicalMeasurementsStatus == 'COMPLETED') {
-                $row['physicalMeasurementsStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$participant->physicalMeasurementsTime;
+                $row['physicalMeasurementsStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$this->dateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
             }
             else {
                 $row['physicalMeasurementsStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
@@ -392,7 +396,7 @@ class WorkQueueController extends AbstractController
                     $row["sample{$field}"] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
                 }
                 if ($participant->{'sampleStatus'.$field.'Time'}) {
-                    $row["sample{$field}Time"] = $participant->{'sampleStatus'.$field.'Time'};
+                    $row["sample{$field}Time"] = $this->dateFromString($participant->{'sampleStatus'.$field.'Time'}, $app->getUserTimezone());
                 } else {
                     $row["sample{$field}Time"] = '';
                 }
@@ -423,7 +427,7 @@ class WorkQueueController extends AbstractController
         return is_object($date) ? $date->format('m/d/Y') : '';
     }
 
-    protected static function csvDateFromString($string, $timezone)
+    protected static function dateFromString($string, $timezone)
     {
         if (!empty($string)) {
             try {
@@ -535,13 +539,13 @@ class WorkQueueController extends AbstractController
                             self::csvDateFromObject($participant->dob),
                             $participant->language,
                             self::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-                            self::csvDateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone()),
+                            self::dateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone()),
                             self::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-                            self::csvDateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone()),
+                            self::dateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone()),
                             self::csvStatusFromSubmitted($participant->consentForconsentForCABoR),
-                            self::csvDateFromString($participant->consentForCABoRTime, $app->getUserTimezone()),
+                            self::dateFromString($participant->consentForCABoRTime, $app->getUserTimezone()),
                             $participant->withdrawalStatus == 'NO_USE' ? '1' : '0',
-                            self::csvDateFromString($participant->withdrawalTime, $app->getUserTimezone()),
+                            self::dateFromString($participant->withdrawalTime, $app->getUserTimezone()),
                             $participant->streetAddress,
                             $participant->city,
                             $participant->state,
@@ -557,7 +561,7 @@ class WorkQueueController extends AbstractController
                         ];
                         foreach (self::$surveys as $survey => $label) {
                             $row[] = self::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                            $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"}, $app->getUserTimezone());
+                            $row[] = self::dateFromString($participant->{"questionnaireOn{$survey}Time"}, $app->getUserTimezone());
                         }
                     } else {
                         $row = [
@@ -567,7 +571,7 @@ class WorkQueueController extends AbstractController
                         ];                   
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                    $row[] = self::csvDateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
+                    $row[] = self::dateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
                     $row[] = $participant->evaluationFinalizedSite;
                     $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                     $row[] = $participant->numBaselineSamplesArrived;
@@ -579,7 +583,7 @@ class WorkQueueController extends AbstractController
                             }
                         }
                         $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
-                        $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"}, $app->getUserTimezone());
+                        $row[] = self::dateFromString($participant->{"sampleStatus{$sample}Time"}, $app->getUserTimezone());
                     }
                     $row[] = $participant->orderCreatedSite;
                     fputcsv($output, $row);
