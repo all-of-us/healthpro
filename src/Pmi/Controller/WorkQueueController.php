@@ -154,7 +154,7 @@ class WorkQueueController extends AbstractController
 
     protected $ajaxType = false;
 
-    protected function participantSummarySearch($organization, &$params, $app)
+    protected function participantSummarySearch($organization, &$params, $app, $type = null)
     {
         $rdrParams = [];
         if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] === 'NO_USE') {
@@ -185,7 +185,7 @@ class WorkQueueController extends AbstractController
         }
         $results = [];
         try {
-            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $app, $this->next);
+            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $app, $this->next, $type);
             foreach ($summaries as $summary) {
                 if (isset($summary->resource)) {
                     $results[] = new Participant($summary->resource);
@@ -245,7 +245,7 @@ class WorkQueueController extends AbstractController
             if (empty($params['start'])) {
                 $app['session']->set('tokens', []);
             }
-            $participants = $this->participantSummarySearch($organization, $params, $app);
+            $participants = $this->participantSummarySearch($organization, $params, $app, $type = 'wQtable');
             $ajaxData = [];
             $ajaxData['recordsTotal'] = 10000;
             $ajaxData['recordsFiltered'] = 10000;
