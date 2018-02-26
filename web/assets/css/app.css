@@ -240,6 +240,9 @@ label.label-normal {
 .multiheader-contact {
     background-color: #edd;
 }
+.dataTables_processing {
+    z-index: 1000;
+}
 
 /* Orders */
 table.table-samples {
