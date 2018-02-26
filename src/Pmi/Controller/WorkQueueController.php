@@ -19,6 +19,62 @@ class WorkQueueController extends AbstractController
         ['index', '/'],
         ['export', '/export.csv']
     ];
+
+    protected static $wQColumns = [
+        0 => 'lastName',
+        1 => 'firstName',
+        2 => 'dateOfBirth',
+        3 => 'participantId',
+        4 => 'biobankId',
+        5 => 'language',
+        6 => 'consentForStudyEnrollmentTime',
+        7 => 'consentForElectronicHealthRecordsTime',
+        8 => 'consentForCABoRTime',
+        9 => 'withdrawalTime',
+        10 => 'recontactMethod',
+        12 => 'email',
+        13 => 'phoneNumber',
+        14 => 'numCompletedBaselinePPIModules',
+        15 => 'numCompletedPPIModules',
+        16 => 'questionnaireOnTheBasics',
+        17 => 'questionnaireOnTheBasicsTime',
+        18 => 'questionnaireOnOverallHealth',
+        19 => 'questionnaireOnOverallHealthTime',
+        20 => 'questionnaireOnLifestyle',
+        21 => 'questionnaireOnLifestyleTime',
+        22 => 'questionnaireOnMedicalHistory',
+        23 => 'questionnaireOnMedicalHistoryTime',
+        24 => 'questionnaireOnMedications',
+        25 => 'questionnaireOnMedicationsTime',
+        26 => 'questionnaireOnFamilyHealth',
+        27 => 'questionnaireOnFamilyHealthTime',
+        28 => 'questionnaireOnHealthcareAccess',
+        29 => 'questionnaireOnHealthcareAccessTime',
+        30 => 'physicalMeasurementsTime',
+        31 => 'evaluationFinalizedSite',
+        32 => 'numBaselineSamplesArrived',
+        34 => 'sampleStatus1SST8',
+        35 => 'sampleStatus1PST8',
+        36 => 'sampleStatus1HEP4',
+        37 => 'sampleStatus1ED04',
+        38 => 'sampleStatus1ED10',
+        39 => 'sampleStatus2ED10',
+        40 => 'sampleStatus1UR10',
+        41 => 'sampleStatus1SAL',
+        42 => 'sampleStatus1SST8Time',
+        43 => 'sampleStatus1PST8Time',
+        44 => 'sampleStatus1HEP4Time',
+        45 => 'sampleStatus1ED04Time',
+        46 => 'sampleStatus1ED10Time',
+        47 => 'sampleStatus2ED10Time',
+        48 => 'sampleStatus1UR10Time',
+        49 => 'sampleStatus1SALTime',
+        50 => 'orderCreatedSite',
+        52 => 'sex',
+        53 => 'genderIdentity',
+        54 => 'race',
+        55 => 'education',
+    ];
     protected static $filters = [
         'withdrawalStatus' => [
             'label' => 'Withdrawal Status',
@@ -189,10 +245,22 @@ class WorkQueueController extends AbstractController
             $rdrParams['race'] = $params['race'];
         }
 
-        // Pass table params
         if ($type == 'wQTable') {
+            // Pass table params
             $rdrParams['start'] = isset($params['start']) ? $params['start'] : 0;
             $rdrParams['_count'] = isset($params['length']) ? $params['length'] : 10;
+
+            // Pass sort params
+            if (!empty($params['order'][0])) {
+                $sortColumnIndex = $params['order'][0]['column'];
+                $sortColumnName = self::$wQColumns[$sortColumnIndex];
+                $sortDir = $params['order'][0]['dir'];
+                if ($sortDir == 'asc') {
+                    $rdrParams['_sort'] = $sortColumnName;
+                } else {
+                    $rdrParams['_sort:desc'] = $sortColumnName;
+                }
+            }
         }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
