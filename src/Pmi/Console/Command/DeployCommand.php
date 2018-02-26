@@ -580,7 +580,7 @@ class DeployCommand extends Command {
         $process->setTimeout(null);
         $run = $mustRun ? 'mustRun' : 'run';
         $process->$run(function($type, $buffer) {
-            echo $buffer;
+            $this->out->write($buffer);
         });
         return $process;
     }

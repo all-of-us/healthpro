@@ -37,10 +37,12 @@ $(document).ready(function()
     var _PMITPL = {}; // cache of templates
     // global function for views to use to grab templates
     window.pmiGetTpl = function(tplId) {
+        /* eslint-disable security/detect-object-injection */
         if (!_PMITPL.hasOwnProperty(tplId)) {
             _PMITPL[tplId] = _.template($("#" + tplId).html());
         }
         return _PMITPL[tplId];
+        /* eslint-enable security/detect-object-injection */
     };
 
     /*************************************************************************
