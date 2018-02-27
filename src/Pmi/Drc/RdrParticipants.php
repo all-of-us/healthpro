@@ -129,10 +129,8 @@ class RdrParticipants
                         $this->nextToken = $nextParameters['_token'];
                         // Store tokens in session
                         if ($app && $type == 'wQTable') {
-                            if (empty($tokens[$index])) {
-                                $tokens[$index] = $this->nextToken;
-                                $app['session']->set('tokens', $tokens);                               
-                            }
+                            $tokens[$index] = $this->nextToken;
+                            $app['session']->set('tokens', $tokens);
                         }
                     }
                     break;
