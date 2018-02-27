@@ -70,6 +70,7 @@ class WorkQueueController extends AbstractController
         48 => 'sampleStatus1SAL',
         49 => 'sampleStatus1SALTime',
         50 => 'orderCreatedSite',
+        51 => 'dateOfBirth',
         52 => 'sex',
         53 => 'genderIdentity',
         54 => 'race',
