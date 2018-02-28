@@ -55,6 +55,7 @@
                 <th rowspan="2" class="col-group-info">PMI ID</th>
                 <th rowspan="2" class="col-group-info">Biobank ID</th>
                 <th rowspan="2" class="col-group-info">Language</th>
+                <th rowspan="2" class="col-group-default">Participant Status</th>
                 <th rowspan="2" class="col-group-default col-group-info">General Consent</th>
                 <th rowspan="2" class="col-group-default col-group-info">EHR Consent</th>
                 <th rowspan="2" class="col-group-info">CABoR Consent <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></th>
@@ -120,6 +121,7 @@
                     <td>{{ participant.id }}</td>
                     <td>{{ participant.biobankId }}</td>
                     <td>{{ participant.language }}</td>
+                    <td>{{ participant.enrollmentStatus }}</td>
                     <td class="text-center" data-order="{{ participant.consentForStudyEnrollment == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForStudyEnrollmentTime }}">
                         {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
@@ -283,6 +285,7 @@ $(document).ready(function() {
             { name: 'participantId', visible: false },
             { name: 'biobankId', visible: false },
             { name: 'language', visible: false  },
+            { name: 'participantStatus' },
             { name: 'generalConsent' },
             { name: 'ehrConsent' },
             { name: 'caborConsent', visible: false  },
