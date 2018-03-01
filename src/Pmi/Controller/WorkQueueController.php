@@ -142,8 +142,14 @@ class WorkQueueController extends AbstractController
         '1SAL' => 'Saliva'
     ];
     public static $samplesAlias = [
-        '1SST8' => '1SS08',
-        '1PST8' => '1PS08'
+        [
+            '1SST8' => '1SS08',
+            '1PST8' => '1PS08'
+        ],
+        [
+            '1SST8' => '2SST8',
+            '1PST8' => '2PST8'
+        ]
     ];
     protected $rdrError = false;
 
