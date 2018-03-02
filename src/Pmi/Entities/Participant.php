@@ -83,6 +83,10 @@ class Participant
         }
 
         // Remove site prefix
+        if (!empty($participant->site) && $participant->site !== 'UNSET') {
+            $this->site = $this->getSiteSuffix($participant->site);
+        }
+
         if (!empty($participant->physicalMeasurementsFinalizedSite) && $participant->physicalMeasurementsFinalizedSite !== 'UNSET') {
             $this->evaluationFinalizedSite = $this->getSiteSuffix($participant->physicalMeasurementsFinalizedSite);
         }
