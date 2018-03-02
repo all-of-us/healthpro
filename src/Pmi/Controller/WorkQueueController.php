@@ -344,6 +344,7 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Physical Measurements Completion Date';
+            $headers[] = 'Paired Site Location';
             $headers[] = 'Physical Measurements Location';
             $headers[] = 'Samples for DNA Received';
             $headers[] = 'Biospecimens';
@@ -399,6 +400,7 @@ class WorkQueueController extends AbstractController
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
                     $row[] = self::csvDateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
+                    $row[] = $participant->site;
                     $row[] = $participant->evaluationFinalizedSite;
                     $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                     $row[] = $participant->numBaselineSamplesArrived;
