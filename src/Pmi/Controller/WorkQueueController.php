@@ -219,7 +219,7 @@ class WorkQueueController extends AbstractController
         if (!empty($sites)) {
             $sitesList = [];
             $sitesList['site']['label'] = 'Paired Site Location';
-            foreach ($sites as $key => $site) {
+            foreach ($sites as $site) {
                 $sitesList['site']['options'][$site['google_group']] = \Pmi\Security\User::SITE_PREFIX.$site['google_group'];
             }
             $filters = array_merge($filters, $sitesList);
