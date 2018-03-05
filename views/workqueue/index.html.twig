@@ -185,7 +185,7 @@
                     {% endfor %}
 
                     {# In-Person Enrollment #}
-                    <td>{{ participant.site ? participant.site }}</td>
+                    <td>{{ participant.siteSuffix ? participant.siteSuffix }}</td>
                     <td class="text-center"  data-order="{{ participant.physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0' }}-{{ participant.physicalMeasurementsTime }}">
                         {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
