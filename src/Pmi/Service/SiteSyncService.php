@@ -47,13 +47,14 @@ class SiteSyncService
                         $siteData = [];
                     }
                     $siteData['name'] = $site->displayName;
-                    $siteData['google_group'] = $googleGroup;
+                    $siteData['google_group'] = $googleGroup; // backwards compatibility
+                    $siteData['organization'] = $awardee->id; // backwards compatibility
+                    $siteData['site_id'] = $googleGroup;
+                    $siteData['organization_id'] = $organization->id;
+                    $siteData['awardee_id'] = $awardee->id;
                     $siteData['mayolink_account'] = $site->mayolinkClientNumber;
                     $siteData['timezone'] = $site->timeZoneId;
-                    $siteData['organization'] = $awardee->id;
                     $siteData['type'] = $awardee->type;
-                    // $siteData['awardee'] = ?? not sure what this should be since organization is actually awardee. i think to be backwards-compatible, this might be for dv's only
-                    // $siteData['email'] = ?? data doesn't seem to be correct and is an array but not properly separated?
 
                     if (empty($siteData['workqueue_download'])) {
                         $siteData['workqueue_download'] = 'full_data';
