@@ -83,6 +83,11 @@ class Participant
             }
         }
 
+        // Get site suffix
+        if (!empty($participant->site) && $participant->site !== 'UNSET') {
+            $this->siteSuffix = $this->getSiteSuffix($participant->site);
+        }
+
         //Set age
         $this->age = $this->getAge();
 

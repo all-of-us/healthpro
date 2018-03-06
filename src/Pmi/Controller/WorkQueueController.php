@@ -52,6 +52,7 @@ class WorkQueueController extends AbstractController
         'questionnaireOnFamilyHealthTime',
         'questionnaireOnHealthcareAccess',
         'questionnaireOnHealthcareAccessTime',
+        'site',
         'physicalMeasurementsTime',
         'evaluationFinalizedSite',
         'numBaselineSamplesArrived',
@@ -451,6 +452,7 @@ class WorkQueueController extends AbstractController
             }
 
             //In-Person Enrollment
+            $row['pairedSiteLocation'] = $participant->siteSuffix;
             if ($participant->physicalMeasurementsStatus == 'COMPLETED') {
                 $row['physicalMeasurementsStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$this->dateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
             }
