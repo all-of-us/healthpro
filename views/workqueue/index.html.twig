@@ -55,6 +55,7 @@
                 <th rowspan="2" class="col-group-info">PMI ID</th>
                 <th rowspan="2" class="col-group-info">Biobank ID</th>
                 <th rowspan="2" class="col-group-info">Language</th>
+                <th rowspan="2" class="col-group-default">Participant Status</th>
                 <th rowspan="2" class="col-group-default col-group-info">General Consent</th>
                 <th rowspan="2" class="col-group-default col-group-info">EHR Consent</th>
                 <th rowspan="2" class="col-group-info">CABoR Consent <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></th>
@@ -142,7 +143,7 @@ $(document).ready(function() {
         serverSide: true,
         scrollX: true,
         ajax: url,
-        order: [[6, 'desc']],
+        order: [[7, 'desc']],
         dom: 'lBrtip',
         columns: [
             { name: 'lastName', data: 'lastName' },
@@ -151,6 +152,7 @@ $(document).ready(function() {
             { name: 'participantId', visible: false, data: 'participantId' },
             { name: 'biobankId', visible: false, data: 'biobankId' },
             { name: 'language', visible: false, data: 'language'  },
+            { name: 'participantStatus', data: 'participantStatus' },
             { name: 'generalConsent', data: 'generalConsent' },
             { name: 'ehrConsent', data: 'ehrConsent' },
             { name: 'caborConsent', visible: false, data: 'caborConsent' },
