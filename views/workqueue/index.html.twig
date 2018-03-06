@@ -98,145 +98,7 @@
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Education</th>
             </tr>
         </thead>
-        <tbody>
-            {% for participant in participants %}
-                <tr>
-                    {# Identifiers and status #}
-                    <td data-order="{{ participant.lastName }}">
-                        {% if is_granted('ROLE_USER') %}
-                            <a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}</a>
-                        {% else %}
-                            {{ participant.lastName }}
-                        {% endif %}
-                    </td>
-                    <td data-order="{{ participant.firstName }}">
-                        {% if is_granted('ROLE_USER') %}
-                            <a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a>
-                        {% else %}
-                            {{ participant.firstName }}
-                        {% endif %}
-                    </td>
-                    <td data-order="{{ participant.dob ? participant.dob|date('Y-m-d') }}">{{ participant.dob ? participant.dob|date('m/d/Y') }}</td>
-                    <td>{{ participant.id }}</td>
-                    <td>{{ participant.biobankId }}</td>
-                    <td>{{ participant.language }}</td>
-                    <td class="text-center" data-order="{{ participant.consentForStudyEnrollment == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForStudyEnrollmentTime }}">
-                        {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
-                            <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.consentForStudyEnrollmentTime ? participant.consentForStudyEnrollmentTime|date('m/d/Y', app.userTimezone) }}
-                        {% else %}
-                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                        {% endif %}
-                    </td>
-                    <td class="text-center" data-order="{{ participant.consentForElectronicHealthRecords == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForElectronicHealthRecordsTime }}">
-                        {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
-                            <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('m/d/Y', app.userTimezone) }}
-                        {% else %}
-                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('m/d/Y', app.userTimezone) : '(not completed)' }}
-                        {% endif %}
-                    </td>
-                    <td class="text-center" data-order="{{ participant.consentForCABoR == 'SUBMITTED' ? '1' : '0' }}-{{ participant.consentForCABoRTime }}">
-                        {% if participant.consentForCABoR == 'SUBMITTED' %}
-                            <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('m/d/Y', app.userTimezone) }}
-                        {% else %}
-                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('m/d/Y', app.userTimezone) : '(not completed)' }}
-                        {% endif %}
-                    </td>
-                    <td class="text-center" data-order="{{ participant.withdrawalStatus == 'NO_USE' ? '1' : '0' }}-{{ participant.withdrawalTime }}">
-                        {% if participant.withdrawalStatus == 'NO_USE' %}
-                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            <span class="text-danger">No Use</span> - {{ participant.withdrawalTime ? participant.withdrawalTime|date('m/d/Y', app.userTimezone) }}
-                        {% endif %}
-                    </td>
-
-                    {# Contact #}
-                    <td>{{ participant.recontactMethod }}</td>
-                    <td>{{ participant.getAddress() }}</td>
-                    <td>{{ participant.email }}</td>
-                    <td>{{ participant.phoneNumber }}</td>
-
-                    {# PPI Surveys #}
-                    <td class="text-center" data-order="{{ participant.numCompletedBaselinePPIModules == 3 ? '1' : '0' }}">
-                        {% if participant.numCompletedBaselinePPIModules == 3 %}
-                            <i class="fa fa-check text-success" aria-hidden="true"></i>
-                        {% else %}
-                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                        {% endif %}
-                    </td>
-                    <td class="text-center">{{ participant.numCompletedPPIModules }}</td>
-                    {% for field, label in surveys %}
-                        <td class="text-center" data-order="{{ attribute(participant, 'questionnaireOn' ~ field) == 'SUBMITTED' ? '1' : '0' }}">
-                            {% if attribute(participant, 'questionnaireOn' ~ field) == 'SUBMITTED' %}
-                                <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {% else %}
-                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            {% endif %}
-                        </td>
-                        <td data-order="{{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time') }}">
-                            {% if attribute(participant, 'questionnaireOn' ~ field ~ 'Time') %}
-                                {{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time')|date('m/d/Y', app.userTimezone) }}
-                            {% endif %}
-                        </td>
-                    {% endfor %}
-
-                    {# In-Person Enrollment #}
-                    <td class="text-center"  data-order="{{ participant.physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0' }}-{{ participant.physicalMeasurementsTime }}">
-                        {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
-                            <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ participant.physicalMeasurementsTime ? participant.physicalMeasurementsTime|date('m/d/Y', app.userTimezone) }}
-                        {% else %}
-                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                        {% endif %}
-                    </td>
-                    <td>{{ participant.evaluationFinalizedSite ? participant.evaluationFinalizedSite }}</td>
-                    <td class="text-center" data-order="{{ participant.samplesToIsolateDNA == 'RECEIVED' ? '1' : '0' }}">
-                        {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
-                            <i class="fa fa-check text-success" aria-hidden="true"></i>
-                        {% else %}
-                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                        {% endif %}
-                    </td>
-                    <td class="text-center" data-order="{{ participant.numBaselineSamplesArrived }}">
-                        {% if participant.numBaselineSamplesArrived >= 7 %}
-                            <i class="fa fa-check text-success" aria-hidden="true"></i>
-                        {% endif %}
-                        {{ participant.numBaselineSamplesArrived }}
-                    </td>
-                    {% for field, label in samples %}
-                        {% if attribute(samplesAlias, field) is defined %}
-                            {% set sampleAlias = attribute(samplesAlias, field) %}
-                            {% if attribute(participant, 'sampleStatus' ~ sampleAlias) == 'RECEIVED' %}
-                                {% set field = sampleAlias %}
-                            {% endif %}
-                        {% endif %}
-                        <td class="text-center" data-order="{{ attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' ? '1' : '0' }}">
-                            {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
-                                <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {% else %}
-                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            {% endif %}
-                        </td>
-                        <td data-order="{{ attribute(participant, 'sampleStatus' ~ field ~ 'Time') }}">
-                            {% if attribute(participant, 'sampleStatus' ~ field ~ 'Time') %}
-                                {{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y', app.userTimezone) }}
-                            {% endif %}
-                        </td>
-                    {% endfor %}
-                    <td>{{ participant.orderCreatedSite ? participant.orderCreatedSite }}</td>
-
-                    {# Demographics #}
-                    <td>{{ participant.getAge() }}</td>
-                    <td>{{ participant.sex }}</td>
-                    <td>{{ participant.genderIdentity }}</td>
-                    <td>{{ participant.race }}</td>
-                    <td>{{ participant.education }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
+        <tbody id="participant_info"></tbody>
     </table>
     {% if isDownloadDisabled == false %}
         <p class="text-right">
@@ -273,44 +135,53 @@ $(document).ready(function() {
             btnTextTrue: 'Accept'
         });
     });
+    var url = window.location.href;
     var table = $('#workqueue').DataTable({
+        pagingType: "simple",
+        processing: true,
+        serverSide: true,
+        scrollX: true,
+        ajax: url,
         order: [[6, 'desc']],
         dom: 'lBrtip',
         columns: [
-            { name: 'lastName' },
-            { name: 'firstName' },
-            { name: 'dateOfBirth' },
-            { name: 'participantId', visible: false },
-            { name: 'biobankId', visible: false },
-            { name: 'language', visible: false  },
-            { name: 'generalConsent' },
-            { name: 'ehrConsent' },
-            { name: 'caborConsent', visible: false  },
-            { name: 'withdrawal' },
-            { name: 'contactMethod', visible: false },
-            { name: 'address', visible: false },
-            { name: 'email', visible: false  },
-            { name: 'phone', visible: false  },
-            { name: 'ppiStatus' },
-            { name: 'ppiSurveys' },
+            { name: 'lastName', data: 'lastName' },
+            { name: 'firstName', data: 'firstName' },
+            { name: 'dateOfBirth', data: 'dateOfBirth' },
+            { name: 'participantId', visible: false, data: 'participantId' },
+            { name: 'biobankId', visible: false, data: 'biobankId' },
+            { name: 'language', visible: false, data: 'language'  },
+            { name: 'generalConsent', data: 'generalConsent' },
+            { name: 'ehrConsent', data: 'ehrConsent' },
+            { name: 'caborConsent', visible: false, data: 'caborConsent' },
+            { name: 'withdrawal', data: 'withdrawal' },
+            { name: 'contactMethod', visible: false, data: 'contactMethod' },
+            { name: 'address', visible: false, data: 'address', orderable: false },
+            { name: 'email', visible: false, data: 'email' },
+            { name: 'phone', visible: false, data: 'phone' },
+            { name: 'ppiStatus', data: 'ppiStatus' },
+            { name: 'ppiSurveys', data: 'ppiSurveys' },
             {% for field, label in surveys %}
-                { name: 'ppi{{ field }}', visible: false },
-                { name: 'ppi{{ field }}Time', visible: false },
+                { name: 'ppi{{ field }}', visible: false, data: 'ppi{{ field }}' },
+                { name: 'ppi{{ field }}Time', visible: false, data: 'ppi{{ field }}Time' },
             {% endfor %}
-            { name: 'physicalMeasurementsStatus' },
-            { name: 'evaluationFinalizedSite', visible: false },
-            { name: 'biobankDnaStatus' },
-            { name: 'biobankSamples' },
+            { name: 'physicalMeasurementsStatus', data: 'physicalMeasurementsStatus' },
+            { name: 'evaluationFinalizedSite', visible: false, data: 'evaluationFinalizedSite' },
+            { name: 'biobankDnaStatus', data: 'biobankDnaStatus' },
+            { name: 'biobankSamples', data: 'biobankSamples', orderable: false },
             {% for field, label in samples %}
-                { name: 'sample{{ field }}', visible: false },
-                { name: 'sample{{ field }}Time', visible: false },
+                { name: 'sample{{ field }}', visible: false, data: 'sample{{ field }}' },
+                { name: 'sample{{ field }}Time', visible: false, data: 'sample{{ field }}Time' },
             {% endfor %}
-            { name: 'orderCreatedSite', visible: false },
-            { name: 'age', visible: false },
-            { name: 'sex', visible: false },
-            { name: 'genderIdentity', visible: false },
-            { name: 'race', visible: false },
-            { name: 'education', visible: false }
+            { name: 'orderCreatedSite', visible: false, data: 'orderCreatedSite' },
+            { name: 'age', visible: false, data: 'age' },
+            { name: 'sex', visible: false, data: 'sex' },
+            { name: 'genderIdentity', visible: false, data: 'genderIdentity' },
+            { name: 'race', visible: false, data: 'race' },
+            { name: 'education', visible: false, data: 'education' }
+        ],
+        columnDefs: [
+            { className: "text-center", targets: [6, 7, 8, 9, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 31, 32, 34, 36, 38, 40, 42, 44, 46, 48] }
         ],
         pageLength: 25,
         buttons: [
@@ -439,6 +310,12 @@ $(document).ready(function() {
             }
         ]
     });
+
+    //Reset table data on page length change
+    $('#workqueue').on('length.dt', function() {
+        table.clear().draw();
+    });
+
     table.buttons().container().find('.btn').addClass('btn-sm');
     $('#workqueue_length').addClass('pull-right');
     $('#workqueue_info').addClass('pull-left');

@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Pmi\Audit\Log;
 use Pmi\Entities\Participant;
 use Pmi\Drc\CodeBook;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class WorkQueueController extends AbstractController
 {
@@ -17,6 +18,63 @@ class WorkQueueController extends AbstractController
     protected static $routes = [
         ['index', '/'],
         ['export', '/export.csv']
+    ];
+
+    protected static $wQColumns = [
+        0 => 'lastName',
+        1 => 'firstName',
+        2 => 'dateOfBirth',
+        3 => 'participantId',
+        4 => 'biobankId',
+        5 => 'language',
+        6 => 'consentForStudyEnrollmentTime',
+        7 => 'consentForElectronicHealthRecordsTime',
+        8 => 'consentForCABoRTime',
+        9 => 'withdrawalTime',
+        10 => 'recontactMethod',
+        12 => 'email',
+        13 => 'phoneNumber',
+        14 => 'numCompletedBaselinePPIModules',
+        15 => 'numCompletedPPIModules',
+        16 => 'questionnaireOnTheBasics',
+        17 => 'questionnaireOnTheBasicsTime',
+        18 => 'questionnaireOnOverallHealth',
+        19 => 'questionnaireOnOverallHealthTime',
+        20 => 'questionnaireOnLifestyle',
+        21 => 'questionnaireOnLifestyleTime',
+        22 => 'questionnaireOnMedicalHistory',
+        23 => 'questionnaireOnMedicalHistoryTime',
+        24 => 'questionnaireOnMedications',
+        25 => 'questionnaireOnMedicationsTime',
+        26 => 'questionnaireOnFamilyHealth',
+        27 => 'questionnaireOnFamilyHealthTime',
+        28 => 'questionnaireOnHealthcareAccess',
+        29 => 'questionnaireOnHealthcareAccessTime',
+        30 => 'physicalMeasurementsTime',
+        31 => 'evaluationFinalizedSite',
+        32 => 'numBaselineSamplesArrived',
+        34 => 'sampleStatus1SST8',
+        35 => 'sampleStatus1SST8Time',
+        36 => 'sampleStatus1PST8',
+        37 => 'sampleStatus1PST8Time',
+        38 => 'sampleStatus1HEP4',
+        39 => 'sampleStatus1HEP4Time',
+        40 => 'sampleStatus1ED04',
+        41 => 'sampleStatus1ED04Time',
+        42 => 'sampleStatus1ED10',
+        43 => 'sampleStatus1ED10Time',
+        44 => 'sampleStatus2ED10',
+        45 => 'sampleStatus2ED10Time',
+        46 => 'sampleStatus1UR10',
+        47 => 'sampleStatus1UR10Time',
+        48 => 'sampleStatus1SAL',
+        49 => 'sampleStatus1SALTime',
+        50 => 'orderCreatedSite',
+        51 => 'dateOfBirth',
+        52 => 'sex',
+        53 => 'genderIdentity',
+        54 => 'race',
+        55 => 'education',
     ];
     protected static $filters = [
         'withdrawalStatus' => [
@@ -147,7 +205,13 @@ class WorkQueueController extends AbstractController
     ];
     protected $rdrError = false;
 
-    protected function participantSummarySearch($organization, &$params, $app)
+    protected $next = true;
+
+    protected $prev = false;
+
+    protected $ajaxType = false;
+
+    protected function participantSummarySearch($organization, &$params, $app, $type = null)
     {
         $rdrParams = [];
         if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] === 'NO_USE') {
@@ -160,10 +224,44 @@ class WorkQueueController extends AbstractController
         } else {
             $rdrParams['_sort:desc'] = 'consentForStudyEnrollmentTime';
         }
-        $rdrParams = array_merge($rdrParams, $params);
         $rdrParams['hpoId'] = $organization;
-        if (!isset($rdrParams['_count'])) {
-            $rdrParams['_count'] = self::LIMIT_DEFAULT;
+        if (isset($params['_count'])) {
+            $rdrParams['_count'] = $params['_count'];
+        }
+
+        //Pass filter params
+        if (!empty($params['withdrawalStatus'])) {
+            $rdrParams['withdrawalStatus'] = $params['withdrawalStatus'];
+        }
+        if (!empty($params['consentForElectronicHealthRecords'])) {
+            $rdrParams['consentForElectronicHealthRecords'] = $params['consentForElectronicHealthRecords'];
+        }
+        if (!empty($params['ageRange'])) {
+            $rdrParams['ageRange'] = $params['ageRange'];
+        }
+        if (!empty($params['genderIdentity'])) {
+            $rdrParams['genderIdentity'] = $params['genderIdentity'];
+        }
+        if (!empty($params['race'])) {
+            $rdrParams['race'] = $params['race'];
+        }
+
+        if ($type == 'wQTable') {
+            // Pass table params
+            $rdrParams['start'] = isset($params['start']) ? $params['start'] : 0;
+            $rdrParams['_count'] = isset($params['length']) ? $params['length'] : 10;
+
+            // Pass sort params
+            if (!empty($params['order'][0])) {
+                $sortColumnIndex = $params['order'][0]['column'];
+                $sortColumnName = self::$wQColumns[$sortColumnIndex];
+                $sortDir = $params['order'][0]['dir'];
+                if ($sortDir == 'asc') {
+                    $rdrParams['_sort'] = $sortColumnName;
+                } else {
+                    $rdrParams['_sort:desc'] = $sortColumnName;
+                }
+            }
         }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
@@ -179,7 +277,7 @@ class WorkQueueController extends AbstractController
         }
         $results = [];
         try {
-            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, true);
+            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $app, $this->next, $type);
             foreach ($summaries as $summary) {
                 if (isset($summary->resource)) {
                     $results[] = new Participant($summary->resource);
@@ -234,19 +332,182 @@ class WorkQueueController extends AbstractController
             // Save selected (or default) organization in session
             $app['session']->set('awardeeOrganization', $organization);
         }
-        $participants = $this->participantSummarySearch($organization, $params, $app);
-        $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
-        return $app['twig']->render('workqueue/index.html.twig', [
-            'filters' => $filters,
-            'surveys' => self::$surveys,
-            'samples' => self::$samples,
-            'participants' => $participants,
-            'params' => $params,
-            'organization' => $organization,
-            'isRdrError' => $this->rdrError,
-            'samplesAlias' => self::$samplesAlias,
-            'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload)
-        ]);
+        //For ajax requests
+        if ($request->isXmlHttpRequest()) {
+            if (empty($params['start'])) {
+                $app['session']->set('tokens', []);
+            }
+            $participants = $this->participantSummarySearch($organization, $params, $app, $type = 'wQTable');
+            $ajaxData = [];
+            $ajaxData['recordsTotal'] = 10000;
+            $ajaxData['recordsFiltered'] = 10000;
+            $ajaxData['data'] = $this->generateWorkqueueTableRows($participants, $app);
+            return new JsonResponse($ajaxData);
+        } else {
+            $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
+            return $app['twig']->render('workqueue/index.html.twig', [
+                'filters' => $filters,
+                'surveys' => self::$surveys,
+                'samples' => self::$samples,
+                'participants' => [],
+                'params' => $params,
+                'organization' => $organization,
+                'isRdrError' => $this->rdrError,
+                'samplesAlias' => self::$samplesAlias,
+                'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload)
+            ]);
+        }
+    }
+
+    public function generateWorkqueueTableRows($participants, $app)
+    {
+        $rows = [];
+        foreach ($participants as $participant) {
+            $row = [];
+            //Identifiers and status
+            if($app->hasRole('ROLE_USER')) {
+                $row['lastName'] = '<a href="/participant/'.$participant->id.'">'.$participant->lastName.'</a>';
+            } else {
+                $row['lastName'] = $participant->lastName;
+            }
+            if ($app->hasRole('ROLE_USER')) {
+                $row['firstName'] = '<a href="/participant/'.$participant->id.'">'.$participant->firstName.'</a>';
+            } else {
+                $row['firstName'] = $participant->firstName;
+            }
+            if ($participant->dob) {
+                $row['dateOfBirth'] = $participant->dob->format('m/d/Y'); 
+            } else {
+                $row['dateOfBirth'] = '';
+            }
+            if ($participant->id) {
+                $row['participantId'] = $participant->id;
+            } else {
+                $row['participantId'] = ''; 
+            }
+            $row['biobankId'] = $participant->biobankId;
+            $row['language'] = $participant->language;
+            if ($participant->consentForStudyEnrollment == 'SUBMITTED') {
+                $row['generalConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$this->dateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone());         
+            }
+            else {
+                $row['generalConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            if ($participant->consentForElectronicHealthRecords == 'SUBMITTED') {
+                $row['ehrConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$this->dateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone());
+            }
+            else {
+                $row['ehrConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            if ($participant->consentForCABoR == 'SUBMITTED') {
+                $row['caborConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$this->dateFromString($participant->consentForCABoRTime, $app->getUserTimezone());
+            }
+            else {
+                $row['caborConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            if ($participant->withdrawalStatus == 'NO_USE') {
+                $row['withdrawal'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i><span class="text-danger">No Use</span> - '.$this->dateFromString($participant->withdrawalTime, $app->getUserTimezone());
+            } else {
+               $row['withdrawal'] = ''; 
+            }
+
+            //Contact
+            $row['contactMethod'] = $participant->recontactMethod;
+            if ($participant->getAddress) {
+                $row['address'] = $participant->getAddress;
+            } else {
+                $row['address'] = '';  
+            }
+            $row['email'] = $participant->email;
+            if ($participant->phoneNumber) {
+                $row['phone'] = $participant->phoneNumber;
+            } else {
+                $row['phone'] = '';
+            }
+
+            //PPI Surveys
+            if ($participant->numCompletedBaselinePPIModules == 3) {
+                $row['ppiStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+            }
+            else {
+                $row['ppiStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            $row['ppiSurveys'] = $participant->numCompletedPPIModules;
+            foreach (self::$surveys as $field => $survey) {
+                if ($participant->{'questionnaireOn'.$field} == 'SUBMITTED') {
+                    $row["ppi{$field}"] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+                }
+                else {
+                    $row["ppi{$field}"] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+                }
+                if ($participant->{'questionnaireOn'.$field.'Time'} == 'SUBMITTED') {
+                    $row["ppi{$field}Time"] = $this->dateFromString($participant->{'questionnaireOn'.$field.'Time'}, $app->getUserTimezone());
+                } else {
+                    $row["ppi{$field}Time"] = '';
+                }
+            }
+
+            //In-Person Enrollment
+            if ($participant->physicalMeasurementsStatus == 'COMPLETED') {
+                $row['physicalMeasurementsStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$this->dateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
+            }
+            else {
+                $row['physicalMeasurementsStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            if ($participant->evaluationFinalizedSite) {
+                $row['evaluationFinalizedSite'] = $participant->evaluationFinalizedSite;
+            } else {
+                $row['evaluationFinalizedSite'] = '';
+            }
+            if ($participant->samplesToIsolateDNA == 'RECEIVED') {
+                $row['biobankDnaStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+            }
+            else {
+                $row['biobankDnaStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+            }
+            if ($participant->numBaselineSamplesArrived >= 7) {
+                $row['biobankSamples'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$participant->numBaselineSamplesArrived;
+            } else {
+                $row['biobankSamples'] = '';
+            }
+            foreach (self::$samples as $field => $label) {
+                if (isset(self::$samplesAlias[$field])) {
+                    $sampleAlias = self::$samplesAlias[$field];
+                    if ($participant->{'sampleStatus'.$sampleAlias} == 'RECEIVED') {
+                        $field = $sampleAlias;
+                    }
+                }
+                if ($participant->{'sampleStatus'.$field} == 'RECEIVED') {
+                    $row["sample{$field}"] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+                }
+                else {
+                    $row["sample{$field}"] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+                }
+                if ($participant->{'sampleStatus'.$field.'Time'}) {
+                    $row["sample{$field}Time"] = $this->dateFromString($participant->{'sampleStatus'.$field.'Time'}, $app->getUserTimezone());
+                } else {
+                    $row["sample{$field}Time"] = '';
+                }
+            }
+            if ($participant->orderCreatedSite) {
+                $row['orderCreatedSite'] = $participant->orderCreatedSite;
+            } else {
+                $row['orderCreatedSite'] = '';
+            }
+
+            //Demographics
+            if ($participant->age) {
+                $row['age'] = $participant->age;
+            } else {
+                $row['age'] = '';
+            }
+            $row['sex'] = $participant->sex;
+            $row['genderIdentity'] = $participant->genderIdentity;
+            $row['race'] = $participant->race;
+            $row['education'] = $participant->education;
+            array_push($rows, $row);
+        } 
+        return $rows;
     }
 
     protected static function csvDateFromObject($date)
@@ -254,7 +515,7 @@ class WorkQueueController extends AbstractController
         return is_object($date) ? $date->format('m/d/Y') : '';
     }
 
-    protected static function csvDateFromString($string, $timezone)
+    protected static function dateFromString($string, $timezone)
     {
         if (!empty($string)) {
             try {
@@ -366,13 +627,13 @@ class WorkQueueController extends AbstractController
                             self::csvDateFromObject($participant->dob),
                             $participant->language,
                             self::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-                            self::csvDateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone()),
+                            self::dateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone()),
                             self::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-                            self::csvDateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone()),
+                            self::dateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone()),
                             self::csvStatusFromSubmitted($participant->consentForconsentForCABoR),
-                            self::csvDateFromString($participant->consentForCABoRTime, $app->getUserTimezone()),
+                            self::dateFromString($participant->consentForCABoRTime, $app->getUserTimezone()),
                             $participant->withdrawalStatus == 'NO_USE' ? '1' : '0',
-                            self::csvDateFromString($participant->withdrawalTime, $app->getUserTimezone()),
+                            self::dateFromString($participant->withdrawalTime, $app->getUserTimezone()),
                             $participant->streetAddress,
                             $participant->city,
                             $participant->state,
@@ -388,7 +649,7 @@ class WorkQueueController extends AbstractController
                         ];
                         foreach (self::$surveys as $survey => $label) {
                             $row[] = self::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                            $row[] = self::csvDateFromString($participant->{"questionnaireOn{$survey}Time"}, $app->getUserTimezone());
+                            $row[] = self::dateFromString($participant->{"questionnaireOn{$survey}Time"}, $app->getUserTimezone());
                         }
                     } else {
                         $row = [
@@ -398,7 +659,7 @@ class WorkQueueController extends AbstractController
                         ];                   
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                    $row[] = self::csvDateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
+                    $row[] = self::dateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
                     $row[] = $participant->evaluationFinalizedSite;
                     $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                     $row[] = $participant->numBaselineSamplesArrived;
@@ -410,7 +671,7 @@ class WorkQueueController extends AbstractController
                             }
                         }
                         $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
-                        $row[] = self::csvDateFromString($participant->{"sampleStatus{$sample}Time"}, $app->getUserTimezone());
+                        $row[] = self::dateFromString($participant->{"sampleStatus{$sample}Time"}, $app->getUserTimezone());
                     }
                     $row[] = $participant->orderCreatedSite;
                     fputcsv($output, $row);
