@@ -166,6 +166,11 @@ class WorkQueueController extends AbstractController
             $rdrParams['_count'] = self::LIMIT_DEFAULT;
         }
 
+        // Add site prefix
+        if (!empty($rdrParams['site'])) {
+            $rdrParams['site'] = \Pmi\Security\User::SITE_PREFIX . $rdrParams['site'];
+        }
+
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($rdrParams['ageRange'])) {
             $ageRange = $rdrParams['ageRange'];
@@ -220,7 +225,9 @@ class WorkQueueController extends AbstractController
             $sitesList = [];
             $sitesList['site']['label'] = 'Paired Site Location';
             foreach ($sites as $site) {
-                $sitesList['site']['options'][$site['google_group']] = \Pmi\Security\User::SITE_PREFIX . $site['google_group'];
+                if (!empty($site['google_group'])) {
+                    $sitesList['site']['options'][$site['google_group']] = $site['google_group'];
+                }
             }
             $filters = array_merge($filters, $sitesList);
         }

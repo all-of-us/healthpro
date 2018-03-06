@@ -361,10 +361,9 @@ class HpoApplication extends AbstractApplication
 
     public function getSitesFromOrganization($org)
     {
-        $sites = $this['em']->getRepository('sites')->fetchBy([
+        return $this['em']->getRepository('sites')->fetchBy([
             'organization' => $org
         ]);
-        return $sites;
     }
 
     public function isDVType() {
