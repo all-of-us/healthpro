@@ -499,7 +499,7 @@ class WorkQueueController extends AbstractController
             } else {
                 $row['biobankSamples'] = '';
             }
-            foreach (self::$samples as $sample => $label) {
+            foreach (array_keys(self::$samples) as $sample) {
                 $newSample = $sample;
                 if (array_key_exists($sample, self::$samplesAlias[0]) && $participant->{"sampleStatus".self::$samplesAlias[0][$sample].""} == 'RECEIVED') {
                     $newSample = self::$samplesAlias[0][$sample];
