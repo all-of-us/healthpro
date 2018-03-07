@@ -242,6 +242,8 @@ label.label-normal {
 }
 .dataTables_processing {
     z-index: 1000;
+    color: #fff;
+    background-color: #337ab7;
 }
 
 /* Orders */
