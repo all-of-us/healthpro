@@ -52,6 +52,7 @@ class WorkQueueController extends AbstractController
         'questionnaireOnFamilyHealthTime',
         'questionnaireOnHealthcareAccess',
         'questionnaireOnHealthcareAccessTime',
+        'site',
         'physicalMeasurementsTime',
         'evaluationFinalizedSite',
         'numBaselineSamplesArrived',
@@ -247,6 +248,10 @@ class WorkQueueController extends AbstractController
         if (!empty($params['race'])) {
             $rdrParams['race'] = $params['race'];
         }
+        // Add site prefix
+        if (!empty($params['site'])) {
+            $rdrParams['site'] = \Pmi\Security\User::SITE_PREFIX . $params['site'];
+        }
 
         if ($type == 'wQTable') {
             // Pass table params
@@ -313,6 +318,20 @@ class WorkQueueController extends AbstractController
 
         $params = array_filter($request->query->all());
         $filters = self::$filters;
+
+        //Add sites filter
+        $sites = $app->getSitesFromOrganization($organization);
+        if (!empty($sites)) {
+            $sitesList = [];
+            $sitesList['site']['label'] = 'Paired Site Location';
+            foreach ($sites as $site) {
+                if (!empty($site['google_group'])) {
+                    $sitesList['site']['options'][$site['google_group']] = $site['google_group'];
+                }
+            }
+            $filters = array_merge($filters, $sitesList);
+        }
+
         if ($app->hasRole('ROLE_AWARDEE')) {
             // Add organizations to filters
             $organizationsList = [];
@@ -451,6 +470,7 @@ class WorkQueueController extends AbstractController
             }
 
             //In-Person Enrollment
+            $row['pairedSiteLocation'] = $participant->siteSuffix;
             if ($participant->physicalMeasurementsStatus == 'COMPLETED') {
                 $row['physicalMeasurementsStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$this->dateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
             }
@@ -609,6 +629,7 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Physical Measurements Completion Date';
+            $headers[] = 'Paired Site Location';
             $headers[] = 'Physical Measurements Location';
             $headers[] = 'Samples for DNA Received';
             $headers[] = 'Biospecimens';
@@ -665,6 +686,7 @@ class WorkQueueController extends AbstractController
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
                     $row[] = self::dateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
+                    $row[] = $participant->siteSuffix;
                     $row[] = $participant->evaluationFinalizedSite;
                     $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                     $row[] = $participant->numBaselineSamplesArrived;
