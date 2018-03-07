@@ -203,8 +203,14 @@ class WorkQueueController extends AbstractController
         '1SAL' => 'Saliva'
     ];
     public static $samplesAlias = [
-        '1SST8' => '1SS08',
-        '1PST8' => '1PS08'
+        [
+            '1SST8' => '1SS08',
+            '1PST8' => '1PS08'
+        ],
+        [
+            '1SST8' => '2SST8',
+            '1PST8' => '2PST8'
+        ]
     ];
     protected $rdrError = false;
 
@@ -493,23 +499,23 @@ class WorkQueueController extends AbstractController
             } else {
                 $row['biobankSamples'] = '';
             }
-            foreach (self::$samples as $field => $label) {
-                if (isset(self::$samplesAlias[$field])) {
-                    $sampleAlias = self::$samplesAlias[$field];
-                    if ($participant->{'sampleStatus'.$sampleAlias} == 'RECEIVED') {
-                        $field = $sampleAlias;
-                    }
+            foreach (self::$samples as $sample => $label) {
+                $newSample = $sample;
+                if (array_key_exists($sample, self::$samplesAlias[0]) && $participant->{"sampleStatus".self::$samplesAlias[0][$sample].""} == 'RECEIVED') {
+                    $newSample = self::$samplesAlias[0][$sample];
+                } elseif (array_key_exists($sample, self::$samplesAlias[1]) && $participant->{"sampleStatus".self::$samplesAlias[1][$sample].""} == 'RECEIVED') {
+                    $newSample = self::$samplesAlias[1][$sample];
                 }
-                if ($participant->{'sampleStatus'.$field} == 'RECEIVED') {
-                    $row["sample{$field}"] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+                if ($participant->{'sampleStatus'.$newSample} == 'RECEIVED') {
+                    $row["sample{$sample}"] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
                 }
                 else {
-                    $row["sample{$field}"] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+                    $row["sample{$sample}"] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
                 }
-                if ($participant->{'sampleStatus'.$field.'Time'}) {
-                    $row["sample{$field}Time"] = $this->dateFromString($participant->{'sampleStatus'.$field.'Time'}, $app->getUserTimezone());
+                if ($participant->{'sampleStatus'.$newSample.'Time'}) {
+                    $row["sample{$sample}Time"] = $this->dateFromString($participant->{'sampleStatus'.$newSample.'Time'}, $app->getUserTimezone());
                 } else {
-                    $row["sample{$field}Time"] = '';
+                    $row["sample{$sample}Time"] = '';
                 }
             }
             if ($participant->orderCreatedSite) {
@@ -691,11 +697,10 @@ class WorkQueueController extends AbstractController
                     $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                     $row[] = $participant->numBaselineSamplesArrived;
                     foreach (self::$samples as $sample => $label) {
-                        if (array_key_exists($sample, self::$samplesAlias)) {
-                            $sampleAlias = self::$samplesAlias[$sample];
-                            if ($participant->{"sampleStatus{$sampleAlias}"} == 'RECEIVED') {
-                                $sample = $sampleAlias;
-                            }
+                        if (array_key_exists($sample, self::$samplesAlias[0]) && $participant->{"sampleStatus".self::$samplesAlias[0][$sample].""} == 'RECEIVED') {
+                            $sample = self::$samplesAlias[0][$sample];
+                        } elseif (array_key_exists($sample, self::$samplesAlias[1]) && $participant->{"sampleStatus".self::$samplesAlias[1][$sample].""} == 'RECEIVED') {
+                            $sample = self::$samplesAlias[1][$sample];
                         }
                         $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
                         $row[] = self::dateFromString($participant->{"sampleStatus{$sample}Time"}, $app->getUserTimezone());

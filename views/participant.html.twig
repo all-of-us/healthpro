@@ -392,11 +392,10 @@
                                     </dl>
                                     <div class="text-center">
                                         {% for field, label in samples %}
-                                            {% if attribute(samplesAlias, field) is defined %}
-                                                {% set sampleAlias = attribute(samplesAlias, field) %}
-                                                {% if attribute(participant, 'sampleStatus' ~ sampleAlias) == 'RECEIVED' %}
-                                                    {% set field = sampleAlias %}
-                                                {% endif %}
+                                            {% if attribute(samplesAlias[0], field) is defined  and attribute(participant, 'sampleStatus' ~ attribute(samplesAlias[0], field)) == 'RECEIVED' %}
+                                                {% set field = attribute(samplesAlias[0], field) %}
+                                            {% elseif attribute(samplesAlias[1], field) is defined and attribute(participant, 'sampleStatus' ~ attribute(samplesAlias[1], field)) == 'RECEIVED' %}
+                                                {% set field = attribute(samplesAlias[1], field) %}
                                             {% endif %}
                                             <div class="participant-detail-status">
                                                 <strong>{{ label }}</strong>
