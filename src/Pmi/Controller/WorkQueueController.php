@@ -16,7 +16,7 @@ class WorkQueueController extends AbstractController
 
     protected static $name = 'workqueue';
     protected static $routes = [
-        ['index', '/'],
+        ['index', '/', ['method' => 'GET|POST']],
         ['export', '/export.csv']
     ];
 
@@ -362,6 +362,7 @@ class WorkQueueController extends AbstractController
         }
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
+            $params = array_merge($params, array_filter($request->request->all()));
             if (empty($params['start'])) {
                 $app['session']->set('tokens', []);
             }
