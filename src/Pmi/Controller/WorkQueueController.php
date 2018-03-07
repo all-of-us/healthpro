@@ -248,6 +248,10 @@ class WorkQueueController extends AbstractController
         if (!empty($params['race'])) {
             $rdrParams['race'] = $params['race'];
         }
+        // Add site prefix
+        if (!empty($params['site'])) {
+            $rdrParams['site'] = \Pmi\Security\User::SITE_PREFIX . $params['site'];
+        }
 
         if ($type == 'wQTable') {
             // Pass table params
@@ -314,6 +318,20 @@ class WorkQueueController extends AbstractController
 
         $params = array_filter($request->query->all());
         $filters = self::$filters;
+
+        //Add sites filter
+        $sites = $app->getSitesFromOrganization($organization);
+        if (!empty($sites)) {
+            $sitesList = [];
+            $sitesList['site']['label'] = 'Paired Site Location';
+            foreach ($sites as $site) {
+                if (!empty($site['google_group'])) {
+                    $sitesList['site']['options'][$site['google_group']] = $site['google_group'];
+                }
+            }
+            $filters = array_merge($filters, $sitesList);
+        }
+
         if ($app->hasRole('ROLE_AWARDEE')) {
             // Add organizations to filters
             $organizationsList = [];
