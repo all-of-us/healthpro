@@ -542,21 +542,9 @@ class DeployCommand extends Command {
         $this->out->writeln("Running SensioLabs Security Checker...");
         $checker = new SecurityChecker();
         $vulnerabilities = $checker->check($composerLockFile);
-        $isVulnerable = count($vulnerabilities) > 0 ? true : false ;
         // Ignore vulnerabilities mentioned in sensioignore file
-        $sensioIgnoreVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'sensioignore.json'), true);
-        foreach ($vulnerabilities as $vulnerability) {
-            if (!empty($vulnerability['advisories'])) {
-                $values = array_values($vulnerability['advisories']);
-                if (!empty($values[0]['link'])) {
-                    $isVulnerable = false;
-                    if (!$this->isVulnerabilityExists($sensioIgnoreVulnerabilities, $values[0]['link'])) {
-                        $isVulnerable = true;
-                    }
-                }
-            }
-        }
-        if (!$isVulnerable) {
+        $vulnerabilities = $this->removeSensioIgnoredVulnerabilities($vulnerabilities);
+        if (count($vulnerabilities) === 0) {
             $this->out->writeln('No packages have known vulnerabilities');
         } else {
             $formatter = new SimpleFormatter($this->getHelper('formatter'));
@@ -599,7 +587,26 @@ class DeployCommand extends Command {
         return $process;
     }
 
-    private function isVulnerabilityExists($vulnerabilities, $link)
+
+    private function removeSensioIgnoredVulnerabilities($vulnerabilities)
+    {
+        $newVulnerabilities = $vulnerabilities;
+        $sensioIgnoredVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'sensioignore.json'), true);
+        foreach ($vulnerabilities as $key => $vulnerability) {
+            if (!empty($vulnerability['advisories'])) {
+                $values = array_values($vulnerability['advisories']);
+                if (!empty($values[0]['link'])) {
+                    if ($this->isVulnerabilityIgnored($sensioIgnoredVulnerabilities, $values[0]['link'])) {
+                        unset($newVulnerabilities[$key]);
+                        break;
+                    }
+                }
+            }
+        }
+        return $newVulnerabilities;
+    }
+
+    private function isVulnerabilityIgnored($vulnerabilities, $link)
     {
         foreach ($vulnerabilities as $vulnerability) {
             if ($link == $vulnerability['link']) {

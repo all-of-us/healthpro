@@ -1,6 +1,6 @@
 [
     {
         "link" : "https://github.com/paragonie/random_compat/issues/96",
-        "justification" : "We are relying on random compat to generate uuid"
+        "justification" : "Due to the version of PHP currently available in App Engine Standard, we must continue to rely on OpenSSL for generating random bytes. While there is an issue with fork safety, we do not believe this affects our application. Furthermore, our use of random_compat in UUID generation is not related to any security mechanisms (the worse that could happen is a UUID collision occurs when generating order IDs, which would simply result in an application error)"
     }
 ]
