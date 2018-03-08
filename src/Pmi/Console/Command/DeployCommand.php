@@ -542,7 +542,16 @@ class DeployCommand extends Command {
         $this->out->writeln("Running SensioLabs Security Checker...");
         $checker = new SecurityChecker();
         $vulnerabilities = $checker->check($composerLockFile);
-        if (count($vulnerabilities) === 0) {
+        $isVulnerable = count($vulnerabilities) > 0 ? true : false ;
+        $sensioIgnorePackages = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'sensioignore.json'), true);
+        foreach (array_keys($vulnerabilities) as $vulnerability) {
+            $isVulnerable = false;
+            if (!array_key_exists($vulnerability, $sensioIgnorePackages)) {
+                $isVulnerable = true;
+                break;
+            }
+        }
+        if (!$isVulnerable) {
             $this->out->writeln('No packages have known vulnerabilities');
         } else {
             $formatter = new SimpleFormatter($this->getHelper('formatter'));

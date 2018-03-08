@@ -1,0 +1,7 @@
+{
+    "paragonie/random_compat": {
+        "component": "random_compat",
+        "identifiers" : { "issue": "96" },
+        "justification" : "We are relying on random compat to generate uuid (https://github.com/paragonie/random_compat/issues/96)"
+    }
+}
