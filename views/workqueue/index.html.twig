@@ -162,7 +162,7 @@ $(document).ready(function() {
             { name: 'caborConsent', visible: false, data: 'caborConsent' },
             { name: 'withdrawal', data: 'withdrawal' },
             { name: 'contactMethod', visible: false, data: 'contactMethod' },
-            { name: 'address', visible: false, data: 'address', orderable: false },
+            { name: 'address', visible: false, data: 'address'},
             { name: 'email', visible: false, data: 'email' },
             { name: 'phone', visible: false, data: 'phone' },
             { name: 'ppiStatus', data: 'ppiStatus' },
@@ -175,7 +175,7 @@ $(document).ready(function() {
             { name: 'physicalMeasurementsStatus', data: 'physicalMeasurementsStatus' },
             { name: 'evaluationFinalizedSite', visible: false, data: 'evaluationFinalizedSite' },
             { name: 'biobankDnaStatus', data: 'biobankDnaStatus' },
-            { name: 'biobankSamples', data: 'biobankSamples', orderable: false },
+            { name: 'biobankSamples', data: 'biobankSamples'},
             {% for field, label in samples %}
                 { name: 'sample{{ field }}', visible: false, data: 'sample{{ field }}' },
                 { name: 'sample{{ field }}Time', visible: false, data: 'sample{{ field }}Time' },
