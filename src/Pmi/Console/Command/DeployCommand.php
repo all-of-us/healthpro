@@ -543,12 +543,17 @@ class DeployCommand extends Command {
         $checker = new SecurityChecker();
         $vulnerabilities = $checker->check($composerLockFile);
         $isVulnerable = count($vulnerabilities) > 0 ? true : false ;
-        $sensioIgnorePackages = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'sensioignore.json'), true);
-        foreach (array_keys($vulnerabilities) as $vulnerability) {
-            $isVulnerable = false;
-            if (!array_key_exists($vulnerability, $sensioIgnorePackages)) {
-                $isVulnerable = true;
-                break;
+        // Ignore vulnerabilities mentioned in sensioignore file
+        $sensioIgnoreVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'sensioignore.json'), true);
+        foreach ($vulnerabilities as $vulnerability) {
+            if (!empty($vulnerability['advisories'])) {
+                $values = array_values($vulnerability['advisories']);
+                if (!empty($values[0]['link'])) {
+                    $isVulnerable = false;
+                    if (!$this->isVulnerabilityExists($sensioIgnoreVulnerabilities, $values[0]['link'])) {
+                        $isVulnerable = true;
+                    }
+                }
             }
         }
         if (!$isVulnerable) {
@@ -592,5 +597,15 @@ class DeployCommand extends Command {
             $this->out->write($buffer);
         });
         return $process;
+    }
+
+    private function isVulnerabilityExists($vulnerabilities, $link)
+    {
+        foreach ($vulnerabilities as $vulnerability) {
+            if ($link == $vulnerability['link']) {
+                return true;
+            }
+        }
+        return false;
     }
 }
