@@ -231,8 +231,6 @@ class WorkQueueController extends AbstractController
                 }
                 unset($params[$key]);
             }
-        } else {
-            $rdrParams['_sort:desc'] = 'consentForStudyEnrollmentTime';
         }
         $rdrParams['hpoId'] = $organization;
         if (isset($params['_count'])) {
