@@ -92,14 +92,21 @@ class RdrParticipants
     public function listParticipantSummaries($params, $app = null, $next = false, $type = null, $tableParams = null)
     {
         if ($next && $this->nextToken) {
-            $params['_token'] = $this->nextToken;
+            $rdrNextToken = $this->nextToken;
         }
         if ($app && $type == 'wQTable') {
             $tokens = $app['session']->get('tokens');
             $index = $tableParams['start'] + $tableParams['count'];
-            //Pass token if exists
             if (!empty($tokens)) {
-                $params['_token'] = $tokens[$tableParams['start']];
+                $rdrNextToken = $tokens[$tableParams['start']];
+            }
+        }
+        //Pass token if exists
+        if (!empty($rdrNextToken)) {
+            if (is_array($params)) {
+                $params['_token'] = $rdrNextToken;
+            } else {
+                $params = $params . '&_token=' . $rdrNextToken;
             }
         }
         $this->nextToken = null;
