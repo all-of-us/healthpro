@@ -594,12 +594,19 @@ class DeployCommand extends Command {
         $sensioIgnoredVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'sensioignore.json'), true);
         foreach ($vulnerabilities as $key => $vulnerability) {
             if (!empty($vulnerability['advisories'])) {
-                $values = array_values($vulnerability['advisories']);
-                if (!empty($values[0]['link'])) {
-                    if ($this->isVulnerabilityIgnored($sensioIgnoredVulnerabilities, $values[0]['link'])) {
-                        unset($newVulnerabilities[$key]);
-                        break;
+                $advisories = $vulnerability['advisories'];
+                foreach($vulnerability['advisories'] as $advisoryKey => $advisory) {
+                    if (!empty($advisory['link'])) {
+                        if ($this->isVulnerabilityIgnored($sensioIgnoredVulnerabilities, $advisory['link'])) {
+                            //Remove ignored advisories
+                            unset($advisories[$advisoryKey]);
+                        }
                     }
+                }
+                if (!empty($advisories)) {
+                    $newVulnerabilities[$key]['advisories'] = $advisories; 
+                } else {
+                    unset($newVulnerabilities[$key]);
                 }
             }
         }
