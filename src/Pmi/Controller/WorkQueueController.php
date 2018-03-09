@@ -224,6 +224,7 @@ class WorkQueueController extends AbstractController
     protected function participantSummarySearch($organization, &$params, $app, $type = null)
     {
         $rdrParams = [];
+        $tableParams = [];
         if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] === 'NO_USE') {
             foreach ($params as $key => $value) {
                 if ($key === 'withdrawalStatus' || $key === 'organization') {
@@ -244,9 +245,6 @@ class WorkQueueController extends AbstractController
         if (!empty($params['consentForElectronicHealthRecords'])) {
             $rdrParams['consentForElectronicHealthRecords'] = $params['consentForElectronicHealthRecords'];
         }
-        if (!empty($params['ageRange'])) {
-            $rdrParams['ageRange'] = $params['ageRange'];
-        }
         if (!empty($params['genderIdentity'])) {
             $rdrParams['genderIdentity'] = $params['genderIdentity'];
         }
@@ -259,9 +257,10 @@ class WorkQueueController extends AbstractController
         }
 
         if ($type == 'wQTable') {
-            // Pass table params
-            $rdrParams['start'] = isset($params['start']) ? $params['start'] : 0;
             $rdrParams['_count'] = isset($params['length']) ? $params['length'] : 10;
+            // Pass table params
+            $tableParams['start'] = isset($params['start']) ? $params['start'] : 0;
+            $tableParams['count'] = $rdrParams['_count'];
 
             // Pass sort params
             if (!empty($params['order'][0])) {
@@ -277,9 +276,8 @@ class WorkQueueController extends AbstractController
         }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
-        if (isset($rdrParams['ageRange'])) {
-            $ageRange = $rdrParams['ageRange'];
-            unset($rdrParams['ageRange']);
+        if (isset($params['ageRange'])) {
+            $ageRange = $params['ageRange'];
             $rdrParams = http_build_query($rdrParams, null, '&', PHP_QUERY_RFC3986);
 
             $dateOfBirthFilters = CodeBook::ageRangeToDob($ageRange);
@@ -289,7 +287,7 @@ class WorkQueueController extends AbstractController
         }
         $results = [];
         try {
-            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $app, $this->next, $type);
+            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $app, $this->next, $type, $tableParams);
             foreach ($summaries as $summary) {
                 if (isset($summary->resource)) {
                     $results[] = new Participant($summary->resource);
