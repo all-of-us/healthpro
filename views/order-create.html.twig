@@ -9,18 +9,8 @@
         <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
     </h2>
 
-    <dl class="dl-horizontal">
-        <dt>Name</dt>
-        <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-        <dt>Participant ID</dt>
-        <dd>{{ participant.id }}</dd>
-        <dt>Biobank ID</dt>
-        <dd>{{ participant.biobankId }}</dd>
-        <dt>DOB</dt>
-        <dd>{{ participant.dob ? participant.dob|date('n/j/Y') }}</dd>
-        <dt>Gender Identity</dt>
-        <dd>{{ participant.genderIdentity }}</dd>
-    </dl>
+    {% include 'partials/participant-dl.html.twig' %}
+
     <ul class="nav nav-tabs">
         <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
         <li role="presentation" class="active"><a href="#">Create</a></li>

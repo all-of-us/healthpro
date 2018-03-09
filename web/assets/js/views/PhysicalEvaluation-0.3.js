@@ -1,6 +1,9 @@
 /**
  * Physical evaluation form view
  */
+
+/* eslint security/detect-object-injection: "off" */
+
 PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     events: {
         "click .toggle-help-image": "displayHelpModal",
