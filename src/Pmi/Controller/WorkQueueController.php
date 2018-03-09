@@ -405,11 +405,7 @@ class WorkQueueController extends AbstractController
             } else {
                 $row['dateOfBirth'] = '';
             }
-            if ($participant->id) {
-                $row['participantId'] = $participant->id;
-            } else {
-                $row['participantId'] = ''; 
-            }
+            $row['participantId'] = $participant->id;
             $row['biobankId'] = $participant->biobankId;
             $row['language'] = $participant->language;
             $row['participantStatus'] = $participant->enrollmentStatus;
@@ -445,11 +441,7 @@ class WorkQueueController extends AbstractController
                 $row['address'] = '';  
             }
             $row['email'] = $participant->email;
-            if ($participant->phoneNumber) {
-                $row['phone'] = $participant->phoneNumber;
-            } else {
-                $row['phone'] = '';
-            }
+            $row['phone'] = $participant->phoneNumber;
 
             //PPI Surveys
             if ($participant->numCompletedBaselinePPIModules == 3) {
@@ -481,11 +473,7 @@ class WorkQueueController extends AbstractController
             else {
                 $row['physicalMeasurementsStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
             }
-            if ($participant->evaluationFinalizedSite) {
-                $row['evaluationFinalizedSite'] = $participant->evaluationFinalizedSite;
-            } else {
-                $row['evaluationFinalizedSite'] = '';
-            }
+            $row['evaluationFinalizedSite'] = $participant->evaluationFinalizedSite;
             if ($participant->samplesToIsolateDNA == 'RECEIVED') {
                 $row['biobankDnaStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
             }
@@ -516,18 +504,10 @@ class WorkQueueController extends AbstractController
                     $row["sample{$sample}Time"] = '';
                 }
             }
-            if ($participant->orderCreatedSite) {
-                $row['orderCreatedSite'] = $participant->orderCreatedSite;
-            } else {
-                $row['orderCreatedSite'] = '';
-            }
+            $row['orderCreatedSite'] = $participant->orderCreatedSite;
 
             //Demographics
-            if ($participant->age) {
-                $row['age'] = $participant->age;
-            } else {
-                $row['age'] = '';
-            }
+            $row['age'] = $participant->age;
             $row['sex'] = $participant->sex;
             $row['genderIdentity'] = $participant->genderIdentity;
             $row['race'] = $participant->race;
