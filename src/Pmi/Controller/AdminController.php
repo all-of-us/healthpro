@@ -71,6 +71,7 @@ class AdminController extends AbstractController
 
     public function siteAction($siteId, Application $app, Request $request)
     {
+        $syncEnabled = $app->getConfig('sites_use_rdr');
         if ($siteId) {
             $site = $app['em']->getRepository('sites')->fetchOneBy([
                 'id' => $siteId
@@ -86,13 +87,17 @@ class AdminController extends AbstractController
                 return $app->redirectToRoute('admin_sites');
             }
         } else {
+            if ($syncEnabled) {
+                // can't create new sites if syncing from rdr
+                $app->abort(404);
+            }
             $site = null;
         }
 
         $siteEditForm = $this->getSiteEditForm($app, $site);
         $siteEditForm->handleRequest($request);
         if ($siteEditForm->isSubmitted()) {
-            if ($siteEditForm->isValid()) {
+            if ($siteEditForm->isValid() && !$syncEnabled) {
                 if ($site) {
                     $duplicateGoogleGroup = $app['em']->getRepository('sites')->fetchBySql('google_group = ? and id != ?', [
                         $siteEditForm['google_group']->getData(),
@@ -138,38 +143,43 @@ class AdminController extends AbstractController
         if ($site && isset($site['id'])) {
             unset($site['id']);
         }
-        return $app['form.factory']->createBuilder(FormType::class, $site)
-            ->add('name', Type\TextType::class, [
-                'label' => 'Name',
-                'required' => true,
-                'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Type('string')
-                ]
-            ])
-            ->add('google_group', Type\TextType::class, [
-                'label' => 'Google Group',
-                'required' => true,
-                'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Type('string')
-                ]
-            ])
-            ->add('mayolink_account', Type\TextType::class, [
-                'label' => 'MayoLink Account',
-                'required' => false,
-                'constraints' => new Constraints\Type('string')
-            ])
-            ->add('organization', Type\TextType::class, [
-                'label' => 'Organization',
-                'required' => false,
-                'constraints' => new Constraints\Type('string')
-            ])
-            ->add('type', Type\TextType::class, [
-                'label' => 'Type',
-                'required' => false,
-                'constraints' => new Constraints\Type('string')
-            ])
+        $syncEnabled = $app->getConfig('sites_use_rdr');
+        $builder = $app['form.factory']->createBuilder(FormType::class, $site);
+        if (!$syncEnabled) {
+            $builder
+                ->add('name', Type\TextType::class, [
+                    'label' => 'Name',
+                    'required' => true,
+                    'constraints' => [
+                        new Constraints\NotBlank(),
+                        new Constraints\Type('string')
+                    ]
+                ])
+                ->add('google_group', Type\TextType::class, [
+                    'label' => 'Google Group',
+                    'required' => true,
+                    'constraints' => [
+                        new Constraints\NotBlank(),
+                        new Constraints\Type('string')
+                    ]
+                ])
+                ->add('mayolink_account', Type\TextType::class, [
+                    'label' => 'MayoLink Account',
+                    'required' => false,
+                    'constraints' => new Constraints\Type('string')
+                ])
+                ->add('organization', Type\TextType::class, [
+                    'label' => 'Organization',
+                    'required' => false,
+                    'constraints' => new Constraints\Type('string')
+                ])
+                ->add('type', Type\TextType::class, [
+                    'label' => 'Type',
+                    'required' => false,
+                    'constraints' => new Constraints\Type('string')
+                ]);
+        }
+        $builder
             ->add('awardee', Type\TextType::class, [
                 'label' => 'Awardee',
                 'required' => false,
@@ -224,8 +234,8 @@ class AdminController extends AbstractController
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
                 ]
-            ])
-            ->getForm();
+            ]);
+        return $builder->getForm();
     }
 
     public function withdrawalNotificationsAction(Application $app)

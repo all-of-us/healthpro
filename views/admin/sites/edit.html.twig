@@ -4,6 +4,9 @@
     <div class="page-header">
         <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> {{ site ? 'Edit' : 'Create' }} Site</h2>
     </div>
+    {% if site and (site.name or site.google_group) %}
+        <h3>{{ site.name }} ({{ site.google_group }})</h3>
+    {% endif %}
     <div class="row">
         <div class="col-sm-6 col-sm-offset-3">
             {{ form_start(siteForm) }}
