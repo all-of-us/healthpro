@@ -7,6 +7,11 @@ class WorkQueue
     const LIMIT_EXPORT = 10000;
     const LIMIT_EXPORT_PAGE_SIZE = 1000;
 
+    const HTML_SUCCESS = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+    const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+
+    protected $app;
+
     public static $wQColumns = [
         'lastName',
         'firstName',
@@ -206,19 +211,20 @@ class WorkQueue
         ]
     ];
 
-    public static function generateTableRows($participants, $app)
+    public function generateTableRows($participants, $app)
     {
+        $this->app = $app;
         $rows = [];
         foreach ($participants as $participant) {
             $row = [];
             //Identifiers and status
             if($app->hasRole('ROLE_USER')) {
-                $row['lastName'] = '<a href="/participant/'.$participant->id.'">'.$participant->lastName.'</a>';
+                $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
             } else {
                 $row['lastName'] = $participant->lastName;
             }
             if ($app->hasRole('ROLE_USER')) {
-                $row['firstName'] = '<a href="/participant/'.$participant->id.'">'.$participant->firstName.'</a>';
+                $row['firstName'] = $this->generateLink($participant->id, $participant->lastName);
             } else {
                 $row['firstName'] = $participant->firstName;
             }
@@ -231,26 +237,11 @@ class WorkQueue
             $row['biobankId'] = $participant->biobankId;
             $row['language'] = $participant->language;
             $row['participantStatus'] = $participant->enrollmentStatus;
-            if ($participant->consentForStudyEnrollment == 'SUBMITTED') {
-                $row['generalConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.self::dateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone());         
-            }
-            else {
-                $row['generalConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-            }
-            if ($participant->consentForElectronicHealthRecords == 'SUBMITTED') {
-                $row['ehrConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.self::dateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone());
-            }
-            else {
-                $row['ehrConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-            }
-            if ($participant->consentForCABoR == 'SUBMITTED') {
-                $row['caborConsent'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.self::dateFromString($participant->consentForCABoRTime, $app->getUserTimezone());
-            }
-            else {
-                $row['caborConsent'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-            }
+            $row['generalConsent'] = $this->formatData($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentTime);
+            $row['ehrConsent'] = $this->formatData($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime);
+            $row['caborConsent'] = $this->formatData($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime);
             if ($participant->withdrawalStatus == 'NO_USE') {
-                $row['withdrawal'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i><span class="text-danger">No Use</span> - '.self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
+                $row['withdrawal'] = self::HTML_DANGER . '<span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
             } else {
                $row['withdrawal'] = ''; 
             }
@@ -267,20 +258,15 @@ class WorkQueue
 
             //PPI Surveys
             if ($participant->numCompletedBaselinePPIModules == 3) {
-                $row['ppiStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+                $row['ppiStatus'] = self::HTML_SUCCESS;
             }
             else {
-                $row['ppiStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+                $row['ppiStatus'] = self::HTML_DANGER;
             }
             $row['ppiSurveys'] = $participant->numCompletedPPIModules;
             foreach (self::$surveys as $field => $survey) {
-                if ($participant->{'questionnaireOn'.$field} == 'SUBMITTED') {
-                    $row["ppi{$field}"] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-                }
-                else {
-                    $row["ppi{$field}"] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-                }
-                if ($participant->{'questionnaireOn'.$field.'Time'} == 'SUBMITTED') {
+                $row["ppi{$field}"] = $this->formatData($participant->{'questionnaireOn'.$field}, 'SUBMITTED');
+                if (!empty($participant->{'questionnaireOn'.$field.'Time'})) {
                     $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn'.$field.'Time'}, $app->getUserTimezone());
                 } else {
                     $row["ppi{$field}Time"] = '';
@@ -289,21 +275,11 @@ class WorkQueue
 
             //In-Person Enrollment
             $row['pairedSiteLocation'] = $participant->siteSuffix;
-            if ($participant->physicalMeasurementsStatus == 'COMPLETED') {
-                $row['physicalMeasurementsStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.self::dateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
-            }
-            else {
-                $row['physicalMeasurementsStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-            }
+            $row['physicalMeasurementsStatus'] = $this->formatData($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsTime);
             $row['evaluationFinalizedSite'] = $participant->evaluationFinalizedSite;
-            if ($participant->samplesToIsolateDNA == 'RECEIVED') {
-                $row['biobankDnaStatus'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-            }
-            else {
-                $row['biobankDnaStatus'] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-            }
+            $row['biobankDnaStatus'] = $this->formatData($participant->samplesToIsolateDNA, 'RECEIVED');
             if ($participant->numBaselineSamplesArrived >= 7) {
-                $row['biobankSamples'] = '<i class="fa fa-check text-success" aria-hidden="true"></i>'.$participant->numBaselineSamplesArrived;
+                $row['biobankSamples'] = self::HTML_SUCCESS . $participant->numBaselineSamplesArrived;
             } else {
                 $row['biobankSamples'] = '';
             }
@@ -314,13 +290,8 @@ class WorkQueue
                 } elseif (array_key_exists($sample, self::$samplesAlias[1]) && $participant->{"sampleStatus".self::$samplesAlias[1][$sample].""} == 'RECEIVED') {
                     $newSample = self::$samplesAlias[1][$sample];
                 }
-                if ($participant->{'sampleStatus'.$newSample} == 'RECEIVED') {
-                    $row["sample{$sample}"] = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-                }
-                else {
-                    $row["sample{$sample}"] = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-                }
-                if ($participant->{'sampleStatus'.$newSample.'Time'}) {
+                $row["sample{$sample}"] = $this->formatData($participant->{'sampleStatus'.$newSample}, 'RECEIVED');
+                if (!empty($participant->{'sampleStatus'.$newSample.'Time'})) {
                     $row["sample{$sample}Time"] = self::dateFromString($participant->{'sampleStatus'.$newSample.'Time'}, $app->getUserTimezone());
                 } else {
                     $row["sample{$sample}Time"] = '';
@@ -362,5 +333,22 @@ class WorkQueue
     public static function csvStatusFromSubmitted($status)
     {
         return $status === 'SUBMITTED' ? 1 : 0;
+    }
+
+    public function formatData($field, $status, $time = null)
+    {
+        if ($field == $status) {
+            if (!empty($time)) {
+                return self::HTML_SUCCESS . self::dateFromString($time, $this->app->getUserTimezone());
+            }
+            return self::HTML_SUCCESS;
+        } else {
+            return self::HTML_DANGER;
+        }
+    }
+
+    public function generateLink($id, $name)
+    {
+        return '<a href="/participant/' . $id . '">' . $name . '</a>';;
     }
 }

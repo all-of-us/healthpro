@@ -166,7 +166,8 @@ class WorkQueueController extends AbstractController
             $ajaxData = [];
             $ajaxData['recordsTotal'] = 10000;
             $ajaxData['recordsFiltered'] = 10000;
-            $ajaxData['data'] = WorkQueue::generateTableRows($participants, $app);
+            $WorkQueue = new WorkQueue;
+            $ajaxData['data'] = $WorkQueue->generateTableRows($participants, $app);
             return new JsonResponse($ajaxData);
         } else {
             $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
