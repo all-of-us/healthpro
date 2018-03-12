@@ -34,8 +34,13 @@ class WorkQueueController extends AbstractController
             }
         }
         $rdrParams['hpoId'] = $organization;
+
+        //Pass export params
         if (isset($params['_count'])) {
             $rdrParams['_count'] = $params['_count'];
+        }
+        if (isset($params['_sort:desc'])) {
+            $rdrParams['_sort:desc'] = $params['_sort:desc'];
         }
 
         //Pass filter params
@@ -214,6 +219,7 @@ class WorkQueueController extends AbstractController
 
         $params = array_filter($request->query->all());
         $params['_count'] = WorkQueue::LIMIT_EXPORT_PAGE_SIZE;
+        $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
 
         $stream = function() use ($app, $params, $organization, $hasFullDataAcess) {
             $output = fopen('php://output', 'w');
