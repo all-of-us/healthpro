@@ -611,14 +611,15 @@ class Order
         $samples = [];
         foreach ($this->getRequestedSamples() as $description => $test) {
             // Convert new samples
+            $rdrTest = $test;
             if ($test == '1SS08') {
-                $test = ($this->order['processed_centrifuge_type'] == self::FIXED_ANGLE) ? '2SST8' : '1SST8';
+                $rdrTest = ($this->order['processed_centrifuge_type'] == self::FIXED_ANGLE) ? '2SST8' : '1SST8';
             }
             if ($test == '1PS08') {
-                $test = ($this->order['processed_centrifuge_type'] == self::FIXED_ANGLE) ? '2PST8' : '1PST8';
+                $rdrTest = ($this->order['processed_centrifuge_type'] == self::FIXED_ANGLE) ? '2PST8' : '1PST8';
             }
             $sample = [
-                'test' => $test,
+                'test' => $rdrTest,
                 'description' => $description,
                 'processingRequired' => in_array($test, self::$samplesRequiringProcessing)
             ];
