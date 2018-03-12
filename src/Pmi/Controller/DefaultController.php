@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
+use Pmi\WorkQueue\WorkQueue;
 
 class DefaultController extends AbstractController
 {
@@ -345,9 +346,9 @@ class DefaultController extends AbstractController
             'agreeForm' => $agreeForm->createView(),
             'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled(),
             'canViewDetails' => $canViewDetails,
-            'samples' => WorkQueueController::$samples,
-            'surveys' => WorkQueueController::$surveys,
-            'samplesAlias' => WorkQueueController::$samplesAlias,
+            'samples' => WorkQueue::$samples,
+            'surveys' => WorkQueue::$surveys,
+            'samplesAlias' => WorkQueue::$samplesAlias,
         ]);
     }
 
