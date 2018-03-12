@@ -68,7 +68,7 @@ class CronController extends AbstractController
             $app['pmi.drc.rdrhelper']->getClient(),
             $app['em']->getRepository('sites')
         );
-        $siteSync->sync();
-        return (new JsonResponse())->setData(true);
+        $results = $siteSync->sync();
+        return (new JsonResponse())->setData($results);
     }
 }
