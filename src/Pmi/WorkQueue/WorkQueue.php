@@ -265,9 +265,9 @@ class WorkQueue
             }
             $row['ppiSurveys'] = $participant->numCompletedPPIModules;
             foreach (self::$surveys as $field => $survey) {
-                $row["ppi{$field}"] = $this->formatData($participant->{'questionnaireOn'.$field}, 'SUBMITTED');
-                if (!empty($participant->{'questionnaireOn'.$field.'Time'})) {
-                    $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn'.$field.'Time'}, $app->getUserTimezone());
+                $row["ppi{$field}"] = $this->formatData($participant->{'questionnaireOn' . $field}, 'SUBMITTED');
+                if (!empty($participant->{'questionnaireOn' . $field . 'Time'})) {
+                    $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn' . $field . 'Time'}, $app->getUserTimezone());
                 } else {
                     $row["ppi{$field}Time"] = '';
                 }
@@ -285,14 +285,14 @@ class WorkQueue
             }
             foreach (array_keys(self::$samples) as $sample) {
                 $newSample = $sample;
-                if (array_key_exists($sample, self::$samplesAlias[0]) && $participant->{"sampleStatus".self::$samplesAlias[0][$sample].""} == 'RECEIVED') {
+                if (array_key_exists($sample, self::$samplesAlias[0]) && $participant->{"sampleStatus" . self::$samplesAlias[0][$sample]} == 'RECEIVED') {
                     $newSample = self::$samplesAlias[0][$sample];
-                } elseif (array_key_exists($sample, self::$samplesAlias[1]) && $participant->{"sampleStatus".self::$samplesAlias[1][$sample].""} == 'RECEIVED') {
+                } elseif (array_key_exists($sample, self::$samplesAlias[1]) && $participant->{"sampleStatus" . self::$samplesAlias[1][$sample]} == 'RECEIVED') {
                     $newSample = self::$samplesAlias[1][$sample];
                 }
-                $row["sample{$sample}"] = $this->formatData($participant->{'sampleStatus'.$newSample}, 'RECEIVED');
-                if (!empty($participant->{'sampleStatus'.$newSample.'Time'})) {
-                    $row["sample{$sample}Time"] = self::dateFromString($participant->{'sampleStatus'.$newSample.'Time'}, $app->getUserTimezone());
+                $row["sample{$sample}"] = $this->formatData($participant->{'sampleStatus' . $newSample}, 'RECEIVED');
+                if (!empty($participant->{'sampleStatus' . $newSample . 'Time'})) {
+                    $row["sample{$sample}Time"] = self::dateFromString($participant->{'sampleStatus' . $newSample . 'Time'}, $app->getUserTimezone());
                 } else {
                     $row["sample{$sample}Time"] = '';
                 }
