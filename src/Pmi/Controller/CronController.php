@@ -64,11 +64,20 @@ class CronController extends AbstractController
 
     public function sitesAction(Application $app, Request $request)
     {
+        $action = $request->get('action');
+        if (!in_array($action, ['sync', 'preview'])) {
+            return (new JsonResponse())->setData(['error' => 'Invalid action']);
+        }
+
         $siteSync = new SiteSyncService(
             $app['pmi.drc.rdrhelper']->getClient(),
             $app['em']->getRepository('sites')
         );
-        $results = $siteSync->sync();
+        if ($action === 'sync') {
+            $results = $siteSync->sync();
+        } else {
+            $results = $siteSync->dryRun();
+        }
         return (new JsonResponse())->setData($results);
     }
 }
