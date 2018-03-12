@@ -13,6 +13,7 @@ use Pmi\Audit\Log;
 use Pmi\Service\WithdrawalService;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Order\Order;
+use Pmi\Service\SiteSyncService;
 
 class AdminController extends AbstractController
 {
@@ -31,6 +32,9 @@ class AdminController extends AbstractController
             'method' => 'GET|POST',
             'defaults' => ['siteId' => null]
         ]],
+        ['siteSync', '/sites/sync', [
+            'method' => 'GET|POST'
+        ]],
         ['withdrawalNotifications', '/notifications/withdrawal'],
         ['missingMeasurements', '/missing/measurements', ['method' => 'GET|POST']],
         ['missingOrders', '/missing/orders', ['method' => 'GET|POST']]
@@ -41,10 +45,28 @@ class AdminController extends AbstractController
         return $app['twig']->render('admin/index.html.twig');
     }
 
+    public function siteSyncAction(Application $app, Request $request)
+    {
+        if (!$app->getConfig('sites_use_rdr')) {
+            $app->abort(404);
+        }
+        $siteSync = new SiteSyncService(
+            $app['pmi.drc.rdrhelper']->getClient(),
+            $app['em']->getRepository('sites')
+        );
+        $preview = $siteSync->dryRun();
+        return $app['twig']->render('admin/sites/sync.html.twig', [
+            'preview' => $preview
+        ]);
+    }
+
     public function sitesAction(Application $app)
     {
         $sites = $app['em']->getRepository('sites')->fetchBy([], ['name' => 'asc']);
-        return $app['twig']->render('admin/sites/index.html.twig', ['sites' => $sites]);
+        return $app['twig']->render('admin/sites/index.html.twig', [
+            'sites' => $sites,
+            'sync' => $app->getConfig('sites_use_rdr')
+        ]);
     }
 
     public function siteAction($siteId, Application $app, Request $request)

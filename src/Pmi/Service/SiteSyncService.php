@@ -46,7 +46,7 @@ class SiteSyncService
 
     public function sync($preview = false)
     {
-        $new = [];
+        $created = [];
         $modified = [];
         $existingSites = $this->getSitesFromDb();
         $deleted = array_keys($existingSites); // add everything to the deleted array, then remove as we find them
@@ -95,7 +95,7 @@ class SiteSyncService
                         }
                         unset($deleted[array_search($siteId, $deleted)]);
                     } else {
-                        $new[] = $siteData;
+                        $created[] = $siteData;
                         if (!$preview) {
                             $this->sitesRepository->insert($siteData);
                         }
@@ -111,7 +111,7 @@ class SiteSyncService
         }
 
         return [
-            'new' => $new,
+            'created' => $created,
             'modified' => $modified,
             'deleted' => array_values($deleted)
         ];
