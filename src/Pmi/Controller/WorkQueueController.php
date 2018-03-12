@@ -73,6 +73,10 @@ class WorkQueueController extends AbstractController
                     $rdrParams['_sort:desc'] = $sortColumnName;
                 }
             }
+
+            // Set next token
+            $app['pmi.drc.participants']->setNextToken($app, $tableParams);
+
         }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
@@ -87,7 +91,11 @@ class WorkQueueController extends AbstractController
         }
         $results = [];
         try {
-            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $app, $this->next, $type, $tableParams);
+            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $this->next);
+            if ($type == 'wQTable' && !empty($app['pmi.drc.participants']->getNextToken())) {
+                // Set next token in session
+                $app['pmi.drc.participants']->setNextToken($app, $tableParams, $type = 'session');
+            }
             foreach ($summaries as $summary) {
                 if (isset($summary->resource)) {
                     $results[] = new Participant($summary->resource);

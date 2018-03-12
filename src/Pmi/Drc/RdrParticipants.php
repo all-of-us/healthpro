@@ -89,24 +89,14 @@ class RdrParticipants
         return $results;
     }
 
-    public function listParticipantSummaries($params, $app = null, $next = false, $type = null, $tableParams = null)
+    public function listParticipantSummaries($params, $next = false)
     {
         if ($next && $this->nextToken) {
-            $rdrNextToken = $this->nextToken;
-        }
-        if ($app && $type == 'wQTable') {
-            $tokens = $app['session']->get('tokens');
-            $index = $tableParams['start'] + $tableParams['count'];
-            if (!empty($tokens)) {
-                $rdrNextToken = $tokens[$tableParams['start']];
-            }
-        }
-        //Pass token if exists
-        if (!empty($rdrNextToken)) {
+            //Pass token if exists
             if (is_array($params)) {
-                $params['_token'] = $rdrNextToken;
+                $params['_token'] = $this->nextToken;
             } else {
-                $params = $params . '&_token=' . $rdrNextToken;
+                $params = $params . '&_token=' . $this->nextToken;
             }
         }
         $this->nextToken = null;
@@ -133,11 +123,6 @@ class RdrParticipants
                     parse_str($queryString, $nextParameters);
                     if (isset($nextParameters['_token'])) {
                         $this->nextToken = $nextParameters['_token'];
-                        // Store tokens in session
-                        if ($app && $type == 'wQTable') {
-                            $tokens[$index] = $this->nextToken;
-                            $app['session']->set('tokens', $tokens);
-                        }
                     }
                     break;
                 }
@@ -149,6 +134,18 @@ class RdrParticipants
     public function getNextToken()
     {
         return $this->nextToken;
+    }
+
+    public function setNextToken($app, $tableParams, $type = null)
+    {
+        $tokens = $app['session']->get('tokens');
+        $index = $tableParams['start'] + $tableParams['count'];
+        if (empty($type) && !empty($tokens)) {
+            $this->nextToken = $tokens[$tableParams['start']];
+        } else {
+            $tokens[$index] = $this->nextToken;
+            $app['session']->set('tokens', $tokens);
+        }
     }
 
     public function getById($id, $refresh = null)
