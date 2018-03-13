@@ -224,7 +224,7 @@ class WorkQueue
                 $row['lastName'] = $participant->lastName;
             }
             if ($app->hasRole('ROLE_USER')) {
-                $row['firstName'] = $this->generateLink($participant->id, $participant->lastName);
+                $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
             } else {
                 $row['firstName'] = $participant->firstName;
             }
