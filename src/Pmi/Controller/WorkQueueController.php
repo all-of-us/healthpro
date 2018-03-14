@@ -19,8 +19,6 @@ class WorkQueueController extends AbstractController
 
     protected $rdrError = false;
 
-    protected $next = true;
-
     protected function participantSummarySearch($organization, &$params, $app, $type = null)
     {
         $rdrParams = [];
@@ -99,7 +97,7 @@ class WorkQueueController extends AbstractController
         }
         $results = [];
         try {
-            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $this->next);
+            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, true);
             if ($type == 'wQTable' && !empty($app['pmi.drc.participants']->getNextToken())) {
                 // Set next token in session
                 $app['pmi.drc.participants']->setNextToken($app, $tableParams, $type = 'session');
@@ -180,8 +178,7 @@ class WorkQueueController extends AbstractController
             }
             $participants = $this->participantSummarySearch($organization, $params, $app, $type = 'wQTable');
             $ajaxData = [];
-            $ajaxData['recordsTotal'] = 10000;
-            $ajaxData['recordsFiltered'] = 10000;
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $app['pmi.drc.participants']->getTotal();
             $WorkQueue = new WorkQueue;
             $ajaxData['data'] = $WorkQueue->generateTableRows($participants, $app);
             return new JsonResponse($ajaxData);
