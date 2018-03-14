@@ -221,6 +221,9 @@ class WorkQueue
 
     public function generateTableRows($participants, $app)
     {
+        $e = function($string) {
+            return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        };
         $this->app = $app;
         $rows = [];
         foreach ($participants as $participant) {
@@ -229,25 +232,25 @@ class WorkQueue
             if($app->hasRole('ROLE_USER')) {
                 $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
             } else {
-                $row['lastName'] = $participant->lastName;
+                $row['lastName'] = $e($participant->lastName);
             }
             if ($app->hasRole('ROLE_USER')) {
                 $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
             } else {
-                $row['firstName'] = $participant->firstName;
+                $row['firstName'] = $e($participant->firstName);
             }
             if ($participant->dob) {
                 $row['dateOfBirth'] = $participant->dob->format('m/d/Y'); 
             } else {
                 $row['dateOfBirth'] = '';
             }
-            $row['participantId'] = $participant->id;
-            $row['biobankId'] = $participant->biobankId;
-            $row['language'] = $participant->language;
-            $row['participantStatus'] = $participant->enrollmentStatus;
-            $row['generalConsent'] = $this->formatData($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentTime);
-            $row['ehrConsent'] = $this->formatData($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime);
-            $row['caborConsent'] = $this->formatData($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime);
+            $row['participantId'] = $e($participant->id);
+            $row['biobankId'] = $e($participant->biobankId);
+            $row['language'] = $e($participant->language);
+            $row['participantStatus'] = $e($participant->enrollmentStatus);
+            $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentTime);
+            $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime);
+            $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime);
             if ($participant->withdrawalStatus == 'NO_USE') {
                 $row['withdrawal'] = self::HTML_DANGER . '<span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
             } else {
@@ -255,14 +258,14 @@ class WorkQueue
             }
 
             //Contact
-            $row['contactMethod'] = $participant->recontactMethod;
+            $row['contactMethod'] = $e($participant->recontactMethod);
             if ($participant->getAddress()) {
-                $row['address'] = $participant->getAddress();
+                $row['address'] = $e($participant->getAddress());
             } else {
                 $row['address'] = '';  
             }
-            $row['email'] = $participant->email;
-            $row['phone'] = $participant->phoneNumber;
+            $row['email'] = $e($participant->email);
+            $row['phone'] = $e($participant->phoneNumber);
 
             //PPI Surveys
             if ($participant->numCompletedBaselinePPIModules == 3) {
@@ -271,9 +274,9 @@ class WorkQueue
             else {
                 $row['ppiStatus'] = self::HTML_DANGER;
             }
-            $row['ppiSurveys'] = $participant->numCompletedPPIModules;
+            $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
             foreach (self::$surveys as $field => $survey) {
-                $row["ppi{$field}"] = $this->formatData($participant->{'questionnaireOn' . $field}, 'SUBMITTED');
+                $row["ppi{$field}"] = $this->displayStatus($participant->{'questionnaireOn' . $field}, 'SUBMITTED');
                 if (!empty($participant->{'questionnaireOn' . $field . 'Time'})) {
                     $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn' . $field . 'Time'}, $app->getUserTimezone());
                 } else {
@@ -282,12 +285,12 @@ class WorkQueue
             }
 
             //In-Person Enrollment
-            $row['pairedSiteLocation'] = $participant->siteSuffix;
-            $row['physicalMeasurementsStatus'] = $this->formatData($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsTime);
-            $row['evaluationFinalizedSite'] = $participant->evaluationFinalizedSite;
-            $row['biobankDnaStatus'] = $this->formatData($participant->samplesToIsolateDNA, 'RECEIVED');
+            $row['pairedSiteLocation'] = $e($participant->siteSuffix);
+            $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsTime);
+            $row['evaluationFinalizedSite'] = $e($participant->evaluationFinalizedSite);
+            $row['biobankDnaStatus'] = $this->displayStatus($participant->samplesToIsolateDNA, 'RECEIVED');
             if ($participant->numBaselineSamplesArrived >= 7) {
-                $row['biobankSamples'] = self::HTML_SUCCESS . $participant->numBaselineSamplesArrived;
+                $row['biobankSamples'] = self::HTML_SUCCESS . $e($participant->numBaselineSamplesArrived);
             } else {
                 $row['biobankSamples'] = '';
             }
@@ -298,21 +301,21 @@ class WorkQueue
                 } elseif (array_key_exists($sample, self::$samplesAlias[1]) && $participant->{"sampleStatus" . self::$samplesAlias[1][$sample]} == 'RECEIVED') {
                     $newSample = self::$samplesAlias[1][$sample];
                 }
-                $row["sample{$sample}"] = $this->formatData($participant->{'sampleStatus' . $newSample}, 'RECEIVED');
+                $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED');
                 if (!empty($participant->{'sampleStatus' . $newSample . 'Time'})) {
                     $row["sample{$sample}Time"] = self::dateFromString($participant->{'sampleStatus' . $newSample . 'Time'}, $app->getUserTimezone());
                 } else {
                     $row["sample{$sample}Time"] = '';
                 }
             }
-            $row['orderCreatedSite'] = $participant->orderCreatedSite;
+            $row['orderCreatedSite'] = $e($participant->orderCreatedSite);
 
             //Demographics
-            $row['age'] = $participant->age;
-            $row['sex'] = $participant->sex;
-            $row['genderIdentity'] = $participant->genderIdentity;
-            $row['race'] = $participant->race;
-            $row['education'] = $participant->education;
+            $row['age'] = $e($participant->age);
+            $row['sex'] = $e($participant->sex);
+            $row['genderIdentity'] = $e($participant->genderIdentity);
+            $row['race'] = $e($participant->race);
+            $row['education'] = $e($participant->education);
             array_push($rows, $row);
         } 
         return $rows;
@@ -343,11 +346,11 @@ class WorkQueue
         return $status === 'SUBMITTED' ? 1 : 0;
     }
 
-    public function formatData($field, $status, $time = null)
+    public function displayStatus($value, $successStatus, $time = null)
     {
-        if ($field == $status) {
-            if (!empty($time)) {
-                return self::HTML_SUCCESS . self::dateFromString($time, $this->app->getUserTimezone());
+        if ($value === $successStatus) {
+            if ($time) {
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone());
             }
             return self::HTML_SUCCESS;
         } else {
@@ -357,6 +360,6 @@ class WorkQueue
 
     public function generateLink($id, $name)
     {
-        return '<a href="/participant/' . $id . '">' . $name . '</a>';;
+        return '<a href="/participant/' . urlencode($id) . '">' . htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a>';;
     }
 }
