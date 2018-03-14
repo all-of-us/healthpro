@@ -229,7 +229,19 @@ $(document).ready(function() {
         ]
     });
 
-    //Reset table data on page length change
+    // Populate count in header
+    $('#workqueue').on('init.dt', function(e, settings, json) {
+        var count = json.recordsFiltered;
+        $('#heading-count .count').text(count);
+        if (count == 1) {
+            $('#heading-count .plural').hide();
+        } else {
+            $('#heading-count .plural').show();
+        }
+        $('#heading-count').show();
+    });
+
+    // Reset table data on page length change
     $('#workqueue').on('length.dt', function() {
         table.clear().draw();
     });
