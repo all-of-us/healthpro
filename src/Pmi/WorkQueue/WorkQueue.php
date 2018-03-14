@@ -81,6 +81,14 @@ class WorkQueue
                 'Not withdrawn' => 'NOT_WITHDRAWN'
             ]
         ],
+        'enrollmentStatus' => [
+            'label' => 'Participant Status',
+            'options' => [
+                'Registered' => 'INTERESTED',
+                'Member' => 'MEMBER',
+                'Full Participant' => 'FULL_PARTICIPANT'
+            ]
+        ],
         'consentForElectronicHealthRecords' => [
             'label' => 'EHR Consent Status',
             'options' => [

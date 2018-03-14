@@ -47,6 +47,9 @@ class WorkQueueController extends AbstractController
         if (!empty($params['withdrawalStatus'])) {
             $rdrParams['withdrawalStatus'] = $params['withdrawalStatus'];
         }
+        if (!empty($params['enrollmentStatus'])) {
+            $rdrParams['enrollmentStatus'] = $params['enrollmentStatus'];
+        }
         if (!empty($params['consentForElectronicHealthRecords'])) {
             $rdrParams['consentForElectronicHealthRecords'] = $params['consentForElectronicHealthRecords'];
         }
