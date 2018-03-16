@@ -41,13 +41,13 @@ $(document).ready(function() {
       { name: 'dateOfBirth', data: 'dateOfBirth' },
       { name: 'participantId', visible: false, data: 'participantId' },
       { name: 'biobankId', visible: false, data: 'biobankId' },
-      { name: 'language', visible: false, data: 'language'  },
+      { name: 'language', visible: false, data: 'language', orderable: false  },
       { name: 'participantStatus', data: 'participantStatus' },
       { name: 'generalConsent', data: 'generalConsent', class: 'text-center' },
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
       { name: 'withdrawal', data: 'withdrawal', class: 'text-center' },
-      { name: 'contactMethod', visible: false, data: 'contactMethod' },
+      { name: 'contactMethod', visible: false, data: 'contactMethod', orderable: false },
       { name: 'address', visible: false, data: 'address'},
       { name: 'email', visible: false, data: 'email' },
       { name: 'phone', visible: false, data: 'phone' },
@@ -65,7 +65,7 @@ $(document).ready(function() {
     tableColumns.push(
       { name: 'pairedSiteLocation', data: 'pairedSiteLocation' },
       { name: 'physicalMeasurementsStatus', data: 'physicalMeasurementsStatus', class: 'text-center' },
-      { name: 'evaluationFinalizedSite', visible: false, data: 'evaluationFinalizedSite' },
+      { name: 'evaluationFinalizedSite', visible: false, data: 'evaluationFinalizedSite', orderable: false },
       { name: 'biobankDnaStatus', data: 'biobankDnaStatus', class: 'text-center' },
       { name: 'biobankSamples', data: 'biobankSamples', class: 'text-center'}
     );
@@ -78,12 +78,12 @@ $(document).ready(function() {
       );
     });
     tableColumns.push(
-      { name: 'orderCreatedSite', visible: false, data: 'orderCreatedSite' },
+      { name: 'orderCreatedSite', visible: false, data: 'orderCreatedSite', orderable: false },
       { name: 'age', visible: false, data: 'age' },
-      { name: 'sex', visible: false, data: 'sex' },
+      { name: 'sex', visible: false, data: 'sex', orderable: false },
       { name: 'genderIdentity', visible: false, data: 'genderIdentity' },
       { name: 'race', visible: false, data: 'race' },
-      { name: 'education', visible: false, data: 'education' }
+      { name: 'education', visible: false, data: 'education', orderable: false }
     );
 
     var table = $('#workqueue').DataTable({
