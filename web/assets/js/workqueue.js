@@ -56,10 +56,10 @@ $(document).ready(function() {
     );
     Object.keys(surveys).forEach(function(key, _i) {
       tableColumns.push(
-        { name: 'ppi'+key, visibile: false, data: 'ppi'+key }
+        { name: 'ppi'+key, visible: false, data: 'ppi'+key }
       );
       tableColumns.push(
-        { name: 'ppi'+key+'Time', visibile: false, data: 'ppi'+key+'Time' }
+        { name: 'ppi'+key+'Time', visible: false, data: 'ppi'+key+'Time' }
       );
     });
     tableColumns.push(
@@ -71,10 +71,10 @@ $(document).ready(function() {
     );
     Object.keys(samples).forEach(function(key, _i) {
       tableColumns.push(
-        { name: 'sample'+key, visibile: false, data: 'sample'+key }
+        { name: 'sample'+key, visible: false, data: 'sample'+key }
       );
       tableColumns.push(
-        { name: 'sample'+key+'Time', visibile: false, data: 'sample'+key+'Time' }
+        { name: 'sample'+key+'Time', visible: false, data: 'sample'+key+'Time' }
       );
     });
     tableColumns.push(
