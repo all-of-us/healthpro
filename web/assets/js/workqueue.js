@@ -43,20 +43,20 @@ $(document).ready(function() {
       { name: 'biobankId', visible: false, data: 'biobankId' },
       { name: 'language', visible: false, data: 'language'  },
       { name: 'participantStatus', data: 'participantStatus' },
-      { name: 'generalConsent', data: 'generalConsent' },
-      { name: 'ehrConsent', data: 'ehrConsent' },
-      { name: 'caborConsent', visible: false, data: 'caborConsent' },
-      { name: 'withdrawal', data: 'withdrawal' },
+      { name: 'generalConsent', data: 'generalConsent', class: 'text-center' },
+      { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
+      { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
+      { name: 'withdrawal', data: 'withdrawal', class: 'text-center' },
       { name: 'contactMethod', visible: false, data: 'contactMethod' },
       { name: 'address', visible: false, data: 'address'},
       { name: 'email', visible: false, data: 'email' },
       { name: 'phone', visible: false, data: 'phone' },
-      { name: 'ppiStatus', data: 'ppiStatus' },
-      { name: 'ppiSurveys', data: 'ppiSurveys' }
+      { name: 'ppiStatus', data: 'ppiStatus', class: 'text-center' },
+      { name: 'ppiSurveys', data: 'ppiSurveys', class: 'text-center' }
     );
     Object.keys(surveys).forEach(function(key, _i) {
       tableColumns.push(
-        { name: 'ppi'+key, visible: false, data: 'ppi'+key }
+        { name: 'ppi'+key, visible: false, data: 'ppi'+key, class: 'text-center' }
       );
       tableColumns.push(
         { name: 'ppi'+key+'Time', visible: false, data: 'ppi'+key+'Time' }
@@ -64,14 +64,14 @@ $(document).ready(function() {
     });
     tableColumns.push(
       { name: 'pairedSiteLocation', data: 'pairedSiteLocation' },
-      { name: 'physicalMeasurementsStatus', data: 'physicalMeasurementsStatus' },
+      { name: 'physicalMeasurementsStatus', data: 'physicalMeasurementsStatus', class: 'text-center' },
       { name: 'evaluationFinalizedSite', visible: false, data: 'evaluationFinalizedSite' },
-      { name: 'biobankDnaStatus', data: 'biobankDnaStatus' },
-      { name: 'biobankSamples', data: 'biobankSamples'}
+      { name: 'biobankDnaStatus', data: 'biobankDnaStatus', class: 'text-center' },
+      { name: 'biobankSamples', data: 'biobankSamples', class: 'text-center'}
     );
     Object.keys(samples).forEach(function(key, _i) {
       tableColumns.push(
-        { name: 'sample'+key, visible: false, data: 'sample'+key }
+        { name: 'sample'+key, visible: false, data: 'sample'+key, class: 'text-center' }
       );
       tableColumns.push(
         { name: 'sample'+key+'Time', visible: false, data: 'sample'+key+'Time' }
@@ -98,9 +98,6 @@ $(document).ready(function() {
         order: [[7, 'desc']],
         dom: 'lBrtip',
         columns: tableColumns,
-        columnDefs: [
-            { className: "text-center", targets: [6, 7, 8, 9, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 31, 32, 34, 36, 38, 40, 42, 44, 46, 48] }
-        ],
         pageLength: 25,
         buttons: [
             {
