@@ -5,11 +5,11 @@ $(document).ready(function() {
     }
 
     var checkFilters = function () {
-        if ($('select[name=withdrawalStatus]').val() == 'NO_USE') {
-            $('select').not('[name=withdrawalStatus], [name=organization]').val('');
-            $('select').not('[name=withdrawalStatus], [name=organization]').prop('disabled', true);
+        if ($('#filters select[name=withdrawalStatus]').val() == 'NO_USE') {
+            $('#filters select').not('[name=withdrawalStatus], [name=organization]').val('');
+            $('#filters select').not('[name=withdrawalStatus], [name=organization]').prop('disabled', true);
         } else {
-            $('select').prop('disabled', false);
+            $('#filters select').prop('disabled', false);
         }
     };
     checkFilters();
