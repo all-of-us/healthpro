@@ -23,6 +23,32 @@ class WorkQueueController extends AbstractController
     {
         $rdrParams = [];
         $tableParams = [];
+
+        if ($type == 'wQTable') {
+            $rdrParams['_count'] = isset($params['length']) ? $params['length'] : 10;
+
+            // Pass sort params
+            if (!empty($params['order'][0])) {
+                $sortColumnIndex = $params['order'][0]['column'];
+                $sortColumnName = WorkQueue::$wQColumns[$sortColumnIndex];
+                $sortDir = $params['order'][0]['dir'];
+                if ($sortDir == 'asc') {
+                    $rdrParams['_sort'] = $sortColumnName;
+                } else {
+                    $rdrParams['_sort:desc'] = $sortColumnName;
+                }
+            }
+
+            // Pass table params
+            $tableParams['start'] = isset($params['start']) ? $params['start'] : 0;
+            $tableParams['count'] = $rdrParams['_count'];
+
+            // Set next token
+            $app['pmi.drc.participants']->setNextToken($app, $tableParams);
+
+        }
+
+        // Unset other params when withdrawal status is NO_USE
         if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] === 'NO_USE') {
             foreach ($params as $key => $value) {
                 if ($key === 'withdrawalStatus' || $key === 'organization') {
@@ -60,29 +86,6 @@ class WorkQueueController extends AbstractController
         // Add site prefix
         if (!empty($params['site'])) {
             $rdrParams['site'] = \Pmi\Security\User::SITE_PREFIX . $params['site'];
-        }
-
-        if ($type == 'wQTable') {
-            $rdrParams['_count'] = isset($params['length']) ? $params['length'] : 10;
-            // Pass table params
-            $tableParams['start'] = isset($params['start']) ? $params['start'] : 0;
-            $tableParams['count'] = $rdrParams['_count'];
-
-            // Pass sort params
-            if (!empty($params['order'][0])) {
-                $sortColumnIndex = $params['order'][0]['column'];
-                $sortColumnName = WorkQueue::$wQColumns[$sortColumnIndex];
-                $sortDir = $params['order'][0]['dir'];
-                if ($sortDir == 'asc') {
-                    $rdrParams['_sort'] = $sortColumnName;
-                } else {
-                    $rdrParams['_sort:desc'] = $sortColumnName;
-                }
-            }
-
-            // Set next token
-            $app['pmi.drc.participants']->setNextToken($app, $tableParams);
-
         }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name

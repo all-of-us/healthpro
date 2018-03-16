@@ -5,11 +5,11 @@ $(document).ready(function() {
     }
 
     var checkFilters = function () {
-        if ($('select[name=withdrawalStatus]').val() == 'NO_USE') {
-            $('select').not('[name=withdrawalStatus], [name=organization]').val('');
-            $('select').not('[name=withdrawalStatus], [name=organization]').prop('disabled', true);
+        if ($('#filters select[name=withdrawalStatus]').val() == 'NO_USE') {
+            $('#filters select').not('[name=withdrawalStatus], [name=organization]').val('');
+            $('#filters select').not('[name=withdrawalStatus], [name=organization]').prop('disabled', true);
         } else {
-            $('select').prop('disabled', false);
+            $('#filters select').prop('disabled', false);
         }
     };
     checkFilters();
@@ -41,49 +41,49 @@ $(document).ready(function() {
       { name: 'dateOfBirth', data: 'dateOfBirth' },
       { name: 'participantId', visible: false, data: 'participantId' },
       { name: 'biobankId', visible: false, data: 'biobankId' },
-      { name: 'language', visible: false, data: 'language'  },
+      { name: 'language', visible: false, data: 'language', orderable: false  },
       { name: 'participantStatus', data: 'participantStatus' },
-      { name: 'generalConsent', data: 'generalConsent' },
-      { name: 'ehrConsent', data: 'ehrConsent' },
-      { name: 'caborConsent', visible: false, data: 'caborConsent' },
-      { name: 'withdrawal', data: 'withdrawal' },
-      { name: 'contactMethod', visible: false, data: 'contactMethod' },
+      { name: 'generalConsent', data: 'generalConsent', class: 'text-center' },
+      { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
+      { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
+      { name: 'withdrawal', data: 'withdrawal', class: 'text-center' },
+      { name: 'contactMethod', visible: false, data: 'contactMethod', orderable: false },
       { name: 'address', visible: false, data: 'address'},
       { name: 'email', visible: false, data: 'email' },
       { name: 'phone', visible: false, data: 'phone' },
-      { name: 'ppiStatus', data: 'ppiStatus' },
-      { name: 'ppiSurveys', data: 'ppiSurveys' }
+      { name: 'ppiStatus', data: 'ppiStatus', class: 'text-center' },
+      { name: 'ppiSurveys', data: 'ppiSurveys', class: 'text-center' }
     );
     Object.keys(surveys).forEach(function(key, _i) {
       tableColumns.push(
-        { name: 'ppi'+key, visibile: false, data: 'ppi'+key }
+        { name: 'ppi'+key, visible: false, data: 'ppi'+key, class: 'text-center' }
       );
       tableColumns.push(
-        { name: 'ppi'+key+'Time', visibile: false, data: 'ppi'+key+'Time' }
+        { name: 'ppi'+key+'Time', visible: false, data: 'ppi'+key+'Time' }
       );
     });
     tableColumns.push(
       { name: 'pairedSiteLocation', data: 'pairedSiteLocation' },
-      { name: 'physicalMeasurementsStatus', data: 'physicalMeasurementsStatus' },
-      { name: 'evaluationFinalizedSite', visible: false, data: 'evaluationFinalizedSite' },
-      { name: 'biobankDnaStatus', data: 'biobankDnaStatus' },
-      { name: 'biobankSamples', data: 'biobankSamples'}
+      { name: 'physicalMeasurementsStatus', data: 'physicalMeasurementsStatus', class: 'text-center' },
+      { name: 'evaluationFinalizedSite', visible: false, data: 'evaluationFinalizedSite', orderable: false },
+      { name: 'biobankDnaStatus', data: 'biobankDnaStatus', class: 'text-center' },
+      { name: 'biobankSamples', data: 'biobankSamples', class: 'text-center'}
     );
     Object.keys(samples).forEach(function(key, _i) {
       tableColumns.push(
-        { name: 'sample'+key, visibile: false, data: 'sample'+key }
+        { name: 'sample'+key, visible: false, data: 'sample'+key, class: 'text-center' }
       );
       tableColumns.push(
-        { name: 'sample'+key+'Time', visibile: false, data: 'sample'+key+'Time' }
+        { name: 'sample'+key+'Time', visible: false, data: 'sample'+key+'Time' }
       );
     });
     tableColumns.push(
-      { name: 'orderCreatedSite', visible: false, data: 'orderCreatedSite' },
+      { name: 'orderCreatedSite', visible: false, data: 'orderCreatedSite', orderable: false },
       { name: 'age', visible: false, data: 'age' },
-      { name: 'sex', visible: false, data: 'sex' },
+      { name: 'sex', visible: false, data: 'sex', orderable: false },
       { name: 'genderIdentity', visible: false, data: 'genderIdentity' },
       { name: 'race', visible: false, data: 'race' },
-      { name: 'education', visible: false, data: 'education' }
+      { name: 'education', visible: false, data: 'education', orderable: false }
     );
 
     var table = $('#workqueue').DataTable({
@@ -98,9 +98,6 @@ $(document).ready(function() {
         order: [[7, 'desc']],
         dom: 'lBrtip',
         columns: tableColumns,
-        columnDefs: [
-            { className: "text-center", targets: [6, 7, 8, 9, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 31, 32, 34, 36, 38, 40, 42, 44, 46, 48] }
-        ],
         pageLength: 25,
         buttons: [
             {
