@@ -47,16 +47,26 @@ class AdminController extends AbstractController
 
     public function siteSyncAction(Application $app, Request $request)
     {
-        if (!$app->getConfig('sites_use_rdr')) {
-            $app->abort(404);
-        }
         $siteSync = new SiteSyncService(
             $app['pmi.drc.rdrhelper']->getClient(),
             $app['em']->getRepository('sites')
         );
         $preview = $siteSync->dryRun();
+
+        if (!$app->getConfig('sites_use_rdr')) {
+            $formView = false;
+        } else {
+            $form = $app['form.factory']->createBuilder(FormType::class)->getForm();
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $siteSync->sync();
+                return $app->redirectToRoute('admin_sites');
+            }
+            $formView = $form->createView();
+        }
         return $app['twig']->render('admin/sites/sync.html.twig', [
-            'preview' => $preview
+            'preview' => $preview,
+            'form' => $formView
         ]);
     }
 

@@ -8,7 +8,7 @@
         {% if sync %}
             <a href="{{ path('admin_siteSync') }}" class="btn btn-primary"><i class="fa fa-refresh" aria-hidden="true"></i> Sync Sites</a>
         {% else %}
-            <a href="{{ path('admin_site') }}" class="btn btn-primary">Add Site</a>
+            <a href="{{ path('admin_site') }}" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i> Add Site</a> <a href="{{ path('admin_siteSync') }}" class="btn btn-default"><i class="fa fa-refresh" aria-hidden="true"></i> Preview Site Sync</a>
         {% endif %}
     </p>
     {% if sites|length > 0 %}
