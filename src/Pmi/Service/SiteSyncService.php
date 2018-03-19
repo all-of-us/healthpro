@@ -76,7 +76,7 @@ class SiteSyncService
                     $siteData['organization_id'] = $organization->id;
                     $siteData['awardee_id'] = $awardee->id;
                     $siteData['mayolink_account'] = $site->mayolinkClientNumber;
-                    $siteData['timezone'] = $site->timeZoneId;
+                    $siteData['timezone'] = isset($site->timeZoneId) ? $site->timeZoneId : '';
                     $siteData['type'] = $awardee->type;
                     if (empty($siteData['workqueue_download'])) {
                         $siteData['workqueue_download'] = 'full_data'; // default value for workqueue downlaod
