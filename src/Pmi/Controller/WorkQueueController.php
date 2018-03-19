@@ -87,6 +87,9 @@ class WorkQueueController extends AbstractController
         if (!empty($params['site'])) {
             $rdrParams['site'] = \Pmi\Security\User::SITE_PREFIX . $params['site'];
         }
+        if (!empty($params['organization_id'])) {
+            $rdrParams['organization'] = $params['organization_id'];
+        }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($params['ageRange'])) {
@@ -139,9 +142,9 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $filters = WorkQueue::$filters;
 
-        //Add sites filter
         $sites = $app->getSitesFromOrganization($organization);
         if (!empty($sites)) {
+            //Add sites filter
             $sitesList = [];
             $sitesList['site']['label'] = 'Paired Site Location';
             foreach ($sites as $site) {
@@ -149,7 +152,17 @@ class WorkQueueController extends AbstractController
                     $sitesList['site']['options'][$site['google_group']] = $site['google_group'];
                 }
             }
-            $filters = array_merge($filters, $sitesList);
+
+            //Add organization filter
+            $organizationsList = [];
+            $organizationsList['organization_id']['label'] = 'Paired Organization';
+            foreach ($sites as $site) {
+                if (!empty($site['organization_id'])) {
+                    $organizationsList['organization_id']['options'][$site['organization_id']] = $site['organization_id'];
+                }
+            }
+
+            $filters = array_merge($filters, $sitesList, $organizationsList);
         }
 
         if ($app->hasRole('ROLE_AWARDEE')) {
