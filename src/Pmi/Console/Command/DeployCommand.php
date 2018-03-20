@@ -537,6 +537,8 @@ class DeployCommand extends Command {
         $this->out->writeln("Running SensioLabs Security Checker...");
         $checker = new SecurityChecker();
         $vulnerabilities = $checker->check($composerLockFile);
+        // Ignore vulnerabilities mentioned in sensioignore file
+        $vulnerabilities = $this->removeSensioIgnoredVulnerabilities($vulnerabilities);
         if (count($vulnerabilities) === 0) {
             $this->out->writeln('No packages have known vulnerabilities');
         } else {
@@ -578,5 +580,41 @@ class DeployCommand extends Command {
             $this->out->write($buffer);
         });
         return $process;
+    }
+
+
+    private function removeSensioIgnoredVulnerabilities($vulnerabilities)
+    {
+        $newVulnerabilities = $vulnerabilities;
+        $sensioIgnoredVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'sensioignore.json'), true);
+        foreach ($vulnerabilities as $key => $vulnerability) {
+            if (!empty($vulnerability['advisories'])) {
+                $advisories = $vulnerability['advisories'];
+                foreach($vulnerability['advisories'] as $advisoryKey => $advisory) {
+                    if (!empty($advisory['link'])) {
+                        if ($this->isVulnerabilityIgnored($sensioIgnoredVulnerabilities, $advisory['link'])) {
+                            //Remove ignored advisories
+                            unset($advisories[$advisoryKey]);
+                        }
+                    }
+                }
+                if (!empty($advisories)) {
+                    $newVulnerabilities[$key]['advisories'] = $advisories; 
+                } else {
+                    unset($newVulnerabilities[$key]);
+                }
+            }
+        }
+        return $newVulnerabilities;
+    }
+
+    private function isVulnerabilityIgnored($vulnerabilities, $link)
+    {
+        foreach ($vulnerabilities as $vulnerability) {
+            if ($link == $vulnerability['link']) {
+                return true;
+            }
+        }
+        return false;
     }
 }
