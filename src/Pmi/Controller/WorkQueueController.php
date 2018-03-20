@@ -146,7 +146,7 @@ class WorkQueueController extends AbstractController
         if (!empty($sites)) {
             //Add sites filter
             $sitesList = [];
-            $sitesList['site']['label'] = 'Paired Site Location';
+            $sitesList['site']['label'] = 'Paired Site';
             foreach ($sites as $site) {
                 if (!empty($site['google_group'])) {
                     $sitesList['site']['options'][$site['google_group']] = $site['google_group'];

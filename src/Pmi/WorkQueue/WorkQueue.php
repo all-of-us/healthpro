@@ -45,6 +45,7 @@ class WorkQueue
         'questionnaireOnHealthcareAccess',
         'questionnaireOnHealthcareAccessTime',
         'site',
+        'organization',
         'physicalMeasurementsTime',
         'physicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
@@ -285,7 +286,8 @@ class WorkQueue
             }
 
             //In-Person Enrollment
-            $row['pairedSiteLocation'] = $e($participant->siteSuffix);
+            $row['pairedSite'] = $e($participant->siteSuffix);
+            $row['pairedOrganization'] = $e($participant->organization);
             $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsTime);
             $row['evaluationFinalizedSite'] = $e($participant->evaluationFinalizedSite);
             $row['biobankDnaStatus'] = $this->displayStatus($participant->samplesToIsolateDNA, 'RECEIVED');
