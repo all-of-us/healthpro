@@ -19,7 +19,8 @@ class CronController extends AbstractController
     protected static $routes = [
         ['pingTest', '/ping-test'],
         ['withdrawal', '/withdrawal'],
-        ['sites', '/sites']
+        ['sites', '/sites'],
+        ['awardeesAndOrganizations', '/awardees-organizations']
     ];
     
     /**
@@ -71,7 +72,7 @@ class CronController extends AbstractController
 
         $siteSync = new SiteSyncService(
             $app['pmi.drc.rdrhelper']->getClient(),
-            $app['em']->getRepository('sites')
+            $app['em']
         );
         if ($action === 'sync') {
             if (!$app->getConfig('sites_use_rdr')) {
@@ -82,5 +83,16 @@ class CronController extends AbstractController
             $results = $siteSync->dryRun();
         }
         return (new JsonResponse())->setData($results);
+    }
+
+    public function awardeesAndOrganizationsAction(Application $app, Request $request)
+    {
+        $siteSync = new SiteSyncService(
+            $app['pmi.drc.rdrhelper']->getClient(),
+            $app['em']
+        );
+        $siteSync->syncAwardees();
+        $siteSync->syncOrganizations();
+        return (new JsonResponse())->setData(true);
     }
 }

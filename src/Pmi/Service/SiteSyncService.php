@@ -4,21 +4,26 @@ namespace Pmi\Service;
 class SiteSyncService
 {
     private $rdrClient;
-    private $sitesRepository;
+    private $em;
     private $orgEndpoint = 'rdr/v1/Awardee';
+    private $entries;
 
-    public function __construct($rdrClient, $sitesRepository)
+    public function __construct($rdrClient, $entityManager)
     {
         $this->rdrClient = $rdrClient;
-        $this->sitesRepository = $sitesRepository;
+        $this->em = $entityManager;
     }
 
     private function getAwardeeEntriesFromRdr()
     {
+        if (!is_null($this->entries)) {
+            return $this->entries;
+        }
         $response = $this->rdrClient->request('GET', $this->orgEndpoint);
         $responseObject = json_decode($response->getBody()->getContents());
         if ($responseObject && !empty($responseObject->entry)) {
-            return $responseObject->entry;
+            $this->entries = $responseObject->entry;
+            return $this->entries;
         } else {
             return [];
         }
@@ -26,7 +31,8 @@ class SiteSyncService
 
     private function getSitesFromDb()
     {
-        $sites = $this->sitesRepository->fetchBy([]);
+        $sitesRepository = $this->em->getRepository('sites');
+        $sites = $sitesRepository->fetchBy([]);
         $sitesById = [];
         foreach ($sites as $site) {
             $sitesById[$site['google_group']] = $site;
@@ -48,6 +54,7 @@ class SiteSyncService
     {
         $created = [];
         $modified = [];
+        $sitesRepository = $this->em->getRepository('sites');
         $existingSites = $this->getSitesFromDb();
         $deleted = array_keys($existingSites); // add everything to the deleted array, then remove as we find them
         $entries = $this->getAwardeeEntriesFromRdr();
@@ -90,14 +97,14 @@ class SiteSyncService
                                 'new' => $siteData
                             ];
                             if (!$preview) {
-                                $this->sitesRepository->update($primaryId, $siteData);
+                                $sitesRepository->update($primaryId, $siteData);
                             }
                         }
                         unset($deleted[array_search($siteId, $deleted)]);
                     } else {
                         $created[] = $siteData;
                         if (!$preview) {
-                            $this->sitesRepository->insert($siteData);
+                            $sitesRepository->insert($siteData);
                         }
                     }
                 }
@@ -106,7 +113,7 @@ class SiteSyncService
         $deleted = array_values($deleted);
         if (!$preview) {
             foreach ($deleted as $siteId) {
-                $this->sitesRepository->delete($existingSites[$siteId]['id']);
+                $sitesRepository->delete($existingSites[$siteId]['id']);
             }
         }
 
@@ -115,5 +122,63 @@ class SiteSyncService
             'modified' => $modified,
             'deleted' => array_values($deleted)
         ];
+    }
+
+    public function syncAwardees()
+    {
+        $entries = $this->getAwardeeEntriesFromRdr();
+        $awardeesMap = [];
+        foreach ($entries as $entry) {
+            $awardee = $entry->resource;
+            if (empty($awardee->id) || empty($awardee->displayName)) {
+                continue;
+            }
+            if ($awardee->id === 'UNSET') {
+                continue;
+            }
+            $awardeesMap[$awardee->id] = $awardee->displayName;
+        }
+        $awardeesRepository = $this->em->getRepository('awardees');
+        $awardeesRepository->wrapInTransaction(function() use ($awardeesRepository, $awardeesMap) {
+            $awardeesRepository->truncate();
+            foreach ($awardeesMap as $id => $name) {
+                $awardeesRepository->insert([
+                    'id' => $id,
+                    'name' => $name
+                ]);
+            }
+        });
+    }
+
+    public function syncOrganizations()
+    {
+        $entries = $this->getAwardeeEntriesFromRdr();
+        $organizationsMap = [];
+        foreach ($entries as $entry) {
+            $awardee = $entry->resource;
+            if (!isset($awardee->organizations) || !is_array($awardee->organizations)) {
+                continue;
+            }
+            foreach ($awardee->organizations as $organization) {
+                if (empty($organization->id) || empty($organization->displayName)) {
+                    continue;
+                }
+                if (in_array($organization->id, ['VA_Palo_Alto_VAMC', 'VA_Boston_VAMC'])) {
+                    // temporary fix for bad RDR data
+                    continue;
+                }
+                $organizationsMap[$organization->id] = $organization->displayName;
+            }
+        }
+        $organizationsRepository = $this->em->getRepository('organizations');
+        $organizationsRepository->wrapInTransaction(function() use ($organizationsRepository, $organizationsMap) {
+            $organizationsRepository->truncate();
+            foreach ($organizationsMap as $id => $name) {
+                $organizationsRepository->insert([
+                    'id' => $id,
+                    'name' => $name
+                ]);
+            }
+        });
     }
 }

@@ -49,7 +49,7 @@ class AdminController extends AbstractController
     {
         $siteSync = new SiteSyncService(
             $app['pmi.drc.rdrhelper']->getClient(),
-            $app['em']->getRepository('sites')
+            $app['em']
         );
         $preview = $siteSync->dryRun();
 
