@@ -82,7 +82,11 @@ class Participant
             }
         }
 
-        // Remove site prefix
+        // Get site suffix
+        if (!empty($participant->site) && $participant->site !== 'UNSET') {
+            $this->siteSuffix = $this->getSiteSuffix($participant->site);
+        }
+
         if (!empty($participant->physicalMeasurementsFinalizedSite) && $participant->physicalMeasurementsFinalizedSite !== 'UNSET') {
             $this->evaluationFinalizedSite = $this->getSiteSuffix($participant->physicalMeasurementsFinalizedSite);
         }

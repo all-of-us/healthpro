@@ -172,6 +172,11 @@ class WorkQueueController extends AbstractController
             $rdrParams['_count'] = self::LIMIT_DEFAULT;
         }
 
+        // Add site prefix
+        if (!empty($rdrParams['site'])) {
+            $rdrParams['site'] = \Pmi\Security\User::SITE_PREFIX . $rdrParams['site'];
+        }
+
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($rdrParams['ageRange'])) {
             $ageRange = $rdrParams['ageRange'];
@@ -219,6 +224,20 @@ class WorkQueueController extends AbstractController
 
         $params = array_filter($request->query->all());
         $filters = self::$filters;
+
+        //Add sites filter
+        $sites = $app->getSitesFromOrganization($organization);
+        if (!empty($sites)) {
+            $sitesList = [];
+            $sitesList['site']['label'] = 'Paired Site Location';
+            foreach ($sites as $site) {
+                if (!empty($site['google_group'])) {
+                    $sitesList['site']['options'][$site['google_group']] = $site['google_group'];
+                }
+            }
+            $filters = array_merge($filters, $sitesList);
+        }
+
         if ($app->hasRole('ROLE_AWARDEE')) {
             // Add organizations to filters
             $organizationsList = [];
@@ -350,6 +369,7 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Physical Measurements Completion Date';
+            $headers[] = 'Paired Site Location';
             $headers[] = 'Physical Measurements Location';
             $headers[] = 'Samples for DNA Received';
             $headers[] = 'Biospecimens';
@@ -405,6 +425,7 @@ class WorkQueueController extends AbstractController
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
                     $row[] = self::csvDateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
+                    $row[] = $participant->site;
                     $row[] = $participant->evaluationFinalizedSite;
                     $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                     $row[] = $participant->numBaselineSamplesArrived;
