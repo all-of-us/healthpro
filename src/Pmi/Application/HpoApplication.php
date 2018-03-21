@@ -12,6 +12,7 @@ class HpoApplication extends AbstractApplication
 {
     protected $configuration = [];
     protected $participantSource = 'rdr';
+    protected $siteNameMapper = [];
 
     public function setup($config = [])
     {
@@ -481,19 +482,21 @@ class HpoApplication extends AbstractApplication
         return $errors;
     }
 
-    public function getSiteNameFromSuffix($siteSuffix, $returnSiteSuffixIfEmpty = true)
+    public function getSiteDisplayName($siteSuffix)
     {
+        $siteName = $siteSuffix;
         if (!empty($siteSuffix)) {
-            $site = $this['em']->getRepository('sites')->fetchOneBy([
-                'google_group' => $siteSuffix
-            ]);
-            if (!empty($site)) {
-                return $site['name'];
+            if (array_key_exists($siteSuffix, $this->siteNameMapper)) {
+                $siteName = $this->siteNameMapper[$siteSuffix];
+            } else {
+                $site = $this['em']->getRepository('sites')->fetchOneBy([
+                    'google_group' => $siteSuffix
+                ]);
+                if (!empty($site)) {
+                    $siteName = $this->siteNameMapper[$siteSuffix] = $site['name'];
+                }
             }
         }
-        if ($returnSiteSuffixIfEmpty) {
-            return $siteSuffix;
-        }
-        return null;
+        return $siteName;
     }
 }

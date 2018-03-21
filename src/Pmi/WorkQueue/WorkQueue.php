@@ -220,8 +220,6 @@ class WorkQueue
         ]
     ];
 
-    protected $siteNameMapper = [];
-
     public function generateTableRows($participants, $app)
     {
         $e = function($string) {
@@ -288,10 +286,10 @@ class WorkQueue
             }
 
             //In-Person Enrollment
-            $row['pairedSite'] = $this->getSiteName($e($participant->siteSuffix));
+            $row['pairedSite'] = $this->app->getSiteDisplayName($e($participant->siteSuffix));
             $row['pairedOrganization'] = $e($participant->organization);
             $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsTime);
-            $row['evaluationFinalizedSite'] = $this->getSiteName($e($participant->evaluationFinalizedSite));
+            $row['evaluationFinalizedSite'] = $this->app->getSiteDisplayName($e($participant->evaluationFinalizedSite));
             $row['biobankDnaStatus'] = $this->displayStatus($participant->samplesToIsolateDNA, 'RECEIVED');
             if ($participant->numBaselineSamplesArrived >= 7) {
                 $row['biobankSamples'] = self::HTML_SUCCESS . $e($participant->numBaselineSamplesArrived);
@@ -312,7 +310,7 @@ class WorkQueue
                     $row["sample{$sample}Time"] = '';
                 }
             }
-            $row['orderCreatedSite'] = $this->getSiteName($e($participant->orderCreatedSite));
+            $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
 
             //Demographics
             $row['age'] = $e($participant->age);
@@ -365,20 +363,5 @@ class WorkQueue
     public function generateLink($id, $name)
     {
         return '<a href="/participant/' . urlencode($id) . '">' . htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a>';;
-    }
-
-    public function getSiteName($siteSuffix)
-    {
-        $siteName = $siteSuffix;
-        if (!empty($siteSuffix)) {
-            if (array_key_exists($siteSuffix, $this->siteNameMapper)) {
-                $siteName = $this->siteNameMapper[$siteSuffix];
-            } else {
-                if (!empty($name = $this->app->getSiteNameFromSuffix($siteSuffix, false))) {
-                    $siteName = $this->siteNameMapper[$siteSuffix] = $name;
-                }
-            }
-        }
-        return $siteName;       
     }
 }
