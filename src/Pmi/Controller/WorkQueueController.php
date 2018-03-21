@@ -149,7 +149,7 @@ class WorkQueueController extends AbstractController
             $sitesList['site']['label'] = 'Paired Site';
             foreach ($sites as $site) {
                 if (!empty($site['google_group'])) {
-                    $sitesList['site']['options'][$site['google_group']] = $site['google_group'];
+                    $sitesList['site']['options'][$site['name']] = $site['google_group'];
                 }
             }
 
