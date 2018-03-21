@@ -480,4 +480,20 @@ class HpoApplication extends AbstractApplication
         }
         return $errors;
     }
+
+    public function getSiteNameFromSuffix($siteSuffix, $returnSiteSuffixIfEmpty = true)
+    {
+        if (!empty($siteSuffix)) {
+            $site = $this['em']->getRepository('sites')->fetchOneBy([
+                'google_group' => $siteSuffix
+            ]);
+            if (!empty($site)) {
+                return $site['name'];
+            }
+        }
+        if ($returnSiteSuffixIfEmpty) {
+            return $siteSuffix;
+        }
+        return null;
+    }
 }

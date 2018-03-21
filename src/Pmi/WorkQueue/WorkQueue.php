@@ -227,6 +227,7 @@ class WorkQueue
         };
         $this->app = $app;
         $rows = [];
+        $siteNameMapper = [];
         foreach ($participants as $participant) {
             $row = [];
             //Identifiers and status
@@ -286,7 +287,17 @@ class WorkQueue
             }
 
             //In-Person Enrollment
-            $row['pairedSite'] = $e($participant->siteSuffix);
+            $siteSuffix = $siteName = $e($participant->siteSuffix);
+            if (!empty($siteSuffix)) {
+                if (array_key_exists($siteSuffix, $siteNameMapper)) {
+                    $siteName = $siteNameMapper[$siteSuffix];
+                } else {
+                    if (!empty($name = $this->app->getSiteNameFromSuffix($siteSuffix, false))) {
+                        $siteName = $siteNameMapper[$siteSuffix] = $name;
+                    }
+                }
+            }
+            $row['pairedSite'] = $siteName;
             $row['pairedOrganization'] = $e($participant->organization);
             $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsTime);
             $row['evaluationFinalizedSite'] = $e($participant->evaluationFinalizedSite);
@@ -319,7 +330,7 @@ class WorkQueue
             $row['race'] = $e($participant->race);
             $row['education'] = $e($participant->education);
             array_push($rows, $row);
-        } 
+        }
         return $rows;
     }
 
