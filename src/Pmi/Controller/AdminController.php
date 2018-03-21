@@ -59,7 +59,12 @@ class AdminController extends AbstractController
             $form = $app['form.factory']->createBuilder(FormType::class)->getForm();
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                $siteSync->sync();
+                if ($request->request->has('awardeeOrgSync')) {
+                    $siteSync->syncAwardees();
+                    $siteSync->syncOrganizations();
+                } else {
+                    $siteSync->sync();
+                }
                 return $app->redirectToRoute('admin_sites');
             }
             $formView = $form->createView();
