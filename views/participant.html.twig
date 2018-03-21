@@ -350,7 +350,7 @@
                                         </div>
                                         <br/>
                                         {% if participant.siteSuffix %}
-                                            Location: <samp>{{ participant.siteSuffix }}</samp>
+                                            Location: <samp>{{ app.getSiteNameFromSuffix(participant.siteSuffix) }}</samp>
                                         {% endif %}
                                     </div>
                                     <hr />
@@ -369,7 +369,7 @@
                                         </div>
                                         <br />
                                         {% if participant.evaluationFinalizedSite %}
-                                            Location: <samp>{{ participant.evaluationFinalizedSite }}</samp>
+                                            Location: <samp>{{ app.getSiteNameFromSuffix(participant.evaluationFinalizedSite) }}</samp>
                                         {% endif %}
                                     </div>
                                     <hr />
@@ -412,7 +412,7 @@
                                         {% endfor %}
                                         <br />
                                         {% if participant.orderCreatedSite %}
-                                            Location: <samp>{{ participant.orderCreatedSite }}</samp>
+                                            Location: <samp>{{ app.getSiteNameFromSuffix(participant.orderCreatedSite) }}</samp>
                                         {% endif %}
                                     </div>
                                 </div>
