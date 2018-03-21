@@ -184,47 +184,47 @@ class AdminController extends AbstractController
                     'constraints' => new Constraints\Type('string')
                 ])
                 ->add('organization', Type\TextType::class, [
-                    'label' => 'Organization',
+                    'label' => 'Awardee (formerly HPO ID)',
                     'required' => false,
                     'constraints' => new Constraints\Type('string')
                 ])
                 ->add('type', Type\TextType::class, [
-                    'label' => 'Type',
+                    'label' => 'Type (e.g. HPO, DV)',
                     'required' => false,
                     'constraints' => new Constraints\Type('string')
+                ])
+                ->add('email', Type\TextType::class, [
+                    'label' => 'Email address(es)',
+                    'required' => false,
+                    'constraints' => [
+                        new Constraints\Type('string'),
+                        new Constraints\Length(['max' => 512]),
+                        new Constraints\Callback(function($list, $context) {
+                            $list = trim($list);
+                            if (empty($list)) {
+                                return;
+                            }
+                            $emails = explode(',', $list);
+                            $validator = Validation::createValidator();
+                            foreach ($emails as $email) {
+                                $email = trim($email);
+                                $errors = $validator->validate($email, new Constraints\Email());
+                                if (count($errors) > 0) {
+                                    $context
+                                        ->buildViolation('Must be a comma-separated list of valid email addresses')
+                                        ->addViolation();
+                                    break;
+                                }
+                            }
+                        })
+                    ]
                 ]);
         }
         $builder
             ->add('awardee', Type\TextType::class, [
-                'label' => 'Awardee',
+                'label' => 'Program (e.g. STSI)',
                 'required' => false,
                 'constraints' => new Constraints\Type('string')
-            ])
-            ->add('email', Type\TextType::class, [
-                'label' => 'Email address(es)',
-                'required' => false,
-                'constraints' => [
-                    new Constraints\Type('string'),
-                    new Constraints\Length(['max' => 512]),
-                    new Constraints\Callback(function($list, $context) {
-                        $list = trim($list);
-                        if (empty($list)) {
-                            return;
-                        }
-                        $emails = explode(',', $list);
-                        $validator = Validation::createValidator();
-                        foreach ($emails as $email) {
-                            $email = trim($email);
-                            $errors = $validator->validate($email, new Constraints\Email());
-                            if (count($errors) > 0) {
-                                $context
-                                    ->buildViolation('Must be a comma-separated list of valid email addresses')
-                                    ->addViolation();
-                                break;
-                            }
-                        }
-                    })
-                ]
             ])
             ->add('centrifuge_type', Type\ChoiceType::class, [
                 'label' => 'Centrifuge type',
@@ -237,7 +237,7 @@ class AdminController extends AbstractController
                 'multiple' => false
             ])
             ->add('workqueue_download', Type\ChoiceType::class, [
-                'label' => 'Work Qeue Download',
+                'label' => 'Work Queue Download',
                 'required' => true,
                 'choices' => [
                     'Full Data Access'=> self::FULL_DATA_ACCESS,
