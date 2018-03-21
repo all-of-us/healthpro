@@ -163,10 +163,6 @@ class SiteSyncService
                 if (empty($organization->id) || empty($organization->displayName)) {
                     continue;
                 }
-                if (in_array($organization->id, ['VA_Palo_Alto_VAMC', 'VA_Boston_VAMC'])) {
-                    // temporary fix for bad RDR data
-                    continue;
-                }
                 $organizationsMap[$organization->id] = $organization->displayName;
             }
         }
