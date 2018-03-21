@@ -54,11 +54,11 @@ class SiteSyncService
         foreach ($entries as $entry) {
             $awardee = $entry->resource;
             if (!isset($awardee->organizations) || !is_array($awardee->organizations)) {
-                break;
+                continue;
             }
             foreach ($awardee->organizations as $organization) {
                 if (!isset($organization->sites) || !is_array($organization->sites)) {
-                    break;
+                    continue;
                 }
                 foreach ($organization->sites as $site) {
                     $existing = false;
