@@ -1,5 +1,6 @@
 CREATE TABLE `sites` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
   `name` varchar(255) NOT NULL,
   `site_id` varchar(255) NULL DEFAULT NULL,
   `organization_id` varchar(255) NULL DEFAULT NULL,

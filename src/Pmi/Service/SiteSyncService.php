@@ -5,7 +5,7 @@ class SiteSyncService
 {
     private $rdrClient;
     private $em;
-    private $orgEndpoint = 'rdr/v1/Awardee';
+    private $orgEndpoint = 'rdr/v1/Awardee?_inactive=true';
     private $entries;
 
     public function __construct($rdrClient, $entityManager)
@@ -75,6 +75,7 @@ class SiteSyncService
                         $existing = $siteData = $existingSites[$siteId];
                         $primaryId = $siteData['id'];
                     }
+                    $siteData['status'] = (isset($site->enrollingStatus) && $site->enrollingStatus === 'ACTIVE') ? 1 : 0;
                     $siteData['name'] = $site->displayName;
                     $siteData['google_group'] = $siteId; // backwards compatibility
                     $siteData['organization'] = $awardee->id; // backwards compatibility
@@ -82,9 +83,9 @@ class SiteSyncService
                     $siteData['organization_id'] = $organization->id;
                     $siteData['awardee_id'] = $awardee->id;
                     if ($syncMayoAccount) {
-                        $siteData['mayolink_account'] = $site->mayolinkClientNumber;
+                        $siteData['mayolink_account'] = isset($site->mayolinkClientNumber) ? $site->mayolinkClientNumber : null;
                     }
-                    $siteData['timezone'] = isset($site->timeZoneId) ? $site->timeZoneId : '';
+                    $siteData['timezone'] = isset($site->timeZoneId) ? $site->timeZoneId : null;
                     $siteData['type'] = $awardee->type;
                     if (isset($site->adminEmails) && is_array($site->adminEmails)) {
                         $siteData['email'] = join(', ', $site->adminEmails);

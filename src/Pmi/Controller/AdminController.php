@@ -175,6 +175,15 @@ class AdminController extends AbstractController
                 ],
                 'disabled' => $disabled,
             ])
+            ->add('status', Type\ChoiceType::class, [
+                'label' => 'Status',
+                'required' => true,
+                'choices' => [
+                    'Active'=> 1,
+                    'Inactive' => 0
+                ],
+                'disabled' => $disabled
+            ])
             ->add('google_group', Type\TextType::class, [
                 'label' => 'Google Group',
                 'required' => true,
