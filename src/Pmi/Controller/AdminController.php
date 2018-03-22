@@ -183,14 +183,20 @@ class AdminController extends AbstractController
                 ],
                 'disabled' => $disabled,
             ])
-            ->add('mayolink_account', Type\TextType::class, [
-                'label' => 'MayoLink Account',
+            ->add('organization', Type\TextType::class, [
+                'label' => 'Awardee (formerly HPO ID)',
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
                 'disabled' => $disabled,
             ])
-            ->add('organization', Type\TextType::class, [
-                'label' => 'Awardee (formerly HPO ID)',
+            ->add('organization_id', Type\TextType::class, [
+                'label' => 'Organization',
+                'required' => false,
+                'constraints' => new Constraints\Type('string'),
+                'disabled' => $disabled,
+            ])
+            ->add('mayolink_account', Type\TextType::class, [
+                'label' => 'MayoLink Account',
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
                 'disabled' => $disabled,
