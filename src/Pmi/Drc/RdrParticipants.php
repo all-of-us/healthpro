@@ -11,6 +11,7 @@ class RdrParticipants
     protected $cacheEnabled = true;
     protected static $resourceEndpoint = 'rdr/v1/';
     protected $nextToken;
+    protected $total;
 
     public function __construct(RdrHelper $rdrHelper)
     {
@@ -89,12 +90,30 @@ class RdrParticipants
         return $results;
     }
 
+    /**
+     * @param string|array $params Particpant Summary API parameters (query string or array)
+     * @param bool $next Enable paging
+     **/
     public function listParticipantSummaries($params, $next = false)
     {
-        if ($next && $this->nextToken) {
-            $params['_token'] = $this->nextToken;
+        if ($next) {
+            //Pass token if exists
+            if ($this->nextToken) {
+                if (is_array($params)) {
+                    $params['_token'] = $this->nextToken;
+                } else {
+                    $params .= '&_token=' . $this->nextToken;
+                }
+            }
+            // Request count
+            if (is_array($params)) {
+                $params['_includeTotal'] = 'true';
+            } else {
+                $params .= '&_includeTotal=true';
+            }
+
         }
-        $this->nextToken = null;
+        $this->nextToken = $this->total = null;
         try {
             $response = $this->getClient()->request('GET', 'ParticipantSummary', [
                 'query' => $params
@@ -123,12 +142,32 @@ class RdrParticipants
                 }
             }
         }
+        if (isset($responseObject->total)) {
+            $this->total = intval($responseObject->total);
+        }
         return $responseObject->entry;
     }
 
     public function getNextToken()
     {
         return $this->nextToken;
+    }
+
+    public function getTotal()
+    {
+        return $this->total;
+    }
+
+    public function setNextToken($app, $tableParams, $type = null)
+    {
+        $tokens = $app['session']->get('tokens');
+        $index = $tableParams['start'] + $tableParams['count'];
+        if (empty($type) && !empty($tokens)) {
+            $this->nextToken = $tokens[$tableParams['start']];
+        } else {
+            $tokens[$index] = $this->nextToken;
+            $app['session']->set('tokens', $tokens);
+        }
     }
 
     public function getById($id, $refresh = null)
