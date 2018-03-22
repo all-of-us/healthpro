@@ -85,7 +85,7 @@ class CronController extends AbstractController
         return (new JsonResponse())->setData($results);
     }
 
-    public function awardeesAndOrganizationsAction(Application $app, Request $request)
+    public function awardeesAndOrganizationsAction(Application $app)
     {
         $siteSync = new SiteSyncService(
             $app['pmi.drc.rdrhelper']->getClient(),
