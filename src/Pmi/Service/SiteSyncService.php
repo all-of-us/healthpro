@@ -44,12 +44,12 @@ class SiteSyncService
         return str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
     }
 
-    public function dryRun()
+    public function dryRun($syncMayoAccount)
     {
-        return $this->sync(true);
+        return $this->sync($syncMayoAccount, true);
     }
 
-    public function sync($preview = false)
+    public function sync($syncMayoAccount, $preview = false)
     {
         $created = [];
         $modified = [];
@@ -81,7 +81,9 @@ class SiteSyncService
                     $siteData['site_id'] = $siteId;
                     $siteData['organization_id'] = $organization->id;
                     $siteData['awardee_id'] = $awardee->id;
-                    $siteData['mayolink_account'] = $site->mayolinkClientNumber;
+                    if ($syncMayoAccount) {
+                        $siteData['mayolink_account'] = $site->mayolinkClientNumber;
+                    }
                     $siteData['timezone'] = isset($site->timeZoneId) ? $site->timeZoneId : '';
                     $siteData['type'] = $awardee->type;
                     if (isset($site->adminEmails) && is_array($site->adminEmails)) {
