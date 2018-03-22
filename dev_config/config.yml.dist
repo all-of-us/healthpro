@@ -73,3 +73,6 @@ enforce2fa: 0
 # Mandrill configuration for sending emails
 # mail_method: mandrill
 # mandrill_key: 
+
+# enable site sync using RDR Organization API
+sites_use_rdr: true
