@@ -90,6 +90,8 @@ class SiteSyncService
                     if ($isProd) {
                         if (isset($site->adminEmails) && is_array($site->adminEmails)) {
                             $siteData['email'] = join(', ', $site->adminEmails);
+                        } else {
+                            $siteData['email'] = null;
                         }
                     }
                     if (empty($siteData['workqueue_download'])) {
