@@ -44,12 +44,12 @@ class SiteSyncService
         return str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
     }
 
-    public function dryRun($syncMayoAccount)
+    public function dryRun($isProd)
     {
-        return $this->sync($syncMayoAccount, true);
+        return $this->sync($isProd, true);
     }
 
-    public function sync($syncMayoAccount, $preview = false)
+    public function sync($isProd, $preview = false)
     {
         $created = [];
         $modified = [];
@@ -82,13 +82,15 @@ class SiteSyncService
                     $siteData['site_id'] = $siteId;
                     $siteData['organization_id'] = $organization->id;
                     $siteData['awardee_id'] = $awardee->id;
-                    if ($syncMayoAccount) {
+                    if ($isProd) {
                         $siteData['mayolink_account'] = isset($site->mayolinkClientNumber) ? $site->mayolinkClientNumber : null;
                     }
                     $siteData['timezone'] = isset($site->timeZoneId) ? $site->timeZoneId : null;
                     $siteData['type'] = $awardee->type;
-                    if (isset($site->adminEmails) && is_array($site->adminEmails)) {
-                        $siteData['email'] = join(', ', $site->adminEmails);
+                    if ($isProd) {
+                        if (isset($site->adminEmails) && is_array($site->adminEmails)) {
+                            $siteData['email'] = join(', ', $site->adminEmails);
+                        }
                     }
                     if (empty($siteData['workqueue_download'])) {
                         $siteData['workqueue_download'] = 'full_data'; // default value for workqueue downlaod

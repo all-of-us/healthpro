@@ -51,8 +51,8 @@ class AdminController extends AbstractController
             $app['pmi.drc.rdrhelper']->getClient(),
             $app['em']
         );
-        $syncMayoAccount = !$app->isStable();
-        $preview = $siteSync->dryRun($syncMayoAccount);
+        $isProd = $app->isProd();
+        $preview = $siteSync->dryRun($isProd);
 
         if (!$app->getConfig('sites_use_rdr')) {
             $formView = false;
@@ -64,7 +64,7 @@ class AdminController extends AbstractController
                     $siteSync->syncAwardees();
                     $siteSync->syncOrganizations();
                 } else {
-                    $siteSync->sync($syncMayoAccount);
+                    $siteSync->sync($isProd);
                 }
                 $app->addFlashSuccess('Successfully synced');
                 return $app->redirectToRoute('admin_sites');

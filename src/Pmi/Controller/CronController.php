@@ -74,14 +74,14 @@ class CronController extends AbstractController
             $app['pmi.drc.rdrhelper']->getClient(),
             $app['em']
         );
-        $syncMayoAccount = !$app->isStable();
+        $isProd = $app->isProd();
         if ($action === 'sync') {
             if (!$app->getConfig('sites_use_rdr')) {
                 return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
             }
-            $results = $siteSync->sync($syncMayoAccount);
+            $results = $siteSync->sync($isProd);
         } else {
-            $results = $siteSync->dryRun($syncMayoAccount);
+            $results = $siteSync->dryRun($isProd);
         }
         return (new JsonResponse())->setData($results);
     }
