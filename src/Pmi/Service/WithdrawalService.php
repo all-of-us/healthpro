@@ -31,7 +31,7 @@ class WithdrawalService
 
     protected function getOrganizations()
     {
-        $rows = $this->db->fetchAll('SELECT organization, GROUP_CONCAT(email) as emails FROM sites WHERE organization IS NOT NULL GROUP BY organization');
+        $rows = $this->db->fetchAll('SELECT organization, GROUP_CONCAT(email) as emails FROM sites WHERE organization IS NOT NULL AND status = 1 GROUP BY organization');
         $organizations = [];
         $lastWithdrawals = $this->getOrganizationsLastWithdrawals();
         foreach ($rows as $row) {
