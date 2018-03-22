@@ -160,67 +160,71 @@ class AdminController extends AbstractController
         }
         $syncEnabled = $app->getConfig('sites_use_rdr');
         $builder = $app['form.factory']->createBuilder(FormType::class, $site);
-        if (!$syncEnabled) {
-            $builder
-                ->add('name', Type\TextType::class, [
-                    'label' => 'Name',
-                    'required' => true,
-                    'constraints' => [
-                        new Constraints\NotBlank(),
-                        new Constraints\Type('string')
-                    ]
-                ])
-                ->add('google_group', Type\TextType::class, [
-                    'label' => 'Google Group',
-                    'required' => true,
-                    'constraints' => [
-                        new Constraints\NotBlank(),
-                        new Constraints\Type('string')
-                    ]
-                ])
-                ->add('mayolink_account', Type\TextType::class, [
-                    'label' => 'MayoLink Account',
-                    'required' => false,
-                    'constraints' => new Constraints\Type('string')
-                ])
-                ->add('organization', Type\TextType::class, [
-                    'label' => 'Awardee (formerly HPO ID)',
-                    'required' => false,
-                    'constraints' => new Constraints\Type('string')
-                ])
-                ->add('type', Type\TextType::class, [
-                    'label' => 'Type (e.g. HPO, DV)',
-                    'required' => false,
-                    'constraints' => new Constraints\Type('string')
-                ])
-                ->add('email', Type\TextType::class, [
-                    'label' => 'Email address(es)',
-                    'required' => false,
-                    'constraints' => [
-                        new Constraints\Type('string'),
-                        new Constraints\Length(['max' => 512]),
-                        new Constraints\Callback(function($list, $context) {
-                            $list = trim($list);
-                            if (empty($list)) {
-                                return;
-                            }
-                            $emails = explode(',', $list);
-                            $validator = Validation::createValidator();
-                            foreach ($emails as $email) {
-                                $email = trim($email);
-                                $errors = $validator->validate($email, new Constraints\Email());
-                                if (count($errors) > 0) {
-                                    $context
-                                        ->buildViolation('Must be a comma-separated list of valid email addresses')
-                                        ->addViolation();
-                                    break;
-                                }
-                            }
-                        })
-                    ]
-                ]);
-        }
+        $disabled = $syncEnabled ? true : false;
         $builder
+            ->add('name', Type\TextType::class, [
+                'label' => 'Name',
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'disabled' => $disabled,
+            ])
+            ->add('google_group', Type\TextType::class, [
+                'label' => 'Google Group',
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'disabled' => $disabled,
+            ])
+            ->add('mayolink_account', Type\TextType::class, [
+                'label' => 'MayoLink Account',
+                'required' => false,
+                'constraints' => new Constraints\Type('string'),
+                'disabled' => $disabled,
+            ])
+            ->add('organization', Type\TextType::class, [
+                'label' => 'Awardee (formerly HPO ID)',
+                'required' => false,
+                'constraints' => new Constraints\Type('string'),
+                'disabled' => $disabled,
+            ])
+            ->add('type', Type\TextType::class, [
+                'label' => 'Type (e.g. HPO, DV)',
+                'required' => false,
+                'constraints' => new Constraints\Type('string'),
+                'disabled' => $disabled,
+            ])
+            ->add('email', Type\TextType::class, [
+                'label' => 'Email address(es)',
+                'required' => false,
+                'constraints' => [
+                    new Constraints\Type('string'),
+                    new Constraints\Length(['max' => 512]),
+                    new Constraints\Callback(function($list, $context) {
+                        $list = trim($list);
+                        if (empty($list)) {
+                            return;
+                        }
+                        $emails = explode(',', $list);
+                        $validator = Validation::createValidator();
+                        foreach ($emails as $email) {
+                            $email = trim($email);
+                            $errors = $validator->validate($email, new Constraints\Email());
+                            if (count($errors) > 0) {
+                                $context
+                                    ->buildViolation('Must be a comma-separated list of valid email addresses')
+                                    ->addViolation();
+                                break;
+                            }
+                        }
+                    })
+                ],
+                'disabled' => $disabled,
+            ])
             ->add('awardee', Type\TextType::class, [
                 'label' => 'Program (e.g. STSI)',
                 'required' => false,
