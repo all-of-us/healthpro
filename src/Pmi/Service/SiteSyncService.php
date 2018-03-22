@@ -24,9 +24,8 @@ class SiteSyncService
         if ($responseObject && !empty($responseObject->entry)) {
             $this->entries = $responseObject->entry;
             return $this->entries;
-        } else {
-            return [];
         }
+        return [];
     }
 
     private function getSitesFromDb()
