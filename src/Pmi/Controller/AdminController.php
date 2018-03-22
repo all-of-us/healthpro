@@ -65,13 +65,16 @@ class AdminController extends AbstractController
                 } else {
                     $siteSync->sync();
                 }
+                $app->addFlashSuccess('Successfully synced');
                 return $app->redirectToRoute('admin_sites');
             }
             $formView = $form->createView();
         }
+        $canSync = !empty($preview['deleted']) || !empty($preview['modified']) || !empty($preview['created']);
         return $app['twig']->render('admin/sites/sync.html.twig', [
             'preview' => $preview,
-            'form' => $formView
+            'form' => $formView,
+            'canSync' => $canSync
         ]);
     }
 

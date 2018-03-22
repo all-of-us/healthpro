@@ -17,7 +17,7 @@
         {{ form_errors(form) }}
         {{ form_rest(form) }}
         <p>
-            <button type="submit" name="siteSync" class="btn btn-primary" onclick="return confirm('Are you sure? Please review the changes below.');"><i class="fa fa-refresh" aria-hidden="true"></i> Perform Site Sync</button>
+            <button type="submit" name="siteSync" class="btn btn-primary" onclick="return confirm('Are you sure? Please review the changes below.');" {% if not canSync %} disabled="disabled" {% endif %}><i class="fa fa-refresh" aria-hidden="true"></i> Perform Site Sync</button>
             <button type="submit" name="awardeeOrgSync" class="btn btn-default pull-right"><i class="fa fa-refresh" aria-hidden="true"></i> Sync Organizations and Awardees</button>
         </p>
         {{ form_end(form) }}
@@ -70,5 +70,7 @@
     {% else %}
         <p>No new sites</p>
     {% endfor %}
+
+    <div align="center"><a class="btn btn-default" href="{{ path('admin_sites') }}">Cancel</a></div>
 
 {% endblock %}
