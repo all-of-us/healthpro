@@ -165,6 +165,7 @@ class AdminController extends AbstractController
         $syncEnabled = $app->getConfig('sites_use_rdr');
         $builder = $app['form.factory']->createBuilder(FormType::class, $site);
         $disabled = $syncEnabled ? true : false;
+        $isProd = $app->isProd();
         $builder
             ->add('name', Type\TextType::class, [
                 'label' => 'Name',
@@ -209,7 +210,7 @@ class AdminController extends AbstractController
                 'label' => 'MayoLink Account',
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
-                'disabled' => $disabled,
+                'disabled' => $disabled && $isProd,
             ])
             ->add('type', Type\TextType::class, [
                 'label' => 'Type (e.g. HPO, DV)',
@@ -242,7 +243,7 @@ class AdminController extends AbstractController
                         }
                     })
                 ],
-                'disabled' => $disabled,
+                'disabled' => $disabled && $isProd,
             ])
             ->add('awardee', Type\TextType::class, [
                 'label' => 'Program (e.g. STSI)',
