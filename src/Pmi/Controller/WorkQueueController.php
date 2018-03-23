@@ -158,7 +158,7 @@ class WorkQueueController extends AbstractController
             $organizationsList['organization_id']['label'] = 'Paired Organization';
             foreach ($sites as $site) {
                 if (!empty($site['organization_id'])) {
-                    $organizationsList['organization_id']['options'][$site['organization_id']] = $site['organization_id'];
+                    $organizationsList['organization_id']['options'][$app->getOrganizationDisplayName($site['organization_id'])] = $site['organization_id'];
                 }
             }
 

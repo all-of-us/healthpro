@@ -350,7 +350,7 @@
                                         </div>
                                         <br/>
                                         {% if participant.organization %}
-                                            <samp>{{ participant.organization }}</samp>
+                                            <samp>{{ app.getOrganizationDisplayName(participant.organization) }}</samp>
                                         {% endif %}
                                     </div>
                                     <hr />

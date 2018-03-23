@@ -287,7 +287,7 @@ class WorkQueue
 
             //In-Person Enrollment
             $row['pairedSite'] = $this->app->getSiteDisplayName($e($participant->siteSuffix));
-            $row['pairedOrganization'] = $e($participant->organization);
+            $row['pairedOrganization'] = $this->app->getOrganizationDisplayName($e($participant->organization));
             $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsTime);
             $row['evaluationFinalizedSite'] = $this->app->getSiteDisplayName($e($participant->evaluationFinalizedSite));
             $row['biobankDnaStatus'] = $this->displayStatus($participant->samplesToIsolateDNA, 'RECEIVED');

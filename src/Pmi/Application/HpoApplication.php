@@ -13,6 +13,7 @@ class HpoApplication extends AbstractApplication
     protected $configuration = [];
     protected $participantSource = 'rdr';
     protected $siteNameMapper = [];
+    protected $organizationNameMapper = [];
 
     public function setup($config = [])
     {
@@ -498,5 +499,23 @@ class HpoApplication extends AbstractApplication
             }
         }
         return $siteName;
+    }
+
+    public function getOrganizationDisplayName($organizationId)
+    {
+        $organizationName = $organizationId;
+        if (!empty($organizationId)) {
+            if (array_key_exists($organizationId, $this->organizationNameMapper)) {
+                $organizationName = $this->organizationNameMapper[$organizationId];
+            } else {
+                $organization = $this['em']->getRepository('organizations')->fetchOneBy([
+                    'id' => $organizationId
+                ]);
+                if (!empty($organization)) {
+                    $organizationName = $this->organizationNameMapper[$organizationId] = $organization['name'];
+                }
+            }
+        }
+        return $organizationName;
     }
 }
