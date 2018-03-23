@@ -63,7 +63,8 @@ $(document).ready(function() {
       );
     });
     tableColumns.push(
-      { name: 'pairedSiteLocation', data: 'pairedSiteLocation' },
+      { name: 'pairedSite', data: 'pairedSite' },
+      { name: 'pairedOrganization', data: 'pairedOrganization' },
       { name: 'physicalMeasurementsStatus', data: 'physicalMeasurementsStatus', class: 'text-center' },
       { name: 'evaluationFinalizedSite', visible: false, data: 'evaluationFinalizedSite', orderable: false },
       { name: 'biobankDnaStatus', data: 'biobankDnaStatus', class: 'text-center' },

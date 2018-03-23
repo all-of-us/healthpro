@@ -45,6 +45,7 @@ class WorkQueue
         'questionnaireOnHealthcareAccess',
         'questionnaireOnHealthcareAccessTime',
         'site',
+        'organization',
         'physicalMeasurementsTime',
         'physicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
@@ -285,9 +286,10 @@ class WorkQueue
             }
 
             //In-Person Enrollment
-            $row['pairedSiteLocation'] = $e($participant->siteSuffix);
+            $row['pairedSite'] = $this->app->getSiteDisplayName($e($participant->siteSuffix));
+            $row['pairedOrganization'] = $this->app->getOrganizationDisplayName($e($participant->organization));
             $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsTime);
-            $row['evaluationFinalizedSite'] = $e($participant->evaluationFinalizedSite);
+            $row['evaluationFinalizedSite'] = $this->app->getSiteDisplayName($e($participant->evaluationFinalizedSite));
             $row['biobankDnaStatus'] = $this->displayStatus($participant->samplesToIsolateDNA, 'RECEIVED');
             if ($participant->numBaselineSamplesArrived >= 7) {
                 $row['biobankSamples'] = self::HTML_SUCCESS . $e($participant->numBaselineSamplesArrived);
@@ -308,7 +310,7 @@ class WorkQueue
                     $row["sample{$sample}Time"] = '';
                 }
             }
-            $row['orderCreatedSite'] = $e($participant->orderCreatedSite);
+            $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
 
             //Demographics
             $row['age'] = $e($participant->age);
@@ -317,7 +319,7 @@ class WorkQueue
             $row['race'] = $e($participant->race);
             $row['education'] = $e($participant->education);
             array_push($rows, $row);
-        } 
+        }
         return $rows;
     }
 
