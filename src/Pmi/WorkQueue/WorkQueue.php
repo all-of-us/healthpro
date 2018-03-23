@@ -276,7 +276,7 @@ class WorkQueue
                 $row['ppiStatus'] = self::HTML_DANGER;
             }
             $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
-            foreach (self::$surveys as $field => $survey) {
+            foreach (array_keys(self::$surveys) as $field) {
                 $row["ppi{$field}"] = $this->displayStatus($participant->{'questionnaireOn' . $field}, 'SUBMITTED');
                 if (!empty($participant->{'questionnaireOn' . $field . 'Time'})) {
                     $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn' . $field . 'Time'}, $app->getUserTimezone());
