@@ -14,6 +14,7 @@ class HpoApplication extends AbstractApplication
     protected $participantSource = 'rdr';
     protected $siteNameMapper = [];
     protected $organizationNameMapper = [];
+    protected $awardeeNameMapper = [];
 
     public function setup($config = [])
     {
@@ -517,5 +518,23 @@ class HpoApplication extends AbstractApplication
             }
         }
         return $organizationName;
+    }
+
+    public function getAwardeeDisplayName($awardeeId)
+    {
+        $awardeeName = $awardeeId;
+        if (!empty($awardeeId)) {
+            if (array_key_exists($awardeeId, $this->awardeeNameMapper)) {
+                $awardeeName = $this->awardeeNameMapper[$awardeeId];
+            } else {
+                $awardee = $this['em']->getRepository('awardees')->fetchOneBy([
+                    'id' => $awardeeId
+                ]);
+                if (!empty($awardee)) {
+                    $awardeeName = $this->awardeeNameMapper[$awardeeId] = $awardee['name'];
+                }
+            }
+        }
+        return $awardeeName;
     }
 }
