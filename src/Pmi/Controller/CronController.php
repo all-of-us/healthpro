@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Pmi\Service\WithdrawalService;
+use Pmi\Service\SiteSyncService;
 
 /**
  * NOTE: all /cron routes should be protected by `login: admin` in app.yaml
@@ -17,7 +18,9 @@ class CronController extends AbstractController
 
     protected static $routes = [
         ['pingTest', '/ping-test'],
-        ['withdrawal', '/withdrawal']
+        ['withdrawal', '/withdrawal'],
+        ['sites', '/sites'],
+        ['awardeesAndOrganizations', '/awardees-organizations']
     ];
     
     /**
@@ -57,6 +60,40 @@ class CronController extends AbstractController
             error_log('Cron ping test requested by Appengine-Cron');
         }
         
+        return (new JsonResponse())->setData(true);
+    }
+
+    public function sitesAction(Application $app, Request $request)
+    {
+        $action = $request->get('action');
+        if (!in_array($action, ['sync', 'preview'])) {
+            return (new JsonResponse())->setData(['error' => 'Invalid action']);
+        }
+
+        $siteSync = new SiteSyncService(
+            $app['pmi.drc.rdrhelper']->getClient(),
+            $app['em']
+        );
+        $isProd = $app->isProd();
+        if ($action === 'sync') {
+            if (!$app->getConfig('sites_use_rdr')) {
+                return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
+            }
+            $results = $siteSync->sync($isProd);
+        } else {
+            $results = $siteSync->dryRun($isProd);
+        }
+        return (new JsonResponse())->setData($results);
+    }
+
+    public function awardeesAndOrganizationsAction(Application $app)
+    {
+        $siteSync = new SiteSyncService(
+            $app['pmi.drc.rdrhelper']->getClient(),
+            $app['em']
+        );
+        $siteSync->syncAwardees();
+        $siteSync->syncOrganizations();
         return (new JsonResponse())->setData(true);
     }
 }

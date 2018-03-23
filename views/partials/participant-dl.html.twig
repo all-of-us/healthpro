@@ -9,4 +9,6 @@
     <dd>{{ participant.dob ? participant.dob|date('n/j/Y') : '--' }}</dd>
     <dt>Gender Identity</dt>
     <dd>{{ participant.genderIdentity|default('--') }}</dd>
+    <dt>Participant Status</dt>
+    <dd>{{ participant.enrollmentStatus|default('--') }}</dd>
 </dl>
