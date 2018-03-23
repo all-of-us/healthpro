@@ -85,7 +85,11 @@ class WorkQueueController extends AbstractController
         }
         // Add site prefix
         if (!empty($params['site'])) {
-            $rdrParams['site'] = \Pmi\Security\User::SITE_PREFIX . $params['site'];
+            $site = $params['site'];
+            if ($site !== 'UNSET') {
+                $site = \Pmi\Security\User::SITE_PREFIX . $site;
+            }
+            $rdrParams['site'] = $site;
         }
         if (!empty($params['organization_id'])) {
             $rdrParams['organization'] = $params['organization_id'];
@@ -152,6 +156,7 @@ class WorkQueueController extends AbstractController
                     $sitesList['site']['options'][$site['name']] = $site['google_group'];
                 }
             }
+            $sitesList['site']['options']['Unpaired'] = 'UNSET';
 
             //Add organization filter
             $organizationsList = [];

@@ -365,7 +365,8 @@ class HpoApplication extends AbstractApplication
     public function getSitesFromOrganization($org)
     {
         return $this['em']->getRepository('sites')->fetchBy([
-            'organization' => $org
+            'status' => 1,
+            'organization' => $org,
         ]);
     }
 
