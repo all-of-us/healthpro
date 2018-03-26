@@ -247,4 +247,10 @@ $(document).ready(function() {
     table.buttons().container().find('.btn').addClass('btn-sm');
     $('#workqueue_length').addClass('pull-right');
     $('#workqueue_info').addClass('pull-left');
+
+    // Display custom error message
+    $.fn.dataTable.ext.errMode = 'none';
+    $('#workqueue').on('error.dt', function(e) {
+        alert('An error occured please reload the page and try again');
+    });
 });
