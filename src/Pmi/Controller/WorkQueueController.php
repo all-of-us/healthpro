@@ -202,7 +202,11 @@ class WorkQueueController extends AbstractController
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $app['pmi.drc.participants']->getTotal();
             $WorkQueue = new WorkQueue;
             $ajaxData['data'] = $WorkQueue->generateTableRows($participants, $app);
-            return new JsonResponse($ajaxData);
+            $responseCode = 200;
+            if ($this->rdrError) {
+                $responseCode = 500;
+            }
+            return new JsonResponse($ajaxData, $responseCode);
         } else {
             $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
             return $app['twig']->render('workqueue/index.html.twig', [

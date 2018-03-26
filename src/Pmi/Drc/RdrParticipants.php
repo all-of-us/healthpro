@@ -162,7 +162,7 @@ class RdrParticipants
     {
         $tokens = $app['session']->get('tokens');
         $index = $tableParams['start'] + $tableParams['count'];
-        if (empty($type) && !empty($tokens)) {
+        if (empty($type) && !empty($tokens[$tableParams['start']])) {
             $this->nextToken = $tokens[$tableParams['start']];
         } else {
             $tokens[$index] = $this->nextToken;
