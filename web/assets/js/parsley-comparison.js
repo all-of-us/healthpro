@@ -1,5 +1,5 @@
 /*
- * Copied from bower_components/parsleyjs/src/extra/validator/comparison.js
+ * Copied from node_modules/parsleyjs/src/extra/validator/comparison.js
  * Modified to remove the import line and add messages
  */
 
@@ -31,4 +31,3 @@ window.Parsley.addValidator('lt', {
   },
   priority: 32
 });
-

@@ -278,7 +278,6 @@ class OrderController extends AbstractController
                             if ($app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId])) {
                                 $app->log(Log::ORDER_EDIT, $orderId);
                                 $order = $this->loadOrder($participantId, $orderId, $app);
-                                $order->sendToRdr();
                                 $successMsg = 'Order collection updated and successfully sent';
                                 // Redirect to print requisition
                                 if ($order->get('type') !== 'kit') {
