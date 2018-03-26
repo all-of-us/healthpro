@@ -193,7 +193,7 @@ class DeployCommand extends Command {
             }
             $cmd .= " {$this->appDir}/app.yaml";
         } else {
-            $cmd = "gcloud app deploy --quiet --project={$this->appId} --version=1 {$this->appDir}/app.yaml";
+            $cmd = "gcloud app deploy --quiet --project={$this->appId} {$this->appDir}/app.yaml";
         }
         $output->writeln('');
         $output->writeln("Deploy command: <info>{$cmd}</info>");
