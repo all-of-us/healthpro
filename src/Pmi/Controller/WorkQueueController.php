@@ -148,10 +148,11 @@ class WorkQueueController extends AbstractController
 
         if ($app->hasRole('ROLE_AWARDEE')) {
             // Add organizations to filters
+            // ToDo: change organization key and variable names to awardee
             $organizationsList = [];
             $organizationsList['organization']['label'] = 'Organization';
             foreach ($organizations as $org) {
-                $organizationsList['organization']['options'][$org] = $org;
+                $organizationsList['organization']['options'][$app->getAwardeeDisplayName($org)] = $org;
             }
             $filters = array_merge($filters, $organizationsList);
 
