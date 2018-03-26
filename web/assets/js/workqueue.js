@@ -253,4 +253,9 @@ $(document).ready(function() {
     $('#workqueue').on('error.dt', function(e) {
         alert('An error occured please reload the page and try again');
     });
+
+    // Disable pagination buttons when ajax request is made
+    $('#workqueue').on('preXhr.dt', function(e) {
+        $('.paginate_button').addClass('disabled');
+    });
 });
