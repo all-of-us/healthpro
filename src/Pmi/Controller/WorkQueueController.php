@@ -146,6 +146,29 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $filters = WorkQueue::$filters;
 
+        if ($app->hasRole('ROLE_AWARDEE')) {
+            // Add organizations to filters
+            // ToDo: change organization key and variable names to awardee
+            $organizationsList = [];
+            $organizationsList['organization']['label'] = 'Organization';
+            foreach ($organizations as $org) {
+                $organizationsList['organization']['options'][$app->getAwardeeDisplayName($org)] = $org;
+            }
+            $filters = array_merge($filters, $organizationsList);
+
+            // Set to selected organization
+            if (isset($params['organization'])) {
+                // Check if the awardee has access to this organization
+                if (!in_array($params['organization'], $app->getAwardeeOrganization())) {
+                    $app->abort(403);
+                }
+                $organization = $params['organization'];
+                unset($params['organization']);
+            }
+            // Save selected (or default) organization in session
+            $app['session']->set('awardeeOrganization', $organization);
+        }
+
         $sites = $app->getSitesFromOrganization($organization);
         if (!empty($sites)) {
             //Add sites filter
@@ -170,27 +193,6 @@ class WorkQueueController extends AbstractController
             $filters = array_merge($filters, $sitesList, $organizationsList);
         }
 
-        if ($app->hasRole('ROLE_AWARDEE')) {
-            // Add organizations to filters
-            $organizationsList = [];
-            $organizationsList['organization']['label'] = 'Organization';
-            foreach ($organizations as $org) {
-                $organizationsList['organization']['options'][$org] = $org;
-            }
-            $filters = array_merge($filters, $organizationsList);
-
-            // Set to selected organization
-            if (isset($params['organization'])) {
-                // Check if the awardee has access to this organization
-                if (!in_array($params['organization'], $app->getAwardeeOrganization())) {
-                    $app->abort(403);
-                }
-                $organization = $params['organization'];
-                unset($params['organization']);
-            }
-            // Save selected (or default) organization in session
-            $app['session']->set('awardeeOrganization', $organization);
-        }
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = array_merge($params, array_filter($request->request->all()));
