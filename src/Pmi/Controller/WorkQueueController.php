@@ -180,6 +180,7 @@ class WorkQueueController extends AbstractController
                 }
             }
             $sitesList['site']['options']['Unpaired'] = 'UNSET';
+            $filters = array_merge($filters, $sitesList);
 
             //Add organization filter
             $organizationsList = [];
@@ -189,8 +190,9 @@ class WorkQueueController extends AbstractController
                     $organizationsList['organization_id']['options'][$app->getOrganizationDisplayName($site['organization_id'])] = $site['organization_id'];
                 }
             }
-
-            $filters = array_merge($filters, $sitesList, $organizationsList);
+            if (!empty($organizationsList['organization_id']['options'])) {
+                $filters = array_merge($filters, $organizationsList);
+            }
         }
 
         //For ajax requests
