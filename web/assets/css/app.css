@@ -245,6 +245,10 @@ label.label-normal {
     color: #fff;
     background-color: #337ab7;
 }
+#workqueue_wrapper .tooltip-inner {
+    width: 300px;
+    max-width: 300px;
+}
 
 /* Orders */
 table.table-samples {
