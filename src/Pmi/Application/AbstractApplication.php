@@ -403,7 +403,7 @@ abstract class AbstractApplication extends Application
                     break;
                 case 'tooltip':
                     $tooltipText = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-                    return '<span title="' . $tooltipText . '" data-toggle="tooltip"><i class="fa fa-info-circle" aria-hidden="true"></i></span>';
+                    return '<span title="' . $tooltipText . '" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span>';
                     break;
                 default:
                     return $message;
