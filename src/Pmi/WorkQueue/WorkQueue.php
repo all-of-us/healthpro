@@ -294,7 +294,7 @@ class WorkQueue
             if ($participant->numBaselineSamplesArrived >= 7) {
                 $row['biobankSamples'] = self::HTML_SUCCESS . $e($participant->numBaselineSamplesArrived);
             } else {
-                $row['biobankSamples'] = '';
+                $row['biobankSamples'] = $e($participant->numBaselineSamplesArrived);;
             }
             foreach (array_keys(self::$samples) as $sample) {
                 $newSample = $sample;
