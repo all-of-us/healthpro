@@ -253,7 +253,7 @@ class WorkQueue
             $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime);
             $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime);
             if ($participant->withdrawalStatus == 'NO_USE') {
-                $row['withdrawal'] = self::HTML_DANGER . '<span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
+                $row['withdrawal'] = self::HTML_DANGER . ' <span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
             } else {
                 $row['withdrawal'] = ''; 
             }
@@ -292,7 +292,7 @@ class WorkQueue
             $row['evaluationFinalizedSite'] = $this->app->getSiteDisplayName($e($participant->evaluationFinalizedSite));
             $row['biobankDnaStatus'] = $this->displayStatus($participant->samplesToIsolateDNA, 'RECEIVED');
             if ($participant->numBaselineSamplesArrived >= 7) {
-                $row['biobankSamples'] = self::HTML_SUCCESS . $e($participant->numBaselineSamplesArrived);
+                $row['biobankSamples'] = self::HTML_SUCCESS . ' ' . $e($participant->numBaselineSamplesArrived);
             } else {
                 $row['biobankSamples'] = $e($participant->numBaselineSamplesArrived);;
             }
