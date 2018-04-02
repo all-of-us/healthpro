@@ -40,7 +40,10 @@
         </div>
             
         <div class="alert alert-danger" style="display:none" id="failed">
-            Participants may not have blood drawn if they have donated blood, platelets, or plasma in the past week or have received a blood transfusion in the past 6 months. Saliva collection is permissible, and can be initiated by selecting Continue.
+            Participants may not have blood drawn if they have donated blood, platelets, or plasma in the past week or have received a blood transfusion in the past 6 months.
+            {% if app.isDvType is empty %}
+                Saliva collection is permissible, and can be initiated by selecting Continue.
+            {% endif %}
         </div>
         <div id="succeed" style="display:none">
             <br />
@@ -57,7 +60,11 @@ $(document).ready(function() {
         var transfusion = $('input:radio[name=transfusion]:checked').val();
         if ((typeof(donate) !== 'undefined' && typeof(transfusion) !== 'undefined') && (donate === 'yes' || transfusion === 'yes')) {
             $('#failed').show();
-            $('#succeed').show();
+            {% if app.isDvType %}
+                $('#succeed').hide();
+            {% else %}
+                $('#succeed').show();
+            {% endif %}
         }
         if (donate === 'no' && transfusion === 'no') {
             $('#succeed').show();
