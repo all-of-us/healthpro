@@ -31,7 +31,7 @@
             <div class="row row-equal-height">
                 {% if app.isDvType is empty %}
                     <div class="col-sm-6 col-md-6">
-                        <div class="panel panel-default">
+                        <div class="panel panel-default {% if not showBloodTubes %} disable-div {% endif %}">
                             <div class="panel-heading">
                                 <h3 class="panel-title text-center">HPO Biobank Order</h3>
                             </div>
@@ -47,24 +47,31 @@
                                         </p>
                                     </div>
                                 </div>
-                                <div{% if not showCustom %} style="display:none"{% endif %} id="customize-on">
-                                    <p class="text-center">Customize your All of Us℠ biobank order</p>
-                                    <div class="form-group{% if not confirmForm.samples.vars.valid %} has-error{% endif %}">
-                                        {{ form_label(confirmForm.samples) }}
-                                        {{ samples.form_widget(confirmForm.samples, false, samplesInfo) }}
-                                        {{ form_errors(confirmForm.samples) }}
+                                {% if showBloodTubes %}
+                                    <div{% if not showCustom %} style="display:none"{% endif %} id="customize-on">
+                                        <p class="text-center">Customize your All of Us℠ biobank order</p>
+                                        <div class="form-group{% if not confirmForm.samples.vars.valid %} has-error{% endif %}">
+                                            {{ form_label(confirmForm.samples) }}
+                                            {{ samples.form_widget(confirmForm.samples, false, samplesInfo) }}
+                                            {{ form_errors(confirmForm.samples) }}
+                                        </div>
+                                        <div class="text-center">
+                                            <p>
+                                                <button type="submit" name="custom" class="btn btn-primary">Create custom order</button>
+                                            </p>
+                                            <p>
+                                                <a href="#" id="customize-disable">Revert to standard order</a>
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div class="text-center">
-                                        <p>
-                                            <button type="submit" name="custom" class="btn btn-primary">Create custom order</button>
-                                        </p>
-                                        <p>
-                                            <a href="#" id="customize-disable">Revert to standard order</a>
-                                        </p>
-                                    </div>
-                                </div>
+                                {% endif %}
                             </div>
                         </div>
+                        {% if not showBloodTubes %}
+                            <p class="text-center text-warning">
+                                <i class="fa fa-info-circle" aria-hidden="true"></i> <small>Biobank orders for blood draws cannot be created at this moment due to safety checks.</small>
+                            </p>
+                        {% endif %}
                     </div>
                 {% endif %}
                 {% if app.isDvType %}
@@ -110,6 +117,7 @@
             <p class="text-center">
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
             </p>
+            <input type="hidden" name="show-blood-tubes" value="{{ showBloodTubes }}">
             {{ form_rest(confirmForm) }}
         {{ form_end(confirmForm) }}
     </div>

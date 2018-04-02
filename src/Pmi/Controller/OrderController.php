@@ -17,7 +17,7 @@ class OrderController extends AbstractController
 {
     protected static $routes = [
         ['orderCheck', '/participant/{participantId}/order/check'],
-        ['orderCreate', '/participant/{participantId}/order/create', ['method' => 'GET|POST']],
+        ['orderCreate', '/participant/{participantId}/order/create', ['method' => 'POST']],
         ['orderLabelsPdf', '/participant/{participantId}/order/{orderId}/labels.pdf'],
         ['orderRequisitionPdf', '/participant/{participantId}/order/{orderId}/requisition.pdf'],
         ['order', '/participant/{participantId}/order/{orderId}'],
@@ -70,6 +70,19 @@ class OrderController extends AbstractController
         if ($app->isDVType() && $request->request->has('saliva')) {
             $app->abort(403);
         }
+        $showBloodTubes = false;
+        if ($request->request->has('donate') && $request->request->has('transfusion')) {
+            if ($request->request->get('donate') === 'no' && $request->request->get('transfusion') === 'no') {
+                $showBloodTubes = true;
+            }
+        } elseif ($request->request->has('show-blood-tubes')) {
+            $showBloodTubes = $request->request->get('show-blood-tubes'); 
+        } else {
+            $app->abort(403);
+        }
+        if ($app->isDVType() && !$showBloodTubes) {
+            $app->abort(403);
+        }
         $formBuilder = $app['form.factory']->createBuilder(FormType::class);
         if ($app->isDVType()) {
             $formBuilder->add('kitId', Type\RepeatedType::class, [
@@ -96,7 +109,7 @@ class OrderController extends AbstractController
                 ]
             ]);
         }
-        if (!$app->isDVType()) {
+        if (!$app->isDVType() && $showBloodTubes) {
             $formBuilder->add('samples', Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
@@ -159,7 +172,8 @@ class OrderController extends AbstractController
             'participant' => $participant,
             'confirmForm' => $confirmForm->createView(),
             'showCustom' => $showCustom,
-            'samplesInfo' => Order::$samplesInformation
+            'samplesInfo' => Order::$samplesInformation,
+            'showBloodTubes' => $showBloodTubes
         ]);
     }
 
