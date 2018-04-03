@@ -75,8 +75,8 @@ class OrderController extends AbstractController
             if ($request->request->get('donate') === 'no' && $request->request->get('transfusion') === 'no') {
                 $showBloodTubes = true;
             }
-        } elseif ($request->request->has('show-blood-tubes')) {
-            $showBloodTubes = $request->request->get('show-blood-tubes'); 
+        } elseif (isset($request->request->get('form')['show-blood-tubes'])) {
+            $showBloodTubes = $request->request->get('form')['show-blood-tubes']; 
         } else {
             $app->abort(403);
         }
@@ -118,6 +118,9 @@ class OrderController extends AbstractController
                 'required' => false
             ]);
         }
+        $formBuilder->add('show-blood-tubes', Type\HiddenType::class, [
+            'data' => $showBloodTubes
+        ]);
         $confirmForm = $formBuilder->getForm();
         $showCustom = false;
         $confirmForm->handleRequest($request);
