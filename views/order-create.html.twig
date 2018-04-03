@@ -31,23 +31,23 @@
             <div class="row row-equal-height">
                 {% if app.isDvType is empty %}
                     <div class="col-sm-6 col-md-6">
-                        <div class="panel panel-default {% if not showBloodTubes %} disable-div {% endif %}">
+                        <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title text-center">HPO Biobank Order</h3>
                             </div>
                             <div class="panel-body">
-                                <div class="text-center">
-                                    <div id="customize-off" {% if showCustom %} style="display:none"{% endif %}>
-                                        <p>Create an order for all 7 All of Us℠ biospecimens</p>
-                                        <p>
-                                            <button type="submit" name="standard" class="btn btn-primary">Create</button>
-                                        </p>
-                                        <p>
-                                            <a href="#" id="customize-enable">Customize order</a>
-                                        </p>
-                                    </div>
-                                </div>
                                 {% if showBloodTubes %}
+                                    <div class="text-center">
+                                        <div id="customize-off" {% if showCustom %} style="display:none"{% endif %}>
+                                            <p>Create an order for all 7 All of Us℠ biospecimens</p>
+                                            <p>
+                                                <button type="submit" name="standard" class="btn btn-primary">Create</button>
+                                            </p>
+                                            <p>
+                                                <a href="#" id="customize-enable">Customize order</a>
+                                            </p>
+                                        </div>
+                                    </div>
                                     <div{% if not showCustom %} style="display:none"{% endif %} id="customize-on">
                                         <p class="text-center">Customize your All of Us℠ biobank order</p>
                                         <div class="form-group{% if not confirmForm.samples.vars.valid %} has-error{% endif %}">
@@ -64,14 +64,13 @@
                                             </p>
                                         </div>
                                     </div>
+                                {% else %}
+                                    <p class="text-center text-warning">
+                                        <i class="fa fa-info-circle" aria-hidden="true"></i> Biobank orders for blood draws cannot be created at this moment due to safety checks.
+                                    </p>
                                 {% endif %}
                             </div>
                         </div>
-                        {% if not showBloodTubes %}
-                            <p class="text-center text-warning">
-                                <i class="fa fa-info-circle" aria-hidden="true"></i> <small>Biobank orders for blood draws cannot be created at this moment due to safety checks.</small>
-                            </p>
-                        {% endif %}
                     </div>
                 {% endif %}
                 {% if app.isDvType %}
