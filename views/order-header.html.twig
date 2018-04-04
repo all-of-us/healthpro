@@ -33,6 +33,16 @@
         finalize: ['Finalize', 'finalized']
     } %}
 {% endif %}
+{% set stepNeedDetails = ['collect', 'process', 'finalize'] %}
+{% if active in stepNeedDetails %}
+    {% set activeStep = attribute(steps, active)[1] %}
+    {% if attribute(order, activeStep~'_ts') is not empty %}
+        <div class="{% if order.finalized_ts is empty %} well well-sm {% else %} alert alert-success {% endif %}">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>{{ activeStep|capitalize }} by {{ app.getUserEmailById(attribute(order, activeStep~'_user_id')) }} at {{ app.getSiteDisplayName(attribute(order, activeStep~'_site')) }} on {{ attribute(order, activeStep~'_ts')|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong>
+        </div>
+    {% endif %}
+{% endif %}
 <ul class="nav nav-tabs">
     <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
     <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
