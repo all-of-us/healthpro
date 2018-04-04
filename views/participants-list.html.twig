@@ -22,7 +22,7 @@
                                 {% if participant.hpoId != app.siteOrganization %}
                                     <i class="fa fa-info-circle text-warning" title="Participant paired location is different from your site" data-toggle="tooltip"></i>
                                 {% endif %}
-                                {{ participant.hpoId }}
+                                {{ app.getAwardeeDisplayName(participant.hpoId) }}
                             {% else %}
                                 <i class="fa fa-info-circle text-warning" title="Participant is unpaired" data-toggle="tooltip"></i>
                                 <span class="text-muted">Unpaired</span>
