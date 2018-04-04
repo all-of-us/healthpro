@@ -547,6 +547,6 @@ class HpoApplication extends AbstractApplication
         if (!empty($user)) {
             return $user['email'];
         }
-        return 'Unknown';
+        return null;
     }
 }
