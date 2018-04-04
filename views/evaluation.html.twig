@@ -34,7 +34,7 @@
         {% if evaluation and evaluation.finalized_ts %}
             <div class="alert alert-success">
                 <i class="fa fa-check-circle" aria-hidden="true"></i>
-                <strong>Finalized on {{ evaluation.finalized_ts|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong>
+                <strong>Finalized by {{ app.getUserEmailById(evaluation.finalized_user_id) }} at {{ app.getSiteDisplayName(evaluation.finalized_site) }} on {{ evaluation.finalized_ts|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong>
                 <a class="btn btn-success btn-xs pull-right" href="{{ path('evaluationSummary', { participantId: participant.id, evalId: evaluation.id }) }}" target="_blank">Summary</a>
             </div>
         {% endif %}
