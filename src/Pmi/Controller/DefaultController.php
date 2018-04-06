@@ -337,6 +337,16 @@ class DefaultController extends AbstractController
         if (empty($participant->cacheTime)) {
             $participant->cacheTime = new \DateTime();
         }
+        foreach ($orders as $key => $order) {
+            // Display most recent processed sample time if exists
+            $processedSamplesTs = json_decode($order['processed_samples_ts'], true);
+            if (!empty($processedSamplesTs)) {
+                $processedTs = new \DateTime();
+                $processedTs->setTimestamp(max($processedSamplesTs));
+                $processedTs->setTimezone(new \DateTimeZone($app->getUserTimezone()));
+                $orders[$key]['processed_ts'] = $processedTs;
+            }
+        }
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
