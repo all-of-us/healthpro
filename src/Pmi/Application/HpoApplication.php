@@ -486,9 +486,9 @@ class HpoApplication extends AbstractApplication
         return $errors;
     }
 
-    public function getSiteDisplayName($siteSuffix)
+    public function getSiteDisplayName($siteSuffix, $defaultToSiteSuffix = true)
     {
-        $siteName = $siteSuffix;
+        $siteName = $defaultToSiteSuffix ? $siteSuffix : null ;
         if (!empty($siteSuffix)) {
             if (array_key_exists($siteSuffix, $this->siteNameMapper)) {
                 $siteName = $this->siteNameMapper[$siteSuffix];
