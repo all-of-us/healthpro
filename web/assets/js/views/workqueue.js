@@ -100,6 +100,11 @@ $(document).ready(function() {
         dom: 'lBrtip',
         columns: tableColumns,
         pageLength: 25,
+        createdRow: function(row, data) {
+            if (data.withdrawal) {
+                $(row).addClass('tr-withdrawn');
+            }
+        },
         buttons: [
             {
                 extend: 'colvisGroup',
