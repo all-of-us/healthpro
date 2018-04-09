@@ -340,7 +340,7 @@ class DefaultController extends AbstractController
         foreach ($orders as $key => $order) {
             // Display most recent processed sample time if exists
             $processedSamplesTs = json_decode($order['processed_samples_ts'], true);
-            if (!empty($processedSamplesTs)) {
+            if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
                 $processedTs = new \DateTime();
                 $processedTs->setTimestamp(max($processedSamplesTs));
                 $processedTs->setTimezone(new \DateTimeZone($app->getUserTimezone()));
