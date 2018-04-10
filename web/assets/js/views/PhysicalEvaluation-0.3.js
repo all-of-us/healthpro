@@ -568,7 +568,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         var input = block.parent().prev().find('input');
         input.val(val);
         if (e.type == 'change') {
-            block.parent().prev().find('input').change(); // trigger change even if not different
+            block.parent().prev().find('input').trigger('change'); // trigger change even if not different
             block.parent().prev().find('input').parsley().validate(); // trigger parsley validation
         }
     },

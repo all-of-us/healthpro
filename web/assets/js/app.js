@@ -208,7 +208,7 @@ $(document).ready(function()
         var triggerChange = (this.val() != val);
         this.val(val);
         if (triggerChange) {
-            this.change();
+            this.trigger('change');
         }
         return this;
     };
@@ -279,7 +279,7 @@ $(document).ready(function()
         });
     });
 
-    $('.external-link').click(function() {
+    $('.external-link').on('click', function() {
         var location = $(this).data('href');
         var msg = '<p>You are leaving the DRC HealthPro web application and accessing a non-FISMA destination.</p>';
         msg += '<ul>';

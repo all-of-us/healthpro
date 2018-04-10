@@ -3,6 +3,7 @@ var NODE_DIR = './node_modules';
 var ASSETS = {
     'js': [
         NODE_DIR + '/jquery/dist/jquery.js',
+        NODE_DIR + '/jquery-migrate/dist/jquery-migrate.js',
         NODE_DIR + '/moment/moment.js',
         NODE_DIR + '/bootstrap/dist/js/bootstrap.js',
         NODE_DIR + '/underscore/underscore.js',

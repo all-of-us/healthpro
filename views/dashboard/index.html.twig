@@ -174,7 +174,7 @@
                     }
                 }
 
-                $('#toggle-traces').click(function() {
+                $('#toggle-traces').on('click', function() {
                     togglePlotlyTraces('plotly-total-progress');
                 });
 
@@ -199,12 +199,12 @@
                 });
 
                 // re-render on filter change
-                $('.total-progress-control').change(function() {
+                $('.total-progress-control').on('change', function() {
                     renderTotalProgressPlot('spinner');
                 });
 
                 // re-render on time filter change with modal (may need new metrics)
-                $('.total-progress-time-control').change(function() {
+                $('.total-progress-time-control').on('change', function() {
                     renderTotalProgressPlot('modal');
                 });
 
@@ -215,7 +215,7 @@
                     }
                 });
 
-                $('#total-progress').find('.redraw-plotly').click(function() {
+                $('#total-progress').find('.redraw-plotly').on('click', function() {
                     renderTotalProgressPlot('spinner');
                 });
             </script>
@@ -361,12 +361,12 @@
                 });
 
                 // re-render on filter change
-                $('.region-plot-control').change(function() {
+                $('.region-plot-control').on('change', function() {
                     renderMapPlot('spinner');
                 });
 
                 // re-render on filter change with modal (for time changes, may need new metrics)
-                $('.region-plot-time-control').change(function() {
+                $('.region-plot-time-control').on('change', function() {
                     renderMapPlot('modal');
                 });
 
@@ -377,7 +377,7 @@
                     }
                 });
 
-                $('#participants-by-region').find('.redraw-plotly').click(function() {
+                $('#participants-by-region').find('.redraw-plotly').on('click', function() {
                     renderMapPlot('spinner');
                 });
             </script>
@@ -510,12 +510,12 @@
                 });
 
                 // re-render on filter change
-                $('.lifecycle-plot-control').change(function() {
+                $('.lifecycle-plot-control').on('change', function() {
                     renderLcPlot('spinner');
                 });
 
                 // re-render on filter change with modal (for time changes, may need new metrics)
-                $('.lifecycle-time-control').change(function() {
+                $('.lifecycle-time-control').on('change', function() {
                     renderLcPlot('modal');
                 });
 
@@ -526,7 +526,7 @@
                     }
                 });
 
-                $('#participants-by-lifecycle').find('.redraw-plotly').click(function() {
+                $('#participants-by-lifecycle').find('.redraw-plotly').on('click', function() {
                     renderLcPlot('spinner');
                 });
             </script>

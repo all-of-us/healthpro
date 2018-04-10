@@ -113,7 +113,7 @@
                 });
 
                 // re-render on filter change
-                $('.time-plot-control').change(function() {
+                $('.time-plot-control').on('change', function() {
                     renderPlot(true);
                 });
 
@@ -124,7 +124,7 @@
                     }
                 });
 
-                $('#participants-by-time').find('.redraw-plotly').click(function() {
+                $('#participants-by-time').find('.redraw-plotly').on('click', function() {
                     renderPlot(true);
                 });
             </script>
@@ -221,7 +221,7 @@
                 });
 
                 // re-render on date change
-                $('.region-plot-control').change(function() {
+                $('.region-plot-control').on('change', function() {
                     renderMap(true);
                 });
 
@@ -313,7 +313,7 @@
                 });
 
                 // re-render on date change
-                $('.lifecycle-plot-control').change(function() {
+                $('.lifecycle-plot-control').on('change', function() {
                     renderLcPlot(true);
                 });
 
@@ -324,7 +324,7 @@
                     }
                 });
 
-                $('#participants-by-lifecycle').find('.redraw-plotly').click(function() {
+                $('#participants-by-lifecycle').find('.redraw-plotly').on('click', function() {
                     renderLcPlot(true);
                 });
             </script>

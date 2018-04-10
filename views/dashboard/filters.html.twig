@@ -44,7 +44,7 @@
 
 <script type="text/javascript">
     // toggle subgroup
-    $('#{{ id }}').find('.toggle-center-filters').click(function(e) {
+    $('#{{ id }}').find('.toggle-center-filters').on('click', function(e) {
         var listGroup = $(e.currentTarget).data('identifier');
         console.log('toggling ' + listGroup);
         var cb = $('#{{ id }}').find('.' + listGroup).find('input');
@@ -54,7 +54,7 @@
     });
 
     // toggle all
-    $('#{{ id }}').find('.toggle-all-filters').click(function(e) {
+    $('#{{ id }}').find('.toggle-all-filters').on('click', function(e) {
         console.log('toggling all filters');
         var cb = $('#{{ id }}').find('.center-filter');
         cb.prop('checked', !cb.prop('checked'));
