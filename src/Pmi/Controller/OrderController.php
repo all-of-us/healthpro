@@ -114,7 +114,7 @@ class OrderController extends AbstractController
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Select requested samples',
-                'choices' => Order::${'samples' . Order::$version},
+                'choices' => Order::$samples[Order::$version],
                 'required' => false
             ]);
         }

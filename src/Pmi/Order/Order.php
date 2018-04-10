@@ -20,24 +20,25 @@ class Order
 
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
-    public static $samples1 = [
-        '(1) 8 mL SST [1SST8]' => '1SST8',
-        '(2) 8 mL PST [1PST8]' => '1PST8',
-        '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
-        '(4) 4 mL EDTA [1ED04]' => '1ED04',
-        '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
-        '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
-        '(7) Urine 10 mL [1UR10]' => '1UR10'
-    ];
-
-    public static $samples2 = [
-        '(1) 8 mL SST [1SS08]' => '1SS08',
-        '(2) 8 mL PST [1PS08]' => '1PS08',
-        '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
-        '(4) 4 mL EDTA [1ED04]' => '1ED04',
-        '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
-        '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
-        '(7) Urine 10 mL [1UR10]' => '1UR10'
+    public static $samples = [
+        1 => [
+            '(1) 8 mL SST [1SST8]' => '1SST8',
+            '(2) 8 mL PST [1PST8]' => '1PST8',
+            '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
+            '(4) 4 mL EDTA [1ED04]' => '1ED04',
+            '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
+            '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
+            '(7) Urine 10 mL [1UR10]' => '1UR10'
+        ],
+        2 => [
+            '(1) 8 mL SST [1SS08]' => '1SS08',
+            '(2) 8 mL PST [1PS08]' => '1PS08',
+            '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
+            '(4) 4 mL EDTA [1ED04]' => '1ED04',
+            '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
+            '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
+            '(7) Urine 10 mL [1UR10]' => '1UR10'
+        ]
     ];
 
     public static $samplesInformation = [
@@ -90,7 +91,12 @@ class Order
     ];
 
     public static $salivaSamples = [
-        'Saliva [1SAL]' => '1SAL'
+        1 => [
+            'Saliva [1SAL]' => '1SAL'
+        ],
+        2 => [
+            'Saliva [1SAL]' => '1SAL'
+        ]
     ];
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL'];
@@ -689,16 +695,16 @@ class Order
     protected function getRequestedSamples()
     {
         if ($this->order['type'] == 'saliva') {
-            return self::$salivaSamples;
+            return self::$salivaSamples[self::$version];
         }
         if ($this->order['requested_samples'] &&
             ($requestedArray = json_decode($this->order['requested_samples'])) &&
             is_array($requestedArray) &&
             count($requestedArray) > 0
         ) {
-            return array_intersect(self::${'samples' . self::$version}, $requestedArray);
+            return array_intersect(self::$samples[self::$version], $requestedArray);
         } else {
-            return self::${'samples' . self::$version};
+            return self::$samples[self::$version];
         }
     }
 
@@ -814,7 +820,7 @@ class Order
             $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
             $sst = array_values(array_intersect($processedSamples, self::$sst));
             $pst = array_values(array_intersect($processedSamples, self::$pst));
-            $sal = array_values(array_intersect($processedSamples, self::$salivaSamples));
+            $sal = array_values(array_intersect($processedSamples, self::$salivaSamples[self::$version]));
             //Check if SST processing time is less than collection time
             if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] <= $collectedTs->getTimestamp()) {
                 $errors['sst'] = 'SST Processing Time is before Collection Time';
