@@ -539,4 +539,15 @@ class HpoApplication extends AbstractApplication
         }
         return $awardeeName;
     }
+
+    public function getUserEmailById($userId)
+    {
+        $user = $this['em']->getRepository('users')->fetchOneBy([
+            'id' => $userId
+        ]);
+        if (!empty($user)) {
+            return $user['email'];
+        }
+        return null;
+    }
 }

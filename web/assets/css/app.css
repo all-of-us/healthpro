@@ -24,6 +24,9 @@ iframe.pdf {
     font-weight: bold;
     margin: 0 0 5px 0;
 }
+#flash-notices .close {
+    margin-top: -2px;
+}
 .btn-block {
     margin-bottom: 10px;
 }
