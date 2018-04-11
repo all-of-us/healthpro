@@ -30,6 +30,7 @@
                         {% if app.siteOrganization %}
                             <li><a href="{{ path('workqueue_index') }}">Work Queue</a></li>
                         {% endif %}
+                        <li><a href="{{ path('today_home') }}">Today</a></li>
                     {% endif %}
                     {% if is_granted('ROLE_AWARDEE') and app.session.get('awardee') and app.awardeeOrganization %}
                         <li><a href="{{ path('workqueue_index') }}">Work Queue</a></li>
