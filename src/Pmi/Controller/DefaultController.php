@@ -175,6 +175,9 @@ class DefaultController extends AbstractController
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => 'P000000000'
                 ]
             ])
             ->getForm();
