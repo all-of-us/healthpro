@@ -110,7 +110,8 @@ class OrderController extends AbstractController
             ]);
         }
         $order = new Order;
-        $order->loadSamplesSchema();
+        $version = $app->getConfig('order_samples_version');
+        $order->loadSamplesSchema($version);
         if (!$app->isDVType() && $showBloodTubes) {
             $formBuilder->add('samples', Type\ChoiceType::class, [
                 'expanded' => true,
@@ -157,7 +158,7 @@ class OrderController extends AbstractController
                 $orderData['participant_id'] = $participant->id;
                 $orderData['biobank_id'] = $participant->biobankId;
                 $orderData['created_ts'] = new \DateTime();
-                $orderData['version'] = Order::$version;
+                $orderData['version'] = $version;
                 if (!$app->isDVType()) {
                     $orderData['processed_centrifuge_type'] = Order::SWINGING_BUCKET;
                 }

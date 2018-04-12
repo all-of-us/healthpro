@@ -15,9 +15,6 @@ class Order
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
 
-    // This represents the current version of samples
-    public static $version = 2;
-
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
 
@@ -56,9 +53,8 @@ class Order
         '1SAL' => 'sal'
     ];
 
-    public function loadSamplesSchema()
+    public function loadSamplesSchema($version)
     {
-        $version = self::$version;
         $file = __DIR__ . "/versions/{$version}.json";
         if (!file_exists($file)) {
             throw new MissingSchemaException();
@@ -89,10 +85,8 @@ class Order
         $this->order = $order;
         $this->order['expired'] = $this->isOrderExpired();
         $this->participant = $participant;
-        if (empty($order['version'])) {
-            self::$version = 1;
-        }
-        $this->loadSamplesSchema();
+        $version = !empty($order['version']) ? $order['version'] : 1;
+        $this->loadSamplesSchema($version);
     }
 
     public function isValid()
