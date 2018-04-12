@@ -34,49 +34,44 @@ class TodayController extends AbstractController
             'physicalMeasurement' => null
         ];
 
-        $ordersQuery = 'select id, participant_id, order_id, created_ts, collected_ts, processed_ts, finalized_ts, finalized_samples, ' .
-            'greatest(coalesce(created_ts, 0), coalesce(collected_ts, 0), coalesce(processed_ts, 0), coalesce(finalized_ts, 0)) as latest_ts ' .
-            'from orders where ' .
+        $ordersQuery = 'SELECT participant_id, \'order\' as type, id, order_id, created_ts, collected_ts, processed_ts, finalized_ts, finalized_samples, ' .
+            'greatest(coalesce(created_ts, 0), coalesce(collected_ts, 0), coalesce(processed_ts, 0), coalesce(finalized_ts, 0)) AS latest_ts ' .
+            'FROM orders WHERE ' .
             '(created_ts >= :today OR collected_ts >= :today OR processed_ts >= :today OR finalized_ts >= :today) ' .
-            'AND (site = :site OR collected_site = :site OR processed_site = :site OR finalized_site = :site) ' .
-            'order by latest_ts desc';
-        $orders = $app['db']->fetchAll($ordersQuery, [
-            'today' => $today,
-            'site' => $site
-        ]);
-        foreach ($orders as $order) {
-            if (!array_key_exists($order['participant_id'], $participants)) {
-                if ($order['finalized_samples'] && ($samples = json_decode($order['finalized_samples'])) && is_array($samples)) {
-                    $finalizedSamples = count($samples);
-                } else {
-                    $finalizedSamples = null;
-                }
-                $participant = $emptyParticipant;
-                $participant['order'] = $order;
-                $participant['orderCount'] = 1;
-                $participant['finalizedSamples'] = $finalizedSamples;
-                $participants[$order['participant_id']] = $participant;
-            } else {
-                $participants[$order['participant_id']]['orderCount']++;
-            }
-        }
-
-        $measurementsQuery = 'select id, participant_id, created_ts, finalized_ts, coalesce(finalized_ts, created_ts) as latest_ts ' .
-            'from evaluations where ' .
+            'AND (site = :site OR collected_site = :site OR processed_site = :site OR finalized_site = :site) ';
+        $measurementsQuery = 'SELECT participant_id, \'measurement\' as type, id, null, created_ts, null, null, finalized_ts, null, coalesce(finalized_ts, created_ts) as latest_ts ' .
+            'FROM evaluations WHERE ' .
             '(created_ts >= :today OR finalized_ts >= :today) ' .
-            'AND (site = :site OR finalized_site = :site) ' .
-            'order by latest_ts desc';
-        $measurements = $app['db']->fetchAll($measurementsQuery, [
+            'AND (site = :site OR finalized_site = :site)';
+        $query = "($ordersQuery) UNION ($measurementsQuery) ORDER BY latest_ts DESC";
+        $rows = $app['db']->fetchAll($query, [
             'today' => $today,
             'site' => $site
         ]);
-        foreach ($measurements as $measurement) {
-            if (!array_key_exists($measurement['participant_id'], $participants)) {
-                $participant = $emptyParticipant;
-                $participant['physicalMeasurement'] = $measurement;
-                $participants[$measurement['participant_id']] = $participant;
-            } elseif (is_null($participants[$measurement['participant_id']]['physicalMeasurement'])) {
-                $participants[$measurement['participant_id']]['physicalMeasurement'] = $measurement;
+
+        foreach ($rows as $row) {
+            $participantId = $row['participant_id'];
+            if (!array_key_exists($participantId, $participants)) {
+                $participants[$participantId] = $emptyParticipant;
+            }
+            switch ($row['type']) {
+                case 'order':
+                    if (is_null($participants[$participantId]['order'])) {
+                        if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
+                            $finalizedSamples = count($samples);
+                        } else {
+                            $finalizedSamples = null;
+                        }
+                        $participants[$participantId]['order'] = $row;
+                        $participants[$participantId]['orderCount'] = 1;
+                        $participants[$participantId]['finalizedSamples'] = $finalizedSamples;
+                    } else {
+                        $participants[$participantId]['orderCount']++;
+                    }
+                    break;
+                case 'measurement':
+                    $participants[$participantId]['physicalMeasurement'] = $row;
+                    break;
             }
         }
 
