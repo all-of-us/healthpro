@@ -35,3 +35,14 @@
         "hideTZWarning": {{ app.session.get('hideTZWarning')|json_encode|raw }}
     };
 </script>
+
+{# Google Analytics #}
+{% if app.getConfig('google_analytics_property') %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ app.getConfig('google_analytics_property')|url_encode }}"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', {{ app.getConfig('google_analytics_property')|json_encode|raw }});
+</script>
+{% endif %}

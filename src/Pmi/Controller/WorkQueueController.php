@@ -301,14 +301,14 @@ class WorkQueueController extends AbstractController
             $headers[] = 'Physical Measurements Completion Date';
             $headers[] = 'Paired Site';
             $headers[] = 'Paired Organization';
-            $headers[] = 'Physical Measurements Location';
+            $headers[] = 'Physical Measurements Site';
             $headers[] = 'Samples for DNA Received';
             $headers[] = 'Biospecimens';
             foreach (WorkQueue::$samples as $sample => $label) {
                 $headers[] = $label . ' Collected';
                 $headers[] = $label . ' Collection Date';
             }
-            $headers[] = 'Biospecimens Location';
+            $headers[] = 'Biospecimens Site';
             fputcsv($output, $headers);
 
             for ($i = 0; $i < ceil(WorkQueue::LIMIT_EXPORT / WorkQueue::LIMIT_EXPORT_PAGE_SIZE); $i++) {

@@ -240,7 +240,7 @@ class WorkQueue
             } else {
                 $row['firstName'] = $e($participant->firstName);
             }
-            if ($participant->dob) {
+            if (!empty($participant->dob)) {
                 $row['dateOfBirth'] = $participant->dob->format('m/d/Y'); 
             } else {
                 $row['dateOfBirth'] = '';
@@ -250,8 +250,8 @@ class WorkQueue
             $row['language'] = $e($participant->language);
             $row['participantStatus'] = $e($participant->enrollmentStatus);
             $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentTime);
-            $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime);
-            $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime);
+            $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime, true);
+            $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime, true);
             if ($participant->withdrawalStatus == 'NO_USE') {
                 $row['withdrawal'] = self::HTML_DANGER . ' <span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
             } else {
@@ -348,14 +348,17 @@ class WorkQueue
         return $status === 'SUBMITTED' ? 1 : 0;
     }
 
-    public function displayStatus($value, $successStatus, $time = null)
+    public function displayStatus($value, $successStatus, $time = null, $showNotCompleteText = false)
     {
         if ($value === $successStatus) {
-            if ($time) {
+            if (!empty($time)) {
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone());
             }
             return self::HTML_SUCCESS;
         } else {
+            if ($showNotCompleteText) {
+                return !empty($time) ? self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone()) : self::HTML_DANGER . ' (not completed)';
+            }
             return self::HTML_DANGER;
         }
     }

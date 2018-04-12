@@ -36,33 +36,39 @@
                                 <h3 class="panel-title text-center">HPO Biobank Order</h3>
                             </div>
                             <div class="panel-body">
-                                <div class="text-center">
-                                    <div id="customize-off" {% if showCustom %} style="display:none"{% endif %}>
-                                        <p>Create an order for all 7 All of Us℠ biospecimens</p>
-                                        <p>
-                                            <button type="submit" name="standard" class="btn btn-primary">Create</button>
-                                        </p>
-                                        <p>
-                                            <a href="#" id="customize-enable">Customize order</a>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div{% if not showCustom %} style="display:none"{% endif %} id="customize-on">
-                                    <p class="text-center">Customize your All of Us℠ biobank order</p>
-                                    <div class="form-group{% if not confirmForm.samples.vars.valid %} has-error{% endif %}">
-                                        {{ form_label(confirmForm.samples) }}
-                                        {{ samples.form_widget(confirmForm.samples, false, samplesInfo) }}
-                                        {{ form_errors(confirmForm.samples) }}
-                                    </div>
+                                {% if showBloodTubes %}
                                     <div class="text-center">
-                                        <p>
-                                            <button type="submit" name="custom" class="btn btn-primary">Create custom order</button>
-                                        </p>
-                                        <p>
-                                            <a href="#" id="customize-disable">Revert to standard order</a>
-                                        </p>
+                                        <div id="customize-off" {% if showCustom %} style="display:none"{% endif %}>
+                                            <p>Create an order for all 7 All of Us℠ biospecimens</p>
+                                            <p>
+                                                <button type="submit" name="standard" class="btn btn-primary">Create</button>
+                                            </p>
+                                            <p>
+                                                <a href="#" id="customize-enable">Customize order</a>
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
+                                    <div{% if not showCustom %} style="display:none"{% endif %} id="customize-on">
+                                        <p class="text-center">Customize your All of Us℠ biobank order</p>
+                                        <div class="form-group{% if not confirmForm.samples.vars.valid %} has-error{% endif %}">
+                                            {{ form_label(confirmForm.samples) }}
+                                            {{ samples.form_widget(confirmForm.samples, false, samplesInfo) }}
+                                            {{ form_errors(confirmForm.samples) }}
+                                        </div>
+                                        <div class="text-center">
+                                            <p>
+                                                <button type="submit" name="custom" class="btn btn-primary">Create custom order</button>
+                                            </p>
+                                            <p>
+                                                <a href="#" id="customize-disable">Revert to standard order</a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <p class="text-center text-warning">
+                                        <i class="fa fa-info-circle" aria-hidden="true"></i> Biobank orders for blood draws cannot be created at this moment due to safety checks.
+                                    </p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

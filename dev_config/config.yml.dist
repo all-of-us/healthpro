@@ -76,3 +76,6 @@ enforce2fa: 0
 
 # enable site sync using RDR Organization API
 sites_use_rdr: true
+
+# Enable Google Analytics by setting property ID
+# google_analytics_property: UA-XXXXXXXX-NN

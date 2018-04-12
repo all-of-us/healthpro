@@ -221,9 +221,10 @@ class HpoApplication extends AbstractApplication
         $whitelist =  "default-src 'self'"
             . " 'unsafe-eval'" // required for setTimeout and setInterval
             . " 'unsafe-inline'" // for the places we are using inline JS
+            . " www.google-analytics.com www.googletagmanager.com" // Google Analytics
             . " storage.googleapis.com" // for SOP PDFs stored in a Google Storage bucket
             . " cdn.plot.ly;" // allow plot.ly remote requests
-            . " img-src 'self' data:"; // allow self and data: urls for img src
+            . " img-src www.google-analytics.com 'self' data:"; // allow Google Analytcs, self, and data: urls for img src
 
         $response->headers->set('Content-Security-Policy', $whitelist);
 
@@ -485,9 +486,9 @@ class HpoApplication extends AbstractApplication
         return $errors;
     }
 
-    public function getSiteDisplayName($siteSuffix)
+    public function getSiteDisplayName($siteSuffix, $defaultToSiteSuffix = true)
     {
-        $siteName = $siteSuffix;
+        $siteName = $defaultToSiteSuffix ? $siteSuffix : null ;
         if (!empty($siteSuffix)) {
             if (array_key_exists($siteSuffix, $this->siteNameMapper)) {
                 $siteName = $this->siteNameMapper[$siteSuffix];
@@ -537,5 +538,16 @@ class HpoApplication extends AbstractApplication
             }
         }
         return $awardeeName;
+    }
+
+    public function getUserEmailById($userId)
+    {
+        $user = $this['em']->getRepository('users')->fetchOneBy([
+            'id' => $userId
+        ]);
+        if (!empty($user)) {
+            return $user['email'];
+        }
+        return null;
     }
 }

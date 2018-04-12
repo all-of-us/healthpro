@@ -24,6 +24,9 @@ iframe.pdf {
     font-weight: bold;
     margin: 0 0 5px 0;
 }
+#flash-notices .close {
+    margin-top: -2px;
+}
 .btn-block {
     margin-bottom: 10px;
 }
@@ -244,6 +247,25 @@ label.label-normal {
     z-index: 1000;
     color: #fff;
     background-color: #337ab7;
+}
+#workqueue tr.tr-withdrawn {
+    background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10px,
+        #f4e7e7 10px,
+        #f4e7e7 20px
+    );
+    opacity: 0.7;
+}
+#workqueue tr.tr-withdrawn.odd {
+    background: repeating-linear-gradient(
+        -45deg,
+        #f9f9f9,
+        #f9f9f9 10px,
+        #f4e7e7 10px,
+        #f4e7e7 20px
+    );
 }
 
 /* Orders */
