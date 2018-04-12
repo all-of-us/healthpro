@@ -109,12 +109,14 @@ class OrderController extends AbstractController
                 ]
             ]);
         }
+        $order = new Order;
+        $order->loadSamplesSchema();
         if (!$app->isDVType() && $showBloodTubes) {
             $formBuilder->add('samples', Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Select requested samples',
-                'choices' => Order::$samples[Order::$version],
+                'choices' => $order->samples,
                 'required' => false
             ]);
         }
@@ -175,7 +177,7 @@ class OrderController extends AbstractController
             'participant' => $participant,
             'confirmForm' => $confirmForm->createView(),
             'showCustom' => $showCustom,
-            'samplesInfo' => Order::$samplesInformation,
+            'samplesInfo' => $order->samplesInformation,
             'showBloodTubes' => $showBloodTubes
         ]);
     }
@@ -336,7 +338,7 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'collectForm' => $collectForm->createView(),
-            'samplesInfo' => Order::$samplesInformation,
+            'samplesInfo' => $order->samplesInformation,
             'processTabClass' => $order->getProcessTabClass()
         ]);
     }
@@ -403,7 +405,7 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'processForm' => $processForm->createView(),
-            'samplesInfo' => Order::$samplesInformation,
+            'samplesInfo' => $order->samplesInformation,
             'processTabClass' => $order->getProcessTabClass()
         ]);
     }
@@ -492,7 +494,7 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'finalizeForm' => $finalizeForm->createView(),
-            'samplesInfo' => Order::$samplesInformation,
+            'samplesInfo' => $order->samplesInformation,
             'hasErrors' => $hasErrors,
             'processTabClass' => $order->getProcessTabClass()
         ]);

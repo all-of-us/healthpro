@@ -20,84 +20,12 @@ class Order
 
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
-    public static $samples = [
-        1 => [
-            '(1) 8 mL SST [1SST8]' => '1SST8',
-            '(2) 8 mL PST [1PST8]' => '1PST8',
-            '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
-            '(4) 4 mL EDTA [1ED04]' => '1ED04',
-            '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
-            '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
-            '(7) Urine 10 mL [1UR10]' => '1UR10'
-        ],
-        2 => [
-            '(1) 8 mL SST [1SS08]' => '1SS08',
-            '(2) 8 mL PST [1PS08]' => '1PS08',
-            '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
-            '(4) 4 mL EDTA [1ED04]' => '1ED04',
-            '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
-            '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
-            '(7) Urine 10 mL [1UR10]' => '1UR10'
-        ]
-    ];
 
-    public static $samplesInformation = [
-        '1SS08' => [
-            'number' => 1,
-            'label' => '8 mL SST',
-            'color' => 'Red and gray'
-        ],
-        '1PS08' => [
-            'number' => 2,
-            'label' => '8 mL PST',
-            'color' => 'Green and gray'
-        ],
-        '1HEP4' => [
-            'number' => 3,
-            'label' => '4 mL Na-Hep',
-            'color' => 'Green'
-        ],
-        '1ED04' => [
-            'number' => 4,
-            'label' => '4 mL EDTA',
-            'color' => 'Lavender'
-        ],
-        '1ED10' => [
-            'number' => 5,
-            'label' => '1st 10 mL EDTA',
-            'color' => 'Lavender'
-        ],
-        '2ED10' => [
-            'number' => 6,
-            'label' => '2nd 10 mL EDTA',
-            'color' => 'Lavender'
-        ],
-        '1UR10' => [
-            'number' => 7,
-            'label' => 'Urine 10 mL',
-            'color' => 'Yellow'
-        ],
-        // Keep old sample codes for backward compatability
-        '1SST8' => [
-            'number' => 1,
-            'label' => '8 mL SST',
-            'color' => 'Red and gray'
-        ],
-        '1PST8' => [
-            'number' => 2,
-            'label' => '8 mL PST',
-            'color' => 'Green and gray'
-        ],
-    ];
+    public $samples;
 
-    public static $salivaSamples = [
-        1 => [
-            'Saliva [1SAL]' => '1SAL'
-        ],
-        2 => [
-            'Saliva [1SAL]' => '1SAL'
-        ]
-    ];
+    public $samplesInformation;
+
+    public $salivaSamples;
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL'];
 
@@ -128,6 +56,22 @@ class Order
         '1SAL' => 'sal'
     ];
 
+    public function loadSamplesSchema()
+    {
+        $version = self::$version;
+        $file = __DIR__ . "/versions/{$version}.json";
+        if (!file_exists($file)) {
+            throw new MissingSchemaException();
+        }
+        $this->schema = json_decode(file_get_contents($file), true);
+        if (!is_array($this->schema) && !empty($this->schema)) {
+            throw new InvalidSchemaException();
+        }
+        $this->samples = $this->schema['samples'];
+        $this->samplesInformation = $this->schema['samplesInformation'];
+        $this->salivaSamples = $this->schema['salivaSamples'];
+    }
+
     public function loadOrder($participantId, $orderId, Application $app)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);
@@ -148,6 +92,7 @@ class Order
         if (empty($order['version'])) {
             self::$version = 1;
         }
+        $this->loadSamplesSchema();
     }
 
     public function isValid()
@@ -695,16 +640,16 @@ class Order
     protected function getRequestedSamples()
     {
         if ($this->order['type'] == 'saliva') {
-            return self::$salivaSamples[self::$version];
+            return $this->salivaSamples;
         }
         if ($this->order['requested_samples'] &&
             ($requestedArray = json_decode($this->order['requested_samples'])) &&
             is_array($requestedArray) &&
             count($requestedArray) > 0
         ) {
-            return array_intersect(self::$samples[self::$version], $requestedArray);
+            return array_intersect($this->samples, $requestedArray);
         } else {
-            return self::$samples[self::$version];
+            return $this->samples;
         }
     }
 
@@ -820,7 +765,7 @@ class Order
             $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
             $sst = array_values(array_intersect($processedSamples, self::$sst));
             $pst = array_values(array_intersect($processedSamples, self::$pst));
-            $sal = array_values(array_intersect($processedSamples, self::$salivaSamples[self::$version]));
+            $sal = array_values(array_intersect($processedSamples, $this->salivaSamples));
             //Check if SST processing time is less than collection time
             if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] <= $collectedTs->getTimestamp()) {
                 $errors['sst'] = 'SST Processing Time is before Collection Time';

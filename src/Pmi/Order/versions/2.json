@@ -1,0 +1,52 @@
+{
+    "version": "2",
+    "samples": {
+        "(1) 8 mL SST [1SS08]": "1SS08",
+        "(2) 8 mL PST [1PS08]": "1PS08",
+        "(3) 4 mL Na-Hep [1HEP4]": "1HEP4",
+        "(4) 4 mL EDTA [1ED04]": "1ED04",
+        "(5) 1st 10 mL EDTA [1ED10]": "1ED10",
+        "(6) 2nd 10 mL EDTA [2ED10]": "2ED10",
+        "(7) Urine 10 mL [1UR10]": "1UR10"
+    },
+    "salivaSamples": {
+        "Saliva [1SAL]": "1SAL"
+    },
+    "samplesInformation": {
+        "1SS08": {
+            "number": 1,
+            "label": "8 mL SST",
+            "color": "Red and gray"
+        },
+        "1PS08": {
+            "number": 2,
+            "label": "8 mL PST",
+            "color": "Green and gray"
+        },
+        "1HEP4": {
+            "number": 3,
+            "label": "4 mL Na-Hep",
+            "color": "Green"
+        },
+        "1ED04": {
+            "number": 4,
+            "label": "4 mL EDTA",
+            "color": "Lavender"
+        },
+        "1ED10": {
+            "number": 5,
+            "label": "1st 10 mL EDTA",
+            "color": "Lavender"
+        },
+        "2ED10": {
+            "number": 6,
+            "label": "2nd 10 mL EDTA",
+            "color": "Lavender"
+        },
+        "1UR10": {
+            "number": 7,
+            "label": "Urine 10 mL",
+            "color": "Yellow"
+        }
+    }
+}
