@@ -12,6 +12,7 @@ class Order
     protected $app;
     protected $order;
     protected $participant;
+    public $version = 2;
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
 
@@ -53,40 +54,50 @@ class Order
         '1SAL' => 'sal'
     ];
 
-    public function loadSamplesSchema($version)
+    public function __construct($app = null)
     {
-        $file = __DIR__ . "/versions/{$version}.json";
+        if ($app) {
+            $this->app = $app;
+            if (!empty($app->getConfig('order_samples_version'))) {
+                $this->version = $app->getConfig('order_samples_version');
+            }
+        }
+        $this->loadSamplesSchema();
+    }
+
+    public function loadSamplesSchema()
+    {
+        $file = __DIR__ . "/versions/{$this->version}.json";
         if (!file_exists($file)) {
-            throw new MissingSchemaException();
+            throw new \Pmi\Evaluation\MissingSchemaException();
         }
         $this->schema = json_decode(file_get_contents($file), true);
         if (!is_array($this->schema) && !empty($this->schema)) {
-            throw new InvalidSchemaException();
+            throw new \Pmi\Evaluation\InvalidSchemaException();
         }
         $this->samples = $this->schema['samples'];
         $this->samplesInformation = $this->schema['samplesInformation'];
         $this->salivaSamples = $this->schema['salivaSamples'];
     }
 
-    public function loadOrder($participantId, $orderId, Application $app)
+    public function loadOrder($participantId, $orderId)
     {
-        $participant = $app['pmi.drc.participants']->getById($participantId);
+        $participant = $this->app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             return;
         }
-        $order = $app['em']->getRepository('orders')->fetchOneBy([
+        $order = $this->app['em']->getRepository('orders')->fetchOneBy([
             'id' => $orderId,
             'participant_id' => $participantId
         ]);
         if (!$order) {
             return;
         }
-        $this->app = $app;
         $this->order = $order;
         $this->order['expired'] = $this->isOrderExpired();
         $this->participant = $participant;
-        $version = !empty($order['version']) ? $order['version'] : 1;
-        $this->loadSamplesSchema($version);
+        $this->version = !empty($order['version']) ? $order['version'] : 1;
+        $this->loadSamplesSchema();
     }
 
     public function isValid()
@@ -439,13 +450,10 @@ class Order
         return $form;
     }
 
-    public function getRdrObject($order = null, $app = null)
+    public function getRdrObject($order = null)
     {
         if ($order) {
             $this->order = $order;
-        }
-        if ($app) {
-            $this->app = $app;
         }
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $this->order['participant_id'];
