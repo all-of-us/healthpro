@@ -23,6 +23,21 @@ class RdrMetrics
         return $responseObject;
     }
 
+    public function participantCountsOverTime($start_date, $end_date, $stratification, $enrollmentStatus, $awardee)
+    {
+        $client = $this->rdrHelper->getClient();
+        $queryString =
+            '?startDate=' . $start_date .
+            '&endDate=' . $end_date .
+            '&stratification=' . $stratification .
+            '&enrollmentStatus=' . $enrollmentStatus .
+            '&awardee' . $awardee;
+
+        $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime' . $queryString);
+        $responseObject = json_decode($response->getBody()->getContents(), True);
+        return $responseObject;
+    }
+
     public function metricsFields()
     {
         $client = $this->rdrHelper->getClient();
