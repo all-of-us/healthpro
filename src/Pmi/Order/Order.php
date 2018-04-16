@@ -25,6 +25,8 @@ class Order
 
     public $salivaSamples;
 
+    public $salivaSamplesInformation;
+
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL'];
 
     public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
@@ -71,13 +73,14 @@ class Order
         if (!file_exists($file)) {
             throw new \Pmi\Evaluation\MissingSchemaException();
         }
-        $this->schema = json_decode(file_get_contents($file), true);
-        if (!is_array($this->schema) && !empty($this->schema)) {
+        $schema = json_decode(file_get_contents($file), true);
+        if (!is_array($schema) && !empty($schema)) {
             throw new \Pmi\Evaluation\InvalidSchemaException();
         }
-        $this->samples = $this->schema['samples'];
-        $this->samplesInformation = $this->schema['samplesInformation'];
-        $this->salivaSamples = $this->schema['salivaSamples'];
+        $this->samples = $schema['samples'];
+        $this->samplesInformation = $schema['samplesInformation'];
+        $this->salivaSamples = $schema['salivaSamples'];
+        $this->salivaSamplesInformation = $schema['salivaSamplesInformation'];
     }
 
     public function loadOrder($participantId, $orderId)

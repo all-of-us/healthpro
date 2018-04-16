@@ -640,7 +640,9 @@ class OrderController extends AbstractController
                 'collected_at' => $collectedAt->format('c'),
                 'mayoClientId' => $mayoClientId,
                 'requested_samples' => $orderData['requested_samples'],
-                'version' => $orderData['version']
+                'version' => $orderData['version'],
+                'tests' => $order->samplesInformation,
+                'salivaTests' => $order->salivaSamplesInformation
             ];
             $pdf = $mlOrder->getLabelsPdf($options);
             return $pdf;
@@ -677,7 +679,9 @@ class OrderController extends AbstractController
                 'mayoClientId' => $mayoClientId,
                 'collected_samples' => $orderData["{$type}_samples"],
                 'centrifugeType' => $orderData['processed_centrifuge_type'],
-                'version' => $orderData['version']
+                'version' => $orderData['version'],
+                'tests' => $order->samplesInformation,
+                'salivaTests' => $order->salivaSamplesInformation
             ];
             $mayoOrder = new MayolinkOrder($app);
             $mayoId = $mayoOrder->createOrder($options);
