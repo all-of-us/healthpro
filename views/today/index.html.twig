@@ -22,6 +22,7 @@
         <thead>
             <tr>
                 <th rowspan="2">Participant ID</th>
+                <th rowspan="2">Name</th>
                 <th colspan="2">Physical Measurement</th>
                 <th colspan="6">Biobank Order</th>
             </tr>
@@ -38,7 +39,21 @@
         <tbody>
             {% for id, participant in participants %}
                 <tr>
-                    <td><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>
+                    <td><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>                    
+                    {% if participant.participant is defined %}
+                        <td>
+                            {% if participant.participant %}
+                                {{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}
+                            {% else %}
+                                {# Blank if participant was requested but empty #}
+                            {% endif %}
+                        </td>
+                    {% else %}
+                        <td data-participant-id="{{ id }}" data-href="{{ path('participant', { id: id }) }}" class="load-name">
+                            <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                            <span class="sr-only">Loading...</span>
+                        </td>
+                    {% endif %}
                     <td>
                         {{ today.displayDate(participant, 'physicalMeasurement', 'created_ts') }}
                     </td>
@@ -70,4 +85,25 @@
             {% endfor %}
         </tbody>
     </table>
+{% endblock %} 
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    $('.load-name').each(function() {
+        var td = $(this);
+        $.getJSON({{ path('today_participantNameLookup')|json_encode|raw }} + "?id=" + td.data('participant-id'), function(data) {
+            td.empty();
+            if (data && data.lastName && data.firstName) {
+                var a = $('<a>')
+                    .attr('href', td.data('href'))
+                    .text(data.lastName + ', ' + data.firstName);
+                td.append(a);
+            } else {
+                // display error message?
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

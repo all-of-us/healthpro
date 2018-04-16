@@ -3,13 +3,15 @@ namespace Pmi\Controller;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TodayController extends AbstractController
 {
     protected static $name = 'today';
 
     protected static $routes = [
-        ['home', '/']
+        ['home', '/'],
+        ['participantNameLookup', '/participant/lookup']
     ];
 
     public function homeAction(Application $app, Request $request)
@@ -79,6 +81,25 @@ class TodayController extends AbstractController
 
         return $app['twig']->render('today/index.html.twig', [
             'participants' => $participants
+        ]);
+    }
+
+    public function participantNameLookupAction(Application $app, Request $request)
+    {
+        $id = trim($request->query->get('id'));
+        if (!$id) {
+            return new JsonResponse(false);
+        }
+
+        $participant = $app['pmi.drc.participants']->getById($id);
+        if (!$participant) {
+            return new JsonResponse(false);
+        }
+
+        return new JsonResponse([
+            'id' => $id,
+            'firstName' => $participant->firstName,
+            'lastName' => $participant->lastName
         ]);
     }
 }
