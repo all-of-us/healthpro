@@ -1,18 +1,6 @@
 {
     "version": "3",
-    "samples": {
-        "(1) 8 mL SST [1SS08]": "1SS08",
-        "(2) 8 mL PST [1PS08]": "1PS08",
-        "(3) 4 mL Na-Hep [1HEP4]": "1HEP4",
-        "(4) 4 mL EDTA [1ED04]": "1ED04",
-        "(5) 10 mL EDTA [1ED10]": "1ED10",
-        "(6) Urine 10 mL [1UR10]": "1UR10",
-        "(7) Cell-Free DNA": "1CFD9",
-        "(8) Paxgene RNA": "1PXR2"
-    },
-    "salivaSamples": {
-        "Saliva [1SAL]": "1SAL"
-    },
+    "notes": "Pre-Pilot samples",
     "samplesInformation": {
         "1SS08": {
             "number": 1,
@@ -78,6 +66,7 @@
     },
     "salivaSamplesInformation": {
         "1SAL": {
+            "label": "Saliva [1SAL]",
             "temperature": "Refrigerated",
             "specimen": "Serum SST"
         }

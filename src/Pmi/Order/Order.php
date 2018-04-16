@@ -56,6 +56,8 @@ class Order
         '1SAL' => 'sal'
     ];
 
+    public static $nonBloodSamples = ['1UR10', '1SAL'];
+
     public function __construct($app = null)
     {
         if ($app) {
@@ -77,10 +79,20 @@ class Order
         if (!is_array($schema) && !empty($schema)) {
             throw new \Pmi\Evaluation\InvalidSchemaException();
         }
-        $this->samples = $schema['samples'];
         $this->samplesInformation = $schema['samplesInformation'];
-        $this->salivaSamples = $schema['salivaSamples'];
+        $samples = [];
+        foreach($this->samplesInformation as $sample => $info) {
+            $label = "({$info['number']}) {$info['label']} [{$sample}]";
+            $samples[$label] = $sample;
+        }
+        $this->samples = $samples;
+
         $this->salivaSamplesInformation = $schema['salivaSamplesInformation'];
+        $salivaSamples = [];
+        foreach($this->salivaSamplesInformation as $salivaSample => $info) {
+            $salivaSamples[$info['label']] = $salivaSample;
+        }
+        $this->salivaSamples = $salivaSamples;
     }
 
     public function loadOrder($participantId, $orderId)
@@ -277,7 +289,7 @@ class Order
         } else {
             $samples = $this->getRequestedSamples();
         }
-        $nonBloodSample = count($samples) === 1 && (isset($samples['(7) Urine 10 mL [1UR10]']) || isset($samples['Saliva [1SAL]']));
+        $nonBloodSample = count($samples) === 1 && $this->isNonBloodSample($samples);
         if ($set == 'collected' && !$nonBloodSample) {
             $tsLabel = 'Blood Collection Time';
         }
@@ -801,5 +813,14 @@ class Order
     public function isOrderExpired()
     {
         return empty($this->order['finalized_ts']) && empty($this->order['version']);
+    }
+
+    public function isNonBloodSample($samples)
+    {
+        foreach ($samples as $key => $sampleCode) {
+            if (in_array($sampleCode, self::$nonBloodSamples)) {
+                return true;
+            }
+        }
     }
 }
