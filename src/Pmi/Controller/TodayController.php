@@ -70,7 +70,9 @@ class TodayController extends AbstractController
                     }
                     break;
                 case 'measurement':
-                    $participants[$participantId]['physicalMeasurement'] = $row;
+                    if (is_null($participants[$participantId]['physicalMeasurement'])) {
+                        $participants[$participantId]['physicalMeasurement'] = $row;
+                    }
                     break;
             }
         }
