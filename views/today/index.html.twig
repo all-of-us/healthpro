@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block bodycontainer %}container-fluid{% endblock %}
+{% set missingName = '' %}
 
 {% macro displayDate(participant, entity, dateType) %}
     {% if participant[entity] and participant[entity][dateType] %}
@@ -46,11 +47,21 @@
         <tbody>
             {% for id, participant in participants %}
                 <tr>
-                    <td><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>                    
-                    <td data-participant-id="{{ id }}" data-href="{{ path('participant', { id: id }) }}" class="load-name">
-                        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                        <span class="sr-only">Loading...</span>
-                    </td>
+                    <td><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>
+                    {% if participant.participant is defined %}
+                        <td>
+                            {% if participant.participant %}
+                                {{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}
+                            {% else %}
+                                {{ missingName }}
+                            {% endif %}
+                        </td>
+                    {% else %}
+                        <td data-participant-id="{{ id }}" data-href="{{ path('participant', { id: id }) }}" class="load-name">
+                            <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                            <span class="sr-only">Loading...</span>
+                        </td>
+                    {% endif %}
                     <td>
                         {% if participant.physicalMeasurement %}
                             <nobr>
@@ -116,7 +127,7 @@ $(document).ready(function() {
                     .text(data.lastName + ', ' + data.firstName);
                 td.append(a);
             } else {
-                // display error message?
+                td.text({{ missingName|json_encode|raw }});
             }
         });
     });

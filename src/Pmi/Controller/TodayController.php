@@ -83,6 +83,15 @@ class TodayController extends AbstractController
             }
         }
 
+        // Preload first 5 names
+        $count = 0;
+        foreach ($participants as $id => $participant) {
+            $participants[$id]['participant'] = $app['pmi.drc.participants']->getById($id);
+            if (++$count >= 5) {
+                break;
+            }
+        }
+
         return $app['twig']->render('today/index.html.twig', [
             'participants' => $participants
         ]);
