@@ -11,6 +11,7 @@ class TodayController extends AbstractController
 
     protected static $routes = [
         ['home', '/'],
+        ['orders', '/orders'],
         ['participantNameLookup', '/participant/lookup']
     ];
 
@@ -113,6 +114,25 @@ class TodayController extends AbstractController
             'id' => $id,
             'firstName' => $participant->firstName,
             'lastName' => $participant->lastName
+        ]);
+    }
+
+    public function ordersAction(Application $app, Request $request)
+    {
+        $site = $app->getSiteId();
+        if (!$site) {
+            $app->addFlashError('You must select a valid site');
+            return $app->redirectToRoute('home');
+        }
+
+        $orders = $app['em']->getRepository('orders')->fetchBySql(
+            'site = ? AND finalized_ts IS NULL',
+            [$app->getSiteId()],
+            ['created_ts' => 'DESC']
+        );
+
+        return $app['twig']->render('today/orders.html.twig', [
+            'orders' => $orders
         ]);
     }
 }
