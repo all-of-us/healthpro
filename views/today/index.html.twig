@@ -5,11 +5,11 @@
 {% macro displayDate(participant, entity, dateType) %}
     {% if participant[entity] and participant[entity][dateType] %}
         {% if 'now'|date('Y-m-d', app.userTimezone) == participant[entity][dateType]|date('Y-m-d', app.userTimezone) %}
-            <strong>{{ participant[entity][dateType]|date('g:ia', app.userTimezone) }}</strong>
+            {# previously displayed only time if date is today. leaving this here in case we want to display something different in the future #}
+            {{ participant[entity][dateType]|date('n/j/Y g:ia', app.userTimezone) }}
         {% else %}
             {{ participant[entity][dateType]|date('n/j/Y g:ia', app.userTimezone) }}
         {% endif %}
-        
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
     {% endif %}
@@ -104,8 +104,10 @@
                         {{ today.displayDate(participant, 'order', 'finalized_ts') }}
                     </td>
                     <td>
-                        {% if participant.order %}
+                        {% if participant.order and participant.finalizedSamples %}
                             {{ participant.finalizedSamples }}
+                        {% else %}
+                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
                     </td>
                 </tr>
