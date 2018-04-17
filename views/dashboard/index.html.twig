@@ -542,5 +542,22 @@
         $('.panel-collapse').on('show.bs.collapse hide.bs.collapse', function() {
             toggleGlyph($(this).prev().find('span.toggle-glyph'));
         });
+
+        var centerFilterStatuses = {};
+
+        function updateCenterFilters() {
+
+          $('.center-filter').each(function(index, element) {
+            var centerFilter = $(element);
+            var center = centerFilter.val();
+            var isChecked = centerFilter.is(':checked') ? 1 : 0;
+            centerFilterStatuses[center] = isChecked;
+          });
+
+        }
+
+        $(document).on('change', '.center-filter', function() {
+          updateCenterFiltersStatuses();
+        });
     </script>
 {% endblock %}
