@@ -61,7 +61,7 @@
         "1SAL": {
             "label": "Saliva [1SAL]",
             "temperature": "Refrigerated",
-            "specimen": "Serum SST"
+            "specimen": "Saliva"
         }
     }
 }
