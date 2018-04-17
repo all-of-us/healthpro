@@ -1,8 +1,14 @@
 {% extends 'base.html.twig' %}
+{% block bodycontainer %}container-fluid{% endblock %}
 
 {% macro displayDate(participant, entity, dateType) %}
     {% if participant[entity] and participant[entity][dateType] %}
-        {{ participant[entity][dateType]|date('n/j/Y g:ia', app.userTimezone) }}
+        {% if 'now'|date('Y-m-d', app.userTimezone) == participant[entity][dateType]|date('Y-m-d', app.userTimezone) %}
+            <strong>{{ participant[entity][dateType]|date('g:ia', app.userTimezone) }}</strong>
+        {% else %}
+            {{ participant[entity][dateType]|date('n/j/Y g:ia', app.userTimezone) }}
+        {% endif %}
+        
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
     {% endif %}
@@ -23,13 +29,14 @@
             <tr>
                 <th rowspan="2">Participant ID</th>
                 <th rowspan="2">Name</th>
-                <th colspan="2" class="text-center" style="background-color: #f9f9f9">Physical Measurement</th>
+                <th colspan="3" class="text-center" style="background-color: #f9f9f9">Physical Measurement</th>
                 <th colspan="6" class="text-center" style="background-color: #f9f9f9">Biobank Order</th>
             </tr>
             <tr>
+                <th>ID</th>
                 <th>Created</th>
                 <th>Finalized</th>
-                <th>Order ID</th>
+                <th>ID</th>
                 <th>Created</th>
                 <th>Collected</th>
                 <th>Processed</th>
@@ -40,20 +47,23 @@
             {% for id, participant in participants %}
                 <tr>
                     <td><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>                    
-                    {% if participant.participant is defined %}
-                        <td>
-                            {% if participant.participant %}
-                                {{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}
-                            {% else %}
-                                {# Blank if participant was requested but empty #}
-                            {% endif %}
-                        </td>
-                    {% else %}
-                        <td data-participant-id="{{ id }}" data-href="{{ path('participant', { id: id }) }}" class="load-name">
-                            <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                            <span class="sr-only">Loading...</span>
-                        </td>
-                    {% endif %}
+                    <td data-participant-id="{{ id }}" data-href="{{ path('participant', { id: id }) }}" class="load-name">
+                        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                        <span class="sr-only">Loading...</span>
+                    </td>
+                    <td>
+                        {% if participant.physicalMeasurement %}
+                            <nobr>
+                                <a href="{{ path('evaluation', { participantId: id, evalId: participant.physicalMeasurement.id }) }}">
+                                    {{ participant.physicalMeasurement.id }}
+                                </a>
+                                {% if participant.physicalMeasurementCount > 1 %}
+                                    <i class="fa fa-info-circle" aria-hidden="true" title="More than one physical measurements for this participant was edited today. Go to the Participant Summary page for full history of physical measurements." data-toggle="tooltip"></i>
+                                    <span class="sr-only">More than one physical measurements for this participant was edited today. Go to the Participant Summary page for full history of physical measurements.</span>
+                                {% endif %}
+                            </nobr>
+                        {% endif %}
+                    </td>
                     <td>
                         {{ today.displayDate(participant, 'physicalMeasurement', 'created_ts') }}
                     </td>
@@ -65,8 +75,8 @@
                             <nobr>
                                 <a href="{{ path('order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.order.order_id }}</a>
                                 {% if participant.orderCount > 1 %}
-                                    <i class="fa fa-info-circle" aria-hidden="true" title="More than 1 biobank order for this participant was edited today. Go to the Participant Summary page for full history of biospecimen interactions." data-toggle="tooltip"></i>
-                                    <span class="sr-only">More than 1 biobank order for this participant was edited today. Go to the Participant Summary page for full history of biospecimen interactions.</span>
+                                    <i class="fa fa-info-circle" aria-hidden="true" title="More than one biobank order for this participant was edited today. Go to the Participant Summary page for full history of biospecimen interactions." data-toggle="tooltip"></i>
+                                    <span class="sr-only">More than one biobank order for this participant was edited today. Go to the Participant Summary page for full history of biospecimen interactions.</span>
                                 {% endif %}
                             </nobr>
                         {% endif %}

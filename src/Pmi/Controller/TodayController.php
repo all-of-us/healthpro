@@ -33,7 +33,8 @@ class TodayController extends AbstractController
             'order' => null,
             'orderCount' => 0,
             'finalizedSamples' => null,
-            'physicalMeasurement' => null
+            'physicalMeasurement' => null,
+            'physicalMeasurementCount' => 0
         ];
 
         $ordersQuery = 'SELECT participant_id, \'order\' as type, id, order_id, created_ts, collected_ts, processed_ts, finalized_ts, finalized_samples, ' .
@@ -74,6 +75,9 @@ class TodayController extends AbstractController
                 case 'measurement':
                     if (is_null($participants[$participantId]['physicalMeasurement'])) {
                         $participants[$participantId]['physicalMeasurement'] = $row;
+                        $participants[$participantId]['physicalMeasurementCount'] = 1;
+                    } else {
+                        $participants[$participantId]['physicalMeasurementCount']++;
                     }
                     break;
             }
