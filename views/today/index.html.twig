@@ -27,13 +27,13 @@
                 <th colspan="6" class="text-center" style="background-color: #f9f9f9">Biobank Order</th>
             </tr>
             <tr>
-                <th>Creation</th>
-                <th>Finalization</th>
+                <th>Created</th>
+                <th>Finalized</th>
                 <th>Order ID</th>
-                <th>Creation</th>
-                <th>Collection</th>
-                <th>Process</th>
-                <th>Finalization</th>
+                <th>Created</th>
+                <th>Collected</th>
+                <th>Processed</th>
+                <th>Finalized</th>
                 <th>Finalized Samples</th>
             </tr>
         <tbody>
@@ -62,7 +62,13 @@
                     </td>
                     <td>
                         {% if participant.order %}
-                            <a href="{{ path('order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.order.order_id }}</a>
+                            <nobr>
+                                <a href="{{ path('order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.order.order_id }}</a>
+                                {% if participant.orderCount > 1 %}
+                                    <i class="fa fa-info-circle" aria-hidden="true" title="More than 1 biobank order for this participant was edited today. Go to the Participant Summary page for full history of biospecimen interactions." data-toggle="tooltip"></i>
+                                    <span class="sr-only">More than 1 biobank order for this participant was edited today. Go to the Participant Summary page for full history of biospecimen interactions.</span>
+                                {% endif %}
+                            </nobr>
                         {% endif %}
                     <td>
                         {{ today.displayDate(participant, 'order', 'created_ts') }}
