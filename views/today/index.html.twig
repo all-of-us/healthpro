@@ -49,7 +49,7 @@
                     {% if participant.participant is defined %}
                         <td>
                             {% if participant.participant %}
-                                {{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}
+                                <a href="{{ path('participant', { id: id }) }}">{{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}</a>
                             {% else %}
                                 {{ missingName }}
                             {% endif %}
