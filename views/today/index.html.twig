@@ -66,8 +66,8 @@
                             <nobr>
                                 <a href="{{ path('evaluation', { participantId: id, evalId: participant.physicalMeasurement.id }) }}">{{ participant.physicalMeasurementStatus }}</a>
                                 {% if participant.physicalMeasurementCount > 1 %}
-                                    <i class="fa fa-info-circle" aria-hidden="true" title="More than one physical measurements for this participant was edited today. Go to the Participant Summary page for full history of physical measurements." data-toggle="tooltip"></i>
-                                    <span class="sr-only">More than one physical measurements for this participant was edited today. Go to the Participant Summary page for full history of physical measurements.</span>
+                                    <i class="fa fa-info-circle" aria-hidden="true" title="More than one physical measurements for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of physical measurements." data-toggle="tooltip"></i>
+                                    <span class="sr-only">More than one physical measurements for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of physical measurements.</span>
                                 {% endif %}
                             </nobr>
                         {% endif %}
@@ -83,8 +83,8 @@
                             <nobr>
                                 <a href="{{ path('order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.orderStatus }}</a>
                                 {% if participant.orderCount > 1 %}
-                                    <i class="fa fa-info-circle" aria-hidden="true" title="More than one biobank order for this participant was edited today. Go to the Participant Summary page for full history of biospecimen interactions." data-toggle="tooltip"></i>
-                                    <span class="sr-only">More than one biobank order for this participant was edited today. Go to the Participant Summary page for full history of biospecimen interactions.</span>
+                                    <i class="fa fa-info-circle" aria-hidden="true" title="More than one biobank order for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of biospecimen interactions." data-toggle="tooltip"></i>
+                                    <span class="sr-only">More than one biobank order for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of biospecimen interactions.</span>
                                 {% endif %}
                             </nobr>
                         {% endif %}
