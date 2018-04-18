@@ -14,6 +14,16 @@ class TodayController extends AbstractController
         ['orders', '/orders'],
         ['participantNameLookup', '/participant/lookup']
     ];
+    protected static $orderStatus = [
+        'created_ts' => 'Created',
+        'collected_ts' => 'Collected',
+        'processed_ts' => 'Processed',
+        'finalized_ts' => 'Finalized'
+    ];
+    protected static $measurementsStatus = [
+        'created_ts' => 'Created',
+        'finalized_ts' => 'Finalized'
+    ];
 
     public function homeAction(Application $app, Request $request)
     {
@@ -33,9 +43,11 @@ class TodayController extends AbstractController
         $emptyParticipant = [
             'order' => null,
             'orderCount' => 0,
+            'orderStatus' => '',
             'finalizedSamples' => null,
             'physicalMeasurement' => null,
-            'physicalMeasurementCount' => 0
+            'physicalMeasurementCount' => 0,
+            'physicalMeasurementStatus' => ''
         ];
 
         $ordersQuery = 'SELECT participant_id, \'order\' as type, id, order_id, created_ts, collected_ts, processed_ts, finalized_ts, finalized_samples, ' .
@@ -61,14 +73,18 @@ class TodayController extends AbstractController
             switch ($row['type']) {
                 case 'order':
                     if (is_null($participants[$participantId]['order'])) {
-                        if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
-                            $finalizedSamples = count($samples);
-                        } else {
-                            $finalizedSamples = null;
-                        }
                         $participants[$participantId]['order'] = $row;
                         $participants[$participantId]['orderCount'] = 1;
-                        $participants[$participantId]['finalizedSamples'] = $finalizedSamples;
+                        // Get order status
+                        foreach (self::$orderStatus as $field => $status) {
+                            if ($row[$field]) {
+                                $participants[$participantId]['orderStatus'] = $status;
+                            }
+                        }
+                        // Get number of finalized samples
+                        if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
+                            $participants[$participantId]['finalizedSamples'] = count($samples);
+                        }
                     } else {
                         $participants[$participantId]['orderCount']++;
                     }
@@ -77,6 +93,12 @@ class TodayController extends AbstractController
                     if (is_null($participants[$participantId]['physicalMeasurement'])) {
                         $participants[$participantId]['physicalMeasurement'] = $row;
                         $participants[$participantId]['physicalMeasurementCount'] = 1;
+                        // Get physical measurements status
+                        foreach (self::$measurementsStatus as $field => $status) {
+                            if ($row[$field]) {
+                                $participants[$participantId]['physicalMeasurementStatus'] = $status;
+                            }
+                        }
                     } else {
                         $participants[$participantId]['physicalMeasurementCount']++;
                     }

@@ -29,13 +29,14 @@
                 <th rowspan="2">Participant ID</th>
                 <th rowspan="2">Name</th>
                 <th colspan="3" class="text-center" style="background-color: #f9f9f9">Physical Measurement</th>
-                <th colspan="6" class="text-center" style="background-color: #f9f9f9">Biobank Order</th>
+                <th colspan="7" class="text-center" style="background-color: #f9f9f9">Biobank Order</th>
             </tr>
             <tr>
-                <th>ID</th>
+                <th>Status</th>
                 <th>Created</th>
                 <th>Finalized</th>
-                <th>ID</th>
+                <th>Status</th>
+                <th>Order ID</th>
                 <th>Created</th>
                 <th>Collected</th>
                 <th>Processed</th>
@@ -63,9 +64,7 @@
                     <td>
                         {% if participant.physicalMeasurement %}
                             <nobr>
-                                <a href="{{ path('evaluation', { participantId: id, evalId: participant.physicalMeasurement.id }) }}">
-                                    {{ participant.physicalMeasurement.id }}
-                                </a>
+                                <a href="{{ path('evaluation', { participantId: id, evalId: participant.physicalMeasurement.id }) }}">{{ participant.physicalMeasurementStatus }}</a>
                                 {% if participant.physicalMeasurementCount > 1 %}
                                     <i class="fa fa-info-circle" aria-hidden="true" title="More than one physical measurements for this participant was edited today. Go to the Participant Summary page for full history of physical measurements." data-toggle="tooltip"></i>
                                     <span class="sr-only">More than one physical measurements for this participant was edited today. Go to the Participant Summary page for full history of physical measurements.</span>
@@ -82,13 +81,19 @@
                     <td>
                         {% if participant.order %}
                             <nobr>
-                                <a href="{{ path('order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.order.order_id }}</a>
+                                <a href="{{ path('order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.orderStatus }}</a>
                                 {% if participant.orderCount > 1 %}
                                     <i class="fa fa-info-circle" aria-hidden="true" title="More than one biobank order for this participant was edited today. Go to the Participant Summary page for full history of biospecimen interactions." data-toggle="tooltip"></i>
                                     <span class="sr-only">More than one biobank order for this participant was edited today. Go to the Participant Summary page for full history of biospecimen interactions.</span>
                                 {% endif %}
                             </nobr>
                         {% endif %}
+                    </td>
+                    <td>
+                        {% if participant.order %}
+                            {{ participant.order.order_id }}
+                        {% endif %}
+                    </td>
                     <td>
                         {{ today.displayDate(participant, 'order', 'created_ts') }}
                     </td>
