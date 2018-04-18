@@ -177,7 +177,8 @@ class OrderController extends AbstractController
             'confirmForm' => $confirmForm->createView(),
             'showCustom' => $showCustom,
             'samplesInfo' => $order->samplesInformation,
-            'showBloodTubes' => $showBloodTubes
+            'showBloodTubes' => $showBloodTubes,
+            'version' => $order->version
         ]);
     }
 
@@ -338,6 +339,7 @@ class OrderController extends AbstractController
             'order' => $order->toArray(),
             'collectForm' => $collectForm->createView(),
             'samplesInfo' => $order->samplesInformation,
+            'version' => $order->version,
             'processTabClass' => $order->getProcessTabClass()
         ]);
     }
@@ -405,6 +407,7 @@ class OrderController extends AbstractController
             'order' => $order->toArray(),
             'processForm' => $processForm->createView(),
             'samplesInfo' => $order->samplesInformation,
+            'version' => $order->version,
             'processTabClass' => $order->getProcessTabClass()
         ]);
     }
@@ -494,6 +497,7 @@ class OrderController extends AbstractController
             'order' => $order->toArray(),
             'finalizeForm' => $finalizeForm->createView(),
             'samplesInfo' => $order->samplesInformation,
+            'version' => $order->version,
             'hasErrors' => $hasErrors,
             'processTabClass' => $order->getProcessTabClass()
         ]);

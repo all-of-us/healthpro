@@ -79,4 +79,5 @@ sites_use_rdr: true
 
 # Enable Google Analytics by setting property ID
 # google_analytics_property: UA-XXXXXXXX-NN
-# order_samples_version: 2
+# order_samples_version:
+# order_samples_info_3:
