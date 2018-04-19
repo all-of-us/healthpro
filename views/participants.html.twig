@@ -20,6 +20,13 @@
                 {{ form_widget(idForm) }}
                 <p><button type="submit" class="btn btn-primary">Go</button></p>
             {{ form_end(idForm) }}
+
+            <hr />
+            <h3><i class="fa fa-envelope" aria-hidden="true"></i> Find by Email</h3>
+            {{ form_start(emailForm) }}
+                {{ form_widget(emailForm) }}
+                <p><button type="submit" class="btn btn-primary">Go</button></p>
+            {{ form_end(emailForm) }}
         </div>
     </div>
 {% endblock %}

@@ -33,6 +33,20 @@ class ParticipantSearchTest extends \PHPUnit_Framework_TestCase
         $this->assertIsValidParticipant($participant);
     }
 
+    public function testEmailSearch()
+    {
+        $client = $this->getDrcParticipantClient();
+        $parameters = [
+            'email' => 'test@example.com'
+        ];
+        $result = $client->search($parameters);
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(1, count($result));
+        $this->assertArrayHasKey(0, $result);
+        $participant = $result[0];
+        $this->assertIsValidParticipant($participant);
+    }
+
     public function testRetrieve()
     {
         $client = $this->getDrcParticipantClient();
