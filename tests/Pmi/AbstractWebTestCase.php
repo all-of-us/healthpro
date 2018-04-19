@@ -47,7 +47,7 @@ abstract class AbstractWebTestCase extends WebTestCase
         $app->mount('/admin', new Controller\AdminController());
         $app->mount('/workqueue', new Controller\WorkQueueController());
         $app->mount('/problem', new Controller\ProblemReportController());
-        $app->mount('/today', new Controller\TodayController());
+        $app->mount('/review', new Controller\ReviewController());
 
         return $app;
     }

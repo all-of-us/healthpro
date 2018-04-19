@@ -20,8 +20,8 @@
 {% block body %}
     <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#">Today's Participants</a></li>
-        <li role="presentation"><a href="{{ path('today_orders') }}">Unfinalized Biobank Orders</a></li>
-        <li role="presentation"><a href="{{ path('today_measurements') }}">Unfinalized Physical Measurements</a></li>
+        <li role="presentation"><a href="{{ path('review_orders') }}">Unfinalized Biobank Orders</a></li>
+        <li role="presentation"><a href="{{ path('review_measurements') }}">Unfinalized Physical Measurements</a></li>
     </ul>
     <br />
     <table class="table table-striped table-bordered table-small">
@@ -125,7 +125,7 @@
 $(document).ready(function() {
     $('.load-name').each(function() {
         var td = $(this);
-        $.getJSON({{ path('today_participantNameLookup')|json_encode|raw }} + "?id=" + td.data('participant-id'), function(data) {
+        $.getJSON({{ path('review_participantNameLookup')|json_encode|raw }} + "?id=" + td.data('participant-id'), function(data) {
             td.empty();
             if (data && data.lastName && data.firstName) {
                 var a = $('<a>')

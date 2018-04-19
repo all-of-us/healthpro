@@ -5,12 +5,12 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class TodayController extends AbstractController
+class ReviewController extends AbstractController
 {
-    protected static $name = 'today';
+    protected static $name = 'review';
 
     protected static $routes = [
-        ['home', '/'],
+        ['today', '/'],
         ['orders', '/orders'],
         ['measurements', '/measurements'],
         ['participantNameLookup', '/participant/lookup']
@@ -26,7 +26,7 @@ class TodayController extends AbstractController
         'finalized_ts' => 'Finalized'
     ];
 
-    public function homeAction(Application $app, Request $request)
+    public function todayAction(Application $app, Request $request)
     {
         $site = $app->getSiteId();
         if (!$site) {
@@ -122,7 +122,7 @@ class TodayController extends AbstractController
             }
         }
 
-        return $app['twig']->render('today/index.html.twig', [
+        return $app['twig']->render('review/today.html.twig', [
             'participants' => $participants
         ]);
     }
@@ -160,7 +160,7 @@ class TodayController extends AbstractController
             ['created_ts' => 'DESC']
         );
 
-        return $app['twig']->render('today/orders.html.twig', [
+        return $app['twig']->render('review/orders.html.twig', [
             'orders' => $orders
         ]);
     }
@@ -179,7 +179,7 @@ class TodayController extends AbstractController
             ['created_ts' => 'DESC']
         );
 
-        return $app['twig']->render('today/measurements.html.twig', [
+        return $app['twig']->render('review/measurements.html.twig', [
             'measurements' => $measurements
         ]);
     }
