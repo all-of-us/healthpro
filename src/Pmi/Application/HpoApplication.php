@@ -12,6 +12,9 @@ class HpoApplication extends AbstractApplication
 {
     protected $configuration = [];
     protected $participantSource = 'rdr';
+    protected $siteNameMapper = [];
+    protected $organizationNameMapper = [];
+    protected $awardeeNameMapper = [];
 
     public function setup($config = [])
     {
@@ -218,9 +221,10 @@ class HpoApplication extends AbstractApplication
         $whitelist =  "default-src 'self'"
             . " 'unsafe-eval'" // required for setTimeout and setInterval
             . " 'unsafe-inline'" // for the places we are using inline JS
+            . " www.google-analytics.com www.googletagmanager.com" // Google Analytics
             . " storage.googleapis.com" // for SOP PDFs stored in a Google Storage bucket
             . " cdn.plot.ly;" // allow plot.ly remote requests
-            . " img-src 'self' data:"; // allow self and data: urls for img src
+            . " img-src www.google-analytics.com 'self' data:"; // allow Google Analytcs, self, and data: urls for img src
 
         $response->headers->set('Content-Security-Policy', $whitelist);
 
@@ -359,6 +363,14 @@ class HpoApplication extends AbstractApplication
         }
     }
 
+    public function getSitesFromOrganization($org)
+    {
+        return $this['em']->getRepository('sites')->fetchBy([
+            'status' => 1,
+            'organization' => $org,
+        ]);
+    }
+
     public function isDVType() {
         $site = $this['em']->getRepository('sites')->fetchBy([
             'google_group' => $this->getSiteId(),
@@ -457,5 +469,85 @@ class HpoApplication extends AbstractApplication
     public function getReportKitUrl()
     {
         return $this->getConfig('reportKitUrl');
+    }
+
+    public function getFormErrors($form)
+    {
+        $errors = [];
+        foreach ($form->getErrors() as $error) {
+            $errors[] = $error->getMessage();
+        }
+        foreach ($form->all() as $child) {
+            $childErrors = $this->getFormErrors($child);
+            if (count($childErrors) > 0) {
+                $errors = array_merge($errors, $childErrors);
+            }
+        }
+        return $errors;
+    }
+
+    public function getSiteDisplayName($siteSuffix, $defaultToSiteSuffix = true)
+    {
+        $siteName = $defaultToSiteSuffix ? $siteSuffix : null ;
+        if (!empty($siteSuffix)) {
+            if (array_key_exists($siteSuffix, $this->siteNameMapper)) {
+                $siteName = $this->siteNameMapper[$siteSuffix];
+            } else {
+                $site = $this['em']->getRepository('sites')->fetchOneBy([
+                    'google_group' => $siteSuffix
+                ]);
+                if (!empty($site)) {
+                    $siteName = $this->siteNameMapper[$siteSuffix] = $site['name'];
+                }
+            }
+        }
+        return $siteName;
+    }
+
+    public function getOrganizationDisplayName($organizationId)
+    {
+        $organizationName = $organizationId;
+        if (!empty($organizationId)) {
+            if (array_key_exists($organizationId, $this->organizationNameMapper)) {
+                $organizationName = $this->organizationNameMapper[$organizationId];
+            } else {
+                $organization = $this['em']->getRepository('organizations')->fetchOneBy([
+                    'id' => $organizationId
+                ]);
+                if (!empty($organization)) {
+                    $organizationName = $this->organizationNameMapper[$organizationId] = $organization['name'];
+                }
+            }
+        }
+        return $organizationName;
+    }
+
+    public function getAwardeeDisplayName($awardeeId)
+    {
+        $awardeeName = $awardeeId;
+        if (!empty($awardeeId)) {
+            if (array_key_exists($awardeeId, $this->awardeeNameMapper)) {
+                $awardeeName = $this->awardeeNameMapper[$awardeeId];
+            } else {
+                $awardee = $this['em']->getRepository('awardees')->fetchOneBy([
+                    'id' => $awardeeId
+                ]);
+                if (!empty($awardee)) {
+                    $awardeeName = $this->awardeeNameMapper[$awardeeId] = $awardee['name'];
+                }
+            }
+        }
+        return $awardeeName;
+    }
+
+    public function getUserEmailById($userId)
+    {
+        $user = $this['em']->getRepository('users')->fetchOneBy([
+            'id' => $userId
+        ]);
+        if (!empty($user)) {
+            return $user['email'];
+        }
+        return null;
     }
 }

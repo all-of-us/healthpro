@@ -12,10 +12,15 @@ class Order
     protected $app;
     protected $order;
     protected $participant;
+    const FIXED_ANGLE = 'fixed_angle';
+    const SWINGING_BUCKET = 'swinging_bucket';
+
+    // This represents the current version of samples
+    public static $version = 2;
 
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
-    public static $samples = [
+    public static $samples1 = [
         '(1) 8 mL SST [1SST8]' => '1SST8',
         '(2) 8 mL PST [1PST8]' => '1PST8',
         '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
@@ -25,13 +30,23 @@ class Order
         '(7) Urine 10 mL [1UR10]' => '1UR10'
     ];
 
+    public static $samples2 = [
+        '(1) 8 mL SST [1SS08]' => '1SS08',
+        '(2) 8 mL PST [1PS08]' => '1PS08',
+        '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
+        '(4) 4 mL EDTA [1ED04]' => '1ED04',
+        '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
+        '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
+        '(7) Urine 10 mL [1UR10]' => '1UR10'
+    ];
+
     public static $samplesInformation = [
-        '1SST8' => [
+        '1SS08' => [
             'number' => 1,
             'label' => '8 mL SST',
             'color' => 'Red and gray'
         ],
-        '1PST8' => [
+        '1PS08' => [
             'number' => 2,
             'label' => '8 mL PST',
             'color' => 'Green and gray'
@@ -60,14 +75,27 @@ class Order
             'number' => 7,
             'label' => 'Urine 10 mL',
             'color' => 'Yellow'
-        ]
+        ],
+        // Keep old sample codes for backward compatability
+        '1SST8' => [
+            'number' => 1,
+            'label' => '8 mL SST',
+            'color' => 'Red and gray'
+        ],
+        '1PST8' => [
+            'number' => 2,
+            'label' => '8 mL PST',
+            'color' => 'Green and gray'
+        ],
     ];
 
     public static $salivaSamples = [
         'Saliva [1SAL]' => '1SAL'
     ];
 
-    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SAL'];
+    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL'];
+
+    public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
 
     public static $identifierLabel = [
         'name' => 'name',
@@ -75,6 +103,23 @@ class Order
         'phone' => 'phone number',
         'address' => 'street address',
         'email' => 'email address'
+    ];
+
+    public static $centrifugeType = [
+        'swinging_bucket' => 'Swinging Bucket',
+        'fixed_angle' => 'Fixed Angle'
+    ];
+
+    public static $sst = ['1SST8', '1SS08'];
+
+    public static $pst = ['1PST8', '1PS08'];
+
+    public static $sampleMessageLabels = [
+        '1SST8' => 'sst',
+        '1SS08' => 'sst',
+        '1PST8' => 'pst',
+        '1PS08' => 'pst',
+        '1SAL' => 'sal'
     ];
 
     public function loadOrder($participantId, $orderId, Application $app)
@@ -92,7 +137,11 @@ class Order
         }
         $this->app = $app;
         $this->order = $order;
+        $this->order['expired'] = $this->isOrderExpired();
         $this->participant = $participant;
+        if (empty($order['version'])) {
+            self::$version = 1;
+        }
     }
 
     public function isValid()
@@ -131,14 +180,20 @@ class Order
 
     public function getCurrentStep()
     {
+        //Return collect step if collected_ts is set and mayo_id is empty
+        if ($this->order["collected_ts"] && !$this->order["mayo_id"]) {
+            return 'collect';
+        }
         $columns = [
-            'print' => 'printed',
+            'printLabels' => 'printed',
             'collect' => 'collected',
+            'printRequisition' => 'collected',
             'process' => 'processed',
-            'finalize' => 'finalized'
+            'finalize' => 'finalized'           
         ];
         if ($this->order['type'] === 'kit') {
-            unset($columns['print']);
+            unset($columns['printLabels']);
+            unset($columns['printRequisition']);
         }
         $step = 'finalize';
         foreach ($columns as $name => $column) {
@@ -153,18 +208,25 @@ class Order
     public function getAvailableSteps()
     {
         $columns = [
-            'print' => 'printed',
+            'printLabels' => 'printed',
             'collect' => 'collected',
+            'printRequisition' => 'collected',
             'process' => 'processed',
             'finalize' => 'finalized'
         ];
         if ($this->order['type'] === 'kit') {
-            unset($columns['print']);
+            unset($columns['printLabels']);
+            unset($columns['printRequisition']);
         }
         $steps = [];
         foreach ($columns as $name => $column) {
             $steps[] = $name;
-            if (!$this->order["{$column}_ts"]) {
+            if ($column === 'collected' && $this->order['type'] !== 'kit') {
+                $condition = $this->order["{$column}_ts"] && $this->order["mayo_id"];
+            } else {
+                $condition = $this->order["{$column}_ts"];
+            }
+            if (!$condition) {
                 break;
             }
         }
@@ -187,24 +249,29 @@ class Order
                 $updateArray["{$set}_ts"] = null;
             }
         }
-        $hasSampleArray = $formData["{$set}_samples"] && is_array($formData["{$set}_samples"]);
-        if ($hasSampleArray) {
-            $updateArray["{$set}_samples"] = json_encode(array_values($formData["{$set}_samples"]));
-        } else {
-            $updateArray["{$set}_samples"] = json_encode([]);
-        }
-        if ($set == 'processed') {
-            $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
-            if ($hasSampleArray && $hasSampleTimeArray) {
-                $processedSampleTimes = [];
-                foreach ($formData['processed_samples_ts'] as $sample => $dateTime) {
-                    if ($dateTime && in_array($sample, $formData["{$set}_samples"])) {
-                        $processedSampleTimes[$sample] = $dateTime->getTimestamp();
-                    }
-                }
-                $updateArray['processed_samples_ts'] = json_encode($processedSampleTimes);
+        if ($form->has("{$set}_samples")) {
+            $hasSampleArray = $formData["{$set}_samples"] && is_array($formData["{$set}_samples"]);
+            if ($hasSampleArray) {
+                $updateArray["{$set}_samples"] = json_encode(array_values($formData["{$set}_samples"]));
             } else {
-                $updateArray['processed_samples_ts'] = json_encode([]);
+                $updateArray["{$set}_samples"] = json_encode([]);
+            }
+            if ($set == 'processed') {
+                $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
+                if ($hasSampleArray && $hasSampleTimeArray) {
+                    $processedSampleTimes = [];
+                    foreach ($formData['processed_samples_ts'] as $sample => $dateTime) {
+                        if ($dateTime && in_array($sample, $formData["{$set}_samples"])) {
+                            $processedSampleTimes[$sample] = $dateTime->getTimestamp();
+                        }
+                    }
+                    $updateArray['processed_samples_ts'] = json_encode($processedSampleTimes);
+                } else {
+                    $updateArray['processed_samples_ts'] = json_encode([]);
+                }
+                if ($this->order['type'] !== 'saliva' && !empty($formData["processed_centrifuge_type"])) {
+                    $updateArray["processed_centrifuge_type"] = $formData["processed_centrifuge_type"];
+                }
             }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
@@ -215,7 +282,7 @@ class Order
 
     public function createOrderForm($set, $formFactory)
     {
-        $disabled = $this->order['finalized_ts'] ? true : false;
+        $disabled = $this->order['finalized_ts'] || $this->order['expired'] ? true : false;
 
         switch ($set) {
             case 'collected':
@@ -251,10 +318,40 @@ class Order
         } else {
             $samples = $this->getRequestedSamples();
         }
+        $nonBloodSample = count($samples) === 1 && (isset($samples['(7) Urine 10 mL [1UR10]']) || isset($samples['Saliva [1SAL]']));
+        if ($set == 'collected' && !$nonBloodSample) {
+            $tsLabel = 'Blood Collection Time';
+        }
         $enabledSamples = $this->getEnabledSamples($set);
         $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
         if ($set != 'processed') {
+            $constraints = [
+                new Constraints\LessThanOrEqual([
+                    'value' => $constraintDateTime,
+                    'message' => 'Timestamp cannot be in the future'
+                ])
+            ];
+            if ($set === 'finalized') {
+                array_push($constraints,
+                    new Constraints\GreaterThan([
+                        'value' => $this->order['collected_ts'],
+                        'message' => 'Finalized Time is before Collection Time'
+                    ])
+                );
+                $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+                if (!empty($processedSamplesTs)) {
+                    $processedTs = new \DateTime();
+                    $processedTs->setTimestamp(max($processedSamplesTs));
+                    $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                    array_push($constraints,
+                        new Constraints\GreaterThan([
+                            'value' => $processedTs,
+                            'message' => 'Finalized Time is before Processing Time'
+                        ])
+                    );
+                }
+            }
             $formBuilder->add("{$set}_ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
                 'widget' => 'single_text',
@@ -263,29 +360,62 @@ class Order
                 'disabled' => $disabled,
                 'view_timezone' => $this->app->getUserTimezone(),
                 'model_timezone' => 'UTC',
-                'constraints' => [
-                    new Constraints\LessThanOrEqual([
-                        'value' => $constraintDateTime,
-                        'message' => 'Timestamp cannot be in the future'
-                    ])
-                ]
+                'constraints' => $constraints
             ]);
         }
-        $formBuilder->add("{$set}_samples", Type\ChoiceType::class, [
-            'expanded' => true,
-            'multiple' => true,
-            'label' => $samplesLabel,
-            'choices' => $samples,
-            'required' => false,
-            'disabled' => $disabled,
-            'choice_attr' => function($val, $key, $index) use ($enabledSamples) {
-                if (in_array($val, $enabledSamples)) {
-                    return [];
-                } else {
-                    return ['disabled' => true, 'class' => 'sample-disabled'];
-                }
+        if (!empty($samples)) {
+            // Disable collected samples when mayo_id is set
+            $samplesDisabled = $disabled;
+            if ($set === 'collected' && $this->order['mayo_id']) {
+                $samplesDisabled = true;
             }
-        ]);
+            $formBuilder->add("{$set}_samples", Type\ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => true,
+                'label' => $samplesLabel,
+                'choices' => $samples,
+                'required' => false,
+                'disabled' => $samplesDisabled,
+                'choice_attr' => function($val) use ($enabledSamples, $set) {
+                    $attr = [];
+                    if ($set === 'finalized') {
+                        $collectedSamples = json_decode($this->order['collected_samples'], true);
+                        $processedSamples = json_decode($this->order['processed_samples_ts'], true);
+                        if (in_array($val, $collectedSamples)) {
+                            $attr = ['collected' => $this->order['collected_ts']->format('n/j/Y g:ia')];
+                        }
+                        if (!empty($processedSamples[$val])) {
+                            $time = new \DateTime();
+                            $time->setTimestamp($processedSamples[$val]);
+                            $time->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                            $attr['processed'] = $time->format('n/j/Y g:ia');
+                        }
+                        if (in_array($val, self::$samplesRequiringProcessing) && in_array($val, $collectedSamples)) {
+                            $attr['required-processing'] = 'yes';
+                        }
+                    }
+                    if ($set === 'processed' || $set === 'finalized') {
+                        $warnings = $this->getWarnings();
+                        $errors = $this->getErrors();
+                        if (array_key_exists($val, self::$sampleMessageLabels)) {
+                            $type = self::$sampleMessageLabels[$val];
+                            if (!empty($errors[$type])) {
+                                $attr['error'] = $errors[$type];
+                            } elseif (!empty($warnings[$type])) {
+                                $attr['warning'] = $warnings[$type];
+                            }
+                        }
+                    }
+                    if (in_array($val, $enabledSamples)) {
+                        return $attr;
+                    } else {
+                        $attr['disabled'] = true;
+                        $attr['class'] = 'sample-disabled';
+                        return $attr;
+                    }
+                }
+            ]);
+        }
         if ($set == 'processed') {
             $formBuilder->add('processed_samples_ts', Type\CollectionType::class, [
                 'entry_type' => Type\DateTimeType::class,
@@ -308,26 +438,48 @@ class Order
                 ],
                 'required' => false
             ]);
+            if ($this->app->isDVType()) {
+                $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
+                    'google_group' => $this->app->getSiteId()
+                ]);
+                if ($this->order['type'] !== 'saliva' && !empty($enabledSamples) && empty($sites['centrifuge_type'])) {
+                    $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
+                        'label' => 'Centrifuge type',
+                        'required' => true,
+                        'disabled' => $disabled,
+                        'choices' => [
+                            '-- Select centrifuge type --' => null,
+                            'Fixed Angle'=> self::FIXED_ANGLE,
+                            'Swinging Bucket' => self::SWINGING_BUCKET
+                        ],
+                        'multiple' => false,
+                        'constraints' => new Constraints\NotBlank([
+                            'message' => 'Please select centrifuge type'
+                        ])
+                    ]);
+                }
+            }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
             $formBuilder->add('fedex_tracking', Type\RepeatedType::class, [
                 'type' => Type\TextType::class,
                 'disabled' => $disabled,
-                'invalid_message' => 'FedEx tracking numbers must match.',
+                'invalid_message' => 'Tracking numbers must match.',
                 'first_options' => [
-                    'label' => 'FedEx tracking number (optional)'
+                    'label' => 'FedEx or UPS tracking number (optional)'
                 ],
                 'second_options' => [
-                    'label' => 'Verify FedEx tracking number',
+                    'label' => 'Verify tracking number',
                 ],
                 'required' => false,
                 'error_mapping' => [
                     '.' => 'second' // target the second (repeated) field for non-matching error
                 ],
                 'constraints' => [
+                    new Constraints\Type('string'),
                     new Constraints\Regex([
-                        'pattern' => '/^\d{12,14}$/',
-                        'message' => 'FedEx tracking numbers must be a string of 12-14 digits'
+                        'pattern' => '/^\d{12,14}$|^[a-zA-Z0-9]{18}$/',
+                        'message' => 'Tracking numbers must be a string of 12 to 14 digits for FedEX and 18 digits for UPS'
                     ])
                 ]
             ]);
@@ -335,7 +487,8 @@ class Order
         $formBuilder->add("{$set}_notes", Type\TextareaType::class, [
             'label' => $notesLabel,
             'disabled' => $disabled,
-            'required' => false
+            'required' => false,
+            'constraints' => new Constraints\Type('string')
         ]);
         $form = $formBuilder->getForm();
         return $form;
@@ -457,8 +610,16 @@ class Order
     {
         $samples = [];
         foreach ($this->getRequestedSamples() as $description => $test) {
+            // Convert new samples
+            $rdrTest = $test;
+            if ($test == '1SS08') {
+                $rdrTest = ($this->order['processed_centrifuge_type'] == self::FIXED_ANGLE) ? '2SST8' : '1SST8';
+            }
+            if ($test == '1PS08') {
+                $rdrTest = ($this->order['processed_centrifuge_type'] == self::FIXED_ANGLE) ? '2PST8' : '1PST8';
+            }
             $sample = [
-                'test' => $test,
+                'test' => $rdrTest,
                 'description' => $description,
                 'processingRequired' => in_array($test, self::$samplesRequiringProcessing)
             ];
@@ -515,6 +676,9 @@ class Order
                     $formData['processed_samples_ts'][$sample] = null;
                 }
             }
+            if ($this->order["processed_centrifuge_type"]) {
+                $formData["processed_centrifuge_type"] = $this->order["processed_centrifuge_type"];
+            }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
             $formData['fedex_tracking'] = $this->order['fedex_tracking'];
@@ -532,9 +696,9 @@ class Order
             is_array($requestedArray) &&
             count($requestedArray) > 0
         ) {
-            return array_intersect(self::$samples, $requestedArray);
+            return array_intersect(self::${'samples' . self::$version}, $requestedArray);
         } else {
-            return self::$samples;
+            return self::${'samples' . self::$version};
         }
     }
 
@@ -612,5 +776,74 @@ class Order
     public function checkIdentifiers($notes)
     {
         return $this->getParticipant()->checkIdentifiers($notes);
+    }
+
+    public function getWarnings()
+    {
+        $warnings = [];
+        if ($this->order['type'] !== 'saliva' && !empty($this->order['collected_ts']) && !empty($this->order['processed_samples_ts'])) {
+            $collectedTs = clone $this->order['collected_ts'];
+            $processedSamples = json_decode($this->order['processed_samples'], true);
+            $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+            $sst = array_values(array_intersect($processedSamples, self::$sst));
+            $pst = array_values(array_intersect($processedSamples, self::$pst));
+            //Check if SST processing time is less than 30 mins after collection time
+            $collectedTs->modify('+30 minutes');
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] < $collectedTs->getTimestamp()) {
+                $warnings['sst'] = 'SST Specimen Processed Less than 30 minutes after Collection';
+            }
+            //Check if SST processing time is greater than 4 hrs after collection time
+            $collectedTs->modify('+210 minutes');
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] > $collectedTs->getTimestamp()) {
+                $warnings['sst'] = 'Processing Time is Greater than 4 hours after Collection';
+            }
+            //Check if PST processing time is greater than 4 hrs after collection time
+            if (!empty($pst) && !empty($processedSamplesTs[$pst[0]]) && $processedSamplesTs[$pst[0]] > $collectedTs->getTimestamp()) {
+                $warnings['pst'] = 'Processing Time is Greater than 4 hours after Collection';
+            }
+        }
+        return $warnings;
+    }
+
+    public function getErrors()
+    {
+        $errors = [];
+        if (!empty($this->order['collected_ts']) && !empty($this->order['processed_samples_ts'])) {
+            $collectedTs = clone $this->order['collected_ts'];
+            $processedSamples = json_decode($this->order['processed_samples'], true);
+            $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+            $sst = array_values(array_intersect($processedSamples, self::$sst));
+            $pst = array_values(array_intersect($processedSamples, self::$pst));
+            $sal = array_values(array_intersect($processedSamples, self::$salivaSamples));
+            //Check if SST processing time is less than collection time
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] <= $collectedTs->getTimestamp()) {
+                $errors['sst'] = 'SST Processing Time is before Collection Time';
+            }
+            //Check if PST processing time is less than collection time
+            if (!empty($pst) && !empty($processedSamplesTs[$pst[0]]) && $processedSamplesTs[$pst[0]] <= $collectedTs->getTimestamp()) {
+                $errors['pst'] = 'PST Processing Time is before Collection Time';
+            }
+            //Check if SAL processing time is less than collection time
+            if (!empty($sal) && !empty($processedSamplesTs[$sal[0]]) && $processedSamplesTs[$sal[0]] <= $collectedTs->getTimestamp()) {
+                $errors['sal'] = 'SAL Processing Time is before Collection Time';
+            }
+        }
+        return $errors;        
+    }
+
+    public function getProcessTabClass()
+    {
+        $class = 'fa fa-check-circle text-success';
+        if (!empty($this->getErrors())) {
+            $class = 'fa fa-exclamation-circle text-danger';
+        } elseif (!empty($this->getWarnings())) {
+            $class = 'fa fa-exclamation-triangle text-warning';
+        }
+        return $class;
+    }
+
+    public function isOrderExpired()
+    {
+        return empty($this->order['finalized_ts']) && empty($this->order['version']);
     }
 }

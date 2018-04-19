@@ -28,18 +28,7 @@
 
     <div class="row">
         <div class="col-sm-6">
-            <dl class="dl-horizontal">
-                <dt>Name</dt>
-                <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-                <dt>Participant ID</dt>
-                <dd>{{ participant.id }}</dd>
-                <dt>Biobank ID</dt>
-                <dd>{{ participant.biobankId }}</dd>
-                <dt>DOB</dt>
-                <dd>{{ participant.dob ? participant.dob|date('n/j/Y') }}</dd>
-                <dt>Gender Identity</dt>
-                <dd>{{ participant.genderIdentity }}</dd>
-            </dl>
+          {% include 'partials/participant-dl.html.twig' %}
         </div>
         <div class="col-sm-6 text-center">
             <svg id="participant-barcode"></svg>
@@ -166,13 +155,14 @@
                                         <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
                                             {{ order.created_ts|date('D n/j/Y', app.userTimezone) }} <small class="text-muted"><strong>{{ order.order_id }}</strong></small><br />
                                             <small class="text-muted">
-                                                {% if order.finalized_ts %}
-                                                    <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
+                                                {% if not order.finalized_ts and not order.version %}
+                                                    <span class="label label-danger">Expired</span>
+                                                {% elseif order.finalized_ts %}
+                                                    <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                                 {% elseif order.processed_ts %}
-                                                    <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
+                                                    <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                                 {% elseif order.collected_ts %}
-                                                    <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}</small>
-                                                {% else %}
+                                                    <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                                 {% endif %}                                    
                                             </small>
                                         </a>
@@ -274,11 +264,11 @@
                                         <dt>Contact Method</dt>
                                         <dd>{{ participant.recontactMethod|default('--') }}</dd>
                                         <dt>Address</dt>
-                                        <dd>{{ participant.getAddress(true)|nl2br }}</dd>
+                                        <dd>{{ participant.getAddress(true)|default('--')|nl2br }}</dd>
                                         <dt>Email</dt>
-                                        <dd>{{ participant.email }}</dd>
+                                        <dd>{{ participant.email|default('--') }}</dd>
                                         <dt>Phone</dt>
-                                        <dd>{{ participant.phoneNumber }}</dd>
+                                        <dd>{{ participant.phoneNumber|default('--') }}</dd>
                                     </dl>
                                 </div>
                             </div>
@@ -290,15 +280,16 @@
                                 <div class="panel-body">
                                     <dl class="dl-vertical">
                                         <dt>Age</dt>
-                                        <dd>{{ participant.getAge() }}</dd>
+                                        <dd>{{ participant.getAge()|default('--') }}</dd>
                                         <dt>Sex</dt>
-                                        <dd>{{ participant.sex }}</dd>
+                                        <dd>{{ participant.sex|default('--') }}</dd>
                                         <dt>Gender Identity</dt>
-                                        <dd>{{ participant.genderIdentity }}</dd>
+                                        <dd>{{ participant.genderIdentity|default('--') }}</dd>
                                         <dt>Race/Ethnicity</dt>
-                                        <dd>{{ participant.race }}</dd>
+                                        <dd>{{ participant.race|default('--') }}</dd>
                                         <dt>Education</dt>
-                                        <dd>{{ participant.education }}</dd>
+                                        <dd>{{ participant.education|default('--') }}</dd>
+                                    </dl>
                                 </div>
                             </div>
                         </div>
@@ -349,6 +340,38 @@
                                 <div class="panel-body">
                                     <div class="text-center">
                                         <div class="participant-detail-status">
+                                            <strong>Paired Organization</strong>
+                                            {% if participant.organization %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                            {% else %}
+                                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                <small>(not paired)</small>
+                                            {% endif %}
+                                        </div>
+                                        <br/>
+                                        {% if participant.organization %}
+                                            <samp>{{ app.getOrganizationDisplayName(participant.organization) }}</samp>
+                                        {% endif %}
+                                    </div>
+                                    <hr />
+                                    <div class="text-center">
+                                        <div class="participant-detail-status">
+                                            <strong>Paired Site</strong>
+                                            {% if participant.siteSuffix %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                            {% else %}
+                                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                <small>(not paired)</small>
+                                            {% endif %}
+                                        </div>
+                                        <br/>
+                                        {% if participant.siteSuffix %}
+                                            Location: <samp>{{ app.getSiteDisplayName(participant.siteSuffix) }}</samp>
+                                        {% endif %}
+                                    </div>
+                                    <hr />
+                                    <div class="text-center">
+                                        <div class="participant-detail-status">
                                             <strong>Physical Measurements</strong>
                                             {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
                                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
@@ -362,7 +385,7 @@
                                         </div>
                                         <br />
                                         {% if participant.evaluationFinalizedSite %}
-                                            Location: <samp>{{ participant.evaluationFinalizedSite }}</samp>
+                                            Location: <samp>{{ app.getSiteDisplayName(participant.evaluationFinalizedSite) }}</samp>
                                         {% endif %}
                                     </div>
                                     <hr />
@@ -385,6 +408,11 @@
                                     </dl>
                                     <div class="text-center">
                                         {% for field, label in samples %}
+                                            {% if attribute(samplesAlias[0], field) is defined  and attribute(participant, 'sampleStatus' ~ attribute(samplesAlias[0], field)) == 'RECEIVED' %}
+                                                {% set field = attribute(samplesAlias[0], field) %}
+                                            {% elseif attribute(samplesAlias[1], field) is defined and attribute(participant, 'sampleStatus' ~ attribute(samplesAlias[1], field)) == 'RECEIVED' %}
+                                                {% set field = attribute(samplesAlias[1], field) %}
+                                            {% endif %}
                                             <div class="participant-detail-status">
                                                 <strong>{{ label }}</strong>
                                                 {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
@@ -400,7 +428,7 @@
                                         {% endfor %}
                                         <br />
                                         {% if participant.orderCreatedSite %}
-                                            Location: <samp>{{ participant.orderCreatedSite }}</samp>
+                                            Location: <samp>{{ app.getSiteDisplayName(participant.orderCreatedSite) }}</samp>
                                         {% endif %}
                                     </div>
                                 </div>

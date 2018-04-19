@@ -7,49 +7,49 @@
         <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
     </h2>
 
-    <dl class="dl-horizontal">
-        <dt>Name</dt>
-        <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-        <dt>Participant ID</dt>
-        <dd>{{ participant.id }}</dd>
-        <dt>Biobank ID</dt>
-        <dd>{{ participant.biobankId }}</dd>
-        <dt>DOB</dt>
-        <dd>{{ participant.dob ? participant.dob|date('n/j/Y') }}</dd>
-        <dt>Gender Identity</dt>
-        <dd>{{ participant.genderIdentity }}</dd>
-    </dl>
+    {% include 'partials/participant-dl.html.twig' %}
+
     <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#">Safety Check</a></li>
-        {% for step in ['create', 'print', 'collect', 'process', 'finalize'] %}
-            <li role="presentation" class="disabled"><a href="#">{{ step|capitalize }}</a></li>
+        {% if app.isDvType %}
+            {% set steps = ['Create', 'Collect', 'Process', 'Finalize'] %}
+        {% else %}
+            {% set steps = ['Create', 'Print Labels', 'Collect', 'Print Requisition', 'Process', 'Finalize'] %}
+        {% endif %}
+        {% for step in steps %}
+            <li role="presentation" class="disabled"><a href="#">{{ step }}</a></li>
         {% endfor %}
     </ul>
     <br />
 
     <h3>In the past week has the participant donated blood (e.g. Blood Bank, Red Cross), platelets, or plasma?</h3>
-    <div class="radio">
-        <label><input type="radio" name="donate" value="yes" /> Yes</label>
-    </div>
-    <div class="radio">
-        <label><input type="radio" name="donate" value="no" /> No</label>
-    </div>
+    <form method="post" action="{{ path('orderCreate', { participantId: participant.id }) }}">
+        <div class="radio">
+            <label><input type="radio" name="donate" value="yes" /> Yes</label>
+        </div>
+        <div class="radio">
+            <label><input type="radio" name="donate" value="no" /> No</label>
+        </div>
 
-    <h3>In the past 6 months, has the participant had a blood transfusion?</h3>
-    <div class="radio">
-        <label><input type="radio" name="transfusion" value="yes" /> Yes</label>
-    </div>
-    <div class="radio">
-        <label><input type="radio" name="transfusion" value="no" /> No</label>
-    </div>
-        
-    <div class="alert alert-danger" style="display:none" id="failed">
-        Participants may not have blood drawn if they have donated blood, platelets, or plasma in the past week or have received a blood transfusion in the past 6 months.
-    </div>
-    <div id="succeed" style="display:none">
-        <br />
-        <p><a href="{{ path('orderCreate', { participantId: participant.id }) }}" class="btn btn-primary">Continue</a></p>
-    </div>
+        <h3>In the past 6 months, has the participant had a blood transfusion?</h3>
+        <div class="radio">
+            <label><input type="radio" name="transfusion" value="yes" /> Yes</label>
+        </div>
+        <div class="radio">
+            <label><input type="radio" name="transfusion" value="no" /> No</label>
+        </div>
+            
+        <div class="alert alert-danger" style="display:none" id="failed">
+            Participants may not have blood drawn if they have donated blood, platelets, or plasma in the past week or have received a blood transfusion in the past 6 months.
+            {% if app.isDvType is empty %}
+                <strong>Saliva collection is permissible, and can be initiated by selecting Continue.</strong>
+            {% endif %}
+        </div>
+        <div id="succeed" style="display:none">
+            <br />
+            <p><button type="submit" class="btn btn-primary">Continue</button></p>
+        </div>
+    </form>
 {% endblock %}
 
 {% block pagejs %}
@@ -58,9 +58,13 @@ $(document).ready(function() {
     $('input[type=radio]').change(function() {
         var donate = $('input:radio[name=donate]:checked').val();
         var transfusion = $('input:radio[name=transfusion]:checked').val();
-        if (donate === 'yes' || transfusion === 'yes') {
-            $('#succeed').hide();
+        if ((typeof(donate) !== 'undefined' && typeof(transfusion) !== 'undefined') && (donate === 'yes' || transfusion === 'yes')) {
             $('#failed').show();
+            {% if app.isDvType %}
+                $('#succeed').hide();
+            {% else %}
+                $('#succeed').show();
+            {% endif %}
         }
         if (donate === 'no' && transfusion === 'no') {
             $('#succeed').show();

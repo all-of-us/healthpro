@@ -160,11 +160,6 @@ class DeployCommand extends Command {
             $output->writeln("Checking NPM dependencies...");
             $this->exec("npm install");
 
-            // ensure that we are up-to-date with the latest Bower dependencies
-            $output->writeln('');
-            $output->writeln("Checking Bower dependencies...");
-            $this->exec("{$this->appDir}/bin/bower install");
-
             // compile (concat/minify/copy) assets
             $output->writeln('');
             $output->writeln("Compiling assets...");
@@ -198,7 +193,7 @@ class DeployCommand extends Command {
             }
             $cmd .= " {$this->appDir}/app.yaml";
         } else {
-            $cmd = "gcloud app deploy --quiet --project={$this->appId} --version=1 {$this->appDir}/app.yaml";
+            $cmd = "gcloud app deploy --quiet --project={$this->appId} {$this->appDir}/app.yaml";
         }
         $output->writeln('');
         $output->writeln("Deploy command: <info>{$cmd}</info>");
@@ -526,7 +521,7 @@ class DeployCommand extends Command {
     /** Enhance instance class and scaling */
     private function configureScaling(&$config)
     {
-        $config['instance_class'] = 'F2'; // 256MB, 1.2 GHz
+        $config['instance_class'] = 'F4'; // 512MB, 2.4 GHz
         // improve user experience during low traffic
         $config['automatic_scaling']['min_idle_instances'] = 2;
     }
@@ -542,6 +537,8 @@ class DeployCommand extends Command {
         $this->out->writeln("Running SensioLabs Security Checker...");
         $checker = new SecurityChecker();
         $vulnerabilities = $checker->check($composerLockFile);
+        // Ignore vulnerabilities mentioned in sensioignore file
+        $vulnerabilities = $this->removeSensioIgnoredVulnerabilities($vulnerabilities);
         if (count($vulnerabilities) === 0) {
             $this->out->writeln('No packages have known vulnerabilities');
         } else {
@@ -580,8 +577,44 @@ class DeployCommand extends Command {
         $process->setTimeout(null);
         $run = $mustRun ? 'mustRun' : 'run';
         $process->$run(function($type, $buffer) {
-            echo $buffer;
+            $this->out->write($buffer);
         });
         return $process;
+    }
+
+
+    private function removeSensioIgnoredVulnerabilities($vulnerabilities)
+    {
+        $newVulnerabilities = $vulnerabilities;
+        $sensioIgnoredVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'sensioignore.json'), true);
+        foreach ($vulnerabilities as $key => $vulnerability) {
+            if (!empty($vulnerability['advisories'])) {
+                $advisories = $vulnerability['advisories'];
+                foreach($vulnerability['advisories'] as $advisoryKey => $advisory) {
+                    if (!empty($advisory['link'])) {
+                        if ($this->isVulnerabilityIgnored($sensioIgnoredVulnerabilities, $advisory['link'])) {
+                            //Remove ignored advisories
+                            unset($advisories[$advisoryKey]);
+                        }
+                    }
+                }
+                if (!empty($advisories)) {
+                    $newVulnerabilities[$key]['advisories'] = $advisories; 
+                } else {
+                    unset($newVulnerabilities[$key]);
+                }
+            }
+        }
+        return $newVulnerabilities;
+    }
+
+    private function isVulnerabilityIgnored($vulnerabilities, $link)
+    {
+        foreach ($vulnerabilities as $vulnerability) {
+            if ($link == $vulnerability['link']) {
+                return true;
+            }
+        }
+        return false;
     }
 }

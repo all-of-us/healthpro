@@ -13,10 +13,14 @@ use Pmi\Audit\Log;
 use Pmi\Service\WithdrawalService;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Order\Order;
+use Pmi\Service\SiteSyncService;
 
 class AdminController extends AbstractController
 {
     protected static $name = 'admin';
+
+    const FIXED_ANGLE = 'fixed_angle';
+    const SWINGING_BUCKET = 'swinging_bucket';
     const FULL_DATA_ACCESS = 'full_data';
     const LIMITED_DATA_ACCESS = 'limited_data';
     const DOWNLOAD_DISABLED = 'disabled';
@@ -28,6 +32,9 @@ class AdminController extends AbstractController
             'method' => 'GET|POST',
             'defaults' => ['siteId' => null]
         ]],
+        ['siteSync', '/sites/sync', [
+            'method' => 'GET|POST'
+        ]],
         ['withdrawalNotifications', '/notifications/withdrawal'],
         ['missingMeasurements', '/missing/measurements', ['method' => 'GET|POST']],
         ['missingOrders', '/missing/orders', ['method' => 'GET|POST']]
@@ -38,14 +45,52 @@ class AdminController extends AbstractController
         return $app['twig']->render('admin/index.html.twig');
     }
 
+    public function siteSyncAction(Application $app, Request $request)
+    {
+        $siteSync = new SiteSyncService(
+            $app['pmi.drc.rdrhelper']->getClient(),
+            $app['em']
+        );
+        $isProd = $app->isProd();
+        $preview = $siteSync->dryRun($isProd);
+
+        if (!$app->getConfig('sites_use_rdr')) {
+            $formView = false;
+        } else {
+            $form = $app['form.factory']->createBuilder(FormType::class)->getForm();
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                if ($request->request->has('awardeeOrgSync')) {
+                    $siteSync->syncAwardees();
+                    $siteSync->syncOrganizations();
+                } else {
+                    $siteSync->sync($isProd);
+                }
+                $app->addFlashSuccess('Successfully synced');
+                return $app->redirectToRoute('admin_sites');
+            }
+            $formView = $form->createView();
+        }
+        $canSync = !empty($preview['deleted']) || !empty($preview['modified']) || !empty($preview['created']);
+        return $app['twig']->render('admin/sites/sync.html.twig', [
+            'preview' => $preview,
+            'form' => $formView,
+            'canSync' => $canSync
+        ]);
+    }
+
     public function sitesAction(Application $app)
     {
         $sites = $app['em']->getRepository('sites')->fetchBy([], ['name' => 'asc']);
-        return $app['twig']->render('admin/sites/index.html.twig', ['sites' => $sites]);
+        return $app['twig']->render('admin/sites/index.html.twig', [
+            'sites' => $sites,
+            'sync' => $app->getConfig('sites_use_rdr')
+        ]);
     }
 
     public function siteAction($siteId, Application $app, Request $request)
     {
+        $syncEnabled = $app->getConfig('sites_use_rdr');
         if ($siteId) {
             $site = $app['em']->getRepository('sites')->fetchOneBy([
                 'id' => $siteId
@@ -61,13 +106,17 @@ class AdminController extends AbstractController
                 return $app->redirectToRoute('admin_sites');
             }
         } else {
+            if ($syncEnabled) {
+                // can't create new sites if syncing from rdr
+                $app->abort(404);
+            }
             $site = null;
         }
 
         $siteEditForm = $this->getSiteEditForm($app, $site);
         $siteEditForm->handleRequest($request);
         if ($siteEditForm->isSubmitted()) {
-            if ($siteEditForm->isValid()) {
+            if ($siteEditForm->isValid() && !$syncEnabled) {
                 if ($site) {
                     $duplicateGoogleGroup = $app['em']->getRepository('sites')->fetchBySql('google_group = ? and id != ?', [
                         $siteEditForm['google_group']->getData(),
@@ -113,14 +162,28 @@ class AdminController extends AbstractController
         if ($site && isset($site['id'])) {
             unset($site['id']);
         }
-        return $app['form.factory']->createBuilder(FormType::class, $site)
+        $syncEnabled = $app->getConfig('sites_use_rdr');
+        $builder = $app['form.factory']->createBuilder(FormType::class, $site);
+        $disabled = $syncEnabled ? true : false;
+        $isProd = $app->isProd();
+        $builder
             ->add('name', Type\TextType::class, [
                 'label' => 'Name',
                 'required' => true,
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
-                ]
+                ],
+                'disabled' => $disabled,
+            ])
+            ->add('status', Type\ChoiceType::class, [
+                'label' => 'Status',
+                'required' => true,
+                'choices' => [
+                    'Active'=> 1,
+                    'Inactive' => 0
+                ],
+                'disabled' => $disabled
             ])
             ->add('google_group', Type\TextType::class, [
                 'label' => 'Google Group',
@@ -128,27 +191,32 @@ class AdminController extends AbstractController
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
-                ]
+                ],
+                'disabled' => $disabled,
+            ])
+            ->add('organization', Type\TextType::class, [
+                'label' => 'Awardee (formerly HPO ID)',
+                'required' => false,
+                'constraints' => new Constraints\Type('string'),
+                'disabled' => $disabled,
+            ])
+            ->add('organization_id', Type\TextType::class, [
+                'label' => 'Organization',
+                'required' => false,
+                'constraints' => new Constraints\Type('string'),
+                'disabled' => $disabled,
             ])
             ->add('mayolink_account', Type\TextType::class, [
                 'label' => 'MayoLink Account',
                 'required' => false,
-                'constraints' => new Constraints\Type('string')
-            ])
-            ->add('organization', Type\TextType::class, [
-                'label' => 'Organization',
-                'required' => false,
-                'constraints' => new Constraints\Type('string')
+                'constraints' => new Constraints\Type('string'),
+                'disabled' => $disabled && $isProd,
             ])
             ->add('type', Type\TextType::class, [
-                'label' => 'Type',
+                'label' => 'Type (e.g. HPO, DV)',
                 'required' => false,
-                'constraints' => new Constraints\Type('string')
-            ])
-            ->add('awardee', Type\TextType::class, [
-                'label' => 'Awardee',
-                'required' => false,
-                'constraints' => new Constraints\Type('string')
+                'constraints' => new Constraints\Type('string'),
+                'disabled' => $disabled,
             ])
             ->add('email', Type\TextType::class, [
                 'label' => 'Email address(es)',
@@ -174,10 +242,26 @@ class AdminController extends AbstractController
                             }
                         }
                     })
-                ]
+                ],
+                'disabled' => $disabled && $isProd,
+            ])
+            ->add('awardee', Type\TextType::class, [
+                'label' => 'Program (e.g. STSI)',
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
+            ])
+            ->add('centrifuge_type', Type\ChoiceType::class, [
+                'label' => 'Centrifuge type',
+                'required' => false,
+                'choices' => [
+                    '-- Select centrifuge type --' => null,
+                    'Fixed Angle'=> self::FIXED_ANGLE,
+                    'Swinging Bucket' => self::SWINGING_BUCKET
+                ],
+                'multiple' => false
             ])
             ->add('workqueue_download', Type\ChoiceType::class, [
-                'label' => 'Work Qeue Download',
+                'label' => 'Work Queue Download',
                 'required' => true,
                 'choices' => [
                     'Full Data Access'=> self::FULL_DATA_ACCESS,
@@ -189,8 +273,8 @@ class AdminController extends AbstractController
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
                 ]
-            ])
-            ->getForm();
+            ]);
+        return $builder->getForm();
     }
 
     public function withdrawalNotificationsAction(Application $app)

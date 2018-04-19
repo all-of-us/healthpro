@@ -18,11 +18,14 @@ iframe.pdf {
     margin-top: -10px;
     margin-bottom: 15px;
 }
-#flash-notices div {
+#flash-notices div, .custom-alert {
     padding: 5px;
     text-align: center;
     font-weight: bold;
     margin: 0 0 5px 0;
+}
+#flash-notices .close {
+    margin-top: -2px;
 }
 .btn-block {
     margin-bottom: 10px;
@@ -240,6 +243,30 @@ label.label-normal {
 .multiheader-contact {
     background-color: #edd;
 }
+.dataTables_processing {
+    z-index: 1000;
+    color: #fff;
+    background-color: #337ab7;
+}
+#workqueue tr.tr-withdrawn {
+    background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10px,
+        #f4e7e7 10px,
+        #f4e7e7 20px
+    );
+    opacity: 0.7;
+}
+#workqueue tr.tr-withdrawn.odd {
+    background: repeating-linear-gradient(
+        -45deg,
+        #f9f9f9,
+        #f9f9f9 10px,
+        #f4e7e7 10px,
+        #f4e7e7 20px
+    );
+}
 
 /* Orders */
 table.table-samples {
@@ -247,6 +274,12 @@ table.table-samples {
 }
 table.table-samples td {
     border-top: 0 !important;
+}
+.header-collected {
+    padding-left: 24px;
+}
+.saliva-info {
+    padding-left: 150px;
 }
 
 .help-footer {

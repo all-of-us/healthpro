@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
+use Pmi\WorkQueue\WorkQueue;
 
 class DefaultController extends AbstractController
 {
@@ -174,6 +175,9 @@ class DefaultController extends AbstractController
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => 'P000000000'
                 ]
             ])
             ->getForm();
@@ -188,6 +192,38 @@ class DefaultController extends AbstractController
             }
             $app->addFlashError('Participant ID not found');
         }
+
+        $emailForm = $app['form.factory']->createNamedBuilder('email', FormType::class)
+            ->add('email', TextType::class, [
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => 'janedoe@example.com'
+                ]
+            ])
+            ->getForm();
+
+        $emailForm->handleRequest($request);
+
+        if ($emailForm->isValid()) {
+            $searchParameters = $emailForm->getData();
+            try {
+                $searchResults = $app['pmi.drc.participants']->search($searchParameters);
+                if (count($searchResults) == 1) {
+                    return $app->redirectToRoute('participant', [
+                        'id' => $searchResults[0]->id
+                    ]);
+                }
+                return $app['twig']->render('participants-list.html.twig', [
+                    'participants' => $searchResults
+                ]);
+            } catch (ParticipantSearchExceptionInterface $e) {
+                $emailForm->addError(new FormError($e->getMessage()));
+            }
+        }
+
 
         $searchForm = $app['form.factory']->createNamedBuilder('search', FormType::class)
             ->add('lastName', TextType::class, [
@@ -236,7 +272,8 @@ class DefaultController extends AbstractController
 
         return $app['twig']->render('participants.html.twig', [
             'searchForm' => $searchForm->createView(),
-            'idForm' => $idForm->createView()
+            'idForm' => $idForm->createView(),
+            'emailForm' => $emailForm->createView()
         ]);
     }
 
@@ -336,6 +373,16 @@ class DefaultController extends AbstractController
         if (empty($participant->cacheTime)) {
             $participant->cacheTime = new \DateTime();
         }
+        foreach ($orders as $key => $order) {
+            // Display most recent processed sample time if exists
+            $processedSamplesTs = json_decode($order['processed_samples_ts'], true);
+            if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
+                $processedTs = new \DateTime();
+                $processedTs->setTimestamp(max($processedSamplesTs));
+                $processedTs->setTimezone(new \DateTimeZone($app->getUserTimezone()));
+                $orders[$key]['processed_ts'] = $processedTs;
+            }
+        }
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
@@ -345,8 +392,9 @@ class DefaultController extends AbstractController
             'agreeForm' => $agreeForm->createView(),
             'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled(),
             'canViewDetails' => $canViewDetails,
-            'samples' => WorkQueueController::$samples,
-            'surveys' => WorkQueueController::$surveys
+            'samples' => WorkQueue::$samples,
+            'surveys' => WorkQueue::$surveys,
+            'samplesAlias' => WorkQueue::$samplesAlias,
         ]);
     }
 

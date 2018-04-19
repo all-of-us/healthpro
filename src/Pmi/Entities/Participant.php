@@ -13,9 +13,10 @@ class Participant
     public $gender;
     public $dob;
     public $cacheTime;
-    protected $rdrData;
+    public $rdrData;
     public $evaluationFinalizedSite;
     public $orderCreatedSite;
+    public $age;
 
     public function __construct($rdrParticipant = null)
     {
@@ -81,6 +82,14 @@ class Participant
                 $this->dob = null;
             }
         }
+
+        // Get site suffix
+        if (!empty($participant->site) && $participant->site !== 'UNSET') {
+            $this->siteSuffix = $this->getSiteSuffix($participant->site);
+        }
+
+        //Set age
+        $this->age = $this->getAge();
 
         // Remove site prefix
         if (!empty($participant->physicalMeasurementsFinalizedSite) && $participant->physicalMeasurementsFinalizedSite !== 'UNSET') {

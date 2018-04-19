@@ -19,6 +19,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             'participant_id' => $particpantId,
             'bioank_id' => $biobankId,
             'order_id' => $orderId,
+            'mayo_id' => null,
             'created_ts' => null,
             'printed_ts' => null,
             'collected_ts' => null,
@@ -31,7 +32,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             'finalized_samples' => null,
             'collected_notes' => null,
             'processed_notes' => null,
-            'finalized_notes' => null
+            'finalized_notes' => null,
+            'processed_centrifuge_type' => null
         ];
         $orderParameters = array_merge($orderParameters, $parameters);
         $order->setOrder($orderParameters);
@@ -64,7 +66,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
     public function testOrderStep()
     {
         $order = $this->createOrder();
-        $this->assertSame('print', $order->getCurrentStep());
+        $this->assertSame('printLabels', $order->getCurrentStep());
 
         $order = $this->createOrder([
             'created_ts' => new \DateTime('2016-01-01 08:00:00'),
@@ -75,7 +77,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $order = $this->createOrder([
             'created_ts' => new \DateTime('2016-01-01 08:00:00'),
             'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
-            'collected_ts' => new \DateTime('2016-01-01 10:00:00')
+            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+            'mayo_id' => 'YZXWVU'
         ]);
         $this->assertSame('process', $order->getCurrentStep());
 
@@ -83,7 +86,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             'created_ts' => new \DateTime('2016-01-01 08:00:00'),
             'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
             'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
-            'processed_ts' => new \DateTime('2016-01-01 11:00:00')
+            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
+            'mayo_id' => 'YZXWVU'
         ]);
         $this->assertSame('finalize', $order->getCurrentStep());
 
@@ -92,9 +96,27 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
             'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
             'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
-            'finalized_ts' => new \DateTime('2016-01-01 12:00:00')
+            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
+            'mayo_id' => 'YZXWVU'
         ]);
         $this->assertSame('finalize', $order->getCurrentStep());
+
+        $order = $this->createOrder([
+            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
+            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+            'processed_ts' => new \DateTime('2016-01-01 11:00:00')
+        ]);
+        $this->assertSame('collect', $order->getCurrentStep());
+
+        $order = $this->createOrder([
+            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
+            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
+            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
+        ]);
+        $this->assertSame('collect', $order->getCurrentStep());
     }
 
     public function testRdrObject()
@@ -115,5 +137,37 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $created->setTimezone(new \DateTimeZone('UTC'));
         $this->assertSame($created->format('Y-m-d\TH:i:s\Z'), $object->created);
         $this->assertSame(7, count($object->samples));
+    }
+
+    public function testRdrObjectSwingingBucketType()
+    {
+        $order = $this->createOrder([
+            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
+            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
+            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
+            'processed_centrifuge_type' => 'swinging_bucket'
+        ]);
+        $object = $order->getRdrObject();
+        $samples = $object->samples;
+        $this->assertSame('1SST8', $samples[0]['test']);
+        $this->assertSame('1PST8', $samples[1]['test']);
+    }
+
+    public function testRdrObjectFixedAngleType()
+    {
+        $order = $this->createOrder([
+            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
+            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
+            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
+            'processed_centrifuge_type' => 'fixed_angle'
+        ]);
+        $object = $order->getRdrObject();
+        $samples = $object->samples;
+        $this->assertSame('2SST8', $samples[0]['test']);
+        $this->assertSame('2PST8', $samples[1]['test']);
     }
 }

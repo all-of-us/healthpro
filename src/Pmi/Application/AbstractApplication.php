@@ -390,6 +390,26 @@ abstract class AbstractApplication extends Application
             return !is_null($this['routes']->get($name));
         }));
 
+        // Register custom Twig function for in-app messaging
+        $this['twig']->addFunction(new Twig_SimpleFunction('display_message', function($name, $type = false, $options = []) {
+            $configPrefix = 'messaging_';
+            $message = $this->getConfig($configPrefix . $name);
+            if (empty($message)) {
+                return;
+            }
+            switch ($type) {
+                case 'alert':
+                    return '<div class="alert alert-info">' . $message . '</div>';
+                    break;
+                case 'tooltip':
+                    $tooltipText = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                    return '<span title="' . $tooltipText . '" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span>';
+                    break;
+                default:
+                    return $message;
+            }
+        }, ['is_safe' => ['html']]));        
+
         // Register custom Twig cache
         if (isset($this['twigCacheHandler'])) {
             switch ($this['twigCacheHandler']) {

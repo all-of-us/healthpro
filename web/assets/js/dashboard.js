@@ -90,6 +90,7 @@ function loadBarChartAnnotations(plotlyData, annotationsArray, interval) {
     if (interval === 'weeks') {
         fontSize = 10;
     }
+    /* eslint-disable security/detect-object-injection */
     for (var i = 0; i < plotlyData[0]['x'].length ; i++){
         var total = 0;
         plotlyData.map(function(el) {
@@ -112,6 +113,7 @@ function loadBarChartAnnotations(plotlyData, annotationsArray, interval) {
         };
         annotationsArray.push(annot);
     }
+    /* eslint-enable security/detect-object-injection */
     return annotationsArray;
 }
 

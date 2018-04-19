@@ -13,7 +13,9 @@ class EntityManager
         'withdrawal_log' => 'doctrine',
         'problems' => 'doctrine',
         'problem_comments' => 'doctrine',
-        'evaluations_queue' => 'doctrine'
+        'evaluations_queue' => 'doctrine',
+        'organizations' => 'doctrine',
+        'awardees' => 'doctrine'
     ];
 
     protected $timezone;

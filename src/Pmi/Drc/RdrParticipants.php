@@ -10,6 +10,8 @@ class RdrParticipants
     protected $client;
     protected $cacheEnabled = true;
     protected static $resourceEndpoint = 'rdr/v1/';
+    protected $nextToken;
+    protected $total;
 
     public function __construct(RdrHelper $rdrHelper)
     {
@@ -54,6 +56,10 @@ class RdrParticipants
             }
         }
 
+        if (isset($params['email'])) {
+            $query['email'] = strtolower($params['email']);
+        }
+
         return $query;
     }
 
@@ -88,8 +94,30 @@ class RdrParticipants
         return $results;
     }
 
-    public function listParticipantSummaries($params)
+    /**
+     * @param string|array $params Particpant Summary API parameters (query string or array)
+     * @param bool $next Enable paging
+     **/
+    public function listParticipantSummaries($params, $next = false)
     {
+        if ($next) {
+            //Pass token if exists
+            if ($this->nextToken) {
+                if (is_array($params)) {
+                    $params['_token'] = $this->nextToken;
+                } else {
+                    $params .= '&_token=' . $this->nextToken;
+                }
+            }
+            // Request count
+            if (is_array($params)) {
+                $params['_includeTotal'] = 'true';
+            } else {
+                $params .= '&_includeTotal=true';
+            }
+
+        }
+        $this->nextToken = $this->total = null;
         try {
             $response = $this->getClient()->request('GET', 'ParticipantSummary', [
                 'query' => $params
@@ -106,8 +134,44 @@ class RdrParticipants
         if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
             return [];
         }
-
+        if (isset($responseObject->link) && is_array($responseObject->link)) {
+            foreach ($responseObject->link as $link) {
+                if ($link->relation === 'next') {
+                    $queryString = parse_url($link->url, PHP_URL_QUERY);
+                    parse_str($queryString, $nextParameters);
+                    if (isset($nextParameters['_token'])) {
+                        $this->nextToken = $nextParameters['_token'];
+                    }
+                    break;
+                }
+            }
+        }
+        if (isset($responseObject->total)) {
+            $this->total = intval($responseObject->total);
+        }
         return $responseObject->entry;
+    }
+
+    public function getNextToken()
+    {
+        return $this->nextToken;
+    }
+
+    public function getTotal()
+    {
+        return $this->total;
+    }
+
+    public function setNextToken($app, $tableParams, $type = null)
+    {
+        $tokens = $app['session']->get('tokens');
+        $index = $tableParams['start'] + $tableParams['count'];
+        if (empty($type) && !empty($tokens[$tableParams['start']])) {
+            $this->nextToken = $tokens[$tableParams['start']];
+        } else {
+            $tokens[$index] = $this->nextToken;
+            $app['session']->set('tokens', $tokens);
+        }
     }
 
     public function getById($id, $refresh = null)

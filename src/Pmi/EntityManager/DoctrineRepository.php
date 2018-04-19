@@ -135,4 +135,14 @@ class DoctrineRepository
             ['id' => $id]
         );
     }
+
+    public function truncate()
+    {
+        $this->dbal->query("DELETE FROM `{$this->entity}`");
+    }
+
+    public function wrapInTransaction($callback)
+    {
+        $this->dbal->transactional($callback);
+    }
 }

@@ -37,10 +37,12 @@
     },
     "scripts": {
         "post-install-cmd" : [
-            "./bin/cleanVendor"
+            "./bin/cleanVendor",
+            "./bin/installHooks"
         ],
         "post-update-cmd" : [
-            "./bin/cleanVendor"
+            "./bin/cleanVendor",
+            "./bin/installHooks"
         ]
     }
 }
