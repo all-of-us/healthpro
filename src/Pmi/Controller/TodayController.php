@@ -12,6 +12,7 @@ class TodayController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['orders', '/orders'],
+        ['measurements', '/measurements'],
         ['participantNameLookup', '/participant/lookup']
     ];
     protected static $orderStatus = [
@@ -155,6 +156,25 @@ class TodayController extends AbstractController
 
         return $app['twig']->render('today/orders.html.twig', [
             'orders' => $orders
+        ]);
+    }
+
+    public function measurementsAction(Application $app, Request $request)
+    {
+        $site = $app->getSiteId();
+        if (!$site) {
+            $app->addFlashError('You must select a valid site');
+            return $app->redirectToRoute('home');
+        }
+
+        $measurements = $app['em']->getRepository('evaluations')->fetchBySql(
+            'site = ? AND finalized_ts IS NULL',
+            [$app->getSiteId()],
+            ['created_ts' => 'DESC']
+        );
+
+        return $app['twig']->render('today/measurements.html.twig', [
+            'measurements' => $measurements
         ]);
     }
 }
