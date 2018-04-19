@@ -35,7 +35,13 @@ class TodayController extends AbstractController
         }
 
         // Get beginning of today (at midnight) in user's timezone
-        $startTime = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
+        $startString = 'today';
+        // Allow overriding start time to test in non-prod environments
+        if (!$app->isProd() && intval($request->query->get('days')) > 0) {
+            $startString = '-' . intval($request->query->get('days')) . ' days';
+        }
+
+        $startTime = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
         // Get MySQL date/time string in UTC
         $startTime->setTimezone(new \DateTimezone('UTC'));
         $today = $startTime->format('Y-m-d H:i:s');
