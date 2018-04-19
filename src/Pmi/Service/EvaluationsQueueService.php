@@ -40,13 +40,13 @@ class EvaluationsQueueService
                 $this->em->getRepository('evaluations')->update($evaluation['id'], ['rdr_id' => $rdrEvalId, 'fhir_version' => Fhir::CURRENT_VERSION]);
                 $this->em->getRepository('evaluations_queue')->update($queue['id'], ['new_rdr_id' => $rdrEvalId, 'fhir_version' => Fhir::CURRENT_VERSION, 'sent_ts' => $now]);
                 $this->app->log(Log::QUEUE_RESEND_EVALUATION, [
-                	'id' => $queue['id'],
+                    'id' => $queue['id'],
                     'old_rdr_id' => $queue['old_rdr_id'],
                     'new_rdr_id' => $rdrEvalId,
                     'fhir_version' => Fhir::CURRENT_VERSION
                 ]);
             } else {
-            	syslog(LOG_ERR, "#{$evalId} failed sending to RDR: " .$this->rdr->getLastError());
+                syslog(LOG_ERR, "#{$evalId} failed sending to RDR: " .$this->rdr->getLastError());
             }
         }
     }
