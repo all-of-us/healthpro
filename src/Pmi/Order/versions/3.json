@@ -65,8 +65,8 @@
         }
     },
     "salivaSamplesInformation": {
-        "1SAL": {
-            "label": "Saliva [1SAL]",
+        "1SAL2": {
+            "label": "Saliva [1SAL2]",
             "temperature": "Refrigerated",
             "specimen": "Saliva"
         }
