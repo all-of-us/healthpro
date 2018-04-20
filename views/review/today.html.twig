@@ -128,7 +128,7 @@
 $(document).ready(function() {
     $('.load-name').each(function() {
         var td = $(this);
-        $.getJSON({{ path('review_participantNameLookup')|json_encode|raw }} + "?id=" + td.data('participant-id'), function(data) {
+        $.getJSON({{ path('review_participantNameLookup', { csrf_token: csrf_token('review'), id: '' })|json_encode|raw }} + td.data('participant-id'), function(data) {
             td.empty();
             if (data && data.lastName && data.firstName) {
                 var a = $('<a>')
@@ -138,6 +138,9 @@ $(document).ready(function() {
             } else {
                 td.text({{ missingName|json_encode|raw }});
             }
+        })
+        .fail(function() {
+            td.html('<em>Error loading name</em>');
         });
     });
 });

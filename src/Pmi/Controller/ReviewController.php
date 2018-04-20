@@ -4,6 +4,7 @@ namespace Pmi\Controller;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 class ReviewController extends AbstractController
 {
@@ -138,14 +139,18 @@ class ReviewController extends AbstractController
 
     public function participantNameLookupAction(Application $app, Request $request)
     {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('review', $request->get('csrf_token')))) {
+            return new JsonResponse(['error' => 'Invalid request'], 403);
+        }
+
         $id = trim($request->query->get('id'));
         if (!$id) {
-            return new JsonResponse(false);
+            return new JsonResponse(null);
         }
 
         $participant = $app['pmi.drc.participants']->getById($id);
         if (!$participant) {
-            return new JsonResponse(false);
+            return new JsonResponse(null);
         }
 
         return new JsonResponse([
