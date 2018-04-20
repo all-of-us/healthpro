@@ -12,6 +12,7 @@ class DashboardController extends AbstractController
 
     protected static $routes = [
         ['home', '/'],
+        ['metrics2_load', '/metrics2_load'],
         ['metrics_load', '/metrics_load'],
         ['metrics_load_region', '/metrics_load_region'],
         ['metrics_load_lifecycle', '/metrics_load_lifecycle'],
@@ -34,19 +35,19 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    public function metrics2_load_realtimeAction(Application $app, Request $request)
+    public function metrics2_loadAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
             return $app->abort(403);
         }
 
         // get request attributes
-        $filter_by = $request->get('stratification');
         $interval = $request->get('interval');
+        $stratification = $request->get('stratification');
         $start_date = $request->get('start_date');
         $end_date = $request->get('end_date');
         $centers = explode(',', $request->get('centers'));
-        $enrollmentStatuses = explode(',', $request->get('enrollment_statuses'));
+        $enrollment_statuses = explode(',', $request->get('enrollment_statuses'));
 
         // set up & sanitize variables
         $start_date = $this->sanitizeDate($start_date);
@@ -56,9 +57,12 @@ class DashboardController extends AbstractController
         $values = [];
         $hover_text = [];
 
-        $metrics = $this->getMetrics2Object($app, start_date, $end_date, $centers, $enrollmentStatuses);
+        $metrics = $this->getMetrics2Object($app, $start_date, $end_date, $stratification, $centers, $enrollment_statuses);
 
+        syslog(LOG_INFO, "\t\tmetrics");
+        syslog(LOG_INFO, $metrics);
 
+        return $app->json($data);
     }
 
     // loads data from metrics API (or cache) to display attributes over time
@@ -656,15 +660,18 @@ class DashboardController extends AbstractController
 
     // Main method for retrieving near-real-time metrics from API
     // stores result in memcache with 15-minute expiration
-    private function getMetrics2Object(Application $app, $start_date, $end_date, $centers, $enrollmentStatuses)
+    private function getMetrics2Object(Application $app, $start_date, $end_date, $stratification, $centers,
+                                       $enrollment_statuses)
     {
+        $centers = implode(",", $centers);
+        $enrollment_statuses = implode(",", $enrollment_statuses);
         $memcache = new \Memcache();
-        $memcacheKey = 'metrics_api_2_' . $start_date . '_' . $end_date . '_' . $centers . '_' . $enrollmentStatuses;
+        $memcacheKey = 'metrics_api_2_' . $start_date . '_' . $end_date . '_' . $stratification . '_' . $centers . '_' . $enrollment_statuses;
         $metrics = $memcache->get($memcacheKey);
         if (!$metrics) {
             try {
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-                $metrics = $metricsApi->metrics2($start_date, $end_date, $centers, $enrollmentStatuses);
+                $metrics = $metricsApi->metrics2($start_date, $end_date, $stratification, $centers, $enrollment_statuses);
                 // first check if there are counts available for the given date
                 if (!$metrics) {
                     return false;

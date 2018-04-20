@@ -23,16 +23,18 @@ class RdrMetrics
         return $responseObject;
     }
 
-    public function metrics2($start_date, $end_date, $stratification, $enrollmentStatus, $awardee)
+    public function metrics2($start_date, $end_date, $stratification, $centers, $enrollment_statuses)
     {
         $client = $this->rdrHelper->getClient();
         $queryString =
-            '?startDate=' . $start_date .
+            '?bucketSize=1' .
+             '&startDate=' . $start_date .
             '&endDate=' . $end_date .
             '&stratification=' . $stratification .
-            '&enrollmentStatus=' . $enrollmentStatus .
-            '&awardee' . $awardee;
-
+            '&awardee' . $centers .
+            '&enrollmentStatus=' . $enrollment_statuses;
+        syslog(LOG_INFO, "\t\tqueryString");
+        syslog(LOG_INFO, $queryString);
         $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime' . $queryString);
         $responseObject = json_decode($response->getBody()->getContents(), True);
         return $responseObject;
