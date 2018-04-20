@@ -23,7 +23,7 @@ class RdrMetrics
         return $responseObject;
     }
 
-    public function participantCountsOverTime($start_date, $end_date, $stratification, $enrollmentStatus, $awardee)
+    public function metrics2($start_date, $end_date, $stratification, $enrollmentStatus, $awardee)
     {
         $client = $this->rdrHelper->getClient();
         $queryString =

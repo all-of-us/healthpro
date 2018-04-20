@@ -34,6 +34,33 @@ class DashboardController extends AbstractController
         ]);
     }
 
+    public function metrics2_load_realtimeAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
+            return $app->abort(403);
+        }
+
+        // get request attributes
+        $filter_by = $request->get('stratification');
+        $interval = $request->get('interval');
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
+        $centers = explode(',', $request->get('centers'));
+        $enrollmentStatuses = explode(',', $request->get('enrollment_statuses'));
+
+        // set up & sanitize variables
+        $start_date = $this->sanitizeDate($start_date);
+        $control_dates = array_reverse($this->getDashboardDates($start_date, $end_date, $interval));
+        $data = [];
+        $dates = [];
+        $values = [];
+        $hover_text = [];
+
+        $metrics = $this->getMetrics2Object($app, start_date, $end_date, $centers, $enrollmentStatuses);
+
+
+    }
+
     // loads data from metrics API (or cache) to display attributes over time
     public function metrics_loadAction(Application $app, Request $request)
     {
@@ -619,6 +646,30 @@ class DashboardController extends AbstractController
                     return false;
                 } else {
                     $memcache->set($memcacheKey, $metrics, 0, 3600);
+                }
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                return false;
+            }
+        }
+        return $metrics;
+    }
+
+    // Main method for retrieving near-real-time metrics from API
+    // stores result in memcache with 15-minute expiration
+    private function getMetrics2Object(Application $app, $start_date, $end_date, $centers, $enrollmentStatuses)
+    {
+        $memcache = new \Memcache();
+        $memcacheKey = 'metrics_api_2_' . $start_date . '_' . $end_date . '_' . $centers . '_' . $enrollmentStatuses;
+        $metrics = $memcache->get($memcacheKey);
+        if (!$metrics) {
+            try {
+                $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+                $metrics = $metricsApi->metrics2($start_date, $end_date, $centers, $enrollmentStatuses);
+                // first check if there are counts available for the given date
+                if (!$metrics) {
+                    return false;
+                } else {
+                    $memcache->set($memcacheKey, $metrics, 0, 900);
                 }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
