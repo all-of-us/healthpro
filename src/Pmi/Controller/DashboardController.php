@@ -59,10 +59,7 @@ class DashboardController extends AbstractController
 
         $metrics = $this->getMetrics2Object($app, $start_date, $end_date, $stratification, $centers, $enrollment_statuses);
 
-        syslog(LOG_INFO, "\t\tmetrics");
-        syslog(LOG_INFO, $metrics);
-
-        return $app->json($data);
+        return $app->json($metrics);
     }
 
     // loads data from metrics API (or cache) to display attributes over time

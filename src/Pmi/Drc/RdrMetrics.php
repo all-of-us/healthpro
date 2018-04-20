@@ -33,8 +33,7 @@ class RdrMetrics
             '&stratification=' . $stratification .
             '&awardee' . $centers .
             '&enrollmentStatus=' . $enrollment_statuses;
-        syslog(LOG_INFO, "\t\tqueryString");
-        syslog(LOG_INFO, $queryString);
+
         $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime' . $queryString);
         $responseObject = json_decode($response->getBody()->getContents(), True);
         return $responseObject;
