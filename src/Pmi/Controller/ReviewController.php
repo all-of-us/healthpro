@@ -26,37 +26,8 @@ class ReviewController extends AbstractController
         'finalized_ts' => 'Finalized'
     ];
 
-    public function todayAction(Application $app, Request $request)
+    protected function getTodayRows($db, $today, $site)
     {
-        $site = $app->getSiteId();
-        if (!$site) {
-            $app->addFlashError('You must select a valid site');
-            return $app->redirectToRoute('home');
-        }
-
-        // Get beginning of today (at midnight) in user's timezone
-        $startString = 'today';
-        // Allow overriding start time to test in non-prod environments
-        if (!$app->isProd() && intval($request->query->get('days')) > 0) {
-            $startString = '-' . intval($request->query->get('days')) . ' days';
-        }
-
-        $startTime = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
-        // Get MySQL date/time string in UTC
-        $startTime->setTimezone(new \DateTimezone('UTC'));
-        $today = $startTime->format('Y-m-d H:i:s');
-
-        $participants = [];
-        $emptyParticipant = [
-            'order' => null,
-            'orderCount' => 0,
-            'orderStatus' => '',
-            'finalizedSamples' => null,
-            'physicalMeasurement' => null,
-            'physicalMeasurementCount' => 0,
-            'physicalMeasurementStatus' => ''
-        ];
-
         $ordersQuery = 'SELECT participant_id, \'order\' as type, id, order_id, created_ts, collected_ts, processed_ts, finalized_ts, finalized_samples, ' .
             'greatest(coalesce(created_ts, 0), coalesce(collected_ts, 0), coalesce(processed_ts, 0), coalesce(finalized_ts, 0)) AS latest_ts ' .
             'FROM orders WHERE ' .
@@ -67,12 +38,26 @@ class ReviewController extends AbstractController
             '(created_ts >= :today OR finalized_ts >= :today) ' .
             'AND (site = :site OR finalized_site = :site)';
         $query = "($ordersQuery) UNION ($measurementsQuery) ORDER BY latest_ts DESC";
-        $rows = $app['db']->fetchAll($query, [
+
+        return $db->fetchAll($query, [
             'today' => $today,
             'site' => $site
         ]);
+    }
 
-        foreach ($rows as $row) {
+    protected function getTodayParticipants($db, $today, $site)
+    {
+        $participants = [];
+        $emptyParticipant = [
+            'order' => null,
+            'orderCount' => 0,
+            'orderStatus' => '',
+            'finalizedSamples' => null,
+            'physicalMeasurement' => null,
+            'physicalMeasurementCount' => 0,
+            'physicalMeasurementStatus' => ''
+        ];
+        foreach ($this->getTodayRows($db, $today, $site) as $row) {
             $participantId = $row['participant_id'];
             if (!array_key_exists($participantId, $participants)) {
                 $participants[$participantId] = $emptyParticipant;
@@ -113,6 +98,30 @@ class ReviewController extends AbstractController
             }
         }
 
+        return $participants;
+    }
+
+    public function todayAction(Application $app, Request $request)
+    {
+        $site = $app->getSiteId();
+        if (!$site) {
+            $app->addFlashError('You must select a valid site');
+            return $app->redirectToRoute('home');
+        }
+
+        // Get beginning of today (at midnight) in user's timezone
+        $startString = 'today';
+        // Allow overriding start time to test in non-prod environments
+        if (!$app->isProd() && intval($request->query->get('days')) > 0) {
+            $startString = '-' . intval($request->query->get('days')) . ' days';
+        }
+        $startTime = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
+        // Get MySQL date/time string in UTC
+        $startTime->setTimezone(new \DateTimezone('UTC'));
+        $today = $startTime->format('Y-m-d H:i:s');
+
+        $participants = $this->getTodayParticipants($app['db'], $today, $site);
+        
         // Preload first 5 names
         $count = 0;
         foreach (array_keys($participants) as $id) {
