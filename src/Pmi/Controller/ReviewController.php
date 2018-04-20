@@ -115,7 +115,7 @@ class ReviewController extends AbstractController
 
         // Preload first 5 names
         $count = 0;
-        foreach ($participants as $id => $participant) {
+        foreach (array_keys($participants) as $id) {
             $participants[$id]['participant'] = $app['pmi.drc.participants']->getById($id);
             if (++$count >= 5) {
                 break;
@@ -146,7 +146,7 @@ class ReviewController extends AbstractController
         ]);
     }
 
-    public function ordersAction(Application $app, Request $request)
+    public function ordersAction(Application $app)
     {
         $site = $app->getSiteId();
         if (!$site) {
@@ -165,7 +165,7 @@ class ReviewController extends AbstractController
         ]);
     }
 
-    public function measurementsAction(Application $app, Request $request)
+    public function measurementsAction(Application $app)
     {
         $site = $app->getSiteId();
         if (!$site) {
