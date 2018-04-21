@@ -317,11 +317,11 @@
                   var showAnnot = $('#real-time-show-annot').is(':checked');
                   var tpWidth = $('#plotly-real-time').width() - 30;
                   if (centers.length == $('#real-time .center-filter').length) {
-                    centers = ['ALL'];
+                    centers = [''];
                   }
 
                   // load data from metrics API
-                  $.getJSON('/dashboard/metrics_load?csrf_token={{ csrf_token('dashboard') }}&metrics_attribute=' + metricAttr + '&interval=' + tpInterval + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate + '&centers=' + centers, function(data) {
+                  $.getJSON('/dashboard/metrics2_load?csrf_token={{ csrf_token('dashboard') }}&stratification=ENROLLMENT_STATUS&interval=' + tpInterval + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate + '&centers=' + centers + '&enrollment_statuses=', function(data) {
                     if (data.length != 0) {
                       var progressAnnot = [];
                       var tpLayout = {
