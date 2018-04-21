@@ -57,7 +57,8 @@ class DashboardController extends AbstractController
         $values = [];
         $hover_text = [];
 
-        $metrics = $this->getMetrics2Object($app, $start_date, $end_date, $stratification, $centers, $enrollment_statuses);
+        $metrics = $this->getMetrics2Object($app, $start_date, $end_date, $stratification, $centers,
+            $enrollment_statuses);
 
         return $app->json($metrics);
     }
