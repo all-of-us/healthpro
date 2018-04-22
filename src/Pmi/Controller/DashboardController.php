@@ -72,6 +72,7 @@ class DashboardController extends AbstractController
         // if we got this far, we have data!
         // assemble data object in Plotly format
         foreach ($trace_names as $trace_name => $value) {
+
             $trace = array(
                 'x' => [],
                 'y' => [],
@@ -95,6 +96,26 @@ class DashboardController extends AbstractController
         foreach($display_values as $name => $display_name) {
             $trace = $traces_obj[$name];
             array_push($data, $trace);
+        }
+
+        // sort alphabetically by trace name, unless looking at enrollment status (then do reverse sort)
+        if ($stratification == 'ENROLLMENT_STATUS') {
+            usort($data, function ($a, $b) {
+                if ($a['name'] == $b['name']) return 0;
+                return ($a['name'] > $b['name']) ? 1 : -1;
+            });
+        } else {
+            usort($data, function ($a, $b) {
+                if ($a['name'] == $b['name']) return 0;
+                return ($a['name'] > $b['name']) ? -1 : 1;
+            });
+        }
+
+        // now apply colors since we're in order
+        for ($i = 0; $i < count($data); $i++) {
+            $data[$i]['marker'] = array(
+                "color" => $this->getColorBrewerVal($i)
+            );
         }
 
         return $app->json($data);
