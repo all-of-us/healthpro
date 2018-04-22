@@ -233,17 +233,6 @@
                         </div>
                         <div class="panel-body">
                             <div class="row form-group-sm">
-                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
-                                    <label for="real-time-metric-attribute">
-                                        Display Metric
-                                        <i class="fa fa-question-circle text-info pull-right" style="cursor: pointer;" id="display-metrics-help"></i>
-                                    </label>
-                                    <select id="real-time-metric-attribute" class="form-control real-time-control">
-                                        {% for metric_key, display_val in metrics_attributes %}
-                                            <option value="{{ metric_key }}">{{ display_val }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
                                 <div class="col-md-6 col-xs-3 form-group form-group-sm">
                                     <label for="real-time-start-date">Start</label>
                                     <input type="text" class="form-control datepicker real-time-time-control" id="real-time-start-date" />
