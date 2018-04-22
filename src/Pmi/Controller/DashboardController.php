@@ -52,13 +52,11 @@ class DashboardController extends AbstractController
         // set up & sanitize variables
         $start_date = $this->sanitizeDate($start_date);
         $control_dates = array_reverse($this->getDashboardDates($start_date, $end_date, $interval));
-        $data = [];
-        $dates = [];
-        $values = [];
-        $hover_text = [];
 
         $day_counts = $this->getMetrics2Object($app, $start_date, $end_date, $stratification, $centers,
             $enrollment_statuses);
+
+//        return $app->json($day_counts);
 
         $display_values = array(
             'FULL_PARTICIPANT' => 'Full Participant',
@@ -72,23 +70,32 @@ class DashboardController extends AbstractController
         // if we got this far, we have data!
         // assemble data object in Plotly format
         foreach ($trace_names as $trace_name => $value) {
-
             $trace = array(
                 'x' => [],
                 'y' => [],
                 'name' => $display_values[$trace_name],
                 'type' => 'bar',
-                'text' => $display_values[$trace_name],
+                'text' => [],
                 'hoverinfo' => 'text+name'
             );
             $traces_obj[$trace_name] = $trace;
         }
 
+
         foreach ($day_counts as $day_count) {
             $date = $day_count['date'];
+
+            $total = 0;
+
             foreach ($trace_names as $trace_name => $value) {
+                $total += $value;
                 array_push($traces_obj[$trace_name]['x'], $date);
                 array_push($traces_obj[$trace_name]['y'], $value);
+            }
+
+            foreach ($trace_names as $trace_name => $value) {
+                $text = $this->calculatePercentText($value, $total) . '<br />' . $date;
+                array_push($traces_obj[$trace_name]['text'], $text);
             }
         }
 
