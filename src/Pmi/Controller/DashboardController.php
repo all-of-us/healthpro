@@ -57,10 +57,41 @@ class DashboardController extends AbstractController
         $values = [];
         $hover_text = [];
 
-        $metrics = $this->getMetrics2Object($app, $start_date, $end_date, $stratification, $centers,
+        $day_counts = $this->getMetrics2Object($app, $start_date, $end_date, $stratification, $centers,
             $enrollment_statuses);
 
-        return $app->json($metrics);
+        $traces_obj = array();
+        $trace_names = $day_counts[0]['metrics'];
+
+        // if we got this far, we have data!
+        // assemble data object in Plotly format
+        foreach ($trace_names as $trace_name => $value) {
+            $trace = array(
+                'x' => [],
+                'y' => [],
+                'name' => $trace_name,
+                'type' => 'bar',
+                'text' => $trace_name,
+                'hoverinfo' => 'text+name'
+            );
+            $traces_obj[$trace_name] = $trace;
+        }
+
+        foreach ($day_counts as $day_count) {
+            $date = $day_count['date'];
+            foreach ($trace_names as $trace_name => $value) {
+                array_push($traces_obj[$trace_name]['x'], $date);
+                array_push($traces_obj[$trace_name]['y'], $value);
+            }
+        }
+
+        $data = [];
+        foreach($traces_obj as $name => $trace) {
+            $trace = $traces_obj[$name];
+            array_push($data, $trace);
+        }
+
+        return $app->json($data);
     }
 
     // loads data from metrics API (or cache) to display attributes over time
