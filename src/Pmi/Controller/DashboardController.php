@@ -60,6 +60,12 @@ class DashboardController extends AbstractController
         $day_counts = $this->getMetrics2Object($app, $start_date, $end_date, $stratification, $centers,
             $enrollment_statuses);
 
+        $display_values = array(
+            'FULL_PARTICIPANT' => 'Full Participant',
+            'MEMBER' => 'Member',
+            'INTERESTED' => 'Registered'
+        );
+
         $traces_obj = array();
         $trace_names = $day_counts[0]['metrics'];
 
@@ -69,9 +75,9 @@ class DashboardController extends AbstractController
             $trace = array(
                 'x' => [],
                 'y' => [],
-                'name' => $trace_name,
+                'name' => $display_values[$trace_name],
                 'type' => 'bar',
-                'text' => $trace_name,
+                'text' => $display_values[$trace_name],
                 'hoverinfo' => 'text+name'
             );
             $traces_obj[$trace_name] = $trace;
@@ -86,7 +92,7 @@ class DashboardController extends AbstractController
         }
 
         $data = [];
-        foreach($traces_obj as $name => $trace) {
+        foreach($display_values as $name => $display_name) {
             $trace = $traces_obj[$name];
             array_push($data, $trace);
         }
