@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Pmi\Service\WithdrawalService;
+use Pmi\Service\EvaluationsQueueService;
 use Pmi\Service\SiteSyncService;
 
 /**
@@ -19,6 +20,7 @@ class CronController extends AbstractController
     protected static $routes = [
         ['pingTest', '/ping-test'],
         ['withdrawal', '/withdrawal'],
+        ['resendEvaluationsToRdr', '/resend-evaluations-rdr'],
         ['sites', '/sites'],
         ['awardeesAndOrganizations', '/awardees-organizations']
     ];
@@ -60,6 +62,16 @@ class CronController extends AbstractController
             error_log('Cron ping test requested by Appengine-Cron');
         }
         
+        return (new JsonResponse())->setData(true);
+    }
+
+    public function resendEvaluationsToRdrAction(Application $app, Request $request)
+    {
+        if (!$this->isAdmin($request)) {
+            throw new AccessDeniedHttpException();
+        }
+        $withdrawal = new EvaluationsQueueService($app);
+        $withdrawal->resendEvaluationsToRdr();
         return (new JsonResponse())->setData(true);
     }
 
