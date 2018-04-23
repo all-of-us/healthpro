@@ -7,5 +7,6 @@ CREATE TABLE `evaluations_queue` (
   `fhir_version` int(11) NULL DEFAULT NULL,
   `queued_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `sent_ts` timestamp NULL DEFAULT NULL,
+  `attempted_ts` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8mb4;
