@@ -24,7 +24,7 @@ class EvaluationsQueueService
     public function resendEvaluationsToRdr()
     {
         $limit = $this->app->getConfig('evaluation_queue_limit');
-        $evaluationsQueue = $this->em->getRepository('evaluations_queue')->fetchBySql("sent_ts is null limit 0, $limit");
+        $evaluationsQueue = $this->em->getRepository('evaluations_queue')->fetchBySql("sent_ts is null and attempted_ts is null limit 0, $limit");
         foreach ($evaluationsQueue as $queue) {
             $evalId = $queue['evaluation_id'];
             $evaluationService = new Evaluation();
@@ -35,10 +35,10 @@ class EvaluationsQueueService
             }
             $evaluationService->loadFromArray($evaluation, $this->app);
             $fhir = $evaluationService->getFhir($evaluation['finalized_ts'], $queue['old_rdr_id']);
+            $now = new \DateTime();
             if ($rdrEvalId = $this->rdr->createEvaluation($evaluation['participant_id'], $fhir)) {
-                $now = new \DateTime();
                 $this->em->getRepository('evaluations')->update($evaluation['id'], ['rdr_id' => $rdrEvalId, 'fhir_version' => Fhir::CURRENT_VERSION]);
-                $this->em->getRepository('evaluations_queue')->update($queue['id'], ['new_rdr_id' => $rdrEvalId, 'fhir_version' => Fhir::CURRENT_VERSION, 'sent_ts' => $now]);
+                $this->em->getRepository('evaluations_queue')->update($queue['id'], ['new_rdr_id' => $rdrEvalId, 'fhir_version' => Fhir::CURRENT_VERSION, 'sent_ts' => $now, 'attempted_ts' => $now]);
                 $this->app->log(Log::QUEUE_RESEND_EVALUATION, [
                     'id' => $queue['id'],
                     'old_rdr_id' => $queue['old_rdr_id'],
@@ -46,6 +46,7 @@ class EvaluationsQueueService
                     'fhir_version' => Fhir::CURRENT_VERSION
                 ]);
             } else {
+                $this->em->getRepository('evaluations_queue')->update($queue['id'], ['attempted_ts' => $now]);
                 syslog(LOG_ERR, "#{$evalId} failed sending to RDR: " .$this->rdr->getLastError());
             }
         }
