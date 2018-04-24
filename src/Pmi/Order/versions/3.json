@@ -52,14 +52,14 @@
         "1CFD9": {
             "number": 7,
             "label": "Cell-Free DNA",
-            "color": "Lavender",
+            "color": "Clear/Blue",
             "temperature": "Refrigerated",
             "specimen": "Cell-Free DNA"
         },
         "1PXR2": {
             "number": 8,
             "label": "Paxgene RNA",
-            "color": "Lavender",
+            "color": "Clear/Red",
             "temperature": "Refrigerated",
             "specimen": "Paxgene RNA"
         }

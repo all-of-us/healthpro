@@ -30,7 +30,7 @@
         "1ED02": {
             "number": 4,
             "label": "2 mL EDTA",
-            "color": "Lavender",
+            "color": "Purple",
             "temperature": "Refrigerated",
             "specimen": "Whole Blood EDTA"
         },
@@ -51,7 +51,7 @@
         "1UR90": {
             "number": 7,
             "label": "Urine 90 mL",
-            "color": "Yellow",
+            "color": "Orange",
             "temperature": "Refrigerated",
             "specimen": "Urine",
             "labelCount": 2
@@ -59,14 +59,14 @@
         "1CFD9": {
             "number": 8,
             "label": "Cell-Free DNA",
-            "color": "Lavender",
+            "color": "Clear/Blue",
             "temperature": "Refrigerated",
             "specimen": "Cell-Free DNA"
         },
         "1PXR2": {
             "number": 9,
             "label": "Paxgene RNA",
-            "color": "Lavender",
+            "color": "Clear/Red",
             "temperature": "Refrigerated",
             "specimen": "Paxgene RNA"
         }
