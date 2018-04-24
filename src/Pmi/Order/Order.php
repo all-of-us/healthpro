@@ -817,7 +817,7 @@ class Order
 
     public function isNonBloodSample($samples)
     {
-        foreach ($samples as $key => $sampleCode) {
+        foreach ($samples as $sampleCode) {
             if (in_array($sampleCode, self::$nonBloodSamples)) {
                 return true;
             }
