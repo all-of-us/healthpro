@@ -268,6 +268,14 @@ label.label-normal {
     );
 }
 
+/* Today's participants */
+#table-today>thead>tr>td, #table-today>thead>tr>th {
+    border-bottom-width: 1px;
+}
+#table-today>tbody>tr>td.td-left-border, #table-today>thead>tr>th.td-left-border {
+    border-left-width: 3px;
+}
+
 /* Orders */
 table.table-samples {
     margin-bottom: 5px;
