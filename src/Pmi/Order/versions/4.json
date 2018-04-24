@@ -61,14 +61,14 @@
             "label": "Cell-Free DNA",
             "color": "Clear/Blue",
             "temperature": "Refrigerated",
-            "specimen": "Cell-Free DNA"
+            "specimen": "PAXgene Blood ccfDNA"
         },
         "1PXR2": {
             "number": 9,
             "label": "Paxgene RNA",
             "color": "Clear/Red",
             "temperature": "Refrigerated",
-            "specimen": "Paxgene RNA"
+            "specimen": "PAXgene Blood RNA"
         }
     },
     "salivaSamplesInformation": {
