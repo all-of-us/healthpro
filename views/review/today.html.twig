@@ -95,7 +95,7 @@
                     </td>
                     <td>
                         {% if participant.order %}
-                            {{ participant.order.order_id }}
+                            <a href="{{ path('order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.order.order_id }}</a>
                         {% endif %}
                     </td>
                     <td>
