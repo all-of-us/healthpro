@@ -51,12 +51,11 @@ class DashboardController extends AbstractController
 
         // set up & sanitize variables
         $start_date = $this->sanitizeDate($start_date);
-        $control_dates = array_reverse($this->getDashboardDates($start_date, $end_date, $interval));
 
-        $day_counts = $this->getMetrics2Object($app, $start_date, $end_date, $stratification, $centers,
-            $enrollment_statuses);
+        $day_counts = $this->getMetrics2Object($app, $interval, $start_date, $end_date,
+            $stratification, $centers, $enrollment_statuses);
 
-//        return $app->json($day_counts);
+        return $app->json($day_counts);
 
         $display_values = array(
             'FULL_PARTICIPANT' => 'Full Participant',
@@ -723,23 +722,42 @@ class DashboardController extends AbstractController
 
     // Main method for retrieving near-real-time metrics from API
     // stores result in memcache with 15-minute expiration
-    private function getMetrics2Object(Application $app, $start_date, $end_date, $stratification, $centers,
+    private function getMetrics2Object(Application $app, $interval, $start_date, $end_date, $stratification, $centers,
                                        $enrollment_statuses)
     {
         $centers = implode(",", $centers);
         $enrollment_statuses = implode(",", $enrollment_statuses);
         $memcache = new \Memcache();
-        $memcacheKey = 'metrics_api_2_' . $start_date . '_' . $end_date . '_' . $stratification . '_' . $centers . '_' . $enrollment_statuses;
+        $memcacheKey = 'metrics_api_2_' . $interval . '_' . $start_date . '_' . $end_date . '_' . $stratification . '_' . $centers . '_' . $enrollment_statuses;
         $metrics = $memcache->get($memcacheKey);
         if (!$metrics) {
             try {
+
+                $metrics = [];
+
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-                $metrics = $metricsApi->metrics2($start_date, $end_date, $stratification, $centers, $enrollment_statuses);
+
+                $date_range_bins = $this->getDateRangeBins($start_date, $end_date, $interval);
+
+                syslog(LOG_INFO, 'date_range_bins');
+                syslog(LOG_INFO, json_encode($date_range_bins));
+
+                for ($i = 0; $i < count($date_range_bins); $i++) {
+                    $bin = $date_range_bins[$i];
+                    $this_start_date = $bin[0];
+                    $this_end_date = $bin[1];
+
+                    $metrics_segment = $metricsApi->metrics2($this_start_date, $this_end_date,
+                        $stratification, $centers, $enrollment_statuses);
+
+                    array_push($metrics, $metrics_segment);
+                }
+
                 // first check if there are counts available for the given date
-                if (!$metrics) {
+                if (count($metrics) == 0) {
                     return false;
                 } else {
-                    $memcache->set($memcacheKey, $metrics, 0, 900);
+                    $memcache->set($memcacheKey, $metrics, 0, 900); // 900 s = 15 min
                 }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
@@ -848,8 +866,8 @@ class DashboardController extends AbstractController
         return strtotime($date) >= strtotime($start) && strtotime($date) <= strtotime($end) && in_array($date, $controls);
     }
 
-    // helper function to return array of dates segmented by interval
-    private function getDashboardDates($start_date, $end_date, $interval)
+    // Sum Metrics API 2 counts by day to counts by other interval (e.g. week, month)
+    private function rollupCountsToDateInterval($start_date, $end_date, $interval, $metrics)
     {
         $dates = [$end_date];
         $i = 0;
@@ -859,6 +877,42 @@ class DashboardController extends AbstractController
             $i++;
         }
         return $dates;
+    }
+
+    // Break up large date ranges segmented by maximum Metrics API 2 range
+    private function getDateRangeBins($start_date, $end_date)
+    {
+        $date_range_bins = [];
+
+        $start = strtotime($start_date);
+        $end = strtotime($end_date);
+        $num_days_in_range = $end - $start;
+
+        // Metrics API 2 processes no more than 100 days of data per request
+        $max_days_for_metrics_api_2 = 100 * (24*60*60);
+
+        $num_bins = ceil($num_days_in_range / $max_days_for_metrics_api_2);
+
+        if ($num_bins == 1) {
+            array_push($date_range_bins, [$start_date, $end_date]);
+        }
+
+        $this_date = $start;
+
+        for ($i = 0; $i < $num_bins; $i++) {
+            syslog(LOG_INFO, 'this_date');
+            syslog(LOG_INFO, $this_date);
+            $this_end_date = $this_date + $max_days_for_metrics_api_2;
+
+            # Convert back to YYYY-MM-DD string format
+            $this_date_str = date('Y-m-d', $this_date);
+            $this_end_date_str = date('Y-m-d', $this_end_date);
+
+            array_push($date_range_bins, [$this_date_str, $this_end_date_str]);
+            $this_date += $max_days_for_metrics_api_2;
+        }
+
+        return $date_range_bins;
     }
 
     // helper function for calculating percentages of total for entries
