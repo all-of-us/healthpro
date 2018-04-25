@@ -73,11 +73,11 @@ class Order
     {
         $file = __DIR__ . "/versions/{$this->version}.json";
         if (!file_exists($file)) {
-            throw new \Pmi\Evaluation\MissingSchemaException();
+            throw new \Exception('Samples version file not found');
         }
         $schema = json_decode(file_get_contents($file), true);
         if (!is_array($schema) && !empty($schema)) {
-            throw new \Pmi\Evaluation\InvalidSchemaException();
+            throw new \Exception('Invalid samples schema');
         }
         $this->samplesInformation = $schema['samplesInformation'];
         $samples = [];
