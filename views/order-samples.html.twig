@@ -34,7 +34,7 @@
 {% if app.getConfig('order_samples_info_' ~ version) is not empty %}
     <div class="{% if global.request.attributes.get('_route') != 'orderCreate' %} col-sm-4 {% else %} col-sm-12 {% endif %}">
         <div class="alert alert-info" role="alert">
-            <strong>Note:</strong> {{ app.getConfig('order_samples_info_' ~ version) }}
+            {{ app.getConfig('order_samples_info_' ~ version)|raw }}
         </div>
     </div>
 {% endif %}

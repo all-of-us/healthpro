@@ -27,7 +27,7 @@ class Order
 
     public $salivaSamplesInformation;
 
-    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL'];
+    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL', '1SAL2'];
 
     public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
 
@@ -56,7 +56,7 @@ class Order
         '1SAL' => 'sal'
     ];
 
-    public static $nonBloodSamples = ['1UR10', '1SAL'];
+    public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2'];
 
     public function __construct($app = null)
     {
@@ -289,8 +289,7 @@ class Order
         } else {
             $samples = $this->getRequestedSamples();
         }
-        $nonBloodSample = count($samples) === 1 && $this->isNonBloodSample($samples);
-        if ($set == 'collected' && !$nonBloodSample) {
+        if ($set == 'collected' && $this->hasBloodSample($samples)) {
             $tsLabel = 'Blood Collection Time';
         }
         $enabledSamples = $this->getEnabledSamples($set);
@@ -815,12 +814,13 @@ class Order
         return empty($this->order['finalized_ts']) && empty($this->order['version']);
     }
 
-    public function isNonBloodSample($samples)
+    public function hasBloodSample($samples)
     {
         foreach ($samples as $sampleCode) {
-            if (in_array($sampleCode, self::$nonBloodSamples)) {
+            if (!in_array($sampleCode, self::$nonBloodSamples)) {
                 return true;
             }
         }
+        return false;
     }
 }
