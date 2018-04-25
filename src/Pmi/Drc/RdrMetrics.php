@@ -36,6 +36,9 @@ class RdrMetrics
 
         $url = 'rdr/v1/ParticipantCountsOverTime' . $queryString;
 
+        syslog(LOG_INFO, 'url');
+        syslog(LOG_INFO, $url);
+
         $response = $client->request('GET', $url);
         $responseObject = json_decode($response->getBody()->getContents(), True);
         return $responseObject;

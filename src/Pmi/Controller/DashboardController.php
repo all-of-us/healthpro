@@ -55,7 +55,7 @@ class DashboardController extends AbstractController
         $day_counts = $this->getMetrics2Object($app, $interval, $start_date, $end_date,
             $stratification, $centers, $enrollment_statuses);
 
-        return $app->json($day_counts);
+//        return $app->json($day_counts);
 
         $display_values = array(
             'FULL_PARTICIPANT' => 'Full Participant',
@@ -733,7 +733,7 @@ class DashboardController extends AbstractController
         if (!$metrics) {
             try {
 
-                $metrics = [];
+                $metrics = array();
 
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
 
@@ -750,8 +750,20 @@ class DashboardController extends AbstractController
                     $metrics_segment = $metricsApi->metrics2($this_start_date, $this_end_date,
                         $stratification, $centers, $enrollment_statuses);
 
-                    array_push($metrics, $metrics_segment);
+
+                    syslog(LOG_INFO, 'gettype(metrics_segment)');
+                    syslog(LOG_INFO, gettype($metrics_segment));
+
+                    syslog(LOG_INFO, 'metrics_segment');
+                    syslog(LOG_INFO, json_encode($metrics_segment));
+                    $metrics += $metrics_segment;
                 }
+
+                syslog(LOG_INFO, 'metrics');
+                syslog(LOG_INFO, json_encode($metrics));
+
+                syslog(LOG_INFO, 'count(metrics)');
+                syslog(LOG_INFO, count($metrics));
 
                 // first check if there are counts available for the given date
                 if (count($metrics) == 0) {
@@ -763,6 +775,8 @@ class DashboardController extends AbstractController
                 return false;
             }
         }
+        syslog(LOG_INFO, 'metrics');
+        syslog(LOG_INFO, json_encode($metrics));
         return $metrics;
     }
 
@@ -879,6 +893,19 @@ class DashboardController extends AbstractController
         return $dates;
     }
 
+    // Sum Metrics API 2 counts by day to counts by other interval (e.g. week, month)
+    private function getDashboardDates($start_date, $end_date, $interval)
+    {
+        $dates = [$end_date];
+        $i = 0;
+        while (strtotime($dates[$i]) >= strtotime($start_date)) {
+            $d = strtotime("-1 $interval", strtotime($dates[$i]));
+            array_push($dates, date('Y-m-d', $d));
+            $i++;
+        }
+        return $dates;
+    }
+
     // Break up large date ranges segmented by maximum Metrics API 2 range
     private function getDateRangeBins($start_date, $end_date)
     {
@@ -895,6 +922,7 @@ class DashboardController extends AbstractController
 
         if ($num_bins == 1) {
             array_push($date_range_bins, [$start_date, $end_date]);
+            return $date_range_bins;
         }
 
         $this_date = $start;
