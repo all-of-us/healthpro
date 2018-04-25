@@ -34,7 +34,9 @@ class RdrMetrics
             '&awardee' . $centers .
             '&enrollmentStatus=' . $enrollment_statuses;
 
-        $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime' . $queryString);
+        $url = 'rdr/v1/ParticipantCountsOverTime' . $queryString;
+
+        $response = $client->request('GET', $url);
         $responseObject = json_decode($response->getBody()->getContents(), True);
         return $responseObject;
     }
