@@ -1,0 +1,67 @@
+{
+    "version": "2",
+    "notes": "Biobank 2.0 samples",
+    "samplesInformation": {
+        "1SS08": {
+            "number": 1,
+            "label": "8 mL SST",
+            "color": "Red and gray",
+            "temperature": "Refrigerated",
+            "specimen": "Serum SST",
+            "code": "1SSTP",
+            "prompt": "SST Centrifuge Type"
+        },
+        "1PS08": {
+            "number": 2,
+            "label": "8 mL PST",
+            "color": "Green and gray",
+            "temperature": "Refrigerated",
+            "specimen": "Plasma PST",
+            "code": "1PSTP",
+            "prompt": "PST Centrifuge Type"
+        },
+        "1HEP4": {
+            "number": 3,
+            "label": "4 mL Na-Hep",
+            "color": "Green",
+            "temperature": "Refrigerated",
+            "specimen": "WB Sodium Heparin"
+        },
+        "1ED04": {
+            "number": 4,
+            "label": "4 mL EDTA",
+            "color": "Lavender",
+            "temperature": "Refrigerated",
+            "specimen": "Whole Blood EDTA"
+        },
+        "1ED10": {
+            "number": 5,
+            "label": "1st 10 mL EDTA",
+            "color": "Lavender",
+            "temperature": "Refrigerated",
+            "specimen": "Whole Blood EDTA"
+        },
+        "2ED10": {
+            "number": 6,
+            "label": "2nd 10 mL EDTA",
+            "color": "Lavender",
+            "temperature": "Refrigerated",
+            "specimen": "Whole Blood EDTA"
+        },
+        "1UR10": {
+            "number": 7,
+            "label": "Urine 10 mL",
+            "color": "Yellow",
+            "temperature": "Refrigerated",
+            "specimen": "Urine",
+            "labelCount": 2
+        }
+    },
+    "salivaSamplesInformation": {
+        "1SAL": {
+            "label": "Saliva [1SAL]",
+            "temperature": "Refrigerated",
+            "specimen": "Saliva"
+        }
+    }
+}
