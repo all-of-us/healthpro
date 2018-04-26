@@ -408,11 +408,13 @@
                                     </dl>
                                     <div class="text-center">
                                         {% for field, label in samples %}
-                                            {% if attribute(samplesAlias[0], field) is defined  and attribute(participant, 'sampleStatus' ~ attribute(samplesAlias[0], field)) == 'RECEIVED' %}
-                                                {% set field = attribute(samplesAlias[0], field) %}
-                                            {% elseif attribute(samplesAlias[1], field) is defined and attribute(participant, 'sampleStatus' ~ attribute(samplesAlias[1], field)) == 'RECEIVED' %}
-                                                {% set field = attribute(samplesAlias[1], field) %}
-                                            {% endif %}
+                                            {% set break = false %}
+                                            {% for sampleAlias in samplesAlias if not break %}
+                                                {% if attribute(sampleAlias, field) is defined  and attribute(participant, 'sampleStatus' ~ attribute(sampleAlias, field)) == 'RECEIVED' %}
+                                                    {% set field = attribute(sampleAlias, field) %}
+                                                    {% set break = true %}
+                                                {% endif %}
+                                            {% endfor %}
                                             <div class="participant-detail-status">
                                                 <strong>{{ label }}</strong>
                                                 {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
