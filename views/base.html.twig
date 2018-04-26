@@ -27,6 +27,7 @@
                     {% if is_granted('ROLE_USER') and app.session.get('site') %}
                         <li><a href="{{ path('participants') }}">Participant Lookup</a></li>
                         <li><a href="{{ path('orders') }}">Biobank Order Lookup</a></li>
+                        <li><a href="{{ path('review_today') }}">Participant Review</a></li>
                         {% if app.siteOrganization %}
                             <li><a href="{{ path('workqueue_index') }}">Work Queue</a></li>
                         {% endif %}
