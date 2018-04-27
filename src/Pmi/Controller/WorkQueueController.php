@@ -356,7 +356,7 @@ class WorkQueueController extends AbstractController
                         ];                   
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsTime, $app->getUserTimezone());
+                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone());
                     $row[] = $participant->siteSuffix;
                     $row[] = $participant->organization;
                     $row[] = $participant->evaluationFinalizedSite;
