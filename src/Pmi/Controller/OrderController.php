@@ -179,7 +179,6 @@ class OrderController extends AbstractController
             'samplesInfo' => $order->samplesInformation,
             'showBloodTubes' => $showBloodTubes,
             'version' => $order->version,
-            'samplesCount' => count($order->samples),
             'salivaInstructions' => $order->salivaInstructions,
         ]);
     }
