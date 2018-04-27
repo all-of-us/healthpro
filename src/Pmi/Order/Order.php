@@ -27,6 +27,8 @@ class Order
 
     public $salivaSamplesInformation;
 
+    public $salivaInstructions;
+
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL', '1SAL2'];
 
     public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
@@ -93,6 +95,8 @@ class Order
             $salivaSamples[$info['label']] = $salivaSample;
         }
         $this->salivaSamples = $salivaSamples;
+
+        $this->salivaInstructions = $schema['salivaInstructions'];
     }
 
     public function loadOrder($participantId, $orderId)

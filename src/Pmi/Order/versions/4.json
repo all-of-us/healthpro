@@ -77,5 +77,6 @@
             "temperature": "Refrigerated",
             "specimen": "Saliva"
         }
-    }
+    },
+    "salivaInstructions": "Order a saliva biospecimen only if the participant is unable to provide both the 4 mL EDTA tube and the 10 mL EDTA tube."
 }
