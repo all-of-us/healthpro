@@ -63,5 +63,6 @@
             "temperature": "Refrigerated",
             "specimen": "Saliva"
         }
-    }
+    },
+    "salivaInstructions": "Order a saliva biospecimen only if the participant is unable to provide any of the three EDTA blood tubes."
 }
