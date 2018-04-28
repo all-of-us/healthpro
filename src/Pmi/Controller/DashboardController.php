@@ -46,8 +46,8 @@ class DashboardController extends AbstractController
         $stratification = $request->get('stratification');
         $start_date = $request->get('start_date');
         $end_date = $request->get('end_date');
-        $centers = explode(',', $request->get('centers'));
-        $enrollment_statuses = explode(',', $request->get('enrollment_statuses'));
+        $centers = $request->get('centers');
+        $enrollment_statuses = $request->get('enrollment_statuses');
 
         // set up & sanitize variables
         $start_date = $this->sanitizeDate($start_date);
@@ -725,8 +725,6 @@ class DashboardController extends AbstractController
     private function getMetrics2Object(Application $app, $interval, $start_date, $end_date, $stratification, $centers,
                                        $enrollment_statuses)
     {
-        $centers = implode(",", $centers);
-        $enrollment_statuses = implode(",", $enrollment_statuses);
         $memcache = new \Memcache();
         $memcacheKey = 'metrics_api_2_' . $interval . '_' . $start_date . '_' . $end_date . '_' . $stratification . '_' . $centers . '_' . $enrollment_statuses;
         $metrics = $memcache->get($memcacheKey);
