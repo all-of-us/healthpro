@@ -51,6 +51,7 @@ class DashboardController extends AbstractController
 
         // set up & sanitize variables
         $start_date = $this->sanitizeDate($start_date);
+        $end_date = $this->sanitizeDate($end_date);
 
         $day_counts = $this->getMetrics2Object($app, $interval, $start_date, $end_date,
             $stratification, $centers, $enrollment_statuses);
