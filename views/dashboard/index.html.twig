@@ -223,7 +223,7 @@
                 });
             </script>
         </div>
-        <div id="real-time" class="tab-pane pad active fade">
+        <div id="real-time" class="tab-pane pad fade">
             <div class="row">
                 <div id="real-time-filters" class="col-md-3">
                     {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'real-time'} %}
@@ -375,12 +375,10 @@
               var lastWeekStr = new Date(lastWeek).toISOString().split('T')[0];
               $('#real-time-end-date').val(nowString);
               $('#real-time-start-date').val(lastWeekStr);
-              renderRealTimePlot('modal');
-              PLOTS_SHOWN['real-time-nav'] = true;
 
               // load plot on tab show (to save loading time)
               $('#real-time-nav').on('shown.bs.tab', function (e) {
-                console.log('Showing total progress charts');
+                console.log('Showing real-time data charts');
                 // if plot has not been shown yet, render and then store state
                 // this will prevent points render calls once map has been initialized
                 if (!PLOTS_SHOWN['real-time-nav']) {
