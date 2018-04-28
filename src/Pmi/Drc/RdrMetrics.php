@@ -31,7 +31,7 @@ class RdrMetrics
              '&startDate=' . $start_date .
             '&endDate=' . $end_date .
             '&stratification=' . $stratification .
-            '&awardee' . $centers .
+            '&awardee=' . $centers .
             '&enrollmentStatus=' . $enrollment_statuses;
 
         $url = 'rdr/v1/ParticipantCountsOverTime' . $queryString;
