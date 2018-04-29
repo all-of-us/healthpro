@@ -744,7 +744,7 @@ class DashboardController extends AbstractController
                                        $enrollment_statuses)
     {
         $memcache = new \Memcache();
-        $memcacheKey = 'metrics_api_2_' . $interval . '_' . $start_date . '_' . $end_date . '_' . $stratification . '_' . $centers . '_' . $enrollment_statuses;
+        $memcacheKey = 'metrics_api_2_' . $start_date . '_' . $end_date . '_' . $stratification . '_' . $centers . '_' . $enrollment_statuses;
         $metrics = $memcache->get($memcacheKey);
         if (!$metrics) {
             try {
