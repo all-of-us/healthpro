@@ -65,6 +65,7 @@ class DashboardController extends AbstractController
         );
 
         $traces_obj = array();
+        $interval_counts = array();
         $trace_names = $day_counts[0]['metrics'];
 
         // if we got this far, we have data!
@@ -79,15 +80,31 @@ class DashboardController extends AbstractController
                 'hoverinfo' => 'text+name'
             );
             $traces_obj[$trace_name] = $trace;
+
         }
 
+        $control_dates = array_reverse($this->getDashboardDates($start_date, $end_date, $interval));
 
-        foreach ($day_counts as $day_count) {
-            $date = $day_count['date'];
+        if ($interval == 'DAY') {
+            $interval_counts = $day_counts;
+        } else {
+            foreach ($control_dates as $control_date) {
+                foreach ($day_counts as $day_count) {
+                    $date = $day_count['date'];
+                    if ($control_date == $date) {
+                        array_push($interval_counts, $day_count);
+                    }
+                }
+            }
+        }
+
+        foreach ($interval_counts as $interval_count) {
+            $date = $interval_count['date'];
+            $traces = $interval_count['metrics'];
 
             $total = 0;
 
-            foreach ($trace_names as $trace_name => $value) {
+            foreach ($traces as $trace_name => $value) {
                 $total += $value;
                 array_push($traces_obj[$trace_name]['x'], $date);
                 array_push($traces_obj[$trace_name]['y'], $value);
@@ -731,15 +748,9 @@ class DashboardController extends AbstractController
         $metrics = $memcache->get($memcacheKey);
         if (!$metrics) {
             try {
-
                 $metrics = array();
-
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-
                 $date_range_bins = $this->getDateRangeBins($start_date, $end_date, $interval);
-
-                syslog(LOG_INFO, 'date_range_bins');
-                syslog(LOG_INFO, json_encode($date_range_bins));
 
                 for ($i = 0; $i < count($date_range_bins); $i++) {
                     $bin = $date_range_bins[$i];
@@ -749,20 +760,8 @@ class DashboardController extends AbstractController
                     $metrics_segment = $metricsApi->metrics2($this_start_date, $this_end_date,
                         $stratification, $centers, $enrollment_statuses);
 
-
-                    syslog(LOG_INFO, 'gettype(metrics_segment)');
-                    syslog(LOG_INFO, gettype($metrics_segment));
-
-                    syslog(LOG_INFO, 'metrics_segment');
-                    syslog(LOG_INFO, json_encode($metrics_segment));
                     $metrics += $metrics_segment;
                 }
-
-                syslog(LOG_INFO, 'metrics');
-                syslog(LOG_INFO, json_encode($metrics));
-
-                syslog(LOG_INFO, 'count(metrics)');
-                syslog(LOG_INFO, count($metrics));
 
                 // first check if there are counts available for the given date
                 if (count($metrics) == 0) {
@@ -774,8 +773,6 @@ class DashboardController extends AbstractController
                 return false;
             }
         }
-        syslog(LOG_INFO, 'metrics');
-        syslog(LOG_INFO, json_encode($metrics));
         return $metrics;
     }
 
@@ -879,20 +876,7 @@ class DashboardController extends AbstractController
         return strtotime($date) >= strtotime($start) && strtotime($date) <= strtotime($end) && in_array($date, $controls);
     }
 
-    // Sum Metrics API 2 counts by day to counts by other interval (e.g. week, month)
-    private function rollupCountsToDateInterval($start_date, $end_date, $interval, $metrics)
-    {
-        $dates = [$end_date];
-        $i = 0;
-        while (strtotime($dates[$i]) >= strtotime($start_date)) {
-            $d = strtotime("-1 $interval", strtotime($dates[$i]));
-            array_push($dates, date('Y-m-d', $d));
-            $i++;
-        }
-        return $dates;
-    }
-
-    // Sum Metrics API 2 counts by day to counts by other interval (e.g. week, month)
+    // helper function to return array of dates segmented by interval
     private function getDashboardDates($start_date, $end_date, $interval)
     {
         $dates = [$end_date];
