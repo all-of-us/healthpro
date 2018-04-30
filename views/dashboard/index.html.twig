@@ -111,7 +111,6 @@
                             launchSpinner(spinnerLoc);
                             $('#loading-modal').modal('show');
                         }
-                        console.log('calling renderTotalProgressPlot()');
 
                         // gather params
                         var metricAttr = $('#total-progress-metric-attribute').val();
@@ -167,10 +166,8 @@
                                 // set toggle traces switch to on, regardless of previous state
                                 $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
 
-                                console.log('renderTotalProgressPlot() complete');
                             } else {
                                 setMetricsError(spinnerLoc);
-                                console.log('error in renderTotalProgressPlot()');
                             }
 
                         });
@@ -192,7 +189,6 @@
 
                 // load plot on tab show (to save loading time)
                 $('#total-progress-nav').on('shown.bs.tab', function (e) {
-                    console.log('Showing total progress charts');
                     // if plot has not been shown yet, render and then store state
                     // this will prevent points render calls once map has been initialized
                     if (!PLOTS_SHOWN['total-progress-nav']) {
@@ -304,7 +300,6 @@
                     launchSpinner(spinnerLoc);
                     $('#loading-modal').modal('show');
                   }
-                  console.log('calling renderRealTimePlot()');
 
                   // gather params
                   var tpInterval = $('#real-time-interval').val();
@@ -359,10 +354,8 @@
                       // set toggle traces switch to on, regardless of previous state
                       $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
 
-                      console.log('renderRealTimePlot() complete');
                     } else {
                       setMetricsError(spinnerLoc);
-                      console.log('error in renderRealTimePlot()');
                     }
 
                   });
@@ -382,7 +375,6 @@
 
               // load plot on tab show (to save loading time)
               $('#real-time-nav').on('shown.bs.tab', function (e) {
-                console.log('Showing real-time data charts');
                 // if plot has not been shown yet, render and then store state
                 // this will prevent points render calls once map has been initialized
                 if (!PLOTS_SHOWN['real-time-nav']) {
@@ -483,7 +475,6 @@
                             launchSpinner(spinnerLoc);
                             $('#loading-modal').modal('show');
                         }
-                        console.log('calling renderMapPlot()');
                         // gather params
                         var mapWidth = $('#plotly-participants-by-region').width() - 30;
                         var mapCutoff = $('#region-plot-end-date').val();
@@ -530,10 +521,8 @@
                                     $('#loading-modal').modal('hide');
                                 }
 
-                                console.log('renderMapPlot() complete');
                             } else {
                                 setMetricsError(spinnerLoc);
-                                console.log('error in renderMapPlot()');
                             }
                         });
                     }
@@ -544,7 +533,6 @@
 
                 // load plot on tab show (to save loading time)
                 $('#participants-by-region-nav').on('shown.bs.tab', function (e) {
-                    console.log('Showing region plots');
                     // if plot has not been shown yet, render and then store state
                     // this will prevent points render calls once map has been initialized
                     if (!PLOTS_SHOWN['participants-by-region-nav']) {
@@ -629,7 +617,6 @@
                             launchSpinner(spinnerLoc);
                             $('#loading-modal').modal('show');
                         }
-                        console.log('calling renderLcPlot()');
                         var lcEndDate = $('#lifecycle-end-date').val();
                         var lcShowAnnot = $('#lifecycle-plot-show-annot').is(':checked');
 
@@ -678,10 +665,8 @@
                                 if (dialogType == 'modal') {
                                     $('#loading-modal').modal('hide');
                                 }
-                                console.log('renderLcPlot() complete');
                             } else {
                                 setMetricsError(spinnerLoc);
-                                console.log('error in renderLcPlot()');
                             }
                         });
                     }
@@ -693,7 +678,6 @@
 
                 // load plot on tab show (to save loading time)
                 $('#participants-by-lifecycle-nav').on('shown.bs.tab', function (e) {
-                    console.log('Showing lifecycle plot');
                     // if plot has not been shown yet, render and then store state
                     // this will prevent points render calls once map has been initialized
                     if (!PLOTS_SHOWN['participants-by-lifecycle-nav']) {

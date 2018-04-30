@@ -911,8 +911,6 @@ class DashboardController extends AbstractController
         $this_date = $start;
 
         for ($i = 0; $i < $num_bins; $i++) {
-            syslog(LOG_INFO, 'this_date');
-            syslog(LOG_INFO, $this_date);
             $this_end_date = $this_date + $max_days_for_metrics_api_2;
 
             # Convert back to YYYY-MM-DD string format
