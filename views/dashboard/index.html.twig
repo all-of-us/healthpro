@@ -289,6 +289,7 @@
                   return false;
                 }
                 var centers = loadRecruitmentFilters('real-time');
+                var enrollmentStatuses = loadEnrollmentFilters('real-time');
                 if (centers.length == 0) {
                   alert('You must select at least one recruitment center to plot results.');
                   return false;
@@ -306,7 +307,6 @@
                   console.log('calling renderRealTimePlot()');
 
                   // gather params
-                  var metricAttr = $('#real-time-metric-attribute').val();
                   var tpInterval = $('#real-time-interval').val();
                   var metricTitle = $('#real-time-metric-attribute option:selected').text();
                   var showAnnot = $('#real-time-show-annot').is(':checked');
@@ -316,7 +316,7 @@
                   }
 
                   // load data from metrics API
-                  $.getJSON('/dashboard/metrics2_load?csrf_token={{ csrf_token('dashboard') }}&stratification=ENROLLMENT_STATUS&interval=' + tpInterval + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate + '&centers=' + centers + '&enrollment_statuses=', function(data) {
+                  $.getJSON('/dashboard/metrics2_load?csrf_token={{ csrf_token('dashboard') }}&stratification=ENROLLMENT_STATUS&interval=' + tpInterval + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate + '&centers=' + centers + '&enrollment_statuses=' + enrollmentStatuses, function(data) {
                     if (data.length != 0) {
                       var progressAnnot = [];
                       var tpLayout = {

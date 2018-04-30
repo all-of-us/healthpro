@@ -126,6 +126,16 @@ function loadRecruitmentFilters(id) {
     return centers;
 }
 
+// collect all checked enrollment status filters
+// TODO: When Metrics API 2 supports more filters, abstract this code
+function loadEnrollmentFilters(id) {
+  var enrollmentStatuses = [];
+  $('#' + id).find('.enrollment-status-filter:checked').each(function() {
+    enrollmentStatuses.push($(this).val());
+  });
+  return enrollmentStatuses;
+}
+
 // generic error handler for when metrics API doesn't respond with valid results
 function setMetricsError(div) {
     stopSpinner(div);
