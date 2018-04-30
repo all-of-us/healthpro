@@ -110,7 +110,7 @@ class DashboardController extends AbstractController
                 array_push($traces_obj[$trace_name]['y'], $value);
             }
 
-            foreach ($trace_names as $trace_name => $value) {
+            foreach ($traces as $trace_name => $value) {
                 $text = $this->calculatePercentText($value, $total) . '<br />' . $date;
                 array_push($traces_obj[$trace_name]['text'], $text);
             }
