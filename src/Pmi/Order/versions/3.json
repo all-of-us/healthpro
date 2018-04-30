@@ -7,7 +7,7 @@
             "label": "8 mL SST",
             "color": "Red and gray",
             "temperature": "Refrigerated",
-            "specimen": "Serum SST",
+            "specimen": "PMI SST",
             "code": "1SSTP",
             "prompt": "SST Centrifuge Type"
         },
@@ -16,7 +16,7 @@
             "label": "8 mL PST",
             "color": "Green and gray",
             "temperature": "Refrigerated",
-            "specimen": "Plasma PST",
+            "specimen": "PMI PST",
             "code": "1PSTP",
             "prompt": "PST Centrifuge Type"
         },
@@ -25,28 +25,28 @@
             "label": "4 mL Na-Hep",
             "color": "Green",
             "temperature": "Refrigerated",
-            "specimen": "WB Sodium Heparin"
+            "specimen": "PMI NaHep"
         },
         "1ED04": {
             "number": 4,
             "label": "4 mL EDTA",
             "color": "Lavender",
             "temperature": "Refrigerated",
-            "specimen": "Whole Blood EDTA"
+            "specimen": "PMI EDTA 4ML"
         },
         "1ED10": {
             "number": 5,
             "label": "10 mL EDTA",
             "color": "Lavender",
             "temperature": "Refrigerated",
-            "specimen": "Whole Blood EDTA"
+            "specimen": "PMI EDTA 10ml - 1"
         },
         "1UR10": {
             "number": 6,
             "label": "Urine 10 mL",
             "color": "Yellow",
             "temperature": "Refrigerated",
-            "specimen": "Urine",
+            "specimen": "PMI Urine",
             "labelCount": 2
         },
         "1CFD9": {
@@ -54,21 +54,21 @@
             "label": "Cell-Free DNA",
             "color": "Clear/Blue",
             "temperature": "Refrigerated",
-            "specimen": "PAXgene Blood ccfDNA"
+            "specimen": "PMI Cell-Free DNA"
         },
         "1PXR2": {
             "number": 8,
             "label": "Paxgene RNA",
             "color": "Clear/Red",
             "temperature": "Refrigerated",
-            "specimen": "PAXgene Blood RNA"
+            "specimen": "PMI Paxgene RNA"
         }
     },
     "salivaSamplesInformation": {
         "1SAL2": {
             "label": "Saliva [1SAL2]",
             "temperature": "Refrigerated",
-            "specimen": "Saliva"
+            "specimen": "PMI Saliva, FDA Kit"
         }
     },
     "salivaInstructions": "Order a saliva biospecimen only if the participant is unable to provide both the 4 mL EDTA tube and the 10 mL EDTA tube."
