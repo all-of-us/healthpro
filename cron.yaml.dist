@@ -7,6 +7,10 @@ cron:
   url: /cron/withdrawal
   schedule: every day 07:00
   timezone: America/Chicago
+- description: "Resend evaluations to RDR"
+  url: /cron/resend-evaluations-rdr
+  schedule: 29 of feb 00:00
+  timezone: America/Chicago
 - description: "Datastore normal-Kind backup"
   url: /_ah/datastore_admin/backup.create?name=dsNormalBackup&filesystem=gs&gs_bucket_name={BUCKET_PREFIX}-ds-backups&kind=Configuration
   schedule: every day 04:00

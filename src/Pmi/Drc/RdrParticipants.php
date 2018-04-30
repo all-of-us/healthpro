@@ -56,6 +56,10 @@ class RdrParticipants
             }
         }
 
+        if (isset($params['email'])) {
+            $query['email'] = strtolower($params['email']);
+        }
+
         return $query;
     }
 

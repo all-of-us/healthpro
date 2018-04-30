@@ -371,8 +371,15 @@ class OrderController extends AbstractController
             }
             if ($processForm->isValid()) {
                 $updateArray = $order->getOrderUpdateFromForm('processed', $processForm);
-                if (!$order->get('processed_ts')) {
-                    $updateArray['processed_ts'] = new \DateTime();
+                $updateArray['processed_ts'] = empty($order->get('processed_ts')) ? new \DateTime() : $order->get('processed_ts');
+                // Set processed_ts to the most recent processed sample time if exists
+                if (!empty($updateArray['processed_samples_ts'])) {
+                    $processedSamplesTs = json_decode($updateArray['processed_samples_ts'], true);
+                    if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
+                        $processedTs = new \DateTime();
+                        $processedTs->setTimestamp(max($processedSamplesTs));
+                        $updateArray['processed_ts'] = $processedTs;
+                    }
                 }
                 $updateArray['processed_user_id'] = $app->getUser()->getId();
                 $updateArray['processed_site'] = $app->getSiteId();
