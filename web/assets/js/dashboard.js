@@ -136,9 +136,14 @@ function loadEnrollmentFilters(id) {
 }
 
 // generic error handler for when metrics API doesn't respond with valid results
-function setMetricsError(div) {
+function setMetricsError(div, message) {
     stopSpinner(div);
-    $("#" + div).html("<p class='lead text-danger text-center'>Metrics currently unavailable - either there is an error retrieving data or you requested dates/centers for which no data exists.<br/><br/>Please try again later.</p>");
+    if (typeof message === 'undefined') {
+        message = "<p class='lead text-danger text-center'>Metrics currently unavailable - either there is an error retrieving data or you requested dates/centers for which no data exists.<br/><br/>Please try again later.</p>";
+    } else {
+        message = "<p class='lead text-danger text-center'>" + message + "</p>";
+    }
+    $("#" + div).html(message);
 }
 
 // function to toggle all traces in a Plotly div

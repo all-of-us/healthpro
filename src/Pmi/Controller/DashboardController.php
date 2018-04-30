@@ -53,6 +53,18 @@ class DashboardController extends AbstractController
         $start_date = $this->sanitizeDate($start_date);
         $end_date = $this->sanitizeDate($end_date);
 
+        $seconds_range = strtotime($end_date) - strtotime($start_date);
+        if ($seconds_range > 100 * 24 * 60 * 60) { // 100 days in seconds
+            // TODO: Sending a 400 (status for HTTP Bad Request error)
+            // renders an HTML.  It'd be nice to be able to specify an HTTP
+            // error and send an error message in JSON.
+            //return $app->abort(400, 'Please select a date range less than 100 days');
+
+            return $app->json(array(
+                'error' => 'Please select a date range less than 100 days'
+            ));
+        }
+
         $day_counts = $this->getMetrics2Object($app, $interval, $start_date, $end_date,
             $stratification, $centers, $enrollment_statuses);
 

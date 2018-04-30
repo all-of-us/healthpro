@@ -312,7 +312,7 @@
 
                   // load data from metrics API
                   $.getJSON('/dashboard/metrics2_load?csrf_token={{ csrf_token('dashboard') }}&stratification=ENROLLMENT_STATUS&interval=' + tpInterval + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate + '&centers=' + centers + '&enrollment_statuses=' + enrollmentStatuses, function(data) {
-                    if (data.length != 0) {
+                    if (data.length != 0 && 'error' in data === false) {
                       var progressAnnot = [];
                       var tpLayout = {
                         title: 'Count of <b>enrollment status</b> by date',
@@ -355,7 +355,11 @@
                       $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
 
                     } else {
-                      setMetricsError(spinnerLoc);
+                      if (data.length === 0) {
+                        setMetricsError(spinnerLoc);
+                      } else {
+                        setMetricsError(spinnerLoc, data.error);
+                      }
                     }
 
                   });
