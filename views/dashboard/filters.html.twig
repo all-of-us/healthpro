@@ -11,6 +11,22 @@
                    <div class="row">
                         <div class="col-xs-12">
                             <p class="text-center"><a href="javascript:;" class="redraw-plotly btn btn-primary"><span class="fa fa-filter"></span> Filter Results</a></p>
+                            {% if id == 'real-time' %}
+                            <hr class="divider" />
+                            <h4>Enrollment Status <a href="javascript:;" class="toggle-all-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
+                            <!-- TODO: After more facets are supported in Metrics API 2, use passed values instead of hard-coding -->
+                            <ul class="list-group enrollment-status-filters">
+                                <li class="list-group-item">
+                                    <label><input type="checkbox" name="enrollment_statuses[]" value="INTERESTED" class="enrollment-status-filter" checked> Registered</label>
+                                </li>
+                                <li class="list-group-item">
+                                    <label><input type="checkbox" name="enrollment_statuses[]" value="MEMBER" class="enrollment-status-filter" checked> Member</label>
+                                </li>
+                                <li class="list-group-item">
+                                    <label><input type="checkbox" name="enrollment_statuses[]" value="FULL_PARTICIPANT" class="enrollment-status-filter" checked> Full participant</label>
+                                </li>
+                            </ul>
+                            {% endif %}
                             <hr class="divider" />
                             <h4>Recruitment Origin <a href="javascript:;" class="toggle-all-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
                             {% for group, centers in recruitment_centers %}
