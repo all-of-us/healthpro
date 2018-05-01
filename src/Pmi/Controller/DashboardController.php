@@ -12,6 +12,7 @@ class DashboardController extends AbstractController
 
     protected static $routes = [
         ['home', '/'],
+        ['metrics2_load', '/metrics2_load'],
         ['metrics_load', '/metrics_load'],
         ['metrics_load_region', '/metrics_load_region'],
         ['metrics_load_lifecycle', '/metrics_load_lifecycle'],
@@ -32,6 +33,123 @@ class DashboardController extends AbstractController
             'metrics_attributes' => $metrics_attributes,
             'recruitment_centers' => $recruitment_centers
         ]);
+    }
+
+    public function metrics2_loadAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
+            return $app->abort(403);
+        }
+
+        // get request attributes
+        $interval = $request->get('interval');
+        $stratification = $request->get('stratification');
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
+        $centers = $request->get('centers');
+        $enrollment_statuses = $request->get('enrollment_statuses');
+
+        // set up & sanitize variables
+        $start_date = $this->sanitizeDate($start_date);
+        $end_date = $this->sanitizeDate($end_date);
+
+        $seconds_range = strtotime($end_date) - strtotime($start_date);
+        if ($seconds_range > 100 * 24 * 60 * 60) { // 100 days in seconds
+            return $app->json(array(
+                'error' => 'Please select a date range less than 100 days'
+            ), 400);
+        }
+
+        $day_counts = $this->getMetrics2Object($app, $interval, $start_date, $end_date,
+            $stratification, $centers, $enrollment_statuses);
+
+//        return $app->json($day_counts);
+
+        $display_values = array(
+            'FULL_PARTICIPANT' => 'Full Participant',
+            'MEMBER' => 'Member',
+            'INTERESTED' => 'Registered'
+        );
+
+        $traces_obj = array();
+        $interval_counts = array();
+        $trace_names = $day_counts[0]['metrics'];
+
+        // if we got this far, we have data!
+        // assemble data object in Plotly format
+        foreach ($trace_names as $trace_name => $value) {
+            $trace = array(
+                'x' => [],
+                'y' => [],
+                'name' => $display_values[$trace_name],
+                'type' => 'bar',
+                'text' => [],
+                'hoverinfo' => 'text+name'
+            );
+            $traces_obj[$trace_name] = $trace;
+
+        }
+
+        $control_dates = array_reverse($this->getDashboardDates($start_date, $end_date, $interval));
+
+        if ($interval == 'DAY') {
+            $interval_counts = $day_counts;
+        } else {
+            foreach ($control_dates as $control_date) {
+                foreach ($day_counts as $day_count) {
+                    $date = $day_count['date'];
+                    if ($control_date == $date) {
+                        array_push($interval_counts, $day_count);
+                    }
+                }
+            }
+        }
+
+        foreach ($interval_counts as $interval_count) {
+            $date = $interval_count['date'];
+            $traces = $interval_count['metrics'];
+
+            $total = 0;
+
+            foreach ($traces as $trace_name => $value) {
+                $total += $value;
+                array_push($traces_obj[$trace_name]['x'], $date);
+                array_push($traces_obj[$trace_name]['y'], $value);
+            }
+
+            foreach ($traces as $trace_name => $value) {
+                $text = $this->calculatePercentText($value, $total) . '<br />' . $date;
+                array_push($traces_obj[$trace_name]['text'], $text);
+            }
+        }
+
+        $data = [];
+        foreach($display_values as $name => $display_name) {
+            $trace = $traces_obj[$name];
+            array_push($data, $trace);
+        }
+
+        // sort alphabetically by trace name, unless looking at enrollment status (then do reverse sort)
+        if ($stratification == 'ENROLLMENT_STATUS') {
+            usort($data, function ($a, $b) {
+                if ($a['name'] == $b['name']) return 0;
+                return ($a['name'] > $b['name']) ? 1 : -1;
+            });
+        } else {
+            usort($data, function ($a, $b) {
+                if ($a['name'] == $b['name']) return 0;
+                return ($a['name'] > $b['name']) ? -1 : 1;
+            });
+        }
+
+        // now apply colors since we're in order
+        for ($i = 0; $i < count($data); $i++) {
+            $data[$i]['marker'] = array(
+                "color" => $this->getColorBrewerVal($i)
+            );
+        }
+
+        return $app->json($data);
     }
 
     // loads data from metrics API (or cache) to display attributes over time
@@ -627,6 +745,44 @@ class DashboardController extends AbstractController
         return $metrics;
     }
 
+    // Main method for retrieving near-real-time metrics from API
+    // stores result in memcache with 15-minute expiration
+    private function getMetrics2Object(Application $app, $interval, $start_date, $end_date, $stratification, $centers,
+                                       $enrollment_statuses)
+    {
+        $memcache = new \Memcache();
+        $memcacheKey = 'metrics_api_2_' . $start_date . '_' . $end_date . '_' . $stratification . '_' . $centers . '_' . $enrollment_statuses;
+        $metrics = $memcache->get($memcacheKey);
+        if (!$metrics) {
+            try {
+                $metrics = array();
+                $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+                $date_range_bins = $this->getDateRangeBins($start_date, $end_date, $interval);
+
+                for ($i = 0; $i < count($date_range_bins); $i++) {
+                    $bin = $date_range_bins[$i];
+                    $this_start_date = $bin[0];
+                    $this_end_date = $bin[1];
+
+                    $metrics_segment = $metricsApi->metrics2($this_start_date, $this_end_date,
+                        $stratification, $centers, $enrollment_statuses);
+
+                    $metrics += $metrics_segment;
+                }
+
+                // first check if there are counts available for the given date
+                if (count($metrics) == 0) {
+                    return false;
+                } else {
+                    $memcache->set($memcacheKey, $metrics, 0, 900); // 900 s = 15 min
+                }
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                return false;
+            }
+        }
+        return $metrics;
+    }
+
     // stores and returns field definitions as controlled vocabulary
     // can return either values for specified field_key or all keys present
     private function getMetricsFieldDefinitions(Application $app, $field_key)
@@ -738,6 +894,41 @@ class DashboardController extends AbstractController
             $i++;
         }
         return $dates;
+    }
+
+    // Break up large date ranges segmented by maximum Metrics API 2 range
+    private function getDateRangeBins($start_date, $end_date)
+    {
+        $date_range_bins = [];
+
+        $start = strtotime($start_date);
+        $end = strtotime($end_date);
+        $num_days_in_range = $end - $start;
+
+        // Metrics API 2 processes no more than 100 days of data per request
+        $max_days_for_metrics_api_2 = 100 * (24*60*60);
+
+        $num_bins = ceil($num_days_in_range / $max_days_for_metrics_api_2);
+
+        if ($num_bins == 1) {
+            array_push($date_range_bins, [$start_date, $end_date]);
+            return $date_range_bins;
+        }
+
+        $this_date = $start;
+
+        for ($i = 0; $i < $num_bins; $i++) {
+            $this_end_date = $this_date + $max_days_for_metrics_api_2;
+
+            # Convert back to YYYY-MM-DD string format
+            $this_date_str = date('Y-m-d', $this_date);
+            $this_end_date_str = date('Y-m-d', $this_end_date);
+
+            array_push($date_range_bins, [$this_date_str, $this_end_date_str]);
+            $this_date += $max_days_for_metrics_api_2;
+        }
+
+        return $date_range_bins;
     }
 
     // helper function for calculating percentages of total for entries

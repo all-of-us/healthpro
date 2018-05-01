@@ -321,7 +321,7 @@ class AdminController extends AbstractController
                 }
                 $fhir = $evaluationService->getFhir($evaluation['finalized_ts'], $parentRdrId);
                 if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($evaluation['participant_id'], $fhir)) {
-                    $repository->update($evaluation['id'], ['rdr_id' => $rdrEvalId]);
+                    $repository->update($evaluation['id'], ['rdr_id' => $rdrEvalId, 'fhir_version' => \Pmi\Evaluation\Fhir::CURRENT_VERSION]);
                     $app->addFlashSuccess("#{$id} successfully sent to RDR");
                 } else {
                     $app->addFlashError("#{$id} failed sending to RDR: " . $app['pmi.drc.participants']->getLastError());
