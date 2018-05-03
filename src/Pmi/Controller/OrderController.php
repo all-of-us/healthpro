@@ -259,20 +259,9 @@ class OrderController extends AbstractController
             if ($order->get('finalized_ts') || $order->isOrderExpired()) {
                 $app->abort(403);
             }
-
-            // Throw error if no samples are selected when sending an order
-            if ($request->request->has('send') && empty($collectForm['collected_samples']->getData())) {
-                $collectForm['collected_samples']->addError(new FormError('Please select at least one sample'));
-            }
-
             if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
-            }
-            
-            // Throw error if collected_ts is empty when sending an order
-            if ($request->request->has('send') && empty($collectForm['collected_ts']->getData())) {
-                $collectForm['collected_ts']->addError(new FormError('Collected time is required to send order'));
             }
 
             $orderData = $order->toArray();
@@ -291,29 +280,8 @@ class OrderController extends AbstractController
                         $app->log(Log::ORDER_EDIT, $orderId);
                         $successMsg = 'Order collection updated';
                     }
-                    // Send order to mayo
-                    if ($orderData['type'] !== 'kit' && $request->request->has('send')){
-                        $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app);
-                        if (!empty($mayoId)) {
-                            if ($app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId])) {
-                                $app->log(Log::ORDER_EDIT, $orderId);
-                                $order = $this->loadOrder($participantId, $orderId, $app);
-                                $successMsg = 'Order collection updated and successfully sent';
-                                // Redirect to print requisition
-                                if ($order->get('type') !== 'kit') {
-                                    $app->addFlashNotice($successMsg);
-                                    return $app->redirectToRoute('orderPrintRequisition', [
-                                        'participantId' => $participantId,
-                                        'orderId' => $orderId
-                                    ]);
-                                }
-                            }
-                        } else {
-                            $errorMsg = 'Failed to send order';
-                        }
-                    }
                 } else {
-                    // Save collected time and notes
+                    // Save collected time and notes only
                     $collectedAt = $collectForm['collected_ts']->getData();
                     $notes = $collectForm['collected_notes']->getData();
                      if ($app['em']->getRepository('orders')->update($orderId, ['collected_ts' => $collectedAt, 'collected_notes' => $notes])) {
@@ -462,16 +430,16 @@ class OrderController extends AbstractController
                 if ($order->get('type') === 'kit') {
                     unset($updateArray['finalized_ts']);
                 }
-                // For DV sites finalized time will not be saved at this point
+                // Finalized time will not be saved at this point
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                 }
-                //Send order to mayo for DV kit orders
+                //Send order to mayo
                 $orderData = $order->toArray();
-                if (empty($orderData['mayo_id']) && $orderData['type'] === 'kit' && !empty($finalizeForm['finalized_ts']->getData())) {
+                if (empty($orderData['mayo_id']) && !empty($finalizeForm['finalized_ts']->getData())) {
                     $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
                     if (!empty($mayoId)) {
-                        //Save finalized time
+                        //Save mayo id and finalized time
                         $newUpdateArray = [
                             'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
                             'mayo_id' => $mayoId
@@ -514,7 +482,7 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id'))) {
             $app->abort(403);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
@@ -600,7 +568,7 @@ class OrderController extends AbstractController
     public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id'))) {
             $app->abort(403);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
