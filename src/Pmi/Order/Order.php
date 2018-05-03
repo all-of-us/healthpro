@@ -55,7 +55,8 @@ class Order
         '1SS08' => 'sst',
         '1PST8' => 'pst',
         '1PS08' => 'pst',
-        '1SAL' => 'sal'
+        '1SAL' => 'sal',
+        '1SAL2' => 'sal'
     ];
 
     public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2'];
