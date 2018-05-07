@@ -41,27 +41,27 @@
             "temperature": "Refrigerated",
             "specimen": "PMI EDTA 10ml - 1"
         },
-        "1UR10": {
-            "number": 6,
-            "label": "Urine 10 mL",
-            "color": "Yellow",
-            "temperature": "Refrigerated",
-            "specimen": "PMI Urine",
-            "labelCount": 2
-        },
         "1CFD9": {
-            "number": 7,
+            "number": 6,
             "label": "Cell-Free DNA",
             "color": "Clear/Blue",
             "temperature": "Refrigerated",
             "specimen": "PMI Cell-Free DNA"
         },
         "1PXR2": {
-            "number": 8,
+            "number": 7,
             "label": "Paxgene RNA",
             "color": "Clear/Red",
             "temperature": "Refrigerated",
             "specimen": "PMI Paxgene RNA"
+        },
+        "1UR10": {
+            "number": 8,
+            "label": "Urine 10 mL",
+            "color": "Yellow",
+            "temperature": "Refrigerated",
+            "specimen": "PMI Urine",
+            "labelCount": 2
         }
     },
     "salivaSamplesInformation": {
