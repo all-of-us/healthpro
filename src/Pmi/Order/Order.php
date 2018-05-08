@@ -55,7 +55,8 @@ class Order
         '1SS08' => 'sst',
         '1PST8' => 'pst',
         '1PS08' => 'pst',
-        '1SAL' => 'sal'
+        '1SAL' => 'sal',
+        '1SAL2' => 'sal'
     ];
 
     public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2'];
@@ -155,16 +156,12 @@ class Order
 
     public function getCurrentStep()
     {
-        //Return collect step if collected_ts is set and mayo_id is empty
-        if ($this->order["collected_ts"] && !$this->order["mayo_id"]) {
-            return 'collect';
-        }
         $columns = [
             'printLabels' => 'printed',
             'collect' => 'collected',
-            'printRequisition' => 'collected',
             'process' => 'processed',
-            'finalize' => 'finalized'           
+            'finalize' => 'finalized',
+            'printRequisition' => 'finalized'        
         ];
         if ($this->order['type'] === 'kit') {
             unset($columns['printLabels']);
@@ -185,9 +182,9 @@ class Order
         $columns = [
             'printLabels' => 'printed',
             'collect' => 'collected',
-            'printRequisition' => 'collected',
             'process' => 'processed',
-            'finalize' => 'finalized'
+            'finalize' => 'finalized',
+            'printRequisition' => 'finalized'
         ];
         if ($this->order['type'] === 'kit') {
             unset($columns['printLabels']);
@@ -196,12 +193,7 @@ class Order
         $steps = [];
         foreach ($columns as $name => $column) {
             $steps[] = $name;
-            if ($column === 'collected' && $this->order['type'] !== 'kit') {
-                $condition = $this->order["{$column}_ts"] && $this->order["mayo_id"];
-            } else {
-                $condition = $this->order["{$column}_ts"];
-            }
-            if (!$condition) {
+            if (!$this->order["{$column}_ts"]) {
                 break;
             }
         }
