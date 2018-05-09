@@ -362,14 +362,16 @@ class WorkQueueController extends AbstractController
                     $row[] = $participant->evaluationFinalizedSite;
                     $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                     $row[] = $participant->numBaselineSamplesArrived;
-                    foreach (WorkQueue::$samples as $sample => $label) {
-                        if (array_key_exists($sample, WorkQueue::$samplesAlias[0]) && $participant->{"sampleStatus".WorkQueue::$samplesAlias[0][$sample].""} == 'RECEIVED') {
-                            $sample = WorkQueue::$samplesAlias[0][$sample];
-                        } elseif (array_key_exists($sample, WorkQueue::$samplesAlias[1]) && $participant->{"sampleStatus".WorkQueue::$samplesAlias[1][$sample].""} == 'RECEIVED') {
-                            $sample = WorkQueue::$samplesAlias[1][$sample];
+                    foreach (array_keys(WorkQueue::$samples) as $sample) {
+                        $newSample = $sample;
+                        foreach (WorkQueue::$samplesAlias as $sampleAlias) {
+                            if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} == 'RECEIVED') {
+                                $newSample = $sampleAlias[$sample];
+                                break;
+                            }
                         }
-                        $row[] = $participant->{"sampleStatus{$sample}"} == 'RECEIVED' ? '1' : '0';
-                        $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$sample}Time"}, $app->getUserTimezone());
+                        $row[] = $participant->{"sampleStatus{$newSample}"} == 'RECEIVED' ? '1' : '0';
+                        $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $app->getUserTimezone());
                     }
                     $row[] = $participant->orderCreatedSite;
                     fputcsv($output, $row);

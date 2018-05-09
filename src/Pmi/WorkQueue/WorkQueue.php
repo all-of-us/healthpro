@@ -217,6 +217,9 @@ class WorkQueue
         [
             '1SST8' => '2SST8',
             '1PST8' => '2PST8'
+        ],
+        [
+            '1SAL' => '1SAL2'
         ]
     ];
 
@@ -298,10 +301,11 @@ class WorkQueue
             }
             foreach (array_keys(self::$samples) as $sample) {
                 $newSample = $sample;
-                if (array_key_exists($sample, self::$samplesAlias[0]) && $participant->{"sampleStatus" . self::$samplesAlias[0][$sample]} == 'RECEIVED') {
-                    $newSample = self::$samplesAlias[0][$sample];
-                } elseif (array_key_exists($sample, self::$samplesAlias[1]) && $participant->{"sampleStatus" . self::$samplesAlias[1][$sample]} == 'RECEIVED') {
-                    $newSample = self::$samplesAlias[1][$sample];
+                foreach (self::$samplesAlias as $sampleAlias) {
+                    if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} == 'RECEIVED') {
+                        $newSample = $sampleAlias[$sample];
+                        break;
+                    }
                 }
                 $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED');
                 if (!empty($participant->{'sampleStatus' . $newSample . 'Time'})) {

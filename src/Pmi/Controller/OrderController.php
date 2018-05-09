@@ -32,8 +32,8 @@ class OrderController extends AbstractController
 
     protected function loadOrder($participantId, $orderId, Application $app)
     {
-        $order = new Order();
-        $order->loadOrder($participantId, $orderId, $app);
+        $order = new Order($app);
+        $order->loadOrder($participantId, $orderId);
         if (!$order->isValid()) {
             $app->abort(404);
         }
@@ -109,12 +109,13 @@ class OrderController extends AbstractController
                 ]
             ]);
         }
+        $order = new Order($app);
         if (!$app->isDVType() && $showBloodTubes) {
             $formBuilder->add('samples', Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Select requested samples',
-                'choices' => Order::${'samples' . Order::$version},
+                'choices' => $order->samples,
                 'required' => false
             ]);
         }
@@ -155,7 +156,7 @@ class OrderController extends AbstractController
                 $orderData['participant_id'] = $participant->id;
                 $orderData['biobank_id'] = $participant->biobankId;
                 $orderData['created_ts'] = new \DateTime();
-                $orderData['version'] = Order::$version;
+                $orderData['version'] = $order->version;
                 if (!$app->isDVType()) {
                     $orderData['processed_centrifuge_type'] = Order::SWINGING_BUCKET;
                 }
@@ -175,8 +176,10 @@ class OrderController extends AbstractController
             'participant' => $participant,
             'confirmForm' => $confirmForm->createView(),
             'showCustom' => $showCustom,
-            'samplesInfo' => Order::$samplesInformation,
-            'showBloodTubes' => $showBloodTubes
+            'samplesInfo' => $order->samplesInformation,
+            'showBloodTubes' => $showBloodTubes,
+            'version' => $order->version,
+            'salivaInstructions' => $order->salivaInstructions,
         ]);
     }
 
@@ -336,7 +339,8 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'collectForm' => $collectForm->createView(),
-            'samplesInfo' => Order::$samplesInformation,
+            'samplesInfo' => $order->samplesInformation,
+            'version' => $order->version,
             'processTabClass' => $order->getProcessTabClass()
         ]);
     }
@@ -410,7 +414,8 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'processForm' => $processForm->createView(),
-            'samplesInfo' => Order::$samplesInformation,
+            'samplesInfo' => $order->samplesInformation,
+            'version' => $order->version,
             'processTabClass' => $order->getProcessTabClass()
         ]);
     }
@@ -499,7 +504,8 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'finalizeForm' => $finalizeForm->createView(),
-            'samplesInfo' => Order::$samplesInformation,
+            'samplesInfo' => $order->samplesInformation,
+            'version' => $order->version,
             'hasErrors' => $hasErrors,
             'processTabClass' => $order->getProcessTabClass()
         ]);
@@ -646,7 +652,9 @@ class OrderController extends AbstractController
                 'collected_at' => $collectedAt->format('c'),
                 'mayoClientId' => $mayoClientId,
                 'requested_samples' => $orderData['requested_samples'],
-                'version' => $orderData['version']
+                'version' => $orderData['version'],
+                'tests' => $order->samplesInformation,
+                'salivaTests' => $order->salivaSamplesInformation
             ];
             $pdf = $mlOrder->getLabelsPdf($options);
             return $pdf;
@@ -683,7 +691,9 @@ class OrderController extends AbstractController
                 'mayoClientId' => $mayoClientId,
                 'collected_samples' => $orderData["{$type}_samples"],
                 'centrifugeType' => $orderData['processed_centrifuge_type'],
-                'version' => $orderData['version']
+                'version' => $orderData['version'],
+                'tests' => $order->samplesInformation,
+                'salivaTests' => $order->salivaSamplesInformation
             ];
             $mayoOrder = new MayolinkOrder($app);
             $mayoId = $mayoOrder->createOrder($options);
