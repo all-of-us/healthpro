@@ -34,6 +34,7 @@ class Log
     const PROBLEM_EDIT = 'PROBLEM_EDIT';
     const PROBLEM_COMMENT_CREATE = 'PROBLEM_COMMENT_CREATE';
     const PROBLEM_NOTIFIY = 'PROBLEM_NOTIFIY';
+    const QUEUE_RESEND_EVALUATION = 'QUEUE_RESEND_EVALUATION';
 
     public function __construct($app, $action, $data)
     {

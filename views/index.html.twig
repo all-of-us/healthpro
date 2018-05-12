@@ -11,6 +11,9 @@
             <div class="col-sm-6 col-md-4">
                 <a href="{{ path('orders') }}" class="btn btn-lg btn-default btn-block"><i class="fa fa-medkit" aria-hidden="true"></i> Order Lookup</a>
             </div>
+            <div class="col-sm-6 col-md-4">
+                <a href="{{ path('review_today') }}" class="btn btn-lg btn-default btn-block"><i class="fa fa-list" aria-hidden="true"></i> Participant Review</a>
+            </div>
         {% endif %}
         {% if (is_granted('ROLE_USER') and app.session.get('site') and app.siteOrganization) or (is_granted('ROLE_AWARDEE') and app.session.get('awardee') and app.awardeeOrganization) %}
             <div class="col-sm-6 col-md-4">

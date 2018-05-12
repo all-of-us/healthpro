@@ -17,7 +17,7 @@
                 {% if order.type == 'saliva' %}
                     {{ form_widget(processForm.processed_samples) }}
                 {% else %}
-                    {{ samples.form_widget(processForm.processed_samples, false, samplesInfo) }}
+                    {{ samples.form_widget(processForm.processed_samples, false, samplesInfo, version) }}
                 {% endif %}
                 {{ form_errors(processForm.processed_samples) }}
             </div>

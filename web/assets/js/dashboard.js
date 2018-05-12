@@ -41,7 +41,6 @@ $(window).resize(function() {
     if(this.resizeTO) clearTimeout(this.resizeTO);
     this.resizeTO = setTimeout(function() {
         $(this).trigger('resizeEnd');
-        console.log('resizeEnd');
     }, 100);
 });
 
@@ -126,10 +125,25 @@ function loadRecruitmentFilters(id) {
     return centers;
 }
 
+// collect all checked enrollment status filters
+// TODO: When Metrics API 2 supports more filters, abstract this code
+function loadEnrollmentFilters(id) {
+  var enrollmentStatuses = [];
+  $('#' + id).find('.enrollment-status-filter:checked').each(function() {
+    enrollmentStatuses.push($(this).val());
+  });
+  return enrollmentStatuses;
+}
+
 // generic error handler for when metrics API doesn't respond with valid results
-function setMetricsError(div) {
+function setMetricsError(div, message) {
     stopSpinner(div);
-    $("#" + div).html("<p class='lead text-danger text-center'>Metrics currently unavailable - either there is an error retrieving data or you requested dates/centers for which no data exists.<br/><br/>Please try again later.</p>");
+    if (typeof message === 'undefined') {
+        message = "<p class='lead text-danger text-center'>Metrics currently unavailable - either there is an error retrieving data or you requested dates/centers for which no data exists.<br/><br/>Please try again later.</p>";
+    } else {
+        message = "<p class='lead text-danger text-center'>" + message + "</p>";
+    }
+    $("#" + div).html(message);
 }
 
 // function to toggle all traces in a Plotly div

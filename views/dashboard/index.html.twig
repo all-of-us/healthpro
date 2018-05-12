@@ -17,6 +17,7 @@
     <br />
     <ul class="nav nav-tabs top-pad" role="tablist">
         <li role="presentation" class="active"><a href="#total-progress" role="tab" data-toggle="tab" id="total-progress-nav"><span class="fa fa-users"></span> Total Progress to Date</a></li>
+        <li role="presentation"><a href="#real-time" role="tab" data-toggle="tab" id="real-time-nav"><span class="fa fa-clock-o"></span> Real-Time Data</a></li>
         <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab" id="participants-by-region-nav"><span class="fa fa-globe"></span> Full Participants by Region</a></li>
         <li role="presentation"><a href="#participants-by-lifecycle" role="tab" data-toggle="tab" id="participants-by-lifecycle-nav"><span class="fa fa-sitemap"></span> Participants by Lifecycle Phase</a></li>
     </ul>
@@ -83,6 +84,8 @@
                 </div>
             </div>
             <script type="text/javascript">
+                // TODO: Move this code into dashboard.js
+
                 // function to grab current filter values and load JSON from load_map_data REST endpoint
                 // success handler calls Plotly.newplot()
                 function renderTotalProgressPlot(dialogType) {
@@ -108,7 +111,6 @@
                             launchSpinner(spinnerLoc);
                             $('#loading-modal').modal('show');
                         }
-                        console.log('calling renderTotalProgressPlot()');
 
                         // gather params
                         var metricAttr = $('#total-progress-metric-attribute').val();
@@ -164,10 +166,8 @@
                                 // set toggle traces switch to on, regardless of previous state
                                 $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
 
-                                console.log('renderTotalProgressPlot() complete');
                             } else {
                                 setMetricsError(spinnerLoc);
-                                console.log('error in renderTotalProgressPlot()');
                             }
 
                         });
@@ -189,7 +189,6 @@
 
                 // load plot on tab show (to save loading time)
                 $('#total-progress-nav').on('shown.bs.tab', function (e) {
-                    console.log('Showing total progress charts');
                     // if plot has not been shown yet, render and then store state
                     // this will prevent points render calls once map has been initialized
                     if (!PLOTS_SHOWN['total-progress-nav']) {
@@ -218,6 +217,193 @@
                 $('#total-progress').find('.redraw-plotly').on('click', function() {
                     renderTotalProgressPlot('spinner');
                 });
+            </script>
+        </div>
+        <div id="real-time" class="tab-pane pad fade">
+            <div class="row">
+                <div id="real-time-filters" class="col-md-3">
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'real-time'} %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <h4 class="text-primary">Plot Options</h4>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row form-group-sm">
+                                <div class="col-md-6 col-xs-3 form-group form-group-sm">
+                                    <label for="real-time-start-date">Start</label>
+                                    <input type="text" class="form-control datepicker real-time-time-control" id="real-time-start-date" />
+                                </div>
+                                <div class="col-md-6 col-xs-3 form-group form-group-sm">
+                                    <label for="real-time-end-date">Cutoff</label>
+                                    <input type="text" class="form-control datepicker real-time-time-control" id="real-time-end-date" />
+                                </div>
+                                <div class="col-md-12 col-xs-3 form-group form-group-sm">
+                                    <label for="real-time-interval">Interval</label>
+                                    <select id="real-time-interval" class="form-control real-time-control">
+                                        <option value="DAY">Days</option>
+                                        <option value="WEEK">Weeks</option>
+                                        <option value="MONTH">Months</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12 col-xs-12 form-group form-group-sm">
+                                    <label>Show Column Totals <input type="checkbox" id="real-time-show-annot" class="real-time-control"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <span><i>Latency < 1 hour</i></span>
+                    <i class="fa fa-info-circle text-info" style="cursor: pointer; margin-left: 0.3em" id="real-time-data-help"></i>
+                </div>
+                <div id="plotly-real-time" class="col-md-9 plotly-div"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="text-center">Raw Data</h4>
+                    <div class="table-responsive">
+                        <div id="real-time-table"></div>
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+              // function to grab current filter values and load JSON from load_map_data REST endpoint
+              // success handler calls Plotly.newplot()
+              function renderRealTimePlot(dialogType) {
+                // throw error if date selection is invalid
+                var tpStartDate = $('#real-time-start-date').val();
+                var tpEndDate = $('#real-time-end-date').val();
+                if ( new Date(tpStartDate) > new Date(tpEndDate)) {
+                  alert('Your date selection is invalid: The selected cutoff date of ' + tpEndDate + ' is before ' + tpStartDate + '. Please select a valid date range.');
+                  return false;
+                }
+                var centers = loadRecruitmentFilters('real-time');
+                var enrollmentStatuses = loadEnrollmentFilters('real-time');
+                if (centers.length == 0) {
+                  alert('You must select at least one recruitment center to plot results.');
+                  return false;
+                } else {
+                  var spinnerLoc = 'plotly-real-time';
+                  if (dialogType == 'spinner') {
+                    launchSpinner(spinnerLoc);
+                  } else if (dialogType == 'modal' ) {
+                    spinnerLoc = 'modal-spinner-target';
+                    // empty target in case there was an error message beforehand
+                    $('#' + spinnerLoc).empty();
+                    launchSpinner(spinnerLoc);
+                    $('#loading-modal').modal('show');
+                  }
+
+                  // gather params
+                  var tpInterval = $('#real-time-interval').val();
+                  var metricTitle = $('#real-time-metric-attribute option:selected').text();
+                  var showAnnot = $('#real-time-show-annot').is(':checked');
+                  var tpWidth = $('#plotly-real-time').width() - 30;
+                  if (centers.length == $('#real-time .center-filter').length) {
+                    centers = [''];
+                  }
+
+                  // load data from metrics API
+                  $.getJSON('/dashboard/metrics2_load?csrf_token={{ csrf_token('dashboard') }}&stratification=ENROLLMENT_STATUS&interval=' + tpInterval + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate + '&centers=' + centers + '&enrollment_statuses=' + enrollmentStatuses, function(data) {
+                    if (data.length != 0) {
+                      var progressAnnot = [];
+                      var tpLayout = {
+                        title: 'Count of <b>enrollment status</b> by date',
+                        font: PLOTLY_LABEL_FONT,
+                        barmode: 'stack',
+                        width: tpWidth,
+                        height: tpWidth / 1.66,
+                        hovermode: 'closest',
+                        annotations: progressAnnot,
+                        yaxis: {
+                          fixedrange: true
+                        },
+                        xaxis : {
+                          fixedrange: true
+                        }
+                      };
+
+                      // load column totals if requested
+                      if (showAnnot) {
+                        loadBarChartAnnotations(data, progressAnnot);
+                      }
+
+                      // load table data
+                      var tpTable = $('#real-time-table');
+                      loadTableData(tpTable, data, metricTitle);
+
+                      // empty div contents in case there had been an error message before
+                      $('#' + spinnerLoc).empty();
+
+                      // render plot, remove plotly link and stop spinner
+                      Plotly.newPlot('plotly-real-time', data, tpLayout, PLOTLY_OPTS);
+                      removePlotlyLink('plotly-real-time');
+                      stopSpinner(spinnerLoc);
+
+                      if (dialogType == 'modal' ) {
+                        $('#loading-modal').modal('hide');
+                      }
+
+                      // set toggle traces switch to on, regardless of previous state
+                      $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
+
+                    } else {
+                      if (data.length === 0) {
+                        setMetricsError(spinnerLoc);
+                      }
+                    }
+
+                  })
+                    .error(function(jqXHR) {
+                      setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
+                    });
+                }
+              }
+
+              $('#toggle-traces').click(function() {
+                togglePlotlyTraces('plotly-real-time');
+              });
+
+              var now = new Date();
+              var nowString = now.toISOString().split('T')[0];
+              var lastWeek = new Date().setDate(now.getDate() - 6);
+              var lastWeekStr = new Date(lastWeek).toISOString().split('T')[0];
+              $('#real-time-end-date').val(nowString);
+              $('#real-time-start-date').val(lastWeekStr);
+
+              // load plot on tab show (to save loading time)
+              $('#real-time-nav').on('shown.bs.tab', function (e) {
+                // if plot has not been shown yet, render and then store state
+                // this will prevent points render calls once map has been initialized
+                if (!PLOTS_SHOWN['real-time-nav']) {
+                  renderRealTimePlot('spinner');
+                  PLOTS_SHOWN['real-time-nav'] = true;
+                }
+              });
+
+              // re-render on filter change
+              $('.real-time-control').change(function() {
+                renderRealTimePlot('spinner');
+              });
+
+              // re-render on time filter change with modal (may need new metrics)
+              $('.real-time-time-control').change(function() {
+                renderRealTimePlot('modal');
+              });
+
+              // re-render on window resizeEnd if tab is visible
+              $( window ).on('resizeEnd', function() {
+                if ($('#real-time').is(':visible')) {
+                  renderRealTimePlot('');
+                }
+              });
+
+              $('#real-time').find('.redraw-plotly').click(function() {
+                renderRealTimePlot('spinner');
+              });
             </script>
         </div>
         <div id="participants-by-region" class="tab-pane pad fade">
@@ -290,7 +476,6 @@
                             launchSpinner(spinnerLoc);
                             $('#loading-modal').modal('show');
                         }
-                        console.log('calling renderMapPlot()');
                         // gather params
                         var mapWidth = $('#plotly-participants-by-region').width() - 30;
                         var mapCutoff = $('#region-plot-end-date').val();
@@ -337,10 +522,8 @@
                                     $('#loading-modal').modal('hide');
                                 }
 
-                                console.log('renderMapPlot() complete');
                             } else {
                                 setMetricsError(spinnerLoc);
-                                console.log('error in renderMapPlot()');
                             }
                         });
                     }
@@ -351,7 +534,6 @@
 
                 // load plot on tab show (to save loading time)
                 $('#participants-by-region-nav').on('shown.bs.tab', function (e) {
-                    console.log('Showing region plots');
                     // if plot has not been shown yet, render and then store state
                     // this will prevent points render calls once map has been initialized
                     if (!PLOTS_SHOWN['participants-by-region-nav']) {
@@ -436,7 +618,6 @@
                             launchSpinner(spinnerLoc);
                             $('#loading-modal').modal('show');
                         }
-                        console.log('calling renderLcPlot()');
                         var lcEndDate = $('#lifecycle-end-date').val();
                         var lcShowAnnot = $('#lifecycle-plot-show-annot').is(':checked');
 
@@ -485,10 +666,8 @@
                                 if (dialogType == 'modal') {
                                     $('#loading-modal').modal('hide');
                                 }
-                                console.log('renderLcPlot() complete');
                             } else {
                                 setMetricsError(spinnerLoc);
-                                console.log('error in renderLcPlot()');
                             }
                         });
                     }
@@ -500,7 +679,6 @@
 
                 // load plot on tab show (to save loading time)
                 $('#participants-by-lifecycle-nav').on('shown.bs.tab', function (e) {
-                    console.log('Showing lifecycle plot');
                     // if plot has not been shown yet, render and then store state
                     // this will prevent points render calls once map has been initialized
                     if (!PLOTS_SHOWN['participants-by-lifecycle-nav']) {
@@ -541,6 +719,23 @@
 
         $('.panel-collapse').on('show.bs.collapse hide.bs.collapse', function() {
             toggleGlyph($(this).prev().find('span.toggle-glyph'));
+        });
+
+        var centerFilterStatuses = {};
+
+        function updateCenterFiltersStatuses() {
+
+          $('.center-filter').each(function(index, element) {
+            var centerFilter = $(element);
+            var center = centerFilter.val();
+            var isChecked = centerFilter.is(':checked') ? 1 : 0;
+            centerFilterStatuses[center] = isChecked;
+          });
+
+        }
+
+        $(document).on('change', '.center-filter', function() {
+          updateCenterFiltersStatuses();
         });
     </script>
 {% endblock %}
