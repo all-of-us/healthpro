@@ -31,3 +31,39 @@ window.Parsley.addValidator('lt', {
   },
   priority: 32
 });
+
+var validateHeightWeight = function(height, weight) {
+  if (height && weight) {
+    var bmi = weight / ((height/100) * (height/100));
+    bmi = bmi.toFixed(1);
+    if (bmi < 5 || bmi > 250) {
+      return false;
+    }
+  }
+  return true;
+};
+
+// BMI validators
+window.Parsley.addValidator('bmiHeight', {
+  validateString: function (value, weightSelector) {
+    var height = parseFloat(value);
+    var weight = parseRequirement(weightSelector);
+    return validateHeightWeight(height, weight);
+  },
+  messages: {
+    en: 'Invalid height/weight combination'
+  },
+  priority: 32
+});
+
+window.Parsley.addValidator('bmiWeight', {
+  validateString: function (value, heightSelector) {
+    var weight = parseFloat(value);
+    var height = parseRequirement(heightSelector);
+    return validateHeightWeight(height, weight);
+  },
+  messages: {
+    en: 'Invalid height/weight combination'
+  },
+  priority: 32
+});

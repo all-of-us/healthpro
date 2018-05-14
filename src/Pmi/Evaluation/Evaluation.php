@@ -160,6 +160,12 @@ class Evaluation
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
+            if ($field->name === 'height') {
+                $attributes['data-parsley-bmi-height'] = '#form_weight';
+            }
+            if ($field->name === 'weight') {
+                $attributes['data-parsley-bmi-weight'] = '#form_height';
+            }
 
             if (isset($field->options)) {
                 $class = ChoiceType::class;

@@ -106,10 +106,14 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     calculateBmi: function() {
         var height = parseFloat(this.$('#form_height').val());
         var weight = parseFloat(this.$('#form_weight').val());
+        this.$('#bmi-warning').text('');
         if (height && weight) {
             var bmi = weight / ((height/100) * (height/100));
             bmi = bmi.toFixed(1);
             this.$('#bmi').html('<strong>' + bmi + '</strong>');
+            if (bmi < 15 || bmi > 50) {
+                this.$('#bmi-warning').text('Please verify that the height and weight are correct');
+            }
         } else {
             this.$('#bmi').text('--');
         }
