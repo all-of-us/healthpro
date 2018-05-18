@@ -30,6 +30,8 @@
                     <dd>{{ evaluation.version }} <small class="text-muted">(latest version is {{ latestVersion }})</small></dd>
                 {% endif %}
             {% endif %}
+            <dt>Paired Awardee</dt>
+            <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
         </dl>
         {% if evaluation and evaluation.finalized_ts %}
             <div class="alert alert-success">
