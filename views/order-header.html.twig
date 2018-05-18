@@ -58,7 +58,7 @@
                     {% if attribute(order, column[1]~'_ts') %}
                         {% if step == 'process' and processTabClass is defined %}
                             <i class="{{ processTabClass }}" aria-hidden="true"></i>
-                        {% else %}
+                        {% elseif step != 'printRequisition' %}
                             <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                         {% endif %}
                     {% else %} {# since the printed_ts is set automatically after the first page load, don't disable to next tab #}
