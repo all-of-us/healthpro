@@ -14,49 +14,6 @@ class MayolinkOrder
     protected $userName;
     protected $password;
     protected $app;
-
-    protected static $tests = [
-        '1SS08' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Serum SST',
-            'code' => '1SSTP',
-            'prompt' => 'SST Centrifuge Type'
-        ],
-        '1PS08' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Plasma PST',
-            'code' => '1PSTP',
-            'prompt' => 'PST Centrifuge Type'
-        ],
-        '1HEP4' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'WB Sodium Heparin'
-        ],
-        '1ED04' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
-        '1ED10' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
-        '2ED10' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Whole Blood EDTA'
-        ],
-        '1UR10' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Urine',
-            'labelCount' => 2
-        ]
-    ];
-    protected static $salivaTests = [
-        '1SAL' => [
-            'temperature' => 'Refrigerated',
-            'specimen' => 'Saliva'
-        ]
-    ];
-
     private $client;
 
     public function __construct(Application $app)
@@ -140,9 +97,9 @@ class MayolinkOrder
     public function getSamples($type, $options)
     {
         if (isset($options['type']) && $options['type'] === 'saliva') {
-            $tests = self::$salivaTests;
+            $tests = $options['salivaTests'];
         } else {
-            $tests = self::$tests;
+            $tests = $options['tests'];
         }
         $mayoSamples = [];
         if ($options["{$type}_samples"]) {
@@ -157,6 +114,7 @@ class MayolinkOrder
                         'questionAnswer' => Order::$centrifugeType[$options['centrifugeType']]
                     ];
                 } else {
+                    $sampleItems = [];
                     $sampleItems['code'] = $sample;
                     $sampleItems['name'] = $tests[$sample]['specimen'];
                     if (!empty($tests[$sample]['labelCount'])) {
@@ -168,6 +126,7 @@ class MayolinkOrder
         } else {
             if ($type !== 'collected') {
                 foreach ($tests as $key => $sample) {
+                    $sampleItems = [];
                     $sampleItems['code'] = $key;
                     $sampleItems['name'] = $sample['specimen'];
                     if (!empty($sample['labelCount'])) {
