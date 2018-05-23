@@ -357,8 +357,12 @@
                     }
 
                   })
-                    .error(function(jqXHR) {
-                      setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
+                    .fail(function(jqXHR) {
+                      try {
+                        setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
+                      } catch (e) {
+                        setMetricsError(spinnerLoc, 'An error occurred while loading data the data');
+                      }
                     });
                 }
               }
