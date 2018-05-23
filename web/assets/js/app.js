@@ -142,14 +142,13 @@ $(document).ready(function()
      * Plugin for making panels in bootstrap columns equal heights
      ************************************************************************/
     $.fn.equalizePanelHeight = function() {
-        var selector = this.selector;
-        var equalize = function(selector) {
+        var equalize = function(element) {
             // reset heights
-            $(selector).each(function() {
+            element.each(function() {
                 $(this).find('.panel').height('auto');
             });
             // set heights
-            $(selector).each(function() {
+            element.each(function() {
                 var height = 0;
                 if ($('#is-xs').is(':visible')) {
                     height = 'auto';
@@ -165,12 +164,13 @@ $(document).ready(function()
                 });
             });
         };
-        equalize(selector);
+        var self = this;
+        equalize(self);
         $(window).on('resize', _.debounce(function() {
-            equalize(selector);
+            equalize(self);
         }, 250));
         $(window).on('pmi.equalize', function() {
-            equalize(selector);
+            equalize(self);
         });
     };
     $('.row-equal-height').equalizePanelHeight();
@@ -194,9 +194,8 @@ $(document).ready(function()
                 'delete': null
             }
         };
-        var selector = this.selector;
-        $(selector).datetimepicker(pickerOptions);
-        $(selector).on('dp.change', function() {
+        this.datetimepicker(pickerOptions);
+        this.on('dp.change', function() {
             PMI.markUnsaved();
         });
     };
