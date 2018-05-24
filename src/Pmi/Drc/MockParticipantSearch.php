@@ -25,9 +25,21 @@ class MockParticipantSearch
 
     public function search($params)
     {
-        $results = [];
-        foreach (self::$data as $id => $row) {
-            $results[] = $this->rowToObject($row, $id);
+        // Search by email
+        if (isset($params['email']) && $params['email'] == 'test@example.com') {
+            return [$this->getById(1001)];
+        } elseif (isset($params['email'])) {
+            return [];
+        }
+
+        // Search by other criteria
+        if (isset($params['lastName']) && isset($params['dob'])) {
+            $results = [];
+            foreach (self::$data as $id => $row) {
+                $results[] = $this->rowToObject($row, $id);
+            }
+        } else {
+            $results = [];
         }
 
         return $results;

@@ -117,6 +117,23 @@
     </div>
 </div>
 
+<div class="modal fade" id="real-time-data-help-modal" tabindex="-1" role="dialog" aria-labelledby="loading-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-center">Real-Time Data Help</h2>
+            </div>
+            <div class="modal-body">
+                Full participant counts on the Real-Time Data tab are based on sample collection, rather than
+                receipt, so they will differ slightly in timing and final totals from other full participant counts.
+            </div>
+            <div class="modal-footer">
+                <button class="close" data-dismiss="modal">×</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     $('#dashboard-help').on('click', function() {
        $('#dashboad-help-modal').modal('show');
@@ -124,5 +141,9 @@
 
     $('#display-metrics-help').on('click', function() {
       $('#display-metrics-help-modal').modal('show');
+    });
+
+    $('#real-time-data-help').on('click', function() {
+      $('#real-time-data-help-modal').modal('show');
     });
 </script>

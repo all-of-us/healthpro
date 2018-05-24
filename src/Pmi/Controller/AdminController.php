@@ -321,7 +321,7 @@ class AdminController extends AbstractController
                 }
                 $fhir = $evaluationService->getFhir($evaluation['finalized_ts'], $parentRdrId);
                 if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($evaluation['participant_id'], $fhir)) {
-                    $repository->update($evaluation['id'], ['rdr_id' => $rdrEvalId]);
+                    $repository->update($evaluation['id'], ['rdr_id' => $rdrEvalId, 'fhir_version' => \Pmi\Evaluation\Fhir::CURRENT_VERSION]);
                     $app->addFlashSuccess("#{$id} successfully sent to RDR");
                 } else {
                     $app->addFlashError("#{$id} failed sending to RDR: " . $app['pmi.drc.participants']->getLastError());
@@ -357,12 +357,12 @@ class AdminController extends AbstractController
             $ids = $form->get('ids')->getData();
             $repository = $app['em']->getRepository('orders');
             foreach ($ids as $id) {
-                $orderService = new Order();
+                $orderService = new Order($app);
                 $order = $repository->fetchOneBy(['id' => $id]);
                 if (!$order) {
                     continue;
                 }
-                $orderRdrObject = $orderService->getRdrObject($order, $app);
+                $orderRdrObject = $orderService->getRdrObject($order);
                 if ($rdrId = $app['pmi.drc.participants']->createOrder($order['participant_id'], $orderRdrObject)) {
                     $repository->update($order['id'], ['rdr_id' => $rdrId]);
                     $app->addFlashSuccess("#{$id} successfully sent to RDR");

@@ -32,8 +32,8 @@ class OrderController extends AbstractController
 
     protected function loadOrder($participantId, $orderId, Application $app)
     {
-        $order = new Order();
-        $order->loadOrder($participantId, $orderId, $app);
+        $order = new Order($app);
+        $order->loadOrder($participantId, $orderId);
         if (!$order->isValid()) {
             $app->abort(404);
         }
@@ -109,12 +109,13 @@ class OrderController extends AbstractController
                 ]
             ]);
         }
+        $order = new Order($app);
         if (!$app->isDVType() && $showBloodTubes) {
             $formBuilder->add('samples', Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Select requested samples',
-                'choices' => Order::${'samples' . Order::$version},
+                'choices' => $order->samples,
                 'required' => false
             ]);
         }
@@ -155,7 +156,7 @@ class OrderController extends AbstractController
                 $orderData['participant_id'] = $participant->id;
                 $orderData['biobank_id'] = $participant->biobankId;
                 $orderData['created_ts'] = new \DateTime();
-                $orderData['version'] = Order::$version;
+                $orderData['version'] = $order->version;
                 if (!$app->isDVType()) {
                     $orderData['processed_centrifuge_type'] = Order::SWINGING_BUCKET;
                 }
@@ -175,8 +176,10 @@ class OrderController extends AbstractController
             'participant' => $participant,
             'confirmForm' => $confirmForm->createView(),
             'showCustom' => $showCustom,
-            'samplesInfo' => Order::$samplesInformation,
-            'showBloodTubes' => $showBloodTubes
+            'samplesInfo' => $order->samplesInformation,
+            'showBloodTubes' => $showBloodTubes,
+            'version' => $order->version,
+            'salivaInstructions' => $order->salivaInstructions,
         ]);
     }
 
@@ -256,20 +259,9 @@ class OrderController extends AbstractController
             if ($order->get('finalized_ts') || $order->isOrderExpired()) {
                 $app->abort(403);
             }
-
-            // Throw error if no samples are selected when sending an order
-            if ($request->request->has('send') && empty($collectForm['collected_samples']->getData())) {
-                $collectForm['collected_samples']->addError(new FormError('Please select at least one sample'));
-            }
-
             if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
-            }
-            
-            // Throw error if collected_ts is empty when sending an order
-            if ($request->request->has('send') && empty($collectForm['collected_ts']->getData())) {
-                $collectForm['collected_ts']->addError(new FormError('Collected time is required to send order'));
             }
 
             $orderData = $order->toArray();
@@ -288,29 +280,8 @@ class OrderController extends AbstractController
                         $app->log(Log::ORDER_EDIT, $orderId);
                         $successMsg = 'Order collection updated';
                     }
-                    // Send order to mayo
-                    if ($orderData['type'] !== 'kit' && $request->request->has('send')){
-                        $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app);
-                        if (!empty($mayoId)) {
-                            if ($app['em']->getRepository('orders')->update($orderId, ['mayo_id' => $mayoId])) {
-                                $app->log(Log::ORDER_EDIT, $orderId);
-                                $order = $this->loadOrder($participantId, $orderId, $app);
-                                $successMsg = 'Order collection updated and successfully sent';
-                                // Redirect to print requisition
-                                if ($order->get('type') !== 'kit') {
-                                    $app->addFlashNotice($successMsg);
-                                    return $app->redirectToRoute('orderPrintRequisition', [
-                                        'participantId' => $participantId,
-                                        'orderId' => $orderId
-                                    ]);
-                                }
-                            }
-                        } else {
-                            $errorMsg = 'Failed to send order';
-                        }
-                    }
                 } else {
-                    // Save collected time and notes
+                    // Save collected time and notes only
                     $collectedAt = $collectForm['collected_ts']->getData();
                     $notes = $collectForm['collected_notes']->getData();
                      if ($app['em']->getRepository('orders')->update($orderId, ['collected_ts' => $collectedAt, 'collected_notes' => $notes])) {
@@ -336,7 +307,8 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'collectForm' => $collectForm->createView(),
-            'samplesInfo' => Order::$samplesInformation,
+            'samplesInfo' => $order->samplesInformation,
+            'version' => $order->version,
             'processTabClass' => $order->getProcessTabClass()
         ]);
     }
@@ -371,8 +343,15 @@ class OrderController extends AbstractController
             }
             if ($processForm->isValid()) {
                 $updateArray = $order->getOrderUpdateFromForm('processed', $processForm);
-                if (!$order->get('processed_ts')) {
-                    $updateArray['processed_ts'] = new \DateTime();
+                $updateArray['processed_ts'] = empty($order->get('processed_ts')) ? new \DateTime() : $order->get('processed_ts');
+                // Set processed_ts to the most recent processed sample time if exists
+                if (!empty($updateArray['processed_samples_ts'])) {
+                    $processedSamplesTs = json_decode($updateArray['processed_samples_ts'], true);
+                    if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
+                        $processedTs = new \DateTime();
+                        $processedTs->setTimestamp(max($processedSamplesTs));
+                        $updateArray['processed_ts'] = $processedTs;
+                    }
                 }
                 $updateArray['processed_user_id'] = $app->getUser()->getId();
                 $updateArray['processed_site'] = $app->getSiteId();
@@ -403,7 +382,8 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'processForm' => $processForm->createView(),
-            'samplesInfo' => Order::$samplesInformation,
+            'samplesInfo' => $order->samplesInformation,
+            'version' => $order->version,
             'processTabClass' => $order->getProcessTabClass()
         ]);
     }
@@ -450,16 +430,16 @@ class OrderController extends AbstractController
                 if ($order->get('type') === 'kit') {
                     unset($updateArray['finalized_ts']);
                 }
-                // For DV sites finalized time will not be saved at this point
+                // Finalized time will not be saved at this point
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                 }
-                //Send order to mayo for DV kit orders
+                //Send order to mayo
                 $orderData = $order->toArray();
-                if (empty($orderData['mayo_id']) && $orderData['type'] === 'kit' && !empty($finalizeForm['finalized_ts']->getData())) {
+                if (empty($orderData['mayo_id']) && !empty($finalizeForm['finalized_ts']->getData())) {
                     $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
                     if (!empty($mayoId)) {
-                        //Save finalized time
+                        //Save mayo id and finalized time
                         $newUpdateArray = [
                             'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
                             'mayo_id' => $mayoId
@@ -492,7 +472,8 @@ class OrderController extends AbstractController
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'finalizeForm' => $finalizeForm->createView(),
-            'samplesInfo' => Order::$samplesInformation,
+            'samplesInfo' => $order->samplesInformation,
+            'version' => $order->version,
             'hasErrors' => $hasErrors,
             'processTabClass' => $order->getProcessTabClass()
         ]);
@@ -501,7 +482,7 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id'))) {
             $app->abort(403);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
@@ -587,7 +568,7 @@ class OrderController extends AbstractController
     public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id'))) {
             $app->abort(403);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
@@ -639,7 +620,9 @@ class OrderController extends AbstractController
                 'collected_at' => $collectedAt->format('c'),
                 'mayoClientId' => $mayoClientId,
                 'requested_samples' => $orderData['requested_samples'],
-                'version' => $orderData['version']
+                'version' => $orderData['version'],
+                'tests' => $order->samplesInformation,
+                'salivaTests' => $order->salivaSamplesInformation
             ];
             $pdf = $mlOrder->getLabelsPdf($options);
             return $pdf;
@@ -676,7 +659,9 @@ class OrderController extends AbstractController
                 'mayoClientId' => $mayoClientId,
                 'collected_samples' => $orderData["{$type}_samples"],
                 'centrifugeType' => $orderData['processed_centrifuge_type'],
-                'version' => $orderData['version']
+                'version' => $orderData['version'],
+                'tests' => $order->samplesInformation,
+                'salivaTests' => $order->salivaSamplesInformation
             ];
             $mayoOrder = new MayolinkOrder($app);
             $mayoId = $mayoOrder->createOrder($options);

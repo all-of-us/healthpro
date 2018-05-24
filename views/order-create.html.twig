@@ -17,7 +17,7 @@
         {% if app.isDvType %}
             {% set steps = ['Collect', 'Process', 'Finalize'] %}
         {% else %}
-            {% set steps = ['Print Labels', 'Collect', 'Print Requisition', 'Process', 'Finalize'] %}
+            {% set steps = ['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
         {% endif %}
         {% for step in steps %}
             <li role="presentation" class="disabled"><a href="#">{{ step }}</a></li>
@@ -39,7 +39,7 @@
                                 {% if showBloodTubes %}
                                     <div class="text-center">
                                         <div id="customize-off" {% if showCustom %} style="display:none"{% endif %}>
-                                            <p>Create an order for all 7 All of Us℠ biospecimens</p>
+                                            <p>Create an order for all {{ samplesInfo|length }} All of Us℠ biospecimens</p>
                                             <p>
                                                 <button type="submit" name="standard" class="btn btn-primary">Create</button>
                                             </p>
@@ -52,7 +52,7 @@
                                         <p class="text-center">Customize your All of Us℠ biobank order</p>
                                         <div class="form-group{% if not confirmForm.samples.vars.valid %} has-error{% endif %}">
                                             {{ form_label(confirmForm.samples) }}
-                                            {{ samples.form_widget(confirmForm.samples, false, samplesInfo) }}
+                                            {{ samples.form_widget(confirmForm.samples, false, samplesInfo, version) }}
                                             {{ form_errors(confirmForm.samples) }}
                                         </div>
                                         <div class="text-center">
@@ -103,7 +103,7 @@
                             </div>
                             <div class="panel-body text-center">
                                 <p>
-                                    Order a saliva biospecimen only if the participant is unable to provide any of the three EDTA blood tubes.
+                                    {{ salivaInstructions }}
                                 </p>
                                 <p>
                                     <button type="submit" name="saliva" class="btn btn-primary">Create</button>

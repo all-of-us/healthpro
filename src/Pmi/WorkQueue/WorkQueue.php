@@ -46,7 +46,7 @@ class WorkQueue
         'questionnaireOnHealthcareAccessTime',
         'site',
         'organization',
-        'physicalMeasurementsTime',
+        'physicalMeasurementsFinalizedTime',
         'physicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
         'numBaselineSamplesArrived',
@@ -56,14 +56,22 @@ class WorkQueue
         'sampleStatus1PST8Time',
         'sampleStatus1HEP4',
         'sampleStatus1HEP4Time',
+        'sampleStatus1ED02',
+        'sampleStatus1ED02Time',
         'sampleStatus1ED04',
         'sampleStatus1ED04Time',
         'sampleStatus1ED10',
         'sampleStatus1ED10Time',
         'sampleStatus2ED10',
         'sampleStatus2ED10Time',
+        'sampleStatus1CFD9',
+        'sampleStatus1CFD9Time',
+        'sampleStatus1PXR2',
+        'sampleStatus1PXR2Time',
         'sampleStatus1UR10',
         'sampleStatus1UR10Time',
+        'sampleStatus1UR90',
+        'sampleStatus1UR90Time',
         'sampleStatus1SAL',
         'sampleStatus1SALTime',
         'biospecimenSourceSite',
@@ -202,10 +210,14 @@ class WorkQueue
         '1SST8' => '8 mL SST',
         '1PST8' => '8 mL PST',
         '1HEP4' => '4 mL Na-Hep',
+        '1ED02' => '2 mL EDTA',
         '1ED04' => '4 mL EDTA',
         '1ED10' => '1st 10 mL EDTA',
         '2ED10' => '2nd 10 mL EDTA',
+        '1CFD9' => 'Cell-Free DNA',
+        '1PXR2' => 'Paxgene RNA',
         '1UR10' => 'Urine 10 mL',
+        '1UR90' => 'Urine 90 mL',
         '1SAL' => 'Saliva'
     ];
 
@@ -217,6 +229,9 @@ class WorkQueue
         [
             '1SST8' => '2SST8',
             '1PST8' => '2PST8'
+        ],
+        [
+            '1SAL' => '1SAL2'
         ]
     ];
 
@@ -288,7 +303,7 @@ class WorkQueue
             //In-Person Enrollment
             $row['pairedSite'] = $this->app->getSiteDisplayName($e($participant->siteSuffix));
             $row['pairedOrganization'] = $this->app->getOrganizationDisplayName($e($participant->organization));
-            $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsTime);
+            $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsFinalizedTime);
             $row['evaluationFinalizedSite'] = $this->app->getSiteDisplayName($e($participant->evaluationFinalizedSite));
             $row['biobankDnaStatus'] = $this->displayStatus($participant->samplesToIsolateDNA, 'RECEIVED');
             if ($participant->numBaselineSamplesArrived >= 7) {
@@ -298,10 +313,11 @@ class WorkQueue
             }
             foreach (array_keys(self::$samples) as $sample) {
                 $newSample = $sample;
-                if (array_key_exists($sample, self::$samplesAlias[0]) && $participant->{"sampleStatus" . self::$samplesAlias[0][$sample]} == 'RECEIVED') {
-                    $newSample = self::$samplesAlias[0][$sample];
-                } elseif (array_key_exists($sample, self::$samplesAlias[1]) && $participant->{"sampleStatus" . self::$samplesAlias[1][$sample]} == 'RECEIVED') {
-                    $newSample = self::$samplesAlias[1][$sample];
+                foreach (self::$samplesAlias as $sampleAlias) {
+                    if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} == 'RECEIVED') {
+                        $newSample = $sampleAlias[$sample];
+                        break;
+                    }
                 }
                 $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED');
                 if (!empty($participant->{'sampleStatus' . $newSample . 'Time'})) {

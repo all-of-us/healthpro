@@ -175,6 +175,9 @@ class DefaultController extends AbstractController
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => 'P000000000'
                 ]
             ])
             ->getForm();
@@ -189,6 +192,38 @@ class DefaultController extends AbstractController
             }
             $app->addFlashError('Participant ID not found');
         }
+
+        $emailForm = $app['form.factory']->createNamedBuilder('email', FormType::class)
+            ->add('email', TextType::class, [
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => 'janedoe@example.com'
+                ]
+            ])
+            ->getForm();
+
+        $emailForm->handleRequest($request);
+
+        if ($emailForm->isValid()) {
+            $searchParameters = $emailForm->getData();
+            try {
+                $searchResults = $app['pmi.drc.participants']->search($searchParameters);
+                if (count($searchResults) == 1) {
+                    return $app->redirectToRoute('participant', [
+                        'id' => $searchResults[0]->id
+                    ]);
+                }
+                return $app['twig']->render('participants-list.html.twig', [
+                    'participants' => $searchResults
+                ]);
+            } catch (ParticipantSearchExceptionInterface $e) {
+                $emailForm->addError(new FormError($e->getMessage()));
+            }
+        }
+
 
         $searchForm = $app['form.factory']->createNamedBuilder('search', FormType::class)
             ->add('lastName', TextType::class, [
@@ -237,7 +272,8 @@ class DefaultController extends AbstractController
 
         return $app['twig']->render('participants.html.twig', [
             'searchForm' => $searchForm->createView(),
-            'idForm' => $idForm->createView()
+            'idForm' => $idForm->createView(),
+            'emailForm' => $emailForm->createView()
         ]);
     }
 

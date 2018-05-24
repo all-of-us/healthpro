@@ -12,88 +12,24 @@ class Order
     protected $app;
     protected $order;
     protected $participant;
+    public $version = 2;
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
 
-    // This represents the current version of samples
-    public static $version = 2;
-
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
-    public static $samples1 = [
-        '(1) 8 mL SST [1SST8]' => '1SST8',
-        '(2) 8 mL PST [1PST8]' => '1PST8',
-        '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
-        '(4) 4 mL EDTA [1ED04]' => '1ED04',
-        '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
-        '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
-        '(7) Urine 10 mL [1UR10]' => '1UR10'
-    ];
 
-    public static $samples2 = [
-        '(1) 8 mL SST [1SS08]' => '1SS08',
-        '(2) 8 mL PST [1PS08]' => '1PS08',
-        '(3) 4 mL Na-Hep [1HEP4]' => '1HEP4',
-        '(4) 4 mL EDTA [1ED04]' => '1ED04',
-        '(5) 1st 10 mL EDTA [1ED10]' => '1ED10',
-        '(6) 2nd 10 mL EDTA [2ED10]' => '2ED10',
-        '(7) Urine 10 mL [1UR10]' => '1UR10'
-    ];
+    public $samples;
 
-    public static $samplesInformation = [
-        '1SS08' => [
-            'number' => 1,
-            'label' => '8 mL SST',
-            'color' => 'Red and gray'
-        ],
-        '1PS08' => [
-            'number' => 2,
-            'label' => '8 mL PST',
-            'color' => 'Green and gray'
-        ],
-        '1HEP4' => [
-            'number' => 3,
-            'label' => '4 mL Na-Hep',
-            'color' => 'Green'
-        ],
-        '1ED04' => [
-            'number' => 4,
-            'label' => '4 mL EDTA',
-            'color' => 'Lavender'
-        ],
-        '1ED10' => [
-            'number' => 5,
-            'label' => '1st 10 mL EDTA',
-            'color' => 'Lavender'
-        ],
-        '2ED10' => [
-            'number' => 6,
-            'label' => '2nd 10 mL EDTA',
-            'color' => 'Lavender'
-        ],
-        '1UR10' => [
-            'number' => 7,
-            'label' => 'Urine 10 mL',
-            'color' => 'Yellow'
-        ],
-        // Keep old sample codes for backward compatability
-        '1SST8' => [
-            'number' => 1,
-            'label' => '8 mL SST',
-            'color' => 'Red and gray'
-        ],
-        '1PST8' => [
-            'number' => 2,
-            'label' => '8 mL PST',
-            'color' => 'Green and gray'
-        ],
-    ];
+    public $samplesInformation;
 
-    public static $salivaSamples = [
-        'Saliva [1SAL]' => '1SAL'
-    ];
+    public $salivaSamples;
 
-    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL'];
+    public $salivaSamplesInformation;
+
+    public $salivaInstructions;
+
+    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL', '1SAL2'];
 
     public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
 
@@ -119,29 +55,69 @@ class Order
         '1SS08' => 'sst',
         '1PST8' => 'pst',
         '1PS08' => 'pst',
-        '1SAL' => 'sal'
+        '1SAL' => 'sal',
+        '1SAL2' => 'sal'
     ];
 
-    public function loadOrder($participantId, $orderId, Application $app)
+    public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2'];
+
+    public function __construct($app = null)
     {
-        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if ($app) {
+            $this->app = $app;
+            if (!empty($app->getConfig('order_samples_version'))) {
+                $this->version = $app->getConfig('order_samples_version');
+            }
+        }
+        $this->loadSamplesSchema();
+    }
+
+    public function loadSamplesSchema()
+    {
+        $file = __DIR__ . "/versions/{$this->version}.json";
+        if (!file_exists($file)) {
+            throw new \Exception('Samples version file not found');
+        }
+        $schema = json_decode(file_get_contents($file), true);
+        if (!is_array($schema) && !empty($schema)) {
+            throw new \Exception('Invalid samples schema');
+        }
+        $this->samplesInformation = $schema['samplesInformation'];
+        $samples = [];
+        foreach($this->samplesInformation as $sample => $info) {
+            $label = "({$info['number']}) {$info['label']} [{$sample}]";
+            $samples[$label] = $sample;
+        }
+        $this->samples = $samples;
+
+        $this->salivaSamplesInformation = $schema['salivaSamplesInformation'];
+        $salivaSamples = [];
+        foreach($this->salivaSamplesInformation as $salivaSample => $info) {
+            $salivaSamples[$info['label']] = $salivaSample;
+        }
+        $this->salivaSamples = $salivaSamples;
+
+        $this->salivaInstructions = $schema['salivaInstructions'];
+    }
+
+    public function loadOrder($participantId, $orderId)
+    {
+        $participant = $this->app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             return;
         }
-        $order = $app['em']->getRepository('orders')->fetchOneBy([
+        $order = $this->app['em']->getRepository('orders')->fetchOneBy([
             'id' => $orderId,
             'participant_id' => $participantId
         ]);
         if (!$order) {
             return;
         }
-        $this->app = $app;
         $this->order = $order;
         $this->order['expired'] = $this->isOrderExpired();
         $this->participant = $participant;
-        if (empty($order['version'])) {
-            self::$version = 1;
-        }
+        $this->version = !empty($order['version']) ? $order['version'] : 1;
+        $this->loadSamplesSchema();
     }
 
     public function isValid()
@@ -180,16 +156,12 @@ class Order
 
     public function getCurrentStep()
     {
-        //Return collect step if collected_ts is set and mayo_id is empty
-        if ($this->order["collected_ts"] && !$this->order["mayo_id"]) {
-            return 'collect';
-        }
         $columns = [
             'printLabels' => 'printed',
             'collect' => 'collected',
-            'printRequisition' => 'collected',
             'process' => 'processed',
-            'finalize' => 'finalized'           
+            'finalize' => 'finalized',
+            'printRequisition' => 'finalized'        
         ];
         if ($this->order['type'] === 'kit') {
             unset($columns['printLabels']);
@@ -210,9 +182,9 @@ class Order
         $columns = [
             'printLabels' => 'printed',
             'collect' => 'collected',
-            'printRequisition' => 'collected',
             'process' => 'processed',
-            'finalize' => 'finalized'
+            'finalize' => 'finalized',
+            'printRequisition' => 'finalized'
         ];
         if ($this->order['type'] === 'kit') {
             unset($columns['printLabels']);
@@ -221,12 +193,7 @@ class Order
         $steps = [];
         foreach ($columns as $name => $column) {
             $steps[] = $name;
-            if ($column === 'collected' && $this->order['type'] !== 'kit') {
-                $condition = $this->order["{$column}_ts"] && $this->order["mayo_id"];
-            } else {
-                $condition = $this->order["{$column}_ts"];
-            }
-            if (!$condition) {
+            if (!$this->order["{$column}_ts"]) {
                 break;
             }
         }
@@ -318,8 +285,7 @@ class Order
         } else {
             $samples = $this->getRequestedSamples();
         }
-        $nonBloodSample = count($samples) === 1 && (isset($samples['(7) Urine 10 mL [1UR10]']) || isset($samples['Saliva [1SAL]']));
-        if ($set == 'collected' && !$nonBloodSample) {
+        if ($set == 'collected' && $this->hasBloodSample($samples)) {
             $tsLabel = 'Blood Collection Time';
         }
         $enabledSamples = $this->getEnabledSamples($set);
@@ -494,13 +460,10 @@ class Order
         return $form;
     }
 
-    public function getRdrObject($order = null, $app = null)
+    public function getRdrObject($order = null)
     {
         if ($order) {
             $this->order = $order;
-        }
-        if ($app) {
-            $this->app = $app;
         }
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $this->order['participant_id'];
@@ -689,16 +652,16 @@ class Order
     protected function getRequestedSamples()
     {
         if ($this->order['type'] == 'saliva') {
-            return self::$salivaSamples;
+            return $this->salivaSamples;
         }
         if ($this->order['requested_samples'] &&
             ($requestedArray = json_decode($this->order['requested_samples'])) &&
             is_array($requestedArray) &&
             count($requestedArray) > 0
         ) {
-            return array_intersect(self::${'samples' . self::$version}, $requestedArray);
+            return array_intersect($this->samples, $requestedArray);
         } else {
-            return self::${'samples' . self::$version};
+            return $this->samples;
         }
     }
 
@@ -814,7 +777,7 @@ class Order
             $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
             $sst = array_values(array_intersect($processedSamples, self::$sst));
             $pst = array_values(array_intersect($processedSamples, self::$pst));
-            $sal = array_values(array_intersect($processedSamples, self::$salivaSamples));
+            $sal = array_values(array_intersect($processedSamples, $this->salivaSamples));
             //Check if SST processing time is less than collection time
             if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] <= $collectedTs->getTimestamp()) {
                 $errors['sst'] = 'SST Processing Time is before Collection Time';
@@ -845,5 +808,15 @@ class Order
     public function isOrderExpired()
     {
         return empty($this->order['finalized_ts']) && empty($this->order['version']);
+    }
+
+    public function hasBloodSample($samples)
+    {
+        foreach ($samples as $sampleCode) {
+            if (!in_array($sampleCode, self::$nonBloodSamples)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

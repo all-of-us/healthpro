@@ -26,7 +26,7 @@
             {% if order.type == 'saliva' %}
                 {{ form_widget(finalizeForm.finalized_samples) }}
             {% else %}
-                {{ samples.form_widget(finalizeForm.finalized_samples, order.finalized_ts ? false : true, samplesInfo) }}
+                {{ samples.form_widget(finalizeForm.finalized_samples, order.finalized_ts ? false : true, samplesInfo, version) }}
             {% endif %}
             {{ form_errors(finalizeForm.finalized_samples) }}
         </div>
@@ -93,15 +93,15 @@ $(document).ready(function () {
         var processed = $(name).attr('processed');
         var error = $(name).attr('error');
         if (typeof collected !== 'undefined') {
-            html = '<label><b>Collected:</b></label> <i class="fa fa-check text-success" aria-hidden="true"></i>'+collected+'</span>';
+            html = '<label><b>Collected:</b></label> <i class="fa fa-check text-success" aria-hidden="true"></i> '+collected+'</span>';
         } else {
             html += '<label><b>Collected:</b></label> <span class="label-normal text-danger">Not collected</span></span>';
         }
         if (typeof processed !== 'undefined') {
             if (typeof error !== 'undefined') {
-                html += '<label><b>Processed:</b></label> <span class="text-danger"><i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+error+'"></i>'+processed+'</span>';
+                html += '<label><b>Processed:</b></label> <span class="text-danger"><i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+error+'"></i> '+processed+'</span>';
             } else {
-                html += '<label><b>Processed:</b></label> <i class="fa fa-check text-success" aria-hidden="true"></i>'+processed+'</span>';
+                html += '<label><b>Processed:</b></label> <i class="fa fa-check text-success" aria-hidden="true"></i> '+processed+'</span>';
             }
         } else {
             html += '<label><b>Processed:</b></label> <span class="label-normal text-danger">Not processed</span></span>';
