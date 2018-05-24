@@ -583,7 +583,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         if (height && weight) {
             var bmi = weight / ((height/100) * (height/100));
             bmi = bmi.toFixed(1);
-            if (bmi < 5 || bmi > 250) {
+            if (bmi < 5 || bmi > 125) {
                 return false;
             }
         }
