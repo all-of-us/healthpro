@@ -2377,29 +2377,30 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v3.3.13",
+            "version": "v3.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "5943f0f19817a7e05992d20a90729b0dc93faf36"
+                "reference": "a7b5fc605d1c215cea1122359044b1e682eb70c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/5943f0f19817a7e05992d20a90729b0dc93faf36",
-                "reference": "5943f0f19817a7e05992d20a90729b0dc93faf36",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/a7b5fc605d1c215cea1122359044b1e682eb70c0",
+                "reference": "a7b5fc605d1c215cea1122359044b1e682eb70c0",
                 "shasum": ""
             },
             "require": {
                 "php": "^5.5.9|>=7.0.8",
-                "symfony/polyfill-mbstring": "~1.1"
+                "symfony/polyfill-mbstring": "~1.1",
+                "symfony/polyfill-php70": "~1.6"
             },
             "require-dev": {
-                "symfony/expression-language": "~2.8|~3.0"
+                "symfony/expression-language": "~2.8|~3.0|~4.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.3-dev"
+                    "dev-master": "3.4-dev"
                 }
             },
             "autoload": {
@@ -2426,7 +2427,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-13T18:13:16+00:00"
+            "time": "2018-05-25T11:07:31+00:00"
         },
         {
             "name": "symfony/http-kernel",
@@ -3181,27 +3182,26 @@
         },
         {
             "name": "symfony/security",
-            "version": "v3.3.13",
+            "version": "v3.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security.git",
-                "reference": "b3e577ea48e3e63c46d86dfd8f21f59ee0ff1d48"
+                "reference": "b4f0319d6b9c424dd6ac1e15f3cd32708b57aa0a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security/zipball/b3e577ea48e3e63c46d86dfd8f21f59ee0ff1d48",
-                "reference": "b3e577ea48e3e63c46d86dfd8f21f59ee0ff1d48",
+                "url": "https://api.github.com/repos/symfony/security/zipball/b4f0319d6b9c424dd6ac1e15f3cd32708b57aa0a",
+                "reference": "b4f0319d6b9c424dd6ac1e15f3cd32708b57aa0a",
                 "shasum": ""
             },
             "require": {
                 "php": "^5.5.9|>=7.0.8",
-                "symfony/event-dispatcher": "~2.8|~3.0",
-                "symfony/http-foundation": "^2.8.31|~3.3.13|~3.4-beta5",
-                "symfony/http-kernel": "~3.3",
+                "symfony/event-dispatcher": "~2.8|~3.0|~4.0",
+                "symfony/http-foundation": "^2.8.31|~3.3.13|~3.4|~4.0",
+                "symfony/http-kernel": "~3.3|~4.0",
                 "symfony/polyfill-php56": "~1.0",
                 "symfony/polyfill-php70": "~1.0",
-                "symfony/polyfill-util": "~1.0",
-                "symfony/property-access": "~2.8|~3.0"
+                "symfony/property-access": "~2.8|~3.0|~4.0"
             },
             "replace": {
                 "symfony/security-core": "self.version",
@@ -3210,15 +3210,17 @@
                 "symfony/security-http": "self.version"
             },
             "require-dev": {
+                "psr/container": "^1.0",
                 "psr/log": "~1.0",
-                "symfony/expression-language": "~2.8|~3.0",
-                "symfony/finder": "~2.8|~3.0",
-                "symfony/ldap": "~3.1",
+                "symfony/expression-language": "~2.8|~3.0|~4.0",
+                "symfony/finder": "~2.8|~3.0|~4.0",
+                "symfony/ldap": "~3.1|~4.0",
                 "symfony/polyfill-intl-icu": "~1.0",
-                "symfony/routing": "~2.8|~3.0",
-                "symfony/validator": "^2.8.18|^3.2.5"
+                "symfony/routing": "~2.8|~3.0|~4.0",
+                "symfony/validator": "^3.2.5|~4.0"
             },
             "suggest": {
+                "psr/container-implementation": "To instantiate the Security class",
                 "symfony/expression-language": "For using the expression voter",
                 "symfony/form": "",
                 "symfony/ldap": "For using the LDAP user and authentication providers",
@@ -3228,7 +3230,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.3-dev"
+                    "dev-master": "3.4-dev"
                 }
             },
             "autoload": {
@@ -3255,7 +3257,7 @@
             ],
             "description": "Symfony Security Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-16T16:14:18+00:00"
+            "time": "2018-05-25T11:50:55+00:00"
         },
         {
             "name": "symfony/translation",
