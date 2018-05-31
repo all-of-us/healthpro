@@ -327,7 +327,7 @@ class WorkQueueController extends AbstractController
                             WorkQueue::dateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone()),
                             WorkQueue::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
                             WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone()),
-                            WorkQueue::csvStatusFromSubmitted($participant->consentForconsentForCABoR),
+                            WorkQueue::csvStatusFromSubmitted($participant->consentForCABoR),
                             WorkQueue::dateFromString($participant->consentForCABoRTime, $app->getUserTimezone()),
                             $participant->withdrawalStatus == 'NO_USE' ? '1' : '0',
                             WorkQueue::dateFromString($participant->withdrawalTime, $app->getUserTimezone()),
