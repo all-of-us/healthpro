@@ -11,4 +11,6 @@
     <dd>{{ participant.genderIdentity|default('--') }}</dd>
     <dt>Participant Status</dt>
     <dd>{{ participant.enrollmentStatus|default('--') }}</dd>
+    <dt>Paired Awardee</dt>
+    <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
 </dl>

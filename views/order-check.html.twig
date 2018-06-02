@@ -14,7 +14,7 @@
         {% if app.isDvType %}
             {% set steps = ['Create', 'Collect', 'Process', 'Finalize'] %}
         {% else %}
-            {% set steps = ['Create', 'Print Labels', 'Collect', 'Print Requisition', 'Process', 'Finalize'] %}
+            {% set steps = ['Create', 'Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
         {% endif %}
         {% for step in steps %}
             <li role="presentation" class="disabled"><a href="#">{{ step }}</a></li>
