@@ -1,0 +1,13 @@
+Subject: MISSING MEASUREMENTS/ORDERS INFORMATION
+
+Hello, failed to send the following Physical Mearsurements/Biobank Orders to RDR.
+
+{% if missingEvalutionIds is not empty %}
+Physical Measurement Ids: {{ missingEvalutionIds }}
+{% endif %}
+
+{% if missingOrderIds is not empty %}
+Biobank Order Ids: {{ missingOrderIds }}
+{% endif %}
+
+Thank you.
