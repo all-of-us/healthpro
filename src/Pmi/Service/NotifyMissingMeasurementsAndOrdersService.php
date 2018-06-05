@@ -49,7 +49,13 @@ class NotifyMissingMeasurementsAndOrdersService
                     'missingEvalutionIds' => implode(', ', $missingEvalutionIds),
                     'missingOrderIds' => implode(', ', $missingOrderIds)
                 ])
-                ->send();       
+                ->send();
+            $this->app->log(Log::MISSING_ORDER_MEASUREMENTS_NOTIFY, [
+                'order_ids' => $missingOrderIds,
+                'evaluation_ids' => $missingEvalutionIds,
+                'status' => 'Notifications sent',
+                'notified' => $emails
+            ]);       
         }
     }
 
