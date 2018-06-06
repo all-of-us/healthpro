@@ -27,32 +27,23 @@ class NotifyMissingMeasurementsAndOrdersService
             $emails = explode(',', $emails);
         }
 
-        $missingEvalutions = $this->db->fetchAll('select id from evaluations where id not in (select record_id from missing_notifications_log where type="measurement") and finalized_ts is not null and rdr_id is null');
-        $missingEvalutionIds = [];
-        foreach ($missingEvalutions as $evaluation) {
-            $missingEvalutionIds[] = $evaluation['id'];
+        $missingEvaluations = $this->db->fetchAll('select id from evaluations where id not in (select record_id from missing_notifications_log where type="measurement") and finalized_ts is not null and rdr_id is null');
+        foreach ($missingEvaluations as $evaluation) {
             $this->insertRecords($evaluation['id'], self::MEASUREMENT_TYPE);
         }
 
         $missingOrders = $this->db->fetchAll('select id from orders where id not in (select record_id from missing_notifications_log where type="order") and finalized_ts is not null and rdr_id is null');
-        $missingOrderIds = [];
         foreach ($missingOrders as $order) {
-            $missingOrderIds[] = $order['id'];
             $this->insertRecords($order['id'], self::ORDER_TYPE);
         }
 
-        if (!empty($missingEvalutionIds) || !empty($missingOrderIds)) {
+        if (!empty($missingEvaluations) || !empty($missingOrders)) {
             $message = new Message($this->app);
             $message
                 ->setTo($emails)
-                ->render('missing-notify', [
-                    'missingEvalutionIds' => implode(', ', $missingEvalutionIds),
-                    'missingOrderIds' => implode(', ', $missingOrderIds)
-                ])
+                ->render('missing-notify', [])
                 ->send();
             $this->app->log(Log::MISSING_ORDER_MEASUREMENTS_NOTIFY, [
-                'order_ids' => $missingOrderIds,
-                'evaluation_ids' => $missingEvalutionIds,
                 'status' => 'Notifications sent',
                 'notified' => $emails
             ]);       
