@@ -24,7 +24,7 @@ class CronController extends AbstractController
         ['resendEvaluationsToRdr', '/resend-evaluations-rdr'],
         ['sites', '/sites'],
         ['awardeesAndOrganizations', '/awardees-organizations'],
-        ['missingNotifications', '/missing-notifications'],
+        ['missingMeasurementsOrders', '/missing-measurements-orders'],
     ];
     
     /**
@@ -111,7 +111,7 @@ class CronController extends AbstractController
         return (new JsonResponse())->setData(true);
     }
 
-    public function missingNotificationsAction(Application $app, Request $request)
+    public function missingMeasurementsOrdersAction(Application $app, Request $request)
     {
         if (!$this->isAdmin($request)) {
             throw new AccessDeniedHttpException();

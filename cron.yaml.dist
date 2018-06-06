@@ -11,6 +11,10 @@ cron:
   url: /cron/resend-evaluations-rdr
   schedule: 29 of feb 00:00
   timezone: America/Chicago
+- description: "missing measurements/orders notification"
+  url: /cron/missing-measurements-orders
+  schedule: every day 08:00
+  timezone: America/Chicago
 - description: "Datastore normal-Kind backup"
   url: /_ah/datastore_admin/backup.create?name=dsNormalBackup&filesystem=gs&gs_bucket_name={BUCKET_PREFIX}-ds-backups&kind=Configuration
   schedule: every day 04:00

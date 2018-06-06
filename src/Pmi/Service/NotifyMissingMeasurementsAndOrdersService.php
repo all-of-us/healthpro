@@ -26,13 +26,12 @@ class NotifyMissingMeasurementsAndOrdersService
         if (!empty($emails)) {
             $emails = explode(',', $emails);
         }
-
-        $missingEvaluations = $this->db->fetchAll('select id from evaluations where id not in (select record_id from missing_notifications_log where type="measurement") and finalized_ts is not null and rdr_id is null');
+        $missingEvaluations = $this->db->fetchAll('select id from evaluations where id not in (select record_id from missing_notifications_log where type="' . self::MEASUREMENT_TYPE . '") and finalized_ts is not null and rdr_id is null');
         foreach ($missingEvaluations as $evaluation) {
             $this->insertRecords($evaluation['id'], self::MEASUREMENT_TYPE);
         }
 
-        $missingOrders = $this->db->fetchAll('select id from orders where id not in (select record_id from missing_notifications_log where type="order") and finalized_ts is not null and rdr_id is null');
+        $missingOrders = $this->db->fetchAll('select id from orders where id not in (select record_id from missing_notifications_log where type="' . self::ORDER_TYPE . '") and finalized_ts is not null and rdr_id is null');
         foreach ($missingOrders as $order) {
             $this->insertRecords($order['id'], self::ORDER_TYPE);
         }
@@ -41,9 +40,9 @@ class NotifyMissingMeasurementsAndOrdersService
             $message = new Message($this->app);
             $message
                 ->setTo($emails)
-                ->render('missing-notify', [])
+                ->render('missing-measurements-orders', [])
                 ->send();
-            $this->app->log(Log::MISSING_ORDER_MEASUREMENTS_NOTIFY, [
+            $this->app->log(Log::MISSING_MEASUREMENTS_ORDERS_NOTIFY, [
                 'status' => 'Notifications sent',
                 'notified' => $emails
             ]);       
