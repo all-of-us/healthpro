@@ -79,7 +79,7 @@
     });
 
     // toggle all enrollment status filters
-    $('#{{ id }}').find('.toggle-all-enrollment-filters').click(function(e) {
+    $('#{{ id }}').find('.toggle-all-enrollment-filters').on('click', function(e) {
       var cb = $('#{{ id }}').find('.enrollment-status-filter');
       cb.prop('checked', !cb.prop('checked'));
       // check first element to determine whether toggle switch should be on or off

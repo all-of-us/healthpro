@@ -367,7 +367,7 @@
                 }
               }
 
-              $('#toggle-traces').click(function() {
+              $('#toggle-traces').on('click', function() {
                 togglePlotlyTraces('plotly-real-time');
               });
 
@@ -389,12 +389,12 @@
               });
 
               // re-render on filter change
-              $('.real-time-control').change(function() {
+              $('.real-time-control').on('change', function() {
                 renderRealTimePlot('spinner');
               });
 
               // re-render on time filter change with modal (may need new metrics)
-              $('.real-time-time-control').change(function() {
+              $('.real-time-time-control').on('change', function() {
                 renderRealTimePlot('modal');
               });
 
@@ -405,7 +405,7 @@
                 }
               });
 
-              $('#real-time').find('.redraw-plotly').click(function() {
+              $('#real-time').find('.redraw-plotly').on('click', function() {
                 renderRealTimePlot('spinner');
               });
             </script>
