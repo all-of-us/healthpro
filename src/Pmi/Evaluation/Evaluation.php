@@ -164,7 +164,7 @@ class Evaluation
             $bmiConstraint = function($value, $context) use ($form) {
                 $bmi = round(self::calculateBmi($form->getData()->height, $form->getData()->weight), 1);
                 if ($bmi !== false && ($bmi < 5 || $bmi > 125)) {
-                    $context->buildViolation('Invalid height/weight combination')->addViolation();
+                    $context->buildViolation('This height/weight combination has yielded an invalid BMI')->addViolation();
                 }
             };
 

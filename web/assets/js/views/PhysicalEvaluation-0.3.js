@@ -598,7 +598,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 return self.validateHeightWeight(height, weight);
             },
             messages: {
-                en: 'Invalid height/weight combination'
+                en: 'This height/weight combination has yielded an invalid BMI'
             },
             priority: 32
         });
@@ -609,7 +609,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 return self.validateHeightWeight(height, weight);
             },
             messages: {
-                en: 'Invalid height/weight combination'
+                en: 'This height/weight combination has yielded an invalid BMI'
             },
             priority: 32
         });
