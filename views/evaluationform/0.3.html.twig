@@ -126,7 +126,12 @@
             <div class="col-sm-4">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title">BMI</h3>
+                        <h3 class="panel-title">
+                            BMI
+                            <span class="toggle-help-image" data-id="bmiModal" style="color:white">
+                                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                            </span>
+                        </h3>
                     </div>
                     <div class="panel-body">
                         <p class="text-center lead" id="bmi"></p>
@@ -297,3 +302,23 @@
     </div>
 </div>
 
+<div id="bmiModal" style="display:none">
+    <h4 class="help-header-text">BMI</h4>
+    <table class="table">
+        <thead>
+            <tr><th>Weight Category</th><th>BMI (kg/m<sup>2</sup>)</th></tr>
+        </thead>
+        <tbody>
+            <tr><td class="text-danger"><strong>Error</strong></td><td>&lt; 5</td></tr>
+            <tr><td class="text-warning"><strong>Warning</strong></td><td>&lt; 15</td></tr>
+            <tr><td>Underweight</td><td>&lt; 18.5</td></tr>
+            <tr><td>Healthy Weight</td><td>18.5 - 24.9</td></tr>
+            <tr><td>Overweight</td><td>25 - 29.9</td></tr>
+            <tr><td>Obese Class I</td><td>30 - 34.9</td></tr>
+            <tr><td>Obese Class II</td><td>35 - 39.9</td></tr>
+            <tr><td>Obese Class III</td><td>&gt; 40</td></tr>
+            <tr><td class="text-warning"><strong>Warning</strong></td><td>&gt; 50</td></tr>
+            <tr><td class="text-danger"><strong>Error</strong></td><td>&gt; 125</td></tr>
+        </tbody>
+    </table>
+</div>
