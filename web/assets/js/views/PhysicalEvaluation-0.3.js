@@ -107,8 +107,10 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         var height = parseFloat(this.$('#form_height').val());
         var weight = parseFloat(this.$('#form_weight').val());
         this.$('#bmi-warning').text('');
-        this.$('#form_height').parsley().validate();
-        this.$('#form_weight').parsley().validate();
+        if (this.rendered || (height && weight)) {
+            this.$('#form_height').parsley().validate();
+            this.$('#form_weight').parsley().validate();
+        }
         if (height && weight) {
             var bmi = weight / ((height/100) * (height/100));
             bmi = bmi.toFixed(1);
