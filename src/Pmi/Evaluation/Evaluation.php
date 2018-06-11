@@ -160,6 +160,22 @@ class Evaluation
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
+            $form = $formBuilder->getForm();
+            $bmiConstraint = function($value, $context) use ($form) {
+                $bmi = round(self::calculateBmi($form->getData()->height, $form->getData()->weight), 1);
+                if ($bmi != false && ($bmi < 5 || $bmi > 125)) {
+                    $context->buildViolation('This height/weight combination has yielded an invalid BMI')->addViolation();
+                }
+            };
+
+            if ($field->name === 'height') {
+                $attributes['data-parsley-bmi-height'] = '#form_weight';
+                $constraints[] = new Constraints\Callback($bmiConstraint);
+            }
+            if ($field->name === 'weight') {
+                $attributes['data-parsley-bmi-weight'] = '#form_height';
+                $constraints[] = new Constraints\Callback($bmiConstraint);
+            }
 
             if (isset($field->options)) {
                 $class = ChoiceType::class;
@@ -201,7 +217,6 @@ class Evaluation
                     $compareType = $field->compare->type;
                     $compareField = $field->compare->field;
                     $compareMessage = $field->compare->message;
-                    $form = $formBuilder->getForm();
                     $callback = function($value, $context, $replicate) use ($form, $compareField, $compareType, $compareMessage) {
                         $compareTo = $form->getData()->$compareField;
                         if (!isset($compareTo[$replicate])) {
@@ -391,6 +406,14 @@ class Evaluation
         }
     }
 
+    protected static function calculateBmi($height, $weight)
+    {
+        if ($height && $weight) {
+            return $weight / (($height / 100) * ($height / 100));
+        }
+        return false;
+    }
+
     public function getSummary()
     {
         $summary = [];
@@ -407,7 +430,7 @@ class Evaluation
             ];
         }
         if ($this->data->weight && $this->data->height) {
-            $summary['bmi'] = $this->data->weight / (($this->data->height / 100) * ($this->data->height / 100));
+            $summary['bmi'] = self::calculateBmi($this->data->height, $this->data->weight);
         }
         if ($hip = $this->calculateMean('hip-circumference')) {
             $summary['hip'] = [

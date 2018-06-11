@@ -106,10 +106,18 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     calculateBmi: function() {
         var height = parseFloat(this.$('#form_height').val());
         var weight = parseFloat(this.$('#form_weight').val());
+        this.$('#bmi-warning').text('');
+        if (this.rendered || (height && weight)) {
+            this.$('#form_height').parsley().validate();
+            this.$('#form_weight').parsley().validate();
+        }
         if (height && weight) {
             var bmi = weight / ((height/100) * (height/100));
             bmi = bmi.toFixed(1);
             this.$('#bmi').html('<strong>' + bmi + '</strong>');
+            if (bmi < 15 || bmi > 50) {
+                this.$('#bmi-warning').text('Please verify that the height and weight are correct');
+            }
         } else {
             this.$('#bmi').text('--');
         }
@@ -572,15 +580,42 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             block.parent().prev().find('input').parsley().validate(); // trigger parsley validation
         }
     },
-    initialize: function(obj) {
-        this.warnings = obj.warnings;
-        this.conversions = obj.conversions;
-        this.finalized = obj.finalized;
-        this.rendered = false;
-        this.render();
+    // for parsley validator
+    validateHeightWeight: function(height, weight) {
+        if (height && weight) {
+            var bmi = weight / ((height/100) * (height/100));
+            bmi = bmi.toFixed(1);
+            if (bmi < 5 || bmi > 125) {
+                return false;
+            }
+        }
+        return true;
     },
-    render: function() {
-        var self = this;
+    initParsley: function() {
+        self = this;
+        window.Parsley.addValidator('bmiHeight', {
+            validateString: function (value, weightSelector) {
+                var height = parseFloat(value);
+                var weight = parseRequirement(weightSelector);
+                return self.validateHeightWeight(height, weight);
+            },
+            messages: {
+                en: 'This height/weight combination has yielded an invalid BMI'
+            },
+            priority: 32
+        });
+        window.Parsley.addValidator('bmiWeight', {
+            validateString: function (value, heightSelector) {
+                var weight = parseFloat(value);
+                var height = parseRequirement(heightSelector);
+                return self.validateHeightWeight(height, weight);
+            },
+            messages: {
+                en: 'This height/weight combination has yielded an invalid BMI'
+            },
+            priority: 32
+        });
+        
         this.$('form').parsley({
             errorClass: "has-error",
             classHandler: function(el) {
@@ -593,6 +628,17 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             errorTemplate: '<div></div>',
             trigger: "keyup change"
         });
+    },
+    initialize: function(obj) {
+        this.warnings = obj.warnings;
+        this.conversions = obj.conversions;
+        this.finalized = obj.finalized;
+        this.rendered = false;
+        this.render();
+    },
+    render: function() {
+        var self = this;
+        self.initParsley();
 
         var processedReplicates = {};
         this.$('.replicate .field').each(function() {
