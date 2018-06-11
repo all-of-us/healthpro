@@ -15,7 +15,8 @@ class EntityManager
         'problem_comments' => 'doctrine',
         'evaluations_queue' => 'doctrine',
         'organizations' => 'doctrine',
-        'awardees' => 'doctrine'
+        'awardees' => 'doctrine',
+        'missing_notifications_log' => 'doctrine'
     ];
 
     protected $timezone;
