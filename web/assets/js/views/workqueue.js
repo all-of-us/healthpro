@@ -13,11 +13,11 @@ $(document).ready(function() {
         }
     };
     checkFilters();
-    $('#filters select').change(function() {
+    $('#filters select').on('change', function() {
         checkFilters();
         $('#filters').submit();
     });
-    $('button.export').click(function() {
+    $('button.export').on('click', function() {
         var location = $(this).data('href');
         new PmiConfirmModal({
             title: 'Attention',

@@ -25,7 +25,7 @@
         "gulp-rename": "1.2.x",
         "gulp-sourcemaps": "1.6.x",
         "gulp-uglify": "1.5.x",
-        "jquery": "^1.12.4",
+        "jquery": "^3.3.1",
         "jsbarcode": "^3.9.0",
         "merge-stream": "^1.0.0",
         "parsleyjs": "^2.8.1",

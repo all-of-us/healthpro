@@ -60,7 +60,7 @@
 
 <script type="text/javascript">
     // toggle subgroup
-    $('#{{ id }}').find('.toggle-center-filters').click(function(e) {
+    $('#{{ id }}').find('.toggle-center-filters').on('click', function(e) {
         var listGroup = $(e.currentTarget).data('identifier');
         console.log('toggling ' + listGroup);
         var cb = $('#{{ id }}').find('.' + listGroup).find('input');
@@ -70,7 +70,7 @@
     });
 
     // toggle all recruitment origin filters
-    $('#{{ id }}').find('.toggle-all-center-filters').click(function(e) {
+    $('#{{ id }}').find('.toggle-all-center-filters').on('click', function(e) {
         var cb = $('#{{ id }}').find('.center-filter');
         cb.prop('checked', !cb.prop('checked'));
         // check first element to determine whether toggle switch should be on or off
@@ -79,7 +79,7 @@
     });
 
     // toggle all enrollment status filters
-    $('#{{ id }}').find('.toggle-all-enrollment-filters').click(function(e) {
+    $('#{{ id }}').find('.toggle-all-enrollment-filters').on('click', function(e) {
       var cb = $('#{{ id }}').find('.enrollment-status-filter');
       cb.prop('checked', !cb.prop('checked'));
       // check first element to determine whether toggle switch should be on or off
