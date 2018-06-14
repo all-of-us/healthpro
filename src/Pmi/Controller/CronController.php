@@ -9,6 +9,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Pmi\Service\WithdrawalService;
 use Pmi\Service\EvaluationsQueueService;
 use Pmi\Service\SiteSyncService;
+use Pmi\Service\NotifyMissingMeasurementsAndOrdersService;
 
 /**
  * NOTE: all /cron routes should be protected by `login: admin` in app.yaml
@@ -22,7 +23,8 @@ class CronController extends AbstractController
         ['withdrawal', '/withdrawal'],
         ['resendEvaluationsToRdr', '/resend-evaluations-rdr'],
         ['sites', '/sites'],
-        ['awardeesAndOrganizations', '/awardees-organizations']
+        ['awardeesAndOrganizations', '/awardees-organizations'],
+        ['missingMeasurementsOrders', '/missing-measurements-orders'],
     ];
     
     /**
@@ -106,6 +108,18 @@ class CronController extends AbstractController
         );
         $siteSync->syncAwardees();
         $siteSync->syncOrganizations();
+        return (new JsonResponse())->setData(true);
+    }
+
+    public function missingMeasurementsOrdersAction(Application $app, Request $request)
+    {
+        if (!$this->isAdmin($request)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $notifyMissing = new NotifyMissingMeasurementsAndOrdersService($app);
+        $notifyMissing->sendEmails();
+
         return (new JsonResponse())->setData(true);
     }
 }

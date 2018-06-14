@@ -1,15 +1,5 @@
 [
     { 
-        "component": "jquery",
-        "identifiers" : { "issue": "2432"},
-        "justification" : "We have disabled jQuery's AJAX execution of remote javascript (https://github.com/vanderbilt/pmi-drc-hpo/commit/95a5b44c)"
-    },
-    { 
-        "component": "jquery",
-        "identifiers" : { "issue": "11974"},
-        "justification" : "We are not using $.parseHTML on any external or untrusted strings"
-    },
-    { 
         "component": "bootstrap",
         "identifiers" : { "issue": "20184"},
         "justification" : "https://github.com/twbs/bootstrap/issues/20184 is not a vulnerability in our application because we do not set any data-target attributes dynamically."

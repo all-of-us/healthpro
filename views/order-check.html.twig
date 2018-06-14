@@ -55,7 +55,7 @@
 {% block pagejs %}
 <script>
 $(document).ready(function() {
-    $('input[type=radio]').change(function() {
+    $('input[type=radio]').on('change', function() {
         var donate = $('input:radio[name=donate]:checked').val();
         var transfusion = $('input:radio[name=transfusion]:checked').val();
         if ((typeof(donate) !== 'undefined' && typeof(transfusion) !== 'undefined') && (donate === 'yes' || transfusion === 'yes')) {
