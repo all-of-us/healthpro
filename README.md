@@ -2,6 +2,10 @@
 
 ![Build Status of master](https://circleci.com/gh/vanderbilt/pmi-drc-hpo.png?circle-token=17ce7a55825cb047e685c2376d7e33441a07c590)
 
+## Contributions
+
+HealthPro is being developed to facilitate in-person enrollment and other operations of the All of Us Research Program. We are developing this project in the open, and publishing the code with an open-source license, to share knowledge and provide insight and sample code for the community. We welcome your feedback! Please send any security concerns to security@pmi-ops.org, and feel free to file other issues via GitHub. Please note that we do not plan to incorporate external code contributions at this time, given that HealthPro exists to meet the specific operational needs of the All of Us Research Program.
+
 ## Developer Quick Start
 
 Prerequisites:
