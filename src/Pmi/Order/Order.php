@@ -822,6 +822,19 @@ class Order
 
     public function generateId()
     {
-        return Util::generateShortUuid(12);
+        $attempts = 0;
+        $ordersRepository = $this->app['em']->getRepository('orders');
+        while (++$attempts <= 20) {
+            $id = rand(1000000000, 9999999999);
+            if ($ordersRepository->fetchOneBy(['order_id' => $id])) {
+                $id = null;
+            } else {
+                break;
+            }
+        }
+        if (is_null($id)) {
+            throw new \Exception('Failed to generate unique order id');
+        }
+        return $id;
     }
 }
