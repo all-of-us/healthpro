@@ -11,7 +11,6 @@ use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
 use Pmi\Order\Order;
 use Pmi\Order\Mayolink\MayolinkOrder;
-use Pmi\Util;
 
 class OrderController extends AbstractController
 {
@@ -122,22 +121,22 @@ class OrderController extends AbstractController
         $formBuilder->add('show-blood-tubes', Type\HiddenType::class, [
             'data' => $showBloodTubes
         ]);
-        $confirmForm = $formBuilder->getForm();
         $showCustom = false;
+        $ordersRepository = $app['em']->getRepository('orders');
+        $confirmForm = $formBuilder->getForm();
         $confirmForm->handleRequest($request);
         if ($confirmForm->isValid()) {
             $orderData = ['type' => null];
             if ($request->request->has('existing')) {
                 if (empty($confirmForm['kitId']->getData())) {
                     $confirmForm['kitId']['first']->addError(new FormError('Please enter a kit order ID'));
-                } elseif ($app['em']->getRepository('orders')->fetchOneBy(['order_id' => $confirmForm['kitId']->getData()])) {
+                } elseif ($ordersRepository->fetchOneBy(['order_id' => $confirmForm['kitId']->getData()])) {
                     $confirmForm['kitId']['first']->addError(new FormError('This order ID already exists'));
                 } else {
                     $orderData['order_id'] = $confirmForm['kitId']->getData();
                     $orderData['type'] = 'kit';
                 }
             } else {
-                $orderData['order_id'] = Util::generateShortUuid(12);
                 if ($request->request->has('custom')) {
                     $showCustom = true;
                     $requestedSamples = $confirmForm['samples']->getData();
@@ -160,7 +159,13 @@ class OrderController extends AbstractController
                 if (!$app->isDVType()) {
                     $orderData['processed_centrifuge_type'] = Order::SWINGING_BUCKET;
                 }
-                $orderId = $app['em']->getRepository('orders')->insert($orderData);
+                $orderId = null;
+                $ordersRepository->wrapInTransaction(function() use ($ordersRepository, $order, &$orderData, &$orderId) {
+                    if (!isset($orderData['order_id'])) {
+                        $orderData['order_id'] = $order->generateId();
+                    }
+                    $orderId = $ordersRepository->insert($orderData);
+                });
                 if ($orderId) {
                     $app->log(Log::ORDER_CREATE, $orderId);
                     return $app->redirectToRoute('order', [

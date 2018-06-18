@@ -819,4 +819,9 @@ class Order
         }
         return false;
     }
+
+    public function generateId()
+    {
+        return Util::generateShortUuid(12);
+    }
 }
