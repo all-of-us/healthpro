@@ -26,11 +26,11 @@ $(document).ready(function() {
 
     $('input:radio[name=red_blood_qn]').on('change', function() {
         if ($(this).val() === 'yes') {
-            hideFields(['order-info-text'])
+            hideFields(['order-info-text']);
             showFields(['continue']);
         } else {
             showFields(['order-info-text', 'blood-info-text-2', 'saliva-info-text', 'continue']);
-            hideFields(['blood-info-text', 'urine-info-text'])
+            hideFields(['blood-info-text', 'urine-info-text']);
         }
     });
 
@@ -39,14 +39,14 @@ $(document).ready(function() {
         var transfusionRedBlood = $('input:checkbox[name=transfusion_red_blood]:checked').val();
         if (typeof(transfusionWholeBlood) !== 'undefined' || typeof(transfusionRedBlood) !== 'undefined') {
             if ((transfusionWholeBlood === 'whole') || (transfusionWholeBlood === 'whole' && transfusionRedBlood === 'red')) {
-                hideFields(['red-blood-qn', 'order-info-text'])
+                hideFields(['red-blood-qn', 'order-info-text']);
                 showFields(['continue']);
             } else {
                 showFields(['red-blood-qn']);
                 hideFields(['continue']);
             }
         } else {
-            hideFields(['red-blood-qn', 'order-info-text', 'continue'])
+            hideFields(['red-blood-qn', 'order-info-text', 'continue']);
         }
     });
 

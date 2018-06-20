@@ -85,9 +85,6 @@ class OrderController extends AbstractController
         } else {
             $app->abort(403);
         }
-        if ($app->isDVType() && !$showBloodTubes && !$showSalivaTubes) {
-            $app->abort(403);
-        }
         $formBuilder = $app['form.factory']->createBuilder(FormType::class);
         if ($app->isDVType()) {
             $formBuilder->add('kitId', Type\RepeatedType::class, [
@@ -126,7 +123,7 @@ class OrderController extends AbstractController
                     if ($showBloodTubes) {
                         return [];
                     }
-                    return $val !== '1UR10' ? ['disabled' => 'disabled'] : ['checked' => 'checked'];
+                    return !in_array($val, Order::$nonBloodSamples) ? ['disabled' => 'disabled'] : ['checked' => 'checked'];
                 }
             ]);
         }
@@ -149,6 +146,9 @@ class OrderController extends AbstractController
                 } else {
                     $orderData['order_id'] = $confirmForm['kitId']->getData();
                     $orderData['type'] = 'kit';
+                    if (!$showBloodTubes) {
+                        $orderData['requested_samples'] = json_encode([$order->getUrineSample()]);
+                    }
                 }
             } else {
                 $orderData['order_id'] = Util::generateShortUuid(12);

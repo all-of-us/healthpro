@@ -83,6 +83,11 @@
                             </div>
                             <div class="panel-body">
                                 <p class="text-center">Register an All of Us℠ Biospecimen Kit</p>
+                                {% if not showBloodTubes %}
+                                    <p class="text-center text-warning">
+                                        <i class="fa fa-info-circle" aria-hidden="true"></i> Biobank orders for blood draws cannot be created at this moment due to safety checks. Only urine sample can be created.
+                                    </p>
+                                {% endif %}
                                     <br />
                                     {{ form_row(confirmForm.kitId) }}
                                 <p class="text-center">
