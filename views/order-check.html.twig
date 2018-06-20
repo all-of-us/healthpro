@@ -23,7 +23,7 @@
     <br />
 
     <h3>In the past week has the participant donated blood (e.g. Blood Bank, Red Cross), platelets, or plasma?</h3>
-    <form method="post" action="{{ path('orderCreate', { participantId: participant.id }) }}">
+    <form method="post" action="{{ path('orderCreate', { participantId: participant.id }) }}" id="safety-checks">
         <div class="radio">
             <label><input type="radio" name="donate" value="yes" /> Yes</label>
         </div>
@@ -59,11 +59,10 @@
             </div>
         </div>
         <div class="alert alert-danger" style="display:none" id="order-info-text">
-            Participants may not have blood drawn and saliva collected if they have donated blood, platelets, or plasma in the past week or have received a blood transfusion in the past 6 months.
+            <span style="display: none" id="blood-info-text">Participants may not have blood drawn and saliva collected if they have donated blood, platelets, or plasma in the past week or have received a blood transfusion in the past 6 months.</span>
+            <span style="display: none" id="blood-info-text-2">Participants may not have blood drawn if they have received RBC transfusion in the past 2 months or Plasma, Platelet, Cryoprecipitate transfusion in the past week.</span>
             <strong style="display: none" id="urine-info-text">Urine collection is permissible, and can be initiated by selecting Continue.</strong>
-            {% if app.isDvType is empty %}
-                <strong style="display: none" id="saliva-info-text">Urine and saliva collection are permissible, and can be initiated by selecting Continue.</strong>
-            {% endif %}
+            <strong style="display: none" id="saliva-info-text">Urine {% if not app.isDvType %} and saliva {% endif %} collection {% if not app.isDvType %} are {% else %} is {% endif %} permissible, and can be initiated by selecting Continue.</strong>
         </div>
         <div id="continue" style="display:none">
             <br />
@@ -77,8 +76,8 @@
 $(document).ready(function() {
     $('input:radio[name=donate]').on('change', function() {
         if ($(this).val() === 'yes') {
-            hideFields(['transfusion', 'saliva-info-text']);
-            showFields(['order-info-text', 'urine-info-text', 'continue']);
+            hideFields(['transfusion', 'blood-info-text-2', 'saliva-info-text']);
+            showFields(['order-info-text', 'blood-info-text', 'urine-info-text', 'continue']);
         } else {
             showFields(['transfusion']);
             hideFields(['transfusion-qn', 'red-blood-qn', 'order-info-text', 'continue']);
@@ -100,8 +99,8 @@ $(document).ready(function() {
             hideFields(['order-info-text'])
             showFields(['continue']);
         } else {
-            showFields(['order-info-text', 'saliva-info-text', 'continue']);
-            hideFields(['urine-info-text'])
+            showFields(['order-info-text', 'blood-info-text-2', 'saliva-info-text', 'continue']);
+            hideFields(['blood-info-text', 'urine-info-text'])
         }
     });
 
