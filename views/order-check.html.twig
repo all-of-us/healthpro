@@ -31,21 +31,41 @@
             <label><input type="radio" name="donate" value="no" /> No</label>
         </div>
 
-        <h3>In the past 6 months, has the participant had a blood transfusion?</h3>
-        <div class="radio">
-            <label><input type="radio" name="transfusion" value="yes" /> Yes</label>
+        <div style="display:none" id="transfusion">
+            <h3>In the past 6 months, has the participant had a blood transfusion?</h3>
+            <div class="radio">
+                <label><input type="radio" name="transfusion" value="yes" /> Yes</label>
+            </div>
+            <div class="radio">
+                <label><input type="radio" name="transfusion" value="no" /> No</label>
+            </div>
+            <div style="display:none" id="transfusion-qn">
+                <h3>Please select the specific type of blood transfusion (check boxes for responses):</h3>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="transfusion_whole_blood" value="whole" /> Whole blood transfusion</label>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="transfusion_red_blood" value="red" /> Red Blood Cells (RBC), packed RBC, Plasma, Platelet, or Cryoprecipitate transfusion</label>
+                </div>
+            </div>
+            <div style="display:none" id="red-blood-qn">
+                <h3>Has it been at least 2 months since participant's RBC transfusion? Or, has it been at least a week since the participant donated Plasma, Platelet, or Cryoprecipitate?</h3>
+                <div class="radio">
+                    <label><input type="radio" name="red_blood_qn" value="yes" /> Yes</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="red_blood_qn" value="no" /> No</label>
+                </div>
+            </div>
         </div>
-        <div class="radio">
-            <label><input type="radio" name="transfusion" value="no" /> No</label>
-        </div>
-            
-        <div class="alert alert-danger" style="display:none" id="failed">
-            Participants may not have blood drawn if they have donated blood, platelets, or plasma in the past week or have received a blood transfusion in the past 6 months.
+        <div class="alert alert-danger" style="display:none" id="order-info-text">
+            Participants may not have blood drawn and saliva collected if they have donated blood, platelets, or plasma in the past week or have received a blood transfusion in the past 6 months.
+            <strong style="display: none" id="urine-info-text">Urine collection is permissible, and can be initiated by selecting Continue.</strong>
             {% if app.isDvType is empty %}
-                <strong>Saliva collection is permissible, and can be initiated by selecting Continue.</strong>
+                <strong style="display: none" id="saliva-info-text">Urine and saliva collection are permissible, and can be initiated by selecting Continue.</strong>
             {% endif %}
         </div>
-        <div id="succeed" style="display:none">
+        <div id="continue" style="display:none">
             <br />
             <p><button type="submit" class="btn btn-primary">Continue</button></p>
         </div>
@@ -55,22 +75,64 @@
 {% block pagejs %}
 <script>
 $(document).ready(function() {
-    $('input[type=radio]').on('change', function() {
-        var donate = $('input:radio[name=donate]:checked').val();
-        var transfusion = $('input:radio[name=transfusion]:checked').val();
-        if ((typeof(donate) !== 'undefined' && typeof(transfusion) !== 'undefined') && (donate === 'yes' || transfusion === 'yes')) {
-            $('#failed').show();
-            {% if app.isDvType %}
-                $('#succeed').hide();
-            {% else %}
-                $('#succeed').show();
-            {% endif %}
-        }
-        if (donate === 'no' && transfusion === 'no') {
-            $('#succeed').show();
-            $('#failed').hide();
+    $('input:radio[name=donate]').on('change', function() {
+        if ($(this).val() === 'yes') {
+            hideFields(['transfusion', 'saliva-info-text']);
+            showFields(['order-info-text', 'urine-info-text', 'continue']);
+        } else {
+            showFields(['transfusion']);
+            hideFields(['transfusion-qn', 'red-blood-qn', 'order-info-text', 'continue']);
         }
     });
+
+    $('input:radio[name=transfusion]').on('change', function() {
+        if ($(this).val() === 'yes') {
+            showFields(['transfusion-qn']);
+            hideFields(['continue']);
+        } else {
+            hideFields(['transfusion-qn', 'red-blood-qn', 'order-info-text']);
+            showFields(['continue']);
+        }
+    });
+
+    $('input:radio[name=red_blood_qn]').on('change', function() {
+        if ($(this).val() === 'yes') {
+            hideFields(['order-info-text'])
+            showFields(['continue']);
+        } else {
+            showFields(['order-info-text', 'saliva-info-text', 'continue']);
+            hideFields(['urine-info-text'])
+        }
+    });
+
+    $('input[type=checkbox]').on('change', function() {
+        var transfusionWholeBlood = $('input:checkbox[name=transfusion_whole_blood]:checked').val();
+        var transfusionRedBlood = $('input:checkbox[name=transfusion_red_blood]:checked').val();
+        if (typeof(transfusionWholeBlood) !== 'undefined' || typeof(transfusionRedBlood) !== 'undefined') {
+            if ((transfusionWholeBlood === 'whole') || (transfusionWholeBlood === 'whole' && transfusionRedBlood === 'red')) {
+                hideFields(['red-blood-qn', 'order-info-text'])
+                showFields(['continue']);
+            } else {
+                showFields(['red-blood-qn']);
+                hideFields(['continue']);
+            }
+        } else {
+            hideFields(['red-blood-qn', 'order-info-text', 'continue'])
+        }
+    });
+
+    var hideFields = function(fields) {
+        for (var i = 0; i < fields.length; i++) {
+            $('#' + fields[i]).hide();
+            $('#' + fields[i]).find('input:radio, input:checkbox').prop('checked', false);
+        }
+    }
+
+    var showFields = function(fields) {
+        for (var i = 0; i < fields.length; i++) {
+            $('#' + fields[i]).show();
+        }
+    }
 });
 </script>
 {% endblock %}
