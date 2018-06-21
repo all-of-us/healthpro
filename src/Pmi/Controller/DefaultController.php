@@ -294,6 +294,13 @@ class DefaultController extends AbstractController
 
         if ($idForm->isValid()) {
             $id = $idForm->get('mayoId')->getData();
+            
+            // New barcodes include a 4-digit sample identifier appended to the 10 digit order id
+            // If the string matches this format, remove the sample identifier to get the order id
+            if (preg_match('/^\d{14}$/', $id)) {
+                $id = substr($id, 0, 10);
+            }
+
             $order = $app['em']->getRepository('orders')->fetchOneBy([
                 'order_id' => $id
             ]);
