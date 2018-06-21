@@ -825,7 +825,7 @@ class Order
         $attempts = 0;
         $ordersRepository = $this->app['em']->getRepository('orders');
         while (++$attempts <= 20) {
-            $id = rand(1000000000, 9999999999);
+            $id = (string)rand(1000000000, 9999999999);
             if ($ordersRepository->fetchOneBy(['order_id' => $id])) {
                 $id = null;
             } else {
