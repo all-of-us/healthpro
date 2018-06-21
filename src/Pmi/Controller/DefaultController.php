@@ -280,7 +280,7 @@ class DefaultController extends AbstractController
     public function ordersAction(Application $app, Request $request)
     {
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
-            ->add('mayoId', TextType::class, [
+            ->add('orderId', TextType::class, [
                 'label' => 'Order ID',
                 'attr' => ['placeholder' => 'Scan barcode or enter order ID'],
                 'constraints' => [
@@ -293,7 +293,7 @@ class DefaultController extends AbstractController
         $idForm->handleRequest($request);
 
         if ($idForm->isValid()) {
-            $id = $idForm->get('mayoId')->getData();
+            $id = $idForm->get('orderId')->getData();
             
             // New barcodes include a 4-digit sample identifier appended to the 10 digit order id
             // If the string matches this format, remove the sample identifier to get the order id
