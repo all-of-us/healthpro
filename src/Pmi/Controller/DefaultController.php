@@ -282,7 +282,7 @@ class DefaultController extends AbstractController
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
             ->add('mayoId', TextType::class, [
                 'label' => 'Order ID',
-                'attr' => ['placeholder' => 'Scan barcode'],
+                'attr' => ['placeholder' => 'Scan barcode or enter order ID'],
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
