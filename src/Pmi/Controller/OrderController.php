@@ -434,21 +434,30 @@ class OrderController extends AbstractController
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                 }
-                //Send order to mayo
                 $orderData = $order->toArray();
                 if (empty($orderData['mayo_id']) && !empty($finalizeForm['finalized_ts']->getData())) {
-                    $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
-                    if (!empty($mayoId)) {
-                        //Save mayo id and finalized time
-                        $newUpdateArray = [
-                            'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
-                            'mayo_id' => $mayoId
-                        ];
-                        if ($app['em']->getRepository('orders')->update($orderId, $newUpdateArray)) {
-                            $app->log(Log::ORDER_EDIT, $orderId);
+                    // Check for empty finalized samples
+                    if (!empty($finalizeForm['finalized_samples']->getData())) {
+                        //Send order to mayo
+                        $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                        if (!empty($mayoId)) {
+                            //Save mayo id and finalized time
+                            $newUpdateArray = [
+                                'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
+                                'mayo_id' => $mayoId
+                            ];
+                            if ($app['em']->getRepository('orders')->update($orderId, $newUpdateArray)) {
+                                $app->log(Log::ORDER_EDIT, $orderId);
+                            }
+                        } else {
+                            $app->addFlashError('Failed to send order');
                         }
                     } else {
-                        $app->addFlashError('Failed to send order');
+                        //Save finalized time
+                        if ($app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()])) {
+                            $app->log(Log::ORDER_EDIT, $orderId);
+                        }
+                        $app->addFlashSuccess('Order finalized');
                     }
                 }
                 $order = $this->loadOrder($participantId, $orderId, $app);
