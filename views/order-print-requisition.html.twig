@@ -4,22 +4,28 @@
     {% include 'order-header.html.twig' with { active: 'printRequisition' } %}
     <div class="row">
         <div class="col-sm-10 col-md-offset-1">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Requisition</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="text-center">
-                        <p id="requisition-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
-                        <p id="requisition-loaded">
-                            <a href="javascript:window.requisition.print();" class="btn btn-primary btn-sm">
-                                <i class="fa fa-print" aria-hidden="true"></i> Print
-                            </a>
-                        </p>
+            {% if order.mayo_id is not empty %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Requisition</h3>
                     </div>
-                    <iframe name="requisition" class="pdf pdf-requisition" src="{{ path('orderRequisitionPdf', { participantId: participant.id, orderId: order.id, type: 'requisition' }) }}#view=FitH"></iframe>
+                    <div class="panel-body">
+                        <div class="text-center">
+                            <p id="requisition-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
+                            <p id="requisition-loaded">
+                                <a href="javascript:window.requisition.print();" class="btn btn-primary btn-sm">
+                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                </a>
+                            </p>
+                        </div>
+                        <iframe name="requisition" class="pdf pdf-requisition" src="{{ path('orderRequisitionPdf', { participantId: participant.id, orderId: order.id, type: 'requisition' }) }}#view=FitH"></iframe>
+                    </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="alert alert-danger" role="alert">
+                    This order was finalized as an empty order and was not submitted to the Biobank. If this was done in error, create a new order with the original order information and please submit a Support Center ticket to the Biobank with the 2 order IDs.
+                </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

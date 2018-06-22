@@ -491,7 +491,7 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id'))) {
+        if (empty($order->get('finalized_ts'))) {
             $app->abort(403);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
