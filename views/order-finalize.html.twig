@@ -197,6 +197,17 @@ $(document).ready(function () {
     //Display warning message
     $('button[type="submit"]').on('click', function() {
         var message = 'Are you sure you want to finalize this order?';
+
+        //Check if zero samples are selected
+        if ($('input[name="form[finalized_samples][]"]').prop('checked') === false) {
+            var printMessage = '';
+            {% if app.isDvType is empty %}
+                printMessage = ' and the Print Requisition will not be generated';
+            {% endif %}
+            message = 'Warning: Finalizing an empty order will result in the order not being submitted to the Biobank' + printMessage + '. Are you sure you wish to continue?';
+            return confirm(message);
+        }
+
         $('input[name="form[finalized_samples][]"]').each(function() {
             //Select samples that are unchecked and not disabled
             if ($(this).prop('checked') === false && $(this).prop('disabled') === false) {
