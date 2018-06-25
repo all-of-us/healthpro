@@ -22,7 +22,7 @@ class NotifyMissingMeasurementsAndOrdersService
 
     public function sendEmails()
     {
-        $missingEvaluations = $this->db->fetchAll('select id from evaluations where id not in (select record_id from missing_notifications_log where type="' . self::MEASUREMENT_TYPE . '") and finalized_ts is not null and mayo_id is not null and rdr_id is null');
+        $missingEvaluations = $this->db->fetchAll('select id from evaluations where id not in (select record_id from missing_notifications_log where type="' . self::MEASUREMENT_TYPE . '") and finalized_ts is not null and rdr_id is null');
         foreach ($missingEvaluations as $evaluation) {
             $this->insertRecords($evaluation['id'], self::MEASUREMENT_TYPE);
         }

@@ -491,8 +491,9 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if (empty($order->get('finalized_ts'))) {
-            $app->abort(403);
+        if ($app->isDVType() && !in_array('printRequisition', $order->getAvailableSteps())) {
+            // 404 because print is not a valid route for kit orders regardless of state
+            $app->abort(404);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
             return $app->redirectToRoute('order', [
@@ -500,10 +501,7 @@ class OrderController extends AbstractController
                 'orderId' => $orderId
             ]);
         }
-        if (!in_array('printRequisition', $order->getAvailableSteps())) {
-            // 404 because print is not a valid route for kit orders regardless of state
-            $app->abort(404);
-        }
+
         return $app['twig']->render('order-print-requisition.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
