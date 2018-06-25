@@ -446,17 +446,13 @@ class OrderController extends AbstractController
                                 'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
                                 'mayo_id' => $mayoId
                             ];
-                            if ($app['em']->getRepository('orders')->update($orderId, $newUpdateArray)) {
-                                $app->log(Log::ORDER_EDIT, $orderId);
-                            }
+                            $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
                         } else {
                             $app->addFlashError('Failed to send order');
                         }
                     } else {
                         //Save finalized time
-                        if ($app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()])) {
-                            $app->log(Log::ORDER_EDIT, $orderId);
-                        }
+                        $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()]);
                         $app->addFlashSuccess('Order finalized');
                     }
                 }

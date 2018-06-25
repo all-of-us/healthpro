@@ -200,21 +200,20 @@ $(document).ready(function () {
 
         //Check if zero samples are selected
         if ($('input[name="form[finalized_samples][]"]').prop('checked') === false) {
-            var printMessage = '';
-            {% if app.isDvType is empty %}
-                printMessage = ' and the Print Requisition will not be generated';
+            {% if order.type == 'kit' %}
+                message = 'Warning: Finalizing an empty order will result in the order not being submitted to the Biobank. Are you sure you wish to continue?';
+            {% else %}
+                message = 'Warning: Finalizing an empty order will result in the order not being submitted to the Biobank and the Print Requisition will not be generated. Are you sure you wish to continue?';
             {% endif %}
-            message = 'Warning: Finalizing an empty order will result in the order not being submitted to the Biobank' + printMessage + '. Are you sure you wish to continue?';
-            return confirm(message);
+        } else {
+            $('input[name="form[finalized_samples][]"]').each(function() {
+                //Select samples that are unchecked and not disabled
+                if ($(this).prop('checked') === false && $(this).prop('disabled') === false) {
+                    message = 'Warning: At least one sample that was collected and processed (as applicable) was not finalized. Are you sure you wish to continue?';
+                    return false;
+                }
+            });
         }
-
-        $('input[name="form[finalized_samples][]"]').each(function() {
-            //Select samples that are unchecked and not disabled
-            if ($(this).prop('checked') === false && $(this).prop('disabled') === false) {
-                message = 'Warning: At least one sample that was collected and processed (as applicable) was not finalized. Are you sure you wish to continue?';
-                return false;
-            }
-        });
         return confirm(message);
     });
 });
