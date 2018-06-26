@@ -72,7 +72,7 @@
         </div>
         <div class="form-group" id="finalize-empty-order-check" style="display:none;">
             <input type="checkbox" name="finalize_empty_order" value="1">
-            <label>This order is being intentionally finalizing with no samples</label>
+            <label>This order is being intentionally finalized with no samples</label>
         </div>
         {{ form_rest(finalizeForm) }}
         {% if not order.finalized_ts and not order.expired %}
@@ -201,12 +201,9 @@ $(document).ready(function () {
 
     var showHideConfirmEmptyOrderCheck = function() {
         var showCheckBox = true;
-        $('input[name="form[finalized_samples][]"]').each(function() {
-            if ($(this).prop('checked') === true) {
-                showCheckBox = false;
-                return false;
-            }
-        });
+        if ($('input[name="form[finalized_samples][]"]:checked').length > 0) {
+            showCheckBox = false;
+        }
         if (showCheckBox) {
             $('#finalize-empty-order-check').show();
         } else {
@@ -225,13 +222,7 @@ $(document).ready(function () {
     $('button[type="submit"]').on('click', function() {
         //Display alert message
         var showAlert = true;
-        $('input[name="form[finalized_samples][]"]').each(function() {
-            if ($(this).prop('checked') === true) {
-                showAlert = false;
-                return false;
-            }
-        });
-        if ($('input[name="finalize_empty_order"]').prop('checked') === true) {
+        if ($('input[name="form[finalized_samples][]"]:checked').length > 0 || $('input[name="finalize_empty_order"]').prop('checked') === true) {
             showAlert = false;
         }
         if (showAlert) {
@@ -242,7 +233,7 @@ $(document).ready(function () {
         //Display warning message
         var message = 'Are you sure you want to finalize this order?';
         //Check if zero samples are selected
-        if ($('input[name="form[finalized_samples][]"]').prop('checked') === false) {
+        if ($('input[name="form[finalized_samples][]"]:checked').length === 0) {
             {% if order.type == 'kit' %}
                 message = 'Warning: Finalizing an empty order will result in the order not being submitted to the Biobank. Are you sure you wish to continue?';
             {% else %}
