@@ -70,6 +70,10 @@
             <small class="text-warning">Comments entered in this field must be transmitted to the Biobank via reconciliation reporting. You may not enter any participant identifying information here.</small>
             {{ form_errors(finalizeForm.finalized_notes) }}
         </div>
+        <div class="form-group" id="finalize-empty-order-check" style="display:none;">
+            <input type="checkbox" name="finalize_empty_order" value="1">
+            <label>This order is being intentionally finalizing with no samples</label>
+        </div>
         {{ form_rest(finalizeForm) }}
         {% if not order.finalized_ts and not order.expired %}
             <p>
@@ -143,6 +147,7 @@ $(document).ready(function () {
 
     $('#checkall').on('change', function() {
         $('#form_finalized_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
+        showHideConfirmEmptyOrderCheck();
     });
     $('#form_finalized_ts').pmiDateTimePicker();
     var orderView = new PMI.views['OrderSubPage']({
@@ -194,10 +199,48 @@ $(document).ready(function () {
         }
     });
 
-    //Display warning message
-    $('button[type="submit"]').on('click', function() {
-        var message = 'Are you sure you want to finalize this order?';
+    var showHideConfirmEmptyOrderCheck = function() {
+        var showCheckBox = true;
+        $('input[name="form[finalized_samples][]"]').each(function() {
+            if ($(this).prop('checked') === true) {
+                showCheckBox = false;
+                return false;
+            }
+        });
+        if (showCheckBox) {
+            $('#finalize-empty-order-check').show();
+        } else {
+            $('#finalize-empty-order-check').hide();
+        }
+        $('input[name="finalize_empty_order"]').prop('checked', false);
+    };
 
+    showHideConfirmEmptyOrderCheck();
+
+    $('input[name="form[finalized_samples][]').on('change', function() {
+        showHideConfirmEmptyOrderCheck();
+    });
+
+
+    $('button[type="submit"]').on('click', function() {
+        //Display alert message
+        var showAlert = true;
+        $('input[name="form[finalized_samples][]"]').each(function() {
+            if ($(this).prop('checked') === true) {
+                showAlert = false;
+                return false;
+            }
+        });
+        if ($('input[name="finalize_empty_order"]').prop('checked') === true) {
+            showAlert = false;
+        }
+        if (showAlert) {
+            alert('You must check the box indicating that this order is intentionally finalized without samples or select at least one sample to finalize');
+            return false;
+        }
+
+        //Display warning message
+        var message = 'Are you sure you want to finalize this order?';
         //Check if zero samples are selected
         if ($('input[name="form[finalized_samples][]"]').prop('checked') === false) {
             {% if order.type == 'kit' %}
