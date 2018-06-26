@@ -434,21 +434,26 @@ class OrderController extends AbstractController
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                 }
-                //Send order to mayo
                 $orderData = $order->toArray();
                 if (empty($orderData['mayo_id']) && !empty($finalizeForm['finalized_ts']->getData())) {
-                    $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
-                    if (!empty($mayoId)) {
-                        //Save mayo id and finalized time
-                        $newUpdateArray = [
-                            'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
-                            'mayo_id' => $mayoId
-                        ];
-                        if ($app['em']->getRepository('orders')->update($orderId, $newUpdateArray)) {
-                            $app->log(Log::ORDER_EDIT, $orderId);
+                    // Check for empty finalized samples
+                    if (!empty($finalizeForm['finalized_samples']->getData())) {
+                        //Send order to mayo
+                        $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                        if (!empty($mayoId)) {
+                            //Save mayo id and finalized time
+                            $newUpdateArray = [
+                                'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
+                                'mayo_id' => $mayoId
+                            ];
+                            $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
+                        } else {
+                            $app->addFlashError('Failed to send order');
                         }
                     } else {
-                        $app->addFlashError('Failed to send order');
+                        //Save finalized time
+                        $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()]);
+                        $app->addFlashSuccess('Order finalized');
                     }
                 }
                 $order = $this->loadOrder($participantId, $orderId, $app);
@@ -482,8 +487,9 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id'))) {
-            $app->abort(403);
+        if ($app->isDVType() && !in_array('printRequisition', $order->getAvailableSteps())) {
+            // 404 because print is not a valid route for kit orders regardless of state
+            $app->abort(404);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
             return $app->redirectToRoute('order', [
@@ -491,10 +497,7 @@ class OrderController extends AbstractController
                 'orderId' => $orderId
             ]);
         }
-        if (!in_array('printRequisition', $order->getAvailableSteps())) {
-            // 404 because print is not a valid route for kit orders regardless of state
-            $app->abort(404);
-        }
+
         return $app['twig']->render('order-print-requisition.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),

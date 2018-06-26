@@ -337,7 +337,7 @@ class AdminController extends AbstractController
 
     public function missingOrdersAction(Application $app, Request $request, $_route)
     {
-        $missing = $app['em']->getRepository('orders')->fetchBySQL('finalized_ts is not null and rdr_id is null');
+        $missing = $app['em']->getRepository('orders')->fetchBySQL('finalized_ts is not null and mayo_id is not null and rdr_id is null');
         $choices = [];
         foreach ($missing as $orders) {
             $choices[$orders['id']] = $orders['id'];
