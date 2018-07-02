@@ -263,4 +263,12 @@ $(document).ready(function() {
     $('#workqueue').on('preXhr.dt', function(e) {
         $('.paginate_button').addClass('disabled');
     });
+
+    // Scroll to top when performing pagination
+    $('#workqueue').on('page.dt', function() {
+        $('html').animate({
+            scrollTop: $('#filters').offset().top
+        }, 'slow');
+        $('thead tr th:first-child').focus().blur();
+    });
 });
