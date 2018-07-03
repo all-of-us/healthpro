@@ -266,6 +266,7 @@ $(document).ready(function() {
 
     // Scroll to top when performing pagination
     $('#workqueue').on('page.dt', function() {
+        //Took reference from https://stackoverflow.com/a/21627503
         $('html').animate({
             scrollTop: $('#filters').offset().top
         }, 'slow');
