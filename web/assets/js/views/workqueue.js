@@ -269,6 +269,6 @@ $(document).ready(function() {
         $('html').animate({
             scrollTop: $('#filters').offset().top
         }, 'slow');
-        $('thead tr th:first-child').focus().blur();
+        $('thead tr th:first-child').trigger('focus').trigger('blur');
     });
 });
