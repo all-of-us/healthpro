@@ -59,13 +59,19 @@
             </div>
         </div>
         <div class="alert alert-danger" style="display:none" id="order-info-text">
-            <span style="display: none" id="blood-info-text">Participants may not have blood drawn and saliva collected if they have donated blood, platelets, or plasma in the past week. The same restriction applies to those who have received a blood transfusion in the past 6 months.</span>
+            <span style="display: none" id="blood-info-text">Participants may not have blood drawn {% if not app.isDvType %} and saliva collected {% endif %} if they have donated blood, platelets, or plasma in the past week. The same restriction applies to those who have received a blood transfusion in the past 6 months.</span>
             <span style="display: none" id="blood-info-text-2">
                 <p>1. Participants may not have blood drawn if they have received RBC transfusion in the past 2 months.</p> 
                 <p>2. Participants may not have blood drawn if they have received Plasma, Platelet, Cryoprecipitate transfusion in the past week.</p>
             </span>
             <strong style="display: none" id="urine-info-text">Urine collection is permissible, and can be initiated by selecting Continue.</strong>
-            <strong style="display: none" id="saliva-info-text">Urine {% if not app.isDvType %} and saliva {% endif %} collection {% if not app.isDvType %} are {% else %} is {% endif %} permissible, and can be initiated by selecting Continue.</strong>
+            <strong style="display: none" id="saliva-info-text">
+                {% if not app.isDvType %}
+                    Urine and saliva collection are permissible, and can be initiated by selecting Continue.
+                {% else %}
+                    Urine collection is permissible, and can be initiated by selecting Continue.
+                {% endif %}
+            </strong>
         </div>
         <div id="continue" style="display:none">
             <br />
