@@ -101,7 +101,7 @@ $(document).ready(function () {
         if (typeof collected !== 'undefined') {
             html = '<label><b>Collected:</b></label> <i class="fa fa-check text-success" aria-hidden="true"></i> '+collected+'</span>';
         } else {
-            html += '<label><b>Collected:</b></label> <span class="label-normal text-danger">Not collected</span></span>';
+            html = '<label><b>Collected:</b></label> <span class="label-normal text-danger">Not collected</span></span>';
         }
         if (typeof processed !== 'undefined') {
             if (typeof error !== 'undefined') {
@@ -126,7 +126,7 @@ $(document).ready(function () {
             if (typeof collected !== 'undefined') {
                 html = '<td align="center"><i class="fa fa-check text-success" aria-hidden="true"></i></td>';
             } else {
-                html += '<td align="center"><label class="label-normal text-warning">Not collected</label></td>';
+                html = '<td align="center"><label class="label-normal text-warning">Not collected</label></td>';
             }
             if (typeof processed !== 'undefined') {
                 if (typeof error !== 'undefined') {
