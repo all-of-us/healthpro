@@ -2,22 +2,31 @@
 namespace Pmi\Datastore;
 
 use Pmi\Entities\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 use DateTime;
-use SessionHandlerInterface;
 
-class DatastoreSessionHandler implements SessionHandlerInterface
+class DatastoreSessionHandler extends AbstractSessionHandler
 {
     public function close()
     {
         return true;
     }
 
-    public function destroy($id)
+    public function doDestroy($id)
     {
-        $session = Session::fetchOneByName($id);
-        if ($session) {
-            $session->delete();
+        try {
+            $session = Session::fetchOneByName($id);
+            if ($session) {
+                $session->delete();
+            }
+        } catch (\Exception $e) {
         }
+
+        return true;
+    }
+
+    public function updateTimestamp($id, $data)
+    {
         return true;
     }
 
@@ -32,30 +41,36 @@ class DatastoreSessionHandler implements SessionHandlerInterface
         return true;
     }
 
-    public function open($savePath, $name)
+    public function doRead($id)
     {
-        return true;
-    }
-
-    public function read($id)
-    {
-        $session = Session::fetchOneByName($id);
-        if ($session) {
-            return $session->getData();
-        } else {
+        try {
+            $session = Session::fetchOneByName($id);
+            if ($session) {
+                return $session->getData();
+            } else {
+                return '';
+            }
+        } catch (\Exception $e) {
+            // Destroy session if session id is invalid
+            $this->destroy($id);
             return '';
         }
     }
 
-    public function write($id, $session_data)
+    public function doWrite($id, $session_data)
     {
-        $session = Session::fetchOneByName($id);
-        if (!$session) {
-            $session = new Session();
-            $session->setKeyName($id);
+        try {
+            $session = Session::fetchOneByName($id);
+            if (!$session) {
+                $session = new Session();
+                $session->setKeyName($id);
+            }
+            $session->setData($session_data);
+            $session->setModified(new DateTime());
+            $session->save();
+            return true;
+        } catch (\Exception $e) {
+            return false;
         }
-        $session->setData($session_data);
-        $session->setModified(new DateTime());
-        $session->save();
     }
 }
