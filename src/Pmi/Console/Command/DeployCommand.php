@@ -210,10 +210,13 @@ class DeployCommand extends Command {
         }
 
         $question = $this->getHelper('question');
-        $prodYell = $this->isProd() ? ' <error>TO PRODUCTION</error>!' : '';
-        $reallyDeploy = new ConfirmationQuestion("<question>Do you REALLY want to deploy{$prodYell}? (y/n)</question> ",
+        $this->exec("git status"); // display git status
+        $gitStatus = new ConfirmationQuestion("<comment>Does git status look good? (y/n)</comment> ",
             false, '/^(y|yes)$/');
-        if ($this->local || $question->ask($input, $output, $reallyDeploy)) {
+        $destinationText = $this->isProd() ? ' <error>TO PRODUCTION</error>!' : ' to ' . $this->determineEnv();
+        $reallyDeploy = new ConfirmationQuestion("<question>Do you REALLY want to deploy{$destinationText}? (y/n)</question> ",
+            false, '/^(y|yes)$/');
+        if ($this->local || ($question->ask($input, $output, $gitStatus) && $question->ask($input, $output, $reallyDeploy))) {
             $this->exec($cmd);
             if ($this->isTaggable()) {
                 $this->tagRelease();

@@ -11,7 +11,6 @@ use Symfony\Component\Form\FormError;
 use Pmi\Audit\Log;
 use Pmi\Order\Order;
 use Pmi\Order\Mayolink\MayolinkOrder;
-use Pmi\Util;
 
 class OrderController extends AbstractController
 {
@@ -122,22 +121,22 @@ class OrderController extends AbstractController
         $formBuilder->add('show-blood-tubes', Type\HiddenType::class, [
             'data' => $showBloodTubes
         ]);
-        $confirmForm = $formBuilder->getForm();
         $showCustom = false;
+        $ordersRepository = $app['em']->getRepository('orders');
+        $confirmForm = $formBuilder->getForm();
         $confirmForm->handleRequest($request);
         if ($confirmForm->isValid()) {
             $orderData = ['type' => null];
             if ($request->request->has('existing')) {
                 if (empty($confirmForm['kitId']->getData())) {
                     $confirmForm['kitId']['first']->addError(new FormError('Please enter a kit order ID'));
-                } elseif ($app['em']->getRepository('orders')->fetchOneBy(['order_id' => $confirmForm['kitId']->getData()])) {
+                } elseif ($ordersRepository->fetchOneBy(['order_id' => $confirmForm['kitId']->getData()])) {
                     $confirmForm['kitId']['first']->addError(new FormError('This order ID already exists'));
                 } else {
                     $orderData['order_id'] = $confirmForm['kitId']->getData();
                     $orderData['type'] = 'kit';
                 }
             } else {
-                $orderData['order_id'] = Util::generateShortUuid(12);
                 if ($request->request->has('custom')) {
                     $showCustom = true;
                     $requestedSamples = $confirmForm['samples']->getData();
@@ -160,7 +159,13 @@ class OrderController extends AbstractController
                 if (!$app->isDVType()) {
                     $orderData['processed_centrifuge_type'] = Order::SWINGING_BUCKET;
                 }
-                $orderId = $app['em']->getRepository('orders')->insert($orderData);
+                $orderId = null;
+                $ordersRepository->wrapInTransaction(function() use ($ordersRepository, $order, &$orderData, &$orderId) {
+                    if (!isset($orderData['order_id'])) {
+                        $orderData['order_id'] = $order->generateId();
+                    }
+                    $orderId = $ordersRepository->insert($orderData);
+                });
                 if ($orderId) {
                     $app->log(Log::ORDER_CREATE, $orderId);
                     return $app->redirectToRoute('order', [
@@ -434,21 +439,26 @@ class OrderController extends AbstractController
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                 }
-                //Send order to mayo
                 $orderData = $order->toArray();
                 if (empty($orderData['mayo_id']) && !empty($finalizeForm['finalized_ts']->getData())) {
-                    $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
-                    if (!empty($mayoId)) {
-                        //Save mayo id and finalized time
-                        $newUpdateArray = [
-                            'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
-                            'mayo_id' => $mayoId
-                        ];
-                        if ($app['em']->getRepository('orders')->update($orderId, $newUpdateArray)) {
-                            $app->log(Log::ORDER_EDIT, $orderId);
+                    // Check for empty finalized samples
+                    if (!empty($finalizeForm['finalized_samples']->getData())) {
+                        //Send order to mayo
+                        $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                        if (!empty($mayoId)) {
+                            //Save mayo id and finalized time
+                            $newUpdateArray = [
+                                'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
+                                'mayo_id' => $mayoId
+                            ];
+                            $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
+                        } else {
+                            $app->addFlashError('Failed to send order');
                         }
                     } else {
-                        $app->addFlashError('Failed to send order');
+                        //Save finalized time
+                        $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()]);
+                        $app->addFlashSuccess('Order finalized');
                     }
                 }
                 $order = $this->loadOrder($participantId, $orderId, $app);
@@ -482,8 +492,9 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id'))) {
-            $app->abort(403);
+        if ($app->isDVType() && !in_array('printRequisition', $order->getAvailableSteps())) {
+            // 404 because print is not a valid route for kit orders regardless of state
+            $app->abort(404);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {
             return $app->redirectToRoute('order', [
@@ -491,10 +502,7 @@ class OrderController extends AbstractController
                 'orderId' => $orderId
             ]);
         }
-        if (!in_array('printRequisition', $order->getAvailableSteps())) {
-            // 404 because print is not a valid route for kit orders regardless of state
-            $app->abort(404);
-        }
+
         return $app['twig']->render('order-print-requisition.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
