@@ -39,11 +39,11 @@ $(document).ready(function() {
         var transfusionRedBlood = $('input:checkbox[name=transfusion_red_blood]:checked').val();
         if (typeof(transfusionWholeBlood) !== 'undefined' || typeof(transfusionRedBlood) !== 'undefined') {
             if ((transfusionWholeBlood === 'whole') || (transfusionWholeBlood === 'whole' && transfusionRedBlood === 'red')) {
-                hideFields(['red-blood-qn', 'order-info-text']);
-                showFields(['continue']);
+                hideFields(['red-blood-qn', 'blood-info-text-2', 'saliva-info-text']);
+                showFields(['order-info-text', 'blood-info-text', 'urine-info-text', 'continue']);
             } else {
                 showFields(['red-blood-qn']);
-                hideFields(['continue']);
+                hideFields(['order-info-text', 'blood-info-text', 'blood-info-text-2', 'urine-info-text', 'continue']);
             }
         } else {
             hideFields(['red-blood-qn', 'order-info-text', 'continue']);
