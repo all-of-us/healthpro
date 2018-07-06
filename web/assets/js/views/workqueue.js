@@ -243,11 +243,6 @@ $(document).ready(function() {
         $('#heading-count').show();
     });
 
-    // Reset table data on page length change
-    $('#workqueue').on('length.dt', function() {
-        table.clear().draw();
-    });
-
     table.buttons().container().find('.btn').addClass('btn-sm');
     $('#workqueue_length').addClass('pull-right');
     $('#workqueue_info').addClass('pull-left');
