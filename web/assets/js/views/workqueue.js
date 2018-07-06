@@ -88,7 +88,6 @@ $(document).ready(function() {
     );
 
     var table = $('#workqueue').DataTable({
-        pagingType: "simple",
         processing: true,
         serverSide: true,
         scrollX: true,
