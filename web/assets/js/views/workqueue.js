@@ -253,11 +253,6 @@ $(document).ready(function() {
         alert('An error occured please reload the page and try again');
     });
 
-    // Disable pagination buttons when ajax request is made
-    $('#workqueue').on('preXhr.dt', function(e) {
-        $('.paginate_button').addClass('disabled');
-    });
-
     // Scroll to top when performing pagination
     $('#workqueue').on('page.dt', function() {
         //Took reference from https://stackoverflow.com/a/21627503
