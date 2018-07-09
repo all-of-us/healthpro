@@ -25,6 +25,12 @@ class DatastoreSessionHandler extends AbstractSessionHandler
         return true;
     }
 
+    /**
+     * @SuppressWarnings("PHPMD.UnusedFormalParameter")
+     *
+     * This noop method is required since the AbstractSessionHandler
+     * class implements SessionUpdateTimestampHandlerInterface
+     */
     public function updateTimestamp($id, $data)
     {
         return true;
