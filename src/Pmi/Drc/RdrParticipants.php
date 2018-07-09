@@ -109,13 +109,13 @@ class RdrParticipants
                     $params .= '&_token=' . $this->nextToken;
                 }
             }
-        }
-
-        // Request count
-        if (is_array($params)) {
-            $params['_includeTotal'] = 'true';
         } else {
-            $params .= '&_includeTotal=true';
+            // Request count
+            if (is_array($params)) {
+                $params['_includeTotal'] = 'true';
+            } else {
+                $params .= '&_includeTotal=true';
+            }
         }
         $this->nextToken = $this->total = null;
         try {
