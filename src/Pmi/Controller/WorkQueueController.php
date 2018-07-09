@@ -22,10 +22,11 @@ class WorkQueueController extends AbstractController
     protected function participantSummarySearch($organization, &$params, $app, $type = null)
     {
         $rdrParams = [];
-        $tableParams = [];
+        $next = true;
 
         if ($type == 'wQTable') {
             $rdrParams['_count'] = isset($params['length']) ? $params['length'] : 10;
+            $rdrParams['_offset'] = isset($params['start']) ? $params['start'] : 0;
 
             // Pass sort params
             if (!empty($params['order'][0])) {
@@ -39,13 +40,8 @@ class WorkQueueController extends AbstractController
                 }
             }
 
-            // Pass table params
-            $tableParams['start'] = isset($params['start']) ? $params['start'] : 0;
-            $tableParams['count'] = $rdrParams['_count'];
-
-            // Set next token
-            $app['pmi.drc.participants']->setNextToken($app, $tableParams);
-
+            // Set require next token to false
+            $next = false;
         }
 
         // Unset other params when withdrawal status is NO_USE
@@ -107,11 +103,7 @@ class WorkQueueController extends AbstractController
         }
         $results = [];
         try {
-            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, true);
-            if ($type == 'wQTable' && !empty($app['pmi.drc.participants']->getNextToken())) {
-                // Set next token in session
-                $app['pmi.drc.participants']->setNextToken($app, $tableParams, $type = 'session');
-            }
+            $summaries = $app['pmi.drc.participants']->listParticipantSummaries($rdrParams, $next);
             foreach ($summaries as $summary) {
                 if (isset($summary->resource)) {
                     $results[] = new Participant($summary->resource);
@@ -198,9 +190,6 @@ class WorkQueueController extends AbstractController
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = array_merge($params, array_filter($request->request->all()));
-            if (empty($params['start'])) {
-                $app['session']->set('tokens', []);
-            }
             $participants = $this->participantSummarySearch($organization, $params, $app, $type = 'wQTable');
             $ajaxData = [];
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $app['pmi.drc.participants']->getTotal();
