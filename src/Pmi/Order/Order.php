@@ -70,6 +70,7 @@ class Order
             }
         }
         $this->loadSamplesSchema();
+        $this->setSamplesDisplayText();
     }
 
     public function loadSamplesSchema()
@@ -100,6 +101,21 @@ class Order
         $this->salivaInstructions = $schema['salivaInstructions'];
     }
 
+    public function setSamplesDisplayText()
+    {
+        foreach ($this->samplesInformation as $sample => $sampleInformation) {
+            if (isset($sampleInformation['icodeSwingingBucket']) &&
+                // For custom order creation
+                ((empty($this->order) && !$this->app->isDVType()) ||
+                // For already created orders
+                (!empty($this->order) && empty($this->order['type']) && $this->order['processed_centrifuge_type'] === self::SWINGING_BUCKET))) {
+                $this->samplesInformation[$sample]['displayText'] = $sampleInformation['icodeSwingingBucket'];
+            } else {
+                $this->samplesInformation[$sample]['displayText'] = $sample;
+            }
+        }
+    }
+
     public function loadOrder($participantId, $orderId)
     {
         $participant = $this->app['pmi.drc.participants']->getById($participantId);
@@ -118,6 +134,7 @@ class Order
         $this->participant = $participant;
         $this->version = !empty($order['version']) ? $order['version'] : 1;
         $this->loadSamplesSchema();
+        $this->setSamplesDisplayText();
     }
 
     public function isValid()

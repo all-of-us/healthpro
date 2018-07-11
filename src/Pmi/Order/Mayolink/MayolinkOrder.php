@@ -107,7 +107,7 @@ class MayolinkOrder
             foreach ($samples as $key => $sample) {
                 if (!empty($options['centrifugeType']) && in_array($sample, Order::$samplesRequiringCentrifugeType)) {
                     $mayoSamples[] = [
-                        'code' => $sample,
+                        'code' => $options['tests'][$sample]['displayText'],
                         'name' => $tests[$sample]['specimen'],
                         'questionCode' => $tests[$sample]['code'],
                         'questionPrompt' => $tests[$sample]['prompt'],
@@ -115,7 +115,7 @@ class MayolinkOrder
                     ];
                 } else {
                     $sampleItems = [];
-                    $sampleItems['code'] = $sample;
+                    $sampleItems['code'] = $options['tests'][$sample]['displayText'];
                     $sampleItems['name'] = $tests[$sample]['specimen'];
                     if (!empty($tests[$sample]['labelCount'])) {
                         $sampleItems['labelCount'] = $tests[$sample]['labelCount'];
@@ -127,7 +127,7 @@ class MayolinkOrder
             if ($type !== 'collected') {
                 foreach ($tests as $key => $sample) {
                     $sampleItems = [];
-                    $sampleItems['code'] = $key;
+                    $sampleItems['code'] = $options['tests'][$key]['displayText'];
                     $sampleItems['name'] = $sample['specimen'];
                     if (!empty($sample['labelCount'])) {
                         $sampleItems['labelCount'] = $sample['labelCount'];
