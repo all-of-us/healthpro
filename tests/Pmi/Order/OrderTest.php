@@ -153,4 +153,58 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('2SST8', $samples[0]['test']);
         $this->assertSame('2PST8', $samples[1]['test']);
     }
+
+    public function testSamplesDisplayTextSwingingBucketHpoOrders()
+    {
+        $order = $this->createOrder([
+            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
+            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
+            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
+            'processed_centrifuge_type' => 'swinging_bucket'
+        ]);
+        $order->version = '3.1';
+        $order->loadSamplesSchema();
+        $order->setSamplesDisplayText();
+        $samplesInformation = $order->samplesInformation;
+        $this->assertSame('1SST8', $samplesInformation['1SS08']['displayText']);
+        $this->assertSame('1PST8', $samplesInformation['1PS08']['displayText']);
+    }
+
+    public function testSamplesDisplayTextFixedAngleHpoOrders()
+    {
+        $order = $this->createOrder([
+            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
+            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
+            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
+            'processed_centrifuge_type' => 'fixed_angle'
+        ]);
+        $order->version = '3.1';
+        $order->loadSamplesSchema();
+        $order->setSamplesDisplayText();
+        $samplesInformation = $order->samplesInformation;
+        $this->assertSame('1SS08', $samplesInformation['1SS08']['displayText']);
+        $this->assertSame('1PS08', $samplesInformation['1PS08']['displayText']);
+    }
+
+    public function testSamplesDisplayTextForDvKitOrders()
+    {
+        $order = $this->createOrder([
+            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
+            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
+            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
+            'type' => 'kit'
+        ]);
+        $order->version = '3.1';
+        $order->loadSamplesSchema();
+        $order->setSamplesDisplayText();
+        $samplesInformation = $order->samplesInformation;
+        $this->assertSame('1SS08', $samplesInformation['1SS08']['displayText']);
+        $this->assertSame('1PS08', $samplesInformation['1PS08']['displayText']);
+    }
 }
