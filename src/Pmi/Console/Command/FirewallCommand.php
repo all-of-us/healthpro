@@ -7,10 +7,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Dumper;
 
-class IpWhitelistCommand extends Command
+class FirewallCommand extends Command
 {
     private $appDir;
     private $output;
@@ -19,8 +20,8 @@ class IpWhitelistCommand extends Command
     {
         $this->appDir = realpath(__DIR__ . '/../../../..');
         $this
-            ->setName('pmi:ipwhitelist')
-            ->setDescription('Generates a list of whitelisted IPs')
+            ->setName('pmi:firewall')
+            ->setDescription('Generate rules for the GAE firewall')
         ;
     }
     
@@ -49,42 +50,37 @@ class IpWhitelistCommand extends Command
         
         $output->writeln("Checking country codes...");
         $reader = new Reader($dbFile);
-        $config = ['whitelist' => []];
+        $rules = [
+            [100, 'ALLOW', '0.0.0.0/8', 'Internal App Engine requests']
+        ];
+        $priority = 1000;
         foreach (array_merge($networks->ipRanges, $networks->ipv6Ranges) as $network) {
             $process = $this->exec("{$this->appDir}/bin/network2ip " . escapeshellarg($network), true, true);
             $ip = trim($process->getOutput());
             $record = $reader->country($ip);
             $descr = "... {$network}... {$ip}... {$record->country->isoCode}";
             if ($record->country->isoCode === 'US') {
-                $config['whitelist'][] = $network;
+                $rules[] = [$priority, 'ALLOW', $network, 'Incapsula'];
                 $output->writeln("<info>$descr</info>");
             } else {
                 $output->writeln("<error>$descr</error>");
             }
+            $priority += 10;
         }
+        $rules[] = [2147483647, 'DENY', '*', 'Deny all other traffic'];
+
         $output->writeln('');
-        $config['whitelist'][] = '0.0.0.0/8'; // whitelist internal 0.* block
-        $configFile = "{$this->appDir}/ip_whitelist.yml.dist";
-        $output->write("Writing $configFile...");
-        $dumper = new Dumper();
-        file_put_contents($configFile, $dumper->dump($config, PHP_INT_MAX));
-        $output->writeln(' done!');
+        $table = new Table($output);
+        $table
+            ->setHeaders(['PRIORITY', 'ACTION', 'SOURCE_RANGE', 'DESCRIPTION'])
+            ->setRows($rules);
+        $table->render();
+
         $output->writeln('');
-        
-        
-        $dosFile = "{$this->appDir}/dos.yaml.dist";
-        $output->write("Writing $dosFile...");
-        $csv = implode(',', $config['whitelist']);
-        $process = $this->exec("{$this->appDir}/bin/invertNetworks $csv", true, true);
-        $dosCsv = trim($process->getOutput());
-        $subnets = explode(',', $dosCsv);
-        $dosConfig = ['blacklist' => []];
-        foreach ($subnets as $subnet) {
-            $dosConfig['blacklist'][] = ['subnet' => $subnet];
+        $output->writeln('gcloud commands:');
+        foreach ($rules as $rule) {
+            $output->writeln("gcloud app firewall-rules create {$rule[0]} --action {$rule[1]} --source-range \"{$rule[2]}\" --description \"{$rule[3]}\"");
         }
-        $dumper = new Dumper();
-        file_put_contents($dosFile, $dumper->dump($dosConfig, PHP_INT_MAX));
-        $output->writeln(' done!');
     }
     
     /** Runs a shell command, displaying output as it is generated. */
