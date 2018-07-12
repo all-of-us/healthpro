@@ -106,7 +106,7 @@ class Order
         foreach ($this->samplesInformation as $sample => $sampleInformation) {
             if (isset($sampleInformation['icodeSwingingBucket']) &&
                 // For custom order creation
-                ((empty($this->order) && !$this->app->isDVType()) ||
+                (empty($this->order) ||
                 // For already created orders
                 (!empty($this->order) && empty($this->order['type']) && $this->order['processed_centrifuge_type'] === self::SWINGING_BUCKET))) {
                 $this->samplesInformation[$sample]['displayText'] = $sampleInformation['icodeSwingingBucket'];
