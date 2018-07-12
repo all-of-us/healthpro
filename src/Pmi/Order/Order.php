@@ -95,6 +95,7 @@ class Order
         $salivaSamples = [];
         foreach($this->salivaSamplesInformation as $salivaSample => $info) {
             $salivaSamples[$info['label']] = $salivaSample;
+            $this->salivaSamplesInformation[$salivaSample]['displayText'] = $salivaSample;
         }
         $this->salivaSamples = $salivaSamples;
 
