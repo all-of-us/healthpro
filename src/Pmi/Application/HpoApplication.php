@@ -60,13 +60,6 @@ class HpoApplication extends AbstractApplication
             return new \Pmi\Security\GoogleGroupsAuthenticator($app);
         };
         
-        // use an IP whitelist until GAE has built-in firewall rules
-        $ips = $this->getIpWhitelist();
-        if (count($ips) === 0) {
-            // no config specified - allow everything ('::/0' doesn't work with IpUtils)
-            $ips = ['0.0.0.0/0', '::/1'];
-        }
-        
         $app = $this;
         // include `/` in common routes because homeAction will redirect based on role
         $commonRegex = '^/(logout|login-return|keepalive|client-timeout|agree)?$';
@@ -90,38 +83,17 @@ class HpoApplication extends AbstractApplication
                 ]
             ],
             'security.access_rules' => [
-                [['path' => $anonRegex, 'ips' => $ips], 'IS_AUTHENTICATED_ANONYMOUSLY'],
-                [['path' => $anonRegex], 'ROLE_NO_ACCESS'],
-                
-                [['path' => '^/_dev($|\/)$', 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
-                [['path' => '^/_dev($|\/)$'], 'ROLE_NO_ACCESS'],
-                
-                [['path' => $commonRegex, 'ips' => $ips], 'IS_AUTHENTICATED_FULLY'],
-                [['path' => $commonRegex], 'ROLE_NO_ACCESS'],
-                
-                [['path' => '^/dashboard($|\/)', 'ips' => $ips], 'ROLE_DASHBOARD'],
-                [['path' => '^/dashboard($|\/)'], 'ROLE_NO_ACCESS'],
-
-                [['path' => '^/admin($|\/)', 'ips' => $ips], 'ROLE_ADMIN'],
-                [['path' => '^/admin($|\/)'], 'ROLE_NO_ACCESS'],
-
-                [['path' => '^/workqueue($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_AWARDEE']],
-                [['path' => '^/workqueue($|\/)'], 'ROLE_NO_ACCESS'],
-
-                [['path' => '^/problem($|\/)', 'ips' => $ips], ['ROLE_DV_ADMIN']],
-                [['path' => '^/problem($|\/)'], 'ROLE_NO_ACCESS'],
-
-                [['path' => '^/site($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_AWARDEE']],
-                [['path' => '^/site($|\/)'], 'ROLE_NO_ACCESS'],
-
-                [['path' => '^/help($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
-                [['path' => '^/help($|\/)'], 'ROLE_NO_ACCESS'],
-
-                [['path' => '^/settings($|\/)', 'ips' => $ips], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
-                [['path' => '^/settings($|\/)'], 'ROLE_NO_ACCESS'],
-
-                [['path' => '^/.*$', 'ips' => $ips], 'ROLE_USER'],
-                [['path' => '^/.*$'], 'ROLE_NO_ACCESS']
+                [['path' => $anonRegex], 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                [['path' => '^/_dev($|\/)$'], 'IS_AUTHENTICATED_FULLY'],
+                [['path' => $commonRegex], 'IS_AUTHENTICATED_FULLY'],                
+                [['path' => '^/dashboard($|\/)'], 'ROLE_DASHBOARD'],
+                [['path' => '^/admin($|\/)'], 'ROLE_ADMIN'],
+                [['path' => '^/workqueue($|\/)'], ['ROLE_USER', 'ROLE_AWARDEE']],
+                [['path' => '^/problem($|\/)'], ['ROLE_DV_ADMIN']],
+                [['path' => '^/site($|\/)'], ['ROLE_USER', 'ROLE_AWARDEE']],
+                [['path' => '^/help($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
+                [['path' => '^/settings($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
+                [['path' => '^/.*$'], 'ROLE_USER']
             ]
         ]);
     }
@@ -160,16 +132,6 @@ class HpoApplication extends AbstractApplication
             $configs = Configuration::fetchBy([]);
             foreach ($configs as $config) {
                 $this->configuration[$config->getKey()] = $config->getValue();
-            }
-        }
-        
-        // load IP whitelist
-        $whitelistFile = $appDir . '/ip_whitelist.yml';
-        if (file_exists($whitelistFile)) {
-            $yaml = new \Symfony\Component\Yaml\Parser();
-            $whitelistConfig = $yaml->parse(file_get_contents($whitelistFile));
-            if (is_array($whitelistConfig['whitelist'])) {
-                $this->configuration['ip_whitelist'] = implode(',', $whitelistConfig['whitelist']);
             }
         }
         

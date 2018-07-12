@@ -60,15 +60,12 @@ class Log
         $logArray['site'] = $this->app->getSiteId();
 
         if ($request = $this->app['request_stack']->getCurrentRequest()) {
-            if ($list = $this->app->getConfig('ip_whitelist')) {
-                $trustedProxies = explode(',', $list);
-                $originalTrustedProxies = Request::getTrustedProxies();
-                Request::setTrustedProxies($trustedProxies);
-                $logArray['ip'] = $request->getClientIp();
-                Request::setTrustedProxies($originalTrustedProxies);
-            } else {
-                $logArray['ip'] = $request->getClientIp();
-            }
+            // http://symfony.com/doc/3.4/deployment/proxies.html#but-what-if-the-ip-of-my-reverse-proxy-changes-constantly
+            $trustedProxies = ['127.0.0.1', $request->server->get('REMOTE_ADDR')];
+            $originalTrustedProxies = Request::getTrustedProxies();
+            Request::setTrustedProxies($trustedProxies);
+            $logArray['ip'] = $request->getClientIp();
+            Request::setTrustedProxies($originalTrustedProxies);
             if ($logArray['user'] === null && $request->headers->get('X-Appengine-Cron') === 'true') {
                 $logArray['user'] = 'Appengine-Cron';
             }

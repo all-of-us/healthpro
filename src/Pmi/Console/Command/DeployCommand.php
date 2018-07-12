@@ -36,13 +36,6 @@ class DeployCommand extends Command {
         'healthpro-staging' // staging environment
     ];
 
-    /** Restrict access by IP using dos.yaml */
-    private static $IPRESTRICT_APP_IDS = [
-        'healthpro-prod',
-        'pmi-hpo-test',
-        'pmi-hpo-dev'
-    ];
-
     /** Create release tag when deploying these application IDs. */
     private static $TAG_APP_IDS = [
         'healthpro-prod',
@@ -149,7 +142,6 @@ class DeployCommand extends Command {
 
         // generate config files
         $this->generateAppConfig();
-        $this->generateIpWhitelistConfig();
         $this->generatePhpConfig();
         $this->generateCronConfig();
 
@@ -346,36 +338,6 @@ class DeployCommand extends Command {
 
         $dumper = new Dumper();
         file_put_contents($configFile, $dumper->dump($config, PHP_INT_MAX));
-    }
-
-    /** Generate IP whitelisting config. */
-    private function generateIpWhitelistConfig()
-    {
-        $dosFile = $this->appDir . DIRECTORY_SEPARATOR . 'dos.yaml';
-        $dosDistFile = "{$dosFile}.dist";
-        if (!file_exists($dosDistFile)) {
-            throw new Exception("Couldn't find $dosDistFile");
-        }
-        
-        if (in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
-            copy($dosDistFile, $dosFile);
-        } else {
-            // https://cloud.google.com/appengine/docs/php/config/dos#delete
-            file_put_contents($dosFile, 'blacklist:');
-        }
-        
-        $whitelistFile = $this->appDir . DIRECTORY_SEPARATOR . 'ip_whitelist.yml';
-        $whitelistDistFile = "{$whitelistFile}.dist";
-        if (!file_exists($whitelistDistFile)) {
-            throw new Exception("Couldn't find $whitelistDistFile");
-        }
-        
-        if (in_array($this->appId, self::$IPRESTRICT_APP_IDS)) {
-            copy($whitelistDistFile, $whitelistFile);
-        } else {
-            // https://cloud.google.com/appengine/docs/php/config/dos#delete
-            file_put_contents($whitelistFile, 'whitelist:');
-        }
     }
 
     /** Generate PHP configuration. */

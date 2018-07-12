@@ -194,21 +194,6 @@ abstract class AbstractApplication extends Application
     /** Sets up authentication and firewall. */
     abstract protected function registerSecurity();
     
-    /** Returns an array of (unvalidated) IPs / CIDR blocks. */
-    public function getIpWhitelist()
-    {
-        $list = [];
-        $config = trim($this->getConfig('ip_whitelist'));
-        if ($config) {
-            $ips = explode(',', $config);
-            foreach ($ips as $ip) {
-                $ip = trim($ip);
-                $list[] = $ip;
-            }
-        }
-        return $list;
-    }
-    
     public function getGoogleServiceClass()
     {
         return $this['isUnitTest'] ? 'Tests\Pmi\GoogleUserService' :
@@ -355,16 +340,6 @@ abstract class AbstractApplication extends Application
 
             // If not in debug mode or error is < 500, render the error template
             if (isset($this['errorTemplate']) && (!$this['debug'] || $code < 500)) {
-
-                // display custom page if being denied due to IP whitelist
-                if ($e instanceof AccessDeniedHttpException && $code === 403) {
-                    $ips = $this->getIpWhitelist();
-                    if (is_array($ips) && count($ips) > 0 && !IpUtils::checkIp($request->getClientIp(), $ips)) {
-                        $this->log(Log::INVALID_IP);
-                        return $this['twig']->render('error-ip.html.twig', ['code' => $code]);
-                    }
-                }
-
                 return $this['twig']->render($this['errorTemplate'], ['code' => $code]);
             } else {
                 return;
