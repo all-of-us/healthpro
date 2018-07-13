@@ -154,57 +154,153 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('2PST8', $samples[1]['test']);
     }
 
-    public function testSamplesDisplayTextSwingingBucketHpoOrders()
+    public function testHpoOrdersSamplesDisplayText()
     {
-        $order = $this->createOrder([
-            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
-            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
-            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
-            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
-            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
-            'processed_centrifuge_type' => 'swinging_bucket'
-        ]);
-        $order->version = '3.1';
-        $order->loadSamplesSchema();
-        $order->setSamplesDisplayText();
-        $samplesInformation = $order->samplesInformation;
-        $this->assertSame('1SST8', $samplesInformation['1SS08']['displayText']);
-        $this->assertSame('1PST8', $samplesInformation['1PS08']['displayText']);
+        $data = [
+            'swinging_bucket' => [
+                '1' => [
+                    'displayTexts' => [
+                        '1SST8' => '1SST8',
+                        '1PST8' => '1PST8'
+                    ]
+                ],
+                '2' => [
+                    'displayTexts' => [
+                        '1SS08' => '1SS08',
+                        '1PS08' => '1PS08'
+                    ]
+                ],
+                '3' => [
+                    'displayTexts' => [
+                        '1SS08' => '1SS08',
+                        '1PS08' => '1PS08'
+                    ]
+                ],
+                '3.1' => [
+                    'displayTexts' => [
+                        '1SS08' => '1SST8',
+                        '1PS08' => '1PST8'
+                    ]
+                ],
+                '4' => [
+                    'displayTexts' => [
+                        '1SS08' => '1SST8',
+                        '1PS08' => '1PST8'
+                    ]
+                ]
+            ],
+            'fixed_angle' => [
+                '1' => [
+                    'displayTexts' => [
+                        '1SST8' => '1SST8',
+                        '1PST8' => '1PST8'
+                    ]
+                ],
+                '2' => [
+                    'displayTexts' => [
+                        '1SS08' => '1SS08',
+                        '1PS08' => '1PS08'
+                    ]
+                ],
+                '3' => [
+                    'displayTexts' => [
+                        '1SS08' => '1SS08',
+                        '1PS08' => '1PS08'
+                    ]
+                ],
+                '3.1' => [
+                    'displayTexts' => [
+                        '1SS08' => '1SS08',
+                        '1PS08' => '1PS08'
+                    ]
+                ],
+                '4' => [
+                    'displayTexts' => [
+                        '1SS08' => '1SS08',
+                        '1PS08' => '1PS08'
+                    ]
+                ]
+            ]
+        ];
+
+        // For HPO orders samples display text changes for only swinging bucket centrifuge type
+        foreach ($data as $centrifugeType => $values) {
+            $order = $this->createOrder([
+                'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+                'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
+                'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+                'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
+                'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
+                'processed_centrifuge_type' => $centrifugeType
+            ]);
+            foreach ($values as $version => $value) {
+                $order->version = $version;
+                $order->loadSamplesSchema();
+                $order->setSamplesDisplayText();
+                $samplesInformation = $order->samplesInformation;
+                foreach ($value['displayTexts'] as $sample => $displayText) {
+                    $this->assertSame($displayText, $samplesInformation[$sample]['displayText']);
+                }
+            }
+        }
     }
 
-    public function testSamplesDisplayTextFixedAngleHpoOrders()
+    public function testDvKitOrdersSamplesDisplayText()
     {
-        $order = $this->createOrder([
-            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
-            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
-            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
-            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
-            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
-            'processed_centrifuge_type' => 'fixed_angle'
-        ]);
-        $order->version = '3.1';
-        $order->loadSamplesSchema();
-        $order->setSamplesDisplayText();
-        $samplesInformation = $order->samplesInformation;
-        $this->assertSame('1SS08', $samplesInformation['1SS08']['displayText']);
-        $this->assertSame('1PS08', $samplesInformation['1PS08']['displayText']);
-    }
+        $data = [
+            '1' => [
+                'displayTexts' => [
+                    '1SST8' => '1SST8',
+                    '1PST8' => '1PST8'
+                ]
+            ],
+            '2' => [
+                'displayTexts' => [
+                    '1SS08' => '1SS08',
+                    '1PS08' => '1PS08'
+                ]
+            ],
+            '3' => [
+                'displayTexts' => [
+                    '1SS08' => '1SS08',
+                    '1PS08' => '1PS08'
+                ]
+            ],
+            '3.1' => [
+                'displayTexts' => [
+                    '1SS08' => '1SS08',
+                    '1PS08' => '1PS08'
+                ]
+            ],
+            '4' => [
+                'displayTexts' => [
+                    '1SS08' => '1SS08',
+                    '1PS08' => '1PS08'
+                ]
+            ]
+        ];
 
-    public function testSamplesDisplayTextForDvKitOrders()
-    {
-        $order = $this->createOrder([
-            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
-            'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
-            'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
-            'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
-            'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
-            'type' => 'kit'
-        ]);
-        $order->version = '3.1';
-        $order->loadSamplesSchema();
-        $order->setSamplesDisplayText();
-        $samplesInformation = $order->samplesInformation;
-        $this->assertSame('1SS08', $samplesInformation['1SS08']['displayText']);
-        $this->assertSame('1PS08', $samplesInformation['1PS08']['displayText']);
+        // For DV orders samples display text is not changed regardless of centrifuge type
+        $centrifugeTypes = ['swinging_bucket', 'fixed_angle'];
+        foreach ($centrifugeTypes as $centrifugeType) {
+            $order = $this->createOrder([
+                'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+                'printed_ts' => new \DateTime('2016-01-01 09:00:00'),
+                'collected_ts' => new \DateTime('2016-01-01 10:00:00'),
+                'processed_ts' => new \DateTime('2016-01-01 11:00:00'),
+                'finalized_ts' => new \DateTime('2016-01-01 12:00:00'),
+                'type' => 'kit',
+                'processed_centrifuge_type' => $centrifugeType
+            ]);
+            foreach ($data as $version => $value) {
+                $order->version = $version;
+                $order->loadSamplesSchema();
+                $order->setSamplesDisplayText();
+                $samplesInformation = $order->samplesInformation;
+                foreach ($value['displayTexts'] as $sample => $displayText) {
+                    $this->assertSame($displayText, $samplesInformation[$sample]['displayText']);
+                }
+            }
+         }
     }
 }
