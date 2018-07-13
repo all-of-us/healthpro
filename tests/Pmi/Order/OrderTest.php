@@ -210,14 +210,14 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 ],
                 '3.1' => [
                     'displayTexts' => [
-                        '1SS08' => '1SS08',
-                        '1PS08' => '1PS08'
+                        '1SS08' => '2SST8',
+                        '1PS08' => '2PST8'
                     ]
                 ],
                 '4' => [
                     'displayTexts' => [
-                        '1SS08' => '1SS08',
-                        '1PS08' => '1PS08'
+                        '1SS08' => '2SST8',
+                        '1PS08' => '2PST8'
                     ]
                 ]
             ]

@@ -106,15 +106,20 @@ class Order
     public function setSamplesDisplayText()
     {
         foreach ($this->samplesInformation as $sample => $sampleInformation) {
-            if (isset($sampleInformation['icodeSwingingBucket']) &&
-                // For custom order creation
-                (empty($this->order) ||
-                // For already created orders
-                (!empty($this->order) && empty($this->order['type']) && $this->order['processed_centrifuge_type'] === self::SWINGING_BUCKET))) {
-                $this->samplesInformation[$sample]['displayText'] = $sampleInformation['icodeSwingingBucket'];
-            } else {
-                $this->samplesInformation[$sample]['displayText'] = $sample;
+            $displayText = $sample;
+            if (isset($sampleInformation['icodeSwingingBucket'])){
+                // For custom order creation (always display swinging bucket i-test codes)
+                if (empty($this->order)) {
+                    $displayText = $sampleInformation['icodeSwingingBucket'];
+                } elseif (!empty($this->order) && empty($this->order['type'])) {
+                    if ($this->order['processed_centrifuge_type'] === self::SWINGING_BUCKET) {
+                        $displayText = $sampleInformation['icodeSwingingBucket'];
+                    } elseif ($this->order['processed_centrifuge_type'] === self::FIXED_ANGLE) {
+                        $displayText = $sampleInformation['icodeFixedAngle'];
+                    }
+                }
             }
+            $this->samplesInformation[$sample]['displayText'] = $displayText;
         }
     }
 
