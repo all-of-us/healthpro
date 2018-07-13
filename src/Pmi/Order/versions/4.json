@@ -9,7 +9,9 @@
             "temperature": "Refrigerated",
             "specimen": "PMI SST",
             "code": "1SSTP",
-            "prompt": "SST Centrifuge Type"
+            "prompt": "SST Centrifuge Type",
+            "icodeSwingingBucket": "1SST8",
+            "icodeFixedAngle": "2SST8"
         },
         "1PS08": {
             "number": 2,
@@ -18,7 +20,9 @@
             "temperature": "Refrigerated",
             "specimen": "PMI PST",
             "code": "1PSTP",
-            "prompt": "PST Centrifuge Type"
+            "prompt": "PST Centrifuge Type",
+            "icodeSwingingBucket": "1PST8",
+            "icodeFixedAngle": "2PST8"
         },
         "1HEP4": {
             "number": 3,
