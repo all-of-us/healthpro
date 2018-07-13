@@ -236,7 +236,6 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             foreach ($values as $version => $value) {
                 $order->version = $version;
                 $order->loadSamplesSchema();
-                $order->setSamplesDisplayText();
                 $samplesInformation = $order->samplesInformation;
                 foreach ($value['displayTexts'] as $sample => $displayText) {
                     $this->assertSame($displayText, $samplesInformation[$sample]['displayText']);
@@ -295,7 +294,6 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             foreach ($data as $version => $value) {
                 $order->version = $version;
                 $order->loadSamplesSchema();
-                $order->setSamplesDisplayText();
                 $samplesInformation = $order->samplesInformation;
                 foreach ($value['displayTexts'] as $sample => $displayText) {
                     $this->assertSame($displayText, $samplesInformation[$sample]['displayText']);

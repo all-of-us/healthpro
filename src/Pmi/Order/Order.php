@@ -70,7 +70,6 @@ class Order
             }
         }
         $this->loadSamplesSchema();
-        $this->setSamplesDisplayText();
     }
 
     public function loadSamplesSchema()
@@ -100,6 +99,8 @@ class Order
         $this->salivaSamples = $salivaSamples;
 
         $this->salivaInstructions = $schema['salivaInstructions'];
+
+        $this->setSamplesDisplayText();
     }
 
     public function setSamplesDisplayText()
@@ -135,7 +136,6 @@ class Order
         $this->participant = $participant;
         $this->version = !empty($order['version']) ? $order['version'] : 1;
         $this->loadSamplesSchema();
-        $this->setSamplesDisplayText();
     }
 
     public function isValid()
