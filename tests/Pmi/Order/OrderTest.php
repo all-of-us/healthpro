@@ -154,36 +154,36 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('2PST8', $samples[1]['test']);
     }
 
-    public function testHpoOrdersSamplesDisplayText()
+    public function testHpoOrdersSampleIds()
     {
         $data = [
             'swinging_bucket' => [
                 '1' => [
-                    'displayTexts' => [
+                    'sampleIds' => [
                         '1SST8' => '1SST8',
                         '1PST8' => '1PST8'
                     ]
                 ],
                 '2' => [
-                    'displayTexts' => [
+                    'sampleIds' => [
                         '1SS08' => '1SS08',
                         '1PS08' => '1PS08'
                     ]
                 ],
                 '3' => [
-                    'displayTexts' => [
+                    'sampleIds' => [
                         '1SS08' => '1SS08',
                         '1PS08' => '1PS08'
                     ]
                 ],
                 '3.1' => [
-                    'displayTexts' => [
+                    'sampleIds' => [
                         '1SS08' => '1SST8',
                         '1PS08' => '1PST8'
                     ]
                 ],
                 '4' => [
-                    'displayTexts' => [
+                    'sampleIds' => [
                         '1SS08' => '1SST8',
                         '1PS08' => '1PST8'
                     ]
@@ -191,31 +191,31 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ],
             'fixed_angle' => [
                 '1' => [
-                    'displayTexts' => [
+                    'sampleIds' => [
                         '1SST8' => '1SST8',
                         '1PST8' => '1PST8'
                     ]
                 ],
                 '2' => [
-                    'displayTexts' => [
+                    'sampleIds' => [
                         '1SS08' => '1SS08',
                         '1PS08' => '1PS08'
                     ]
                 ],
                 '3' => [
-                    'displayTexts' => [
+                    'sampleIds' => [
                         '1SS08' => '1SS08',
                         '1PS08' => '1PS08'
                     ]
                 ],
                 '3.1' => [
-                    'displayTexts' => [
+                    'sampleIds' => [
                         '1SS08' => '2SST8',
                         '1PS08' => '2PST8'
                     ]
                 ],
                 '4' => [
-                    'displayTexts' => [
+                    'sampleIds' => [
                         '1SS08' => '2SST8',
                         '1PS08' => '2PST8'
                     ]
@@ -237,42 +237,42 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 $order->version = $version;
                 $order->loadSamplesSchema();
                 $samplesInformation = $order->samplesInformation;
-                foreach ($value['displayTexts'] as $sample => $displayText) {
-                    $this->assertSame($displayText, $samplesInformation[$sample]['displayText']);
+                foreach ($value['sampleIds'] as $sample => $sampleId) {
+                    $this->assertSame($sampleId, $samplesInformation[$sample]['sampleId']);
                 }
             }
         }
     }
 
-    public function testDvKitOrdersSamplesDisplayText()
+    public function testDvKitOrdersSampleIds()
     {
         $data = [
             '1' => [
-                'displayTexts' => [
+                'sampleIds' => [
                     '1SST8' => '1SST8',
                     '1PST8' => '1PST8'
                 ]
             ],
             '2' => [
-                'displayTexts' => [
+                'sampleIds' => [
                     '1SS08' => '1SS08',
                     '1PS08' => '1PS08'
                 ]
             ],
             '3' => [
-                'displayTexts' => [
+                'sampleIds' => [
                     '1SS08' => '1SS08',
                     '1PS08' => '1PS08'
                 ]
             ],
             '3.1' => [
-                'displayTexts' => [
+                'sampleIds' => [
                     '1SS08' => '1SS08',
                     '1PS08' => '1PS08'
                 ]
             ],
             '4' => [
-                'displayTexts' => [
+                'sampleIds' => [
                     '1SS08' => '1SS08',
                     '1PS08' => '1PS08'
                 ]
@@ -295,8 +295,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 $order->version = $version;
                 $order->loadSamplesSchema();
                 $samplesInformation = $order->samplesInformation;
-                foreach ($value['displayTexts'] as $sample => $displayText) {
-                    $this->assertSame($displayText, $samplesInformation[$sample]['displayText']);
+                foreach ($value['sampleIds'] as $sample => $sampleId) {
+                    $this->assertSame($sampleId, $samplesInformation[$sample]['sampleId']);
                 }
             }
          }
