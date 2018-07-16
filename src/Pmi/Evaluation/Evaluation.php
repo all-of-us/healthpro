@@ -15,6 +15,8 @@ use Pmi\Util;
 class Evaluation
 {
     const CURRENT_VERSION = '0.3.3';
+    const LIMIT_TEXT_SHORT = 1000;
+    const LIMIT_TEXT_LONG = 10000;
     protected $version;
     protected $data;
     protected $schema;
@@ -193,10 +195,14 @@ class Evaluation
                 unset($options['scale']);
                 $class = TextareaType::class;
                 $attributes['rows'] = 4;
+                $attributes['data-parsley-maxlength'] = self::LIMIT_TEXT_LONG;
+                $constraints[] = new Constraints\Length(['max' => self::LIMIT_TEXT_LONG]);
                 $constraints[] = new Constraints\Type('string');
             } elseif ($type == 'text') {
                 unset($options['scale']);
                 $class = TextType::class;
+                $attributes['data-parsley-maxlength'] = self::LIMIT_TEXT_SHORT;
+                $constraints[] = new Constraints\Length(['max' => self::LIMIT_TEXT_SHORT]);
                 $constraints[] = new Constraints\Type('string');
             } else {
                 $class = NumberType::class;
