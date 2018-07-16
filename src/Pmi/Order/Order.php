@@ -94,10 +94,33 @@ class Order
         $salivaSamples = [];
         foreach($this->salivaSamplesInformation as $salivaSample => $info) {
             $salivaSamples[$info['label']] = $salivaSample;
+            $this->salivaSamplesInformation[$salivaSample]['sampleId'] = $salivaSample;
         }
         $this->salivaSamples = $salivaSamples;
 
         $this->salivaInstructions = $schema['salivaInstructions'];
+
+        $this->setSampleIds();
+    }
+
+    public function setSampleIds()
+    {
+        foreach ($this->samplesInformation as $sample => $sampleInformation) {
+            $sampleId = $sample;
+            if (isset($sampleInformation['icodeSwingingBucket'])){
+                // For custom order creation (always display swinging bucket i-test codes)
+                if (empty($this->order)) {
+                    $sampleId = $sampleInformation['icodeSwingingBucket'];
+                } elseif (!empty($this->order) && empty($this->order['type'])) {
+                    if ($this->order['processed_centrifuge_type'] === self::SWINGING_BUCKET) {
+                        $sampleId = $sampleInformation['icodeSwingingBucket'];
+                    } elseif ($this->order['processed_centrifuge_type'] === self::FIXED_ANGLE) {
+                        $sampleId = $sampleInformation['icodeFixedAngle'];
+                    }
+                }
+            }
+            $this->samplesInformation[$sample]['sampleId'] = $sampleId;
+        }
     }
 
     public function loadOrder($participantId, $orderId)
