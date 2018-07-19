@@ -10,7 +10,7 @@
                         <h3 class="panel-title">Requisition</h3>
                     </div>
                     <div class="panel-body">
-                        <div class="text-center">
+                        <div id="requisition-loading-widget" class="text-center hidden-ie">
                             <p id="requisition-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
                             <p id="requisition-loaded">
                                 <a href="javascript:window.requisition.print();" class="btn btn-primary btn-sm">
@@ -35,8 +35,18 @@
 $(document).ready(function() {
     $('#requisition-loaded').hide();
     $('iframe[name=requisition]').on('load', function() {
-        $('#requisition-loading').hide();
-        $('#requisition-loaded').show();
+        try {
+            if (typeof window.requisition.print === 'function') {
+                $('#requisition-loading').hide();
+                $('#requisition-loaded').show();
+            } else {
+                $('#requisition-loading-widget').hide();
+            }
+        } catch (e) {
+            // catch firefox issue where pdf.js plugin makes the pdf frame cross-origin
+            // https://github.com/mozilla/pdf.js/issues/5397
+            $('#requisition-loading-widget').hide();
+        }
     });
 });
 </script>

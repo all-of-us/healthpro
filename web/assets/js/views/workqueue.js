@@ -88,7 +88,6 @@ $(document).ready(function() {
     );
 
     var table = $('#workqueue').DataTable({
-        pagingType: "simple",
         processing: true,
         serverSide: true,
         scrollX: true,
@@ -244,11 +243,6 @@ $(document).ready(function() {
         $('#heading-count').show();
     });
 
-    // Reset table data on page length change
-    $('#workqueue').on('length.dt', function() {
-        table.clear().draw();
-    });
-
     table.buttons().container().find('.btn').addClass('btn-sm');
     $('#workqueue_length').addClass('pull-right');
     $('#workqueue_info').addClass('pull-left');
@@ -259,8 +253,12 @@ $(document).ready(function() {
         alert('An error occured please reload the page and try again');
     });
 
-    // Disable pagination buttons when ajax request is made
-    $('#workqueue').on('preXhr.dt', function(e) {
-        $('.paginate_button').addClass('disabled');
+    // Scroll to top when performing pagination
+    $('#workqueue').on('page.dt', function() {
+        //Took reference from https://stackoverflow.com/a/21627503
+        $('html').animate({
+            scrollTop: $('#filters').offset().top
+        }, 'slow');
+        $('thead tr th:first-child').trigger('focus').trigger('blur');
     });
 });
