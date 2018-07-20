@@ -21,36 +21,9 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 {
     private $app;
     
-    /** Array of whitelisted IPs, or null if configuration error. */
-    private $ipWhitelist;
-    
     public function __construct(AbstractApplication $app)
     {
         $this->app = $app;
-        $this->ipWhitelist = $this->buildIpWhitelist();
-    }
-    
-    private function buildIpWhitelist()
-    {
-        $list = [];
-        $config = $this->app->getConfig('ip_whitelist');
-        if ($config) {
-            $ips = explode(',', $config);
-            foreach ($ips as $ip) {
-                $ip = trim($ip);
-                if (filter_var($ip, FILTER_VALIDATE_IP)) {
-                    $list[$ip] = $ip;
-                } else {
-                    return null;
-                }
-            }
-        }
-        return $list;
-    }
-    
-    public function getIpWhitelist()
-    {
-        return $this->ipWhitelist;
     }
     
     private function getAuthLoginClient($state = null)

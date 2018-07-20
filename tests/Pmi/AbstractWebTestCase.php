@@ -37,7 +37,6 @@ abstract class AbstractWebTestCase extends WebTestCase
             // don't bypass groups auth because we handle this with fixtures
             'gaBypass' => false,
             'gaDomain' => 'pmi-drc-hpo-unit-tests.biz',
-            'ip_whitelist' => $this->getIpWhitelist(),
             'gae_auth' => true,
             'enforce2fa' => true
         ]);
@@ -73,10 +72,4 @@ abstract class AbstractWebTestCase extends WebTestCase
     
     /** Override to access the after middleware. */
     protected function afterCallback(Request $request, Response $response) {}
-    
-    /** Override to specify IP whitelist. */
-    protected function getIpWhitelist()
-    {
-        return null;
-    }
 }
