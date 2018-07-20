@@ -820,12 +820,23 @@ class Order
         return false;
     }
 
+    private function getNumericId()
+    {
+        $length = 10;
+        // Avoid leading 0s
+        $id = (string)rand(1,9);
+        for ($i = 0; $i < $length - 1; $i++) {
+            $id .= (string)rand(0,9);
+        }
+        return $id;
+    }
+
     public function generateId()
     {
         $attempts = 0;
         $ordersRepository = $this->app['em']->getRepository('orders');
         while (++$attempts <= 20) {
-            $id = (string)rand(1000000000, 9999999999);
+            $id = $this->getNumericId();
             if ($ordersRepository->fetchOneBy(['order_id' => $id])) {
                 $id = null;
             } else {
