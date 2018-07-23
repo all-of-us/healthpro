@@ -31,7 +31,7 @@ CREATE TABLE `orders` (
   `type` varchar(20) NULL DEFAULT NULL,
   `version` varchar(10) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `order_id` (`order_id`),
   KEY `participant_id` (`participant_id`),
-  KEY `order_id` (`order_id`),
   KEY `mayo_id` (`mayo_id`)
 ) DEFAULT CHARSET=utf8mb4;

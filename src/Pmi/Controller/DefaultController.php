@@ -74,17 +74,6 @@ class DefaultController extends AbstractController
         return $app->redirect($app->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
 
-    /**
-     * This is hack. When authorization fails on the "anonymous" firewall due
-     * to IP whitelist, security will redirect the user to a /login route.
-     * Rather than write a custom authorization class or something just render
-     * the error page here.
-     */
-    public function loginAction(Application $app, Request $request)
-    {
-        return $app['twig']->render('error-ip.html.twig');
-    }
-
     public function loginReturnAction(Application $app, Request $request)
     {
         $app['session']->set('isLoginReturn', true);
@@ -280,9 +269,9 @@ class DefaultController extends AbstractController
     public function ordersAction(Application $app, Request $request)
     {
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
-            ->add('mayoId', TextType::class, [
+            ->add('orderId', TextType::class, [
                 'label' => 'Order ID',
-                'attr' => ['placeholder' => 'Scan barcode'],
+                'attr' => ['placeholder' => 'Scan barcode or enter order ID'],
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
@@ -293,7 +282,14 @@ class DefaultController extends AbstractController
         $idForm->handleRequest($request);
 
         if ($idForm->isValid()) {
-            $id = $idForm->get('mayoId')->getData();
+            $id = $idForm->get('orderId')->getData();
+            
+            // New barcodes include a 4-digit sample identifier appended to the 10 digit order id
+            // If the string matches this format, remove the sample identifier to get the order id
+            if (preg_match('/^\d{14}$/', $id)) {
+                $id = substr($id, 0, 10);
+            }
+
             $order = $app['em']->getRepository('orders')->fetchOneBy([
                 'order_id' => $id
             ]);

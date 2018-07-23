@@ -109,13 +109,13 @@ class RdrParticipants
                     $params .= '&_token=' . $this->nextToken;
                 }
             }
+        } else {
             // Request count
             if (is_array($params)) {
                 $params['_includeTotal'] = 'true';
             } else {
                 $params .= '&_includeTotal=true';
             }
-
         }
         $this->nextToken = $this->total = null;
         try {
@@ -160,18 +160,6 @@ class RdrParticipants
     public function getTotal()
     {
         return $this->total;
-    }
-
-    public function setNextToken($app, $tableParams, $type = null)
-    {
-        $tokens = $app['session']->get('tokens');
-        $index = $tableParams['start'] + $tableParams['count'];
-        if (empty($type) && !empty($tokens[$tableParams['start']])) {
-            $this->nextToken = $tokens[$tableParams['start']];
-        } else {
-            $tokens[$index] = $this->nextToken;
-            $app['session']->set('tokens', $tokens);
-        }
     }
 
     public function getById($id, $refresh = null)

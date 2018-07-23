@@ -829,4 +829,33 @@ class Order
         }
         return null;
     }
+
+    private function getNumericId()
+    {
+        $length = 10;
+        // Avoid leading 0s
+        $id = (string)rand(1,9);
+        for ($i = 0; $i < $length - 1; $i++) {
+            $id .= (string)rand(0,9);
+        }
+        return $id;
+    }
+
+    public function generateId()
+    {
+        $attempts = 0;
+        $ordersRepository = $this->app['em']->getRepository('orders');
+        while (++$attempts <= 20) {
+            $id = $this->getNumericId();
+            if ($ordersRepository->fetchOneBy(['order_id' => $id])) {
+                $id = null;
+            } else {
+                break;
+            }
+        }
+        if (is_null($id)) {
+            throw new \Exception('Failed to generate unique order id');
+        }
+        return $id;
+    }
 }

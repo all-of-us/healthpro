@@ -113,6 +113,16 @@ label.label-normal {
     text-transform: uppercase;
 }
 
+/*
+   IE >= 10 hack
+   https://philipnewcomer.net/2014/04/target-internet-explorer-10-11-css/
+*/
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .hidden-ie {
+        display: none;
+    }
+}
+
 /* Physical evaluation */
 #physicalEvaluation .toggle-help-image {
     cursor: pointer;
