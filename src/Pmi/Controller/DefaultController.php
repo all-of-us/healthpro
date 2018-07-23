@@ -74,17 +74,6 @@ class DefaultController extends AbstractController
         return $app->redirect($app->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
 
-    /**
-     * This is hack. When authorization fails on the "anonymous" firewall due
-     * to IP whitelist, security will redirect the user to a /login route.
-     * Rather than write a custom authorization class or something just render
-     * the error page here.
-     */
-    public function loginAction(Application $app, Request $request)
-    {
-        return $app['twig']->render('error-ip.html.twig');
-    }
-
     public function loginReturnAction(Application $app, Request $request)
     {
         $app['session']->set('isLoginReturn', true);

@@ -64,9 +64,6 @@ gaAdminEmail: hpo-api@staging.pmi-ops.org
 # use Google App Engine auth via UserService instead of Google OAuth
 gae_auth: 1
 
-# IP whitelist (CSV)
-ip_whitelist:
-
 # require user to have two-factor authentication enabled
 enforce2fa: 0
 
