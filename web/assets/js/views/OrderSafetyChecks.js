@@ -4,6 +4,19 @@ $(document).ready(function() {
       return;
     }
 
+    var hideFields = function(fields) {
+        for (var i = 0; i < fields.length; i++) {
+            $('#' + fields[i]).hide();
+            $('#' + fields[i]).find('input:radio, input:checkbox').prop('checked', false);
+        }
+    };
+
+    var showFields = function(fields) {
+        for (var i = 0; i < fields.length; i++) {
+            $('#' + fields[i]).show();
+        }
+    };
+
     $('input:radio[name=donate]').on('change', function() {
         if ($(this).val() === 'yes') {
             hideFields(['transfusion', 'blood-info-text-2', 'saliva-info-text']);
@@ -49,17 +62,4 @@ $(document).ready(function() {
             hideFields(['red-blood-qn', 'order-info-text', 'continue']);
         }
     });
-
-    var hideFields = function(fields) {
-        for (var i = 0; i < fields.length; i++) {
-            $('#' + fields[i]).hide();
-            $('#' + fields[i]).find('input:radio, input:checkbox').prop('checked', false);
-        }
-    }
-
-    var showFields = function(fields) {
-        for (var i = 0; i < fields.length; i++) {
-            $('#' + fields[i]).show();
-        }
-    }
 });
