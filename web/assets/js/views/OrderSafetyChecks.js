@@ -18,15 +18,17 @@ $(document).ready(function() {
     };
 
     var applyBranchingLogic = function() {
-        var donate = $('input:radio[name=donate]:checked').val();
-        var isTransfusionChecked = $('input:radio[name=transfusion]:checked').val();
-        var isTransfusionWholeBloodChecked = $('input:checkbox[name=transfusion_whole_blood]').is(':checked');
-        var isTransfusionRedBloodChecked = $('input:checkbox[name=transfusion_red_blood]').is(':checked');
-        var isRedBloodQnChecked = $('input:radio[name=red_blood_qn]').is(':checked');
-        if (donate === 'yes') {
+        if (!$('input:radio[name=donate]').is(':checked')) {
+            return;
+        }
+        if ($('input:radio[name=donate]:checked').val() === 'yes') {
             hideFields(['transfusion', 'blood-info-text-2', 'saliva-info-text']);
             showFields(['order-info-text', 'blood-info-text', 'urine-info-text', 'continue']);
         } else {
+            var isTransfusionChecked = $('input:radio[name=transfusion]:checked').val();
+            var isTransfusionWholeBloodChecked = $('input:checkbox[name=transfusion_whole_blood]').is(':checked');
+            var isTransfusionRedBloodChecked = $('input:checkbox[name=transfusion_red_blood]').is(':checked');
+            var isRedBloodQnChecked = $('input:radio[name=red_blood_qn]').is(':checked');
             showFields(['transfusion']);
             var hideFieldNames = ['order-info-text', 'continue'];
             if (!isTransfusionWholeBloodChecked && !isTransfusionRedBloodChecked) {
@@ -37,8 +39,7 @@ $(document).ready(function() {
             }
             hideFields(hideFieldNames);
             if (isTransfusionChecked) {
-                var transfusion = $('input:radio[name=transfusion]:checked').val();
-                if (transfusion === 'yes') {
+                if ($('input:radio[name=transfusion]:checked').val() === 'yes') {
                     showFields(['transfusion-qn']);
                     hideFields(['continue']);
                     if (isTransfusionWholeBloodChecked || isTransfusionRedBloodChecked) {
@@ -51,8 +52,7 @@ $(document).ready(function() {
                             showFields(['red-blood-qn']);
                             hideFields(['order-info-text', 'blood-info-text', 'blood-info-text-2', 'urine-info-text', 'continue']);
                             if (isRedBloodQnChecked) {
-                                var redBloodQn = $('input:radio[name=red_blood_qn]:checked').val();
-                                if (redBloodQn === 'yes') {
+                                if ($('input:radio[name=red_blood_qn]:checked').val() === 'yes') {
                                     hideFields(['order-info-text']);
                                     showFields(['continue']);
                                 } else {
@@ -71,6 +71,9 @@ $(document).ready(function() {
             }
         }
     };
+
+    // Display current branching logic state for broswer back clicks
+    applyBranchingLogic();
 
     $('input[type=radio], input[type=checkbox]').on('change', function() {
         applyBranchingLogic();
