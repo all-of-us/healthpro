@@ -299,6 +299,9 @@ table.table-samples td {
 .saliva-info {
     padding-left: 150px;
 }
+.custom-text-muted {
+    color: #dadada;
+}
 
 .help-footer {
     padding-top: 50px;
