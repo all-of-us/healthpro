@@ -70,16 +70,18 @@ class OrderController extends AbstractController
             $app->abort(403);
         }
         $showBloodTubes = false;
-        if ($request->request->has('donate') && $request->request->has('transfusion')) {
-            if ($request->request->get('donate') === 'no' && $request->request->get('transfusion') === 'no') {
+        $showSalivaTubes = false;
+        if ($request->request->has('donate')) {
+            if ($request->request->get('donate') === 'no' && ($request->request->get('transfusion') === 'no' || $request->request->get('red_blood_qn') === 'yes')) {
                 $showBloodTubes = true;
+                $showSalivaTubes = true;
+            } elseif ($request->request->get('red_blood_qn') === 'no') {
+                $showSalivaTubes = true;
             }
-        } elseif (isset($request->request->get('form')['show-blood-tubes'])) {
-            $showBloodTubes = $request->request->get('form')['show-blood-tubes']; 
+        } elseif (isset($request->request->get('form')['show-blood-tubes']) && isset($request->request->get('form')['show-saliva-tubes'])) {
+            $showBloodTubes = $request->request->get('form')['show-blood-tubes'];
+            $showSalivaTubes = $request->request->get('form')['show-saliva-tubes']; 
         } else {
-            $app->abort(403);
-        }
-        if ($app->isDVType() && !$showBloodTubes) {
             $app->abort(403);
         }
         $formBuilder = $app['form.factory']->createBuilder(FormType::class);
@@ -109,18 +111,28 @@ class OrderController extends AbstractController
             ]);
         }
         $order = new Order($app);
-        if (!$app->isDVType() && $showBloodTubes) {
+        if (!$app->isDVType()) {
             $formBuilder->add('samples', Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Select requested samples',
                 'choices' => $order->samples,
-                'required' => false
+                'required' => false,
+                'choice_attr' => function($val) use ($showBloodTubes) {
+                    if ($showBloodTubes) {
+                        return [];
+                    }
+                    return !in_array($val, Order::$nonBloodSamples) ? ['disabled' => 'disabled'] : ['checked' => 'checked'];
+                }
             ]);
         }
         $formBuilder->add('show-blood-tubes', Type\HiddenType::class, [
             'data' => $showBloodTubes
         ]);
+        $formBuilder->add('show-saliva-tubes', Type\HiddenType::class, [
+            'data' => $showSalivaTubes
+        ]);
+        $confirmForm = $formBuilder->getForm();
         $showCustom = false;
         $ordersRepository = $app['em']->getRepository('orders');
         $confirmForm = $formBuilder->getForm();
@@ -135,6 +147,9 @@ class OrderController extends AbstractController
                 } else {
                     $orderData['order_id'] = $confirmForm['kitId']->getData();
                     $orderData['type'] = 'kit';
+                    if (!$showBloodTubes) {
+                        $orderData['requested_samples'] = json_encode([$order->getUrineSample()]);
+                    }
                 }
             } else {
                 if ($request->request->has('custom')) {
@@ -176,13 +191,16 @@ class OrderController extends AbstractController
                 $app->addFlashError('Failed to create order.');
             }
         }
-
+        if (!$showBloodTubes) {
+            $showCustom = true;
+        }
         return $app['twig']->render('order-create.html.twig', [
             'participant' => $participant,
             'confirmForm' => $confirmForm->createView(),
             'showCustom' => $showCustom,
             'samplesInfo' => $order->samplesInformation,
             'showBloodTubes' => $showBloodTubes,
+            'showSalivaTubes' => $showSalivaTubes,
             'version' => $order->version,
             'salivaInstructions' => $order->salivaInstructions,
         ]);
