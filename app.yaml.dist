@@ -11,10 +11,6 @@ skip_files:
 - ^(.*/)?external$
 - ^deploy_.*\.txt$
 
-error_handlers:
-- error_code: dos_api_denial
-  file: dos-response.html
-
 handlers:
 - url: /robots.txt
   static_files: web/robots.txt
