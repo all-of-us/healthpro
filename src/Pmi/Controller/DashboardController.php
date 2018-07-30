@@ -32,11 +32,10 @@ class DashboardController extends AbstractController
      * Home Action
      *
      * @param Application $app
-     * @param Request     $request
      *
      * @return Response
      */
-    public function homeAction(Application $app, Request $request)
+    public function homeAction(Application $app)
     {
         $color_profiles = [
             'Blackbody', 'Bluered', 'Blues', 'Custom', 'Earth', 'Electric', 'Greens',
@@ -163,7 +162,7 @@ class DashboardController extends AbstractController
         }
 
         $data = [];
-        foreach ($display_values as $name => $display_name) {
+        foreach (array_keys($display_values) as $name) {
             $trace = $traces_obj[$name];
             array_push($data, $trace);
         }
