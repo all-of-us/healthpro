@@ -432,9 +432,10 @@ class OrderController extends AbstractController
                 $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
                 $updateArray['finalized_user_id'] = $app->getUser()->getId();
                 $updateArray['finalized_site'] = $app->getSiteId();
-                if ($order->get('type') === 'kit') {
-                    unset($updateArray['finalized_ts']);
-                }
+
+                // Unset finalized_ts for all types of orders
+                unset($updateArray['finalized_ts']);
+
                 // Finalized time will not be saved at this point
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
