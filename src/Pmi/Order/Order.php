@@ -218,10 +218,25 @@ class Order
         }
         if ($form->has("{$set}_samples")) {
             $hasSampleArray = $formData["{$set}_samples"] && is_array($formData["{$set}_samples"]);
+            $samples = [];
             if ($hasSampleArray) {
-                $updateArray["{$set}_samples"] = json_encode(array_values($formData["{$set}_samples"]));
-            } else {
-                $updateArray["{$set}_samples"] = json_encode([]);
+                $samples = array_values($formData["{$set}_samples"]);
+            }
+            $updateArray["{$set}_samples"] = json_encode($samples);
+            // Remove processed samples when not collected
+            if ($set == 'collected' && !empty($this->order['processed_samples_ts'])) {
+                $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+                $newProcessedSamples = [];
+                $newProcessedSamplesTs = [];
+                foreach ($processedSamplesTs as $sample => $timestamp) {
+                    // Check if each processed sample exists in collected samples list
+                    if (in_array($sample, $samples)) {
+                        $newProcessedSamples[] = $sample;
+                        $newProcessedSamplesTs[$sample] = $timestamp; 
+                    }
+                }
+                $updateArray["processed_samples"] = json_encode($newProcessedSamples);
+                $updateArray["processed_samples_ts"] = json_encode($newProcessedSamplesTs);
             }
             if ($set == 'processed') {
                 $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
