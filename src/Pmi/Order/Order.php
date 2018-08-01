@@ -224,7 +224,7 @@ class Order
             }
             $updateArray["{$set}_samples"] = json_encode($samples);
             // Remove processed samples when not collected
-            if ($set == 'collected' && !empty($this->order['processed_samples_ts'])) {
+            if ($set === 'collected' && !empty($this->order['processed_samples_ts'])) {
                 $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
                 $newProcessedSamples = [];
                 $newProcessedSamplesTs = [];
@@ -238,7 +238,7 @@ class Order
                 $updateArray["processed_samples"] = json_encode($newProcessedSamples);
                 $updateArray["processed_samples_ts"] = json_encode($newProcessedSamplesTs);
             }
-            if ($set == 'processed') {
+            if ($set === 'processed') {
                 $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
                 if ($hasSampleArray && $hasSampleTimeArray) {
                     $processedSampleTimes = [];
