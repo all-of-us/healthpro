@@ -4,4 +4,4 @@ CREATE TABLE `users` (
   `google_id` varchar(255) NOT NULL,
   `timezone` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) DEFAULT CHARSET=utf8mb4
+) DEFAULT CHARSET=utf8mb4;
