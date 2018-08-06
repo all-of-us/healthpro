@@ -454,7 +454,7 @@ class OrderController extends AbstractController
                             ];
                             $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
                         } else {
-                            $app->addFlashError('Failed to send order');
+                            $app->addFlashError('Failed to send the order please try again');
                         }
                     } else {
                         //Save finalized time
