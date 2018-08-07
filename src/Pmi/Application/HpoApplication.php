@@ -199,6 +199,10 @@ class HpoApplication extends AbstractApplication
         // "low" security finding: enable XSS Protection
         // http://blog.innerht.ml/the-misunderstood-x-xss-protection/
         $response->headers->set('X-XSS-Protection', '1; mode=block');
+
+        // Default cache control header in ResponseHeaderBag::computeCacheControlValue returns "no-cache, private"
+        // Recommendation from security team is to add no-store as well.
+        $response->headers->addCacheControlDirective('no-cache, no-store');
     }
     
     public function switchSite($email)
