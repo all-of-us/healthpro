@@ -210,11 +210,11 @@ class OrderController extends AbstractController
         if ($app->getConfig('ml_mock_order')) {
             return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
         } else {
-            $pdf = $this->getLabelsPdf($participantId, $orderId, $app);
-            if ($pdf) {
-                return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+            $result = $this->getLabelsPdf($participantId, $orderId, $app);
+            if ($result['status']) {
+                return new Response($result['pdf'], 200, array('Content-Type' => 'application/pdf'));
             } else {
-                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Labels pdf file could not be loaded</strong></body></html>';
+                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>' . $result["errorMessage"] . '</strong></body></html>';
                 return new Response($html, 200, array('Content-Type' => 'text/html'));
             }
         }
@@ -230,17 +230,20 @@ class OrderController extends AbstractController
             // 404 because print is not a valid route for kit orders regardless of state
             $app->abort(404);
         }
-        if (!$order->get('printed_ts') && $this->getLabelsPdf($participantId, $orderId, $app)) {
+        $result = $this->getLabelsPdf($participantId, $orderId, $app);
+        if (!$order->get('printed_ts') && $result['status']) {
             $app->log(Log::ORDER_EDIT, $orderId);
             $app['em']->getRepository('orders')->update($orderId, [
                 'printed_ts' => new \DateTime()
             ]);
             $order = $this->loadOrder($participantId, $orderId, $app);
         }
+        $errorMessage = !empty($result['errorMessage']) ? $result['errorMessage'] : '';
         return $app['twig']->render('order-print-labels.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
-            'processTabClass' => $order->getProcessTabClass()
+            'processTabClass' => $order->getProcessTabClass(),
+            'errorMessage' => $errorMessage
         ]);
     }
 
@@ -601,20 +604,23 @@ class OrderController extends AbstractController
 
     public function getLabelsPdf($participantId, $orderId, $app)
     {
+        // Always return true for mock orders
         if ($app->getConfig('ml_mock_order')) {
-            return true;
-        } else {
-            $mlOrder = new MayolinkOrder($app);
-            $participant = $app['pmi.drc.participants']->getById($participantId);
-            $order = $this->loadOrder($participantId, $orderId, $app);
-            $orderData = $order->toArray();
-            // set collected time to created date at midnight local time
-            $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
-            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
-                $mayoClientId = $site['mayolink_account'];
-            } else {
-                $mayoClientId = null;
-            }
+            return ['status' => true];
+        }
+        $result = [];
+        $result['status'] = false;
+        $mlOrder = new MayolinkOrder($app);
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        $orderData = $order->toArray();
+        // set collected time to created date at midnight local time
+        $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
+        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+            $mayoClientId = $site['mayolink_account'];
+        }
+        // Check if mayo account number exists
+        if (!empty($mayoClientId)) {
             $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
             if ($birthDate) {
                 $birthDate = $birthDate->format('Y-m-d');
@@ -634,8 +640,16 @@ class OrderController extends AbstractController
                 'salivaTests' => $order->salivaSamplesInformation
             ];
             $pdf = $mlOrder->getLabelsPdf($options);
-            return $pdf;
+            if (!empty($pdf)) {
+                $result['status'] = true;
+                $result['pdf'] = $pdf;
+            } else {
+                $result['errorMessage'] = 'Error loading print labels.';
+            }         
+        } else {
+            $result['errorMessage'] = 'Mayo account number is empty for this site. Please contact the administrator.';
         }
+        return $result;
     }
 
     public function sendOrderToMayo($participantId, $orderId, $app, $type = 'collected')
