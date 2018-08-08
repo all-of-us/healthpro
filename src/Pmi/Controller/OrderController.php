@@ -647,7 +647,7 @@ class OrderController extends AbstractController
                 $result['errorMessage'] = 'Error loading print labels.';
             }         
         } else {
-            $result['errorMessage'] = 'Mayo account number is empty for this site. Please contact the administrator.';
+            $result['errorMessage'] = 'Mayo account number is not set for this site. Please contact the administrator.';
         }
         return $result;
     }
@@ -668,7 +668,7 @@ class OrderController extends AbstractController
         if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
             $mayoClientId = $site['mayolink_account'];
         }
-        // Check if mayo account number exists 
+        // Check if mayo account number exists
         if (!empty($mayoClientId)) {
             $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
             if ($birthDate) {
@@ -696,9 +696,9 @@ class OrderController extends AbstractController
                 $result['mayoId'] = $mayoId;
             } else {
                 $result['errorMessage'] = 'An error occurred while attempting to send this order. Please try again.';
-            }       
+            }
         } else {
-            $result['errorMessage'] = 'Mayo account number is empty for this site. Please contact the administrator.';
+            $result['errorMessage'] = 'Mayo account number is not set for this site. Please contact the administrator.';
         }
         return $result;
     }
