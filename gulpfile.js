@@ -93,20 +93,20 @@ gulp.task('compile-fonts', function() {
         .pipe(gulp.dest(destDir));
 });
 
-gulp.task('compile', [
+gulp.task('compile', gulp.parallel(
     'compile-js',
     'compile-css',
     'compile-fonts'
-]);
+));
 
 // re-compile when files change
 gulp.task('watch', function() {
-    gulp.watch(ASSETS.js, ['compile-js']);
-    gulp.watch(ASSETS.csslocal, ['compile-css']);
+    gulp.watch(ASSETS.js, gulp.parallel('compile-js'));
+    gulp.watch(ASSETS.csslocal, gulp.parallel('compile-css'));
 });
 
 // default task is to compile everything and then start watching
-gulp.task('default', [
+gulp.task('default', gulp.series(
     'compile',
     'watch'
-]);
+));
