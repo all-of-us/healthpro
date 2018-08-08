@@ -214,7 +214,7 @@ class OrderController extends AbstractController
             if ($result['status']) {
                 return new Response($result['pdf'], 200, array('Content-Type' => 'application/pdf'));
             } else {
-                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>' . $result["errorMessage"] . '</strong></body></html>';
+                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>' . $result['errorMessage'] . '</strong></body></html>';
                 return new Response($html, 200, array('Content-Type' => 'text/html'));
             }
         }
@@ -448,16 +448,16 @@ class OrderController extends AbstractController
                     // Check for empty finalized samples
                     if (!empty($finalizeForm['finalized_samples']->getData())) {
                         //Send order to mayo
-                        $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
-                        if (!empty($mayoId)) {
+                        $result = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                        if ($result['status'] && !empty($result['mayoId'])) {
                             //Save mayo id and finalized time
                             $newUpdateArray = [
                                 'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
-                                'mayo_id' => $mayoId
+                                'mayo_id' => $result['mayoId']
                             ];
                             $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
                         } else {
-                            $app->addFlashError('An error occurred while attempting to send this order. Please try again.');
+                            $app->addFlashError($result['errorMessage']);
                         }
                     } else {
                         //Save finalized time
@@ -614,7 +614,7 @@ class OrderController extends AbstractController
         $participant = $app['pmi.drc.participants']->getById($participantId);
         $order = $this->loadOrder($participantId, $orderId, $app);
         $orderData = $order->toArray();
-        // set collected time to created date at midnight local time
+        // Set collected time to created date at midnight local time
         $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
         if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
             $mayoClientId = $site['mayolink_account'];
@@ -654,19 +654,22 @@ class OrderController extends AbstractController
 
     public function sendOrderToMayo($participantId, $orderId, $app, $type = 'collected')
     {
-        $order = $this->loadOrder($participantId, $orderId, $app);
+        // Return mock id for mock orders
         if ($app->getConfig('ml_mock_order')) {
-            $mayoId = $app->getConfig('ml_mock_order');
-        } else {
-            // Set collected time to user local time
-            $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
-            $orderData = $order->toArray();
-            $participant = $app['pmi.drc.participants']->getById($participantId);
-            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
-                $mayoClientId = $site['mayolink_account'];
-            } else {
-                $mayoClientId = null;
-            }
+            return ['status' => true, 'mayoId' => $app->getConfig('ml_mock_order')];
+        }
+        $result = [];
+        $result['status'] = false;
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        // Set collected time to user local time
+        $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
+        $orderData = $order->toArray();
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+            $mayoClientId = $site['mayolink_account'];
+        }
+        // Check if mayo account number exists 
+        if (!empty($mayoClientId)) {
             $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
             if ($birthDate) {
                 $birthDate = $birthDate->format('Y-m-d');
@@ -688,7 +691,15 @@ class OrderController extends AbstractController
             ];
             $mayoOrder = new MayolinkOrder($app);
             $mayoId = $mayoOrder->createOrder($options);
+            if (!empty($mayoId)) {
+                $result['status'] = true;
+                $result['mayoId'] = $mayoId;
+            } else {
+                $result['errorMessage'] = 'An error occurred while attempting to send this order. Please try again.';
+            }       
+        } else {
+            $result['errorMessage'] = 'Mayo account number is empty for this site. Please contact the administrator.';
         }
-        return $mayoId;     
+        return $result;
     }
 }
