@@ -211,7 +211,7 @@ class OrderController extends AbstractController
             return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
         } else {
             $result = $this->getLabelsPdf($participantId, $orderId, $app);
-            if ($result['status']) {
+            if ($result['status'] === 'success') {
                 return new Response($result['pdf'], 200, array('Content-Type' => 'application/pdf'));
             } else {
                 $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>' . $result['errorMessage'] . '</strong></body></html>';
@@ -231,7 +231,7 @@ class OrderController extends AbstractController
             $app->abort(404);
         }
         $result = $this->getLabelsPdf($participantId, $orderId, $app);
-        if (!$order->get('printed_ts') && $result['status']) {
+        if (!$order->get('printed_ts') && $result['status'] === 'success') {
             $app->log(Log::ORDER_EDIT, $orderId);
             $app['em']->getRepository('orders')->update($orderId, [
                 'printed_ts' => new \DateTime()
@@ -449,7 +449,7 @@ class OrderController extends AbstractController
                     if (!empty($finalizeForm['finalized_samples']->getData())) {
                         //Send order to mayo
                         $result = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
-                        if ($result['status'] && !empty($result['mayoId'])) {
+                        if ($result['status'] === 'success' && !empty($result['mayoId'])) {
                             //Save mayo id and finalized time
                             $newUpdateArray = [
                                 'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
@@ -606,10 +606,10 @@ class OrderController extends AbstractController
     {
         // Always return true for mock orders
         if ($app->getConfig('ml_mock_order')) {
-            return ['status' => true];
+            return ['status' => 'success'];
         }
         $result = [];
-        $result['status'] = false;
+        $result['status'] = 'fail';
         $mlOrder = new MayolinkOrder($app);
         $participant = $app['pmi.drc.participants']->getById($participantId);
         $order = $this->loadOrder($participantId, $orderId, $app);
@@ -641,7 +641,7 @@ class OrderController extends AbstractController
             ];
             $pdf = $mlOrder->getLabelsPdf($options);
             if (!empty($pdf)) {
-                $result['status'] = true;
+                $result['status'] = 'success';
                 $result['pdf'] = $pdf;
             } else {
                 $result['errorMessage'] = 'Error loading print labels.';
@@ -656,10 +656,10 @@ class OrderController extends AbstractController
     {
         // Return mock id for mock orders
         if ($app->getConfig('ml_mock_order')) {
-            return ['status' => true, 'mayoId' => $app->getConfig('ml_mock_order')];
+            return ['status' => 'success', 'mayoId' => $app->getConfig('ml_mock_order')];
         }
         $result = [];
-        $result['status'] = false;
+        $result['status'] = 'fail';
         $order = $this->loadOrder($participantId, $orderId, $app);
         // Set collected time to user local time
         $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
@@ -692,7 +692,7 @@ class OrderController extends AbstractController
             $mayoOrder = new MayolinkOrder($app);
             $mayoId = $mayoOrder->createOrder($options);
             if (!empty($mayoId)) {
-                $result['status'] = true;
+                $result['status'] = 'success';
                 $result['mayoId'] = $mayoId;
             } else {
                 $result['errorMessage'] = 'An error occurred while attempting to send this order. Please try again.';
