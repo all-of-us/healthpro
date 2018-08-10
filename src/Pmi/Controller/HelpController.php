@@ -69,6 +69,10 @@ class HelpController extends AbstractController
                     'title' => 'SOP-018 HPO Specimen Rejection Criteria',
                     'filename' => 'SOP-018 HPO Specimen Rejection Criteria.pdf'
                 ],
+                'SOP-020' => [
+                    'title' => 'SOP-020 HPO Biobank Order Downtime Procedure',
+                    'filename' => 'SOP-020 HPO Biobank Order Downtime Procedure.pdf'
+                ],
                 'CHANGES-20170412-HPO' => [
                     'download' => true,
                     'title' => 'HPO SOP Changes Presentation 04-12-2017',
@@ -98,6 +102,10 @@ class HelpController extends AbstractController
                 'SOP-019' => [
                     'title' => 'SOP-019 DV Specimen Rejection Criteria',
                     'filename' => 'SOP-019 DV Specimen Rejection Criteria.pdf'
+                ],
+                'SOP-021' => [
+                    'title' => 'SOP-021 DV Biobank Order Downtime Procedure',
+                    'filename' => 'SOP-021 DV Biobank Order Downtime Procedure.pdf'
                 ],
                 'CHANGES-20170412-DV' => [
                     'download' => true,
