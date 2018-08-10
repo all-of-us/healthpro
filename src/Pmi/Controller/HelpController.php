@@ -58,8 +58,8 @@ class HelpController extends AbstractController
                     'filename' => 'SOP-007 HPO Saliva Oragene Collection.pdf'
                 ],
                 'SOP-009' => [
-                    'title' => 'SOP-009 HPO Packaging and Shipping PMI Specimens',
-                    'filename' => 'SOP-009 HPO Packaging and Shipping PMI Specimens.pdf'
+                    'title' => 'SOP-009 HPO Preparing Biobank Orders for Courier Pick-up',
+                    'filename' => 'SOP-009 HPO Preparing Biobank Orders for Courier Pick-up.pdf'
                 ],
                 'SOP-010' => [
                     'title' => 'SOP-010 HPO Ordering Supplies from MML',
