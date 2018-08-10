@@ -7,7 +7,7 @@ use Pmi\Order\Order;
 
 class MayolinkOrder
 {
-    protected $ordersEndpoint = 'http://test.orders.mayomedicallaboratories.com';
+    protected $ordersEndpoint = 'https://test.orders.mayomedicallaboratories.com';
     protected $nameSpace = 'http://orders.mayomedicallaboratories.com';
     protected $labelPdf = 'orders/labels.xml';
     protected $createOrder = 'orders/create.xml';
