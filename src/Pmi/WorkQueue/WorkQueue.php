@@ -265,7 +265,7 @@ class WorkQueue
             $row['language'] = $e($participant->language);
             $row['participantStatus'] = $e($participant->enrollmentStatus);
             $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentTime);
-            $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime, true);
+            $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime, true, 'INVALID');
             $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime, true);
             if ($participant->withdrawalStatus == 'NO_USE') {
                 $row['withdrawal'] = self::HTML_DANGER . ' <span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
@@ -364,7 +364,7 @@ class WorkQueue
         return $status === 'SUBMITTED' ? 1 : 0;
     }
 
-    public function displayStatus($value, $successStatus, $time = null, $showNotCompleteText = false)
+    public function displayStatus($value, $successStatus, $time = null, $showNotCompleteText = false, $invalidStatus = null)
     {
         if ($value === $successStatus) {
             if (!empty($time)) {
@@ -373,7 +373,8 @@ class WorkQueue
             return self::HTML_SUCCESS;
         } else {
             if ($showNotCompleteText) {
-                return !empty($time) ? self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone()) : self::HTML_DANGER . ' (not completed)';
+                $statusText = $value === $invalidStatus ? '(invalid)' : '(not completed)';
+                return !empty($time) ? self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone()) : self::HTML_DANGER . $statusText;
             }
             return self::HTML_DANGER;
         }
