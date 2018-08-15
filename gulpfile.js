@@ -135,6 +135,7 @@ gulp.task('watch-browser-sync', function() {
 });
 
 // custom task to compile everything, initialize browser sync and then start watching
+// example command to run the task "./bin/gulp browser-sync --option localhost:8080"
 gulp.task('browser-sync', gulp.series(
     'compile',
     'initialize-browser-sync',
