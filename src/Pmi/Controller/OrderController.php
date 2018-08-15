@@ -608,8 +608,7 @@ class OrderController extends AbstractController
         if ($app->getConfig('ml_mock_order')) {
             return ['status' => 'success'];
         }
-        $result = [];
-        $result['status'] = 'fail';
+        $result = ['status' => 'fail'];
         $mlOrder = new MayolinkOrder($app);
         $participant = $app['pmi.drc.participants']->getById($participantId);
         $order = $this->loadOrder($participantId, $orderId, $app);
@@ -658,8 +657,7 @@ class OrderController extends AbstractController
         if ($app->getConfig('ml_mock_order')) {
             return ['status' => 'success', 'mayoId' => $app->getConfig('ml_mock_order')];
         }
-        $result = [];
-        $result['status'] = 'fail';
+        $result = ['status' => 'fail'];
         $order = $this->loadOrder($participantId, $orderId, $app);
         // Set collected time to user local time
         $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
