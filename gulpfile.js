@@ -112,6 +112,7 @@ gulp.task('default', gulp.series(
     'watch'
 ));
 
+// initialize browser sync
 var initializeBrowser = function(done) {
     var url = process.argv[4];
     browserSync.init({
@@ -120,24 +121,22 @@ var initializeBrowser = function(done) {
     done();
 };
 
+// reload browser
 var reloadBrowser = function(done) {
     browserSync.reload();
     done();
 };
 
-// initialize browser sync
-gulp.task('initialize-browser-sync', gulp.parallel(initializeBrowser));
-
 // recompile and reload browser when files change
-gulp.task('watch-browser-sync', function() {
+var watchBroswerSync = function() {
     gulp.watch(ASSETS.js, gulp.series('compile-js', reloadBrowser));
     gulp.watch(ASSETS.csslocal, gulp.series('compile-css', reloadBrowser));
-});
+};
 
 // custom task to compile everything, initialize browser sync and then start watching
 // example command to run the task "./bin/gulp browser-sync --option localhost:8080"
 gulp.task('browser-sync', gulp.series(
     'compile',
-    'initialize-browser-sync',
-    'watch-browser-sync'
+    gulp.parallel(initializeBrowser),
+    gulp.parallel(watchBroswerSync)
 ));
