@@ -25,7 +25,7 @@
                 </div>
                 <br />
             {% endif %}
-            <p><strong>Filters</strong> <small><a href="{{ path('workqueue_index') }}">reset</a></p>
+            <p><strong>Filters</strong> <small><a href="{{ path('workqueue_index') }}">reset</a></small></p>
             <div class="form-inline">
                 {% for name, filter in filters if name != 'organization' %}
                     <select name="{{ name }}" class="form-control input-sm">

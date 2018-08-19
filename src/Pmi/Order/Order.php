@@ -94,10 +94,33 @@ class Order
         $salivaSamples = [];
         foreach($this->salivaSamplesInformation as $salivaSample => $info) {
             $salivaSamples[$info['label']] = $salivaSample;
+            $this->salivaSamplesInformation[$salivaSample]['sampleId'] = $salivaSample;
         }
         $this->salivaSamples = $salivaSamples;
 
         $this->salivaInstructions = $schema['salivaInstructions'];
+
+        $this->setSampleIds();
+    }
+
+    public function setSampleIds()
+    {
+        foreach ($this->samplesInformation as $sample => $sampleInformation) {
+            $sampleId = $sample;
+            if (isset($sampleInformation['icodeSwingingBucket'])){
+                // For custom order creation (always display swinging bucket i-test codes)
+                if (empty($this->order)) {
+                    $sampleId = $sampleInformation['icodeSwingingBucket'];
+                } elseif (!empty($this->order) && empty($this->order['type'])) {
+                    if ($this->order['processed_centrifuge_type'] === self::SWINGING_BUCKET) {
+                        $sampleId = $sampleInformation['icodeSwingingBucket'];
+                    } elseif ($this->order['processed_centrifuge_type'] === self::FIXED_ANGLE) {
+                        $sampleId = $sampleInformation['icodeFixedAngle'];
+                    }
+                }
+            }
+            $this->samplesInformation[$sample]['sampleId'] = $sampleId;
+        }
     }
 
     public function loadOrder($participantId, $orderId)
@@ -218,12 +241,27 @@ class Order
         }
         if ($form->has("{$set}_samples")) {
             $hasSampleArray = $formData["{$set}_samples"] && is_array($formData["{$set}_samples"]);
+            $samples = [];
             if ($hasSampleArray) {
-                $updateArray["{$set}_samples"] = json_encode(array_values($formData["{$set}_samples"]));
-            } else {
-                $updateArray["{$set}_samples"] = json_encode([]);
+                $samples = array_values($formData["{$set}_samples"]);
             }
-            if ($set == 'processed') {
+            $updateArray["{$set}_samples"] = json_encode($samples);
+            // Remove processed samples when not collected
+            if ($set === 'collected' && !empty($this->order['processed_samples_ts'])) {
+                $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+                $newProcessedSamples = [];
+                $newProcessedSamplesTs = [];
+                foreach ($processedSamplesTs as $sample => $timestamp) {
+                    // Check if each processed sample exists in collected samples list
+                    if (in_array($sample, $samples)) {
+                        $newProcessedSamples[] = $sample;
+                        $newProcessedSamplesTs[$sample] = $timestamp; 
+                    }
+                }
+                $updateArray["processed_samples"] = json_encode($newProcessedSamples);
+                $updateArray["processed_samples_ts"] = json_encode($newProcessedSamplesTs);
+            }
+            if ($set === 'processed') {
                 $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
                 if ($hasSampleArray && $hasSampleTimeArray) {
                     $processedSampleTimes = [];

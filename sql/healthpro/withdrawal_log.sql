@@ -8,4 +8,4 @@ CREATE TABLE `withdrawal_log` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `participant_id` (`participant_id`),
   KEY `hpo_id` (`hpo_id`)
-) DEFAULT CHARSET=utf8mb4
+) DEFAULT CHARSET=utf8mb4;
