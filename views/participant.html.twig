@@ -100,7 +100,7 @@
         <br />
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="inperson">
-                {% if participant.status %}
+                {% if participant.status and not app.isTestSite %}
                     <div class="row">
                         <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
                             <div class="panel panel-default">
@@ -222,7 +222,10 @@
                         {% endif %}
                     </div>
                 {% else %}
-                    {% if participant.statusReason == 'test-participant' %}
+                    {% if app.isTestSite %}
+                        {% set errorTitle = app.getSiteId() ~ ' Site User' %}
+                        {% set errorMessage = 'In-Person Enrollment is prohibited for ' ~ app.getSiteId() ~ ' site users.' %}
+                    {% elseif participant.statusReason == 'test-participant' %}
                         {% set errorTitle = 'This is not a real participant' %}
                         {% set errorMessage = 'Data collection and entry for test participants are prohibited in the production environment. You may not create a biobank order or collect physical measurements for this participant.' %} 
                     {% elseif participant.statusReason == 'basics' %}

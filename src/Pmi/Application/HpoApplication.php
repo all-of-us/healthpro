@@ -516,4 +516,12 @@ class HpoApplication extends AbstractApplication
         }
         return null;
     }
+
+    /**
+     * Returns true for TEST site only in production
+     */
+    public function isTestSite()
+    {
+        return getenv('PMI_ENV') === self::ENV_PROD && $this->getSiteId() === 'TEST';
+    }
 }
