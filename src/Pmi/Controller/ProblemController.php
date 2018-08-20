@@ -41,7 +41,7 @@ class ProblemController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status) {
+        if (!$participant->status || $app->isTestSite()) {
             $app->abort(403);
         }
         if ($problemId) {
@@ -143,7 +143,7 @@ class ProblemController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status) {
+        if (!$participant->status || $app->isTestSite()) {
             $app->abort(403);
         }
         if ($problemId) {
