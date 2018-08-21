@@ -93,6 +93,17 @@
                     // throw error if date selection is invalid
                     var tpStartDate = $('#total-progress-start-date').val();
                     var tpEndDate = $('#total-progress-end-date').val();
+
+                    // Restrict min/max dates based on selections
+                    $(document).ready(function() {
+                      $('#total-progress-start-date').on("dp.change", function (e) {
+                        $('#total-progress-end-date').data("DateTimePicker").minDate(e.date);
+                      });
+                      $('#total-progress-end-date').on("dp.change", function (e) {
+                        $('#total-progress-start-date').data("DateTimePicker").maxDate(e.date);
+                      });
+                    })
+
                     if ( new Date(tpStartDate) > new Date(tpEndDate)) {
                         alert('Your date selection is invalid: The selected cutoff date of ' + tpEndDate + ' is before ' + tpStartDate + '. Please select a valid date range.');
                         return false;
@@ -277,6 +288,17 @@
                 // throw error if date selection is invalid
                 var tpStartDate = $('#real-time-start-date').val();
                 var tpEndDate = $('#real-time-end-date').val();
+
+                // Restrict min/max dates based on selections
+                $(document).ready(function() {
+                  $('#real-time-start-date').on("dp.change", function (e) {
+                    $('#real-time-end-date').data("DateTimePicker").minDate(e.date);
+                  });
+                  $('#real-time-end-date').on("dp.change", function (e) {
+                    $('#real-time-start-date').data("DateTimePicker").maxDate(e.date);
+                  });
+                })
+
                 if ( new Date(tpStartDate) > new Date(tpEndDate)) {
                   alert('Your date selection is invalid: The selected cutoff date of ' + tpEndDate + ' is before ' + tpStartDate + '. Please select a valid date range.');
                   return false;
@@ -718,7 +740,27 @@
     </div>
     {% include 'dashboard/dashboard_help.html.twig' %}
     <script type="text/javascript">
-        $('.datepicker').datepicker({dateFormat: 'yy-mm-dd', showButtonPanel: true});
+        $('.datepicker').datetimepicker({
+          format: 'YYYY-MM-DD',
+          useCurrent: false,
+          toolbarPlacement: 'top',
+          sideBySide: true,
+          showTodayButton: true,
+          showClear: false,
+          showClose: true,
+          keyBinds: {
+              up: null,
+              down: null,
+              left: null,
+              right: null,
+              'delete': null
+          }
+        });
+
+        // Form field's 'change' event not fired automatically
+        $('.datepicker').on('dp.change', function() {
+          $(this).trigger('change');
+        });
 
         $('[data-toggle="tooltip"]').tooltip({container: 'body'});
 
