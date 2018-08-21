@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-sm-6">
             <h3><i class="fa fa-search" aria-hidden="true"></i> Search</h3>
-            {{ form_start(searchForm) }}
+            {{ form_start(searchForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
                 {{ form_widget(searchForm) }}
                 <p><button type="submit" class="btn btn-primary">Search</button></p>
             {{ form_end(searchForm) }}
@@ -16,14 +16,14 @@
         <div class="col-sm-6">
             <hr class="visible-xs" />
             <h3><i class="fa fa-list-ol" aria-hidden="true"></i> Find by ID</h3>
-            {{ form_start(idForm) }}
+            {{ form_start(idForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
                 {{ form_widget(idForm) }}
                 <p><button type="submit" class="btn btn-primary">Go</button></p>
             {{ form_end(idForm) }}
 
             <hr />
             <h3><i class="fa fa-envelope" aria-hidden="true"></i> Find by Email</h3>
-            {{ form_start(emailForm) }}
+            {{ form_start(emailForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
                 {{ form_widget(emailForm) }}
                 <p><button type="submit" class="btn btn-primary">Go</button></p>
             {{ form_end(emailForm) }}
