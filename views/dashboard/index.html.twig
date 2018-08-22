@@ -96,13 +96,16 @@
 
                     // Restrict min/max dates based on selections
                     $(document).ready(function() {
+                      $('#total-progress-end-date').data("DateTimePicker").minDate(tpStartDate);
+                      $('#total-progress-start-date').data("DateTimePicker").maxDate(tpEndDate);
+
                       $('#total-progress-start-date').on("dp.change", function (e) {
                         $('#total-progress-end-date').data("DateTimePicker").minDate(e.date);
                       });
                       $('#total-progress-end-date').on("dp.change", function (e) {
                         $('#total-progress-start-date').data("DateTimePicker").maxDate(e.date);
                       });
-                    })
+                    });
 
                     if ( new Date(tpStartDate) > new Date(tpEndDate)) {
                         alert('Your date selection is invalid: The selected cutoff date of ' + tpEndDate + ' is before ' + tpStartDate + '. Please select a valid date range.');
@@ -291,6 +294,9 @@
 
                 // Restrict min/max dates based on selections
                 $(document).ready(function() {
+                  $('#real-time-end-date').data("DateTimePicker").minDate(tpStartDate);
+                  $('#real-time-start-date').data("DateTimePicker").maxDate(tpEndDate);
+
                   $('#real-time-start-date').on("dp.change", function (e) {
                     $('#real-time-end-date').data("DateTimePicker").minDate(e.date);
                   });
