@@ -303,7 +303,7 @@
                   $('#real-time-end-date').on("dp.change", function (e) {
                     $('#real-time-start-date').data("DateTimePicker").maxDate(e.date);
                   });
-                })
+                });
 
                 if ( new Date(tpStartDate) > new Date(tpEndDate)) {
                   alert('Your date selection is invalid: The selected cutoff date of ' + tpEndDate + ' is before ' + tpStartDate + '. Please select a valid date range.');
