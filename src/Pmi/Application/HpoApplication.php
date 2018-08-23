@@ -306,6 +306,18 @@ class HpoApplication extends AbstractApplication
         }
     }
 
+    public function getSiteAwardee()
+    {
+        if ($this['isUnitTest']) {
+            return null;
+        }
+        $site = $this->getSiteEntity();
+        if (!$site || empty($site['awardee_id'])) {
+            return null;
+        }
+        return $site['awardee_id'];
+    }
+
     public function getAwardeeOrganization()
     {
         if ($this['isUnitTest']) {
@@ -522,6 +534,6 @@ class HpoApplication extends AbstractApplication
      */
     public function isTestSite()
     {
-        return getenv('PMI_ENV') === self::ENV_PROD && $this->getSiteId() === 'TEST';
+        return getenv('PMI_ENV') === self::ENV_PROD && $this->getSiteAwardee() === 'TEST';
     }
 }

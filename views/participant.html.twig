@@ -223,8 +223,8 @@
                     </div>
                 {% else %}
                     {% if app.isTestSite %}
-                        {% set errorTitle = app.getSiteId() ~ ' Site User' %}
-                        {% set errorMessage = 'In-Person Enrollment is prohibited for ' ~ app.getSiteId() ~ ' site users.' %}
+                        {% set errorTitle = 'Test user' %}
+                        {% set errorMessage = 'Data collection and entry for test users are prohibited in the production environment.' %}
                     {% elseif participant.statusReason == 'test-participant' %}
                         {% set errorTitle = 'This is not a real participant' %}
                         {% set errorMessage = 'Data collection and entry for test participants are prohibited in the production environment. You may not create a biobank order or collect physical measurements for this participant.' %} 
