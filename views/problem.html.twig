@@ -36,7 +36,7 @@
                     </a>
                 {% endif %}
                 <h4>Add Comments</h4> 
-                {{ form_start(problemCommentForm, { attr: { class: 'warn-unsaved', action: path('problemComment', { participantId: participant.id, problemId: problem.id }) } }) }}
+                {{ form_start(problemCommentForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit', action: path('problemComment', { participantId: participant.id, problemId: problem.id }) } }) }}
                 {{ form_errors(problemCommentForm) }}
                 {{ form_rest(problemCommentForm) }}
                 <p>
@@ -49,7 +49,7 @@
             </div>
         {% endif %}
         <div class="col-sm-{{ problemCommentForm ? '8' : '12' }}" id="problemForm">
-            {{ form_start(problemForm, { attr: { class: 'warn-unsaved' } }) }}
+            {{ form_start(problemForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(problemForm) }}
             {{ form_rest(problemForm) }}
             {% if problemCommentForm is null %}

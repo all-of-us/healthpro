@@ -7,7 +7,7 @@
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'collect' } %}
 
-    {{ form_start(collectForm, { attr: { class: 'warn-unsaved disable-enter' } }) }}
+    {{ form_start(collectForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
         {{ form_errors(collectForm) }}
         <div class="form-group{% if not collectForm.collected_ts.vars.valid %} has-error{% endif %}">
             {{ form_label(collectForm.collected_ts) }}
