@@ -36,7 +36,7 @@ class OrderController extends AbstractController
         if (!$order->isValid()) {
             $app->abort(404);
         }
-        if (!$order->getParticipant()->status) {
+        if (!$order->getParticipant()->status || $app->isTestSite()) {
             $app->abort(403);
         }
 
@@ -49,7 +49,7 @@ class OrderController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status) {
+        if (!$participant->status || $app->isTestSite()) {
             $app->abort(403);
         }
         return $app['twig']->render('order-check.html.twig', [
@@ -63,10 +63,7 @@ class OrderController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status) {
-            $app->abort(403);
-        }
-        if ($app->isDVType() && $request->request->has('saliva')) {
+        if (!$participant->status || $app->isTestSite() || ($app->isDVType() && $request->request->has('saliva'))) {
             $app->abort(403);
         }
         $showBloodTubes = false;
