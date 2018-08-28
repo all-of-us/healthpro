@@ -26,7 +26,8 @@ class OrderController extends AbstractController
         ['orderFinalize', '/participant/{participantId}/order/{orderId}/finalize', ['method' => 'GET|POST']],
         ['orderPrintRequisition', '/participant/{participantId}/order/{orderId}/print/requisition'],
         ['orderJson', '/participant/{participantId}/order/{orderId}/order.json'],
-        ['orderExport', '/orders/export.csv']
+        ['orderExport', '/orders/export.csv'],
+        ['orderCancel', '/participant/{participantId}/order/{orderId}/cancel', ['method' => 'GET|POST']]
     ];
 
     protected function loadOrder($participantId, $orderId, Application $app)
@@ -487,6 +488,22 @@ class OrderController extends AbstractController
             'version' => $order->version,
             'hasErrors' => $hasErrors,
             'processTabClass' => $order->getProcessTabClass()
+        ]);
+    }
+
+    public function orderCancelAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        $orders = $app['em']->getRepository('orders')->fetchBy(
+            ['participant_id' => $participantId],
+            ['created_ts' => 'DESC', 'id' => 'DESC']
+        );
+        return $app['twig']->render('order-cancel.html.twig', [
+            'participant' => $order->getParticipant(),
+            'order' => $order->toArray(),
+            'samplesInfo' => $order->getSamplesInfo(),
+            'orders' => $orders,
+            'orderId' => $orderId
         ]);
     }
 

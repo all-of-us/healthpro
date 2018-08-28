@@ -886,4 +886,32 @@ class Order
         }
         return $id;
     }
+
+    public function getSamplesInfo()
+    {
+        $samples = [];
+        foreach ($this->getRequestedSamples() as $key => $value) {
+            $sample = ['code' => $key];
+            if (!empty($this->order['collected_ts']) && in_array($value, json_decode($this->order['collected_samples']))) {
+                $sample['collected_ts'] = $this->order['collected_ts'];
+            }
+            if (!empty($this->order['finalized_ts']) && in_array($value, json_decode($this->order['finalized_samples']))) {
+                $sample['finalized_ts'] = $this->order['finalized_ts'];
+            }
+            if (!empty($this->order['processed_samples_ts']) && in_array($value, json_decode($this->order['processed_samples']))) {
+                $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+                if (!empty($processedSamplesTs[$value])) {
+                    $processedTs = new \DateTime();
+                    $processedTs->setTimestamp($processedSamplesTs[$value]);
+                    $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                    $sample['processed_ts'] = $processedTs;
+                }
+            }
+            if (in_array($value, self::$samplesRequiringProcessing)) {
+                $sample['process'] = true;
+            }
+            $samples[] = $sample;
+        }
+        return $samples;
+    }
 }
