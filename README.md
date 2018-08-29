@@ -31,6 +31,10 @@ Initialize assets and recompile on the fly as assets change:
 
 `./bin/gulp`
 
+Initialize assets, recompile on the fly and reload the browser as assets change (Optional):
+
+`./bin/gulp browser-sync --option localhost:8080`
+
 Run local App Engine dev server:
 
 `./bin/console pmi:deploy --local`
