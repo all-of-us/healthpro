@@ -15,6 +15,7 @@ class Order
     public $version = 2;
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
+    const ORDER_CANCEL = 'cancel';
 
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
@@ -913,5 +914,31 @@ class Order
             $samples[] = $sample;
         }
         return $samples;
+    }
+
+    public function getOrderCancelForm()
+    {
+        $orderCancelForm = $this->app['form.factory']->createBuilder(Type\FormType::class, null)
+            ->add('reason', Type\TextareaType::class, [
+                'label' => 'Reason',
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ]
+            ])
+            ->add('confirm', Type\TextType::class, [
+                'label' => 'Confirm',
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => 'Type the word "CANCEL" to confirm'
+                ]
+            ])
+            ->getForm();
+        return $orderCancelForm;
     }
 }

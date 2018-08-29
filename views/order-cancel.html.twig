@@ -99,4 +99,28 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-sm-12">
+            {{ form_start(orderCancelForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(orderCancelForm) }}
+            {{ form_rest(orderCancelForm) }}
+            <p>
+                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
+                <button type="submit" name="reportable" class="btn btn-primary">Cancel Order</button>
+            </p>
+            {{ form_end(orderCancelForm) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+    <script>
+        $(document).ready(function () {
+            $('#order-overflow-show').on('click', function (e) {
+                $(this).hide();
+                $('#order-overflow').show();
+                e.preventDefault();
+            });
+        });
+    </script>
 {% endblock %}

@@ -498,12 +498,37 @@ class OrderController extends AbstractController
             ['participant_id' => $participantId],
             ['created_ts' => 'DESC', 'id' => 'DESC']
         );
+        $orderCancelForm = $order->getOrderCancelForm();
+        $orderCancelForm->handleRequest($request);
+        if ($orderCancelForm->isSubmitted()) {
+            $orderCancelData = $orderCancelForm->getData();
+            if (strtolower($orderCancelData['confirm']) !== $order::ORDER_CANCEL) {
+                $orderCancelForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
+            }
+            if ($orderCancelForm->isValid()) {
+                unset($orderCancelData['confirm']);
+                $orderCancelData['order_id'] = $orderId;
+                $orderCancelData['user_id'] = $app->getUser()->getId();
+                $orderCancelData['site'] = $app->getSiteId();
+                $orderCancelData['type'] = $order::ORDER_CANCEL;
+                if ($orderHistoryId = $app['em']->getRepository('orders_history')->insert($orderCancelData)) {
+                    $app->log(Log::ORDER_HISTORY_CREATE, $orderHistoryId);
+                    $app->addFlashSuccess('Order cancelled');
+                    return $app->redirectToRoute('participant', [
+                        'id' => $participantId
+                    ]);
+                }
+            } else {
+                $app->addFlashError('Please correct the errors below');
+            }
+        }
         return $app['twig']->render('order-cancel.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'samplesInfo' => $order->getSamplesInfo(),
             'orders' => $orders,
-            'orderId' => $orderId
+            'orderId' => $orderId,
+            'orderCancelForm' => $orderCancelForm->createView()
         ]);
     }
 
