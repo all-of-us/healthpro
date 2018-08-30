@@ -10,6 +10,7 @@
 </h2>
 <p class="lead">
     Order ID: <strong>{{ order.order_id }}</strong>
+    <a href="{{ path('orderCancel', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-sm btn-danger">Cancel Order</a>
     {% if app.isDVType and app.reportKitUrl and order.type == 'kit' %}
         <button type="button" data-href="{{ app.reportKitUrl }}" class="btn btn-danger pull-right external-link">Report Kit Problem</button>
     {% endif %}
