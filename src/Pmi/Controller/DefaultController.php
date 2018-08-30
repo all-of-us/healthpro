@@ -412,7 +412,7 @@ class DefaultController extends AbstractController
                 'timezone' => $settingsForm['timezone']->getData()
             ]);
             $app->addFlashSuccess('Your settings have been updated');
-            if ($request->query->has('return') && preg_match('/^\//', $request->query->get('return'))) {
+            if ($request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
                 return $app->redirect($request->query->get('return'));
             } else {
                 return $app->redirectToRoute('home');

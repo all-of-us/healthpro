@@ -6,7 +6,7 @@
             <div class="page-header">
                 <h2>Settings</h2>
             </div>
-            {{ form_start(settingsForm) }}
+            {{ form_start(settingsForm, { attr: { class: 'warn-unsaved prevent-resubmit' } }) }}
                 {{ form_errors(settingsForm) }}
                 {{ form_widget(settingsForm) }}
                 <p><button type="submit" class="btn btn-primary">Update Settings</button></p>
