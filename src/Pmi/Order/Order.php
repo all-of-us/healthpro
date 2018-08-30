@@ -16,6 +16,7 @@ class Order
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
     const ORDER_CANCEL = 'cancel';
+    const ORDER_ACTIVE = 'active';
 
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
@@ -141,6 +142,7 @@ class Order
         $this->order['expired'] = $this->isOrderExpired();
         $this->participant = $participant;
         $this->version = !empty($order['version']) ? $order['version'] : 1;
+        $this->loadOrderHistory();
         $this->loadSamplesSchema();
     }
 
@@ -288,7 +290,7 @@ class Order
 
     public function createOrderForm($set, $formFactory)
     {
-        $disabled = $this->order['finalized_ts'] || $this->order['expired'] ? true : false;
+        $disabled = $this->order['finalized_ts'] || $this->order['expired'] || $this->order['status'] === self::ORDER_CANCEL ? true : false;
 
         switch ($set) {
             case 'collected':
@@ -940,5 +942,21 @@ class Order
             ])
             ->getForm();
         return $orderCancelForm;
+    }
+
+    public function loadOrderHistory()
+    {
+        $this->order['status'] = self::ORDER_ACTIVE;
+        $orderHistory = $this->app['em']->getRepository('orders_history')->fetchBy(
+            ['order_id' => $this->order['id']],
+            ['created_ts' => 'DESC', 'id' => 'DESC'],
+            [1]
+        );
+        if (!empty($orderHistory)) {
+            $this->order['status'] = $orderHistory[0]['type'];
+            $this->order['history']['user_id'] = $orderHistory[0]['user_id'];
+            $this->order['history']['site'] = $orderHistory[0]['site'];
+            $this->order['history']['time'] = $orderHistory[0]['created_ts'];
+        }
     }
 }

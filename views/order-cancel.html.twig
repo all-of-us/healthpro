@@ -72,7 +72,7 @@
                     {% if loop.index == 6 %}
                     <div id="order-overflow">
                         {% endif %}
-                        <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default" {% if order.id == orderId %} style="background-color: #c9302c;" {% endif %}>
+                        <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg {% if order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                             {{ order.created_ts|date('D n/j/Y', app.userTimezone) }}
                             <small class="text-muted"><strong>{{ order.order_id }}</strong></small>
                             <br/>
@@ -106,7 +106,7 @@
             {{ form_rest(orderCancelForm) }}
             <p>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
-                <button type="submit" name="reportable" class="btn btn-primary">Cancel Order</button>
+                <button type="submit" name="reportable" class="btn btn-danger">Cancel Order</button>
             </p>
             {{ form_end(orderCancelForm) }}
         </div>

@@ -10,7 +10,19 @@
 </h2>
 <p class="lead">
     Order ID: <strong>{{ order.order_id }}</strong>
-    <a href="{{ path('orderCancel', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-sm btn-danger">Cancel Order</a>
+    {% if order.status == 'active' %}
+        <a href="{{ path('orderCancel', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-sm btn-danger">Cancel Order</a>
+    {% elseif order.status == 'cancel' %}
+        <a href="{{ path('orderCancel', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-sm btn-success">Restore Order</a>
+        {% if order.history is defined %}
+        <div class="alert alert-danger well-sm">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>
+                Cancelled by {{ app.getUserEmailById(order.history.user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.history.site) }}
+            </strong>
+        </div>
+        {% endif %}
+    {% endif %}
     {% if app.isDVType and app.reportKitUrl and order.type == 'kit' %}
         <button type="button" data-href="{{ app.reportKitUrl }}" class="btn btn-danger pull-right external-link">Report Kit Problem</button>
     {% endif %}
