@@ -199,7 +199,7 @@ class OrderController extends AbstractController
     public function orderLabelsPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+        if ($order->isOrderDisabled()) {
             $app->abort(403);
         }
         if (!in_array('printLabels', $order->getAvailableSteps())) {
@@ -221,7 +221,7 @@ class OrderController extends AbstractController
     public function orderPrintLabelsAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+        if ($order->isOrderDisabled()) {
             $app->abort(403);
         }
         if (!in_array('printLabels', $order->getAvailableSteps())) {
@@ -535,6 +535,9 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if ($order->isOrderCancelled()) {
+            $app->abort(403);
+        }
         if ($app->isDVType() && !in_array('printRequisition', $order->getAvailableSteps())) {
             // 404 because print is not a valid route for kit orders regardless of state
             $app->abort(404);
@@ -619,7 +622,7 @@ class OrderController extends AbstractController
     public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id'))) {
+        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id')) || $order->isOrderCancelled()) {
             $app->abort(403);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {

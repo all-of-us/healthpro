@@ -854,7 +854,12 @@ class Order
 
     public function isOrderDisabled()
     {
-        return $this->order['finalized_ts'] || $this->order['expired'] || $this->order['status'] === self::ORDER_CANCEL;
+        return $this->order['finalized_ts'] || $this->order['expired'] || $this->isOrderCancelled();
+    }
+
+    public function isOrderCancelled()
+    {
+        return $this->order['status'] === self::ORDER_CANCEL;
     }
 
     public function hasBloodSample($samples)
