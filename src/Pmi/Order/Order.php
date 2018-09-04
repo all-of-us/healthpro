@@ -143,6 +143,7 @@ class Order
         $this->participant = $participant;
         $this->version = !empty($order['version']) ? $order['version'] : 1;
         $this->loadOrderHistory();
+        $this->order['disabled'] = $this->isOrderDisabled();
         $this->loadSamplesSchema();
     }
 
@@ -290,7 +291,7 @@ class Order
 
     public function createOrderForm($set, $formFactory)
     {
-        $disabled = $this->order['finalized_ts'] || $this->order['expired'] || $this->order['status'] === self::ORDER_CANCEL ? true : false;
+        $disabled = $this->isOrderDisabled();
 
         switch ($set) {
             case 'collected':
@@ -849,6 +850,11 @@ class Order
     public function isOrderExpired()
     {
         return empty($this->order['finalized_ts']) && empty($this->order['version']);
+    }
+
+    public function isOrderDisabled()
+    {
+        return $this->order['finalized_ts'] || $this->order['expired'] || $this->order['status'] === self::ORDER_CANCEL;
     }
 
     public function hasBloodSample($samples)
