@@ -53,7 +53,7 @@
                             {{ today.displayDate(order, 'finalized_ts') }}
                         </td>
                         <td>
-                            <a href="{{ path('orderCancel', { participantId: order.participant_id, orderId: order.id }) }}" class="btn btn-xs btn-danger">Cancel Order</a>
+                            <a href="{{ path('orderModify', { participantId: order.participant_id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-xs btn-danger">Cancel Order</a>
                         </td>
                     </tr>
                 {% endfor %}

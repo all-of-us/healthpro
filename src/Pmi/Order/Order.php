@@ -16,6 +16,7 @@ class Order
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
     const ORDER_CANCEL = 'cancel';
+    const ORDER_RESTORE = 'restore';
     const ORDER_ACTIVE = 'active';
 
     // These labels are a fallback - when displayed, they should be using the
@@ -929,18 +930,19 @@ class Order
         return $samples;
     }
 
-    public function getOrderCancelForm()
+    public function getOrderModifyForm($type)
     {
-        $orderCancelForm = $this->app['form.factory']->createBuilder(Type\FormType::class, null)
-            ->add('reason', Type\TextareaType::class, [
-                'label' => 'Reason',
-                'required' => true,
-                'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Type('string')
-                ]
-            ])
-            ->add('confirm', Type\TextType::class, [
+        $orderModifyForm = $this->app['form.factory']->createBuilder(Type\FormType::class, null);
+        $orderModifyForm->add('reason', Type\TextareaType::class, [
+            'label' => 'Reason',
+            'required' => true,
+            'constraints' => [
+                new Constraints\NotBlank(),
+                new Constraints\Type('string')
+            ]
+        ]);
+        if ($type == self::ORDER_CANCEL) {
+            $orderModifyForm->add('confirm', Type\TextType::class, [
                 'label' => 'Confirm',
                 'required' => true,
                 'constraints' => [
@@ -950,9 +952,9 @@ class Order
                 'attr' => [
                     'placeholder' => 'Type the word "CANCEL" to confirm'
                 ]
-            ])
-            ->getForm();
-        return $orderCancelForm;
+            ]);
+        }
+        return $orderModifyForm->getForm();
     }
 
     public function loadOrderHistory()

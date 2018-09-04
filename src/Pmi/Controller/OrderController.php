@@ -27,7 +27,7 @@ class OrderController extends AbstractController
         ['orderPrintRequisition', '/participant/{participantId}/order/{orderId}/print/requisition'],
         ['orderJson', '/participant/{participantId}/order/{orderId}/order.json'],
         ['orderExport', '/orders/export.csv'],
-        ['orderCancel', '/participant/{participantId}/order/{orderId}/cancel', ['method' => 'GET|POST']]
+        ['orderModify', '/participant/{participantId}/order/{orderId}/modify/{type}', ['method' => 'GET|POST']]
     ];
 
     protected function loadOrder($participantId, $orderId, Application $app)
@@ -491,29 +491,36 @@ class OrderController extends AbstractController
         ]);
     }
 
-    public function orderCancelAction($participantId, $orderId, Application $app, Request $request)
+    public function orderModifyAction($participantId, $orderId, $type, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if (!in_array($type, [$order::ORDER_CANCEL, $order::ORDER_RESTORE])
+            || ($type === $order::ORDER_RESTORE and $order->get('status') !== $order::ORDER_CANCEL)
+            || ($type === $order::ORDER_CANCEL and $order->get('status') !== $order::ORDER_ACTIVE)) {
+            $app->abort(404);
+        }
         $orders = $app['em']->getRepository('orders')->fetchBy(
             ['participant_id' => $participantId],
             ['created_ts' => 'DESC', 'id' => 'DESC']
         );
-        $orderCancelForm = $order->getOrderCancelForm();
-        $orderCancelForm->handleRequest($request);
-        if ($orderCancelForm->isSubmitted()) {
-            $orderCancelData = $orderCancelForm->getData();
-            if (strtolower($orderCancelData['confirm']) !== $order::ORDER_CANCEL) {
-                $orderCancelForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
+        $orderModifyForm = $order->getOrderModifyForm($type);
+        $orderModifyForm->handleRequest($request);
+        if ($orderModifyForm->isSubmitted()) {
+            $orderModifyData = $orderModifyForm->getData();
+            if ($type === $order::ORDER_CANCEL && strtolower($orderModifyData['confirm']) !== $order::ORDER_CANCEL) {
+                $orderModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
             }
-            if ($orderCancelForm->isValid()) {
-                unset($orderCancelData['confirm']);
-                $orderCancelData['order_id'] = $orderId;
-                $orderCancelData['user_id'] = $app->getUser()->getId();
-                $orderCancelData['site'] = $app->getSiteId();
-                $orderCancelData['type'] = $order::ORDER_CANCEL;
-                if ($orderHistoryId = $app['em']->getRepository('orders_history')->insert($orderCancelData)) {
+            if ($orderModifyForm->isValid()) {
+                if (isset($request->request->get('form')['confirm'])) {
+                    unset($orderModifyData['confirm']);
+                }
+                $orderModifyData['order_id'] = $orderId;
+                $orderModifyData['user_id'] = $app->getUser()->getId();
+                $orderModifyData['site'] = $app->getSiteId();
+                $orderModifyData['type'] = $type;
+                if ($orderHistoryId = $app['em']->getRepository('orders_history')->insert($orderModifyData)) {
                     $app->log(Log::ORDER_HISTORY_CREATE, $orderHistoryId);
-                    $app->addFlashSuccess('Order cancelled');
+                    $app->addFlashSuccess("Order {$type}ed");
                     return $app->redirectToRoute('participant', [
                         'id' => $participantId
                     ]);
@@ -522,13 +529,14 @@ class OrderController extends AbstractController
                 $app->addFlashError('Please correct the errors below');
             }
         }
-        return $app['twig']->render('order-cancel.html.twig', [
+        return $app['twig']->render('order-modify.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
             'samplesInfo' => $order->getSamplesInfo(),
             'orders' => $orders,
             'orderId' => $orderId,
-            'orderCancelForm' => $orderCancelForm->createView()
+            'orderModifyForm' => $orderModifyForm->createView(),
+            'type' => $type
         ]);
     }
 

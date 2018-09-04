@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 {% block title %}Order - Cancel - {% endblock %}
 {% block body %}
-    <h2 class="text-danger">
+    <h2 class="{% if type == 'cancel' %} text-danger {% elseif type == 'restore' %} text-success {% else %} text-default {% endif %}">
         <i class="fa fa-medkit" aria-hidden="true"></i>
-        Cancel Biobank order
+        {{ type|capitalize }} Biobank order
         <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
     </h2>
 
@@ -101,14 +101,14 @@
     </div>
     <div class="row">
         <div class="col-sm-12">
-            {{ form_start(orderCancelForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
-            {{ form_errors(orderCancelForm) }}
-            {{ form_rest(orderCancelForm) }}
+            {{ form_start(orderModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(orderModifyForm) }}
+            {{ form_rest(orderModifyForm) }}
             <p>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
-                <button type="submit" name="reportable" class="btn btn-danger">Cancel Order</button>
+                <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">{{ type|capitalize }} Order</button>
             </p>
-            {{ form_end(orderCancelForm) }}
+            {{ form_end(orderModifyForm) }}
         </div>
     </div>
 {% endblock %}

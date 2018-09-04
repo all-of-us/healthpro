@@ -11,9 +11,9 @@
 <p class="lead">
     Order ID: <strong>{{ order.order_id }}</strong>
     {% if order.status == 'active' %}
-        <a href="{{ path('orderCancel', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-sm btn-danger">Cancel Order</a>
+        <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel Order</a>
     {% elseif order.status == 'cancel' %}
-        <a href="{{ path('orderCancel', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-sm btn-success">Restore Order</a>
+        <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore Order</a>
         {% if order.history is defined %}
         <div class="alert alert-danger well-sm">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
