@@ -10,17 +10,19 @@
 </h2>
 <p class="lead">
     Order ID: <strong>{{ order.order_id }}</strong>
-    {% if order.status == 'active' %}
+    {% if order.status != 'cancel' %}
         <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel Order</a>
     {% elseif order.status == 'cancel' %}
         <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore Order</a>
         {% if order.history is defined %}
-        <div class="alert alert-danger well-sm">
-            <i class="fa fa-info-circle" aria-hidden="true"></i>
-            <strong>
-                Cancelled by {{ app.getUserEmailById(order.history.user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.history.site) }}
-            </strong>
-        </div>
+            {% if order.status == 'cancel' %}
+                <div class="alert alert-danger well-sm">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <strong>
+                        Cancelled by {{ app.getUserEmailById(order.history.user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.history.site) }} on {{ order.history.time|date('F j, Y g:ia', app.userTimezone) }}
+                    </strong>
+                </div>
+            {% endif %}
         {% endif %}
     {% endif %}
     {% if app.isDVType and app.reportKitUrl and order.type == 'kit' %}

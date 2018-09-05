@@ -494,9 +494,11 @@ class OrderController extends AbstractController
     public function orderModifyAction($participantId, $orderId, $type, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        // Allow cancel for active and restored orders
+        // Allow restore for only canceled orders
         if (!in_array($type, [$order::ORDER_CANCEL, $order::ORDER_RESTORE])
-            || ($type === $order::ORDER_RESTORE and $order->get('status') !== $order::ORDER_CANCEL)
-            || ($type === $order::ORDER_CANCEL and $order->get('status') !== $order::ORDER_ACTIVE)) {
+            || ($type === $order::ORDER_CANCEL and $order->get('status') === $order::ORDER_CANCEL)
+            || ($type === $order::ORDER_RESTORE and $order->get('status') !== $order::ORDER_CANCEL)) {
             $app->abort(404);
         }
         $orders = $app['em']->getRepository('orders')->fetchBy(
@@ -518,6 +520,7 @@ class OrderController extends AbstractController
                 $orderModifyData['user_id'] = $app->getUser()->getId();
                 $orderModifyData['site'] = $app->getSiteId();
                 $orderModifyData['type'] = $type;
+                $orderModifyData['created_ts'] = new \DateTime();
                 if ($orderHistoryId = $app['em']->getRepository('orders_history')->insert($orderModifyData)) {
                     $app->log(Log::ORDER_HISTORY_CREATE, $orderHistoryId);
                     $app->addFlashSuccess("Order {$type}ed");
