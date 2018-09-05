@@ -501,10 +501,7 @@ class OrderController extends AbstractController
             || ($type === $order::ORDER_RESTORE and $order->get('status') !== $order::ORDER_CANCEL)) {
             $app->abort(404);
         }
-        $orders = $app['em']->getRepository('orders')->fetchBy(
-            ['participant_id' => $participantId],
-            ['created_ts' => 'DESC', 'id' => 'DESC']
-        );
+        $orders = $order->getParticipantOrdersWithHistory($participantId);
         $orderModifyForm = $order->getOrderModifyForm($type);
         $orderModifyForm->handleRequest($request);
         if ($orderModifyForm->isSubmitted()) {

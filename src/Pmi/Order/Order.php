@@ -972,4 +972,26 @@ class Order
             $this->order['history']['time'] = $orderHistory[0]['created_ts'];
         }
     }
+
+    public function getParticipantOrdersWithHistory($participantId)
+    {
+        $ordersQuery = "
+            SELECT orders.*, orders_history_tmp.*
+                FROM orders
+                LEFT JOIN
+                (SELECT oh1.order_id AS oh_order_id,
+                    oh1.user_id AS oh_user_id,
+                    oh1.site AS oh_site,
+                    oh1.type AS oh_type,
+                    oh1.created_ts AS oh_created_ts
+                    FROM orders_history AS oh1
+                    LEFT JOIN orders_history AS oh2 ON oh1.order_id = oh2.order_id
+                    AND oh1.created_ts < oh2.created_ts
+                    WHERE oh2.order_id IS NULL 
+                ) AS orders_history_tmp ON (orders.id = orders_history_tmp.oh_order_id)
+                WHERE orders.participant_id = ?
+                ORDER BY orders.id DESC
+            ";
+        return $this->app['db']->fetchAll($ordersQuery, [$participantId]);
+    }
 }
