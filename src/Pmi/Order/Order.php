@@ -950,7 +950,8 @@ class Order
                     new Constraints\Type('string')
                 ],
                 'attr' => [
-                    'placeholder' => 'Type the word "CANCEL" to confirm'
+                    'placeholder' => 'Type the word "CANCEL" to confirm',
+                    'autocomplete' => 'off'
                 ]
             ]);
         }
