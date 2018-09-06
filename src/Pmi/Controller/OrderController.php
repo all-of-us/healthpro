@@ -199,7 +199,7 @@ class OrderController extends AbstractController
     public function orderLabelsPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->isOrderDisabled()) {
+        if ($order->isOrderDisabled() || $order->get('status') === $order::ORDER_UNLOCK) {
             $app->abort(403);
         }
         if (!in_array('printLabels', $order->getAvailableSteps())) {
@@ -221,7 +221,7 @@ class OrderController extends AbstractController
     public function orderPrintLabelsAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->isOrderDisabled()) {
+        if ($order->isOrderDisabled() || $order->get('status') === $order::ORDER_UNLOCK) {
             $app->abort(403);
         }
         if (!in_array('printLabels', $order->getAvailableSteps())) {
@@ -496,7 +496,8 @@ class OrderController extends AbstractController
         $order = $this->loadOrder($participantId, $orderId, $app);
         // Allow cancel for active and restored orders
         // Allow restore for only canceled orders
-        if (!in_array($type, [$order::ORDER_CANCEL, $order::ORDER_RESTORE])
+        // Allow unlock for active and restored orders
+        if (!in_array($type, [$order::ORDER_CANCEL, $order::ORDER_RESTORE, $order::ORDER_UNLOCK])
             || ($type === $order::ORDER_CANCEL && $order->get('status') === $order::ORDER_CANCEL)
             || ($type === $order::ORDER_RESTORE && $order->get('status') !== $order::ORDER_CANCEL)) {
             $app->abort(404);
@@ -543,7 +544,7 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->isOrderCancelled()) {
+        if ($order->isOrderCancelled() || $order->get('status') === $order::ORDER_UNLOCK) {
             $app->abort(403);
         }
         if ($app->isDVType() && !in_array('printRequisition', $order->getAvailableSteps())) {
@@ -630,7 +631,7 @@ class OrderController extends AbstractController
     public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id')) || $order->isOrderCancelled()) {
+        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id')) || $order->isOrderCancelled() || $order->get('status') === $order::ORDER_UNLOCK) {
             $app->abort(403);
         }
         if (!in_array('printRequisition', $order->getAvailableSteps())) {

@@ -15,9 +15,11 @@ class Order
     public $version = 2;
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
+    const ORDER_ACTIVE = 'active';
     const ORDER_CANCEL = 'cancel';
     const ORDER_RESTORE = 'restore';
-    const ORDER_ACTIVE = 'active';
+    const ORDER_UNLOCK = 'unlock';
+    const ORDER_EDIT = 'edit';
 
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
@@ -375,7 +377,7 @@ class Order
         if (!empty($samples)) {
             // Disable collected samples when mayo_id is set
             $samplesDisabled = $disabled;
-            if ($set === 'collected' && $this->order['mayo_id']) {
+            if ($set === 'collected' && $this->order['mayo_id'] && $this->order['status'] !== self::ORDER_UNLOCK) {
                 $samplesDisabled = true;
             }
             $formBuilder->add("{$set}_samples", Type\ChoiceType::class, [
@@ -855,7 +857,7 @@ class Order
 
     public function isOrderDisabled()
     {
-        return $this->order['finalized_ts'] || $this->order['expired'] || $this->isOrderCancelled();
+        return ($this->order['finalized_ts'] || $this->order['expired'] || $this->isOrderCancelled()) && $this->order['status'] !== 'unlock';
     }
 
     public function isOrderCancelled()
