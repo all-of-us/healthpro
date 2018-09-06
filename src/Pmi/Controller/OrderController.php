@@ -497,8 +497,8 @@ class OrderController extends AbstractController
         // Allow cancel for active and restored orders
         // Allow restore for only canceled orders
         if (!in_array($type, [$order::ORDER_CANCEL, $order::ORDER_RESTORE])
-            || ($type === $order::ORDER_CANCEL and $order->get('status') === $order::ORDER_CANCEL)
-            || ($type === $order::ORDER_RESTORE and $order->get('status') !== $order::ORDER_CANCEL)) {
+            || ($type === $order::ORDER_CANCEL && $order->get('status') === $order::ORDER_CANCEL)
+            || ($type === $order::ORDER_RESTORE && $order->get('status') !== $order::ORDER_CANCEL)) {
             $app->abort(404);
         }
         $orders = $order->getParticipantOrdersWithHistory($participantId);
