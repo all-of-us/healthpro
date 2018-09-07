@@ -10,8 +10,11 @@
 </h2>
 <p class="lead">
     Order ID: <strong>{{ order.order_id }}</strong>
+    {% set params = { participantId: participant.id, orderId: order.id } %}
+    {% set route = app.request_stack.currentRequest.attributes.get('_route') %}
+    {% set return = path(route, params) %}
     {% if (order.status == 'active' or order.status == 'restore') and order.rdr_id %}
-        <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'unlock' }) }}" class="btn btn-sm btn-primary">Unlock for Editing</a>
+        <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'unlock', return: return }) }}" class="btn btn-sm btn-primary">Unlock for Editing</a>
     {% endif %}
     {% if order.status != 'cancel' and order.status != 'unlock' %}
         <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel Order</a>
@@ -42,7 +45,6 @@
 
 {% include 'partials/participant-dl.html.twig' %}
 
-{% set params = { participantId: participant.id, orderId: order.id } %}
 {% if order.type == 'kit' %}
     {% set steps = {
         collect: ['Collect', 'collected'],
@@ -108,7 +110,5 @@
 </ul>
 <br />
 {% if active in ['collect', 'process', 'finalize'] %}
-    {% set route = app.request_stack.currentRequest.attributes.get('_route') %}
-    {% set return = path(route, params) %}
     <p><strong>Your time zone</strong>: {{ app.userTimezoneDisplay }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
 {% endif %}

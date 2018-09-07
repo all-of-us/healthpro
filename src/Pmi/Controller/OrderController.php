@@ -522,9 +522,13 @@ class OrderController extends AbstractController
                 if ($orderHistoryId = $app['em']->getRepository('orders_history')->insert($orderModifyData)) {
                     $app->log(Log::ORDER_HISTORY_CREATE, $orderHistoryId);
                     $app->addFlashSuccess("Order {$type}ed");
-                    return $app->redirectToRoute('participant', [
-                        'id' => $participantId
-                    ]);
+                    if ($type === $order::ORDER_UNLOCK && $request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
+                        return $app->redirect($request->query->get('return'));
+                    } else {
+                        return $app->redirectToRoute('participant', [
+                            'id' => $participantId
+                        ]);
+                    }
                 }
             } else {
                 $app->addFlashError('Please correct the errors below');
