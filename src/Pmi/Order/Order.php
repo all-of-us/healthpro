@@ -6,6 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
+use Pmi\Audit\Log;
 
 class Order
 {
@@ -586,6 +587,9 @@ class Order
                 $this->order['id'],
                 ['rdr_id' => $rdrId]
             );
+            if ($this->order['status'] === self::ORDER_UNLOCK) {
+                $this->createOrderHistory(self::ORDER_EDIT);
+            }
         }
     }
 
@@ -958,6 +962,23 @@ class Order
             ]);
         }
         return $orderModifyForm->getForm();
+    }
+
+    public function createOrderHistory($type, $reason = '')
+    {
+        $orderHistoryData = [
+            'reason' => $reason,
+            'order_id' => $this->order['id'],
+            'user_id' => $this->app->getUser()->getId(),
+            'site' => $this->app->getSiteId(),
+            'type' => $type,
+            'created_ts' => new \DateTime()
+        ];
+        if ($orderHistoryId = $this->app['em']->getRepository('orders_history')->insert($orderHistoryData)) {
+            $this->app->log(Log::ORDER_HISTORY_CREATE, $orderHistoryId);
+            return true;
+        }
+        return false;
     }
 
     public function loadOrderHistory()

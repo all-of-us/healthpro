@@ -378,15 +378,17 @@ class OrderController extends AbstractController
         $finalizeForm = $order->createOrderForm('finalized', $app['form.factory']);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {
-            if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+            if ($order->isOrderDisabled()) {
                 $app->abort(403);
             }
             $errors = $order->getErrors();
+            // Check sample errors
             if (!empty($errors)) {
                 foreach ($errors as $error) {
                     $finalizeForm['finalized_samples']->addError(new FormError($error));
                 }
             }
+            // Check identifiers in notes
             if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
@@ -404,34 +406,35 @@ class OrderController extends AbstractController
                 $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
                 $updateArray['finalized_user_id'] = $app->getUser()->getId();
                 $updateArray['finalized_site'] = $app->getSiteId();
-
                 // Unset finalized_ts for all types of orders
                 unset($updateArray['finalized_ts']);
-
                 // Finalized time will not be saved at this point
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                 }
                 $orderData = $order->toArray();
-                if (empty($orderData['mayo_id']) && !empty($finalizeForm['finalized_ts']->getData())) {
+                if ($order->get('status') === $order::ORDER_UNLOCK || (empty($orderData['mayo_id']) && !empty($finalizeForm['finalized_ts']->getData()))) {
                     // Check for empty finalized samples
                     if (!empty($finalizeForm['finalized_samples']->getData())) {
-                        //Send order to mayo
-                        $result = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
-                        if ($result['status'] === 'success' && !empty($result['mayoId'])) {
-                            //Save mayo id and finalized time
-                            $newUpdateArray = [
-                                'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
-                                'mayo_id' => $result['mayoId']
-                            ];
-                            $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
+                        //Send order to mayo if mayo id is empty
+                        if (empty($order->get('mayo_id'))) {
+                            $result = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                            if ($result['status'] === 'success' && !empty($result['mayoId'])) {
+                                //Save mayo id and finalized time
+                                $newUpdateArray = [
+                                    'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
+                                    'mayo_id' => $result['mayoId']
+                                ];
+                                $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
+                            } else {
+                                $app->addFlashError($result['errorMessage']);
+                            }
                         } else {
-                            $app->addFlashError($result['errorMessage']);
+                            // Save finalized time
+                            $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()]);
                         }
                     } else {
-                        //Save finalized time
-                        $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()]);
-                        $app->addFlashSuccess('Order finalized');
+                        $app->addFlashError('Cannot finalize an empty order');
                     }
                 }
                 $order = $this->loadOrder($participantId, $orderId, $app);
@@ -482,16 +485,8 @@ class OrderController extends AbstractController
                 $orderModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
             }
             if ($orderModifyForm->isValid()) {
-                if (isset($request->request->get('form')['confirm'])) {
-                    unset($orderModifyData['confirm']);
-                }
-                $orderModifyData['order_id'] = $orderId;
-                $orderModifyData['user_id'] = $app->getUser()->getId();
-                $orderModifyData['site'] = $app->getSiteId();
-                $orderModifyData['type'] = $type;
-                $orderModifyData['created_ts'] = new \DateTime();
-                if ($orderHistoryId = $app['em']->getRepository('orders_history')->insert($orderModifyData)) {
-                    $app->log(Log::ORDER_HISTORY_CREATE, $orderHistoryId);
+                // Create order history
+                if ($order->createOrderHistory($type, $orderModifyData['reason'])) {
                     $app->addFlashSuccess("Order {$type}ed");
                     if ($type === $order::ORDER_UNLOCK && $request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
                         return $app->redirect($request->query->get('return'));
