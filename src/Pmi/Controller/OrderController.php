@@ -381,6 +381,10 @@ class OrderController extends AbstractController
             if ($order->isOrderDisabled()) {
                 $app->abort(403);
             }
+            // Check empty samples
+            if (empty($finalizeForm['finalized_samples']->getData())) {
+                $finalizeForm['finalized_samples']->addError(new FormError('Please select at least one sample'));
+            }
             $errors = $order->getErrors();
             // Check sample errors
             if (!empty($errors)) {
@@ -414,27 +418,22 @@ class OrderController extends AbstractController
                 }
                 $orderData = $order->toArray();
                 if ($order->get('status') === $order::ORDER_UNLOCK || (empty($orderData['mayo_id']) && !empty($finalizeForm['finalized_ts']->getData()))) {
-                    // Check for empty finalized samples
-                    if (!empty($finalizeForm['finalized_samples']->getData())) {
-                        //Send order to mayo if mayo id is empty
-                        if (empty($order->get('mayo_id'))) {
-                            $result = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
-                            if ($result['status'] === 'success' && !empty($result['mayoId'])) {
-                                //Save mayo id and finalized time
-                                $newUpdateArray = [
-                                    'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
-                                    'mayo_id' => $result['mayoId']
-                                ];
-                                $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
-                            } else {
-                                $app->addFlashError($result['errorMessage']);
-                            }
+                    //Send order to mayo if mayo id is empty
+                    if (empty($order->get('mayo_id'))) {
+                        $result = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                        if ($result['status'] === 'success' && !empty($result['mayoId'])) {
+                            //Save mayo id and finalized time
+                            $newUpdateArray = [
+                                'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
+                                'mayo_id' => $result['mayoId']
+                            ];
+                            $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
                         } else {
-                            // Save finalized time
-                            $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()]);
+                            $app->addFlashError($result['errorMessage']);
                         }
                     } else {
-                        $app->addFlashError('Cannot finalize an empty order');
+                        // Save finalized time
+                        $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()]);
                     }
                 }
                 $order = $this->loadOrder($participantId, $orderId, $app);
