@@ -245,11 +245,6 @@ class OrderController extends AbstractController
         ]);
     }
 
-    /**
-     * Save order
-     * When send request is received, send order to mayo and redirect to Print Requisition tab on success
-     * Allow user to save collected_ts and notes fields when mayo_id is set
-     */
     public function orderCollectAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
@@ -262,44 +257,21 @@ class OrderController extends AbstractController
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
-            if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+            if ($order->isOrderDisabled()) {
                 $app->abort(403);
             }
             if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
-
-            $orderData = $order->toArray();
-            // Throw error if collected_ts is empty for the order which is already sent to mayo
-            if (!empty($orderData['mayo_id']) && empty($collectForm['collected_ts']->getData())) {
-                $collectForm['collected_ts']->addError(new FormError('Collected time cannot be empty for the order which is already sent'));
-            }
             if ($collectForm->isValid()) {
-                // Check if mayo id is set
-                if (empty($orderData['mayo_id'])) {
-                    $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
-                    $updateArray['collected_user_id'] = $app->getUser()->getId();
-                    $updateArray['collected_site'] = $app->getSiteId();
-                    // Save order
-                    if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                        $app->log(Log::ORDER_EDIT, $orderId);
-                        $successMsg = 'Order collection updated';
-                    }
-                } else {
-                    // Save collected time and notes only
-                    $collectedAt = $collectForm['collected_ts']->getData();
-                    $notes = $collectForm['collected_notes']->getData();
-                     if ($app['em']->getRepository('orders')->update($orderId, ['collected_ts' => $collectedAt, 'collected_notes' => $notes])) {
-                        $app->log(Log::ORDER_EDIT, $orderId);
-                        $successMsg = 'Order collection updated';
-                    }
-                }
-                if (!empty($successMsg)) {
-                    $app->addFlashNotice($successMsg);
-                }
-                if (!empty($errorMsg)) {
-                    $app->addFlashError($errorMsg);
+                $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
+                $updateArray['collected_user_id'] = $app->getUser()->getId();
+                $updateArray['collected_site'] = $app->getSiteId();
+                // Save order
+                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                    $app->log(Log::ORDER_EDIT, $orderId);
+                    $app->addFlashNotice('Order collection updated');
                 }
                 return $app->redirectToRoute('orderCollect', [
                     'participantId' => $participantId,
@@ -331,7 +303,7 @@ class OrderController extends AbstractController
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
         if ($processForm->isSubmitted()) {
-            if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+            if ($order->isOrderDisabled()) {
                 $app->abort(403);
             }
             if ($processForm->has('processed_samples')) {
@@ -374,7 +346,6 @@ class OrderController extends AbstractController
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                     $app->addFlashNotice('Order processing updated');
-
                     return $app->redirectToRoute('orderProcess', [
                         'participantId' => $participantId,
                         'orderId' => $orderId
