@@ -254,20 +254,18 @@ class Order
                 $samples = array_values($formData["{$set}_samples"]);
             }
             $updateArray["{$set}_samples"] = json_encode($samples);
-            // Remove processed samples when not collected
-            if ($set === 'collected' && !empty($this->order['processed_samples_ts'])) {
-                $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
-                $newProcessedSamples = [];
-                $newProcessedSamplesTs = [];
-                foreach ($processedSamplesTs as $sample => $timestamp) {
-                    // Check if each processed sample exists in collected samples list
-                    if (in_array($sample, $samples)) {
-                        $newProcessedSamples[] = $sample;
-                        $newProcessedSamplesTs[$sample] = $timestamp; 
-                    }
+            if ($set === 'collected') {
+                // Remove processed samples when not collected
+                if (!empty($this->order['processed_samples_ts'])) {
+                    $newProcessedSamples = $this->getNewProcessedSamples($samples);
+                    $updateArray["processed_samples"] = $newProcessedSamples['samples'];
+                    $updateArray["processed_samples_ts"] = $newProcessedSamples['timeStamps'];
                 }
-                $updateArray["processed_samples"] = json_encode($newProcessedSamples);
-                $updateArray["processed_samples_ts"] = json_encode($newProcessedSamplesTs);
+                // Remove finalized samples when not collected
+                if (!empty($this->order['finalized_samples'])) {
+                    $newFinalizedSamples = $this->getNewFinalizedSamples($samples);
+                    $updateArray["finalized_samples"] = $newFinalizedSamples;
+                }
             }
             if ($set === 'processed') {
                 $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
@@ -939,6 +937,37 @@ class Order
             $samples[] = $sample;
         }
         return $samples;
+    }
+
+    public function getNewProcessedSamples($samples)
+    {
+        $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+        $newProcessedSamples = [];
+        $newProcessedSamplesTs = [];
+        foreach ($processedSamplesTs as $sample => $timestamp) {
+            // Check if each processed sample exists in collected samples list
+            if (in_array($sample, $samples)) {
+                $newProcessedSamples[] = $sample;
+                $newProcessedSamplesTs[$sample] = $timestamp;
+            }
+        }
+        return [
+            'samples' => json_encode($newProcessedSamples),
+            'timeStamps' => json_encode($newProcessedSamplesTs)
+        ];
+    }
+
+    public function getNewFinalizedSamples($samples)
+    {
+        $finalizedSamples = json_decode($this->order['finalized_samples'], true);
+        $newFinalizedSamples = [];
+        foreach ($finalizedSamples as $sample) {
+            // Check if each finalized sample exists in collected samples list
+            if (in_array($sample, $samples)) {
+                $newFinalizedSamples[] = $sample;
+            }
+        }
+        return json_encode($newFinalizedSamples);
     }
 
     public function getOrderModifyForm($type)
