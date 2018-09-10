@@ -869,6 +869,11 @@ class Order
         return $this->order['status'] === self::ORDER_CANCEL;
     }
 
+    public function isOrderUnlocked()
+    {
+        return $this->order['status'] === self::ORDER_UNLOCK;
+    }
+
     public function hasBloodSample($samples)
     {
         foreach ($samples as $sampleCode) {
