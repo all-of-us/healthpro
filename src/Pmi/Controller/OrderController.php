@@ -257,8 +257,20 @@ class OrderController extends AbstractController
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
-            if ($order->isOrderDisabled()) {
+            if ($order->isOrderDisabled() || (!$order->isOrderUnlocked() && $request->request->has('revert'))) {
                 $app->abort(403);
+            }
+            // Revert Order
+            if ($request->request->has('revert')) {
+                if ($order->revertOrder($participantId)) {
+                    $app->addFlashNotice('Order reverted');
+                } else {
+                    $app->addFlashError('Failed to revert order. Please try again.');
+                }
+                return $app->redirectToRoute('orderCollect', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId
+                ]);
             }
             if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
@@ -305,8 +317,20 @@ class OrderController extends AbstractController
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
         if ($processForm->isSubmitted()) {
-            if ($order->isOrderDisabled()) {
+            if ($order->isOrderDisabled() || (!$order->isOrderUnlocked() && $request->request->has('revert'))) {
                 $app->abort(403);
+            }
+            // Revert Order
+            if ($request->request->has('revert')) {
+                if ($order->revertOrder($participantId)) {
+                    $app->addFlashNotice('Order reverted');
+                } else {
+                    $app->addFlashError('Failed to revert order. Please try again.');
+                }
+                return $app->redirectToRoute('orderProcess', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId
+                ]);
             }
             if ($processForm->has('processed_samples')) {
                 $processedSampleTimes = $processForm->get('processed_samples_ts')->getData();
@@ -382,8 +406,20 @@ class OrderController extends AbstractController
         $finalizeForm = $order->createOrderForm('finalized', $app['form.factory']);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {
-            if ($order->isOrderDisabled()) {
+            if ($order->isOrderDisabled() || (!$order->isOrderUnlocked() && $request->request->has('revert'))) {
                 $app->abort(403);
+            }
+            // Revert Order
+            if ($request->request->has('revert')) {
+                if ($order->revertOrder($participantId)) {
+                    $app->addFlashNotice('Order reverted');
+                } else {
+                    $app->addFlashError('Failed to revert order. Please try again.');
+                }
+                return $app->redirectToRoute('orderFinalize', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId
+                ]);
             }
             // Check empty samples
             if (empty($finalizeForm['finalized_samples']->getData())) {

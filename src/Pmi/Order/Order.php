@@ -1057,4 +1057,43 @@ class Order
             ";
         return $this->app['db']->fetchAll($ordersQuery, [$participantId]);
     }
+
+    /**
+     * Revert collected, processed, finalized samples and timestamps
+     */
+    public function revertOrder($participantId)
+    {
+        // Get order object from RDR
+        $object = $this->app['pmi.drc.participants']->getOrder($participantId, $this->order['rdr_id']);
+        foreach ($object->samples as $sample) {
+            if (!empty($sample->collected)) {
+                $collectedSamples[] = $sample->test;
+                $collectedTs = $sample->collected;
+            }
+            if (!empty($sample->processed)) {
+                $processedSamples[] = $sample->test;
+                $processedTs = new \DateTime($sample->processed);
+                $processedSamplesTs[$sample->test] = $processedTs->getTimestamp();
+            }
+            if (!empty($sample->finalized)) {
+                $finalizedSamples[] = $sample->test;
+                $finalizedTs = $sample->finalized;
+            }
+        }
+        $updateArray = [
+            'collected_samples' => json_encode($collectedSamples),
+            'collected_ts' => $collectedTs,
+            'processed_samples' => json_encode($processedSamples),
+            'processed_samples_ts' => json_encode($processedSamplesTs),
+            'finalized_samples' => json_encode($finalizedSamples),
+            'finalized_ts' => $finalizedTs
+        ];
+        // Update order
+        if ($this->app['em']->getRepository('orders')->update($this->order['id'], $updateArray)) {
+            $this->app->log(Log::ORDER_EDIT, $this->order['id']);
+            $this->createOrderHistory(self::ORDER_ACTIVE);
+            return true;
+        }
+        return false;
+    }
 }

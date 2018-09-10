@@ -51,6 +51,9 @@
                         Save and mark as collected
                     {% endif %}
                 </button>
+                {% if order.status == 'unlock' %}
+                    <button type="submit" class="btn btn-warning" name="revert">Revert</button>
+                {% endif %}
             </p>
         {% endif %}
     {{ form_end(collectForm) }}

@@ -76,6 +76,9 @@
                 <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                     Save and mark as finalized
                 </button>
+                {% if order.status == 'unlock' %}
+                    <button type="submit" class="btn btn-warning" name="revert">Revert</button>
+                {% endif %}
             </p>
         {% endif %}
     {{ form_end(finalizeForm) }}
@@ -194,7 +197,7 @@ $(document).ready(function () {
             }
         }
     });
-    
+
     $('button[type="submit"]').on('click', function () {
         //Display warning message
         var message = 'Are you sure you want to finalize this order?';
