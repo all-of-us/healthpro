@@ -283,6 +283,11 @@ class Order
                 if ($this->order['type'] !== 'saliva' && !empty($formData["processed_centrifuge_type"])) {
                     $updateArray["processed_centrifuge_type"] = $formData["processed_centrifuge_type"];
                 }
+                // Remove finalized samples when not processed
+                if (!empty($this->order['finalized_samples'])) {
+                    $newFinalizedSamples = $this->getNewFinalizedSamples($samples);
+                    $updateArray["finalized_samples"] = $newFinalizedSamples;
+                }
             }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
@@ -962,7 +967,7 @@ class Order
         $finalizedSamples = json_decode($this->order['finalized_samples'], true);
         $newFinalizedSamples = [];
         foreach ($finalizedSamples as $sample) {
-            // Check if each finalized sample exists in collected samples list
+            // Check if each finalized sample exists in collected/processed samples list
             if (in_array($sample, $samples)) {
                 $newFinalizedSamples[] = $sample;
             }
