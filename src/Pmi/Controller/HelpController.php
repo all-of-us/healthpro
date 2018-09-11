@@ -116,6 +116,55 @@ class HelpController extends AbstractController
         ]
     ];
 
+    private static $videoGroups = [
+        [
+            'title' => 'Biobank Video Tutorials for Healthcare Provider Organizations (HPO)',
+            'videos' => [
+                'Chapter 1' => [
+                    'title' => 'HPO Creating an Order',
+                    'link' => ''
+                ],
+                'Chapter 3' => [
+                    'title' => 'HPO Blood Collection',
+                    'link' => ''
+                ],
+                'Chapter 5' => [
+                    'title' => 'HPO Urine Collection',
+                    'link' => 'https://www.youtube.com/watch?v=ANJs1_A_zLs'
+                ],
+                'Chapter 7' => [
+                    'title' => 'HPO Saliva Collection',
+                    'link' => 'https://www.youtube.com/watch?v=0WeQCxetXQk'
+                ],
+                'Chapter 9' => [
+                    'title' => 'HPO Ordering Supplies from MML',
+                    'link' => 'https://www.youtube.com/watch?v=6P4nuWNOAQA'
+                ]
+            ]
+        ],
+        [
+            'title' => 'Biobank Video Tutorials for Direct Volunteers (DV)',
+            'videos' => [
+                'Chapter 2' => [
+                    'title' => 'DV Registering a KIT',
+                    'link' => 'https://www.youtube.com/watch?v=pNSndLIIHQA&feature=youtu.be'
+                ],
+                'Chapter 4' => [
+                    'title' => 'DV Blood Collection & Processing',
+                    'link' => 'https://www.youtube.com/watch?v=pNSndLIIHQA&feature=youtu.be'
+                ],
+                'Chapter 6' => [
+                    'title' => 'DV Urine Collection',
+                    'link' => 'https://www.youtube.com/watch?v=wVcFsCiyqtA&feature=youtu.be'
+                ],
+                'Chapter 10' => [
+                    'title' => 'DV Packaging & Shipping Specimens',
+                    'link' => 'https://www.youtube.com/watch?v=yAHGK979kJ0&feature=youtu.be'
+                ]
+            ]
+        ]
+    ];
+
     private function getStoragePath(Application $app)
     {
         return $app->getConfig('help_storage_path') ?: 'https://docsallofus.atlassian.net/wiki/download/attachments/44357';
@@ -138,7 +187,9 @@ class HelpController extends AbstractController
 
     public function videosAction(Application $app)
     {
-        return $app['twig']->render('help/videos.html.twig');
+        return $app['twig']->render('help/videos.html.twig', [
+            'videoGroups' => self::$videoGroups
+        ]);
     }
 
     public function faqAction(Application $app)
