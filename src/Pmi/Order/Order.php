@@ -1128,11 +1128,13 @@ class Order
             $updateArray['processed_centrifuge_type'] = $centrifugeType;
         }
         // Update order
-        if ($this->app['em']->getRepository('orders')->update($this->order['id'], $updateArray)) {
-            $this->app->log(Log::ORDER_EDIT, $this->order['id']);
+        $ordersRepository = $this->app['em']->getRepository('orders');
+        $status = false;
+        $ordersRepository->wrapInTransaction(function () use ($ordersRepository, $updateArray, &$status) {
+            $ordersRepository->update($this->order['id'], $updateArray);
             $this->createOrderHistory(self::ORDER_ACTIVE);
-            return true;
-        }
-        return false;
+            $status = true;
+        });
+        return $status;
     }
 }
