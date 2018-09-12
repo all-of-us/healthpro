@@ -67,6 +67,25 @@ class Order
 
     public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2'];
 
+    public static $mapRdrSamples = [
+        '1SST8' => [
+            'code' => '1SS08',
+            'centrifuge_type' => 'swinging_bucket'
+        ],
+        '2SST8' => [
+            'code' => '1SS08',
+            'centrifuge_type' => 'fixed_angle'
+        ],
+        '1PST8' => [
+            'code' => '1PS08',
+            'centrifuge_type' => 'swinging_bucket'
+        ],
+        '2PST8' => [
+            'code' => '1PS08',
+            'centrifuge_type' => 'fixed_angle'
+        ]
+    ];
+
     public function __construct($app = null)
     {
         if ($app) {
@@ -1078,17 +1097,22 @@ class Order
         // Get order object from RDR
         $object = $this->app['pmi.drc.participants']->getOrder($participantId, $this->order['rdr_id']);
         foreach ($object->samples as $sample) {
+            $sampleCode = $sample->test;
+            if (!array_key_exists($sample->test, $this->samplesInformation) && array_key_exists($sample->test, self::$mapRdrSamples)) {
+                $sampleCode = self::$mapRdrSamples[$sample->test]['code'];
+                $centrifugeType = self::$mapRdrSamples[$sample->test]['centrifuge_type'];
+            }
             if (!empty($sample->collected)) {
-                $collectedSamples[] = $sample->test;
+                $collectedSamples[] = $sampleCode;
                 $collectedTs = $sample->collected;
             }
             if (!empty($sample->processed)) {
-                $processedSamples[] = $sample->test;
+                $processedSamples[] = $sampleCode;
                 $processedTs = new \DateTime($sample->processed);
-                $processedSamplesTs[$sample->test] = $processedTs->getTimestamp();
+                $processedSamplesTs[$sampleCode] = $processedTs->getTimestamp();
             }
             if (!empty($sample->finalized)) {
-                $finalizedSamples[] = $sample->test;
+                $finalizedSamples[] = $sampleCode;
                 $finalizedTs = $sample->finalized;
             }
         }
@@ -1100,6 +1124,9 @@ class Order
             'finalized_samples' => json_encode($finalizedSamples),
             'finalized_ts' => $finalizedTs
         ];
+        if (!empty($centrifugeType)) {
+            $updateArray['processed_centrifuge_type'] = $centrifugeType;
+        }
         // Update order
         if ($this->app['em']->getRepository('orders')->update($this->order['id'], $updateArray)) {
             $this->app->log(Log::ORDER_EDIT, $this->order['id']);
