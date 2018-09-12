@@ -147,19 +147,19 @@ class HelpController extends AbstractController
             'videos' => [
                 'Chapter 2' => [
                     'title' => 'DV Registering a KIT',
-                    'link' => 'https://www.youtube.com/watch?v=pNSndLIIHQA&feature=youtu.be'
+                    'link' => 'https://www.youtube.com/watch?v=pNSndLIIHQA'
                 ],
                 'Chapter 4' => [
                     'title' => 'DV Blood Collection & Processing',
-                    'link' => 'https://www.youtube.com/watch?v=pNSndLIIHQA&feature=youtu.be'
+                    'link' => 'https://www.youtube.com/watch?v=pNSndLIIHQA'
                 ],
                 'Chapter 6' => [
                     'title' => 'DV Urine Collection',
-                    'link' => 'https://www.youtube.com/watch?v=wVcFsCiyqtA&feature=youtu.be'
+                    'link' => 'https://www.youtube.com/watch?v=wVcFsCiyqtA'
                 ],
                 'Chapter 10' => [
                     'title' => 'DV Packaging & Shipping Specimens',
-                    'link' => 'https://www.youtube.com/watch?v=yAHGK979kJ0&feature=youtu.be'
+                    'link' => 'https://www.youtube.com/watch?v=yAHGK979kJ0'
                 ]
             ]
         ]

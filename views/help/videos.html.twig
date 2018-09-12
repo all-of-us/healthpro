@@ -12,8 +12,9 @@
     {% for group in videoGroups %}
         <h3><em>All of Us</em> {{ group.title }}</h3>
         <ul>
-            {% for video in group.videos %}
+            {% for chapter, video in group.videos %}
                 <li>
+                    {{ chapter }}:
                     {% if video.link is not empty %}
                         <a data-href="{{ video.link }}" class="external-link">{{ video.title }}</a>
                     {% else %}
