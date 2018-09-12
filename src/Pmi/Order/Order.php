@@ -1058,6 +1058,18 @@ class Order
         return $this->app['db']->fetchAll($ordersQuery, [$participantId]);
     }
 
+    public function getOrderRevertForm()
+    {
+        $orderRevertForm = $this->app['form.factory']->createBuilder(Type\FormType::class, null);
+        $orderRevertForm->add('revert', Type\SubmitType::class, [
+            'label' => 'Revert',
+            'attr' => [
+                'class' => 'btn-warning'
+            ]
+        ]);
+        return $orderRevertForm->getForm();
+    }
+
     /**
      * Revert collected, processed, finalized samples and timestamps
      */

@@ -76,13 +76,14 @@
                 <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                     Save and mark as finalized
                 </button>
-                {% if order.status == 'unlock' %}
-                    <button type="submit" class="btn btn-warning" name="revert">Revert</button>
-                {% endif %}
             </p>
         {% endif %}
     {{ form_end(finalizeForm) }}
-
+    {% if order.status == 'unlock' %}
+        {{ form_start(revertForm, { 'action': path('orderRevert', { participantId: participant.id, orderId: order.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}
+        {{ form_errors(revertForm) }}
+        {{ form_end(revertForm) }}
+    {% endif %}
 {% endblock %}
 
 {% block pagejs %}
