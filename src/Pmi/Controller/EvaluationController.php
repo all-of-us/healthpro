@@ -16,7 +16,8 @@ class EvaluationController extends AbstractController
         ]],
         ['evaluationSummary', '/participant/{participantId}/measurements/{evalId}/summary'],
         ['evaluationFhir', '/participant/{participantId}/measurements/{evalId}/fhir.json'],
-        ['evaluationRdr', '/participant/{participantId}/measurements/{evalId}/rdr.json']
+        ['evaluationRdr', '/participant/{participantId}/measurements/{evalId}/rdr.json'],
+        ['evaluationModify', '/participant/{participantId}/measurements/{evalId}/modify/{type}', ['method' => 'GET|POST']]
     ];
 
     /* For debugging generated FHIR bundle - only allowed in dev */
@@ -273,6 +274,40 @@ class EvaluationController extends AbstractController
             'conversions' => $evaluationService->getConversions(),
             'latestVersion' => $evaluationService::CURRENT_VERSION,
             'showAutoModification' => $showAutoModification
+        ]);
+    }
+
+    public function evaluationModifyAction($participantId, $evalId, $type, Application $app)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->status || $app->isTestSite()) {
+            $app->abort(403);
+        }
+
+        $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
+            'id' => $evalId,
+            'participant_id' => $participantId
+        ]);
+        if (!$evaluation) {
+            $app->abort(404);
+        }
+        $evaluations = $app['em']->getRepository('evaluations')->fetchBy(
+            ['participant_id' => $participantId],
+            ['updated_ts' => 'DESC', 'id' => 'DESC']
+        );
+        $evaluationService = new Evaluation();
+        $evaluationService->loadFromArray($evaluation, $app);
+        return $app['twig']->render('evaluation-modify.html.twig', [
+            'participant' => $participant,
+            'evaluation' => $evaluation,
+            'evaluations' => $evaluations,
+            'summary' => $evaluationService->getSummary(),
+            'latestVersion' => $evaluationService::CURRENT_VERSION,
+            'evaluationModifyForm' => $evaluationService->getEvaluationModifyForm($app, $type)->createView(),
+            'type' => $type
         ]);
     }
 }

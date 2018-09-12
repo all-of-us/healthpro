@@ -17,6 +17,7 @@ class Evaluation
     const CURRENT_VERSION = '0.3.3';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
+    const EVALUATION_CANCEL = 'cancel';
     protected $version;
     protected $data;
     protected $schema;
@@ -462,5 +463,33 @@ class Evaluation
             $summary['heartrate'] = $heartrate;
         }
         return $summary;
+    }
+
+    public function getEvaluationModifyForm($app, $type)
+    {
+        $evaluationModifyForm = $app['form.factory']->createBuilder(FormType::class, null);
+        $evaluationModifyForm->add('reason', TextareaType::class, [
+            'label' => 'Reason',
+            'required' => true,
+            'constraints' => [
+                new Constraints\NotBlank(),
+                new Constraints\Type('string')
+            ]
+        ]);
+        if ($type == self::EVALUATION_CANCEL) {
+            $evaluationModifyForm->add('confirm', TextType::class, [
+                'label' => 'Confirm',
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => 'Type the word "CANCEL" to confirm',
+                    'autocomplete' => 'off'
+                ]
+            ]);
+        }
+        return $evaluationModifyForm->getForm();
     }
 }
