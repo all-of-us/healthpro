@@ -896,6 +896,11 @@ class Order
         return $this->order['status'] === self::ORDER_UNLOCK;
     }
 
+    public function isOrderFailedToReachRdr()
+    {
+        return !empty($this->order['finalized_ts']) && empty($this->order['rdr_id']);
+    }
+
     public function hasBloodSample($samples)
     {
         foreach ($samples as $sampleCode) {
