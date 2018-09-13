@@ -4,25 +4,48 @@
     <ol class="breadcrumb">
         <li><a href="{{ path('home') }}">Home</a></li>
         <li><a href="{{ path('help_home') }}">Help</a></li>
-        <li class="active">All of Us℠ Research Program Training Videos</li>
+        <li class="active">Training Videos</li>
     </ol>
     <div class="page-header">
-        <h2><i class="fa fa-film" aria-hidden="true"></i> All of Us℠ Research Program Training Videos</h2>
+        <h2><i class="fa fa-film" aria-hidden="true"></i> Training Videos</h2>
     </div>
-    {% for group in videoGroups %}
-        <h3><em>All of Us</em> {{ group.title }}</h3>
-        <ul>
-            {% for chapter, video in group.videos %}
-                <li>
-                    {{ chapter }}:
-                    {% if video.link is not empty %}
-                        <a data-href="{{ video.link }}" class="external-link">{{ video.title }}</a>
-                    {% else %}
-                        {{ video.title }} | <em>Coming Soon!</em>
-                    {% endif %}
-                </li>
+
+    {% set firstVideo = false %}
+    <div class="row">
+        <div class="col-sm-4">
+            {% for group in videoGroups %}
+                <h4>{{ group.title }}</h4>
+                <ul>
+                    {% for chapter, video in group.videos %}
+                        <li>
+                            {% if video.link is not empty %}
+                                <a href="#" class="load-video" data-embed-src="{{ video.link }}">{{ chapter }}: {{ video.title }}</a>
+                                {% if not firstVideo %}
+                                    {% set firstVideo = video.link %}
+                                {% endif %}
+                            {% else %}
+                                {{ chapter }}: {{ video.title }} <span class="badge">Coming Soon!</span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
             {% endfor %}
-        </ul>
-    {% endfor %}
+        </div>
+        <div class="col-sm-8">
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe id="youtube-embed" class="embed-responsive-item" src="{{ firstVideo }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
     {% include 'help/footer.html.twig' %}
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    $('a.load-video').on('click', function() {
+        $('iframe#youtube-embed').attr('src', $(this).data('embed-src'));
+    });
+});
+</script>
 {% endblock %}

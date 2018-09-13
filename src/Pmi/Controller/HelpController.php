@@ -130,15 +130,15 @@ class HelpController extends AbstractController
                 ],
                 'Chapter 5' => [
                     'title' => 'HPO Urine Collection',
-                    'link' => 'https://www.youtube.com/watch?v=ANJs1_A_zLs'
+                    'link' => 'https://www.youtube.com/embed/ANJs1_A_zLs'
                 ],
                 'Chapter 7' => [
                     'title' => 'HPO Saliva Collection',
-                    'link' => 'https://www.youtube.com/watch?v=0WeQCxetXQk'
+                    'link' => 'https://www.youtube.com/embed/0WeQCxetXQk'
                 ],
                 'Chapter 9' => [
                     'title' => 'HPO Ordering Supplies from MML',
-                    'link' => 'https://www.youtube.com/watch?v=6P4nuWNOAQA'
+                    'link' => 'https://www.youtube.com/embed/6P4nuWNOAQA'
                 ]
             ]
         ],
@@ -147,19 +147,19 @@ class HelpController extends AbstractController
             'videos' => [
                 'Chapter 2' => [
                     'title' => 'DV Registering a KIT',
-                    'link' => 'https://www.youtube.com/watch?v=pNSndLIIHQA'
+                    'link' => 'https://www.youtube.com/embed/X9E6u44w8Ks'
                 ],
                 'Chapter 4' => [
                     'title' => 'DV Blood Collection & Processing',
-                    'link' => 'https://www.youtube.com/watch?v=pNSndLIIHQA'
+                    'link' => 'https://www.youtube.com/embed/pNSndLIIHQA'
                 ],
                 'Chapter 6' => [
                     'title' => 'DV Urine Collection',
-                    'link' => 'https://www.youtube.com/watch?v=wVcFsCiyqtA'
+                    'link' => 'https://www.youtube.com/embed/wVcFsCiyqtA'
                 ],
                 'Chapter 10' => [
                     'title' => 'DV Packaging & Shipping Specimens',
-                    'link' => 'https://www.youtube.com/watch?v=yAHGK979kJ0'
+                    'link' => 'https://www.youtube.com/embed/yAHGK979kJ0'
                 ]
             ]
         ]
