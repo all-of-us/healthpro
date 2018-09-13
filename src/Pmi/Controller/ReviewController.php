@@ -14,7 +14,8 @@ class ReviewController extends AbstractController
         ['today', '/'],
         ['orders', '/orders'],
         ['measurements', '/measurements'],
-        ['participantNameLookup', '/participant/lookup']
+        ['participantNameLookup', '/participant/lookup'],
+        ['ordersRecentModify', '/orders/recent/modify']
     ];
     protected static $orderStatus = [
         'created_ts' => 'Created',
@@ -195,6 +196,37 @@ class ReviewController extends AbstractController
 
         return $app['twig']->render('review/measurements.html.twig', [
             'measurements' => $measurements
+        ]);
+    }
+
+    public function ordersRecentModifyAction(Application $app)
+    {
+        $site = $app->getSiteId();
+        if (!$site) {
+            $app->addFlashError('You must select a valid site');
+            return $app->redirectToRoute('home');
+        }
+        $query = "
+            SELECT o.*, oh_tmp.*
+                FROM orders o
+                LEFT JOIN
+                (SELECT oh1.order_id AS oh_order_id,
+                    oh1.type AS oh_type,
+                    oh1.created_ts AS oh_created_ts
+                    FROM orders_history AS oh1
+                    LEFT JOIN orders_history AS oh2 ON oh1.order_id = oh2.order_id
+                    AND oh1.created_ts < oh2.created_ts
+                    WHERE oh2.order_id IS NULL 
+                ) AS oh_tmp ON (o.id = oh_tmp.oh_order_id)
+                WHERE o.site = ? 
+                  AND (oh_tmp.oh_type = ? OR oh_tmp.oh_type = ?)
+                  AND oh_tmp.oh_created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
+                ORDER BY o.id DESC
+            ";
+        // TODO get cancel and edit values from order class
+        $recentModifyOrders = $app['db']->fetchAll($query, [$app->getSiteId(), 'cancel', 'edit']);
+        return $app['twig']->render('review/orders-recent-modify.html.twig', [
+            'orders' => $recentModifyOrders
         ]);
     }
 }
