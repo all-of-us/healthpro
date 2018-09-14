@@ -12,29 +12,35 @@
 
     {% set firstVideo = false %}
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-8 col-sm-push-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title" id="video-title"></h3>
+                </div>
+                <div class="panel-body">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe id="video-embed" class="embed-responsive-item" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-sm-pull-8">
             {% for group in videoGroups %}
                 <h4>{{ group.title }}</h4>
-                <ul>
+                <div class="list-group">
                     {% for chapter, video in group.videos %}
-                        <li>
-                            {% if video.link is not empty %}
-                                <a href="#" class="load-video" data-embed-src="{{ video.link }}">{{ chapter }}: {{ video.title }}</a>
-                                {% if not firstVideo %}
-                                    {% set firstVideo = video.link %}
-                                {% endif %}
-                            {% else %}
-                                {{ chapter }}: {{ video.title }} <span class="badge">Coming Soon!</span>
+                        {% if video.link is not empty %}
+                            <a href="#" class="list-group-item load-video" data-embed-src="{{ video.link }}">{{ chapter }}: {{ video.title }}</a>
+                            {% if not firstVideo %}
+                                {% set firstVideo = video.link %}
                             {% endif %}
-                        </li>
+                        {% else %}
+                            <div class="list-group-item disabled">{{ chapter }}: {{ video.title }} <em><small>(Coming Soon!)</small></em></div>
+                        {% endif %}
                     {% endfor %}
                 </ul>
+                <br />
             {% endfor %}
-        </div>
-        <div class="col-sm-8">
-            <div class="embed-responsive embed-responsive-16by9">
-                <iframe id="youtube-embed" class="embed-responsive-item" src="{{ firstVideo }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            </div>
         </div>
     </div>
     {% include 'help/footer.html.twig' %}
@@ -44,8 +50,14 @@
 <script>
 $(document).ready(function() {
     $('a.load-video').on('click', function() {
-        $('iframe#youtube-embed').attr('src', $(this).data('embed-src'));
+        $('#video-title').html($(this).html());
+        $('iframe#video-embed').attr('src', $(this).data('embed-src') + '?modestbranding=1&rel=0');
+        $('html').scrollTop($('iframe#video-embed').offset().top);
+        $('a.load-video').removeClass('active');
+        $(this).addClass('active');
+        return false;
     });
+    $('a.load-video:first').click();
 });
 </script>
 {% endblock %}
