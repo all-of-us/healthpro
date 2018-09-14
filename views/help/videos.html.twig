@@ -13,7 +13,7 @@
     {% set firstVideo = false %}
     <div class="row">
         <div class="col-sm-8 col-sm-push-4">
-            <div class="panel panel-default">
+            <div class="panel panel-default" id="video-panel">
                 <div class="panel-heading">
                     <h3 class="panel-title" id="video-title"></h3>
                 </div>
@@ -49,15 +49,18 @@
 {% block pagejs %}
 <script>
 $(document).ready(function() {
-    $('a.load-video').on('click', function() {
-        $('#video-title').html($(this).html());
-        $('iframe#video-embed').attr('src', $(this).data('embed-src') + '?modestbranding=1&rel=0');
-        $('html').scrollTop($('iframe#video-embed').offset().top);
+    var loadVideo = function(src) {
+        $('#video-title').html(src.html());
+        $('iframe#video-embed').attr('src', src.data('embed-src') + '?modestbranding=1&rel=0');
         $('a.load-video').removeClass('active');
-        $(this).addClass('active');
+        src.addClass('active');
+    };
+    $('a.load-video').on('click', function() {
+        loadVideo($(this));
+        $('html').scrollTop($('#video-panel').offset().top);
         return false;
     });
-    $('a.load-video:first').trigger('click');
+    loadVideo($('a.load-video:first'));
 });
 </script>
 {% endblock %}
