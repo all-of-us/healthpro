@@ -168,13 +168,27 @@ class ReviewController extends AbstractController
             $app->addFlashError('You must select a valid site');
             return $app->redirectToRoute('home');
         }
-
-        $orders = $app['em']->getRepository('orders')->fetchBySql(
-            'site = ? AND finalized_ts IS NULL',
-            [$app->getSiteId()],
-            ['created_ts' => 'DESC']
-        );
-
+        $ordersQuery = "
+            SELECT orders.*, orders_history_tmp.*
+                FROM orders
+                LEFT JOIN
+                (SELECT oh1.order_id AS oh_order_id,
+                    oh1.user_id AS oh_user_id,
+                    oh1.site AS oh_site,
+                    oh1.type AS oh_type,
+                    oh1.created_ts AS oh_created_ts
+                    FROM orders_history AS oh1
+                    LEFT JOIN orders_history AS oh2 ON oh1.order_id = oh2.order_id
+                    AND oh1.created_ts < oh2.created_ts
+                    WHERE oh2.order_id IS NULL
+                      AND oh1.type != ?
+                ) AS orders_history_tmp ON (orders.id = orders_history_tmp.oh_order_id)
+                WHERE orders.site = ?
+                  AND finalized_ts IS NULL
+                ORDER BY orders.created_ts DESC
+            ";
+        // TODO get cancel value from order class
+        $orders = $app['db']->fetchAll($ordersQuery, ['cancel', $app->getSiteId()]);
         return $app['twig']->render('review/orders.html.twig', [
             'orders' => $orders
         ]);
