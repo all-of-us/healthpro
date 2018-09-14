@@ -16,7 +16,7 @@
     {% if (order.status == 'active' or order.status == 'restore') and order.rdr_id %}
         <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'unlock', return: return }) }}" class="btn btn-sm btn-primary">Unlock for Editing</a>
     {% endif %}
-    {% if (order.status != 'cancel' and order.status != 'unlock') and (order.finalized_ts and order.rdr_id is not empty) %}
+    {% if (order.status != 'cancel' and order.status != 'unlock') and not (order.finalized_ts is not empty and order.rdr_id is empty) %}
         <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel Order</a>
     {% elseif order.status == 'cancel' %}
         <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore Order</a>

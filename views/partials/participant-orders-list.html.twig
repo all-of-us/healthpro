@@ -36,6 +36,8 @@
             <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
         </a>
         {% endif %}
-        <a href="{{ path('orderCheck', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
+        {% if type is not defined %}
+            <a href="{{ path('orderCheck', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
+        {% endif %}
     </div>
 </div>
