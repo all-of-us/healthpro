@@ -10,7 +10,6 @@
         <h2><i class="fa fa-film" aria-hidden="true"></i> Training Videos</h2>
     </div>
 
-    {% set firstVideo = false %}
     <div class="row">
         <div class="col-sm-8 col-sm-push-4">
             <div class="panel panel-default" id="video-panel">
@@ -31,9 +30,6 @@
                     {% for chapter, video in group.videos %}
                         {% if video.link is not empty %}
                             <a href="#" class="list-group-item load-video" data-embed-src="{{ video.link }}">{{ chapter }}: {{ video.title }}</a>
-                            {% if not firstVideo %}
-                                {% set firstVideo = video.link %}
-                            {% endif %}
                         {% else %}
                             <div class="list-group-item disabled">{{ chapter }}: {{ video.title }} <em><small>(Coming Soon!)</small></em></div>
                         {% endif %}
