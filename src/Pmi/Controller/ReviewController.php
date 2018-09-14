@@ -207,24 +207,26 @@ class ReviewController extends AbstractController
             return $app->redirectToRoute('home');
         }
         $query = "
-            SELECT o.*, oh_tmp.*
-                FROM orders o
-                LEFT JOIN
+            SELECT oh_tmp.*, o.*
+                FROM
                 (SELECT oh1.order_id AS oh_order_id,
                     oh1.type AS oh_type,
                     oh1.created_ts AS oh_created_ts
                     FROM orders_history AS oh1
                     LEFT JOIN orders_history AS oh2 ON oh1.order_id = oh2.order_id
                     AND oh1.created_ts < oh2.created_ts
-                    WHERE oh2.order_id IS NULL 
-                ) AS oh_tmp ON (o.id = oh_tmp.oh_order_id)
-                WHERE o.site = ? 
-                  AND (oh_tmp.oh_type = ? OR oh_tmp.oh_type = ?)
-                  AND oh_tmp.oh_created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
-                ORDER BY o.id DESC
+                    WHERE oh2.order_id IS NULL
+                      AND oh1.type != ?
+                      AND oh1.type != ? 
+                      AND oh1.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
+                ) AS oh_tmp 
+                INNER JOIN orders o
+                ON (oh_tmp.oh_order_id = o.id)
+                WHERE o.site = ?
+                ORDER BY oh_tmp.oh_created_ts DESC
             ";
         // TODO get cancel and edit values from order class
-        $recentModifyOrders = $app['db']->fetchAll($query, [$app->getSiteId(), 'cancel', 'edit']);
+        $recentModifyOrders = $app['db']->fetchAll($query, ['active', 'restore', $app->getSiteId()]);
         return $app['twig']->render('review/orders-recent-modify.html.twig', [
             'orders' => $recentModifyOrders
         ]);
