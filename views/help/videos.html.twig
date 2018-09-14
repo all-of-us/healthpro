@@ -57,7 +57,7 @@ $(document).ready(function() {
         $(this).addClass('active');
         return false;
     });
-    $('a.load-video:first').click();
+    $('a.load-video:first').trigger('click');
 });
 </script>
 {% endblock %}
