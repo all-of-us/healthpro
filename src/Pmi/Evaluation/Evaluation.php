@@ -500,8 +500,8 @@ class Evaluation
     public function getEvaluationWithHistory($evalId, $participantId)
     {
          $evaluationsQuery = "
-            SELECT evaluations.*, evaluations_history_tmp.*
-                FROM evaluations
+            SELECT e.*, eh_tmp.*
+                FROM evaluations e
                 LEFT JOIN
                 (SELECT eh1.evaluation_id AS eh_evaluation_id,
                     eh1.user_id AS eh_user_id,
@@ -512,13 +512,35 @@ class Evaluation
                     LEFT JOIN evaluations_history AS eh2 ON eh1.evaluation_id = eh2.evaluation_id
                     AND eh1.created_ts < eh2.created_ts
                     WHERE eh2.evaluation_id IS NULL 
-                ) AS evaluations_history_tmp ON  (evaluations.id = evaluations_history_tmp.eh_evaluation_id)
-                WHERE evaluations.id = ?
-                  AND evaluations.participant_id = ?
-                ORDER BY evaluations.id DESC
+                ) AS eh_tmp ON  (e.id = eh_tmp.eh_evaluation_id)
+                WHERE e.id = ?
+                  AND e.participant_id = ?
+                ORDER BY e.id DESC
             ";
-        $evaluation = $this->app['db']->fetchAll( $evaluationsQuery, [$evalId, $participantId]);
+        $evaluation = $this->app['db']->fetchAll($evaluationsQuery, [$evalId, $participantId]);
         return !empty($evaluation) ? $evaluation[0] : null;
+    }
+
+    public function getEvaluationsWithHistory($participantId)
+    {
+        $evaluationsQuery = "
+            SELECT e.*, eh_tmp.*
+                FROM evaluations e
+                LEFT JOIN
+                (SELECT eh1.evaluation_id AS eh_evaluation_id,
+                    eh1.user_id AS eh_user_id,
+                    eh1.site AS eh_site,
+                    eh1.type AS eh_type,
+                    eh1.created_ts AS eh_created_ts
+                    FROM evaluations_history AS eh1
+                    LEFT JOIN evaluations_history AS eh2 ON eh1.evaluation_id = eh2.evaluation_id
+                    AND eh1.created_ts < eh2.created_ts
+                    WHERE eh2.evaluation_id IS NULL 
+                ) AS eh_tmp ON  (e.id = eh_tmp.eh_evaluation_id)
+                WHERE e.participant_id = ?
+                ORDER BY e.id DESC
+            ";
+        return $this->app['db']->fetchAll($evaluationsQuery, [$participantId]);
     }
 
     public function createEvaluationHistory($type, $evalId, $reason = '')

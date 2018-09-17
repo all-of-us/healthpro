@@ -319,10 +319,7 @@ class EvaluationController extends AbstractController
                 $app->addFlashError('Please correct the errors below');
             }
         }
-        $evaluations = $app['em']->getRepository('evaluations')->fetchBy(
-            ['participant_id' => $participantId],
-            ['updated_ts' => 'DESC', 'id' => 'DESC']
-        );
+        $evaluations = $evaluationService->getEvaluationsWithHistory($participantId);
         $evaluationService->loadFromArray($evaluation, $app);
         return $app['twig']->render('evaluation-modify.html.twig', [
             'participant' => $participant,
@@ -331,7 +328,8 @@ class EvaluationController extends AbstractController
             'summary' => $evaluationService->getSummary(),
             'latestVersion' => $evaluationService::CURRENT_VERSION,
             'evaluationModifyForm' => $evaluationModifyForm->createView(),
-            'type' => $type
+            'type' => $type,
+            'evalId' => $evalId
         ]);
     }
 }
