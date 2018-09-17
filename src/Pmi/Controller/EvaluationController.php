@@ -277,7 +277,7 @@ class EvaluationController extends AbstractController
         ]);
     }
 
-    public function evaluationModifyAction($participantId, $evalId, $type, Application $app)
+    public function evaluationModifyAction($participantId, $evalId, $type, Application $app, Request $request)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
@@ -286,19 +286,43 @@ class EvaluationController extends AbstractController
         if (!$participant->status || $app->isTestSite()) {
             $app->abort(403);
         }
-
-        $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
-            'id' => $evalId,
-            'participant_id' => $participantId
-        ]);
+        $evaluationService = new Evaluation($app);
+        $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);
         if (!$evaluation) {
             $app->abort(404);
+        }
+        // Allow cancel for active and restored evaluations
+        // Allow restore for only canceled evaluations
+        if (!in_array($type, [$evaluationService::EVALUATION_CANCEL, $evaluationService::EVALUATION_RESTORE])) {
+            $app->abort(404);
+        }
+        if (($type === $evaluationService::EVALUATION_CANCEL && $evaluation['eh_type'] === $evaluationService::EVALUATION_CANCEL)
+            || ($type === $evaluationService::EVALUATION_RESTORE && $evaluation['eh_type'] !== $evaluationService::EVALUATION_CANCEL)) {
+            $app->abort(403);
+        }
+        $evaluationModifyForm = $evaluationService->getEvaluationModifyForm($type);
+        $evaluationModifyForm->handleRequest($request);
+        if ($evaluationModifyForm->isSubmitted()) {
+            $evaluationModifyData = $evaluationModifyForm->getData();
+            if ($type === $evaluationService::EVALUATION_CANCEL && strtolower($evaluationModifyData['confirm']) !== $evaluationService::EVALUATION_CANCEL) {
+                $evaluationModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
+            }
+            if ($evaluationModifyForm->isValid()) {
+                // Create evaluation history
+                if ($evaluationService->createEvaluationHistory($type, $evalId, $evaluationModifyData['reason'])) {
+                    $app->addFlashSuccess("Evaluation {$type}ed");
+                    return $app->redirectToRoute('participant', [
+                        'id' => $participantId
+                    ]);
+                }
+            } else {
+                $app->addFlashError('Please correct the errors below');
+            }
         }
         $evaluations = $app['em']->getRepository('evaluations')->fetchBy(
             ['participant_id' => $participantId],
             ['updated_ts' => 'DESC', 'id' => 'DESC']
         );
-        $evaluationService = new Evaluation();
         $evaluationService->loadFromArray($evaluation, $app);
         return $app['twig']->render('evaluation-modify.html.twig', [
             'participant' => $participant,
@@ -306,7 +330,7 @@ class EvaluationController extends AbstractController
             'evaluations' => $evaluations,
             'summary' => $evaluationService->getSummary(),
             'latestVersion' => $evaluationService::CURRENT_VERSION,
-            'evaluationModifyForm' => $evaluationService->getEvaluationModifyForm($app, $type)->createView(),
+            'evaluationModifyForm' => $evaluationModifyForm->createView(),
             'type' => $type
         ]);
     }

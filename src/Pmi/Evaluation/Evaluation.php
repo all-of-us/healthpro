@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
+use Pmi\Audit\Log;
 
 class Evaluation
 {
@@ -18,16 +19,19 @@ class Evaluation
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_CANCEL = 'cancel';
+    const EVALUATION_RESTORE = 'restore';
     protected $version;
     protected $data;
     protected $schema;
     protected $participant;
     protected $locked = false;
+    protected $app;
 
-    public function __construct()
+    public function __construct($app = null)
     {
         $this->version = self::CURRENT_VERSION;
         $this->data = new \StdClass();
+        $this->app = $app;
         $this->loadSchema();
         $this->normalizeData();
     }
@@ -465,9 +469,9 @@ class Evaluation
         return $summary;
     }
 
-    public function getEvaluationModifyForm($app, $type)
+    public function getEvaluationModifyForm($type)
     {
-        $evaluationModifyForm = $app['form.factory']->createBuilder(FormType::class, null);
+        $evaluationModifyForm = $this->app['form.factory']->createBuilder(FormType::class, null);
         $evaluationModifyForm->add('reason', TextareaType::class, [
             'label' => 'Reason',
             'required' => true,
@@ -491,5 +495,46 @@ class Evaluation
             ]);
         }
         return $evaluationModifyForm->getForm();
+    }
+
+    public function getEvaluationWithHistory($evalId, $participantId)
+    {
+         $evaluationsQuery = "
+            SELECT evaluations.*, evaluations_history_tmp.*
+                FROM evaluations
+                LEFT JOIN
+                (SELECT eh1.evaluation_id AS eh_evaluation_id,
+                    eh1.user_id AS eh_user_id,
+                    eh1.site AS eh_site,
+                    eh1.type AS eh_type,
+                    eh1.created_ts AS eh_created_ts
+                    FROM evaluations_history AS eh1
+                    LEFT JOIN evaluations_history AS eh2 ON eh1.evaluation_id = eh2.evaluation_id
+                    AND eh1.created_ts < eh2.created_ts
+                    WHERE eh2.evaluation_id IS NULL 
+                ) AS evaluations_history_tmp ON  (evaluations.id = evaluations_history_tmp.eh_evaluation_id)
+                WHERE evaluations.id = ?
+                  AND evaluations.participant_id = ?
+                ORDER BY evaluations.id DESC
+            ";
+        $evaluation = $this->app['db']->fetchAll( $evaluationsQuery, [$evalId, $participantId]);
+        return !empty($evaluation) ? $evaluation[0] : null;
+    }
+
+    public function createEvaluationHistory($type, $evalId, $reason = '')
+    {
+        $evaluationHistoryData = [
+            'reason' => $reason,
+            'evaluation_id' => $evalId,
+            'user_id' => $this->app->getUser()->getId(),
+            'site' => $this->app->getSiteId(),
+            'type' => $type,
+            'created_ts' => new \DateTime()
+        ];
+        if ($evaluationHistoryId = $this->app['em']->getRepository('evaluations_history')->insert($evaluationHistoryData)) {
+            $this->app->log(Log::EVALUATION_HISTORY_CREATE, $evaluationHistoryId);
+            return true;
+        }
+        return false;
     }
 }

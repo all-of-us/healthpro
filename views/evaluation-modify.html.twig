@@ -49,7 +49,7 @@
             {{ form_rest(evaluationModifyForm) }}
             <p>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
-                <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">{{ type|capitalize }} Evaluation</button>
+                <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">{{ type|capitalize }} Measurement</button>
             </p>
             {{ form_end(evaluationModifyForm) }}
         </div>
