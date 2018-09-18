@@ -12,7 +12,7 @@
                 {% endif %}
                 <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
                 {% if evaluation %}
-                    {% if evaluation.eh_type is empty %}
+                    {% if evaluation.eh_type != 'cancel' %}
                         <a href="{{ path('evaluationModify', { participantId: participant.id, evalId: evaluation.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel</a>
                     {% elseif evaluation.eh_type == 'cancel' %}
                         <a href="{{ path('evaluationModify', { participantId: participant.id, evalId: evaluation.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore</a>
