@@ -133,12 +133,9 @@ class EvaluationController extends AbstractController
         if (!$participant->status || $app->isTestSite()) {
             $app->abort(403);
         }
-        $evaluationService = new Evaluation();
+        $evaluationService = new Evaluation($app);
         if ($evalId) {
-            $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
-                'id' => $evalId,
-                'participant_id' => $participantId
-            ]);
+            $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);
             if (!$evaluation) {
                 $app->abort(404);
             }
@@ -320,7 +317,6 @@ class EvaluationController extends AbstractController
             }
         }
         $evaluations = $evaluationService->getEvaluationsWithHistory($participantId);
-        $evaluationService->loadFromArray($evaluation, $app);
         return $app['twig']->render('evaluation-modify.html.twig', [
             'participant' => $participant,
             'evaluation' => $evaluation,

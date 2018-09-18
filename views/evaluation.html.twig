@@ -11,6 +11,13 @@
                     New Physical Measurements
                 {% endif %}
                 <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+                {% if evaluation %}
+                    {% if evaluation.eh_type is empty %}
+                        <a href="{{ path('evaluationModify', { participantId: participant.id, evalId: evaluation.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel</a>
+                    {% elseif evaluation.eh_type == 'cancel' %}
+                        <a href="{{ path('evaluationModify', { participantId: participant.id, evalId: evaluation.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore</a>
+                    {% endif %}
+                {% endif %}
             </h2>
         </div>
         <dl class="dl-horizontal">
@@ -33,6 +40,12 @@
             <dt>Paired Awardee</dt>
             <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
         </dl>
+        {% if evaluation and evaluation.eh_type == 'cancel' %}
+            <div class="alert alert-danger">
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                <strong>Cancelled by {{ app.getUserEmailById(evaluation.eh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(evaluation.eh_site) }} on {{ evaluation.eh_created_ts|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong>
+            </div>
+        {% endif %}
         {% if evaluation and evaluation.finalized_ts %}
             <div class="alert alert-success">
                 <i class="fa fa-check-circle" aria-hidden="true"></i>
