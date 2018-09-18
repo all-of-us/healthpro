@@ -31,7 +31,7 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        $evaluationService = new Evaluation();
+        $evaluationService = new Evaluation($app);
         $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
             'id' => $evalId,
             'participant_id' => $participantId
@@ -46,7 +46,7 @@ class EvaluationController extends AbstractController
             $evaluation['finalized_ts'] = new \DateTime('2017-01-01', new \DateTimeZone('UTC'));
             $evaluation['finalized_user_id'] = $evaluation['user_id'];
         }
-        $evaluationService->loadFromArray($evaluation, $app);
+        $evaluationService->loadFromArray($evaluation);
         if ($evaluation['finalized_ts']) {
             $date = $evaluation['finalized_ts'];
         } else {
@@ -115,8 +115,8 @@ class EvaluationController extends AbstractController
         if (!$evaluation['finalized_ts']) {
             $app->abort(403);
         }
-        $evaluationService = new Evaluation();
-        $evaluationService->loadFromArray($evaluation, $app);
+        $evaluationService = new Evaluation($app);
+        $evaluationService->loadFromArray($evaluation);
         return $app['twig']->render('evaluation-summary.html.twig', [
             'participant' => $participant,
             'evaluation' => $evaluation,
@@ -139,7 +139,7 @@ class EvaluationController extends AbstractController
             if (!$evaluation) {
                 $app->abort(404);
             }
-            $evaluationService->loadFromArray($evaluation, $app);
+            $evaluationService->loadFromArray($evaluation);
         } else {
             $evaluation = null;
         }
@@ -172,7 +172,7 @@ class EvaluationController extends AbstractController
                             $fhir = $evaluationService->getFhir($now, $parentEvaluation['rdr_id']);
                         } else {
                             if (!$evaluation) {
-                                $evaluationService->loadFromArray($dbArray, $app);
+                                $evaluationService->loadFromArray($dbArray);
                             }
                             $fhir = $evaluationService->getFhir($now);
                         }

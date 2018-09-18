@@ -20,23 +20,28 @@ class Evaluation
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
+
+    protected $app;
     protected $version;
     protected $data;
     protected $schema;
     protected $participant;
+    protected $createdUser;
+    protected $createdSite;
+    protected $finalizedUser;
+    protected $finalizedSite;
     protected $locked = false;
-    protected $app;
 
     public function __construct($app = null)
     {
+        $this->app = $app;
         $this->version = self::CURRENT_VERSION;
         $this->data = new \StdClass();
-        $this->app = $app;
         $this->loadSchema();
         $this->normalizeData();
     }
 
-    public function loadFromArray($array, $app = null)
+    public function loadFromArray($array)
     {
         if (array_key_exists('version', $array)) {
             $this->version = $array['version'];
@@ -52,18 +57,18 @@ class Evaluation
             $this->locked = true;
         }
         $this->participant = $array['participant_id'];
-        if ($app) {
-            $createdUser = $app['em']->getRepository('users')->fetchOneBy([
+        if ($this->app) {
+            $createdUser = $this->app['em']->getRepository('users')->fetchOneBy([
                 'id' => $array['user_id']
             ]);
             if (!$array['finalized_user_id']) {
-                $finalizedUserId = $array['finalized_ts'] ? $array['user_id'] : $app->getUser()->getId();
-                $finalizedSite = $array['finalized_ts'] ? $array['site'] : $app->getSiteId();
+                $finalizedUserId = $array['finalized_ts'] ? $array['user_id'] : $this->app->getUser()->getId();
+                $finalizedSite = $array['finalized_ts'] ? $array['site'] : $this->app->getSiteId();
             } else {
                 $finalizedUserId = $array['finalized_user_id'];
                 $finalizedSite = $array['finalized_site'];          
             }
-            $finalizedUser = $app['em']->getRepository('users')->fetchOneBy([
+            $finalizedUser = $this->app['em']->getRepository('users')->fetchOneBy([
                 'id' => $finalizedUserId
             ]);
             $this->createdUser = $createdUser['email'];
