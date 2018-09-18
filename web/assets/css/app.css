@@ -309,3 +309,8 @@ table.table-samples td {
     padding:2px 6px;
     font-size:12px;
 }
+
+.revert-form {
+    float: right;
+    margin-top: -44px;
+}

@@ -16,6 +16,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 use Pmi\WorkQueue\WorkQueue;
+use Pmi\Order\Order;
 
 class DefaultController extends AbstractController
 {
@@ -356,10 +357,8 @@ class DefaultController extends AbstractController
                 'organization' => $participant->hpoId
             ]);
         }
-        $orders = $app['em']->getRepository('orders')->fetchBy(
-            ['participant_id' => $id],
-            ['created_ts' => 'DESC', 'id' => 'DESC']
-        );
+        $order = new Order($app);
+        $orders = $order->getParticipantOrdersWithHistory($id);
         $evaluations = $app['em']->getRepository('evaluations')->fetchBy(
             ['participant_id' => $id],
             ['updated_ts' => 'DESC', 'id' => 'DESC']

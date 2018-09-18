@@ -6,6 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
+use Pmi\Audit\Log;
 
 class Order
 {
@@ -15,6 +16,11 @@ class Order
     public $version = 2;
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
+    const ORDER_ACTIVE = 'active';
+    const ORDER_CANCEL = 'cancel';
+    const ORDER_RESTORE = 'restore';
+    const ORDER_UNLOCK = 'unlock';
+    const ORDER_EDIT = 'edit';
 
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
@@ -60,6 +66,25 @@ class Order
     ];
 
     public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2'];
+
+    public static $mapRdrSamples = [
+        '1SST8' => [
+            'code' => '1SS08',
+            'centrifuge_type' => 'swinging_bucket'
+        ],
+        '2SST8' => [
+            'code' => '1SS08',
+            'centrifuge_type' => 'fixed_angle'
+        ],
+        '1PST8' => [
+            'code' => '1PS08',
+            'centrifuge_type' => 'swinging_bucket'
+        ],
+        '2PST8' => [
+            'code' => '1PS08',
+            'centrifuge_type' => 'fixed_angle'
+        ]
+    ];
 
     public function __construct($app = null)
     {
@@ -140,6 +165,8 @@ class Order
         $this->order['expired'] = $this->isOrderExpired();
         $this->participant = $participant;
         $this->version = !empty($order['version']) ? $order['version'] : 1;
+        $this->loadOrderHistory();
+        $this->order['disabled'] = $this->isOrderDisabled();
         $this->loadSamplesSchema();
     }
 
@@ -246,20 +273,18 @@ class Order
                 $samples = array_values($formData["{$set}_samples"]);
             }
             $updateArray["{$set}_samples"] = json_encode($samples);
-            // Remove processed samples when not collected
-            if ($set === 'collected' && !empty($this->order['processed_samples_ts'])) {
-                $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
-                $newProcessedSamples = [];
-                $newProcessedSamplesTs = [];
-                foreach ($processedSamplesTs as $sample => $timestamp) {
-                    // Check if each processed sample exists in collected samples list
-                    if (in_array($sample, $samples)) {
-                        $newProcessedSamples[] = $sample;
-                        $newProcessedSamplesTs[$sample] = $timestamp; 
-                    }
+            if ($set === 'collected') {
+                // Remove processed samples when not collected
+                if (!empty($this->order['processed_samples_ts'])) {
+                    $newProcessedSamples = $this->getNewProcessedSamples($samples);
+                    $updateArray["processed_samples"] = $newProcessedSamples['samples'];
+                    $updateArray["processed_samples_ts"] = $newProcessedSamples['timeStamps'];
                 }
-                $updateArray["processed_samples"] = json_encode($newProcessedSamples);
-                $updateArray["processed_samples_ts"] = json_encode($newProcessedSamplesTs);
+                // Remove finalized samples when not collected
+                if (!empty($this->order['finalized_samples'])) {
+                    $newFinalizedSamples = $this->getNewFinalizedSamples($samples);
+                    $updateArray["finalized_samples"] = $newFinalizedSamples;
+                }
             }
             if ($set === 'processed') {
                 $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
@@ -277,6 +302,11 @@ class Order
                 if ($this->order['type'] !== 'saliva' && !empty($formData["processed_centrifuge_type"])) {
                     $updateArray["processed_centrifuge_type"] = $formData["processed_centrifuge_type"];
                 }
+                // Remove finalized samples when not processed
+                if (!empty($this->order['finalized_samples'])) {
+                    $newFinalizedSamples = $this->getNewFinalizedSamples($samples);
+                    $updateArray["finalized_samples"] = $newFinalizedSamples;
+                }
             }
         }
         if ($set === 'finalized' && $this->order['type'] === 'kit') {
@@ -287,7 +317,7 @@ class Order
 
     public function createOrderForm($set, $formFactory)
     {
-        $disabled = $this->order['finalized_ts'] || $this->order['expired'] ? true : false;
+        $disabled = $this->isOrderDisabled();
 
         switch ($set) {
             case 'collected':
@@ -370,7 +400,7 @@ class Order
         if (!empty($samples)) {
             // Disable collected samples when mayo_id is set
             $samplesDisabled = $disabled;
-            if ($set === 'collected' && $this->order['mayo_id']) {
+            if ($set === 'collected' && $this->order['mayo_id'] && $this->order['status'] !== self::ORDER_UNLOCK) {
                 $samplesDisabled = true;
             }
             $formBuilder->add("{$set}_samples", Type\ChoiceType::class, [
@@ -579,6 +609,9 @@ class Order
                 $this->order['id'],
                 ['rdr_id' => $rdrId]
             );
+            if ($this->order['status'] === self::ORDER_UNLOCK) {
+                $this->createOrderHistory(self::ORDER_EDIT);
+            }
         }
     }
 
@@ -848,6 +881,26 @@ class Order
         return empty($this->order['finalized_ts']) && empty($this->order['version']);
     }
 
+    public function isOrderDisabled()
+    {
+        return ($this->order['finalized_ts'] || $this->order['expired'] || $this->isOrderCancelled()) && $this->order['status'] !== 'unlock';
+    }
+
+    public function isOrderCancelled()
+    {
+        return $this->order['status'] === self::ORDER_CANCEL;
+    }
+
+    public function isOrderUnlocked()
+    {
+        return $this->order['status'] === self::ORDER_UNLOCK;
+    }
+
+    public function isOrderFailedToReachRdr()
+    {
+        return !empty($this->order['finalized_ts']) && empty($this->order['rdr_id']);
+    }
+
     public function hasBloodSample($samples)
     {
         foreach ($samples as $sampleCode) {
@@ -885,5 +938,208 @@ class Order
             throw new \Exception('Failed to generate unique order id');
         }
         return $id;
+    }
+
+    public function getSamplesInfo()
+    {
+        $samples = [];
+        foreach ($this->getRequestedSamples() as $key => $value) {
+            $sample = ['code' => $key];
+            if (!empty($this->order['collected_ts']) && in_array($value, json_decode($this->order['collected_samples']))) {
+                $sample['collected_ts'] = $this->order['collected_ts'];
+            }
+            if (!empty($this->order['finalized_ts']) && in_array($value, json_decode($this->order['finalized_samples']))) {
+                $sample['finalized_ts'] = $this->order['finalized_ts'];
+            }
+            if (!empty($this->order['processed_samples_ts']) && in_array($value, json_decode($this->order['processed_samples']))) {
+                $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+                if (!empty($processedSamplesTs[$value])) {
+                    $processedTs = new \DateTime();
+                    $processedTs->setTimestamp($processedSamplesTs[$value]);
+                    $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                    $sample['processed_ts'] = $processedTs;
+                }
+            }
+            if (in_array($value, self::$samplesRequiringProcessing)) {
+                $sample['process'] = true;
+            }
+            $samples[] = $sample;
+        }
+        return $samples;
+    }
+
+    public function getNewProcessedSamples($samples)
+    {
+        $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+        $newProcessedSamples = [];
+        $newProcessedSamplesTs = [];
+        foreach ($processedSamplesTs as $sample => $timestamp) {
+            // Check if each processed sample exists in collected samples list
+            if (in_array($sample, $samples)) {
+                $newProcessedSamples[] = $sample;
+                $newProcessedSamplesTs[$sample] = $timestamp;
+            }
+        }
+        return [
+            'samples' => json_encode($newProcessedSamples),
+            'timeStamps' => json_encode($newProcessedSamplesTs)
+        ];
+    }
+
+    public function getNewFinalizedSamples($samples)
+    {
+        $finalizedSamples = json_decode($this->order['finalized_samples'], true);
+        $newFinalizedSamples = [];
+        foreach ($finalizedSamples as $sample) {
+            // Check if each finalized sample exists in collected/processed samples list
+            if (in_array($sample, $samples)) {
+                $newFinalizedSamples[] = $sample;
+            }
+        }
+        return json_encode($newFinalizedSamples);
+    }
+
+    public function getOrderModifyForm($type)
+    {
+        $orderModifyForm = $this->app['form.factory']->createBuilder(Type\FormType::class, null);
+        $orderModifyForm->add('reason', Type\TextareaType::class, [
+            'label' => 'Reason',
+            'required' => true,
+            'constraints' => [
+                new Constraints\NotBlank(),
+                new Constraints\Type('string')
+            ]
+        ]);
+        if ($type == self::ORDER_CANCEL) {
+            $orderModifyForm->add('confirm', Type\TextType::class, [
+                'label' => 'Confirm',
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => 'Type the word "CANCEL" to confirm',
+                    'autocomplete' => 'off'
+                ]
+            ]);
+        }
+        return $orderModifyForm->getForm();
+    }
+
+    public function createOrderHistory($type, $reason = '')
+    {
+        $orderHistoryData = [
+            'reason' => $reason,
+            'order_id' => $this->order['id'],
+            'user_id' => $this->app->getUser()->getId(),
+            'site' => $this->app->getSiteId(),
+            'type' => $type,
+            'created_ts' => new \DateTime()
+        ];
+        if ($orderHistoryId = $this->app['em']->getRepository('orders_history')->insert($orderHistoryData)) {
+            $this->app->log(Log::ORDER_HISTORY_CREATE, $orderHistoryId);
+            return true;
+        }
+        return false;
+    }
+
+    public function loadOrderHistory()
+    {
+        $this->order['status'] = self::ORDER_ACTIVE;
+        $orderHistory = $this->app['em']->getRepository('orders_history')->fetchBy(
+            ['order_id' => $this->order['id']],
+            ['created_ts' => 'DESC', 'id' => 'DESC'],
+            [1]
+        );
+        if (!empty($orderHistory)) {
+            $this->order['status'] = $orderHistory[0]['type'];
+            $this->order['history']['user_id'] = $orderHistory[0]['user_id'];
+            $this->order['history']['site'] = $orderHistory[0]['site'];
+            $this->order['history']['time'] = $orderHistory[0]['created_ts'];
+        }
+    }
+
+    public function getParticipantOrdersWithHistory($participantId)
+    {
+        $ordersQuery = "
+            SELECT orders.*, orders_history_tmp.*
+                FROM orders
+                LEFT JOIN
+                (SELECT oh1.order_id AS oh_order_id,
+                    oh1.user_id AS oh_user_id,
+                    oh1.site AS oh_site,
+                    oh1.type AS oh_type,
+                    oh1.created_ts AS oh_created_ts
+                    FROM orders_history AS oh1
+                    LEFT JOIN orders_history AS oh2 ON oh1.order_id = oh2.order_id
+                    AND oh1.created_ts < oh2.created_ts
+                    WHERE oh2.order_id IS NULL 
+                ) AS orders_history_tmp ON (orders.id = orders_history_tmp.oh_order_id)
+                WHERE orders.participant_id = ?
+                ORDER BY orders.id DESC
+            ";
+        return $this->app['db']->fetchAll($ordersQuery, [$participantId]);
+    }
+
+    public function getOrderRevertForm()
+    {
+        $orderRevertForm = $this->app['form.factory']->createBuilder(Type\FormType::class, null);
+        $orderRevertForm->add('revert', Type\SubmitType::class, [
+            'label' => 'Revert',
+            'attr' => [
+                'class' => 'btn-warning'
+            ]
+        ]);
+        return $orderRevertForm->getForm();
+    }
+
+    /**
+     * Revert collected, processed, finalized samples and timestamps
+     */
+    public function revertOrder($participantId)
+    {
+        // Get order object from RDR
+        $object = $this->app['pmi.drc.participants']->getOrder($participantId, $this->order['rdr_id']);
+        foreach ($object->samples as $sample) {
+            $sampleCode = $sample->test;
+            if (!array_key_exists($sample->test, $this->samplesInformation) && array_key_exists($sample->test, self::$mapRdrSamples)) {
+                $sampleCode = self::$mapRdrSamples[$sample->test]['code'];
+                $centrifugeType = self::$mapRdrSamples[$sample->test]['centrifuge_type'];
+            }
+            if (!empty($sample->collected)) {
+                $collectedSamples[] = $sampleCode;
+                $collectedTs = $sample->collected;
+            }
+            if (!empty($sample->processed)) {
+                $processedSamples[] = $sampleCode;
+                $processedTs = new \DateTime($sample->processed);
+                $processedSamplesTs[$sampleCode] = $processedTs->getTimestamp();
+            }
+            if (!empty($sample->finalized)) {
+                $finalizedSamples[] = $sampleCode;
+                $finalizedTs = $sample->finalized;
+            }
+        }
+        $updateArray = [
+            'collected_samples' => json_encode($collectedSamples),
+            'collected_ts' => $collectedTs,
+            'processed_samples' => json_encode($processedSamples),
+            'processed_samples_ts' => json_encode($processedSamplesTs),
+            'finalized_samples' => json_encode($finalizedSamples),
+            'finalized_ts' => $finalizedTs
+        ];
+        if (!empty($centrifugeType)) {
+            $updateArray['processed_centrifuge_type'] = $centrifugeType;
+        }
+        // Update order
+        $ordersRepository = $this->app['em']->getRepository('orders');
+        $status = false;
+        $ordersRepository->wrapInTransaction(function () use ($ordersRepository, $updateArray, &$status) {
+            $ordersRepository->update($this->order['id'], $updateArray);
+            $this->createOrderHistory(self::ORDER_ACTIVE);
+            $status = true;
+        });
+        return $status;
     }
 }
