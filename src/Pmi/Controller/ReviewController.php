@@ -170,7 +170,9 @@ class ReviewController extends AbstractController
             return $app->redirectToRoute('home');
         }
         $order = new Order($app);
-        $orders = $order->getSiteUnfinalizedOrders();
+        $unlockedOrders = $order->getSiteUnlockedOrders();
+        $unfinalizedOrders = $order->getSiteUnfinalizedOrders();
+        $orders = array_merge($unlockedOrders, $unfinalizedOrders);
         return $app['twig']->render('review/orders.html.twig', [
             'orders' => $orders
         ]);

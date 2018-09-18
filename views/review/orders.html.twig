@@ -51,7 +51,12 @@
                             {{ today.displayDate(order, 'processed_ts') }}
                         </td>
                         <td>
-                            {{ today.displayDate(order, 'finalized_ts') }}
+                            {% if order.oh_type != 'unlock' %}
+                                {{ today.displayDate(order, 'finalized_ts') }}
+                            {% else %}
+                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                <span class="badge">Unlocked</span>
+                            {% endif %}
                         </td>
                         <td>
                             <a href="{{ path('orderModify', { participantId: order.participant_id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-xs btn-danger">Cancel Order</a>

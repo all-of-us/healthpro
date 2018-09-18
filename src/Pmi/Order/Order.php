@@ -1100,10 +1100,34 @@ class Order
                       AND oh1.type != ?
                 ) AS oh_tmp ON (o.id = oh_tmp.oh_order_id)
                 WHERE o.site = ?
-                  AND finalized_ts IS NULL
+                  AND o.finalized_ts IS NULL
                 ORDER BY o.created_ts DESC
             ";
         return $this->app['db']->fetchAll($ordersQuery, [self::ORDER_CANCEL, $this->app->getSiteId()]);
+    }
+
+
+    public function getSiteUnlockedOrders()
+    {
+        $ordersQuery = "
+            SELECT o.*, oh_tmp.*
+                FROM orders o
+                LEFT JOIN
+                (SELECT oh1.order_id AS oh_order_id,
+                    oh1.user_id AS oh_user_id,
+                    oh1.site AS oh_site,
+                    oh1.type AS oh_type,
+                    oh1.created_ts AS oh_created_ts
+                    FROM orders_history AS oh1
+                    LEFT JOIN orders_history AS oh2 ON oh1.order_id = oh2.order_id
+                    AND oh1.created_ts < oh2.created_ts
+                    WHERE oh2.order_id IS NULL
+                ) AS oh_tmp ON (o.id = oh_tmp.oh_order_id)
+                WHERE o.site = ?
+                  AND oh_tmp.oh_type = ?
+                ORDER BY o.created_ts DESC
+            ";
+        return $this->app['db']->fetchAll($ordersQuery, [$this->app->getSiteId(), self::ORDER_UNLOCK]);
     }
 
     public function getSiteRecentModifiedOrders()
