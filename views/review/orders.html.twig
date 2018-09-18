@@ -59,7 +59,9 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{{ path('orderModify', { participantId: order.participant_id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-xs btn-danger">Cancel Order</a>
+                            {% if order.oh_type != 'unlock' %}
+                                <a href="{{ path('orderModify', { participantId: order.participant_id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-xs btn-danger">Cancel Order</a>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
