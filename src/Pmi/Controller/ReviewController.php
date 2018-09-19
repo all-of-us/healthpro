@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Controller;
 
+use Pmi\Evaluation\Evaluation;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,7 +15,8 @@ class ReviewController extends AbstractController
         ['today', '/'],
         ['orders', '/orders'],
         ['measurements', '/measurements'],
-        ['participantNameLookup', '/participant/lookup']
+        ['participantNameLookup', '/participant/lookup'],
+        ['measurementsRecentModify', '/measurements/recent/modify']
     ];
     protected static $orderStatus = [
         'created_ts' => 'Created',
@@ -195,6 +197,21 @@ class ReviewController extends AbstractController
 
         return $app['twig']->render('review/measurements.html.twig', [
             'measurements' => $measurements
+        ]);
+    }
+
+    public function measurementsRecentModifyAction(Application $app)
+    {
+        $site = $app->getSiteId();
+        if (!$site) {
+            $app->addFlashError('You must select a valid site');
+            return $app->redirectToRoute('home');
+        }
+        $evaluation = new Evaluation($app);
+        $recentModifyMeasurements = $evaluation->getSiteRecentModifiedEvaluations();
+        //echo '<pre>'; print_r($recentModifyMeasurements); exit;
+        return $app['twig']->render('review/measurements-recent-modify.html.twig', [
+            'measurements' => $recentModifyMeasurements
         ]);
     }
 }

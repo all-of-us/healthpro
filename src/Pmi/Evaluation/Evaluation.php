@@ -19,6 +19,7 @@ class Evaluation
     const CURRENT_VERSION = '0.3.3';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
+    const EVALUATION_ACTIVE = 'active';
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
 
@@ -547,6 +548,30 @@ class Evaluation
                 ORDER BY e.id DESC
             ";
         return $this->app['db']->fetchAll($evaluationsQuery, [$participantId]);
+    }
+
+    public function getSiteRecentModifiedEvaluations()
+    {
+        $ordersQuery = "
+            SELECT eh_tmp.*, e.*
+                FROM
+                (SELECT eh1.evaluation_id AS eh_evaluation_id,
+                    eh1.type AS eh_type,
+                    eh1.created_ts AS eh_created_ts
+                    FROM evaluations_history AS eh1
+                    LEFT JOIN evaluations_history AS eh2 ON eh1.evaluation_id = eh2.evaluation_id
+                    AND eh1.created_ts < eh2.created_ts
+                    WHERE eh2.evaluation_id IS NULL
+                      AND eh1.type != ?
+                      AND eh1.type != ? 
+                      AND eh1.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
+                ) AS eh_tmp 
+                INNER JOIN evaluations e
+                ON (eh_tmp.eh_evaluation_id = e.id)
+                WHERE e.site = ?
+                ORDER BY eh_tmp.eh_created_ts DESC
+            ";
+        return $this->app['db']->fetchAll($ordersQuery, [self::EVALUATION_ACTIVE, self::EVALUATION_RESTORE, $this->app->getSiteId()]);
     }
 
     public function createEvaluationHistory($type, $evalId, $reason = '')
