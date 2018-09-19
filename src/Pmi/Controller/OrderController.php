@@ -641,17 +641,20 @@ class OrderController extends AbstractController
         if ($order->isOrderDisabled() || !$order->isOrderUnlocked()) {
             $app->abort(403);
         }
-        // Revert Order
-        if ($order->revertOrder($participantId)) {
-            $app->addFlashNotice('Order reverted');
-        } else {
-            $app->addFlashError('Failed to revert order. Please try again.');
+        $orderRevertForm = $order->getOrderRevertForm();
+        $orderRevertForm->handleRequest($request);
+        if ($orderRevertForm->isSubmitted() && $orderRevertForm->isValid()) {
+            // Revert Order
+            if ($order->revertOrder($participantId)) {
+                $app->addFlashNotice('Order reverted');
+            } else {
+                $app->addFlashError('Failed to revert order. Please try again.');
+            }
         }
         return $app->redirectToRoute('order', [
             'participantId' => $participantId,
             'orderId' => $orderId
         ]);
-
     }
 
     public function getLabelsPdf($participantId, $orderId, $app)
