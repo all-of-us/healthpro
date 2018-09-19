@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
@@ -560,6 +561,27 @@ class Evaluation
         ];
         if ($evaluationHistoryId = $this->app['em']->getRepository('evaluations_history')->insert($evaluationHistoryData)) {
             $this->app->log(Log::EVALUATION_HISTORY_CREATE, $evaluationHistoryId);
+            return true;
+        }
+        return false;
+    }
+
+    public function getEvaluationRevertForm()
+    {
+        $evaluationRevertForm = $this->app['form.factory']->createBuilder(FormType::class, null);
+        $evaluationRevertForm->add('revert', SubmitType::class, [
+            'label' => 'Revert',
+            'attr' => [
+                'class' => 'btn-warning'
+            ]
+        ]);
+        return $evaluationRevertForm->getForm();
+    }
+
+    public function revertEvaluation($evalId)
+    {
+        if ($this->app['em']->getRepository('evaluations')->delete($evalId)) {
+            $this->app->log(Log::SITE_DELETE, $evalId);
             return true;
         }
         return false;

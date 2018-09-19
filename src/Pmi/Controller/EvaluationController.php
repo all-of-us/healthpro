@@ -17,7 +17,8 @@ class EvaluationController extends AbstractController
         ['evaluationSummary', '/participant/{participantId}/measurements/{evalId}/summary'],
         ['evaluationFhir', '/participant/{participantId}/measurements/{evalId}/fhir.json'],
         ['evaluationRdr', '/participant/{participantId}/measurements/{evalId}/rdr.json'],
-        ['evaluationModify', '/participant/{participantId}/measurements/{evalId}/modify/{type}', ['method' => 'GET|POST']]
+        ['evaluationModify', '/participant/{participantId}/measurements/{evalId}/modify/{type}', ['method' => 'GET|POST']],
+        ['evaluationRevert', '/participant/{participantId}/evaluation/{evalId}/revert', ['method' => 'POST']]
     ];
 
     /* For debugging generated FHIR bundle - only allowed in dev */
@@ -270,7 +271,8 @@ class EvaluationController extends AbstractController
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
             'latestVersion' => $evaluationService::CURRENT_VERSION,
-            'showAutoModification' => $showAutoModification
+            'showAutoModification' => $showAutoModification,
+            'revertForm' => $evaluationService->getEvaluationRevertForm()->createView()
         ]);
     }
 
@@ -326,6 +328,36 @@ class EvaluationController extends AbstractController
             'evaluationModifyForm' => $evaluationModifyForm->createView(),
             'type' => $type,
             'evalId' => $evalId
+        ]);
+    }
+
+    public function evaluationRevertAction($participantId, $evalId, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->status || $app->isTestSite()) {
+            $app->abort(403);
+        }
+        $evaluationService = new Evaluation($app);
+        $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);
+        if (!$evaluation) {
+            $app->abort(404);
+        }
+        $evaluationService = new Evaluation($app);
+        $evaluationRevertForm = $evaluationService->getEvaluationRevertForm();
+        $evaluationRevertForm->handleRequest($request);
+        if ($evaluationRevertForm->isSubmitted() && $evaluationRevertForm->isValid()) {
+            // Revert Evaluation
+            if ($evaluationService->revertEvaluation($evalId)) {
+                $app->addFlashSuccess('Physical measurement reverted');
+            } else {
+                $app->addFlashError('Failed to revert physical measurement. Please try again.');
+            }
+        }
+        return $app->redirectToRoute('participant', [
+            'id' => $participantId
         ]);
     }
 }
