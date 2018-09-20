@@ -609,6 +609,10 @@ class OrderController extends AbstractController
                 $orderModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
             }
             if ($orderModifyForm->isValid()) {
+                // Cancel/Restore order in RDR
+                if ($type === $order::ORDER_CANCEL || $type === $order::ORDER_RESTORE) {
+                    $order->cancelRestoreRdrOrder($type, $orderModifyData['reason']);
+                }
                 // Create order history
                 if ($order->createOrderHistory($type, $orderModifyData['reason'])) {
                     $app->addFlashSuccess("Order {$type}ed");

@@ -597,6 +597,18 @@ class Order
         return $obj;
     }
 
+    public function getCancelRestoreRdrObject($type, $reason)
+    {
+        $obj = new \StdClass();
+        $statusType = $type === self::ORDER_CANCEL ? 'cancelled' : 'restored';
+        $obj->status = $statusType;
+        $obj->amendedReason = $reason;
+        $user = $this->getOrderUser($this->app->getUser()->getId(), null);
+        $site = $this->getOrderSite($this->app->getSiteId(), null);
+        $obj->{$statusType} = $this->getOrderUserSiteData($user, $site);
+        return $obj;
+    }
+
     public function sendToRdr()
     {
         if (!$this->order['finalized_ts']) {
@@ -613,6 +625,12 @@ class Order
                 $this->createOrderHistory(self::ORDER_EDIT);
             }
         }
+    }
+
+    public function cancelRestoreRdrOrder($type, $reason)
+    {
+        $order = $this->getCancelRestoreRdrObject($type, $reason);
+        //$this->app['pmi.drc.participants']->cancelRestoreOrder($this->participant->id, $order);
     }
 
     protected function getSampleTime($set, $sample)

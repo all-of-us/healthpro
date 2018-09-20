@@ -269,6 +269,23 @@ class RdrParticipants
         return false;
     }
 
+    public function cancelRestoreOrder($participantId, $order)
+    {
+        try {
+            $response = $this->getClient()->request('PATCH', "Participant/{$participantId}/BiobankOrder", [
+                'json' => $order
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
+
     public function createMockBiobankSamples($participantId)
     {
         try {
