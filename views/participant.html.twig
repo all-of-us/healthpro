@@ -62,6 +62,9 @@
                 {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
                     {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y', app.userTimezone) }}
+                {% elseif participant.consentForElectronicHealthRecords == 'INVALID' %}
+                    <i class="fa fa-times text-danger" aria-hidden="true"></i> (invalid)
+                    {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y', app.userTimezone) }}
                 {% else %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
                     {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y', app.userTimezone) : '(not completed)' }}
