@@ -609,6 +609,16 @@ class Order
         return $obj;
     }
 
+    public function getEditRdrObject($reason)
+    {
+        $obj = $this->getRdrObject();
+        $obj->amendedReason = $reason;
+        $user = $this->getOrderUser($this->app->getUser()->getId(), null);
+        $site = $this->getOrderSite($this->app->getSiteId(), null);
+        $obj->amendedInfo = $this->getOrderUserSiteData($user, $site);
+        return $obj;
+    }
+
     public function sendToRdr()
     {
         if (!$this->order['finalized_ts']) {
@@ -631,6 +641,12 @@ class Order
     {
         $order = $this->getCancelRestoreRdrObject($type, $reason);
         //$this->app['pmi.drc.participants']->cancelRestoreOrder($this->participant->id, $order);
+    }
+
+    public function editRdrOrder($reason)
+    {
+        $order = $this->getEditRdrObject($reason);
+        //$this->app['pmi.drc.participants']->editOrder($this->participant->id, $order);
     }
 
     protected function getSampleTime($set, $sample)
