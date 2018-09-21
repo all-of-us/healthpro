@@ -609,12 +609,13 @@ class OrderController extends AbstractController
                 $orderModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
             }
             if ($orderModifyForm->isValid()) {
+                $status = true;
                 // Cancel/Restore order in RDR
                 if ($type === $order::ORDER_CANCEL || $type === $order::ORDER_RESTORE) {
-                    $order->cancelRestoreRdrOrder($type, $orderModifyData['reason']);
+                    $status = $order->cancelRestoreRdrOrder($type, $orderModifyData['reason']);
                 }
                 // Create order history
-                if ($order->createOrderHistory($type, $orderModifyData['reason'])) {
+                if ($status && $order->createOrderHistory($type, $orderModifyData['reason'])) {
                     $app->addFlashSuccess("Order {$type}ed");
                     if ($type === $order::ORDER_UNLOCK && $request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
                         return $app->redirect($request->query->get('return'));
@@ -623,6 +624,8 @@ class OrderController extends AbstractController
                             'id' => $participantId
                         ]);
                     }
+                } else {
+                    $app->addFlashError("Failed to {$type} order. Please try again.");
                 }
             } else {
                 $app->addFlashError('Please correct the errors below');

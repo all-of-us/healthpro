@@ -605,7 +605,7 @@ class Order
         $obj->amendedReason = $reason;
         $user = $this->getOrderUser($this->app->getUser()->getId(), null);
         $site = $this->getOrderSite($this->app->getSiteId(), null);
-        $obj->{$statusType} = $this->getOrderUserSiteData($user, $site);
+        $obj->{$statusType . 'Info'} = $this->getOrderUserSiteData($user, $site);
         return $obj;
     }
 
@@ -640,7 +640,7 @@ class Order
     public function cancelRestoreRdrOrder($type, $reason)
     {
         $order = $this->getCancelRestoreRdrObject($type, $reason);
-        //$this->app['pmi.drc.participants']->cancelRestoreOrder($this->participant->id, $order);
+        return $this->app['pmi.drc.participants']->cancelRestoreOrder($type, $this->participant->id, $this->order['mayo_id'], $order);
     }
 
     public function editRdrOrder($reason)

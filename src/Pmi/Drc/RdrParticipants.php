@@ -3,6 +3,7 @@ namespace Pmi\Drc;
 
 use Pmi\Entities\Participant;
 use Ramsey\Uuid\Uuid;
+use Pmi\Order\Order;
 
 class RdrParticipants
 {
@@ -12,6 +13,9 @@ class RdrParticipants
     protected static $resourceEndpoint = 'rdr/v1/';
     protected $nextToken;
     protected $total;
+
+    const CANCEL_STATUS = 'CANCELLED';
+    const RESTORE_STATUS = 'UNSET';
 
     public function __construct(RdrHelper $rdrHelper)
     {
@@ -269,15 +273,18 @@ class RdrParticipants
         return false;
     }
 
-    public function cancelRestoreOrder($participantId, $order)
+    public function cancelRestoreOrder($type, $participantId, $orderId, $order)
     {
         try {
-            $response = $this->getClient()->request('PATCH', "Participant/{$participantId}/BiobankOrder", [
-                'json' => $order
+            $result = $this->getOrder($participantId, $orderId);
+            $response = $this->getClient()->request('PATCH', "Participant/{$participantId}/BiobankOrder/{$orderId}", [
+                'json' => $order,
+                'headers' => ['If-Match' => $result->meta->versionId]
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->id)) {
-                return $result->id;
+            $rdrStatus = $type === Order::ORDER_CANCEL ? self::CANCEL_STATUS : self::RESTORE_STATUS;
+            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+                return true;
             }
         } catch (\Exception $e) {
             $this->rdrHelper->logException($e);
