@@ -1084,7 +1084,10 @@ class Order
             'created_ts' => new \DateTime()
         ];
         if ($orderHistoryId = $this->app['em']->getRepository('orders_history')->insert($orderHistoryData)) {
-            $this->app->log(Log::ORDER_HISTORY_CREATE, $orderHistoryId);
+            $this->app->log(Log::ORDER_HISTORY_CREATE, [
+                'id' => $orderHistoryId,
+                'type' => $type
+            ]);
             return true;
         }
         return false;
