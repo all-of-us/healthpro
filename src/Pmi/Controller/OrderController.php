@@ -610,8 +610,8 @@ class OrderController extends AbstractController
             }
             if ($orderModifyForm->isValid()) {
                 $status = true;
-                // Cancel/Restore order in RDR
-                if ($type === $order::ORDER_CANCEL || $type === $order::ORDER_RESTORE) {
+                // Cancel/Restore order in RDR if exists
+                if (!empty($order->get('rdr_id')) && ($type === $order::ORDER_CANCEL || $type === $order::ORDER_RESTORE)) {
                     $status = $order->cancelRestoreRdrOrder($type, $orderModifyData['reason']);
                 }
                 // Create order history
