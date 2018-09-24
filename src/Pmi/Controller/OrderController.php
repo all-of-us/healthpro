@@ -591,13 +591,14 @@ class OrderController extends AbstractController
         $order = $this->loadOrder($participantId, $orderId, $app);
         // Allow cancel for active and restored orders
         // Allow restore for only canceled orders
-        // Allow unlock for active and restored orders
+        // Allow unlock for active, restored and edited orders
         if (!in_array($type, [$order::ORDER_CANCEL, $order::ORDER_RESTORE, $order::ORDER_UNLOCK])) {
             $app->abort(404);
         }
         if ($order->isOrderFailedToReachRdr()
-            || ($type === $order::ORDER_CANCEL && $order->isOrderCancelled())
-            || ($type === $order::ORDER_RESTORE && !$order->isOrderCancelled())) {
+            || ($type === $order::ORDER_CANCEL && ($order->isOrderCancelled() || $order->isOrderUnlocked()))
+            || ($type === $order::ORDER_RESTORE && !$order->isOrderCancelled())
+            || ($type === $order::ORDER_UNLOCK && ($order->isOrderUnlocked() || $order->isOrderCancelled()))) {
             $app->abort(403);
         }
         $orders = $order->getParticipantOrdersWithHistory($participantId);

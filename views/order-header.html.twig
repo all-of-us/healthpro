@@ -13,7 +13,7 @@
     {% set params = { participantId: participant.id, orderId: order.id } %}
     {% set route = app.request_stack.currentRequest.attributes.get('_route') %}
     {% set return = path(route, params) %}
-    {% if (order.status == 'active' or order.status == 'restore') and order.rdr_id %}
+    {% if order.rdr_id and order.status != 'cancel' and order.status != 'unlock' %}
         <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'unlock', return: return }) }}" class="btn btn-sm btn-primary">Unlock for Editing</a>
     {% endif %}
     {% if (order.status != 'cancel' and order.status != 'unlock') and not (order.finalized_ts is not empty and order.rdr_id is empty) %}
