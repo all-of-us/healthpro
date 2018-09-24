@@ -293,11 +293,13 @@ class RdrParticipants
         return false;
     }
 
-    public function editOrder($participantId, $order)
+    public function editOrder($participantId, $orderId, $order)
     {
         try {
-            $response = $this->getClient()->request('PUT', "Participant/{$participantId}/BiobankOrder", [
-                'json' => $order
+            $result = $this->getOrder($participantId, $orderId);
+            $response = $this->getClient()->request('PUT', "Participant/{$participantId}/BiobankOrder/{$orderId}", [
+                'json' => $order,
+                'headers' => ['If-Match' => $result->meta->versionId]
             ]);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {

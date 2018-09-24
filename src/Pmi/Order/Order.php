@@ -609,12 +609,12 @@ class Order
         return $obj;
     }
 
-    public function getEditRdrObject($reason)
+    public function getEditRdrObject()
     {
         $obj = $this->getRdrObject();
-        $obj->amendedReason = $reason;
-        $user = $this->getOrderUser($this->app->getUser()->getId(), null);
-        $site = $this->getOrderSite($this->app->getSiteId(), null);
+        $obj->amendedReason = $this->order['history']['reason'];
+        $user = $this->getOrderUser($this->order['history']['user_id'], null);
+        $site = $this->getOrderSite($this->order['history']['site'], null);
         $obj->amendedInfo = $this->getOrderUserSiteData($user, $site);
         return $obj;
     }
@@ -624,6 +624,15 @@ class Order
         if (!$this->order['finalized_ts']) {
             return false;
         }
+        if ($this->order['status'] === self::ORDER_ACTIVE) {
+            $this->createRdrOrder();
+        } elseif ($this->order['status'] === self::ORDER_UNLOCK) {
+            $this->editRdrOrder();
+        }
+    }
+
+    public function createRdrOrder()
+    {
         $order = $this->getRdrObject();
         $rdrId = $this->app['pmi.drc.participants']->createOrder($this->participant->id, $order);
         if ($rdrId) {
@@ -643,10 +652,13 @@ class Order
         return $this->app['pmi.drc.participants']->cancelRestoreOrder($type, $this->participant->id, $this->order['mayo_id'], $order);
     }
 
-    public function editRdrOrder($reason)
+    public function editRdrOrder()
     {
-        $order = $this->getEditRdrObject($reason);
-        //$this->app['pmi.drc.participants']->editOrder($this->participant->id, $order);
+        $order = $this->getEditRdrObject();
+        $status = $this->app['pmi.drc.participants']->editOrder($this->participant->id, $this->order['mayo_id'], $order);
+        if ($status) {
+            $this->createOrderHistory(self::ORDER_EDIT);
+        }
     }
 
     protected function getSampleTime($set, $sample)
@@ -1091,6 +1103,7 @@ class Order
             $this->order['history']['user_id'] = $orderHistory[0]['user_id'];
             $this->order['history']['site'] = $orderHistory[0]['site'];
             $this->order['history']['time'] = $orderHistory[0]['created_ts'];
+            $this->order['history']['reason'] = $orderHistory[0]['reason'];
         }
     }
 
