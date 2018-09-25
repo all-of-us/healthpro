@@ -63,8 +63,8 @@
 {% set stepNeedDetails = ['collect', 'process', 'finalize'] %}
 {% if active in stepNeedDetails %}
     {% set activeStep = attribute(steps, active)[1] %}
-    {% if attribute(order, activeStep~'_ts') is not empty %}
-        <div class="{% if order.finalized_ts is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
+    {% if attribute(order, activeStep~'_ts') is not empty and (activeStep != 'finalized' or (activeStep == 'finalized' and  attribute(order, 'rdr_id') is not empty)) %}
+        <div class="{% if order.rdr_id is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong>{{ activeStep|capitalize }} by {{ app.getUserEmailById(attribute(order, activeStep~'_user_id'))|default('Unknown') }} at {{ app.getSiteDisplayName(attribute(order, activeStep~'_site')) }}</strong>
         </div>
