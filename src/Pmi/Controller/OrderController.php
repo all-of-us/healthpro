@@ -426,7 +426,7 @@ class OrderController extends AbstractController
                     $app->log(Log::ORDER_EDIT, $orderId);
                 }
                 $orderData = $order->toArray();
-                if ($order->isOrderUnlocked() || (empty($orderData['mayo_id']) && !empty($finalizeForm['finalized_ts']->getData()))) {
+                if (!empty($finalizeForm['finalized_ts']->getData()) || $order->isOrderUnlocked()) {
                     //Send order to mayo if mayo id is empty
                     if (empty($order->get('mayo_id'))) {
                         $result = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
@@ -448,8 +448,11 @@ class OrderController extends AbstractController
                 $order = $this->loadOrder($participantId, $orderId, $app);
                 //Send order to RDR if finalized_ts and mayo_id exists
                 if (!empty($order->get('finalized_ts')) && !empty($order->get('mayo_id'))) {
-                    $order->sendToRdr();
-                    $app->addFlashSuccess('Order finalized');
+                    if ($order->sendToRdr()) {
+                        $app->addFlashSuccess('Order finalized');
+                    } else {
+                        $app->addFlashError('Failed to finalize the order. Please try again.');
+                    }
                 } elseif (empty($finalizeForm['finalized_ts']->getData())) {
                     $app->addFlashNotice('Order updated but not finalized');
                 }

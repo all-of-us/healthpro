@@ -621,14 +621,12 @@ class Order
 
     public function sendToRdr()
     {
-        if (!$this->order['finalized_ts']) {
-            return false;
-        }
         if ($this->order['status'] === self::ORDER_ACTIVE) {
-            $this->createRdrOrder();
+            return $this->createRdrOrder();
         } elseif ($this->order['status'] === self::ORDER_UNLOCK) {
-            $this->editRdrOrder();
+            return $this->editRdrOrder();
         }
+        return false;
     }
 
     public function createRdrOrder()
@@ -640,10 +638,9 @@ class Order
                 $this->order['id'],
                 ['rdr_id' => $rdrId]
             );
-            if ($this->order['status'] === self::ORDER_UNLOCK) {
-                $this->createOrderHistory(self::ORDER_EDIT);
-            }
+            return true;
         }
+        return false;
     }
 
     public function cancelRestoreRdrOrder($type, $reason)
@@ -657,8 +654,9 @@ class Order
         $order = $this->getEditRdrObject();
         $status = $this->app['pmi.drc.participants']->editOrder($this->participant->id, $this->order['mayo_id'], $order);
         if ($status) {
-            $this->createOrderHistory(self::ORDER_EDIT);
+            return $this->createOrderHistory(self::ORDER_EDIT);
         }
+        return false;
     }
 
     protected function getSampleTime($set, $sample)
@@ -929,7 +927,7 @@ class Order
 
     public function isOrderDisabled()
     {
-        return ($this->order['finalized_ts'] || $this->order['expired'] || $this->isOrderCancelled()) && $this->order['status'] !== 'unlock';
+        return ($this->order['rdr_id'] || $this->order['expired'] || $this->isOrderCancelled()) && $this->order['status'] !== 'unlock';
     }
 
     public function isOrderCancelled()
