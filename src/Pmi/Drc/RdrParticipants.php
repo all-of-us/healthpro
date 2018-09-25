@@ -16,6 +16,7 @@ class RdrParticipants
 
     const CANCEL_STATUS = 'CANCELLED';
     const RESTORE_STATUS = 'UNSET';
+    const EDIT_STATUS = 'AMENDED';
 
     public function __construct(RdrHelper $rdrHelper)
     {
@@ -302,8 +303,8 @@ class RdrParticipants
                 'headers' => ['If-Match' => $result->meta->versionId]
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->id)) {
-                return $result->id;
+            if (is_object($result) && isset($result->status) && $result->status === self::EDIT_STATUS) {
+                return true;
             }
         } catch (\Exception $e) {
             $this->rdrHelper->logException($e);
