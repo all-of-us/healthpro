@@ -282,7 +282,7 @@ class Order
                 }
                 // Remove finalized samples when not collected
                 if (!empty($this->order['finalized_samples'])) {
-                    $newFinalizedSamples = $this->getNewFinalizedSamples($samples);
+                    $newFinalizedSamples = $this->getNewFinalizedSamples('collected', $samples);
                     $updateArray["finalized_samples"] = $newFinalizedSamples;
                 }
             }
@@ -304,7 +304,7 @@ class Order
                 }
                 // Remove finalized samples when not processed
                 if (!empty($this->order['finalized_samples'])) {
-                    $newFinalizedSamples = $this->getNewFinalizedSamples($samples);
+                    $newFinalizedSamples = $this->getNewFinalizedSamples('processed', $samples);
                     $updateArray["finalized_samples"] = $newFinalizedSamples;
                 }
             }
@@ -1032,15 +1032,35 @@ class Order
         ];
     }
 
-    public function getNewFinalizedSamples($samples)
+    public function getNewFinalizedSamples($type, $samples)
     {
         $finalizedSamples = json_decode($this->order['finalized_samples'], true);
         $newFinalizedSamples = [];
-        foreach ($finalizedSamples as $sample) {
-            // Check if each finalized sample exists in collected/processed samples list
-            if (in_array($sample, $samples)) {
-                $newFinalizedSamples[] = $sample;
+        if ($type === 'collected') {
+            foreach ($finalizedSamples as $sample) {
+                // Check if each finalized sample exists in collected samples list
+                if (in_array($sample, $samples)) {
+                    $newFinalizedSamples[] = $sample;
+                }
             }
+        } elseif ($type === 'processed') {
+            // Determine processing samples which needs to be removed
+            $processedSamples = array_intersect($finalizedSamples, self::$samplesRequiringProcessing);
+            $removeProcessedSamples = [];
+            foreach ($processedSamples as $processedSample) {
+                if (!in_array($processedSample, $samples)) {
+                    $removeProcessedSamples[] = $processedSample;
+                }
+            }
+            // Remove processing samples which are not processed
+            if (!empty($removeProcessedSamples)) {
+                foreach ($finalizedSamples as $key => $sample) {
+                    if (in_array($sample, $removeProcessedSamples)) {
+                        unset($finalizedSamples[$key]);
+                    }
+                }
+            }
+            $newFinalizedSamples = array_values($finalizedSamples);
         }
         return json_encode($newFinalizedSamples);
     }
