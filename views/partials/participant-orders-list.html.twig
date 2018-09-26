@@ -20,7 +20,7 @@
                         <span class="label label-primary">Unlocked for editing</span> {{ order.oh_created_ts|date('n/j/Y g:ia', app.userTimezone) }}
                     {% elseif order.oh_type == 'edit' %}
                         <span class="label label-success">Edited and Finalized</span> {{ order.oh_created_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                    {% elseif order.finalized_ts %}
+                    {% elseif order.finalized_ts and order.rdr_id %}
                         <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
                     {% elseif order.processed_ts %}
                         <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}
