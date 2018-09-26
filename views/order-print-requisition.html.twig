@@ -4,9 +4,13 @@
     {% include 'order-header.html.twig' with { active: 'printRequisition' } %}
     <div class="row">
         <div class="col-sm-10 col-md-offset-1">
-            {% if order.status == 'edit' %}
+            {% if order.status == 'edit' or order.status == 'unlock' %}
                 <div class="alert alert-warning" role="alert">
-                    This order was edited and finalized so print requisition cannot be generated.
+                    {% if order.status == 'edit' %}
+                        This order was edited and finalized so print requisition cannot be generated.
+                    {% else %}
+                        Print requisition cannot be generated for unlocked orders.
+                    {% endif %}
                 </div>
             {% elseif order.mayo_id is not empty %}
                 <div class="panel panel-default">

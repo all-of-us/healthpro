@@ -84,7 +84,7 @@
     {% set previousStep = false %}
     {% for step, column in steps %}
         {% set path = column[0]|replace({' ' : ''}) %}
-        {% if (step == 'printLabels' and (order.disabled or order.status == 'unlock')) or (step == 'printRequisition' and (order.status == 'cancel' or order.status == 'unlock')) %}
+        {% if (step == 'printLabels' and (order.disabled or order.status == 'unlock')) or (step == 'printRequisition' and order.status == 'cancel') %}
             <li role="presentation" class="disabled">
                 <a href="#">
                     {% if step == 'printLabels' %}

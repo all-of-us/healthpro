@@ -480,7 +480,7 @@ class OrderController extends AbstractController
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->isOrderCancelled() || $order->isOrderUnlocked()) {
+        if ($order->isOrderCancelled()) {
             $app->abort(403);
         }
         if ($app->isDVType() && !in_array('printRequisition', $order->getAvailableSteps())) {
