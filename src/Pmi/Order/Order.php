@@ -1101,14 +1101,22 @@ class Order
             'type' => $type,
             'created_ts' => new \DateTime()
         ];
-        if ($orderHistoryId = $this->app['em']->getRepository('orders_history')->insert($orderHistoryData)) {
+        $ordersHistoryRepository = $this->app['em']->getRepository('orders_history');
+        $status = false;
+        $ordersHistoryRepository->wrapInTransaction(function () use ($ordersHistoryRepository, $orderHistoryData, &$status) {
+            $id = $ordersHistoryRepository->insert($orderHistoryData);
             $this->app->log(Log::ORDER_HISTORY_CREATE, [
-                'id' => $orderHistoryId,
-                'type' => $type
+                'id' => $id,
+                'type' => $orderHistoryData['type']
             ]);
-            return true;
-        }
-        return false;
+            //Update history id in orders table
+            $this->app['em']->getRepository('orders')->update(
+                $this->order['id'],
+                ['history_id' => $id]
+            );
+            $status = true;
+        });
+        return $status;
     }
 
     public function loadOrderHistory()
