@@ -43,6 +43,12 @@ class EntityManager
         }
     }
 
+    public function fetchAll($query, $parameters)
+    {
+        $result = $this->dbal->fetchAll($query, $parameters);
+        return $this->parseMultipleTimestamps($result);
+    }
+
     public function setTimezone($timezone)
     {
         $this->timezone = $timezone;
@@ -51,5 +57,34 @@ class EntityManager
     public function getTimezone()
     {
         return $this->timezone;
+    }
+
+    protected function parseMultipleTimestamps(array $result)
+    {
+        foreach ($result as $key => $value) {
+            $result[$key] = $this->parseTimestamps($value);
+        }
+        return $result;
+    }
+
+    protected function parseTimestamps(array $result)
+    {
+        foreach ($result as $key => $value) {
+            if (null !== $value && substr($key, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
+                $result[$key] = \DateTime::createFromFormat('Y-m-d H:i:s', $value)->setTimezone(new \DateTimeZone($this->timezone));
+            }
+        }
+        return $result;
+    }
+
+    protected function dateTimesToStrings(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if ($value instanceof \DateTime) {
+                $value->setTimezone(new \DateTimezone('UTC'));
+                $data[$key] = $value->format('Y-m-d H:i:s');
+            }
+        }
+        return $data;
     }
 }

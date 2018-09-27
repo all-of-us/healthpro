@@ -154,18 +154,12 @@ class Order
         if (!$participant) {
             return;
         }
-        $order = $this->app['em']->getRepository('orders')->fetchOneBy([
-            'id' => $orderId,
-            'participant_id' => $participantId
-        ]);
-        if (!$order) {
-            return;
-        }
-        $this->order = $order;
+        $order = $this->getParticipantOrderWithHistory($orderId, $participantId);
+        $this->order = $order[0];
         $this->order['expired'] = $this->isOrderExpired();
         $this->participant = $participant;
         $this->version = !empty($order['version']) ? $order['version'] : 1;
-        $this->loadOrderHistory();
+        $this->order['status'] = !empty($this->order['oh_type']) ? $this->order['oh_type'] : self::ORDER_ACTIVE;
         $this->order['disabled'] = $this->isOrderDisabled();
         $this->loadSamplesSchema();
     }
@@ -612,9 +606,9 @@ class Order
     public function getEditRdrObject()
     {
         $obj = $this->getRdrObject();
-        $obj->amendedReason = $this->order['history']['reason'];
-        $user = $this->getOrderUser($this->order['history']['user_id'], null);
-        $site = $this->getOrderSite($this->order['history']['site'], null);
+        $obj->amendedReason = $this->order['oh_reason'];
+        $user = $this->getOrderUser($this->order['oh_user_id'], null);
+        $site = $this->getOrderSite($this->order['oh_site'], null);
         $obj->amendedInfo = $this->getOrderUserSiteData($user, $site);
         return $obj;
     }
@@ -1119,21 +1113,23 @@ class Order
         return $status;
     }
 
-    public function loadOrderHistory()
+    public function getParticipantOrderWithHistory($orderId, $participantId)
     {
-        $this->order['status'] = self::ORDER_ACTIVE;
-        $orderHistory = $this->app['em']->getRepository('orders_history')->fetchBy(
-            ['order_id' => $this->order['id']],
-            ['created_ts' => 'DESC', 'id' => 'DESC'],
-            [1]
-        );
-        if (!empty($orderHistory)) {
-            $this->order['status'] = $orderHistory[0]['type'];
-            $this->order['history']['user_id'] = $orderHistory[0]['user_id'];
-            $this->order['history']['site'] = $orderHistory[0]['site'];
-            $this->order['history']['time'] = $orderHistory[0]['created_ts'];
-            $this->order['history']['reason'] = $orderHistory[0]['reason'];
-        }
+        $ordersQuery = "
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.reason AS oh_reason,
+                   oh.created_ts AS oh_created_ts
+            FROM orders o
+            LEFT JOIN orders_history oh ON o.history_id = oh.id
+            WHERE o.id = ?
+              AND o.participant_id = ?
+            ORDER BY o.id DESC
+        ";
+        return $this->app['em']->fetchAll($ordersQuery, [$orderId, $participantId]);
     }
 
     public function getParticipantOrdersWithHistory($participantId)
