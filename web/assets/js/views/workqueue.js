@@ -47,6 +47,7 @@ $(document).ready(function() {
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
       { name: 'withdrawal', data: 'withdrawal', class: 'text-center' },
+      { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
       { name: 'contactMethod', visible: false, data: 'contactMethod', orderable: false },
       { name: 'address', visible: false, data: 'address'},
       { name: 'email', visible: false, data: 'email' },

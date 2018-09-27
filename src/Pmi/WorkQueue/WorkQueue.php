@@ -270,8 +270,9 @@ class WorkQueue
             if ($participant->withdrawalStatus == 'NO_USE') {
                 $row['withdrawal'] = self::HTML_DANGER . ' <span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
             } else {
-                $row['withdrawal'] = ''; 
+                $row['withdrawal'] = '';
             }
+            $row['withdrawalReason'] = $e($participant->withdrawalReason);
 
             //Contact
             $row['contactMethod'] = $e($participant->recontactMethod);
