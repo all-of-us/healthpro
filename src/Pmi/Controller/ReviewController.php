@@ -31,12 +31,15 @@ class ReviewController extends AbstractController
 
     protected function getTodayRows($db, $today, $site)
     {
-        $ordersQuery = 'SELECT participant_id, \'order\' as type, id, order_id, created_ts, collected_ts, processed_ts, finalized_ts, finalized_samples, ' .
-            'greatest(coalesce(created_ts, 0), coalesce(collected_ts, 0), coalesce(processed_ts, 0), coalesce(finalized_ts, 0)) AS latest_ts ' .
-            'FROM orders WHERE ' .
-            '(created_ts >= :today OR collected_ts >= :today OR processed_ts >= :today OR finalized_ts >= :today) ' .
-            'AND (site = :site OR collected_site = :site OR processed_site = :site OR finalized_site = :site) ';
-        $measurementsQuery = 'SELECT participant_id, \'measurement\' as type, id, null, created_ts, null, null, finalized_ts, null, coalesce(finalized_ts, created_ts) as latest_ts ' .
+        $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, o.order_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, ' .
+            'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
+            'oh.type as oh_type ' .
+            'FROM orders o ' .
+            'INNER JOIN orders_history oh ' .
+            'ON o.history_id = oh.id WHERE ' .
+            '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ' .
+            'AND (o.site = :site OR o.collected_site = :site OR o.processed_site = :site OR o.finalized_site = :site) ';
+        $measurementsQuery = 'SELECT participant_id, \'measurement\' as type, id, null, created_ts, null, null, finalized_ts, null, coalesce(finalized_ts, created_ts) as latest_ts, null ' .
             'FROM evaluations WHERE ' .
             '(created_ts >= :today OR finalized_ts >= :today) ' .
             'AND (site = :site OR finalized_site = :site)';
@@ -73,7 +76,7 @@ class ReviewController extends AbstractController
                         // Get order status
                         foreach (self::$orderStatus as $field => $status) {
                             if ($row[$field]) {
-                                $participants[$participantId]['orderStatus'] = $status;
+                                $participants[$participantId]['orderStatus'] = $this->getOrderStatus($row['oh_type'], $status);
                             }
                         }
                         // Get number of finalized samples
@@ -102,6 +105,19 @@ class ReviewController extends AbstractController
         }
 
         return $participants;
+    }
+
+    public function getOrderStatus($type, $status)
+    {
+        $order = new Order;
+        if ($type === $order::ORDER_CANCEL) {
+            $status = 'Cancelled';
+        } elseif ($type === $order::ORDER_UNLOCK) {
+            $status = 'Unlocked';
+        } elseif ($type === $order::ORDER_EDIT) {
+            $status = 'Edited and Finalized';
+        }
+        return $status;
     }
 
     public function todayAction(Application $app, Request $request)
