@@ -506,72 +506,69 @@ class Evaluation
 
     public function getEvaluationWithHistory($evalId, $participantId)
     {
-         $evaluationsQuery = "
-            SELECT e.*, eh_tmp.*
-                FROM evaluations e
-                LEFT JOIN
-                (SELECT eh1.evaluation_id AS eh_evaluation_id,
-                    eh1.user_id AS eh_user_id,
-                    eh1.site AS eh_site,
-                    eh1.type AS eh_type,
-                    eh1.created_ts AS eh_created_ts
-                    FROM evaluations_history AS eh1
-                    LEFT JOIN evaluations_history AS eh2 ON eh1.evaluation_id = eh2.evaluation_id
-                    AND eh1.created_ts < eh2.created_ts
-                    WHERE eh2.evaluation_id IS NULL 
-                ) AS eh_tmp ON  (e.id = eh_tmp.eh_evaluation_id)
-                WHERE e.id = ?
-                  AND e.participant_id = ?
-                ORDER BY e.id DESC
-            ";
-        $evaluation = $this->app['db']->fetchAll($evaluationsQuery, [$evalId, $participantId]);
+        $evaluationsQuery = "
+            SELECT e.*,
+                   eh.evaluation_id AS eh_evaluation_id,
+                   eh.user_id AS eh_user_id,
+                   eh.site AS eh_site,
+                   eh.type AS eh_type,
+                   eh.reason AS eh_reason,
+                   eh.created_ts AS eh_created_ts
+            FROM evaluations e
+            LEFT JOIN evaluations_history eh ON e.history_id = eh.id
+            WHERE e.id = :evalId
+              AND e.participant_id = :participant_id
+            ORDER BY e.id DESC
+        ";
+        $evaluation = $this->app['db']->fetchAll($evaluationsQuery, [
+            'evalId' => $evalId,
+            'participant_id' => $participantId
+        ]);
         return !empty($evaluation) ? $evaluation[0] : null;
     }
 
     public function getEvaluationsWithHistory($participantId)
     {
         $evaluationsQuery = "
-            SELECT e.*, eh_tmp.*
-                FROM evaluations e
-                LEFT JOIN
-                (SELECT eh1.evaluation_id AS eh_evaluation_id,
-                    eh1.user_id AS eh_user_id,
-                    eh1.site AS eh_site,
-                    eh1.type AS eh_type,
-                    eh1.created_ts AS eh_created_ts
-                    FROM evaluations_history AS eh1
-                    LEFT JOIN evaluations_history AS eh2 ON eh1.evaluation_id = eh2.evaluation_id
-                    AND eh1.created_ts < eh2.created_ts
-                    WHERE eh2.evaluation_id IS NULL 
-                ) AS eh_tmp ON  (e.id = eh_tmp.eh_evaluation_id)
-                WHERE e.participant_id = ?
-                ORDER BY e.id DESC
-            ";
-        return $this->app['db']->fetchAll($evaluationsQuery, [$participantId]);
+            SELECT e.*,
+                   eh.evaluation_id AS eh_evaluation_id,
+                   eh.user_id AS eh_user_id,
+                   eh.site AS eh_site,
+                   eh.type AS eh_type,
+                   eh.reason AS eh_reason,
+                   eh.created_ts AS eh_created_ts
+            FROM evaluations e
+            LEFT JOIN evaluations_history eh ON e.history_id = eh.id
+            WHERE e.participant_id = :participant_id
+            ORDER BY e.id DESC
+        ";
+        return $this->app['db']->fetchAll($evaluationsQuery, [
+            'participant_id' => $participantId
+        ]);
     }
 
     public function getSiteRecentModifiedEvaluations()
     {
-        $ordersQuery = "
-            SELECT eh_tmp.*, e.*
-                FROM
-                (SELECT eh1.evaluation_id AS eh_evaluation_id,
-                    eh1.type AS eh_type,
-                    eh1.created_ts AS eh_created_ts
-                    FROM evaluations_history AS eh1
-                    LEFT JOIN evaluations_history AS eh2 ON eh1.evaluation_id = eh2.evaluation_id
-                    AND eh1.created_ts < eh2.created_ts
-                    WHERE eh2.evaluation_id IS NULL
-                      AND eh1.type != ?
-                      AND eh1.type != ? 
-                      AND eh1.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
-                ) AS eh_tmp 
-                INNER JOIN evaluations e
-                ON (eh_tmp.eh_evaluation_id = e.id)
-                WHERE e.site = ?
-                ORDER BY eh_tmp.eh_created_ts DESC
-            ";
-        return $this->app['db']->fetchAll($ordersQuery, [self::EVALUATION_ACTIVE, self::EVALUATION_RESTORE, $this->app->getSiteId()]);
+        $evaluationsQuery = "
+            SELECT e.*,
+                   eh.evaluation_id AS eh_order_id,
+                   eh.user_id AS eh_user_id,
+                   eh.site AS eh_site,
+                   eh.type AS eh_type,
+                   eh.created_ts AS eh_created_ts
+            FROM evaluations e
+            INNER JOIN evaluations_history eh ON e.history_id = eh.id
+            WHERE e.site = :site
+              AND eh.type != :type1
+              AND eh.type != :type2
+              AND eh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
+            ORDER BY eh.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($evaluationsQuery, [
+            'site' => $this->app->getSiteId(),
+            'type1' => self::EVALUATION_ACTIVE,
+            'type2' => self::EVALUATION_RESTORE
+        ]);
     }
 
     public function createEvaluationHistory($type, $evalId, $reason = '')

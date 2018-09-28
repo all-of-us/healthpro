@@ -115,7 +115,7 @@
                 </p>
             {% endif %}
         {{ form_end(evaluationForm) }}
-        {% if evaluation.parent_id and evaluation.finalized_ts is empty %}
+        {% if evaluation and evaluation.parent_id and evaluation.finalized_ts is empty %}
             {{ form_start(revertForm, { 'action': path('evaluationRevert', { participantId: participant.id, evalId: evaluation.id }), 'method': 'POST', attr: { class: 'eval-revert-form disable-enter prevent-resubmit' }}) }}
             {{ form_errors(revertForm) }}
             {{ form_end(revertForm) }}
