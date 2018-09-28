@@ -4,8 +4,8 @@
     </div>
     <div class="panel-body">
         {% for order in orders %}
-        {% if loop.index == 6 %}
-        <div id="order-overflow">
+            {% if loop.index == 6 %}
+                <div id="order-overflow">
             {% endif %}
             <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {{ order.created_ts|date('D n/j/Y', app.userTimezone) }}
@@ -29,12 +29,12 @@
                     {% endif %}
                 </small>
             </a>
-            {% endfor %}
-            {% if orders|length > 5 %}
-        </div> {# close .order-overflow div above #}
-        <a href="#" class="btn btn-block btn-lg btn-default" id="order-overflow-show">
-            <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
-        </a>
+        {% endfor %}
+        {% if orders|length > 5 %}
+            </div> {# close .order-overflow div above #}
+            <a href="#" class="btn btn-block btn-lg btn-default" id="order-overflow-show">
+                <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
+            </a>
         {% endif %}
         {% if type is not defined %}
             <a href="{{ path('orderCheck', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
