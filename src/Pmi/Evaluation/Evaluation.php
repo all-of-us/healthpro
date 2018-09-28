@@ -584,11 +584,22 @@ class Evaluation
             'type' => $type,
             'created_ts' => new \DateTime()
         ];
-        if ($evaluationHistoryId = $this->app['em']->getRepository('evaluations_history')->insert($evaluationHistoryData)) {
-            $this->app->log(Log::EVALUATION_HISTORY_CREATE, $evaluationHistoryId);
-            return true;
-        }
-        return false;
+        $evaluationsHistoryRepository = $this->app['em']->getRepository('evaluations_history');
+        $status = false;
+        $evaluationsHistoryRepository->wrapInTransaction(function () use ($evaluationsHistoryRepository, $evaluationHistoryData, &$status) {
+            $id = $evaluationsHistoryRepository->insert($evaluationHistoryData);
+            $this->app->log(Log::EVALUATION_HISTORY_CREATE, [
+                'id' => $id,
+                'type' => $evaluationHistoryData['type']
+            ]);
+            //Update history id in evaluations table
+            $this->app['em']->getRepository('evaluations')->update(
+                $evaluationHistoryData['evaluation_id'],
+                ['history_id' => $id]
+            );
+            $status = true;
+        });
+        return $status;
     }
 
     public function getEvaluationRevertForm()
