@@ -4,7 +4,7 @@
     </div>
     <div class="panel-body">
         {% for order in orders %}
-            {% if loop.index == 6 %}
+            {% if type is not defined and loop.index == 6 %}
                 <div id="order-overflow">
             {% endif %}
             <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
@@ -30,7 +30,7 @@
                 </small>
             </a>
         {% endfor %}
-        {% if orders|length > 5 %}
+        {% if type is not defined and orders|length > 5 %}
             </div> {# close .order-overflow div above #}
             <a href="#" class="btn btn-block btn-lg btn-default" id="order-overflow-show">
                 <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
