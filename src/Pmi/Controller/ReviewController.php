@@ -35,7 +35,7 @@ class ReviewController extends AbstractController
             'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
             'oh.type as oh_type ' .
             'FROM orders o ' .
-            'INNER JOIN orders_history oh ' .
+            'LEFT JOIN orders_history oh ' .
             'ON o.history_id = oh.id WHERE ' .
             '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ' .
             'AND (o.site = :site OR o.collected_site = :site OR o.processed_site = :site OR o.finalized_site = :site) ';
