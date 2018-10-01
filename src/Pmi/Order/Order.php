@@ -1128,11 +1128,14 @@ class Order
                    oh.created_ts AS oh_created_ts
             FROM orders o
             LEFT JOIN orders_history oh ON o.history_id = oh.id
-            WHERE o.id = ?
-              AND o.participant_id = ?
+            WHERE o.id = :orderId
+              AND o.participant_id = :participantId
             ORDER BY o.id DESC
         ";
-        return $this->app['em']->fetchAll($ordersQuery, [$orderId, $participantId]);
+        return $this->app['em']->fetchAll($ordersQuery, [
+            'orderId' => $orderId,
+            'participantId' => $participantId
+        ]);
     }
 
     public function getParticipantOrdersWithHistory($participantId)
@@ -1146,10 +1149,12 @@ class Order
                    oh.created_ts AS oh_created_ts
             FROM orders o
             LEFT JOIN orders_history oh ON o.history_id = oh.id
-            WHERE o.participant_id = ?
+            WHERE o.participant_id = :participantId
             ORDER BY o.id DESC
         ";
-        return $this->app['db']->fetchAll($ordersQuery, [$participantId]);
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'participantId' => $participantId
+        ]);
     }
 
     public function getSiteUnfinalizedOrders()
@@ -1165,13 +1170,16 @@ class Order
                       oh.created_ts AS oh_created_ts
                FROM orders o
                LEFT JOIN orders_history oh ON o.history_id = oh.id
-               WHERE o.site = ?
+               WHERE o.site = :site
                  AND o.finalized_ts IS NULL
                ORDER BY o.created_ts DESC) AS tmp
-            WHERE tmp.oh_type != ?
+            WHERE tmp.oh_type != :type
               OR tmp.oh_type IS NULL
         ";
-        return $this->app['db']->fetchAll($ordersQuery, [$this->app->getSiteId(), self::ORDER_CANCEL]);
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'site' => $this->app->getSiteId(),
+            'type' => self::ORDER_CANCEL
+        ]);
     }
 
 
@@ -1188,11 +1196,14 @@ class Order
                       oh.created_ts AS oh_created_ts
                FROM orders o
                LEFT JOIN orders_history oh ON o.history_id = oh.id
-               WHERE o.site = ?
+               WHERE o.site = :site
                ORDER BY o.created_ts DESC) AS tmp
-            WHERE tmp.oh_type = ?
+            WHERE tmp.oh_type = :type
         ";
-        return $this->app['db']->fetchAll($ordersQuery, [$this->app->getSiteId(), self::ORDER_UNLOCK]);
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'site' => $this->app->getSiteId(),
+            'type' => self::ORDER_UNLOCK
+        ]);
     }
 
     public function getSiteRecentModifiedOrders()
@@ -1206,13 +1217,17 @@ class Order
                    oh.created_ts AS oh_created_ts
             FROM orders o
             INNER JOIN orders_history oh ON o.history_id = oh.id
-            WHERE o.site = ?
-              AND oh.type != ?
-              AND oh.type != ?
+            WHERE o.site = :site
+              AND oh.type != :type1
+              AND oh.type != :type2
               AND oh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
             ORDER BY oh.created_ts DESC
         ";
-        return $this->app['db']->fetchAll($ordersQuery, [$this->app->getSiteId(), self::ORDER_ACTIVE, self::ORDER_RESTORE]);
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'site' => $this->app->getSiteId(),
+            'type1' => self::ORDER_ACTIVE,
+            'type2' => self::ORDER_RESTORE
+        ]);
     }
 
     public function getOrderRevertForm()
