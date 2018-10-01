@@ -155,6 +155,9 @@ class Order
             return;
         }
         $order = $this->getParticipantOrderWithHistory($orderId, $participantId);
+        if (empty($order)) {
+            return;
+        }
         $this->order = $order[0];
         $this->order['expired'] = $this->isOrderExpired();
         $this->participant = $participant;
