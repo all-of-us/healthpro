@@ -516,7 +516,8 @@ class Evaluation
                    eh.created_ts AS eh_created_ts
             FROM evaluations e
             LEFT JOIN evaluations_history eh ON e.history_id = eh.id
-            WHERE e.id = :evalId
+            WHERE e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL)
+              AND e.id = :evalId
               AND e.participant_id = :participant_id
             ORDER BY e.id DESC
         ";
@@ -539,7 +540,8 @@ class Evaluation
                    eh.created_ts AS eh_created_ts
             FROM evaluations e
             LEFT JOIN evaluations_history eh ON e.history_id = eh.id
-            WHERE e.participant_id = :participant_id
+            WHERE e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL)
+              AND e.participant_id = :participant_id
             ORDER BY e.id DESC
         ";
         return $this->app['db']->fetchAll($evaluationsQuery, [
