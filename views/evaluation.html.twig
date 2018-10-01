@@ -12,7 +12,7 @@
                 {% endif %}
                 <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
                 {% if evaluation %}
-                    {% if evaluation.eh_type != 'cancel' %}
+                    {% if evaluation.eh_type != 'cancel' and not (evaluation.parent_id is not empty and evaluation.finalized_ts is empty) %}
                         <a href="{{ path('evaluationModify', { participantId: participant.id, evalId: evaluation.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel</a>
                     {% elseif evaluation.eh_type == 'cancel' %}
                         <a href="{{ path('evaluationModify', { participantId: participant.id, evalId: evaluation.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore</a>
@@ -44,6 +44,12 @@
             <div class="alert alert-danger">
                 <i class="fa fa-check-circle" aria-hidden="true"></i>
                 <strong>Cancelled by {{ app.getUserEmailById(evaluation.eh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(evaluation.eh_site) }} on {{ evaluation.eh_created_ts|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong>
+            </div>
+        {% endif %}
+        {% if evaluation and evaluation.parent_id is not empty and evaluation.finalized_ts is empty %}
+            <div class="alert alert-warning">
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                <strong>Unlocked for editing by {{ app.getUserEmailById(evaluation.eh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(evaluation.eh_site) }} on {{ evaluation.eh_created_ts|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong>
             </div>
         {% endif %}
         {% if evaluation and evaluation.finalized_ts %}
