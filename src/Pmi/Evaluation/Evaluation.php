@@ -549,11 +549,34 @@ class Evaluation
         ]);
     }
 
+    public function getSiteUnfinalizedEvaluations()
+    {
+        $evaluationsQuery = "
+            SELECT e.*,
+                   eh.evaluation_id AS eh_evaluation_id,
+                   eh.user_id AS eh_user_id,
+                   eh.site AS eh_site,
+                   eh.type AS eh_type,
+                   eh.reason AS eh_reason,
+                   eh.created_ts AS eh_created_ts
+            FROM evaluations e
+            LEFT JOIN evaluations_history eh ON e.history_id = eh.id
+            WHERE e.site = :site
+              AND e.finalized_ts IS NULL
+              AND (eh.type != :type
+              OR eh.type IS NULL)
+            ORDER BY e.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($evaluationsQuery, [
+            'site' => $this->app->getSiteId(),
+            'type' => self::EVALUATION_CANCEL
+        ]);
+    }
+
     public function getSiteRecentModifiedEvaluations()
     {
         $evaluationsQuery = "
             SELECT e.*,
-                   eh.id AS eh_id,
                    eh.evaluation_id AS eh_order_id,
                    eh.user_id AS eh_user_id,
                    eh.site AS eh_site,
