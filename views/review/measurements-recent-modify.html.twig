@@ -48,15 +48,15 @@
                         {{ today.displayDate(measurement, 'finalized_ts') }}
                     </td>
                     <td>
-                        {{ today.displayDate(measurement, 'eh_created_ts') }}
+                        {{ today.displayDate(measurement, 'modified_ts') }}
                     </td>
                     <td align="center">
-                        {% if measurement.eh_type == 'edit' %}
-                            <span class="label label-success">Edited &amp; Finalized</span>
-                        {% elseif measurement.eh_type == 'cancel' %}
+                        {% if measurement.eh_type == 'cancel' %}
                             <span class="label label-danger">Cancelled</span>
-                        {% elseif measurement.eh_type == 'amend'%}
+                        {% elseif measurement.finalized_ts is empty %}
                             <span class="label label-warning">Edited &amp; Unfinalized</span>
+                        {% elseif measurement.finalized_ts is not empty %}
+                            <span class="label label-success">Edited &amp; Finalized</span>
                         {% endif %}
                     </td>
                 </tr>

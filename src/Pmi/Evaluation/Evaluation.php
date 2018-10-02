@@ -553,23 +553,24 @@ class Evaluation
     {
         $evaluationsQuery = "
             SELECT e.*,
+                   eh.id AS eh_id,
                    eh.evaluation_id AS eh_order_id,
                    eh.user_id AS eh_user_id,
                    eh.site AS eh_site,
                    eh.type AS eh_type,
-                   eh.created_ts AS eh_created_ts
+                   eh.created_ts AS eh_created_ts,
+                   IFNULL (eh.created_ts, e.updated_ts) as modified_ts
             FROM evaluations e
-            INNER JOIN evaluations_history eh ON e.history_id = eh.id
+            LEFT JOIN evaluations_history eh ON e.history_id = eh.id
             WHERE e.site = :site
-              AND eh.type != :type1
-              AND eh.type != :type2
-              AND eh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
-            ORDER BY eh.created_ts DESC
+              AND eh.type = :type
+              OR (eh.type IS NULL AND e.parent_id IS NOT NULL)
+              AND (eh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY OR e.updated_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY)
+            ORDER BY modified_ts DESC
         ";
         return $this->app['db']->fetchAll($evaluationsQuery, [
             'site' => $this->app->getSiteId(),
-            'type1' => self::EVALUATION_ACTIVE,
-            'type2' => self::EVALUATION_RESTORE
+            'type' => self::EVALUATION_CANCEL
         ]);
     }
 
