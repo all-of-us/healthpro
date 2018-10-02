@@ -290,12 +290,14 @@ class EvaluationController extends AbstractController
         if (!$evaluation) {
             $app->abort(404);
         }
+        $evaluationService->loadFromArray($evaluation);
         // Allow cancel for active and restored evaluations
-        // Allow restore for only canceled evaluations
+        // Allow restore for only cancelled evaluations
         if (!in_array($type, [$evaluationService::EVALUATION_CANCEL, $evaluationService::EVALUATION_RESTORE])) {
             $app->abort(404);
         }
-        if (($type === $evaluationService::EVALUATION_CANCEL && $evaluation['eh_type'] === $evaluationService::EVALUATION_CANCEL)
+        if ($evaluationService->isEvaluationUnlocked()
+            || ($type === $evaluationService::EVALUATION_CANCEL && $evaluationService->isEvaluationCancelled())
             || ($type === $evaluationService::EVALUATION_RESTORE && $evaluation['eh_type'] !== $evaluationService::EVALUATION_CANCEL)) {
             $app->abort(403);
         }

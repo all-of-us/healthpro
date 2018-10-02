@@ -33,6 +33,7 @@ class Evaluation
     protected $finalizedUser;
     protected $finalizedSite;
     protected $locked = false;
+    public $evaluation;
 
     public function __construct($app = null)
     {
@@ -45,6 +46,7 @@ class Evaluation
 
     public function loadFromArray($array)
     {
+        $this->evaluation = $array;
         if (array_key_exists('version', $array)) {
             $this->version = $array['version'];
         }
@@ -644,5 +646,15 @@ class Evaluation
             return true;
         }
         return false;
+    }
+
+    public function isEvaluationCancelled()
+    {
+        return $this->evaluation['eh_type'] === self::EVALUATION_CANCEL;
+    }
+
+    public function isEvaluationUnlocked()
+    {
+        return !empty($this->evaluation['parent_id']) && empty($this->evaluation['finalized_ts']);
     }
 }
