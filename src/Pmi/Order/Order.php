@@ -1160,21 +1160,19 @@ class Order
     public function getSiteUnfinalizedOrders()
     {
         $ordersQuery = "
-            SELECT tmp.*
-            FROM
-              (SELECT o.*,
-                      oh.order_id AS oh_order_id,
-                      oh.user_id AS oh_user_id,
-                      oh.site AS oh_site,
-                      oh.type AS oh_type,
-                      oh.created_ts AS oh_created_ts
-               FROM orders o
-               LEFT JOIN orders_history oh ON o.history_id = oh.id
-               WHERE o.site = :site
-                 AND o.finalized_ts IS NULL
-               ORDER BY o.created_ts DESC) AS tmp
-            WHERE tmp.oh_type != :type
-              OR tmp.oh_type IS NULL
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts
+            FROM orders o
+            LEFT JOIN orders_history oh ON o.history_id = oh.id
+            WHERE o.site = :site
+              AND o.finalized_ts IS NULL
+              AND (oh.type != :type
+              OR oh.type IS NULL)
+            ORDER BY o.created_ts DESC
         ";
         return $this->app['db']->fetchAll($ordersQuery, [
             'site' => $this->app->getSiteId(),
@@ -1186,19 +1184,17 @@ class Order
     public function getSiteUnlockedOrders()
     {
         $ordersQuery = "
-            SELECT tmp.*
-            FROM
-              (SELECT o.*,
-                      oh.order_id AS oh_order_id,
-                      oh.user_id AS oh_user_id,
-                      oh.site AS oh_site,
-                      oh.type AS oh_type,
-                      oh.created_ts AS oh_created_ts
-               FROM orders o
-               LEFT JOIN orders_history oh ON o.history_id = oh.id
-               WHERE o.site = :site
-               ORDER BY o.created_ts DESC) AS tmp
-            WHERE tmp.oh_type = :type
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts
+            FROM orders o
+            INNER JOIN orders_history oh ON o.history_id = oh.id
+            WHERE o.site = :site
+              AND oh.type = :type
+            ORDER BY o.created_ts DESC
         ";
         return $this->app['db']->fetchAll($ordersQuery, [
             'site' => $this->app->getSiteId(),
