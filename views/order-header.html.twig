@@ -62,15 +62,15 @@
 {% if active in stepNeedDetails %}
     {% set activeStep = attribute(steps, active)[1] %}
     {% if attribute(order, activeStep~'_ts') is not empty %}
-        {% if activeStep != 'finalized' or attribute(order, 'rdr_id') is not empty %}
-            <div class="{% if order.rdr_id is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
-                <i class="fa fa-info-circle" aria-hidden="true"></i>
-                <strong>{{ activeStep|capitalize }} by {{ app.getUserEmailById(attribute(order, activeStep~'_user_id'))|default('Unknown') }} at {{ app.getSiteDisplayName(attribute(order, activeStep~'_site')) }}</strong>
-            </div>
-        {% elseif attribute(order, 'rdr_id') is empty %}
+        {% if activeStep == 'finalized' and order.rdr_id is empty %}
             <div class="alert alert-danger well-sm">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <strong>An error occurred while finalizing this order. Please try again.</strong>
+            </div>
+        {% else %}
+            <div class="{% if order.rdr_id is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <strong>{{ activeStep|capitalize }} by {{ app.getUserEmailById(attribute(order, activeStep~'_user_id'))|default('Unknown') }} at {{ app.getSiteDisplayName(attribute(order, activeStep~'_site')) }}</strong>
             </div>
         {% endif %}
     {% endif %}
