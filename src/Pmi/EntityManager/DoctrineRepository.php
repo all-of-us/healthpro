@@ -1,6 +1,8 @@
 <?php
 namespace Pmi\EntityManager;
 
+use Pmi\Util;
+
 class DoctrineRepository extends EntityManager
 {
     protected $dbal;
@@ -27,7 +29,7 @@ class DoctrineRepository extends EntityManager
 
         // Convert timestamp fields into user's time zone since they're stored as UTC in the database
         if ($result) {
-            $result = $this->parseTimestamps($result);
+            $result = Util::parseTimestamps($result, $this->timezone);
         }
         return $result;
     }
@@ -56,7 +58,7 @@ class DoctrineRepository extends EntityManager
         }
         $result = $this->dbal->fetchAll($query, $parameters);
         if ($result) {
-            $result = $this->parseMultipleTimestamps($result);
+            $result = Util::parseMultipleTimestamps($result, $this->timezone);
         }
         return $result;
     }
@@ -115,5 +117,16 @@ class DoctrineRepository extends EntityManager
     public function wrapInTransaction($callback)
     {
         $this->dbal->transactional($callback);
+    }
+
+    protected function dateTimesToStrings(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if ($value instanceof \DateTime) {
+                $value->setTimezone(new \DateTimezone('UTC'));
+                $data[$key] = $value->format('Y-m-d H:i:s');
+            }
+        }
+        return $data;
     }
 }
