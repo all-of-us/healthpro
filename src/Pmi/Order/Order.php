@@ -164,6 +164,7 @@ class Order
         $this->version = !empty($order['version']) ? $order['version'] : 1;
         $this->order['status'] = !empty($this->order['oh_type']) ? $this->order['oh_type'] : self::ORDER_ACTIVE;
         $this->order['disabled'] = $this->isOrderDisabled();
+        $this->order['formDisabled'] = $this->isOrderFormDisabled();
         $this->loadSamplesSchema();
     }
 
@@ -314,7 +315,7 @@ class Order
 
     public function createOrderForm($set, $formFactory)
     {
-        $disabled = $this->isOrderDisabled();
+        $disabled = $this->isOrderFormDisabled();
 
         switch ($set) {
             case 'collected':
@@ -925,6 +926,11 @@ class Order
     public function isOrderDisabled()
     {
         return ($this->order['rdr_id'] || $this->order['expired'] || $this->isOrderCancelled()) && $this->order['status'] !== 'unlock';
+    }
+
+    public function isOrderFormDisabled()
+    {
+        return ($this->order['finalized_ts'] || $this->order['expired'] || $this->isOrderCancelled()) && $this->order['status'] !== 'unlock';
     }
 
     public function isOrderCancelled()
