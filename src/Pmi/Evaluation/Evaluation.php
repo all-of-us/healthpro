@@ -689,4 +689,51 @@ class Evaluation
     {
         return !empty($this->evaluation['parent_id']) && empty($this->evaluation['finalized_ts']);
     }
+
+    public function isEvaluationFailedToReachRDR()
+    {
+        return !empty($this->evaluation['finalized_ts']) && empty($this->evaluation['rdr_id']);
+    }
+
+    public function canCancel()
+    {
+        return $this->evaluation['eh_type'] !== self::EVALUATION_CANCEL
+            && !$this->isEvaluationUnlocked()
+            && !$this->isEvaluationFailedToReachRDR();
+    }
+
+    public function canRestore()
+    {
+        return $this->evaluation['eh_type'] === self::EVALUATION_CANCEL
+            && !$this->isEvaluationUnlocked()
+            && !$this->isEvaluationFailedToReachRDR();
+    }
+
+
+    public function sendToRdr()
+    {
+        // TODO remove timezone conversion when entity manager parse timestamps is used
+        $date = new \DateTime($this->evaluation['finalized_ts']);
+        $date->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+        $parentRdrId = null;
+        // Check if parent_id exists
+        if ($this->evaluation['parent_id']) {
+            $parentEvaluation = $this->app['em']->getRepository('evaluations')->fetchOneBy([
+                'id' => $this->evaluation['parent_id']
+            ]);
+            if (!empty($parentEvaluation)) {
+                $parentRdrId = $parentEvaluation['rdr_id'];
+            }
+        }
+        $fhir = $this->getFhir($date, $parentRdrId);
+        $rdrId = $this->app['pmi.drc.participants']->createEvaluation($this->evaluation['participant_id'], $fhir);
+        if (!empty($rdrId)) {
+            $this->app['em']->getRepository('evaluations')->update(
+                $this->evaluation['id'],
+                ['rdr_id' => $rdrId]
+            );
+            return true;
+        }
+        return false;
+    }
 }
