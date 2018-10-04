@@ -262,6 +262,15 @@ class HpoApplication extends AbstractApplication
         }
     }
 
+    public function getSiteIdWithPrefix()
+    {
+        if ($site = $this->getSite()) {
+            return \Pmi\Security\User::SITE_PREFIX . $site->id;
+        } else {
+            return null;
+        }
+    }
+
     public function getAwardeeId()
     {
         if ($awardee = $this->getAwardee()) {

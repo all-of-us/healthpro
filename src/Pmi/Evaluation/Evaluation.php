@@ -506,6 +506,38 @@ class Evaluation
         return $evaluationModifyForm->getForm();
     }
 
+    public function cancelRestoreRdrEvaluation($type, $reason)
+    {
+        $evaluation = $this->getCancelRestoreRdrObject($type, $reason);
+        return $this->app['pmi.drc.participants']->cancelRestoreEvaluation($type, $this->evaluation['participant_id'], $this->evaluation['rdr_id'], $evaluation);
+    }
+
+    public function getCancelRestoreRdrObject($type, $reason)
+    {
+        $obj = new \StdClass();
+        $statusType = $type === self::EVALUATION_CANCEL ? 'cancelled' : 'restored';
+        $obj->status = $statusType;
+        $obj->reason = $reason;
+        $user = $this->app->getUserEmail();
+        $site = $this->app->getSiteIdWithPrefix();
+        $obj->{$statusType . 'Info'} = $this->getEvaluationUserSiteData($user, $site);
+        return $obj;
+    }
+
+    protected function getEvaluationUserSiteData($user, $site)
+    {
+        return [
+            'author' => [
+                'system' => 'https://www.pmi-ops.org/healthpro-username',
+                'value' => $user
+            ],
+            'site' => [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => $site
+            ]
+        ];
+    }
+
     public function getEvaluationWithHistory($evalId, $participantId)
     {
         $evaluationsQuery = "

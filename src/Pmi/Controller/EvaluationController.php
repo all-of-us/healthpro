@@ -309,12 +309,19 @@ class EvaluationController extends AbstractController
                 $evaluationModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
             }
             if ($evaluationModifyForm->isValid()) {
+                $status = true;
+                // Cancel/Restore evaluation in RDR if exists
+                if (!empty($evaluation['rdr_id'])) {
+                    $status = $evaluationService->cancelRestoreRdrEvaluation($type, $evaluationModifyData['reason']);
+                }
                 // Create evaluation history
-                if ($evaluationService->createEvaluationHistory($type, $evalId, $evaluationModifyData['reason'])) {
+                if ($status && $evaluationService->createEvaluationHistory($type, $evalId, $evaluationModifyData['reason'])) {
                     $app->addFlashSuccess("Evaluation {$type}ed");
                     return $app->redirectToRoute('participant', [
                         'id' => $participantId
                     ]);
+                } else {
+                    $app->addFlashError("Failed to {$type} physical measurement. Please try again.");
                 }
             } else {
                 $app->addFlashError('Please correct the errors below');
