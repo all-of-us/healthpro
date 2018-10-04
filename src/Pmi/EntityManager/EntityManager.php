@@ -1,6 +1,8 @@
 <?php
 namespace Pmi\EntityManager;
 
+use Pmi\Util;
+
 class EntityManager
 {
     protected $dbal;
@@ -16,7 +18,8 @@ class EntityManager
         'evaluations_queue' => 'doctrine',
         'organizations' => 'doctrine',
         'awardees' => 'doctrine',
-        'missing_notifications_log' => 'doctrine'
+        'missing_notifications_log' => 'doctrine',
+        'orders_history' => 'doctrine'
     ];
 
     protected $timezone;
@@ -40,6 +43,12 @@ class EntityManager
             default:
                 throw new \Exception('Invalid entity type');
         }
+    }
+
+    public function fetchAll($query, $parameters)
+    {
+        $result = $this->dbal->fetchAll($query, $parameters);
+        return Util::parseMultipleTimestamps($result, $this->timezone);
     }
 
     public function setTimezone($timezone)

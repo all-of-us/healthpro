@@ -146,39 +146,7 @@
                         </div>
 
                         <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
-                                </div>
-                                <div class="panel-body">
-                                    {% for order in orders %}
-                                        {% if loop.index == 6 %}
-                                            <div id="order-overflow">
-                                        {% endif %}
-                                        <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
-                                            {{ order.created_ts|date('D n/j/Y', app.userTimezone) }} <small class="text-muted"><strong>{{ order.order_id }}</strong></small><br />
-                                            <small class="text-muted">
-                                                {% if not order.finalized_ts and not order.version %}
-                                                    <span class="label label-danger">Expired</span>
-                                                {% elseif order.finalized_ts %}
-                                                    <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                {% elseif order.processed_ts %}
-                                                    <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                {% elseif order.collected_ts %}
-                                                    <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                {% endif %}                                    
-                                            </small>
-                                        </a>
-                                    {% endfor %}
-                                    {% if orders|length > 5 %}
-                                        </div> {# close .order-overflow div above #}
-                                        <a href="#" class="btn btn-block btn-lg btn-default" id="order-overflow-show">
-                                            <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
-                                        </a>
-                                    {% endif %}
-                                    <a href="{{ path('orderCheck', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
-                                </div>
-                            </div>
+                            {% include 'partials/participant-orders-list.html.twig' %}
                         </div>
                         {% if app.isDVType %}
                             <div class="col-sm-6 col-lg-4">
