@@ -165,6 +165,9 @@ class Order
         $this->order['status'] = !empty($this->order['oh_type']) ? $this->order['oh_type'] : self::ORDER_ACTIVE;
         $this->order['disabled'] = $this->isOrderDisabled();
         $this->order['formDisabled'] = $this->isOrderFormDisabled();
+        $this->order['canCancel'] = $this->canCancel();
+        $this->order['canRestore'] = $this->canRestore();
+        $this->order['canUnlock'] = $this->canUnlock();
         $this->loadSamplesSchema();
     }
 
@@ -619,12 +622,11 @@ class Order
 
     public function sendToRdr()
     {
-        if ($this->order['status'] === self::ORDER_ACTIVE) {
-            return $this->createRdrOrder();
-        } elseif ($this->order['status'] === self::ORDER_UNLOCK) {
+        if ($this->order['status'] === self::ORDER_UNLOCK) {
             return $this->editRdrOrder();
+        } else {
+            return $this->createRdrOrder();
         }
-        return false;
     }
 
     public function createRdrOrder()
@@ -946,6 +948,21 @@ class Order
     public function isOrderFailedToReachRdr()
     {
         return !empty($this->order['finalized_ts']) && empty($this->order['rdr_id']);
+    }
+
+    public function canCancel()
+    {
+        return !$this->isOrderCancelled() && !$this->isOrderUnlocked() && !$this->isOrderFailedToReachRdr();
+    }
+
+    public function canRestore()
+    {
+        return $this->isOrderCancelled() && !$this->isOrderUnlocked() && !$this->isOrderFailedToReachRdr();
+    }
+
+    public function canUnlock()
+    {
+        return !empty($this->order['rdr_id']) && !$this->isOrderUnlocked() && !$this->isOrderCancelled();
     }
 
     public function hasBloodSample($samples)

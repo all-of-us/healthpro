@@ -13,21 +13,19 @@
     {% set params = { participantId: participant.id, orderId: order.id } %}
     {% set route = app.request_stack.currentRequest.attributes.get('_route') %}
     {% set return = path(route, params) %}
-    {% if order.rdr_id and order.status != 'cancel' and order.status != 'unlock' %}
+    {% if order.canUnlock %}
         <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'unlock', return: return }) }}" class="btn btn-sm btn-primary">Unlock for Editing</a>
     {% endif %}
-    {% if (order.status != 'cancel' and order.status != 'unlock') and not (order.finalized_ts is not empty and order.rdr_id is empty) %}
+    {% if order.canCancel %}
         <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel Order</a>
-    {% elseif order.status == 'cancel' %}
+    {% elseif order.canRestore %}
         <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore Order</a>
-        {% if order.status == 'cancel' %}
-            <div class="alert alert-danger well-sm">
-                <i class="fa fa-info-circle" aria-hidden="true"></i>
-                <strong>
-                    Cancelled by {{ app.getUserEmailById(order.oh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.oh_site) }} on {{ order.oh_created_ts|date('F j, Y g:ia', app.userTimezone) }}
-                </strong>
-            </div>
-        {% endif %}
+        <div class="alert alert-danger well-sm">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>
+                Cancelled by {{ app.getUserEmailById(order.oh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.oh_site) }} on {{ order.oh_created_ts|date('F j, Y g:ia', app.userTimezone) }}
+            </strong>
+        </div>
     {% elseif order.status == 'unlock' %}
         <div class="alert alert-warning well-sm">
             <i class="fa fa-info-circle" aria-hidden="true"></i>

@@ -602,10 +602,9 @@ class OrderController extends AbstractController
         if (!in_array($type, [$order::ORDER_CANCEL, $order::ORDER_RESTORE, $order::ORDER_UNLOCK])) {
             $app->abort(404);
         }
-        if ($order->isOrderFailedToReachRdr()
-            || ($type === $order::ORDER_CANCEL && ($order->isOrderCancelled() || $order->isOrderUnlocked()))
-            || ($type === $order::ORDER_RESTORE && !$order->isOrderCancelled())
-            || ($type === $order::ORDER_UNLOCK && ($order->isOrderUnlocked() || $order->isOrderCancelled()))) {
+        if (($type === $order::ORDER_CANCEL && !$order->canCancel())
+            || ($type === $order::ORDER_RESTORE && !$order->canRestore())
+            || ($type === $order::ORDER_UNLOCK && !$order->canUnlock())) {
             $app->abort(403);
         }
         $orders = $order->getParticipantOrdersWithHistory($participantId);
