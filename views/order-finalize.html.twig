@@ -6,7 +6,7 @@
 {% block title %}Finalize - Order {{ order.order_id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'finalize' } %}
-    {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+    {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit finalize-form' } }) }}
         {{ form_errors(finalizeForm) }}
 
         <div class="form-group{% if not finalizeForm.finalized_ts.vars.valid %} has-error{% endif %}">
@@ -70,14 +70,8 @@
             <small class="text-warning">Comments entered in this field must be transmitted to the Biobank via reconciliation reporting. You may not enter any participant identifying information here.</small>
             {{ form_errors(finalizeForm.finalized_notes) }}
         </div>
-        {% if order.finalized_ts is empty %}
-            <div class="form-group" id="finalize-empty-order-check" style="display:none;">
-                <input type="checkbox" name="finalize_empty_order" value="1">
-                <label>This order is being intentionally finalized with no samples</label>
-            </div>
-        {% endif %}
         {{ form_rest(finalizeForm) }}
-        {% if not order.finalized_ts and not order.expired %}
+        {% if not order.disabled %}
             <p>
                 <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                     Save and mark as finalized
@@ -85,7 +79,11 @@
             </p>
         {% endif %}
     {{ form_end(finalizeForm) }}
-
+    {% if order.status == 'unlock' %}
+        {{ form_start(revertForm, { 'action': path('orderRevert', { participantId: participant.id, orderId: order.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}
+        {{ form_errors(revertForm) }}
+        {{ form_end(revertForm) }}
+    {% endif %}
 {% endblock %}
 
 {% block pagejs %}
@@ -201,55 +199,16 @@ $(document).ready(function () {
         }
     });
 
-    var showHideConfirmEmptyOrderCheck = function() {
-        var showCheckBox = true;
-        if ($('input[name="form[finalized_samples][]"]:checked').length > 0) {
-            showCheckBox = false;
-        }
-        if (showCheckBox) {
-            $('#finalize-empty-order-check').show();
-        } else {
-            $('#finalize-empty-order-check').hide();
-        }
-        $('input[name="finalize_empty_order"]').prop('checked', false);
-    };
-
-    showHideConfirmEmptyOrderCheck();
-
-    $('input[name="form[finalized_samples][]').on('change', function() {
-        showHideConfirmEmptyOrderCheck();
-    });
-
-
-    $('button[type="submit"]').on('click', function() {
-        //Display alert message
-        var showAlert = true;
-        if ($('input[name="form[finalized_samples][]"]:checked').length > 0 || $('input[name="finalize_empty_order"]').prop('checked') === true) {
-            showAlert = false;
-        }
-        if (showAlert) {
-            alert('You must check the box indicating that this order is intentionally finalized without samples or select at least one sample to finalize');
-            return false;
-        }
-
+    $('.finalize-form button[type="submit"]').on('click', function () {
         //Display warning message
         var message = 'Are you sure you want to finalize this order?';
-        //Check if zero samples are selected
-        if ($('input[name="form[finalized_samples][]"]:checked').length === 0) {
-            {% if order.type == 'kit' %}
-                message = 'Warning: Finalizing an empty order will result in the order not being submitted to the Biobank. Are you sure you wish to continue?';
-            {% else %}
-                message = 'Warning: Finalizing an empty order will result in the order not being submitted to the Biobank and the Print Requisition will not be generated. Are you sure you wish to continue?';
-            {% endif %}
-        } else {
-            $('input[name="form[finalized_samples][]"]').each(function() {
-                //Select samples that are unchecked and not disabled
-                if ($(this).prop('checked') === false && $(this).prop('disabled') === false) {
-                    message = 'Warning: At least one sample that was collected and processed (as applicable) was not finalized. Are you sure you wish to continue?';
-                    return false;
-                }
-            });
-        }
+        $('input[name="form[finalized_samples][]"]').each(function () {
+            //Select samples that are unchecked and not disabled
+            if ($(this).prop('checked') === false && $(this).prop('disabled') === false) {
+                message = 'Warning: At least one sample that was collected and processed (as applicable) was not finalized. Are you sure you wish to continue?';
+                return false;
+            }
+        });
         return confirm(message);
     });
 });

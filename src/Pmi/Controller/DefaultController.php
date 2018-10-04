@@ -17,6 +17,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 use Pmi\WorkQueue\WorkQueue;
+use Pmi\Order\Order;
 
 class DefaultController extends AbstractController
 {
@@ -357,12 +358,12 @@ class DefaultController extends AbstractController
                 'organization' => $participant->hpoId
             ]);
         }
-        $orders = $app['em']->getRepository('orders')->fetchBy(
-            ['participant_id' => $id],
-            ['created_ts' => 'DESC', 'id' => 'DESC']
-        );
         $evaluationService = new Evaluation($app);
         $evaluations = $evaluationService->getEvaluationsWithHistory($id);
+
+        $order = new Order($app);
+        $orders = $order->getParticipantOrdersWithHistory($id);
+
         $query = "SELECT p.id, p.updated_ts, p.finalized_ts, MAX(pc.created_ts) as last_comment_ts, count(pc.comment) as comment_count FROM problems p LEFT JOIN problem_comments pc on p.id = pc.problem_id WHERE p.participant_id = ? GROUP BY p.id ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC";
         $problems = $app['db']->fetchAll($query, [$id]);
         if (empty($participant->cacheTime)) {

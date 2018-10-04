@@ -4,7 +4,7 @@
 {% set missingName = '' %}
 
 {% macro displayDate(participant, entity, dateType) %}
-    {% if participant[entity] and participant[entity][dateType] %}
+    {% if participant[entity] and participant[entity][dateType] and participant[entity]['oh_type'] != 'cancel' %}
         {% if 'now'|date('Y-m-d', app.userTimezone) == participant[entity][dateType]|date('Y-m-d', app.userTimezone) %}
             {# previously displayed only time if date is today. leaving this here in case we want to display something different in the future #}
             {{ participant[entity][dateType]|date('n/j/Y g:ia', app.userTimezone) }}
@@ -26,6 +26,7 @@
         <li role="presentation" class="active"><a href="#">Today's Participants</a></li>
         <li role="presentation"><a href="{{ path('review_orders') }}">Unfinalized Biobank Orders</a></li>
         <li role="presentation"><a href="{{ path('review_measurements') }}">Unfinalized Physical Measurements</a></li>
+        <li role="presentation"><a href="{{ path('review_ordersRecentModify') }}">Recently Modified Biobank Orders</a></li>
         <li role="presentation"><a href="{{ path('review_measurementsRecentModify') }}">Recently Modified Physical Measurements</a></li>
     </ul>
     <br />
@@ -111,10 +112,14 @@
                         {{ today.displayDate(participant, 'order', 'processed_ts') }}
                     </td>
                     <td>
-                        {{ today.displayDate(participant, 'order', 'finalized_ts') }}
+                        {% if participant.order.oh_type != 'unlock' %}
+                            {{ today.displayDate(participant, 'order', 'finalized_ts') }}
+                        {% else %}
+                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        {% endif %}
                     </td>
                     <td>
-                        {% if participant.order and participant.finalizedSamples %}
+                        {% if participant.order and participant.finalizedSamples and participant.order.oh_type != 'cancel' %}
                             {{ participant.finalizedSamples }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>

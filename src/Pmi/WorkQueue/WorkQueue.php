@@ -371,7 +371,7 @@ class WorkQueue
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone());
             }
             return self::HTML_SUCCESS;
-        } elseif ($checkInvalidStatus && $value === 'INVALID') {
+        } elseif ($checkInvalidStatus && ($value === 'INVALID' || $value === 'SUBMITTED_INVALID')) {
             return !empty($time) ? self::HTML_DANGER . ' (invalid) ' . self::dateFromString($time, $this->app->getUserTimezone()) : self::HTML_DANGER . ' (invalid)';
         } elseif ($showNotCompleteText) {
             return !empty($time) ? self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone()) : self::HTML_DANGER . ' (not completed)';
