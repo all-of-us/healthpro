@@ -161,7 +161,7 @@ class Order
         $this->order = $order[0];
         $this->order['expired'] = $this->isOrderExpired();
         $this->participant = $participant;
-        $this->version = !empty($order['version']) ? $order['version'] : 1;
+        $this->version = !empty($this->order['version']) ? $this->order['version'] : 1;
         $this->order['status'] = !empty($this->order['oh_type']) ? $this->order['oh_type'] : self::ORDER_ACTIVE;
         $this->order['disabled'] = $this->isOrderDisabled();
         $this->order['formDisabled'] = $this->isOrderFormDisabled();
