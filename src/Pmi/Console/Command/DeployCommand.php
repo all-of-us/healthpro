@@ -505,7 +505,7 @@ class DeployCommand extends Command {
         foreach ($vulnerabilities as $dependency => $issues) {
             $dependencyFullName = $dependency.' ('.$issues['version'].')';
             $this->out->writeln('<info>'.$dependencyFullName."\n".str_repeat('-', strlen($dependencyFullName))."</>\n");
-            foreach ($issues['advisories'] as $issue => $details) {
+            foreach ($issues['advisories'] as $details) {
                 $this->out->write(' * ');
                 if ($details['cve']) {
                     $this->out->write('<comment>'.$details['cve'].': </comment>');
