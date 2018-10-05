@@ -46,7 +46,11 @@
                         {{ today.displayDate(measurement, 'created_ts') }}
                     </td>
                     <td>
-                        {{ today.displayDate(measurement, 'finalized_ts') }}
+                        {% if measurement.rdr_id is not empty %}
+                            {{ today.displayDate(measurement, 'finalized_ts') }}
+                        {% else %}
+                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        {% endif %}
                     </td>
                     <td>
                         {{ today.displayDate(measurement, 'modified_ts') }}
@@ -54,9 +58,9 @@
                     <td align="center">
                         {% if measurement.eh_type == 'cancel' %}
                             <span class="label label-danger">Cancelled</span>
-                        {% elseif measurement.finalized_ts is empty %}
+                        {% elseif measurement.finalized_ts is empty or (measurement.finalized_ts is not empty and measurement.rdr_id is empty) %}
                             <span class="label label-warning">Edited &amp; Unfinalized</span>
-                        {% elseif measurement.finalized_ts is not empty %}
+                        {% elseif measurement.rdr_id is not empty %}
                             <span class="label label-success">Edited &amp; Finalized</span>
                         {% endif %}
                     </td>

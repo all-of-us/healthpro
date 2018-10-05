@@ -12,13 +12,13 @@
                 <small class="text-muted">
                     {% if evaluation.eh_type == 'cancel' %}
                         <span class="label label-danger">Cancelled</span> {{ evaluation.eh_created_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                    {% elseif evaluation.finalized_ts is empty and evaluation.parent_id is empty %}
+                    {% elseif evaluation.rdr_id is empty and evaluation.parent_id is empty %}
                         <span class="label label-default">Saved &amp; Unfinalized</span> {{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                    {% elseif evaluation.finalized_ts and evaluation.parent_id %}
+                    {% elseif evaluation.rdr_id and evaluation.parent_id %}
                         <span class="label label-success">Edited &amp; Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                    {% elseif evaluation.finalized_ts %}
+                    {% elseif evaluation.rdr_id %}
                         <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                    {% elseif evaluation.parent_id and evaluation.finalized_ts is empty %}
+                    {% elseif evaluation.parent_id and evaluation.rdr_id is empty %}
                         <span class="label label-warning">Edited &amp; Unfinalized</span> {{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
                     {% endif %}
                 </small>
