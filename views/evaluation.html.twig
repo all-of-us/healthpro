@@ -102,7 +102,7 @@
 
             {% if not evaluation or not evaluation.rdr_id %}
                 <div id="evaluationAffixSave">
-                    {% if evaluation.finalized_ts is empty  %}
+                    {% if not evaluation or not evaluation.finalized_ts %}
                         <button type="submit" class="btn btn-primary btn-xs" name="save">Save</button>
                     {% endif %}
                     <button type="submit" class="btn btn-success btn-xs" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Save and Finalize</button>
@@ -125,7 +125,7 @@
             {% else %}
                 <p>
                     <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
-                    {% if evaluation.finalized_ts is empty  %}
+                    {% if not evaluation or not evaluation.finalized_ts %}
                         <button type="submit" class="btn btn-primary" name="save">Save</button>
                     {% endif %}
                     <button type="submit" class="btn btn-success pull-right" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Save and Finalize</button>
