@@ -5,6 +5,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Pmi\Util;
 
 class UserProvider implements UserProviderInterface
 {
@@ -28,8 +29,7 @@ class UserProvider implements UserProviderInterface
                 $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
                 $this->app['session']->set('googlegroups', $groups);
             } catch (\Exception $e) {
-                syslog(LOG_CRIT, $e->getMessage());
-                syslog(LOG_INFO, substr($e->getTraceAsString(), 0, 5120)); // log the first 5KB of the stack trace
+                Util::logException($e);
                 throw new AuthenticationException('Failed to retrieve group permissions');
             }
         }
