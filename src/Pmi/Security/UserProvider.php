@@ -24,8 +24,14 @@ class UserProvider implements UserProviderInterface
         if ($this->app['session']->has('googlegroups')) {
             $groups = $this->app['session']->get('googlegroups');
         } else {
-            $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
-            $this->app['session']->set('googlegroups', $groups);
+            try {
+                $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
+                $this->app['session']->set('googlegroups', $groups);
+            } catch (\Exception $e) {
+                syslog(LOG_CRIT, $e->getMessage());
+                syslog(LOG_INFO, substr($e->getTraceAsString(), 0, 5120)); // log the first 5KB of the stack trace
+                throw new AuthenticationException('Failed to retrieve group permissions');
+            }
         }
         $userInfo = $this->getUserInfo($googleUser);
         return new User($googleUser, $groups, $userInfo);
