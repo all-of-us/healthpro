@@ -49,7 +49,7 @@
         {% if evaluation and evaluation.parent_id is not empty and evaluation.rdr_id is empty %}
             <div class="alert alert-warning">
                 <i class="fa fa-check-circle" aria-hidden="true"></i>
-                <strong>Unlocked for editing by {{ app.getUserEmailById(evaluation.eh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(evaluation.eh_site) }} on {{ evaluation.eh_created_ts|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong>
+                <strong>Unlocked for editing by {{ app.getUserEmailById(evaluation.user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(evaluation.site) }} on {{ evaluation.created_ts|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong>
             </div>
         {% endif %}
         {% if evaluation %}
