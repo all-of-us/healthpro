@@ -13,6 +13,7 @@ CREATE TABLE `evaluations` (
   `version` varchar(10) NOT NULL,
   `fhir_version` int(11) NULL DEFAULT NULL,
   `data` text NOT NULL,
+  `history_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `participant_id` (`participant_id`)
 ) DEFAULT CHARSET=utf8mb4;
