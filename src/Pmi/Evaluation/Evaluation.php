@@ -609,6 +609,7 @@ class Evaluation
 
     public function getSiteRecentModifiedEvaluations()
     {
+        //echo $this->app->getSiteId(); exit;
         $evaluationsQuery = "
             SELECT e.*,
                    eh.evaluation_id AS eh_order_id,
@@ -620,13 +621,15 @@ class Evaluation
             FROM evaluations e
             LEFT JOIN evaluations_history eh ON e.history_id = eh.id
             WHERE e.site = :site
-              AND eh.type = :type
-              OR (eh.type IS NULL AND e.parent_id IS NOT NULL)
+              AND (eh.type = :type
+              OR eh.type IS NULL)
+              AND e.parent_id IS NOT NULL
+              AND e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL)
               AND (eh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY OR e.updated_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY)
             ORDER BY modified_ts DESC
         ";
         return $this->app['db']->fetchAll($evaluationsQuery, [
-            'site' => $this->app->getSiteId(),
+            'site' => 'aikenmed',
             'type' => self::EVALUATION_CANCEL
         ]);
     }
