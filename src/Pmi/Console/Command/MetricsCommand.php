@@ -84,7 +84,8 @@ class MetricsCommand extends Command
                 $stratification,
                 join(', ', self::STRATIFICATIONS)
             ));
-            exit(1);
+            // Throw a non-zero exit status
+            return 1;
         }
 
         // Validate start and end dates
@@ -94,7 +95,8 @@ class MetricsCommand extends Command
                 $start_date,
                 $end_date
             ));
-            exit(1);
+            // Throw a non-zero exit status
+            return 1;
         }
 
         putenv('PMI_ENV=' . HpoApplication::ENV_LOCAL);
