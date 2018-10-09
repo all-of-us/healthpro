@@ -555,7 +555,7 @@ class Evaluation
               AND e.participant_id = :participant_id
             ORDER BY e.id DESC
         ";
-        $evaluation = $this->app['db']->fetchAll($evaluationsQuery, [
+        $evaluation = $this->app['em']->fetchAll($evaluationsQuery, [
             'evalId' => $evalId,
             'participant_id' => $participantId
         ]);
@@ -714,10 +714,6 @@ class Evaluation
 
     public function sendToRdr()
     {
-        // TODO remove timezone conversion when entity manager parse timestamps is used
-        $date = new \DateTime($this->evaluation['finalized_ts']);
-        $date->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
-        $parentRdrId = null;
         // Check if parent_id exists
         if ($this->evaluation['parent_id']) {
             $parentEvaluation = $this->app['em']->getRepository('evaluations')->fetchOneBy([
@@ -727,7 +723,7 @@ class Evaluation
                 $parentRdrId = $parentEvaluation['rdr_id'];
             }
         }
-        $fhir = $this->getFhir($date, $parentRdrId);
+        $fhir = $this->getFhir($this->evaluation['finalized_ts'], $parentRdrId);
         $rdrId = $this->app['pmi.drc.participants']->createEvaluation($this->evaluation['participant_id'], $fhir);
         if (!empty($rdrId)) {
             $this->app['em']->getRepository('evaluations')->update(
