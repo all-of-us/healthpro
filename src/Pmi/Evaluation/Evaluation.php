@@ -676,7 +676,7 @@ class Evaluation
     public function revertEvaluation($evalId)
     {
         if ($this->app['em']->getRepository('evaluations')->delete($evalId)) {
-            $this->app->log(Log::SITE_DELETE, $evalId);
+            $this->app->log(Log::EVALUATION_DELETE, $evalId);
             return true;
         }
         return false;
