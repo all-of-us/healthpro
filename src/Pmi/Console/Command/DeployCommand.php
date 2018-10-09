@@ -530,7 +530,7 @@ class DeployCommand extends Command {
         } catch (HttpException $e) {
             $this->out->writeln('<error>' . $e->getMessage() . '</error>');
             if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
-                throw new \Exception('Aborting due SensioLabs Security Checker network error');
+                throw new \Exception('Aborting due to SensioLabs Security Checker network error');
             }
         }
         // Ignore vulnerabilities mentioned in sensioignore file
@@ -540,7 +540,7 @@ class DeployCommand extends Command {
         } else {
             $this->displayVulnerabilities($vulnerabilities);
             if (!$this->local) {
-                throw new \Exception('Fix security vulnerablities before deploying');
+                throw new \Exception('Fix security vulnerabilities before deploying');
             } else {
                 if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
                     throw new \Exception('Aborting due to security vulnerability');
@@ -558,7 +558,7 @@ class DeployCommand extends Command {
         } else {            
             $this->out->writeln('');
             $helper = $this->getHelper('question');
-            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerablities?</error> '))) {
+            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerabilities?</error> '))) {
                 throw new \Exception('Aborting due to JS security vulnerability');
             }
         }
