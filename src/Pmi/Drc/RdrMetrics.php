@@ -10,6 +10,9 @@ class RdrMetrics
         $this->rdrHelper = $rdrHelper;
     }
 
+    /**
+     * @deprecated 2018-10-01 Use ::metrics2 instead.
+     */
     public function metrics($start_date, $end_date)
     {
         $client = $this->rdrHelper->getClient();
@@ -19,7 +22,7 @@ class RdrMetrics
                 'end_date' => $end_date
             ]
         ]);
-        $responseObject = json_decode($response->getBody()->getContents(), True);
+        $responseObject = json_decode($response->getBody()->getContents(), true);
         return $responseObject;
     }
 
@@ -38,7 +41,7 @@ class RdrMetrics
             ]
         ]);
 
-        $responseObject = json_decode($response->getBody()->getContents(), True);
+        $responseObject = json_decode($response->getBody()->getContents(), true);
         return $responseObject;
     }
 
@@ -46,7 +49,7 @@ class RdrMetrics
     {
         $client = $this->rdrHelper->getClient();
         $response = $client->request('GET', 'rdr/v1/MetricsFields');
-        $responseObject = json_decode($response->getBody()->getContents(), True);
+        $responseObject = json_decode($response->getBody()->getContents(), true);
         return $responseObject;
     }
 }
