@@ -75,7 +75,7 @@ class MetricsCommand extends Command
         $stratification = $input->getOption('stratification');
         $centers = join(',', $input->getOption('centers'));
         $statuses = join(',', $input->getOption('statuses'));
-        $pretty = ($input->getOption('pretty') !== false) ? JSON_PRETTY_PRINT : false;
+        $pretty = ($input->getOption('pretty') !== false) ? JSON_PRETTY_PRINT : 0;
 
         // Validate stratification
         if (!in_array($stratification, self::STRATIFICATIONS)) {
