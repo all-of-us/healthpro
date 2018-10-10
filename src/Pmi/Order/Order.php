@@ -87,7 +87,6 @@ class Order
     ];
 
     public static $cancelReasons = [
-        '-- Select Cancel Reason --' => null,
         'Order created in error' => 'ORDER_CREATED_ERROR',
         'Order created for wrong participant' => 'ORDER_CREATED_WRONG_PARTICIPANT',
         'Error with label/label printing' => 'ERROR_LABEL_PRINTING',
@@ -96,7 +95,6 @@ class Order
     ];
 
     public static $unlockReasons = [
-        '-- Select Unlock Reason --' => null,
         'Add/Remove collected or processed samples' => 'ADD_REMOVE_SAMPLES',
         'Change collection or processing timestamps' => 'CHANGE_SAMPLES_TIMESTAMPS',
         'Change Tracking number' => 'CHANGE_TRACKING_NUMBER',
@@ -104,7 +102,6 @@ class Order
     ];
 
     public static $restoreReasons = [
-        '-- Select Restore Reason --' => null,
         'Order cancelled for wrong participant' => 'ORDER_CANCELLED_WRONG_PARTICIPANT',
         'Order can be amended versus cancelled' => 'ORDER_CAN_AMENDED_VERSUS_CANCELLED',
         'Other' => 'OTHER'
@@ -1119,6 +1116,7 @@ class Order
             'label' => 'Reason',
             'required' => true,
             'choices' => $reasons,
+            'placeholder' => '-- Select ' . ucfirst($type) . ' Reason --',
             'multiple' => false,
             'constraints' => new Constraints\NotBlank([
                 'message' => "Please select {$type} reason"

@@ -45,13 +45,11 @@ class Evaluation
     }
 
     public static $cancelReasons = [
-        '-- Select Cancel Reason --' => null,
         'Data entered for wrong participant' => 'DATA_ENTERED_WRONG_PARTICIPANT',
         'Other' => 'OTHER'
     ];
 
     public static $restoreReasons = [
-        '-- Select Restore Reason --' => null,
         'Physical Measurement cancelled for wrong participant' => 'PM_CANCELLED_WRONG_PARTICIPANT',
         'Physical Measurement can be amended versus cancelled' => 'PM_CAN_AMENDED_VERSUS_CANCELLED',
         'Other' => 'OTHER'
@@ -500,6 +498,7 @@ class Evaluation
             'label' => 'Reason',
             'required' => true,
             'choices' => $reasons,
+            'placeholder' => '-- Select ' . ucfirst($type) . ' Reason --',
             'multiple' => false,
             'constraints' => new Constraints\NotBlank([
                 'message' => "Please select {$type} reason"

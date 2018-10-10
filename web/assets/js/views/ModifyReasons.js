@@ -7,13 +7,12 @@ $(document).ready(function() {
     $('#form_other_text').hide();
 
     var selected = $( "#form_reason option:selected").val();
-    var other = $("#form_reason option:contains(Other)").val();
-    if (other === selected) {
+    if (selected === 'OTHER') {
         $('#form_other_text').show();
     }
 
     $('#form_reason').on('change', function () {
-        if ($(this).val() === other) {
+        if ($(this).val() === 'OTHER') {
             $('#form_other_text').show();
         } else {
             $('#form_other_text').hide();
