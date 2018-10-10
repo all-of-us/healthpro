@@ -18,5 +18,5 @@ $(document).ready(function() {
         } else {
             $('#form_other_text').hide();
         }
-    })
+    });
 });
