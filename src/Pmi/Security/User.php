@@ -16,7 +16,7 @@ class User implements UserInterface
     private $googleUser;
     private $groups;
     private $sites;
-    private $awardess;
+    private $awardees;
     private $dashboardAccess;
     private $adminAccess;
     private $info;

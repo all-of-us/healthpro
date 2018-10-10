@@ -23,7 +23,7 @@
     <br />
 
     <h3>In the past week has the participant donated blood (e.g. Blood Bank, Red Cross), platelets, or plasma?</h3>
-    <form method="post" action="{{ path('orderCreate', { participantId: participant.id }) }}" id="safety-checks">
+    <form method="post" action="{{ path('orderCreate', { participantId: participant.id }) }}" id="safety-checks" class="prevent-resubmit">
         <div class="radio">
             <label><input type="radio" name="donate" value="yes" /> Yes</label>
         </div>

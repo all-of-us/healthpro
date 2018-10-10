@@ -6,7 +6,7 @@
 {% block title %}Process - Order {{ order.order_id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'process' } %}
-    {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter' } }) }}
+    {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
         {{ form_errors(processForm) }}
         {% if processForm.processed_samples is defined %}
             <div class="form-group{% if not processForm.processed_samples.vars.valid %} has-error{% endif %}">
@@ -43,7 +43,7 @@
         </div>
         {{ form_rest(processForm) }}
 
-        {% if not order.finalized_ts and not order.expired %}
+        {% if not order.formDisabled %}
             <p>
                 <button type="submit" class="btn btn-primary">
                     {% if order.processed_ts %}
@@ -55,6 +55,11 @@
             </p>
         {% endif %}
     {{ form_end(processForm) }}
+    {% if order.status == 'unlock' %}
+        {{ form_start(revertForm, { 'action': path('orderRevert', { participantId: participant.id, orderId: order.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}
+        {{ form_errors(revertForm) }}
+        {{ form_end(revertForm) }}
+    {% endif %}
 {% endblock %}
 
 {% block pagejs %}

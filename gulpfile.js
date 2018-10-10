@@ -48,6 +48,7 @@ var cssnano = require('gulp-cssnano');
 var cssconcat = require('gulp-concat-css');
 var sourcemaps = require('gulp-sourcemaps');
 var merge = require('merge-stream');
+var browserSync = require('browser-sync').create();
 
 gulp.task('compile-js', function() {
     var destDir = ASSETS_DIR + '/dist/js';
@@ -109,4 +110,33 @@ gulp.task('watch', function() {
 gulp.task('default', gulp.series(
     'compile',
     'watch'
+));
+
+// initialize browser sync
+var initializeBrowser = function(done) {
+    var url = process.argv[4];
+    browserSync.init({
+        proxy: url
+    });
+    done();
+};
+
+// reload browser
+var reloadBrowser = function(done) {
+    browserSync.reload();
+    done();
+};
+
+// recompile and reload browser when files change
+var watchBroswerSync = function() {
+    gulp.watch(ASSETS.js, gulp.series('compile-js', reloadBrowser));
+    gulp.watch(ASSETS.csslocal, gulp.series('compile-css', reloadBrowser));
+};
+
+// custom task to compile everything, initialize browser sync and then start watching
+// example command to run the task "./bin/gulp browser-sync --option localhost:8080"
+gulp.task('browser-sync', gulp.series(
+    'compile',
+    gulp.parallel(initializeBrowser),
+    gulp.parallel(watchBroswerSync)
 ));

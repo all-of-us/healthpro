@@ -1,6 +1,6 @@
 # HealthPro Portal and Admin Dashboard
 
-![Build Status of master](https://circleci.com/gh/vanderbilt/pmi-drc-hpo.png?circle-token=17ce7a55825cb047e685c2376d7e33441a07c590)
+![Build Status of develop](https://circleci.com/gh/all-of-us/healthpro.png)
 
 ## Contributions
 
@@ -30,6 +30,10 @@ Install asset and Gulp dependencies via NPM:
 Initialize assets and recompile on the fly as assets change:
 
 `./bin/gulp`
+
+Initialize assets, recompile on the fly and reload the browser as assets change (Optional):
+
+`./bin/gulp browser-sync --option localhost:8080`
 
 Run local App Engine dev server:
 

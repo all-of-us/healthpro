@@ -185,6 +185,7 @@ class HpoApplication extends AbstractApplication
             . " 'unsafe-inline'" // for the places we are using inline JS
             . " www.google-analytics.com www.googletagmanager.com" // Google Analytics
             . " storage.googleapis.com" // for SOP PDFs stored in a Google Storage bucket
+            . " www.youtube.com" // for training videos hosted on YouTube
             . " cdn.plot.ly;" // allow plot.ly remote requests
             . " img-src www.google-analytics.com 'self' data:"; // allow Google Analytcs, self, and data: urls for img src
 
@@ -262,6 +263,15 @@ class HpoApplication extends AbstractApplication
         }
     }
 
+    public function getSiteIdWithPrefix()
+    {
+        if ($site = $this->getSite()) {
+            return \Pmi\Security\User::SITE_PREFIX . $site->id;
+        } else {
+            return null;
+        }
+    }
+
     public function getAwardeeId()
     {
         if ($awardee = $this->getAwardee()) {
@@ -304,6 +314,18 @@ class HpoApplication extends AbstractApplication
         } else {
             return $site['organization'];
         }
+    }
+
+    public function getSiteAwardee()
+    {
+        if ($this['isUnitTest']) {
+            return null;
+        }
+        $site = $this->getSiteEntity();
+        if (!$site || empty($site['awardee_id'])) {
+            return null;
+        }
+        return $site['awardee_id'];
     }
 
     public function getAwardeeOrganization()
@@ -515,5 +537,13 @@ class HpoApplication extends AbstractApplication
             return $user['email'];
         }
         return null;
+    }
+
+    /**
+     * Returns true for TEST site only in production
+     */
+    public function isTestSite()
+    {
+        return getenv('PMI_ENV') === self::ENV_PROD && $this->getSiteAwardee() === 'TEST';
     }
 }

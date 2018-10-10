@@ -9,8 +9,54 @@
     <div class="page-header">
         <h2><i class="fa fa-film" aria-hidden="true"></i> Training Videos</h2>
     </div>
-    <div class="alert alert-warning lead">
-        Coming soon
+
+    <div class="row">
+        <div class="col-sm-8 col-sm-push-4">
+            <div class="panel panel-default" id="video-panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title" id="video-title"></h3>
+                </div>
+                <div class="panel-body">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe id="video-embed" class="embed-responsive-item" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-sm-pull-8">
+            {% for group in videoGroups %}
+                <h4>{{ group.title }}</h4>
+                <div class="list-group">
+                    {% for chapter, video in group.videos %}
+                        {% if video.link is not empty %}
+                            <a href="#" class="list-group-item load-video" data-embed-src="{{ video.link }}">{{ chapter }}: {{ video.title }}</a>
+                        {% else %}
+                            <div class="list-group-item disabled">{{ chapter }}: {{ video.title }} <em><small>(Coming Soon!)</small></em></div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <br />
+            {% endfor %}
+        </div>
     </div>
     {% include 'help/footer.html.twig' %}
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    var loadVideo = function(src) {
+        $('#video-title').html(src.html());
+        $('iframe#video-embed').attr('src', src.data('embed-src') + '?modestbranding=1&rel=0');
+        $('a.load-video').removeClass('active');
+        src.addClass('active');
+    };
+    $('a.load-video').on('click', function() {
+        loadVideo($(this));
+        $('html').scrollTop($('#video-panel').offset().top);
+        return false;
+    });
+    loadVideo($('a.load-video:first'));
+});
+</script>
 {% endblock %}

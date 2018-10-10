@@ -26,7 +26,9 @@ class OrderController extends AbstractController
         ['orderFinalize', '/participant/{participantId}/order/{orderId}/finalize', ['method' => 'GET|POST']],
         ['orderPrintRequisition', '/participant/{participantId}/order/{orderId}/print/requisition'],
         ['orderJson', '/participant/{participantId}/order/{orderId}/order.json'],
-        ['orderExport', '/orders/export.csv']
+        ['orderExport', '/orders/export.csv'],
+        ['orderModify', '/participant/{participantId}/order/{orderId}/modify/{type}', ['method' => 'GET|POST']],
+        ['orderRevert', '/participant/{participantId}/order/{orderId}/revert', ['method' => 'POST']]
     ];
 
     protected function loadOrder($participantId, $orderId, Application $app)
@@ -36,7 +38,7 @@ class OrderController extends AbstractController
         if (!$order->isValid()) {
             $app->abort(404);
         }
-        if (!$order->getParticipant()->status) {
+        if (!$order->getParticipant()->status || $app->isTestSite()) {
             $app->abort(403);
         }
 
@@ -49,7 +51,7 @@ class OrderController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status) {
+        if (!$participant->status || $app->isTestSite()) {
             $app->abort(403);
         }
         return $app['twig']->render('order-check.html.twig', [
@@ -63,10 +65,7 @@ class OrderController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status) {
-            $app->abort(403);
-        }
-        if ($app->isDVType() && $request->request->has('saliva')) {
+        if (!$participant->status || $app->isTestSite() || ($app->isDVType() && $request->request->has('saliva'))) {
             $app->abort(403);
         }
         $showBloodTubes = false;
@@ -219,7 +218,7 @@ class OrderController extends AbstractController
     public function orderLabelsPdfAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+        if ($order->isOrderDisabled() || $order->isOrderUnlocked()) {
             $app->abort(403);
         }
         if (!in_array('printLabels', $order->getAvailableSteps())) {
@@ -228,11 +227,11 @@ class OrderController extends AbstractController
         if ($app->getConfig('ml_mock_order')) {
             return $app->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
         } else {
-            $pdf = $this->getLabelsPdf($participantId, $orderId, $app);
-            if ($pdf) {
-                return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+            $result = $this->getLabelsPdf($participantId, $orderId, $app);
+            if ($result['status'] === 'success') {
+                return new Response($result['pdf'], 200, array('Content-Type' => 'application/pdf'));
             } else {
-                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Labels pdf file could not be loaded</strong></body></html>';
+                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>' . $result['errorMessage'] . '</strong></body></html>';
                 return new Response($html, 200, array('Content-Type' => 'text/html'));
             }
         }
@@ -241,32 +240,30 @@ class OrderController extends AbstractController
     public function orderPrintLabelsAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+        if ($order->isOrderDisabled() || $order->isOrderUnlocked()) {
             $app->abort(403);
         }
         if (!in_array('printLabels', $order->getAvailableSteps())) {
             // 404 because print is not a valid route for kit orders regardless of state
             $app->abort(404);
         }
-        if (!$order->get('printed_ts') && $this->getLabelsPdf($participantId, $orderId, $app)) {
+        $result = $this->getLabelsPdf($participantId, $orderId, $app);
+        if (!$order->get('printed_ts') && $result['status'] === 'success') {
             $app->log(Log::ORDER_EDIT, $orderId);
             $app['em']->getRepository('orders')->update($orderId, [
                 'printed_ts' => new \DateTime()
             ]);
             $order = $this->loadOrder($participantId, $orderId, $app);
         }
+        $errorMessage = !empty($result['errorMessage']) ? $result['errorMessage'] : '';
         return $app['twig']->render('order-print-labels.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
-            'processTabClass' => $order->getProcessTabClass()
+            'processTabClass' => $order->getProcessTabClass(),
+            'errorMessage' => $errorMessage
         ]);
     }
 
-    /**
-     * Save order
-     * When send request is received, send order to mayo and redirect to Print Requisition tab on success
-     * Allow user to save collected_ts and notes fields when mayo_id is set
-     */
     public function orderCollectAction($participantId, $orderId, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
@@ -279,44 +276,23 @@ class OrderController extends AbstractController
         $collectForm = $order->createOrderForm('collected', $app['form.factory']);
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
-            if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+            if ($order->isOrderDisabled()) {
                 $app->abort(403);
             }
             if ($type = $order->checkIdentifiers($collectForm['collected_notes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collected_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
-
-            $orderData = $order->toArray();
-            // Throw error if collected_ts is empty for the order which is already sent to mayo
-            if (!empty($orderData['mayo_id']) && empty($collectForm['collected_ts']->getData())) {
-                $collectForm['collected_ts']->addError(new FormError('Collected time cannot be empty for the order which is already sent'));
-            }
             if ($collectForm->isValid()) {
-                // Check if mayo id is set
-                if (empty($orderData['mayo_id'])) {
-                    $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
+                $updateArray = $order->getOrderUpdateFromForm('collected', $collectForm);
+                if (!$order->isOrderUnlocked()) {
                     $updateArray['collected_user_id'] = $app->getUser()->getId();
                     $updateArray['collected_site'] = $app->getSiteId();
-                    // Save order
-                    if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                        $app->log(Log::ORDER_EDIT, $orderId);
-                        $successMsg = 'Order collection updated';
-                    }
-                } else {
-                    // Save collected time and notes only
-                    $collectedAt = $collectForm['collected_ts']->getData();
-                    $notes = $collectForm['collected_notes']->getData();
-                     if ($app['em']->getRepository('orders')->update($orderId, ['collected_ts' => $collectedAt, 'collected_notes' => $notes])) {
-                        $app->log(Log::ORDER_EDIT, $orderId);
-                        $successMsg = 'Order collection updated';
-                    }
                 }
-                if (!empty($successMsg)) {
-                    $app->addFlashNotice($successMsg);
-                }
-                if (!empty($errorMsg)) {
-                    $app->addFlashError($errorMsg);
+                // Save order
+                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                    $app->log(Log::ORDER_EDIT, $orderId);
+                    $app->addFlashNotice('Order collection updated');
                 }
                 return $app->redirectToRoute('orderCollect', [
                     'participantId' => $participantId,
@@ -332,7 +308,8 @@ class OrderController extends AbstractController
             'collectForm' => $collectForm->createView(),
             'samplesInfo' => $order->samplesInformation,
             'version' => $order->version,
-            'processTabClass' => $order->getProcessTabClass()
+            'processTabClass' => $order->getProcessTabClass(),
+            'revertForm' => $order->getOrderRevertForm()->createView()
         ]);
     }
 
@@ -348,7 +325,7 @@ class OrderController extends AbstractController
         $processForm = $order->createOrderForm('processed', $app['form.factory']);
         $processForm->handleRequest($request);
         if ($processForm->isSubmitted()) {
-            if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+            if ($order->isOrderDisabled()) {
                 $app->abort(403);
             }
             if ($processForm->has('processed_samples')) {
@@ -376,8 +353,10 @@ class OrderController extends AbstractController
                         $updateArray['processed_ts'] = $processedTs;
                     }
                 }
-                $updateArray['processed_user_id'] = $app->getUser()->getId();
-                $updateArray['processed_site'] = $app->getSiteId();
+                if (!$order->isOrderUnlocked()) {
+                    $updateArray['processed_user_id'] = $app->getUser()->getId();
+                    $updateArray['processed_site'] = $app->getSiteId();
+                }
                 if ($order->get('type') !== 'saliva') {
                     $site = $app['em']->getRepository('sites')->fetchOneBy([
                         'google_group' => $app->getSiteId()
@@ -391,7 +370,6 @@ class OrderController extends AbstractController
                 if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                     $app->log(Log::ORDER_EDIT, $orderId);
                     $app->addFlashNotice('Order processing updated');
-
                     return $app->redirectToRoute('orderProcess', [
                         'participantId' => $participantId,
                         'orderId' => $orderId
@@ -407,7 +385,8 @@ class OrderController extends AbstractController
             'processForm' => $processForm->createView(),
             'samplesInfo' => $order->samplesInformation,
             'version' => $order->version,
-            'processTabClass' => $order->getProcessTabClass()
+            'processTabClass' => $order->getProcessTabClass(),
+            'revertForm' => $order->getOrderRevertForm()->createView()
         ]);
     }
 
@@ -424,67 +403,80 @@ class OrderController extends AbstractController
         $finalizeForm = $order->createOrderForm('finalized', $app['form.factory']);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {
-            if ($order->get('finalized_ts') || $order->isOrderExpired()) {
+            if ($order->isOrderDisabled()) {
                 $app->abort(403);
             }
-            $errors = $order->getErrors();
-            if (!empty($errors)) {
-                foreach ($errors as $error) {
-                    $finalizeForm['finalized_samples']->addError(new FormError($error));
+            if (!$order->isOrderFormDisabled()) {
+                // Check empty samples
+                if (empty($finalizeForm['finalized_samples']->getData())) {
+                    $finalizeForm['finalized_samples']->addError(new FormError('Please select at least one sample'));
                 }
-            }
-            if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
-                $label = Order::$identifierLabel[$type[0]];
-                $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
-            }
-            if ($order->get('type') === 'kit' && $finalizeForm->has('fedex_tracking') && !empty($finalizeForm['fedex_tracking']->getData())) {
-                $duplicateFedexTracking = $app['em']->getRepository('orders')->fetchBySql('fedex_tracking = ? and id != ?', [
-                    $finalizeForm['fedex_tracking']->getData(),
-                    $orderId
-                ]);
-                if ($duplicateFedexTracking) {
-                    $finalizeForm['fedex_tracking']['first']->addError(new FormError('This tracking number has already been used for another order.'));
-                }
-            }
-            if ($finalizeForm->isValid()) {
-                $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
-                $updateArray['finalized_user_id'] = $app->getUser()->getId();
-                $updateArray['finalized_site'] = $app->getSiteId();
-
-                // Unset finalized_ts for all types of orders
-                unset($updateArray['finalized_ts']);
-
-                // Finalized time will not be saved at this point
-                if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                    $app->log(Log::ORDER_EDIT, $orderId);
-                }
-                $orderData = $order->toArray();
-                if (empty($orderData['mayo_id']) && !empty($finalizeForm['finalized_ts']->getData())) {
-                    // Check for empty finalized samples
-                    if (!empty($finalizeForm['finalized_samples']->getData())) {
-                        //Send order to mayo
-                        $mayoId = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
-                        if (!empty($mayoId)) {
-                            //Save mayo id and finalized time
-                            $newUpdateArray = [
-                                'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
-                                'mayo_id' => $mayoId
-                            ];
-                            $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
-                        } else {
-                            $app->addFlashError('An error occurred while attempting to send this order. Please try again.');
-                        }
-                    } else {
-                        //Save finalized time
-                        $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()]);
-                        $app->addFlashSuccess('Order finalized');
+                $errors = $order->getErrors();
+                // Check sample errors
+                if (!empty($errors)) {
+                    foreach ($errors as $error) {
+                        $finalizeForm['finalized_samples']->addError(new FormError($error));
                     }
                 }
+                // Check identifiers in notes
+                if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
+                    $label = Order::$identifierLabel[$type[0]];
+                    $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+                }
+                if ($order->get('type') === 'kit' && $finalizeForm->has('fedex_tracking') && !empty($finalizeForm['fedex_tracking']->getData())) {
+                    $duplicateFedexTracking = $app['em']->getRepository('orders')->fetchBySql('fedex_tracking = ? and id != ?', [
+                        $finalizeForm['fedex_tracking']->getData(),
+                        $orderId
+                    ]);
+                    if ($duplicateFedexTracking) {
+                        $finalizeForm['fedex_tracking']['first']->addError(new FormError('This tracking number has already been used for another order.'));
+                    }
+                }
+                if ($finalizeForm->isValid()) {
+                    $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
+                    if (!$order->isOrderUnlocked()) {
+                        $updateArray['finalized_user_id'] = $app->getUser()->getId();
+                        $updateArray['finalized_site'] = $app->getSiteId();
+                    }
+                    // Unset finalized_ts for all types of orders
+                    unset($updateArray['finalized_ts']);
+                    // Finalized time will not be saved at this point
+                    if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                        $app->log(Log::ORDER_EDIT, $orderId);
+                    }
+                    if (!empty($finalizeForm['finalized_ts']->getData()) || $order->isOrderUnlocked()) {
+                        //Send order to mayo if mayo id is empty
+                        if (empty($order->get('mayo_id'))) {
+                            $result = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                            if ($result['status'] === 'success' && !empty($result['mayoId'])) {
+                                //Save mayo id and finalized time
+                                $newUpdateArray = [
+                                    'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
+                                    'mayo_id' => $result['mayoId']
+                                ];
+                                $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
+                            } else {
+                                $app->addFlashError($result['errorMessage']);
+                            }
+                        } else {
+                            // Save finalized time
+                            $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()]);
+                        }
+                    }
+                    $sendToRdr = true;
+                } else {
+                    $finalizeForm->addError(new FormError('Please correct the errors below'));
+                }
+            }
+            if (!empty($sendToRdr) || $order->isOrderFormDisabled()) {
                 $order = $this->loadOrder($participantId, $orderId, $app);
                 //Send order to RDR if finalized_ts and mayo_id exists
                 if (!empty($order->get('finalized_ts')) && !empty($order->get('mayo_id'))) {
-                    $order->sendToRdr();
-                    $app->addFlashSuccess('Order finalized');
+                    if ($order->sendToRdr()) {
+                        $app->addFlashSuccess('Order finalized');
+                    } else {
+                        $app->addFlashError('Failed to finalize the order. Please try again.');
+                    }
                 } elseif (empty($finalizeForm['finalized_ts']->getData())) {
                     $app->addFlashNotice('Order updated but not finalized');
                 }
@@ -492,8 +484,6 @@ class OrderController extends AbstractController
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
-            } else {
-                $finalizeForm->addError(new FormError('Please correct the errors below'));
             }
         }
         $hasErrors = !empty($order->getErrors()) ? true : false;
@@ -504,13 +494,17 @@ class OrderController extends AbstractController
             'samplesInfo' => $order->samplesInformation,
             'version' => $order->version,
             'hasErrors' => $hasErrors,
-            'processTabClass' => $order->getProcessTabClass()
+            'processTabClass' => $order->getProcessTabClass(),
+            'revertForm' => $order->getOrderRevertForm()->createView()
         ]);
     }
 
     public function orderPrintRequisitionAction($participantId, $orderId, Application $app)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
+        if ($order->isOrderCancelled()) {
+            $app->abort(403);
+        }
         if ($app->isDVType() && !in_array('printRequisition', $order->getAvailableSteps())) {
             // 404 because print is not a valid route for kit orders regardless of state
             $app->abort(404);
@@ -527,6 +521,31 @@ class OrderController extends AbstractController
             'order' => $order->toArray(),
             'processTabClass' => $order->getProcessTabClass()
         ]);
+    }
+
+    public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id')) || $order->isOrderCancelled() || $order->isOrderUnlocked()) {
+            $app->abort(403);
+        }
+        if (!in_array('printRequisition', $order->getAvailableSteps())) {
+            $app->abort(404);
+        }
+        if ($app->getConfig('ml_mock_order')) {
+            return $app->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
+        } else {
+            if ($order->get('mayo_id')) {
+                $mlOrder = new MayolinkOrder($app);
+                $pdf = $mlOrder->getRequisitionPdf($order->get('mayo_id'));
+            }
+            if (!empty($pdf)) {
+                return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+            } else {
+                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Requisition pdf file could not be loaded</strong></body></html>';
+                return new Response($html, 200, array('Content-Type' => 'text/html'));
+            }
+        }
     }
 
     /* For debugging generated JSON representation - only allowed in local dev */
@@ -592,47 +611,102 @@ class OrderController extends AbstractController
         ]);
     }
 
-    public function orderRequisitionPdfAction($participantId, $orderId, Application $app, Request $request)
+    public function orderModifyAction($participantId, $orderId, $type, Application $app, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId, $app);
-        if (empty($order->get('finalized_ts')) || empty($order->get('mayo_id'))) {
-            $app->abort(403);
-        }
-        if (!in_array('printRequisition', $order->getAvailableSteps())) {
+        // Allow cancel for active and restored orders
+        // Allow restore for only canceled orders
+        // Allow unlock for active, restored and edited orders
+        if (!in_array($type, [$order::ORDER_CANCEL, $order::ORDER_RESTORE, $order::ORDER_UNLOCK])) {
             $app->abort(404);
         }
-        if ($app->getConfig('ml_mock_order')) {
-            return $app->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
-        } else {
-            if ($order->get('mayo_id')) {
-                $mlOrder = new MayolinkOrder($app);
-                $pdf = $mlOrder->getRequisitionPdf($order->get('mayo_id'));
+        if (($type === $order::ORDER_CANCEL && !$order->canCancel())
+            || ($type === $order::ORDER_RESTORE && !$order->canRestore())
+            || ($type === $order::ORDER_UNLOCK && !$order->canUnlock())) {
+            $app->abort(403);
+        }
+        $orders = $order->getParticipantOrdersWithHistory($participantId);
+        $orderModifyForm = $order->getOrderModifyForm($type);
+        $orderModifyForm->handleRequest($request);
+        if ($orderModifyForm->isSubmitted()) {
+            $orderModifyData = $orderModifyForm->getData();
+            if ($type === $order::ORDER_CANCEL && strtolower($orderModifyData['confirm']) !== $order::ORDER_CANCEL) {
+                $orderModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
             }
-            if (!empty($pdf)) {
-                return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+            if ($orderModifyForm->isValid()) {
+                $status = true;
+                // Cancel/Restore order in RDR if exists
+                if (!empty($order->get('rdr_id')) && ($type === $order::ORDER_CANCEL || $type === $order::ORDER_RESTORE)) {
+                    $status = $order->cancelRestoreRdrOrder($type, $orderModifyData['reason']);
+                }
+                // Create order history
+                if ($status && $order->createOrderHistory($type, $orderModifyData['reason'])) {
+                    $app->addFlashSuccess("Order {$type}ed");
+                    if ($type === $order::ORDER_UNLOCK && $request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
+                        return $app->redirect($request->query->get('return'));
+                    } else {
+                        return $app->redirectToRoute('participant', [
+                            'id' => $participantId
+                        ]);
+                    }
+                } else {
+                    $app->addFlashError("Failed to {$type} order. Please try again.");
+                }
             } else {
-                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Requisition pdf file could not be loaded</strong></body></html>';
-                return new Response($html, 200, array('Content-Type' => 'text/html'));
+                $app->addFlashError('Please correct the errors below');
             }
         }
+        return $app['twig']->render('order-modify.html.twig', [
+            'participant' => $order->getParticipant(),
+            'order' => $order->toArray(),
+            'samplesInfo' => $order->getSamplesInfo(),
+            'orders' => $orders,
+            'orderId' => $orderId,
+            'orderModifyForm' => $orderModifyForm->createView(),
+            'type' => $type
+        ]);
+    }
+
+    public function orderRevertAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        if ($order->isOrderDisabled() || !$order->isOrderUnlocked()) {
+            $app->abort(403);
+        }
+        $orderRevertForm = $order->getOrderRevertForm();
+        $orderRevertForm->handleRequest($request);
+        if ($orderRevertForm->isSubmitted() && $orderRevertForm->isValid()) {
+            // Revert Order
+            if ($order->revertOrder($participantId)) {
+                $app->addFlashNotice('Order reverted');
+            } else {
+                $app->addFlashError('Failed to revert order. Please try again.');
+            }
+        }
+        return $app->redirectToRoute('order', [
+            'participantId' => $participantId,
+            'orderId' => $orderId
+        ]);
     }
 
     public function getLabelsPdf($participantId, $orderId, $app)
     {
+        // Always return true for mock orders
         if ($app->getConfig('ml_mock_order')) {
-            return true;
-        } else {
-            $mlOrder = new MayolinkOrder($app);
-            $participant = $app['pmi.drc.participants']->getById($participantId);
-            $order = $this->loadOrder($participantId, $orderId, $app);
-            $orderData = $order->toArray();
-            // set collected time to created date at midnight local time
-            $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
-            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
-                $mayoClientId = $site['mayolink_account'];
-            } else {
-                $mayoClientId = null;
-            }
+            return ['status' => 'success'];
+        }
+        $result = ['status' => 'fail'];
+        $mlOrder = new MayolinkOrder($app);
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        $orderData = $order->toArray();
+        // Set collected time to created date at midnight local time
+        $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
+        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+            $mayoClientId = $site['mayolink_account'];
+        }
+        // Check if mayo account number exists
+        if (!empty($mayoClientId)) {
             $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
             if ($birthDate) {
                 $birthDate = $birthDate->format('Y-m-d');
@@ -652,25 +726,35 @@ class OrderController extends AbstractController
                 'salivaTests' => $order->salivaSamplesInformation
             ];
             $pdf = $mlOrder->getLabelsPdf($options);
-            return $pdf;
+            if (!empty($pdf)) {
+                $result['status'] = 'success';
+                $result['pdf'] = $pdf;
+            } else {
+                $result['errorMessage'] = 'Error loading print labels.';
+            }         
+        } else {
+            $result['errorMessage'] = 'Mayo account number is not set for this site. Please contact the administrator.';
         }
+        return $result;
     }
 
     public function sendOrderToMayo($participantId, $orderId, $app, $type = 'collected')
     {
-        $order = $this->loadOrder($participantId, $orderId, $app);
+        // Return mock id for mock orders
         if ($app->getConfig('ml_mock_order')) {
-            $mayoId = $app->getConfig('ml_mock_order');
-        } else {
-            // Set collected time to user local time
-            $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
-            $orderData = $order->toArray();
-            $participant = $app['pmi.drc.participants']->getById($participantId);
-            if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
-                $mayoClientId = $site['mayolink_account'];
-            } else {
-                $mayoClientId = null;
-            }
+            return ['status' => 'success', 'mayoId' => $app->getConfig('ml_mock_order')];
+        }
+        $result = ['status' => 'fail'];
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        // Set collected time to user local time
+        $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
+        $orderData = $order->toArray();
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+            $mayoClientId = $site['mayolink_account'];
+        }
+        // Check if mayo account number exists
+        if (!empty($mayoClientId)) {
             $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
             if ($birthDate) {
                 $birthDate = $birthDate->format('Y-m-d');
@@ -692,7 +776,15 @@ class OrderController extends AbstractController
             ];
             $mayoOrder = new MayolinkOrder($app);
             $mayoId = $mayoOrder->createOrder($options);
+            if (!empty($mayoId)) {
+                $result['status'] = 'success';
+                $result['mayoId'] = $mayoId;
+            } else {
+                $result['errorMessage'] = 'An error occurred while attempting to send this order. Please try again.';
+            }
+        } else {
+            $result['errorMessage'] = 'Mayo account number is not set for this site. Please contact the administrator.';
         }
-        return $mayoId;     
+        return $result;
     }
 }

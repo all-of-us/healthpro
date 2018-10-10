@@ -2,7 +2,9 @@
 namespace Pmi\Drc;
 
 use Pmi\Entities\Participant;
+use Pmi\Evaluation\Evaluation;
 use Ramsey\Uuid\Uuid;
+use Pmi\Order\Order;
 
 class RdrParticipants
 {
@@ -12,6 +14,12 @@ class RdrParticipants
     protected static $resourceEndpoint = 'rdr/v1/';
     protected $nextToken;
     protected $total;
+
+    const EVALUATION_CANCEL_STATUS = 'cancelled';
+    const EVALUATION_RESTORE_STATUS = 'restored';
+    const CANCEL_STATUS = 'CANCELLED';
+    const RESTORE_STATUS = 'UNSET';
+    const EDIT_STATUS = 'AMENDED';
 
     public function __construct(RdrHelper $rdrHelper)
     {
@@ -237,6 +245,24 @@ class RdrParticipants
         return false;
     }
 
+    public function cancelRestoreEvaluation($type, $participantId, $evaluationId, $evaluation)
+    {
+        try {
+            $response = $this->getClient()->request('PATCH', "Participant/{$participantId}/PhysicalMeasurements/{$evaluationId}", [
+                'json' => $evaluation
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            $rdrStatus = $type === Evaluation::EVALUATION_CANCEL ? self::EVALUATION_CANCEL_STATUS : self::EVALUATION_RESTORE_STATUS;
+            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
+
     public function getOrder($participantId, $orderId)
     {
         try {
@@ -261,6 +287,45 @@ class RdrParticipants
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result->id;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function cancelRestoreOrder($type, $participantId, $orderId, $order)
+    {
+        try {
+            $result = $this->getOrder($participantId, $orderId);
+            $response = $this->getClient()->request('PATCH', "Participant/{$participantId}/BiobankOrder/{$orderId}", [
+                'json' => $order,
+                'headers' => ['If-Match' => $result->meta->versionId]
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            $rdrStatus = $type === Order::ORDER_CANCEL ? self::CANCEL_STATUS : self::RESTORE_STATUS;
+            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function editOrder($participantId, $orderId, $order)
+    {
+        try {
+            $result = $this->getOrder($participantId, $orderId);
+            $response = $this->getClient()->request('PUT', "Participant/{$participantId}/BiobankOrder/{$orderId}", [
+                'json' => $order,
+                'headers' => ['If-Match' => $result->meta->versionId]
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->status) && $result->status === self::EDIT_STATUS) {
+                return true;
             }
         } catch (\Exception $e) {
             $this->rdrHelper->logException($e);

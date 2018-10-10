@@ -58,8 +58,8 @@ class HelpController extends AbstractController
                     'filename' => 'SOP-007 HPO Saliva Oragene Collection.pdf'
                 ],
                 'SOP-009' => [
-                    'title' => 'SOP-009 HPO Packaging and Shipping PMI Specimens',
-                    'filename' => 'SOP-009 HPO Packaging and Shipping PMI Specimens.pdf'
+                    'title' => 'SOP-009 HPO Preparing Biobank Orders for Courier Pick-up',
+                    'filename' => 'SOP-009 HPO Preparing Biobank Orders for Courier Pick-up.pdf'
                 ],
                 'SOP-010' => [
                     'title' => 'SOP-010 HPO Ordering Supplies from MML',
@@ -68,6 +68,10 @@ class HelpController extends AbstractController
                 'SOP-018' => [
                     'title' => 'SOP-018 HPO Specimen Rejection Criteria',
                     'filename' => 'SOP-018 HPO Specimen Rejection Criteria.pdf'
+                ],
+                'SOP-020' => [
+                    'title' => 'SOP-020 HPO Biobank Order Downtime Procedure',
+                    'filename' => 'SOP-020 HPO Biobank Order Downtime Procedure.pdf'
                 ],
                 'CHANGES-20170412-HPO' => [
                     'download' => true,
@@ -99,10 +103,63 @@ class HelpController extends AbstractController
                     'title' => 'SOP-019 DV Specimen Rejection Criteria',
                     'filename' => 'SOP-019 DV Specimen Rejection Criteria.pdf'
                 ],
+                'SOP-021' => [
+                    'title' => 'SOP-021 DV Biobank Order Downtime Procedure',
+                    'filename' => 'SOP-021 DV Biobank Order Downtime Procedure.pdf'
+                ],
                 'CHANGES-20170412-DV' => [
                     'download' => true,
                     'title' => 'DV SOP Changes Presentation 04-12-2017',
                     'filename' => 'DV SOP Changes Presentation 04-12-2017.pptx'
+                ]
+            ]
+        ]
+    ];
+
+    private static $videoGroups = [
+        [
+            'title' => 'Biobank Video Tutorials for Healthcare Provider Organizations (HPO)',
+            'videos' => [
+                'Chapter 1' => [
+                    'title' => 'HPO Creating an Order',
+                    'link' => ''
+                ],
+                'Chapter 3' => [
+                    'title' => 'HPO Blood Collection',
+                    'link' => ''
+                ],
+                'Chapter 5' => [
+                    'title' => 'HPO Urine Collection',
+                    'link' => 'https://www.youtube.com/embed/ANJs1_A_zLs'
+                ],
+                'Chapter 7' => [
+                    'title' => 'HPO Saliva Collection',
+                    'link' => 'https://www.youtube.com/embed/0WeQCxetXQk'
+                ],
+                'Chapter 9' => [
+                    'title' => 'HPO Ordering Supplies from MML',
+                    'link' => 'https://www.youtube.com/embed/6P4nuWNOAQA'
+                ]
+            ]
+        ],
+        [
+            'title' => 'Biobank Video Tutorials for Direct Volunteers (DV)',
+            'videos' => [
+                'Chapter 2' => [
+                    'title' => 'DV Registering a KIT',
+                    'link' => 'https://www.youtube.com/embed/X9E6u44w8Ks'
+                ],
+                'Chapter 4' => [
+                    'title' => 'DV Blood Collection & Processing',
+                    'link' => 'https://www.youtube.com/embed/pNSndLIIHQA'
+                ],
+                'Chapter 6' => [
+                    'title' => 'DV Urine Collection',
+                    'link' => 'https://www.youtube.com/embed/wVcFsCiyqtA'
+                ],
+                'Chapter 10' => [
+                    'title' => 'DV Packaging & Shipping Specimens',
+                    'link' => 'https://www.youtube.com/embed/yAHGK979kJ0'
                 ]
             ]
         ]
@@ -130,7 +187,9 @@ class HelpController extends AbstractController
 
     public function videosAction(Application $app)
     {
-        return $app['twig']->render('help/videos.html.twig');
+        return $app['twig']->render('help/videos.html.twig', [
+            'videoGroups' => self::$videoGroups
+        ]);
     }
 
     public function faqAction(Application $app)
