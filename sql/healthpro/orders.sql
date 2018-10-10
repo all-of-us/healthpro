@@ -34,5 +34,6 @@ CREATE TABLE `orders` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_id` (`order_id`),
   KEY `participant_id` (`participant_id`),
-  KEY `mayo_id` (`mayo_id`)
+  KEY `mayo_id` (`mayo_id`),
+  KEY `history_id` (`history_id`)
 ) DEFAULT CHARSET=utf8mb4;

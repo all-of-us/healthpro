@@ -310,6 +310,12 @@ table.table-samples td {
     font-size:12px;
 }
 
+.eval-revert-form {
+    float: right;
+    margin-top: -44px;
+    margin-right: 142px;
+}
+
 .revert-form {
     float: right;
     margin-top: -44px;

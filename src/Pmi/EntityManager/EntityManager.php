@@ -19,6 +19,7 @@ class EntityManager
         'organizations' => 'doctrine',
         'awardees' => 'doctrine',
         'missing_notifications_log' => 'doctrine',
+        'evaluations_history' => 'doctrine',
         'orders_history' => 'doctrine'
     ];
 

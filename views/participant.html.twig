@@ -106,43 +106,7 @@
                 {% if participant.status and not app.isTestSite %}
                     <div class="row">
                         <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h3>
-                                </div>
-                                <div class="panel-body">
-                                    {% for evaluation in evaluations %}
-                                        {% if loop.index == 6 %}
-                                            <div id="evaluation-overflow">
-                                        {% endif %}
-                                        <a href="{{ path('evaluation', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg btn-default">
-                                            {{ evaluation.created_ts|date('D n/j/Y', app.userTimezone) }}<br />
-                                            <small class="text-muted">
-                                                {% if evaluation.finalized_ts %}
-                                                    <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                {% else %}
-                                                    <span class="label label-default">Updated</span> {{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                {% endif %}
-                                            </small>
-                                        </a>
-                                    {% endfor %}
-                                    {% if evaluations|length > 5 %}
-                                        </div> {# close .evaluation-overflow div above #}
-                                        <a href="#" class="btn btn-block btn-lg btn-default" id="evaluation-overflow-show">
-                                            <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
-                                        </a>
-                                    {% endif %}
-                                    <a href="{{ path('evaluation', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
-                                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                                        {% if evaluations|length > 0 %}
-                                            New
-                                        {% else %}
-                                            Start
-                                        {% endif %}
-                                        Physical Measurements
-                                    </a>
-                                </div>
-                            </div>
+                            {% include 'partials/participant-evaluation-list.html.twig' %}
                         </div>
 
                         <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">

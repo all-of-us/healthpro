@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Controller;
 
+use Pmi\Evaluation\Evaluation;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -357,12 +358,12 @@ class DefaultController extends AbstractController
                 'organization' => $participant->hpoId
             ]);
         }
+        $evaluationService = new Evaluation($app);
+        $evaluations = $evaluationService->getEvaluationsWithHistory($id);
+
         $order = new Order($app);
         $orders = $order->getParticipantOrdersWithHistory($id);
-        $evaluations = $app['em']->getRepository('evaluations')->fetchBy(
-            ['participant_id' => $id],
-            ['updated_ts' => 'DESC', 'id' => 'DESC']
-        );
+
         $query = "SELECT p.id, p.updated_ts, p.finalized_ts, MAX(pc.created_ts) as last_comment_ts, count(pc.comment) as comment_count FROM problems p LEFT JOIN problem_comments pc on p.id = pc.problem_id WHERE p.participant_id = ? GROUP BY p.id ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC";
         $problems = $app['db']->fetchAll($query, [$id]);
         if (empty($participant->cacheTime)) {

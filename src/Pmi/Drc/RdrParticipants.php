@@ -2,6 +2,7 @@
 namespace Pmi\Drc;
 
 use Pmi\Entities\Participant;
+use Pmi\Evaluation\Evaluation;
 use Ramsey\Uuid\Uuid;
 use Pmi\Order\Order;
 
@@ -14,6 +15,8 @@ class RdrParticipants
     protected $nextToken;
     protected $total;
 
+    const EVALUATION_CANCEL_STATUS = 'cancelled';
+    const EVALUATION_RESTORE_STATUS = 'restored';
     const CANCEL_STATUS = 'CANCELLED';
     const RESTORE_STATUS = 'UNSET';
     const EDIT_STATUS = 'AMENDED';
@@ -234,6 +237,24 @@ class RdrParticipants
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result->id;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function cancelRestoreEvaluation($type, $participantId, $evaluationId, $evaluation)
+    {
+        try {
+            $response = $this->getClient()->request('PATCH', "Participant/{$participantId}/PhysicalMeasurements/{$evaluationId}", [
+                'json' => $evaluation
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            $rdrStatus = $type === Evaluation::EVALUATION_CANCEL ? self::EVALUATION_CANCEL_STATUS : self::EVALUATION_RESTORE_STATUS;
+            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+                return true;
             }
         } catch (\Exception $e) {
             $this->rdrHelper->logException($e);

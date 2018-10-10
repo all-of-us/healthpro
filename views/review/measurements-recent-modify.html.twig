@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Orders Recent Modify - Participant Review - {% endblock %}
+{% block title %}Measurements - Participant Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 
 {% macro displayDate(order, dateType) %}
@@ -20,55 +20,48 @@
         <li role="presentation"><a href="{{ path('review_today') }}">Today's Participants</a></li>
         <li role="presentation"><a href="{{ path('review_orders') }}">Unfinalized Biobank Orders</a></li>
         <li role="presentation"><a href="{{ path('review_measurements') }}">Unfinalized Physical Measurements</a></li>
-        <li role="presentation" class="active"><a href="#">Recently Modified Biobank Orders</a></li>
-        <li role="presentation"><a href="{{ path('review_measurementsRecentModify') }}">Recently Modified Physical Measurements</a></li>
+        <li role="presentation"><a href="{{ path('review_ordersRecentModify') }}">Recently Modified Biobank Orders</a></li>
+        <li role="presentation" class="active"><a href="{{ path('review_measurementsRecentModify') }}">Recently Modified Physical Measurements</a></li>
     </ul>
-    <br/>
+    <br />
     <div class="container">
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
-                <th>Order ID</th>
+                <th>Participant ID</th>
                 <th>Created</th>
-                <th>Collected</th>
-                <th>Processed</th>
                 <th>Finalized</th>
                 <th>Modified</th>
                 <th>Status</th>
             </tr>
+            </tr>
             </thead>
             <tbody>
-            {% for order in orders %}
+            {% for measurement in measurements %}
                 <tr>
                     <td>
-                        <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.order_id }}</a>
+                        <a href="{{ path('evaluation', { participantId: measurement.participant_id, evalId: measurement.id }) }}">{{ measurement.participant_id }}</a>
                     </td>
                     <td>
-                        {{ today.displayDate(order, 'created_ts') }}
+                        {{ today.displayDate(measurement, 'created_ts') }}
                     </td>
                     <td>
-                        {{ today.displayDate(order, 'collected_ts') }}
-                    </td>
-                    <td>
-                        {{ today.displayDate(order, 'processed_ts') }}
-                    </td>
-                    <td>
-                        {% if order.oh_type != 'unlock' %}
-                            {{ today.displayDate(order, 'finalized_ts') }}
+                        {% if measurement.rdr_id is not empty %}
+                            {{ today.displayDate(measurement, 'finalized_ts') }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
                     </td>
                     <td>
-                        {{ today.displayDate(order, 'oh_created_ts') }}
+                        {{ today.displayDate(measurement, 'modified_ts') }}
                     </td>
                     <td align="center">
-                        {% if order.oh_type == 'edit' %}
-                            <span class="label label-success">Edited &amp; Finalized</span>
-                        {% elseif order.oh_type == 'cancel' %}
+                        {% if measurement.eh_type == 'cancel' %}
                             <span class="label label-danger">Cancelled</span>
-                        {% elseif order.oh_type == 'unlock'%}
-                            <span class="label label-primary">Unlocked</span>
+                        {% elseif measurement.finalized_ts is empty or (measurement.finalized_ts is not empty and measurement.rdr_id is empty) %}
+                            <span class="label label-warning">Edited &amp; Unfinalized</span>
+                        {% elseif measurement.rdr_id is not empty %}
+                            <span class="label label-success">Edited &amp; Finalized</span>
                         {% endif %}
                     </td>
                 </tr>
