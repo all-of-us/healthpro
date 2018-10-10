@@ -103,7 +103,8 @@ class WorkQueue
             'options' => [
                 'Consented' => 'SUBMITTED',
                 'Refused consent' => 'SUBMITTED_NO_CONSENT',
-                'Consent not completed' => 'UNSET'
+                'Consent not completed' => 'UNSET',
+                'Invalid' => 'SUBMITTED_INVALID'
             ]
         ],
         'ageRange' => [
