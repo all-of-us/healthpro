@@ -31,7 +31,7 @@
             <label><input type="radio" name="donate" value="no" /> No</label>
         </div>
 
-        <div style="display:none" id="transfusion">
+        <div id="transfusion">
             <h3>In the past 6 months, has the participant had a blood transfusion?</h3>
             <div class="radio">
                 <label><input type="radio" name="transfusion" value="yes" /> Yes</label>
@@ -42,36 +42,65 @@
             <div style="display:none" id="transfusion-qn">
                 <h3>Please select the specific type of blood transfusion (check boxes for responses):</h3>
                 <div class="checkbox">
-                    <label><input type="checkbox" name="transfusion_whole_blood" value="whole" /> Whole blood transfusion</label>
+                    <label><input type="checkbox" name="transfusion_wb" value="whole" /> Whole blood transfusion</label>
                 </div>
                 <div class="checkbox">
-                    <label><input type="checkbox" name="transfusion_red_blood" value="red" /> Red Blood Cells (RBC), Plasma, Platelet, or Cryoprecipitate transfusion</label>
+                    <label><input type="checkbox" name="transfusion_rbc" value="red" /> Red Blood Cells (RBC)</label>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="transfusion_ppc" value="red" /> Plasma, Platelet, or Cryoprecipitate transfusion</label>
                 </div>
             </div>
-            <div style="display:none" id="red-blood-qn">
+            <div style="display:none" id="rbc-qn">
                 <h3>Has it been at least 2 months since participant's RBC transfusion? Or, has it been at least a week since the participant completed Plasma, Platelet, or Cryoprecipitate transfusion?</h3>
                 <div class="radio">
-                    <label><input type="radio" name="red_blood_qn" value="yes" /> Yes</label>
+                    <label><input type="radio" name="rbc_qn" value="yes" /> Yes</label>
                 </div>
                 <div class="radio">
-                    <label><input type="radio" name="red_blood_qn" value="no" /> No</label>
+                    <label><input type="radio" name="rbc_qn" value="no" /> No</label>
+                </div>
+            </div>
+            <div style="display:none" id="ppc-qn">
+                <h3>Has it been at least a week since the participant received Plasma, Platelet, or Cryoprecipitate transfusion</h3>
+                <div class="radio">
+                    <label><input type="radio" name="ppc_qn" value="yes" /> Yes</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="ppc_qn" value="no" /> No</label>
                 </div>
             </div>
         </div>
         <div class="alert alert-danger" style="display:none" id="order-info-text">
-            <span style="display: none" id="blood-info-text">Participants may not have blood drawn {% if not app.isDvType %} and saliva collected {% endif %} if they have donated blood, platelets, or plasma in the past week. The same restriction applies to those who have received a blood transfusion in the past 6 months.</span>
-            <span style="display: none" id="blood-info-text-2">
-                <p>1. Participants may not have blood drawn if they have received RBC transfusion in the past 2 months.</p> 
-                <p>2. Participants may not have blood drawn if they have received Plasma, Platelet, Cryoprecipitate transfusion in the past week.</p>
+            {% set displayText = app.isDvType ? 'Urine' : 'Saliva and urine ' %}
+            <span style="display: none;" id="info-text-1">
+                Participants may not have blood drawn if they have donated blood, platelets, or plasma in the past week.
+                <strong>{{ displayText }} collection is permissible, and can be initiated by selecting Continue.</strong>
             </span>
-            <strong style="display: none" id="urine-info-text">Urine collection is permissible, and can be initiated by selecting Continue.</strong>
-            <strong style="display: none" id="saliva-info-text">
-                {% if not app.isDvType %}
-                    Urine and saliva collection are permissible, and can be initiated by selecting Continue.
-                {% else %}
-                    Urine collection is permissible, and can be initiated by selecting Continue.
-                {% endif %}
-            </strong>
+            <span style="display: none;" id="info-text-2">
+                Participants may not have blood drawn if they have received RBC transfusion in the past 2 months.
+                <strong>{{ displayText }} collection is permissible, and can be initiated by selecting Continue.</strong>
+            </span>
+            <span style="display: none;" id="info-text-3">
+                Participants may not have blood drawn if they have received Plasma, Platelet, Cryoprecipitate transfusion in the past week.
+                <strong>{{ displayText }} collection is permissible, and can be initiated by selecting Continue.</strong>
+            </span>
+            <span style="display: none;" id="info-text-4">
+                Participants may not have blood drawn {% if not app.isDvType %} and/or saliva collected {% endif %} if they have received Whole Blood Transfusion previously.
+                <strong>Urine collection is permissible, and can be initiated by selecting Continue.</strong>
+            </span>
+            {#<span style="display: none" id="blood-info-text">Participants may not have blood drawn {% if not app.isDvType %} and saliva collected {% endif %} if they have donated blood, platelets, or plasma in the past week. The same restriction applies to those who have received a blood transfusion in the past 6 months.</span>#}
+            {#<span style="display: none" id="blood-info-text-2">#}
+                {#<p>1. Participants may not have blood drawn if they have received RBC transfusion in the past 2 months.</p> #}
+                {#<p>2. Participants may not have blood drawn if they have received Plasma, Platelet, Cryoprecipitate transfusion in the past week.</p>#}
+            {#</span>#}
+            {#<strong style="display: none" id="urine-info-text">Urine collection is permissible, and can be initiated by selecting Continue.</strong>#}
+            {#<strong style="display: none" id="saliva-info-text">#}
+                {#{% if not app.isDvType %}#}
+                    {#Urine and saliva collection are permissible, and can be initiated by selecting Continue.#}
+                {#{% else %}#}
+                    {#Urine collection is permissible, and can be initiated by selecting Continue.#}
+                {#{% endif %}#}
+            {#</strong>#}
         </div>
         <div id="continue" style="display:none">
             <br />
