@@ -45,14 +45,14 @@ $(document).ready(function() {
         }
 
         // Hide fields on initialization
-        var rbcChecked = $('input:radio[name=rbc_qn]').is(':checked');
-        var pccChecked = $('input:radio[name=pcc_qn]').is(':checked');
+        var isRBCChecked = $('input:radio[name=rbc_qn]').is(':checked');
+        var isPPCChecked = $('input:radio[name=pcc_qn]').is(':checked');
         var hideFieldNames = ['order-info-text', 'continue'];
-        if (!rbcChecked) {
+        if (!isRBCChecked) {
             hideFieldNames.push('rbc-qn');
         }
-        if (!pccChecked) {
-            hideFieldNames.push('pcc-qn');
+        if (!isPPCChecked) {
+            hideFieldNames.push('ppc-qn');
         }
         hideFields(hideFieldNames);
 
@@ -93,7 +93,7 @@ $(document).ready(function() {
                 handleStep5();
             }
         } else {
-            hideFields(['transfusion-qn', 'red-blood-qn', 'order-info-text']);
+            hideFields(['transfusion-qn', 'rbc-qn', 'ppc-qn', 'order-info-text']);
             showFields(['continue']);
             if (donate === 'yes') {
                 // #3 Display info text 1 and continue
