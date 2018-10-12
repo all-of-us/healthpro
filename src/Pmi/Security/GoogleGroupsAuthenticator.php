@@ -140,7 +140,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             }
         } elseif ($exception->getMessage() === self::OAUTH_FAILURE_MESSAGE) {
             $template = 'error-oauth.html.twig';
-            $params = [];
+            $params = ['logoutUrl' => $this->app->getGoogleLogoutUrl()];
         } elseif ($this->app->getConfig('gae_auth')) {
             $template = 'error-gae-auth.html.twig';
             $params = ['loginUrl' => $this->app->getGoogleLoginUrl()];
