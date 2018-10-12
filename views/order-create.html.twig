@@ -130,6 +130,8 @@
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
             </p>
             {{ form_rest(confirmForm) }}
+            <input type="hidden" name="show-blood-tubes" value="{{ showBloodTubes ? 'yes' : 'no' }}" />
+            <input type="hidden" name="show-saliva-tubes" value="{{ showSalivaTubes ? 'yes' : 'no' }}" />
         {{ form_end(confirmForm) }}
     </div>
 {% endblock %}

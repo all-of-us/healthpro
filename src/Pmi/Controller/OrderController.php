@@ -70,16 +70,9 @@ class OrderController extends AbstractController
         }
         $showBloodTubes = false;
         $showSalivaTubes = false;
-        if ($request->request->has('donate')) {
-            if ($request->request->get('donate') === 'no' && ($request->request->get('transfusion') === 'no' || $request->request->get('red_blood_qn') === 'yes')) {
-                $showBloodTubes = true;
-                $showSalivaTubes = true;
-            } elseif ($request->request->get('red_blood_qn') === 'no') {
-                $showSalivaTubes = true;
-            }
-        } elseif (isset($request->request->get('form')['show-blood-tubes']) && isset($request->request->get('form')['show-saliva-tubes'])) {
-            $showBloodTubes = $request->request->get('form')['show-blood-tubes'];
-            $showSalivaTubes = $request->request->get('form')['show-saliva-tubes']; 
+        if ($request->request->has('show-blood-tubes') && $request->request->has('show-saliva-tubes')) {
+            $showBloodTubes = $request->request->get('show-blood-tubes') === 'yes' ? true : false;
+            $showSalivaTubes = $request->request->get('show-saliva-tubes') === 'yes' ? true : false;
         } else {
             $app->abort(403);
         }
@@ -125,13 +118,6 @@ class OrderController extends AbstractController
                 }
             ]);
         }
-        $formBuilder->add('show-blood-tubes', Type\HiddenType::class, [
-            'data' => $showBloodTubes
-        ]);
-        $formBuilder->add('show-saliva-tubes', Type\HiddenType::class, [
-            'data' => $showSalivaTubes
-        ]);
-        $confirmForm = $formBuilder->getForm();
         $showCustom = false;
         $ordersRepository = $app['em']->getRepository('orders');
         $confirmForm = $formBuilder->getForm();
