@@ -325,10 +325,16 @@ class EvaluationController extends AbstractController
         $evaluationModifyForm->handleRequest($request);
         if ($evaluationModifyForm->isSubmitted()) {
             $evaluationModifyData = $evaluationModifyForm->getData();
+            if ($evaluationModifyData['reason'] === 'OTHER' && empty($evaluationModifyData['other_text'])) {
+                $evaluationModifyForm['other_text']->addError(new FormError('Please enter a reason'));
+            }
             if ($type === $evaluationService::EVALUATION_CANCEL && strtolower($evaluationModifyData['confirm']) !== $evaluationService::EVALUATION_CANCEL) {
                 $evaluationModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
             }
             if ($evaluationModifyForm->isValid()) {
+                if ($evaluationModifyData['reason'] === 'OTHER') {
+                    $evaluationModifyData['reason'] = $evaluationModifyData['other_text'];
+                }
                 $status = true;
                 // Cancel/Restore evaluation in RDR if exists
                 if (!empty($evaluation['rdr_id'])) {

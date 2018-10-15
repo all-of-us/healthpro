@@ -86,6 +86,27 @@ class Order
         ]
     ];
 
+    public static $cancelReasons = [
+        'Order created in error' => 'ORDER_CREATED_ERROR',
+        'Order created for wrong participant' => 'ORDER_CREATED_WRONG_PARTICIPANT',
+        'Error with label/label printing' => 'ERROR_LABEL_PRINTING',
+        'Missed shipment window for courier pickup' => 'MISSED_COURIER_PICKUP',
+        'Other' => 'OTHER'
+    ];
+
+    public static $unlockReasons = [
+        'Add/Remove collected or processed samples' => 'ADD_REMOVE_SAMPLES',
+        'Change collection or processing timestamps' => 'CHANGE_SAMPLES_TIMESTAMPS',
+        'Change Tracking number' => 'CHANGE_TRACKING_NUMBER',
+        'Other' => 'OTHER'
+    ];
+
+    public static $restoreReasons = [
+        'Order cancelled for wrong participant' => 'ORDER_CANCELLED_WRONG_PARTICIPANT',
+        'Order can be amended versus cancelled' => 'ORDER_CAN_AMENDED_VERSUS_CANCELLED',
+        'Other' => 'OTHER'
+    ];
+
     public function __construct($app = null)
     {
         if ($app) {
@@ -1096,11 +1117,25 @@ class Order
     public function getOrderModifyForm($type)
     {
         $orderModifyForm = $this->app['form.factory']->createBuilder(Type\FormType::class, null);
-        $orderModifyForm->add('reason', Type\TextareaType::class, [
+        $reasonType = $type . 'Reasons';
+        $reasons = self::$$reasonType;
+        if ($type === self::ORDER_UNLOCK && $this->order['type'] !== 'kit') {
+            unset($reasons['Change Tracking number']);
+        }
+        $orderModifyForm->add('reason', Type\ChoiceType::class, [
             'label' => 'Reason',
             'required' => true,
+            'choices' => $reasons,
+            'placeholder' => '-- Select ' . ucfirst($type) . ' Reason --',
+            'multiple' => false,
+            'constraints' => new Constraints\NotBlank([
+                'message' => "Please select {$type} reason"
+            ])
+        ]);
+        $orderModifyForm->add('other_text', Type\TextareaType::class, [
+            'label' => false,
+            'required' => false,
             'constraints' => [
-                new Constraints\NotBlank(),
                 new Constraints\Type('string')
             ]
         ]);

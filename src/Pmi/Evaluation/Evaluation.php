@@ -44,6 +44,17 @@ class Evaluation
         $this->normalizeData();
     }
 
+    public static $cancelReasons = [
+        'Data entered for wrong participant' => 'DATA_ENTERED_WRONG_PARTICIPANT',
+        'Other' => 'OTHER'
+    ];
+
+    public static $restoreReasons = [
+        'Physical Measurement cancelled for wrong participant' => 'PM_CANCELLED_WRONG_PARTICIPANT',
+        'Physical Measurement can be amended versus cancelled' => 'PM_CAN_AMENDED_VERSUS_CANCELLED',
+        'Other' => 'OTHER'
+    ];
+
     public function loadFromArray($array)
     {
         $this->evaluation = $array;
@@ -481,11 +492,22 @@ class Evaluation
     public function getEvaluationModifyForm($type)
     {
         $evaluationModifyForm = $this->app['form.factory']->createBuilder(FormType::class, null);
-        $evaluationModifyForm->add('reason', TextareaType::class, [
+        $reasonType = $type . 'Reasons';
+        $reasons = self::$$reasonType;
+        $evaluationModifyForm->add('reason', ChoiceType::class, [
             'label' => 'Reason',
             'required' => true,
+            'choices' => $reasons,
+            'placeholder' => '-- Select ' . ucfirst($type) . ' Reason --',
+            'multiple' => false,
+            'constraints' => new Constraints\NotBlank([
+                'message' => "Please select {$type} reason"
+            ])
+        ]);
+        $evaluationModifyForm->add('other_text', TextareaType::class, [
+            'label' => false,
+            'required' => false,
             'constraints' => [
-                new Constraints\NotBlank(),
                 new Constraints\Type('string')
             ]
         ]);

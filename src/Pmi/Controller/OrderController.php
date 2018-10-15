@@ -616,10 +616,16 @@ class OrderController extends AbstractController
         $orderModifyForm->handleRequest($request);
         if ($orderModifyForm->isSubmitted()) {
             $orderModifyData = $orderModifyForm->getData();
+            if ($orderModifyData['reason'] === 'OTHER' && empty($orderModifyData['other_text'])) {
+                $orderModifyForm['other_text']->addError(new FormError('Please enter a reason'));
+            }
             if ($type === $order::ORDER_CANCEL && strtolower($orderModifyData['confirm']) !== $order::ORDER_CANCEL) {
                 $orderModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
             }
             if ($orderModifyForm->isValid()) {
+                if ($orderModifyData['reason'] === 'OTHER') {
+                    $orderModifyData['reason'] = $orderModifyData['other_text'];
+                }
                 $status = true;
                 // Cancel/Restore order in RDR if exists
                 if (!empty($order->get('rdr_id')) && ($type === $order::ORDER_CANCEL || $type === $order::ORDER_RESTORE)) {
