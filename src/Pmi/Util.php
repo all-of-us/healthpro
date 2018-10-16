@@ -64,4 +64,10 @@ class Util
         }
         return $result;
     }
+    
+    public static function logException($exception)
+    {
+        syslog(LOG_CRIT, $exception->getMessage());
+        syslog(LOG_INFO, substr($exception->getTraceAsString(), 0, 5120)); // log the first 5KB of the stack trace
+    }
 }

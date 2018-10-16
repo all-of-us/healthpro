@@ -5,6 +5,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Pmi\Util;
 
 class UserProvider implements UserProviderInterface
 {
@@ -24,8 +25,13 @@ class UserProvider implements UserProviderInterface
         if ($this->app['session']->has('googlegroups')) {
             $groups = $this->app['session']->get('googlegroups');
         } else {
-            $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
-            $this->app['session']->set('googlegroups', $groups);
+            try {
+                $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
+                $this->app['session']->set('googlegroups', $groups);
+            } catch (\Exception $e) {
+                Util::logException($e);
+                throw new AuthenticationException('Failed to retrieve group permissions');
+            }
         }
         $userInfo = $this->getUserInfo($googleUser);
         return new User($googleUser, $groups, $userInfo);
