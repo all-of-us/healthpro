@@ -7,6 +7,7 @@
             {% if order.mayo_id is not empty %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
+                        <a class="pull-right" href="{{ path('orderRequisitionPdf', { participantId: participant.id, orderId: order.id, type: 'requisition' }) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
                         <h3 class="panel-title">Requisition</h3>
                     </div>
                     <div class="panel-body">
