@@ -996,6 +996,16 @@ class Order
         return false;
     }
 
+    public function getUrineSample()
+    {
+        foreach ($this->samples as $sample) {
+            if (in_array($sample , Order::$nonBloodSamples)) {
+                return $sample;
+            }
+        }
+        return null;
+    }
+
     private function getNumericId()
     {
         $length = 10;
