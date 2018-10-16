@@ -64,7 +64,7 @@ class Util
         }
         return $result;
     }
-    
+
     public static function logException($exception)
     {
         syslog(LOG_CRIT, $exception->getMessage());
