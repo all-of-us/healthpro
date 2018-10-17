@@ -12,6 +12,7 @@ class WorkQueue
 
     protected $app;
 
+    // These are used to map a DataTables column index to an RDR field for sorting
     public static $wQColumns = [
         'lastName',
         'firstName',
@@ -24,6 +25,7 @@ class WorkQueue
         'consentForElectronicHealthRecordsTime',
         'consentForCABoRTime',
         'withdrawalTime',
+        'withdrawalReason',
         'recontactMethod',
         'streetAddress',
         'email',
