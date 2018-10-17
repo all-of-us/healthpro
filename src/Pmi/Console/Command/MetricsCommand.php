@@ -12,12 +12,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Metrics Command
+ *
+ * Allows debugging local with the RDR Metrics API endpoint
  */
 class MetricsCommand extends Command
 {
-    // Allowed stratfications in RDR
-    const STRATIFICATIONS = ['TOTAL', 'ENROLLMENT_STATUS'];
+    /**
+     * Allowed Stratifications
+     *
+     * @var array
+     */
+    private static $STRATIFICATIONS = ['TOTAL', 'ENROLLMENT_STATUS'];
 
+    /**
+     * Configure
+     *
+     * @return void
+     */
     protected function configure()
     {
         $this
@@ -66,6 +77,13 @@ class MetricsCommand extends Command
         ;
     }
 
+    /**
+     * Execute
+     *
+     * @param IntputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->setFormatter(new OutputFormatter(true));
@@ -78,11 +96,11 @@ class MetricsCommand extends Command
         $pretty = ($input->getOption('pretty') !== false) ? JSON_PRETTY_PRINT : 0;
 
         // Validate stratification
-        if (!in_array($stratification, self::STRATIFICATIONS)) {
+        if (!in_array($stratification, self::$STRATIFICATIONS)) {
             $output->writeln(sprintf(
                 '<error>Invalid stratification: "%s"; Valid options: %s</error>',
                 $stratification,
-                join(', ', self::STRATIFICATIONS)
+                join(', ', self::$STRATIFICATIONS)
             ));
             // Throw a non-zero exit status
             return 1;
