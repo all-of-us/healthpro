@@ -946,11 +946,13 @@ class Order
         return empty($this->order['finalized_ts']) && empty($this->order['version']);
     }
 
+    // Finalized form is only disabled when rdr_id is set
     public function isOrderDisabled()
     {
         return ($this->order['rdr_id'] || $this->order['expired'] || $this->isOrderCancelled()) && $this->order['status'] !== 'unlock';
     }
 
+    // Except finalize form all forms are disabled when finalized_ts is set
     public function isOrderFormDisabled()
     {
         return ($this->order['finalized_ts'] || $this->order['expired'] || $this->isOrderCancelled()) && $this->order['status'] !== 'unlock';
