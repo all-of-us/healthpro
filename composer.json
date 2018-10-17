@@ -9,7 +9,7 @@
         "guzzlehttp/guzzle": "^6.2",
         "paragonie/random_compat": "1.4.*",
         "ramsey/uuid": "^3.5",
-        "sensiolabs/security-checker": "^4.0",
+        "sensiolabs/security-checker": "^5.0",
         "silex/silex": "~2.0",
         "symfony/browser-kit": "^3.1",
         "symfony/config": "^3.1",

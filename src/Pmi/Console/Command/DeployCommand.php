@@ -3,7 +3,7 @@ namespace Pmi\Console\Command;
 
 use Pmi\Application\AbstractApplication;
 use SensioLabs\Security\SecurityChecker;
-use SensioLabs\Security\Formatters\SimpleFormatter;
+use SensioLabs\Security\Exception\HttpException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -496,23 +496,52 @@ class DeployCommand extends Command {
         $this->exec("{$this->appDir}/bin/phpunit");
     }
 
+    private function displayVulnerabilities($vulnerabilities)
+    {
+        // taken from SensioLabs\Security\Formatters\SimpleFormatter in 4.1 that was removed in 5.0
+        $count = count($vulnerabilities);
+        $this->out->writeln(sprintf('<error>[CRITICAL] %d %s known vulnerabilities</>', $count, 1 === $count ? 'package has' : 'packages have'));
+        $this->out->writeln('');
+        foreach ($vulnerabilities as $dependency => $issues) {
+            $dependencyFullName = $dependency.' ('.$issues['version'].')';
+            $this->out->writeln('<info>'.$dependencyFullName."\n".str_repeat('-', strlen($dependencyFullName))."</>\n");
+            foreach ($issues['advisories'] as $details) {
+                $this->out->write(' * ');
+                if ($details['cve']) {
+                    $this->out->write('<comment>'.$details['cve'].': </comment>');
+                }
+                $this->out->writeln($details['title']);
+                if ('' !== $details['link']) {
+                    $this->out->writeln('   '.$details['link']);
+                }
+                $this->out->writeln('');
+            }
+        }
+    }
+
     private function runSecurityCheck()
     {
         $composerLockFile = $this->appDir . DIRECTORY_SEPARATOR . 'composer.lock';
         $this->out->writeln("Running SensioLabs Security Checker...");
         $checker = new SecurityChecker();
-        $vulnerabilities = $checker->check($composerLockFile);
+        $helper = $this->getHelper('question');
+        try {
+            $vulnerabilities = json_decode((string)$checker->check($composerLockFile), true);
+        } catch (HttpException $e) {
+            $this->out->writeln('<error>' . $e->getMessage() . '</error>');
+            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
+                throw new \Exception('Aborting due to SensioLabs Security Checker network error');
+            }
+        }
         // Ignore vulnerabilities mentioned in sensioignore file
         $vulnerabilities = $this->removeSensioIgnoredVulnerabilities($vulnerabilities);
         if (count($vulnerabilities) === 0) {
             $this->out->writeln('No packages have known vulnerabilities');
         } else {
-            $formatter = new SimpleFormatter($this->getHelper('formatter'));
-            $formatter->displayResults($this->out, $composerLockFile, $vulnerabilities);
+            $this->displayVulnerabilities($vulnerabilities);
             if (!$this->local) {
-                throw new \Exception('Fix security vulnerablities before deploying');
+                throw new \Exception('Fix security vulnerabilities before deploying');
             } else {
-                $helper = $this->getHelper('question');
                 if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
                     throw new \Exception('Aborting due to security vulnerability');
                 }
@@ -529,7 +558,7 @@ class DeployCommand extends Command {
         } else {            
             $this->out->writeln('');
             $helper = $this->getHelper('question');
-            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerablities?</error> '))) {
+            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerabilities?</error> '))) {
                 throw new \Exception('Aborting due to JS security vulnerability');
             }
         }
