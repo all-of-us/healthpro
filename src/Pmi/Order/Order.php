@@ -89,8 +89,7 @@ class Order
     public static $cancelReasons = [
         'Order created in error' => 'ORDER_CREATED_ERROR',
         'Order created for wrong participant' => 'ORDER_CREATED_WRONG_PARTICIPANT',
-        'Error with label/label printing' => 'ERROR_LABEL_PRINTING',
-        'Missed shipment window for courier pickup' => 'MISSED_COURIER_PICKUP',
+        'Labeling error identified after finalization' => 'LABELING_ERROR_AFTER_FINALIZATION',
         'Other' => 'OTHER'
     ];
 
@@ -1121,8 +1120,13 @@ class Order
         $orderModifyForm = $this->app['form.factory']->createBuilder(Type\FormType::class, null);
         $reasonType = $type . 'Reasons';
         $reasons = self::$$reasonType;
+        // Remove change tracking number option for non-kit orders
         if ($type === self::ORDER_UNLOCK && $this->order['type'] !== 'kit') {
             unset($reasons['Change Tracking number']);
+        }
+        // Remove label error option for kit orders
+        if ($type === self::ORDER_CANCEL && $this->order['type'] === 'kit') {
+            unset($reasons['Labeling error identified after Finalization']);
         }
         $orderModifyForm->add('reason', Type\ChoiceType::class, [
             'label' => 'Reason',
