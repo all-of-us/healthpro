@@ -15,11 +15,12 @@ class RdrParticipants
     protected $nextToken;
     protected $total;
 
-    const EVALUATION_CANCEL_STATUS = 'cancelled';
-    const EVALUATION_RESTORE_STATUS = 'restored';
-    const CANCEL_STATUS = 'CANCELLED';
-    const RESTORE_STATUS = 'UNSET';
-    const EDIT_STATUS = 'AMENDED';
+    // Expected RDR response status
+    const EVALUATION_CANCEL_STATUS = 'CANCELLED';
+    const EVALUATION_RESTORE_STATUS = 'RESTORED';
+    const ORDER_CANCEL_STATUS = 'CANCELLED';
+    const ORDER_RESTORE_STATUS = 'UNSET';
+    const ORDER_EDIT_STATUS = 'AMENDED';
 
     public function __construct(RdrHelper $rdrHelper)
     {
@@ -253,7 +254,8 @@ class RdrParticipants
             ]);
             $result = json_decode($response->getBody()->getContents());
             $rdrStatus = $type === Evaluation::EVALUATION_CANCEL ? self::EVALUATION_CANCEL_STATUS : self::EVALUATION_RESTORE_STATUS;
-            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+            // Currently, RDR is returning response in lower case (they will soon switch it upper case) so convert the response into uppercase
+            if (is_object($result) && isset($result->status) && strtoupper($result->status) === $rdrStatus) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -304,7 +306,7 @@ class RdrParticipants
                 'headers' => ['If-Match' => $result->meta->versionId]
             ]);
             $result = json_decode($response->getBody()->getContents());
-            $rdrStatus = $type === Order::ORDER_CANCEL ? self::CANCEL_STATUS : self::RESTORE_STATUS;
+            $rdrStatus = $type === Order::ORDER_CANCEL ? self::ORDER_CANCEL_STATUS : self::ORDER_RESTORE_STATUS;
             if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
                 return true;
             }
@@ -324,7 +326,7 @@ class RdrParticipants
                 'headers' => ['If-Match' => $result->meta->versionId]
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->status) && $result->status === self::EDIT_STATUS) {
+            if (is_object($result) && isset($result->status) && $result->status === self::ORDER_EDIT_STATUS) {
                 return true;
             }
         } catch (\Exception $e) {
