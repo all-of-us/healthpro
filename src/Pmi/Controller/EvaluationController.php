@@ -185,7 +185,7 @@ class EvaluationController extends AbstractController
                                 $dbArray['rdr_id'] = $rdrEvalId;
                                 $dbArray['fhir_version'] = \Pmi\Evaluation\Fhir::CURRENT_VERSION;
                             } else {
-                                $app->addFlashError('Failed to finalize the physical measurement. Please try again');
+                                $app->addFlashError('Failed to finalize the physical measurements. Please try again');
                                 $rdrError = true;
                             }
                         } else {
@@ -260,7 +260,7 @@ class EvaluationController extends AbstractController
                 if ($evaluationService->sendToRdr()) {
                     $app->addFlashSuccess('Physical measurements finalized');
                 } else {
-                    $app->addFlashError('Failed to finalize the physical measurement. Please try again');
+                    $app->addFlashError('Failed to finalize the physical measurements. Please try again');
                 }
                 return $app->redirectToRoute('evaluation', [
                     'participantId' => $participant->id,
@@ -347,7 +347,7 @@ class EvaluationController extends AbstractController
                         'id' => $participantId
                     ]);
                 } else {
-                    $app->addFlashError("Failed to {$type} physical measurement. Please try again.");
+                    $app->addFlashError("Failed to {$type} physical measurements. Please try again.");
                 }
             } else {
                 $app->addFlashError('Please correct the errors below');
@@ -386,9 +386,9 @@ class EvaluationController extends AbstractController
         if ($evaluationRevertForm->isSubmitted() && $evaluationRevertForm->isValid()) {
             // Revert Evaluation
             if ($evaluationService->revertEvaluation($evalId)) {
-                $app->addFlashSuccess('Physical measurement reverted');
+                $app->addFlashSuccess('Physical measurements reverted');
             } else {
-                $app->addFlashError('Failed to revert physical measurement. Please try again.');
+                $app->addFlashError('Failed to revert physical measurements. Please try again.');
             }
         }
         return $app->redirectToRoute('participant', [
