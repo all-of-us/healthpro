@@ -12,6 +12,7 @@ class WorkQueue
 
     protected $app;
 
+    // These are used to map a DataTables column index to an RDR field for sorting
     public static $wQColumns = [
         'lastName',
         'firstName',
@@ -24,6 +25,7 @@ class WorkQueue
         'consentForElectronicHealthRecordsTime',
         'consentForCABoRTime',
         'withdrawalTime',
+        'withdrawalReason',
         'recontactMethod',
         'streetAddress',
         'email',
@@ -271,8 +273,9 @@ class WorkQueue
             if ($participant->withdrawalStatus == 'NO_USE') {
                 $row['withdrawal'] = self::HTML_DANGER . ' <span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
             } else {
-                $row['withdrawal'] = ''; 
+                $row['withdrawal'] = '';
             }
+            $row['withdrawalReason'] = $e($participant->withdrawalReason);
 
             //Contact
             $row['contactMethod'] = $e($participant->recontactMethod);
