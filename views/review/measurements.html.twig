@@ -53,7 +53,7 @@
                         </td>
                         <td>
                             {% if measurement.parent_id is empty %}
-                                <a href="{{ path('evaluationModify', { participantId: measurement.participant_id, evalId: measurement.id, type: 'cancel' }) }}" class="btn btn-xs btn-danger">Cancel Evaluation</a>
+                                <a href="{{ path('evaluationModify', { participantId: measurement.participant_id, evalId: measurement.id, type: 'cancel' }) }}" class="btn btn-xs btn-danger">Cancel Physical Measurements</a>
                             {% endif %}
                         </td>
                     </tr>
