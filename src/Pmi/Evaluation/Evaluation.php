@@ -45,13 +45,13 @@ class Evaluation
     }
 
     public static $cancelReasons = [
-        'Data entered for wrong participant' => 'DATA_ENTERED_WRONG_PARTICIPANT',
+        'Data entered for wrong participant' => 'PM_CANCEL_WRONG_PARTICIPANT',
         'Other' => 'OTHER'
     ];
 
     public static $restoreReasons = [
-        'Physical Measurements cancelled for wrong participant' => 'PM_CANCELLED_WRONG_PARTICIPANT',
-        'Physical Measurements can be amended versus cancelled' => 'PM_CAN_AMENDED_VERSUS_CANCELLED',
+        'Physical Measurements cancelled for wrong participant' => 'PM_RESTORE_WRONG_PARTICIPANT',
+        'Physical Measurements can be amended versus cancelled' => 'PM_RESTORE_AMEND',
         'Other' => 'OTHER'
     ];
 
