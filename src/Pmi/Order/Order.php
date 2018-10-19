@@ -1122,11 +1122,15 @@ class Order
         $reasons = self::$$reasonType;
         // Remove change tracking number option for non-kit orders
         if ($type === self::ORDER_UNLOCK && $this->order['type'] !== 'kit') {
-            unset($reasons['Change Tracking number']);
+            if (($key = array_search('ORDER_AMEND_TRACKING', $reasons)) !== false) {
+                unset($reasons[$key]);
+            }
         }
         // Remove label error option for kit orders
         if ($type === self::ORDER_CANCEL && $this->order['type'] === 'kit') {
-            unset($reasons['Labeling error identified after Finalization']);
+            if (($key = array_search('ORDER_CANCEL_LABEL_ERROR', $reasons)) !== false) {
+                unset($reasons[$key]);
+            }
         }
         $orderModifyForm->add('reason', Type\ChoiceType::class, [
             'label' => 'Reason',
