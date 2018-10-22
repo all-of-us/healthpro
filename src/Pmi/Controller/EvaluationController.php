@@ -342,7 +342,7 @@ class EvaluationController extends AbstractController
                 }
                 // Create evaluation history
                 if ($status && $evaluationService->createEvaluationHistory($type, $evalId, $evaluationModifyData['reason'])) {
-                    $app->addFlashSuccess("Evaluation {$type}ed");
+                    $app->addFlashSuccess("Physical measurements {$type}ed");
                     return $app->redirectToRoute('participant', [
                         'id' => $participantId
                     ]);
