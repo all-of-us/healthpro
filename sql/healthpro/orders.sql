@@ -30,8 +30,10 @@ CREATE TABLE `orders` (
   `fedex_tracking` varchar(50) NULL DEFAULT NULL,
   `type` varchar(20) NULL DEFAULT NULL,
   `version` varchar(10) NULL DEFAULT NULL,
+  `history_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_id` (`order_id`),
   KEY `participant_id` (`participant_id`),
-  KEY `mayo_id` (`mayo_id`)
+  KEY `mayo_id` (`mayo_id`),
+  KEY `history_id` (`history_id`)
 ) DEFAULT CHARSET=utf8mb4;

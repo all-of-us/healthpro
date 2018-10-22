@@ -302,6 +302,9 @@ table.table-samples td {
 .saliva-info {
     padding-left: 150px;
 }
+.custom-text-muted {
+    color: #dadada;
+}
 
 .help-footer {
     padding-top: 50px;
@@ -311,4 +314,15 @@ table.table-samples td {
 .tz-change-btn {
     padding:2px 6px;
     font-size:12px;
+}
+
+.eval-revert-form {
+    float: right;
+    margin-top: -44px;
+    margin-right: 142px;
+}
+
+.revert-form {
+    float: right;
+    margin-top: -44px;
 }

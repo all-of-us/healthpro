@@ -47,6 +47,24 @@ class Util
         return true;
     }
 
+    public static function parseMultipleTimestamps(array $result, $timezone)
+    {
+        foreach ($result as $key => $value) {
+            $result[$key] = self::parseTimestamps($value, $timezone);
+        }
+        return $result;
+    }
+
+    public static function parseTimestamps(array $result, $timezone)
+    {
+        foreach ($result as $key => $value) {
+            if (null !== $value && substr($key, -3, 3) == '_ts' && preg_match("/^\d{4}\-\d{2}\-\d{2}/", $value)) {
+                $result[$key] = \DateTime::createFromFormat('Y-m-d H:i:s', $value)->setTimezone(new \DateTimeZone($timezone));
+            }
+        }
+        return $result;
+    }
+
     public static function logException($exception)
     {
         syslog(LOG_CRIT, $exception->getMessage());

@@ -8,31 +8,56 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
+use Pmi\Audit\Log;
 
 class Evaluation
 {
     const CURRENT_VERSION = '0.3.3';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
+    const EVALUATION_ACTIVE = 'active';
+    const EVALUATION_CANCEL = 'cancel';
+    const EVALUATION_RESTORE = 'restore';
+
+    protected $app;
     protected $version;
     protected $data;
     protected $schema;
     protected $participant;
+    protected $createdUser;
+    protected $createdSite;
+    protected $finalizedUser;
+    protected $finalizedSite;
     protected $locked = false;
+    public $evaluation;
 
-    public function __construct()
+    public function __construct($app = null)
     {
+        $this->app = $app;
         $this->version = self::CURRENT_VERSION;
         $this->data = new \StdClass();
         $this->loadSchema();
         $this->normalizeData();
     }
 
-    public function loadFromArray($array, $app = null)
+    public static $cancelReasons = [
+        'Data entered for wrong participant' => 'PM_CANCEL_WRONG_PARTICIPANT',
+        'Other' => 'OTHER'
+    ];
+
+    public static $restoreReasons = [
+        'Physical Measurements cancelled for wrong participant' => 'PM_RESTORE_WRONG_PARTICIPANT',
+        'Physical Measurements can be amended versus cancelled' => 'PM_RESTORE_AMEND',
+        'Other' => 'OTHER'
+    ];
+
+    public function loadFromArray($array)
     {
+        $this->evaluation = $array;
         if (array_key_exists('version', $array)) {
             $this->version = $array['version'];
         }
@@ -47,18 +72,18 @@ class Evaluation
             $this->locked = true;
         }
         $this->participant = $array['participant_id'];
-        if ($app) {
-            $createdUser = $app['em']->getRepository('users')->fetchOneBy([
+        if ($this->app) {
+            $createdUser = $this->app['em']->getRepository('users')->fetchOneBy([
                 'id' => $array['user_id']
             ]);
             if (!$array['finalized_user_id']) {
-                $finalizedUserId = $array['finalized_ts'] ? $array['user_id'] : $app->getUser()->getId();
-                $finalizedSite = $array['finalized_ts'] ? $array['site'] : $app->getSiteId();
+                $finalizedUserId = $array['finalized_ts'] ? $array['user_id'] : $this->app->getUser()->getId();
+                $finalizedSite = $array['finalized_ts'] ? $array['site'] : $this->app->getSiteId();
             } else {
                 $finalizedUserId = $array['finalized_user_id'];
                 $finalizedSite = $array['finalized_site'];          
             }
-            $finalizedUser = $app['em']->getRepository('users')->fetchOneBy([
+            $finalizedUser = $this->app['em']->getRepository('users')->fetchOneBy([
                 'id' => $finalizedUserId
             ]);
             $this->createdUser = $createdUser['email'];
@@ -462,5 +487,273 @@ class Evaluation
             $summary['heartrate'] = $heartrate;
         }
         return $summary;
+    }
+
+    public function getEvaluationModifyForm($type)
+    {
+        $evaluationModifyForm = $this->app['form.factory']->createBuilder(FormType::class, null);
+        $reasonType = $type . 'Reasons';
+        $reasons = self::$$reasonType;
+        $evaluationModifyForm->add('reason', ChoiceType::class, [
+            'label' => 'Reason',
+            'required' => true,
+            'choices' => $reasons,
+            'placeholder' => '-- Select ' . ucfirst($type) . ' Reason --',
+            'multiple' => false,
+            'constraints' => new Constraints\NotBlank([
+                'message' => "Please select {$type} reason"
+            ])
+        ]);
+        $evaluationModifyForm->add('other_text', TextareaType::class, [
+            'label' => false,
+            'required' => false,
+            'constraints' => [
+                new Constraints\Type('string')
+            ]
+        ]);
+        if ($type == self::EVALUATION_CANCEL) {
+            $evaluationModifyForm->add('confirm', TextType::class, [
+                'label' => 'Confirm',
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => 'Type the word "CANCEL" to confirm',
+                    'autocomplete' => 'off'
+                ]
+            ]);
+        }
+        return $evaluationModifyForm->getForm();
+    }
+
+    public function cancelRestoreRdrEvaluation($type, $reason)
+    {
+        $evaluation = $this->getCancelRestoreRdrObject($type, $reason);
+        return $this->app['pmi.drc.participants']->cancelRestoreEvaluation($type, $this->evaluation['participant_id'], $this->evaluation['rdr_id'], $evaluation);
+    }
+
+    public function getCancelRestoreRdrObject($type, $reason)
+    {
+        $obj = new \StdClass();
+        $statusType = $type === self::EVALUATION_CANCEL ? 'cancelled' : 'restored';
+        $obj->status = $statusType;
+        $obj->reason = $reason;
+        $user = $this->app->getUserEmail();
+        $site = $this->app->getSiteIdWithPrefix();
+        $obj->{$statusType . 'Info'} = $this->getEvaluationUserSiteData($user, $site);
+        return $obj;
+    }
+
+    protected function getEvaluationUserSiteData($user, $site)
+    {
+        return [
+            'author' => [
+                'system' => 'https://www.pmi-ops.org/healthpro-username',
+                'value' => $user
+            ],
+            'site' => [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => $site
+            ]
+        ];
+    }
+
+    public function getEvaluationWithHistory($evalId, $participantId)
+    {
+        $evaluationsQuery = "
+            SELECT e.*,
+                   eh.evaluation_id AS eh_evaluation_id,
+                   eh.user_id AS eh_user_id,
+                   eh.site AS eh_site,
+                   eh.type AS eh_type,
+                   eh.reason AS eh_reason,
+                   eh.created_ts AS eh_created_ts
+            FROM evaluations e
+            LEFT JOIN evaluations_history eh ON e.history_id = eh.id
+            WHERE e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL)
+              AND e.id = :evalId
+              AND e.participant_id = :participant_id
+            ORDER BY e.id DESC
+        ";
+        $evaluation = $this->app['em']->fetchAll($evaluationsQuery, [
+            'evalId' => $evalId,
+            'participant_id' => $participantId
+        ]);
+        return !empty($evaluation) ? $evaluation[0] : null;
+    }
+
+    public function getEvaluationsWithHistory($participantId)
+    {
+        $evaluationsQuery = "
+            SELECT e.*,
+                   eh.evaluation_id AS eh_evaluation_id,
+                   eh.user_id AS eh_user_id,
+                   eh.site AS eh_site,
+                   eh.type AS eh_type,
+                   eh.reason AS eh_reason,
+                   eh.created_ts AS eh_created_ts
+            FROM evaluations e
+            LEFT JOIN evaluations_history eh ON e.history_id = eh.id
+            WHERE e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL)
+              AND e.participant_id = :participant_id
+            ORDER BY e.id DESC
+        ";
+        return $this->app['db']->fetchAll($evaluationsQuery, [
+            'participant_id' => $participantId
+        ]);
+    }
+
+    public function getSiteUnfinalizedEvaluations()
+    {
+        $evaluationsQuery = "
+            SELECT e.*,
+                   eh.evaluation_id AS eh_evaluation_id,
+                   eh.user_id AS eh_user_id,
+                   eh.site AS eh_site,
+                   eh.type AS eh_type,
+                   eh.reason AS eh_reason,
+                   eh.created_ts AS eh_created_ts
+            FROM evaluations e
+            LEFT JOIN evaluations_history eh ON e.history_id = eh.id
+            WHERE e.site = :site
+              AND e.finalized_ts IS NULL
+              AND (eh.type != :type
+              OR eh.type IS NULL)
+            ORDER BY e.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($evaluationsQuery, [
+            'site' => $this->app->getSiteId(),
+            'type' => self::EVALUATION_CANCEL
+        ]);
+    }
+
+    public function getSiteRecentModifiedEvaluations()
+    {
+        $evaluationsQuery = "
+            SELECT e.*,
+                   eh.evaluation_id AS eh_order_id,
+                   eh.user_id AS eh_user_id,
+                   eh.site AS eh_site,
+                   eh.type AS eh_type,
+                   eh.created_ts AS eh_created_ts,
+                   IFNULL (eh.created_ts, e.updated_ts) as modified_ts
+            FROM evaluations e
+            LEFT JOIN evaluations_history eh ON e.history_id = eh.id
+            WHERE e.site = :site
+              AND (eh.type = :type
+              OR (eh.type IS NULL
+              AND e.parent_id IS NOT NULL))
+              AND e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL)
+              AND (eh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY OR e.updated_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY)
+            ORDER BY modified_ts DESC
+        ";
+        return $this->app['db']->fetchAll($evaluationsQuery, [
+            'site' => $this->app->getSiteId(),
+            'type' => self::EVALUATION_CANCEL
+        ]);
+    }
+
+    public function createEvaluationHistory($type, $evalId, $reason = '')
+    {
+        $evaluationHistoryData = [
+            'reason' => $reason,
+            'evaluation_id' => $evalId,
+            'user_id' => $this->app->getUser()->getId(),
+            'site' => $this->app->getSiteId(),
+            'type' => $type,
+            'created_ts' => new \DateTime()
+        ];
+        $evaluationsHistoryRepository = $this->app['em']->getRepository('evaluations_history');
+        $status = false;
+        $evaluationsHistoryRepository->wrapInTransaction(function () use ($evaluationsHistoryRepository, $evaluationHistoryData, &$status) {
+            $id = $evaluationsHistoryRepository->insert($evaluationHistoryData);
+            $this->app->log(Log::EVALUATION_HISTORY_CREATE, [
+                'id' => $id,
+                'type' => $evaluationHistoryData['type']
+            ]);
+            //Update history id in evaluations table
+            $this->app['em']->getRepository('evaluations')->update(
+                $evaluationHistoryData['evaluation_id'],
+                ['history_id' => $id]
+            );
+            $status = true;
+        });
+        return $status;
+    }
+
+    public function getEvaluationRevertForm()
+    {
+        $evaluationRevertForm = $this->app['form.factory']->createBuilder(FormType::class, null);
+        $evaluationRevertForm->add('revert', SubmitType::class, [
+            'label' => 'Revert',
+            'attr' => [
+                'class' => 'btn-warning'
+            ]
+        ]);
+        return $evaluationRevertForm->getForm();
+    }
+
+    public function revertEvaluation($evalId)
+    {
+        if ($this->app['em']->getRepository('evaluations')->delete($evalId)) {
+            $this->app->log(Log::EVALUATION_DELETE, $evalId);
+            return true;
+        }
+        return false;
+    }
+
+    public function isEvaluationCancelled()
+    {
+        return $this->evaluation['eh_type'] === self::EVALUATION_CANCEL;
+    }
+
+    public function isEvaluationUnlocked()
+    {
+        return !empty($this->evaluation['parent_id']) && empty($this->evaluation['finalized_ts']);
+    }
+
+    public function isEvaluationFailedToReachRDR()
+    {
+        return !empty($this->evaluation['finalized_ts']) && empty($this->evaluation['rdr_id']);
+    }
+
+    public function canCancel()
+    {
+        return $this->evaluation['eh_type'] !== self::EVALUATION_CANCEL
+            && !$this->isEvaluationUnlocked()
+            && !$this->isEvaluationFailedToReachRDR();
+    }
+
+    public function canRestore()
+    {
+        return $this->evaluation['eh_type'] === self::EVALUATION_CANCEL
+            && !$this->isEvaluationUnlocked()
+            && !$this->isEvaluationFailedToReachRDR();
+    }
+
+
+    public function sendToRdr()
+    {
+        // Check if parent_id exists
+        if ($this->evaluation['parent_id']) {
+            $parentEvaluation = $this->app['em']->getRepository('evaluations')->fetchOneBy([
+                'id' => $this->evaluation['parent_id']
+            ]);
+            if (!empty($parentEvaluation)) {
+                $parentRdrId = $parentEvaluation['rdr_id'];
+            }
+        }
+        $fhir = $this->getFhir($this->evaluation['finalized_ts'], $parentRdrId);
+        $rdrId = $this->app['pmi.drc.participants']->createEvaluation($this->evaluation['participant_id'], $fhir);
+        if (!empty($rdrId)) {
+            $this->app['em']->getRepository('evaluations')->update(
+                $this->evaluation['id'],
+                ['rdr_id' => $rdrId]
+            );
+            return true;
+        }
+        return false;
     }
 }
