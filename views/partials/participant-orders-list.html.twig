@@ -12,10 +12,10 @@
                 <small class="text-muted"><strong>{{ order.order_id }}</strong></small>
                 <br/>
                 <small class="text-muted">
-                    {% if not order.finalized_ts and not order.version %}
-                        <span class="label label-danger">Expired</span>
-                    {% elseif order.oh_type == 'cancel' %}
+                    {% if order.oh_type == 'cancel' %}
                         <span class="label label-danger">Cancelled</span> {{ order.oh_created_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                    {% elseif not order.finalized_ts and not order.version %}
+                        <span class="label label-danger">Expired</span>
                     {% elseif order.oh_type == 'unlock' %}
                         <span class="label label-primary">Unlocked for editing</span> {{ order.oh_created_ts|date('n/j/Y g:ia', app.userTimezone) }}
                     {% elseif order.oh_type == 'edit' %}
