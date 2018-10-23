@@ -633,7 +633,13 @@ class OrderController extends AbstractController
                 }
                 // Create order history
                 if ($status && $order->createOrderHistory($type, $orderModifyData['reason'])) {
-                    $app->addFlashSuccess("Order {$type}ed");
+                    $successText = 'unlocked';
+                    if ($type === $order::ORDER_CANCEL) {
+                        $successText = 'cancelled';
+                    } elseif ($type === $order::ORDER_RESTORE) {
+                        $successText = 'restored';
+                    }
+                    $app->addFlashSuccess("Order {$successText}");
                     if ($type === $order::ORDER_UNLOCK && $request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
                         return $app->redirect($request->query->get('return'));
                     } else {
