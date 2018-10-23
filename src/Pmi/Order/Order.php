@@ -979,12 +979,12 @@ class Order
 
     public function canRestore()
     {
-        return $this->isOrderCancelled() && !$this->isOrderUnlocked() && !$this->isOrderFailedToReachRdr();
+        return !$this->isOrderExpired() && $this->isOrderCancelled() && !$this->isOrderUnlocked() && !$this->isOrderFailedToReachRdr();
     }
 
     public function canUnlock()
     {
-        return !empty($this->order['rdr_id']) && !$this->isOrderUnlocked() && !$this->isOrderCancelled();
+        return !$this->isOrderExpired() && !empty($this->order['rdr_id']) && !$this->isOrderUnlocked() && !$this->isOrderCancelled();
     }
 
     public function hasBloodSample($samples)
