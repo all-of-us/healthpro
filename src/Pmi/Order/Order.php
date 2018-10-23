@@ -102,7 +102,7 @@ class Order
 
     public static $restoreReasons = [
         'Order cancelled for wrong participant' => 'ORDER_RESTORE_WRONG_PARTICIPANT',
-        'Order can be amended versus cancelled' => 'ORDER_RESTORE_AMEND',
+        'Order can be amended instead of cancelled' => 'ORDER_RESTORE_AMEND',
         'Other' => 'OTHER'
     ];
 
