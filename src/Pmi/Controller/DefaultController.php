@@ -339,6 +339,10 @@ class DefaultController extends AbstractController
                 'participantId' => $id,
                 'organization' => $participant->hpoId
             ]);
+            // Check for return url and re-direct
+            if ($request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
+                return $app->redirect($request->query->get('return'));
+            }
             return $app->redirectToRoute('participant', [
                 'id' => $id
             ]);

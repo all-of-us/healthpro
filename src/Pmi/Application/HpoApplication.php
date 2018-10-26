@@ -416,6 +416,14 @@ class HpoApplication extends AbstractApplication
                 return $this->forwardToRoute('selectSite', $request);
             }
         }
+
+        // Display cross-awardee warning on all participant pages
+        if ($request->attributes->has('participantId')) {
+            $participantId = $request->attributes->get('participantId');
+            if (empty($this['session']->get('agreeCrossOrg_' . $participantId))) {
+                return $this->redirectToRoute('participant', ['id' => $participantId, 'return' => $request->getRequestUri()]);
+            }
+        }
     }
 
     protected function afterCallback(Request $request, Response $response)
