@@ -395,6 +395,7 @@ class DefaultController extends AbstractController
             'samples' => WorkQueue::$samples,
             'surveys' => WorkQueue::$surveys,
             'samplesAlias' => WorkQueue::$samplesAlias,
+            'cancelType' => $request->query->get('cancelType', 'participant')
         ]);
     }
 

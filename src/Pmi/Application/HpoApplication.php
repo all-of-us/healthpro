@@ -420,8 +420,13 @@ class HpoApplication extends AbstractApplication
         // Display cross-awardee warning on all participant pages
         if ($request->attributes->has('participantId')) {
             $participantId = $request->attributes->get('participantId');
+            // Check session value
             if (empty($this['session']->get('agreeCrossOrg_' . $participantId))) {
-                return $this->redirectToRoute('participant', ['id' => $participantId, 'return' => $request->getRequestUri()]);
+                $participant = $this['pmi.drc.participants']->getById($participantId);
+                // Check cross-awardee
+                if ($participant->hpoId !== $this->getSiteOrganization()) {
+                    return $this->redirectToRoute('participant', ['id' => $participantId, 'return' => $request->getRequestUri(), 'cancelType' => $request->attributes->get('_route')]);
+                }
             }
         }
     }
