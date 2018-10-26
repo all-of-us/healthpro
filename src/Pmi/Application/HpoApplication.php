@@ -424,7 +424,7 @@ class HpoApplication extends AbstractApplication
             if (empty($this['session']->get('agreeCrossOrg_' . $participantId))) {
                 $participant = $this['pmi.drc.participants']->getById($participantId);
                 // Check cross-awardee
-                if ($participant->hpoId !== $this->getSiteOrganization()) {
+                if (!empty($participant) && $participant->hpoId !== $this->getSiteOrganization()) {
                     return $this->redirectToRoute('participant', ['id' => $participantId, 'return' => $request->getRequestUri(), 'cancelType' => $request->attributes->get('_route')]);
                 }
             }
