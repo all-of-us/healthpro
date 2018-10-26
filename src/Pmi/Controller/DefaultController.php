@@ -383,6 +383,13 @@ class DefaultController extends AbstractController
                 $orders[$key]['processed_ts'] = $processedTs;
             }
         }
+        // Determine cancel route
+        $cancelRoute = 'participants';
+        if ($request->query->has('return')) {
+            if (strpos($request->query->get('return'), '/order/') !== false) {
+                $cancelRoute = 'orders';
+            }
+        }
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
@@ -395,7 +402,7 @@ class DefaultController extends AbstractController
             'samples' => WorkQueue::$samples,
             'surveys' => WorkQueue::$surveys,
             'samplesAlias' => WorkQueue::$samplesAlias,
-            'cancelType' => $request->query->get('cancelType', 'participant')
+            'cancelRoute' => $cancelRoute
         ]);
     }
 

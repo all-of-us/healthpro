@@ -15,7 +15,7 @@
                     <form action="" method="post">
                         {{ form_widget(agreeForm) }}
                         <button type="submit" class="btn btn-success">Acknowledge</button>
-                        <a href="{{ cancelType == 'order' ? path('orders') : path('participants') }}" class="btn btn-default">Cancel</a>
+                        <a href="{{ path(cancelRoute) }}" class="btn btn-default">Cancel</a>
                     </form>
                 </div>
             </div>
