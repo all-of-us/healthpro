@@ -286,7 +286,16 @@ class AdminController extends AbstractController
 
     public function missingMeasurementsAction(Application $app, Request $request, $_route)
     {
-        $missing = $app['em']->getRepository('evaluations')->fetchBySQL('finalized_ts is not null and rdr_id is null');
+        $query = "
+            SELECT e.*
+            FROM evaluations e
+            LEFT JOIN evaluations_history eh ON e.history_id = eh.id
+            WHERE e.finalized_ts is not null
+              AND e.rdr_id is null
+              AND (eh.type != 'cancel'
+              OR eh.type is null)
+        ";
+        $missing = $app['db']->fetchAll($query);
         $choices = [];
         foreach ($missing as $physicalMeasurements) {
             $choices[$physicalMeasurements['id']] = $physicalMeasurements['id'];
@@ -337,7 +346,17 @@ class AdminController extends AbstractController
 
     public function missingOrdersAction(Application $app, Request $request, $_route)
     {
-        $missing = $app['em']->getRepository('orders')->fetchBySQL('finalized_ts is not null and mayo_id is not null and rdr_id is null');
+        $query = "
+            SELECT o.*
+            FROM orders o
+            LEFT JOIN orders_history oh ON o.history_id = oh.id
+            WHERE o.finalized_ts is not null
+              AND o.mayo_id is not null
+              AND o.rdr_id is null
+              AND (oh.type != 'cancel'
+              OR oh.type is null)
+        ";
+        $missing = $app['db']->fetchAll($query);
         $choices = [];
         foreach ($missing as $orders) {
             $choices[$orders['id']] = $orders['id'];
