@@ -737,6 +737,7 @@ class Evaluation
     public function sendToRdr()
     {
         // Check if parent_id exists
+        $parentRdrId = null;
         if ($this->evaluation['parent_id']) {
             $parentEvaluation = $this->app['em']->getRepository('evaluations')->fetchOneBy([
                 'id' => $this->evaluation['parent_id']

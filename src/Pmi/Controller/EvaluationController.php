@@ -151,6 +151,10 @@ class EvaluationController extends AbstractController
         $evaluationForm = $evaluationService->getForm($app['form.factory']);
         $evaluationForm->handleRequest($request);
         if ($evaluationForm->isSubmitted()) {
+            // Check if PMs are cancelled
+            if ($evaluationService->isEvaluationCancelled()) {
+                $app->abort(403);
+            }
             // Check if finalized_ts is set and rdr_id is empty
             if (!$evaluationService->isEvaluationFailedToReachRDR()) {
                 if ($evaluationForm->isValid()) {
