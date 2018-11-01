@@ -3,7 +3,6 @@ namespace Pmi\Controller;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -305,9 +304,7 @@ class AdminController extends AbstractController
                 'multiple' => true,
                 'expanded' => true,
                 'choices' => $choices,
-                'choice_label' => function ($value, $key, $index) {
-                    return ' ';
-                }
+                'choice_label' => false
             ])
             ->getForm();
         $form->handleRequest($request);
@@ -370,9 +367,7 @@ class AdminController extends AbstractController
                 'multiple' => true,
                 'expanded' => true,
                 'choices' => $choices,
-                'choice_label' => function ($value, $key, $index) {
-                    return ' ';
-                }
+                'choice_label' => false
             ])
             ->getForm();
         $form->handleRequest($request);
