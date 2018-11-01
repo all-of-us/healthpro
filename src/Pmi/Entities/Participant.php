@@ -17,6 +17,7 @@ class Participant
     public $evaluationFinalizedSite;
     public $orderCreatedSite;
     public $age;
+    public $disableTestAccess;
 
     public function __construct($rdrParticipant = null)
     {
@@ -24,6 +25,10 @@ class Participant
             if (!empty($rdrParticipant->cacheTime)) {
                 $this->cacheTime = $rdrParticipant->cacheTime;
                 unset($rdrParticipant->cacheTime);
+            }
+            if (isset($rdrParticipant->disableTestAccess)) {
+                $this->disableTestAccess = $rdrParticipant->disableTestAccess;
+                unset($rdrParticipant->disableTestAccess);
             }
             $this->rdrData = $rdrParticipant;
             $this->parseRdrParticipant($rdrParticipant);
@@ -41,8 +46,8 @@ class Participant
             $this->id = $participant->participantId;
         }
 
-        // Check for participants associated with TEST organization in prod
-        if (getenv('PMI_ENV') === Application::ENV_PROD && $participant->hpoId === 'TEST') {
+        // Check for participants associated with TEST organization when disableTestAccess is set to true
+        if (!empty($this->disableTestAccess) && $participant->hpoId === 'TEST') {
             $this->status = false;
             $this->statusReason = 'test-participant';
         }
