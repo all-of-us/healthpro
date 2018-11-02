@@ -39,6 +39,9 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('cache_time')) {
             $rdrOptions['cache_time'] = $this->getConfig('cache_time');
         }
+        if ($this->getConfig('disable_test_access')) {
+            $rdrOptions['disable_test_access'] = $this->getConfig('disable_test_access');
+        }
 
         $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
         if ($this->participantSource == 'mock') {
@@ -540,10 +543,10 @@ class HpoApplication extends AbstractApplication
     }
 
     /**
-     * Returns true for TEST site only in production
+     * Returns true for TEST site if disable_test_access configuration is set to true
      */
     public function isTestSite()
     {
-        return getenv('PMI_ENV') === self::ENV_PROD && $this->getSiteAwardee() === 'TEST';
+        return !empty($this->getConfig('disable_test_access')) && $this->getSiteAwardee() === 'TEST';
     }
 }

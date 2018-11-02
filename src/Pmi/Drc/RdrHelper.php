@@ -11,6 +11,7 @@ class RdrHelper
     protected $cacheEnabled = true;
     protected $cacheTime = 300;
     protected $lastError;
+    protected $disableTestAccess = false;
 
     public function __construct(array $options)
     {
@@ -23,6 +24,9 @@ class RdrHelper
             }
             if (!empty($options['cache_time'])) {
                 $this->cacheTime  = $options['cache_time'];
+            }
+            if (!empty($options['disable_test_access'])) {
+                $this->disableTestAccess  = $options['disable_test_access'];
             }
             $this->options = $options;
         }
@@ -84,5 +88,10 @@ class RdrHelper
     public function getLastError()
     {
         return $this->lastError;
+    }
+
+    public function getDisableTestAccess()
+    {
+        return $this->disableTestAccess;
     }
 }

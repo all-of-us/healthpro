@@ -159,10 +159,10 @@
                 {% else %}
                     {% if app.isTestSite %}
                         {% set errorTitle = 'Test user' %}
-                        {% set errorMessage = 'Data collection and entry for test users are prohibited in the production environment.' %}
+                        {% set errorMessage = 'Data collection and entry for test users are prohibited in this environment.' %}
                     {% elseif participant.statusReason == 'test-participant' %}
                         {% set errorTitle = 'This is not a real participant' %}
-                        {% set errorMessage = 'Data collection and entry for test participants are prohibited in the production environment. You may not create a biobank order or collect physical measurements for this participant.' %} 
+                        {% set errorMessage = 'Data collection and entry for test participants are prohibited in this environment. You may not create a biobank order or collect physical measurements for this participant.' %}
                     {% elseif participant.statusReason == 'basics' %}
                         {% set errorTitle = 'The Basics survey not complete' %}
                         {% set errorMessage = 'This participant has consented but has not completed "The Basics" survey in the participant app and is therefore ineligible for physical measurements and biospecimen collection. Please direct the participant to complete "The Basics" survey in the participant application to enable in person enrollment or contact the help desk if needed.' %}

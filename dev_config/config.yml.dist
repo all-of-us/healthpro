@@ -78,3 +78,6 @@ sites_use_rdr: true
 # google_analytics_property: UA-XXXXXXXX-NN
 # order_samples_version:
 # order_samples_info_3:
+
+# Disables test user and test awardee participant write access when set to true
+# disable_test_access: false
