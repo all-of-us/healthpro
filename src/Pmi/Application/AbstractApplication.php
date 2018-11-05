@@ -59,6 +59,8 @@ abstract class AbstractApplication extends Application
             return self::ENV_STAGING;
         } elseif ($env == self::ENV_PROD) {
             return self::ENV_PROD;
+        } elseif (isset($_SERVER['SERVER_SOFTWARE']) && preg_match('/^PHP [0-9\\.]+ Development Server$/', $_SERVER['SERVER_SOFTWARE'])) {
+            return self::ENV_LOCAL;
         } else {
             throw new Exception("Bad environment: $env");
         }
