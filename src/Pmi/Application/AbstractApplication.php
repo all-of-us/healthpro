@@ -152,7 +152,9 @@ abstract class AbstractApplication extends Application
         $this->register(new FormServiceProvider());
         $this->register(new ValidatorServiceProvider());
 
-        $this->register(new SessionServiceProvider());
+        if (!$this['isUnitTest']) {
+            $this->register(new SessionServiceProvider());
+        }
         if (isset($this['sessionHandler'])) {
             switch ($this['sessionHandler']) {
                 case 'memcache':
