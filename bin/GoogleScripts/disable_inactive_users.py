@@ -104,6 +104,8 @@ def main(argv):
     for user in usersToDisable:
         if user["suspended"]:
             continue
+        if user.get('primaryEmail')==DELEGATE_ACCOUNT:
+            continue
         if not DRYRUN:
             user["suspended"]=True
             user["suspensionReason"]="Inactivity"
