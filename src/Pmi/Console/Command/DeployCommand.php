@@ -93,6 +93,12 @@ class DeployCommand extends Command {
                 'If set, deploy locally to your GAE SDK web server'
             )
             ->addOption(
+                'local-php',
+                null,
+                InputOption::VALUE_NONE,
+                'Used in conjuction with --local; Will use PHP\'s built-in development server if set'
+            )
+            ->addOption(
                 'port',
                 'p',
                 InputOption::VALUE_OPTIONAL,
@@ -174,16 +180,20 @@ class DeployCommand extends Command {
         }
 
         if ($this->local) {
-            $cmd = "dev_appserver.py -A pmi-hpo-dev --port={$this->port}";
-            if ($this->phpCgiPath) {
-                $cmd .= " --php_executable_path {$this->phpCgiPath}";
+            if ($input->getOption('local-php')) {
+                $cmd = "php -S localhost:{$this->port} -t web/ web/local-router.php";
+            } else {
+                $cmd = "dev_appserver.py -A pmi-hpo-dev --port={$this->port}";
+                if ($this->phpCgiPath) {
+                    $cmd .= " --php_executable_path {$this->phpCgiPath}";
+                }
+                if ($dsDir = $input->getOption('datastoreDir')) {
+                    $dsDir = rtrim($dsDir, '/');
+                    $dsDir .= '/datastore.db';
+                    $cmd .= " --datastore_path={$dsDir}";
+                }
+                $cmd .= " {$this->appDir}/app.yaml";
             }
-            if ($dsDir = $input->getOption('datastoreDir')) {
-                $dsDir = rtrim($dsDir, '/');
-                $dsDir .= '/datastore.db';
-                $cmd .= " --datastore_path={$dsDir}";
-            }
-            $cmd .= " {$this->appDir}/app.yaml";
         } else {
             $cmd = "gcloud app deploy --quiet --project={$this->appId} {$this->appDir}/app.yaml {$this->appDir}/cron.yaml";
         }
