@@ -152,6 +152,7 @@ abstract class AbstractApplication extends Application
         $this->register(new FormServiceProvider());
         $this->register(new ValidatorServiceProvider());
 
+        $this->register(new SessionServiceProvider());
         if (isset($this['sessionHandler'])) {
             switch ($this['sessionHandler']) {
                 case 'memcache':
@@ -406,7 +407,6 @@ abstract class AbstractApplication extends Application
 
     protected function enableMemcacheSession()
     {
-        $this->register(new SessionServiceProvider());
         $memcache = new Memcache();
         $handler = new MemcacheSessionHandler($memcache);
         $this['session.storage.handler'] = $handler;
@@ -414,7 +414,6 @@ abstract class AbstractApplication extends Application
 
     protected function enableDatastoreSession()
     {
-        $this->register(new SessionServiceProvider());
         $this['session.storage.handler'] = new DatastoreSessionHandler();
     }
     
@@ -486,7 +485,7 @@ abstract class AbstractApplication extends Application
     {
         $log = new Log($this, $action, $data);
         $log->logSyslog();
-        if (!$this['isUnitTest'] && $action != Log::REQUEST) {
+        if (!$this['isUnitTest'] && !$this->isLocal() && $action != Log::REQUEST) {
             $log->logDatastore();
         }
     }
