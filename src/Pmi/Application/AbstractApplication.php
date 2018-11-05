@@ -46,7 +46,7 @@ abstract class AbstractApplication extends Application
     ];
 
     /** Determines the environment under which the code is running. */
-    private static function determineEnv()
+    private function determineEnv()
     {
         $env = getenv('PMI_ENV');
         if ($env == self::ENV_LOCAL) {
@@ -59,7 +59,7 @@ abstract class AbstractApplication extends Application
             return self::ENV_STAGING;
         } elseif ($env == self::ENV_PROD) {
             return self::ENV_PROD;
-        } elseif (isset($_SERVER['SERVER_SOFTWARE']) && preg_match('/^PHP [0-9\\.]+ Development Server$/', $_SERVER['SERVER_SOFTWARE'])) {
+        } elseif ($this->isPhpDevServer()) {
             return self::ENV_LOCAL;
         } else {
             throw new Exception("Bad environment: $env");
@@ -69,7 +69,7 @@ abstract class AbstractApplication extends Application
     public function __construct(array $values = array())
     {
         if (!array_key_exists('env', $values)) {
-            $values['env'] = self::determineEnv();
+            $values['env'] = $this->determineEnv();
         }
         if (!array_key_exists('release', $values)) {
             $values['release'] = getenv('PMI_RELEASE') === false ?
@@ -111,7 +111,14 @@ abstract class AbstractApplication extends Application
     {
         return $this['env'] === self::ENV_PROD;
     }
-    
+
+    public function isPhpDevServer()
+    {
+        return
+            isset($_SERVER['SERVER_SOFTWARE']) &&
+            preg_match('/^PHP [0-9\\.]+ Development Server$/', $_SERVER['SERVER_SOFTWARE']);
+    }
+
     public function getName()
     {
         return $this->name;
