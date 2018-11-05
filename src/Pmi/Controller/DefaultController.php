@@ -32,8 +32,7 @@ class DefaultController extends AbstractController
         ['clientTimeout', '/client-timeout', [ 'method' => 'GET' ]],
         ['agreeUsage', '/agree', ['method' => 'POST']],
         ['groups', '/groups'],
-        ['switchSite', '/site/{id}/switch', ['method' => 'GET|POST']],
-        ['selectSite', '/site/select'],
+        ['selectSite', '/site/select', ['method' => 'GET|POST']],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
@@ -140,21 +139,20 @@ class DefaultController extends AbstractController
         ]);
     }
     
-    public function switchSiteAction($id, Application $app, Request $request)
-    {
-        if (!$app->isValidSite($id)) {
-            $app->addFlashError("Sorry, there is a problem with your site's configuration. Please contact your site administrator.");
-            return $app['twig']->render('site-select.html.twig', ['siteEmail' => $id]);
-        }
-        if ($app->switchSite($id)) {
-            return $app->redirectToRoute('home');
-        } else {
-            return $app->abort(403);
-        }
-    }
-    
     public function selectSiteAction(Application $app, Request $request)
     {
+        if ($request->request->has('site')) {
+            $siteId = $request->request->get('site');
+            if (!$app->isValidSite($siteId)) {
+                $app->addFlashError("Sorry, there is a problem with your site's configuration. Please contact your site administrator.");
+                return $app['twig']->render('site-select.html.twig', ['siteEmail' => $id]);
+            }
+            if ($app->switchSite($siteId)) {
+                return $app->redirectToRoute('home');
+            } else {
+                return $app->abort(403);
+            }
+        }
         return $app['twig']->render('site-select.html.twig');
     }
 
