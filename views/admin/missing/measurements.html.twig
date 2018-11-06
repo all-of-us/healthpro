@@ -23,7 +23,9 @@
             </tbody>
         </table>
         {{ form_rest(form) }}
-        <button type="submit" class="btn btn-primary">Resend selected</button>
+        {% if missing is not empty %}
+            <button type="submit" class="btn btn-primary">Resend selected</button>
+        {% endif %}
     {{ form_end(form) }}
 {% endblock %}
 
