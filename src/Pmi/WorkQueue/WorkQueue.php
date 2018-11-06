@@ -22,6 +22,7 @@ class WorkQueue
         'language',
         'enrollmentStatus',
         'consentForStudyEnrollmentTime',
+        'primaryLanguage',
         'consentForElectronicHealthRecordsTime',
         'consentForCABoRTime',
         'withdrawalTime',
@@ -238,6 +239,11 @@ class WorkQueue
         ]
     ];
 
+    public static $primaryLanguage = [
+        'en' => 'English',
+        'es' => 'Spanish'
+    ];
+
     public function generateTableRows($participants, $app)
     {
         $e = function($string) {
@@ -268,6 +274,7 @@ class WorkQueue
             $row['language'] = $e($participant->language);
             $row['participantStatus'] = $e($participant->enrollmentStatus);
             $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentTime);
+            $row['primaryLanguage'] = $this->getPrimaryLanguage($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime, true, true);
             $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime, true);
             if ($participant->withdrawalStatus == 'NO_USE') {
@@ -387,4 +394,10 @@ class WorkQueue
     {
         return '<a href="/participant/' . urlencode($id) . '">' . htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a>';;
     }
+
+    public function getPrimaryLanguage($language)
+    {
+        return isset(self::$primaryLanguage[$language]) ? self::$primaryLanguage[$language] : $language;
+    }
+
 }
