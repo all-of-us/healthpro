@@ -120,7 +120,9 @@ class CodeBook
         'OTHER_RACE' => 'Other',
         'INTERESTED' => 'Registered',
         'MEMBER' => 'Member',
-        'FULL_PARTICIPANT' => 'Full Participant'
+        'FULL_PARTICIPANT' => 'Full Participant',
+        'en' => 'English',
+        'es' => 'Spanish'
     ];
 
     public static function display($code)
