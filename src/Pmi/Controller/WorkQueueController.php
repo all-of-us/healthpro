@@ -299,6 +299,7 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Biospecimens Site';
             $headers[] = 'Withdrawal Reason';
+            $headers[] = 'Language of General Consent';
             fputcsv($output, $headers);
 
             for ($i = 0; $i < ceil(WorkQueue::LIMIT_EXPORT / WorkQueue::LIMIT_EXPORT_PAGE_SIZE); $i++) {
@@ -365,6 +366,7 @@ class WorkQueueController extends AbstractController
                     }
                     $row[] = $participant->orderCreatedSite;
                     $row[] = $participant->withdrawalReason;
+                    $row[] = WorkQueue::getPrimaryLanguage($participant->primaryLanguage);
                     fputcsv($output, $row);
                 }
                 unset($participants);
