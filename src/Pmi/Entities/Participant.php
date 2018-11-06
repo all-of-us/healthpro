@@ -18,6 +18,13 @@ class Participant
     public $orderCreatedSite;
     public $age;
     public $disableTestAccess;
+    public $primaryLanguage;
+
+    public static $primaryLanguageMap = [
+        'UNSET' => '',
+        'en' => 'English',
+        'es' => 'Spanish',
+    ];
 
     public function __construct($rdrParticipant = null)
     {
@@ -104,6 +111,9 @@ class Participant
         if (!empty($participant->biospecimenSourceSite) && $participant->biospecimenSourceSite !== 'UNSET') {
             $this->orderCreatedSite = $this->getSiteSuffix($participant->biospecimenSourceSite);
         }
+
+        // Set primary language
+        $this->primaryLanguage = $this->getPrimaryLanguage($participant->primaryLanguage);
     }
 
     public function getShortId()
@@ -269,5 +279,10 @@ class Participant
     public function getSiteSuffix($site)
     {
         return str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
+    }
+
+    public function getPrimaryLanguage($language)
+    {
+        return isset(self::$primaryLanguageMap[$language]) ? self::$primaryLanguageMap[$language] : $language;
     }
 }

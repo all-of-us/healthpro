@@ -366,7 +366,7 @@ class WorkQueueController extends AbstractController
                     }
                     $row[] = $participant->orderCreatedSite;
                     $row[] = $participant->withdrawalReason;
-                    $row[] = WorkQueue::getPrimaryLanguage($participant->primaryLanguage);
+                    $row[] = $participant->primaryLanguage;
                     fputcsv($output, $row);
                 }
                 unset($participants);
