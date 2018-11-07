@@ -22,6 +22,7 @@ class WorkQueue
         'language',
         'enrollmentStatus',
         'consentForStudyEnrollmentTime',
+        'primaryLanguage',
         'consentForElectronicHealthRecordsTime',
         'consentForCABoRTime',
         'withdrawalTime',
@@ -268,6 +269,7 @@ class WorkQueue
             $row['language'] = $e($participant->language);
             $row['participantStatus'] = $e($participant->enrollmentStatus);
             $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentTime);
+            $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime, true, true);
             $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime, true);
             if ($participant->withdrawalStatus == 'NO_USE') {

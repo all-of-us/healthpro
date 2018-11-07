@@ -44,6 +44,7 @@ $(document).ready(function() {
       { name: 'language', visible: false, data: 'language', orderable: false  },
       { name: 'participantStatus', data: 'participantStatus' },
       { name: 'generalConsent', data: 'generalConsent', class: 'text-center' },
+      { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
       { name: 'withdrawal', data: 'withdrawal', class: 'text-center' },
