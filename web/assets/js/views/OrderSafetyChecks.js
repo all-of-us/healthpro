@@ -33,15 +33,21 @@ $(document).ready(function () {
         }
     };
 
-    var handleStep5 = function () {
+    var handleStep5 = function (donate) {
         // #5 Show Question 5
         showFields(['ppc-qn']);
         hideFields(['continue', 'order-info-text']);
         var ppc = $('input:radio[name=ppc_qn]:checked').val();
         if (ppc === 'yes') {
-            // #5 Continue with no restriction
-            showFields(['continue']);
-            allowCollection('all');
+            if (donate === 'no') {
+                // #5 Continue with no restriction
+                showFields(['continue']);
+                allowCollection('all');
+            } else {
+                // #5 Display info text 1 and continue
+                showFields(['order-info-text', 'info-text-1', 'continue']);
+                allowCollection('saliva');
+            }
         } else if (ppc === 'no') {
             // #5 Display info text 3 and continue
             hideFields(['order-info-text']);
@@ -92,23 +98,36 @@ $(document).ready(function () {
                 var rbc = $('input:radio[name=rbc_qn]:checked').val();
                 if (rbc === 'yes') {
                     if (!isTransfusionPPCChecked) {
-                        // #4 Continue with no restriction
-                        showFields(['continue']);
                         hideFields(['order-info-text', 'ppc-qn']);
-                        allowCollection('all');
+                        if (donate === 'no') {
+                            // #4 Continue with no restriction
+                            showFields(['continue']);
+                            allowCollection('all');
+                        } else {
+                            // #4 Display info text 1 and continue
+                            showFields(['order-info-text', 'info-text-1', 'continue']);
+                            allowCollection('saliva');
+                        }
                     } else {
                         // #5 Handle step 5
-                        handleStep5();
+                        handleStep5(donate);
                     }
                 } else if (rbc === 'no') {
                     // #4 Display info text 2 and continue
                     hideFields(['ppc-qn', 'order-info-text']);
                     showFields(['continue', 'order-info-text', 'info-text-2']);
                     allowCollection('saliva');
+                } else {
+                    // Hide PPC question if RBC question is not checked
+                    hideFields(['ppc-qn']);
                 }
             } else if (isTransfusionPPCChecked) {
                 // #5 Handle step 5
-                handleStep5();
+                hideFields(['rbc-qn']);
+                handleStep5(donate);
+            } else {
+                // Hide both RBC and PPC questions if no transfusion type is checked
+                hideFields(['rbc-qn', 'ppc-qn']);
             }
         } else {
             // #3 Continue with no restriction
