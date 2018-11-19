@@ -1343,13 +1343,22 @@ class Order
                 $finalizedTs = $sample->finalized;
             }
         }
+        // Update notes fields
+        if (!empty($object->notes)) {
+            $collectedNotes = !empty($object->notes->collected) ? $object->notes->collected : '';
+            $processedNotes = !empty($object->notes->processed) ? $object->notes->processed : '';
+            $finalizedNotes = !empty($object->notes->finalized) ? $object->notes->finalized : '';
+        }
         $updateArray = [
             'collected_samples' => json_encode($collectedSamples),
             'collected_ts' => $collectedTs,
             'processed_samples' => json_encode($processedSamples),
             'processed_samples_ts' => json_encode($processedSamplesTs),
             'finalized_samples' => json_encode($finalizedSamples),
-            'finalized_ts' => $finalizedTs
+            'finalized_ts' => $finalizedTs,
+            'collected_notes' => $collectedNotes,
+            'processed_notes' => $processedNotes,
+            'finalized_notes' => $finalizedNotes
         ];
         if (!empty($centrifugeType)) {
             $updateArray['processed_centrifuge_type'] = $centrifugeType;
