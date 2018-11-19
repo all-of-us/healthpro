@@ -1323,32 +1323,35 @@ class Order
     {
         // Get order object from RDR
         $object = $this->app['pmi.drc.participants']->getOrder($participantId, $this->order['rdr_id']);
-        foreach ($object->samples as $sample) {
-            $sampleCode = $sample->test;
-            if (!array_key_exists($sample->test, $this->samplesInformation) && array_key_exists($sample->test, self::$mapRdrSamples)) {
-                $sampleCode = self::$mapRdrSamples[$sample->test]['code'];
-                $centrifugeType = self::$mapRdrSamples[$sample->test]['centrifuge_type'];
-            }
-            if (!empty($sample->collected)) {
-                $collectedSamples[] = $sampleCode;
-                $collectedTs = $sample->collected;
-            }
-            if (!empty($sample->processed)) {
-                $processedSamples[] = $sampleCode;
-                $processedTs = new \DateTime($sample->processed);
-                $processedSamplesTs[$sampleCode] = $processedTs->getTimestamp();
-            }
-            if (!empty($sample->finalized)) {
-                $finalizedSamples[] = $sampleCode;
-                $finalizedTs = $sample->finalized;
+
+        //Update samples
+        if (!empty($object->samples)) {
+            foreach ($object->samples as $sample) {
+                $sampleCode = $sample->test;
+                if (!array_key_exists($sample->test, $this->samplesInformation) && array_key_exists($sample->test, self::$mapRdrSamples)) {
+                    $sampleCode = self::$mapRdrSamples[$sample->test]['code'];
+                    $centrifugeType = self::$mapRdrSamples[$sample->test]['centrifuge_type'];
+                }
+                if (!empty($sample->collected)) {
+                    $collectedSamples[] = $sampleCode;
+                    $collectedTs = $sample->collected;
+                }
+                if (!empty($sample->processed)) {
+                    $processedSamples[] = $sampleCode;
+                    $processedTs = new \DateTime($sample->processed);
+                    $processedSamplesTs[$sampleCode] = $processedTs->getTimestamp();
+                }
+                if (!empty($sample->finalized)) {
+                    $finalizedSamples[] = $sampleCode;
+                    $finalizedTs = $sample->finalized;
+                }
             }
         }
+
         // Update notes field
-        if (!empty($object->notes)) {
-            $collectedNotes = !empty($object->notes->collected) ? $object->notes->collected : null;
-            $processedNotes = !empty($object->notes->processed) ? $object->notes->processed : null;
-            $finalizedNotes = !empty($object->notes->finalized) ? $object->notes->finalized : null;
-        }
+        $collectedNotes = !empty($object->notes->collected) ? $object->notes->collected : null;
+        $processedNotes = !empty($object->notes->processed) ? $object->notes->processed : null;
+        $finalizedNotes = !empty($object->notes->finalized) ? $object->notes->finalized : null;
 
         // Update tracking number
         if (!empty($object->identifier)) {
@@ -1360,20 +1363,23 @@ class Order
             }
         }
         $updateArray = [
-            'collected_samples' => json_encode($collectedSamples),
-            'collected_ts' => $collectedTs,
-            'processed_samples' => json_encode($processedSamples),
-            'processed_samples_ts' => json_encode($processedSamplesTs),
-            'finalized_samples' => json_encode($finalizedSamples),
-            'finalized_ts' => $finalizedTs,
+            'collected_samples' => !empty($collectedSamples) ? json_encode($collectedSamples) : [],
+            'collected_ts' => !empty($collectedTs) ? $collectedTs : null,
+            'processed_samples' => !empty($processedSamples) ? json_encode($processedSamples) : [],
+            'processed_samples_ts' => !empty($processedSamplesTs) ? json_encode($processedSamplesTs) : [],
+            'finalized_samples' => !empty($finalizedSamples) ? json_encode($finalizedSamples) : [],
+            'finalized_ts' => !empty($finalizedTs) ? $finalizedTs : null,
             'collected_notes' => $collectedNotes,
             'processed_notes' => $processedNotes,
             'finalized_notes' => $finalizedNotes,
             'fedex_tracking' => !empty($trackingNumber) ? $trackingNumber : null
         ];
+
+        //Update centrifuge type
         if (!empty($centrifugeType)) {
             $updateArray['processed_centrifuge_type'] = $centrifugeType;
         }
+
         // Update order
         $ordersRepository = $this->app['em']->getRepository('orders');
         $status = false;
