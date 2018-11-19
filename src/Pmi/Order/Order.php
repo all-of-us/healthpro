@@ -1343,11 +1343,21 @@ class Order
                 $finalizedTs = $sample->finalized;
             }
         }
-        // Update notes fields
+        // Update notes field
         if (!empty($object->notes)) {
-            $collectedNotes = !empty($object->notes->collected) ? $object->notes->collected : '';
-            $processedNotes = !empty($object->notes->processed) ? $object->notes->processed : '';
-            $finalizedNotes = !empty($object->notes->finalized) ? $object->notes->finalized : '';
+            $collectedNotes = !empty($object->notes->collected) ? $object->notes->collected : null;
+            $processedNotes = !empty($object->notes->processed) ? $object->notes->processed : null;
+            $finalizedNotes = !empty($object->notes->finalized) ? $object->notes->finalized : null;
+        }
+
+        // Update tracking number
+        if (!empty($object->identifier)) {
+            foreach ($object->identifier as $identifier) {
+                if (preg_match("/tracking-number/i", $identifier->system)) {
+                    $trackingNumber = $identifier->value;
+                    break;
+                }
+            }
         }
         $updateArray = [
             'collected_samples' => json_encode($collectedSamples),
@@ -1358,7 +1368,8 @@ class Order
             'finalized_ts' => $finalizedTs,
             'collected_notes' => $collectedNotes,
             'processed_notes' => $processedNotes,
-            'finalized_notes' => $finalizedNotes
+            'finalized_notes' => $finalizedNotes,
+            'fedex_tracking' => !empty($trackingNumber) ? $trackingNumber : null
         ];
         if (!empty($centrifugeType)) {
             $updateArray['processed_centrifuge_type'] = $centrifugeType;
