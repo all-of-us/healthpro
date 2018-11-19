@@ -4,6 +4,7 @@ namespace Pmi\Security;
 use Pmi\Application\AbstractApplication;
 use Pmi\Audit\Log;
 use Pmi\HttpClient;
+use Pmi\Util;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -19,6 +20,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
  */
 class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 {
+    const OAUTH_FAILURE_MESSAGE = 'OAuth Failure';
+
     private $app;
     
     public function __construct(AbstractApplication $app)
@@ -70,15 +73,20 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
                 return $this->buildCredentials(null);
             }
         } elseif ($request->query->get('state') && $request->query->get('state') === $this->app['session']->get('auth_state')) {
-            // process a return from Google authentication
-            $client = $this->getAuthLoginClient();
-            $token = $client->fetchAccessTokenWithAuthCode($request->query->get('code'));
-            $client->setAccessToken($token);
-            $idToken = $client->verifyIdToken();
-            if ($idToken) {
-                $this->app['session']->set('googleUser', new \Pmi\Drc\GoogleUser($idToken['sub'], $idToken['email']));
+            try {
+                // process a return from Google authentication
+                $client = $this->getAuthLoginClient();
+                $token = $client->fetchAccessTokenWithAuthCode($request->query->get('code'));
+                $client->setAccessToken($token);
+                $idToken = $client->verifyIdToken();
+                if ($idToken) {
+                    $this->app['session']->set('googleUser', new \Pmi\Drc\GoogleUser($idToken['sub'], $idToken['email']));
+                }
+                return $this->buildCredentials($this->app->getGoogleUser());
+            } catch (\Exception $e) {
+                Util::logException($e);
+                throw new AuthenticationException(self::OAUTH_FAILURE_MESSAGE);
             }
-            return $this->buildCredentials($this->app->getGoogleUser());
         } elseif ($this->app->getConfig('gae_auth') && $this->app->getGoogleUser()) {
             return $this->buildCredentials($this->app->getGoogleUser());
         } else {
@@ -130,7 +138,9 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             } else {
                 $template = 'error-auth.html.twig';
             }
-            
+        } elseif ($exception->getMessage() === self::OAUTH_FAILURE_MESSAGE) {
+            $template = 'error-oauth.html.twig';
+            $params = ['logoutUrl' => $this->app->getGoogleLogoutUrl()];
         } elseif ($this->app->getConfig('gae_auth')) {
             $template = 'error-gae-auth.html.twig';
             $params = ['loginUrl' => $this->app->getGoogleLoginUrl()];

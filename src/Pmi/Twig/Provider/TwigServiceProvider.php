@@ -17,6 +17,8 @@ use Symfony\Bridge\Twig\Extension\WebLinkExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Form\TwigRenderer;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
+use Symfony\Component\Form\FormRenderer;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Pmi\Twig\Loader\Filesystem;
 
@@ -24,10 +26,10 @@ class TwigServiceProvider extends \Silex\Provider\TwigServiceProvider
 {
     public function register(Container $app)
     {
-        $app['twig.options'] = array();
-        $app['twig.form.templates'] = array('form_div_layout.html.twig');
-        $app['twig.path'] = array();
-        $app['twig.templates'] = array();
+        $app['twig.options'] = [];
+        $app['twig.form.templates'] = ['form_div_layout.html.twig'];
+        $app['twig.path'] = [];
+        $app['twig.templates'] = [];
 
         $app['twig.date.format'] = 'F j, Y H:i';
         $app['twig.date.interval_format'] = '%d days';
@@ -39,11 +41,11 @@ class TwigServiceProvider extends \Silex\Provider\TwigServiceProvider
 
         $app['twig'] = function ($app) {
             $app['twig.options'] = array_replace(
-                array(
+                [
                     'charset' => $app['charset'],
                     'debug' => $app['debug'],
                     'strict_variables' => $app['debug'],
-                ), $app['twig.options']
+                ], $app['twig.options']
             );
 
             $twig = $app['twig.environment_factory']($app);
@@ -112,7 +114,11 @@ class TwigServiceProvider extends \Silex\Provider\TwigServiceProvider
                     $app['twig.form.renderer'] = function ($app) {
                         $csrfTokenManager = isset($app['csrf.token_manager']) ? $app['csrf.token_manager'] : null;
 
-                        return new TwigRenderer($app['twig.form.engine'], $csrfTokenManager);
+                        if (Kernel::VERSION_ID < 30400) {
+                            return new TwigRenderer($app['twig.form.engine'], $csrfTokenManager);
+                        }
+
+                        return new FormRenderer($app['twig.form.engine'], $csrfTokenManager);
                     };
 
                     $twig->addExtension(new FormExtension(class_exists(HttpKernelRuntime::class) ? null : $app['twig.form.renderer']));
@@ -140,7 +146,16 @@ class TwigServiceProvider extends \Silex\Provider\TwigServiceProvider
         };
 
         $app['twig.loader.filesystem'] = function ($app) {
-            return new Filesystem($app['twig.path']);
+            $loader = new Filesystem();
+            foreach (is_array($app['twig.path']) ? $app['twig.path'] : [$app['twig.path']] as $key => $val) {
+                if (is_string($key)) {
+                    $loader->addPath($key, $val);
+                } else {
+                    $loader->addPath($val);
+                }
+            }
+
+            return $loader;
         };
 
         $app['twig.loader.array'] = function ($app) {
@@ -148,10 +163,10 @@ class TwigServiceProvider extends \Silex\Provider\TwigServiceProvider
         };
 
         $app['twig.loader'] = function ($app) {
-            return new \Twig_Loader_Chain(array(
+            return new \Twig_Loader_Chain([
                 $app['twig.loader.array'],
                 $app['twig.loader.filesystem'],
-            ));
+            ]);
         };
 
         $app['twig.environment_factory'] = $app->protect(function ($app) {
@@ -163,10 +178,17 @@ class TwigServiceProvider extends \Silex\Provider\TwigServiceProvider
         };
 
         $app['twig.runtimes'] = function ($app) {
-            return array(
+            $runtimes = [
                 HttpKernelRuntime::class => 'twig.runtime.httpkernel',
-                TwigRenderer::class => 'twig.form.renderer',
-            );
+            ];
+
+            if (Kernel::VERSION_ID < 30400) {
+                $runtimes[TwigRenderer::class] = 'twig.form.renderer';
+            } else {
+                $runtimes[FormRenderer::class] = 'twig.form.renderer';
+            }
+
+            return $runtimes;
         };
 
         $app['twig.runtime_loader'] = function ($app) {

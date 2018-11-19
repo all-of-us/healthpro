@@ -26,7 +26,7 @@
             {% if order.type == 'saliva' %}
                 {{ form_widget(collectForm.collected_samples) }}
             {% else %}
-                {{ samples.form_widget(collectForm.collected_samples, order.finalized_ts ? false : true, samplesInfo, version) }}
+                {{ samples.form_widget(collectForm.collected_samples, order.formDisabled ? false : true, samplesInfo, version) }}
             {% endif %}
             {{ form_errors(collectForm.collected_samples) }}
         </div>
@@ -42,7 +42,7 @@
         </div>
 
         {{ form_rest(collectForm) }}
-        {% if not order.finalized_ts and not order.expired %}
+        {% if not order.formDisabled %}
             <p>
                 <button type="submit" class="btn btn-primary" name="save">
                     {% if order.collected_ts %}
@@ -54,6 +54,11 @@
             </p>
         {% endif %}
     {{ form_end(collectForm) }}
+    {% if order.status == 'unlock' %}
+        {{ form_start(revertForm, { 'action': path('orderRevert', { participantId: participant.id, orderId: order.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}
+        {{ form_errors(revertForm) }}
+        {{ form_end(revertForm) }}
+    {% endif %}
 {% endblock %}
 
 {% block pagejs %}

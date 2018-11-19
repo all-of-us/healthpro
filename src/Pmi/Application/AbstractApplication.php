@@ -6,6 +6,7 @@ use Memcache;
 use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
+use Pmi\Util;
 use Silex\Application;
 use Silex\Provider\CsrfServiceProvider;
 use Silex\Provider\FormServiceProvider;
@@ -334,8 +335,7 @@ abstract class AbstractApplication extends Application
 
             // syslog 500 errors
             if ($code >= 500) {
-                syslog(LOG_CRIT, $e->getMessage());
-                syslog(LOG_INFO, substr($e->getTraceAsString(), 0, 5120)); // log the first 5KB of the stack trace
+                Util::logException($e);
             }
 
             // If not in debug mode or error is < 500, render the error template

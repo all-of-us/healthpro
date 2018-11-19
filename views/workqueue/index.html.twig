@@ -57,9 +57,11 @@
                 <th rowspan="2" class="col-group-info">Language</th>
                 <th rowspan="2" class="col-group-default">Participant Status</th>
                 <th rowspan="2" class="col-group-default col-group-info">General Consent</th>
+                <th rowspan="2" class="col-group-default col-group-info">Language of General Consent</th>
                 <th rowspan="2" class="col-group-default col-group-info">EHR Consent</th>
                 <th rowspan="2" class="col-group-info">CABoR Consent <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip" data-container="body"><i class="fa fa-question-circle text-info"></i></span></th>
                 <th rowspan="2" class="col-group-default col-group-info">Withdrawal</th>
+                <th rowspan="2" class="col-group-info">Withdrawal Reason</th>
 
                 <th colspan="4" class="topheader multiheader-contact">Contact</th>
 
@@ -85,14 +87,14 @@
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Paired Site {{ display_message('pairing_info', 'tooltip')|raw }}</th>
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Paired Organization {{ display_message('pairing_info', 'tooltip')|raw }}</th>
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Phys Measurements</th>
-                <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Phys Meas Site</th>
+                <th class="secondaryheader col-group-inperson multiheader-inperson">Phys Meas Site</th>
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Samples for DNA Received?</th>
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Bio&shy;specimens</th>
                 {% for field, label in samples %}
                     <th class="secondaryheader col-group-inperson multiheader-inperson">{{ label }}</th>
                     <th class="secondaryheader col-group-inperson-time multiheader-inperson">{{ label }} Date</th>
                 {% endfor %}
-                <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Bio&shy;specimens Site</th>
+                <th class="secondaryheader col-group-inperson multiheader-inperson">Bio&shy;specimens Site</th>
 
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Age</th>
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Sex</th>

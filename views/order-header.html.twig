@@ -10,6 +10,32 @@
 </h2>
 <p class="lead">
     Order ID: <strong>{{ order.order_id }}</strong>
+    {% set params = { participantId: participant.id, orderId: order.id } %}
+    {% set route = app.request_stack.currentRequest.attributes.get('_route') %}
+    {% set return = path(route, params) %}
+    {% if order.canUnlock %}
+        <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'unlock', return: return }) }}" class="btn btn-sm btn-primary">Unlock for Editing</a>
+    {% endif %}
+    {% if order.canCancel %}
+        <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel Order</a>
+    {% elseif order.canRestore %}
+        <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore Order</a>
+    {% endif %}
+    {% if order.status == 'unlock' %}
+        <div class="alert alert-warning well-sm">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>
+                Unlocked for editing by {{ app.getUserEmailById(order.oh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.oh_site) }} on {{ order.oh_created_ts|date('F j, Y g:ia', app.userTimezone) }}
+            </strong>
+        </div>
+    {% elseif order.status == 'cancel' %}
+        <div class="alert alert-danger well-sm">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>
+                Cancelled by {{ app.getUserEmailById(order.oh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.oh_site) }} on {{ order.oh_created_ts|date('F j, Y g:ia', app.userTimezone) }}
+            </strong>
+        </div>
+    {% endif %}
     {% if app.isDVType and app.reportKitUrl and order.type == 'kit' %}
         <button type="button" data-href="{{ app.reportKitUrl }}" class="btn btn-danger pull-right external-link">Report Kit Problem</button>
     {% endif %}
@@ -17,7 +43,6 @@
 
 {% include 'partials/participant-dl.html.twig' %}
 
-{% set params = { participantId: participant.id, orderId: order.id } %}
 {% if order.type == 'kit' %}
     {% set steps = {
         collect: ['Collect', 'collected'],
@@ -37,10 +62,17 @@
 {% if active in stepNeedDetails %}
     {% set activeStep = attribute(steps, active)[1] %}
     {% if attribute(order, activeStep~'_ts') is not empty %}
-        <div class="{% if order.finalized_ts is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
-            <i class="fa fa-info-circle" aria-hidden="true"></i>
-            <strong>{{ activeStep|capitalize }} by {{ app.getUserEmailById(attribute(order, activeStep~'_user_id'))|default('Unknown') }} at {{ app.getSiteDisplayName(attribute(order, activeStep~'_site')) }}</strong>
-        </div>
+        {% if activeStep == 'finalized' and order.rdr_id is empty %}
+            <div class="alert alert-danger well-sm">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <strong>An error occurred while finalizing this order. {% if order.status != 'cancel' %} Please try again. {% endif %}</strong>
+            </div>
+        {% else %}
+            <div class="{% if order.rdr_id is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <strong>{{ activeStep|capitalize }} by {{ app.getUserEmailById(attribute(order, activeStep~'_user_id'))|default('Unknown') }} at {{ app.getSiteDisplayName(attribute(order, activeStep~'_site')) }}</strong>
+            </div>
+        {% endif %}
     {% endif %}
 {% endif %}
 <ul class="nav nav-tabs">
@@ -50,8 +82,15 @@
     {% set previousStep = false %}
     {% for step, column in steps %}
         {% set path = column[0]|replace({' ' : ''}) %}
-        {% if (step == 'printLabels') and (order.finalized_ts or order.expired) %}
-            <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> {{ column[0] }}</a></li>
+        {% if (step == 'printLabels' and (order.disabled or order.status == 'unlock')) or (step == 'printRequisition' and order.status == 'cancel') %}
+            <li role="presentation" class="disabled">
+                <a href="#">
+                    {% if step == 'printLabels' %}
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                    {% endif %}
+                    {{ column[0] }}
+                </a>
+            </li>
         {% elseif nextEnabled %}
             <li role="presentation"{% if active == step %} class="active"{% endif %}>
                 <a href="{{ path('order'~path, params) }}">
@@ -76,7 +115,5 @@
 </ul>
 <br />
 {% if active in ['collect', 'process', 'finalize'] %}
-    {% set route = app.request_stack.currentRequest.attributes.get('_route') %}
-    {% set return = path(route, params) %}
     <p><strong>Your time zone</strong>: {{ app.userTimezoneDisplay }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
 {% endif %}

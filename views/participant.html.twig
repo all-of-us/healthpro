@@ -106,79 +106,11 @@
                 {% if participant.status and not app.isTestSite %}
                     <div class="row">
                         <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h3>
-                                </div>
-                                <div class="panel-body">
-                                    {% for evaluation in evaluations %}
-                                        {% if loop.index == 6 %}
-                                            <div id="evaluation-overflow">
-                                        {% endif %}
-                                        <a href="{{ path('evaluation', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg btn-default">
-                                            {{ evaluation.created_ts|date('D n/j/Y', app.userTimezone) }}<br />
-                                            <small class="text-muted">
-                                                {% if evaluation.finalized_ts %}
-                                                    <span class="label label-success">Finalized</span> {{ evaluation.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                {% else %}
-                                                    <span class="label label-default">Updated</span> {{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                {% endif %}
-                                            </small>
-                                        </a>
-                                    {% endfor %}
-                                    {% if evaluations|length > 5 %}
-                                        </div> {# close .evaluation-overflow div above #}
-                                        <a href="#" class="btn btn-block btn-lg btn-default" id="evaluation-overflow-show">
-                                            <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
-                                        </a>
-                                    {% endif %}
-                                    <a href="{{ path('evaluation', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
-                                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                                        {% if evaluations|length > 0 %}
-                                            New
-                                        {% else %}
-                                            Start
-                                        {% endif %}
-                                        Physical Measurements
-                                    </a>
-                                </div>
-                            </div>
+                            {% include 'partials/participant-evaluation-list.html.twig' %}
                         </div>
 
                         <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
-                                </div>
-                                <div class="panel-body">
-                                    {% for order in orders %}
-                                        {% if loop.index == 6 %}
-                                            <div id="order-overflow">
-                                        {% endif %}
-                                        <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg btn-default">
-                                            {{ order.created_ts|date('D n/j/Y', app.userTimezone) }} <small class="text-muted"><strong>{{ order.order_id }}</strong></small><br />
-                                            <small class="text-muted">
-                                                {% if not order.finalized_ts and not order.version %}
-                                                    <span class="label label-danger">Expired</span>
-                                                {% elseif order.finalized_ts %}
-                                                    <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                {% elseif order.processed_ts %}
-                                                    <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                {% elseif order.collected_ts %}
-                                                    <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                {% endif %}                                    
-                                            </small>
-                                        </a>
-                                    {% endfor %}
-                                    {% if orders|length > 5 %}
-                                        </div> {# close .order-overflow div above #}
-                                        <a href="#" class="btn btn-block btn-lg btn-default" id="order-overflow-show">
-                                            <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
-                                        </a>
-                                    {% endif %}
-                                    <a href="{{ path('orderCheck', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
-                                </div>
-                            </div>
+                            {% include 'partials/participant-orders-list.html.twig' %}
                         </div>
                         {% if app.isDVType %}
                             <div class="col-sm-6 col-lg-4">
@@ -227,10 +159,10 @@
                 {% else %}
                     {% if app.isTestSite %}
                         {% set errorTitle = 'Test user' %}
-                        {% set errorMessage = 'Data collection and entry for test users are prohibited in the production environment.' %}
+                        {% set errorMessage = 'Data collection and entry for test users are prohibited in this environment.' %}
                     {% elseif participant.statusReason == 'test-participant' %}
                         {% set errorTitle = 'This is not a real participant' %}
-                        {% set errorMessage = 'Data collection and entry for test participants are prohibited in the production environment. You may not create a biobank order or collect physical measurements for this participant.' %} 
+                        {% set errorMessage = 'Data collection and entry for test participants are prohibited in this environment. You may not create a biobank order or collect physical measurements for this participant.' %}
                     {% elseif participant.statusReason == 'basics' %}
                         {% set errorTitle = 'The Basics survey not complete' %}
                         {% set errorMessage = 'This participant has consented but has not completed "The Basics" survey in the participant app and is therefore ineligible for physical measurements and biospecimen collection. Please direct the participant to complete "The Basics" survey in the participant application to enable in person enrollment or contact the help desk if needed.' %}
@@ -248,7 +180,15 @@
                                     <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> {{ errorTitle }}</h3>
                                 </div>
                                 <div class="panel-body">
-                                    {{ errorMessage }}
+                                    <p>{{ errorMessage }}</p>
+                                    {% if participant.statusReason == 'withdrawal' and participant.withdrawalReason is not empty %}
+                                        <p>
+                                            <strong>Reason:</strong> {{ participant.withdrawalReason }}
+                                            {% if participant.withdrawalReasonJustification is not empty %}
+                                                <br /><strong>Justification:</strong> {{ participant.withdrawalReasonJustification }}
+                                            {% endif %}
+                                        </p>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -259,6 +199,18 @@
                 <div role="tabpanel" class="tab-pane" id="details">
                     <div class="row">
                         <div class="col-md-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Consent</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <dl class="dl-vertical">
+                                        <dt>Language of General Consent</dt>
+                                        <dd>{{ participant.primaryLanguage|default('--') }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Contact</h3>

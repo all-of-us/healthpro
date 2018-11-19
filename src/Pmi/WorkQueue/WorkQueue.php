@@ -12,6 +12,7 @@ class WorkQueue
 
     protected $app;
 
+    // These are used to map a DataTables column index to an RDR field for sorting
     public static $wQColumns = [
         'lastName',
         'firstName',
@@ -21,9 +22,11 @@ class WorkQueue
         'language',
         'enrollmentStatus',
         'consentForStudyEnrollmentTime',
+        'primaryLanguage',
         'consentForElectronicHealthRecordsTime',
         'consentForCABoRTime',
         'withdrawalTime',
+        'withdrawalReason',
         'recontactMethod',
         'streetAddress',
         'email',
@@ -103,7 +106,8 @@ class WorkQueue
             'options' => [
                 'Consented' => 'SUBMITTED',
                 'Refused consent' => 'SUBMITTED_NO_CONSENT',
-                'Consent not completed' => 'UNSET'
+                'Consent not completed' => 'UNSET',
+                'Invalid' => 'SUBMITTED_INVALID'
             ]
         ],
         'ageRange' => [
@@ -265,13 +269,15 @@ class WorkQueue
             $row['language'] = $e($participant->language);
             $row['participantStatus'] = $e($participant->enrollmentStatus);
             $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentTime);
+            $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime, true, true);
             $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime, true);
             if ($participant->withdrawalStatus == 'NO_USE') {
                 $row['withdrawal'] = self::HTML_DANGER . ' <span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
             } else {
-                $row['withdrawal'] = ''; 
+                $row['withdrawal'] = '';
             }
+            $row['withdrawalReason'] = $e($participant->withdrawalReason);
 
             //Contact
             $row['contactMethod'] = $e($participant->recontactMethod);
