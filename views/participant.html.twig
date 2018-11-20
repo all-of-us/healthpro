@@ -72,7 +72,7 @@
                 <br />
             </div>
             <div class="status-block">
-                <strong>DV EHR Sharing</strong> <span title="This only applies to DV participants" data-toggle="tooltip"><span class="sr-only">What is DV EHR Sharing</span><i class="fa fa-question-circle text-info"></i></span>
+                <strong>DV EHR Sharing</strong> <span title="Only applies to DV participants" data-toggle="tooltip"><span class="sr-only">What is DV EHR Sharing</span><i class="fa fa-question-circle text-info"></i></span>
                 {% if participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
                     {{ participant.consentForDvElectronicHealthRecordsSharingTime ? participant.consentForDvElectronicHealthRecordsSharingTime|date('n/j/Y', app.userTimezone) }}
