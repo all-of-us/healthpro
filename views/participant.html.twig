@@ -72,6 +72,20 @@
                 <br />
             </div>
             <div class="status-block">
+                <strong>DV EHR Sharing</strong> <span title="This only applies to DV participants" data-toggle="tooltip"><span class="sr-only">What is DV EHR Sharing</span><i class="fa fa-question-circle text-info"></i></span>
+                {% if participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED' %}
+                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                    {{ participant.consentForDvElectronicHealthRecordsSharingTime ? participant.consentForDvElectronicHealthRecordsSharingTime|date('n/j/Y', app.userTimezone) }}
+                {% elseif participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED_NOT_SURE' %}
+                    <i class="fa fa-question text-warning" aria-hidden="true"></i>
+                    {{ participant.consentForDvElectronicHealthRecordsSharingTime ? participant.consentForDvElectronicHealthRecordsSharingTime|date('n/j/Y', app.userTimezone) }}
+                {% else %}
+                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    {{ participant.consentForDvElectronicHealthRecordsSharingTime ? participant.consentForDvElectronicHealthRecordsSharingTime|date('n/j/Y', app.userTimezone) : '(not completed)' }}
+                {% endif %}
+                <br />
+            </div>
+            <div class="status-block">
                 <strong>CABoR Consent</strong> <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
                 {% if participant.consentForCABoR == 'SUBMITTED' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
