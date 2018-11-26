@@ -188,6 +188,7 @@ class Order
         $this->order['canCancel'] = $this->canCancel();
         $this->order['canRestore'] = $this->canRestore();
         $this->order['canUnlock'] = $this->canUnlock();
+        $this->order['failedToReachRDR'] = $this->isOrderFailedToReachRdr();
         $this->loadSamplesSchema();
     }
 
@@ -969,7 +970,7 @@ class Order
 
     public function isOrderFailedToReachRdr()
     {
-        return !empty($this->order['finalized_ts']) && empty($this->order['rdr_id']);
+        return !empty($this->order['finalized_ts']) && !empty($this->order['mayo_id']) && empty($this->order['rdr_id']);
     }
 
     public function canCancel()
