@@ -62,7 +62,7 @@
 {% if active in stepNeedDetails %}
     {% set activeStep = attribute(steps, active)[1] %}
     {% if attribute(order, activeStep~'_ts') is not empty %}
-        {% if activeStep == 'finalized' and order.rdr_id is empty %}
+        {% if activeStep == 'finalized' and order.failedToReachRDR %}
             <div class="alert alert-danger well-sm">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <strong>An error occurred while finalizing this order. {% if order.status != 'cancel' %} Please try again. {% endif %}</strong>
