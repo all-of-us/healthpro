@@ -39,7 +39,7 @@ $(document).ready(function() {
             isHTML: true,
             onTrue: function () {
                 if (count > 1000) {
-                    workQueueExportWarningModel(location)
+                    workQueueExportWarningModel(location);
                 } else {
                     window.location = location;
                 }
