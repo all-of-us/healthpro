@@ -273,7 +273,7 @@ $(document).ready(function() {
     // Display custom error message
     $.fn.dataTable.ext.errMode = 'none';
     $('#workqueue').on('error.dt', function(e) {
-        alert('An error occured please reload the page and try again');
+        alert('An error occurred please reload the page and try again');
     });
 
     // Scroll to top when performing pagination
