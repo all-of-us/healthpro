@@ -32,6 +32,7 @@ class WorkQueue
         'recontactMethod',
         'streetAddress',
         'email',
+        'loginPhoneNumber',
         'phoneNumber',
         'numCompletedBaselinePPIModules',
         'numCompletedPPIModules',
@@ -290,6 +291,7 @@ class WorkQueue
                 $row['address'] = '';  
             }
             $row['email'] = $e($participant->email);
+            $row['loginPhone'] = $e($participant->loginPhoneNumber);
             $row['phone'] = $e($participant->phoneNumber);
 
             //PPI Surveys

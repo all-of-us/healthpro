@@ -72,6 +72,7 @@ $(document).ready(function() {
       { name: 'contactMethod', visible: false, data: 'contactMethod', orderable: false },
       { name: 'address', visible: false, data: 'address'},
       { name: 'email', visible: false, data: 'email' },
+      { name: 'loginPhone', visible: false, data: 'loginPhone' },
       { name: 'phone', visible: false, data: 'phone' },
       { name: 'ppiStatus', data: 'ppiStatus', class: 'text-center' },
       { name: 'ppiSurveys', data: 'ppiSurveys', class: 'text-center' }
