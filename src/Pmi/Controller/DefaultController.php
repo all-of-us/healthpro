@@ -198,8 +198,23 @@ class DefaultController extends AbstractController
 
         $emailForm->handleRequest($request);
 
-        if ($emailForm->isValid()) {
-            $searchParameters = $emailForm->getData();
+        $phoneForm = $app['form.factory']->createNamedBuilder('phone', FormType::class)
+            ->add('phone', TextType::class, [
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => '9999999999'
+                ]
+            ])
+            ->getForm();
+
+        $phoneForm->handleRequest($request);
+
+        if ($emailForm->isValid() || $phoneForm->isValid()) {
+            $form = $emailForm->isValid() ? $emailForm : $phoneForm;
+            $searchParameters = $form->getData();
             try {
                 $searchResults = $app['pmi.drc.participants']->search($searchParameters);
                 if (count($searchResults) == 1) {
@@ -211,10 +226,9 @@ class DefaultController extends AbstractController
                     'participants' => $searchResults
                 ]);
             } catch (ParticipantSearchExceptionInterface $e) {
-                $emailForm->addError(new FormError($e->getMessage()));
+                $form->addError(new FormError($e->getMessage()));
             }
         }
-
 
         $searchForm = $app['form.factory']->createNamedBuilder('search', FormType::class)
             ->add('lastName', TextType::class, [
@@ -264,7 +278,8 @@ class DefaultController extends AbstractController
         return $app['twig']->render('participants.html.twig', [
             'searchForm' => $searchForm->createView(),
             'idForm' => $idForm->createView(),
-            'emailForm' => $emailForm->createView()
+            'emailForm' => $emailForm->createView(),
+            'phoneForm' => $phoneForm->createView()
         ]);
     }
 

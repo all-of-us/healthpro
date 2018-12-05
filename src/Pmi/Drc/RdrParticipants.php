@@ -66,6 +66,9 @@ class RdrParticipants
                 throw new Exception\InvalidDobException('Date of birth cannot be a future date');
             }
         }
+        if (isset($params['phone'])) {
+            $query['loginPhoneNumber'] = ucfirst($params['phone']);
+        }
 
         if (isset($params['email'])) {
             $query['email'] = strtolower($params['email']);

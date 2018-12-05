@@ -27,6 +27,19 @@
                 {{ form_widget(emailForm) }}
                 <p><button type="submit" class="btn btn-primary">Go</button></p>
             {{ form_end(emailForm) }}
+
+            <a data-toggle="collapse" href="#collapsePhone" aria-expanded="false" aria-controls="collapsePhone">
+                Advance Search
+            </a>
+
+            <div class="collapse" id="collapsePhone">
+                <hr />
+                <h3><i class="fa fa-phone" aria-hidden="true"></i> Find by Phone</h3>
+                {{ form_start(phoneForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
+                {{ form_widget(phoneForm) }}
+                <p><button type="submit" class="btn btn-primary">Go</button></p>
+                {{ form_end(phoneForm) }}
+            </div>
         </div>
     </div>
 {% endblock %}
