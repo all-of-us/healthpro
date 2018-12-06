@@ -29,7 +29,7 @@ mysql_host: 127.0.0.1
 ml_mock_order: pmitest
 
 # Specify MayoLINK API endpoint and credentials
-# ml_orders_endpoint: https://test.orders.mayomedicallaboratories.com
+# ml_orders_endpoint: https://test.orders.mayocliniclabs.com
 # ml_username:
 # ml_password:
 
