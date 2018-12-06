@@ -9,6 +9,7 @@ class WorkQueue
 
     const HTML_SUCCESS = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
     const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+    const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
 
     protected $app;
 
@@ -24,6 +25,7 @@ class WorkQueue
         'consentForStudyEnrollmentTime',
         'primaryLanguage',
         'consentForElectronicHealthRecordsTime',
+        'consentForDvElectronicHealthRecordsSharingTime',
         'consentForCABoRTime',
         'withdrawalTime',
         'withdrawalReason',
@@ -271,6 +273,7 @@ class WorkQueue
             $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentTime);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime, true, true);
+            $row['dvEhrStatus'] = $this->displayStatus($participant->consentForDvElectronicHealthRecordsSharing, 'SUBMITTED', $participant->consentForDvElectronicHealthRecordsSharingTime, true, true);
             $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime, true);
             if ($participant->withdrawalStatus == 'NO_USE') {
                 $row['withdrawal'] = self::HTML_DANGER . ' <span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
@@ -367,7 +370,14 @@ class WorkQueue
 
     public static function csvStatusFromSubmitted($status)
     {
-        return $status === 'SUBMITTED' ? 1 : 0;
+        switch ($status) {
+            case 'SUBMITTED':
+                return 1;
+            case 'SUBMITTED_NOT_SURE':
+                return 2;
+            default:
+                return 0;
+        }
     }
 
     public function displayStatus($value, $successStatus, $time = null, $showNotCompleteText = false, $checkInvalidStatus = false)
@@ -377,6 +387,11 @@ class WorkQueue
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone());
             }
             return self::HTML_SUCCESS;
+        } elseif ($value === "{$successStatus}_NOT_SURE") {
+            if (!empty($time)) {
+                return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone());
+            }
+            return self::HTML_WARNING;
         } elseif ($checkInvalidStatus && ($value === 'INVALID' || $value === 'SUBMITTED_INVALID')) {
             return !empty($time) ? self::HTML_DANGER . ' (invalid) ' . self::dateFromString($time, $this->app->getUserTimezone()) : self::HTML_DANGER . ' (invalid)';
         } elseif ($showNotCompleteText) {

@@ -17,18 +17,37 @@ $(document).ready(function() {
         checkFilters();
         $('#filters').submit();
     });
-    $('button.export').on('click', function() {
+
+    var workQueueExportWarningModel = function (location) {
+        new PmiConfirmModal({
+            title: 'Warning',
+            msg: 'Note that the export reaches the limit of 10,000 participants. If your intent was to capture all participants, you may need to apply filters to ensure each export is less than 10,000 or utilize the Ops Data API. Please contact <em>sysadmin@pmi-ops.org</em> for more information.',
+            isHTML: true,
+            onTrue: function () {
+                window.location = location;
+            },
+            btnTextTrue: 'Ok'
+        });
+    };
+
+    $('button.export').on('click', function () {
         var location = $(this).data('href');
+        var count = parseInt($('.count').html());
         new PmiConfirmModal({
             title: 'Attention',
             msg: 'The file you are about to download contains information that is sensitive and confidential. By clicking "accept" you agree not to distribute either the file or its contents, and to adhere to the <em>All of Us</em> Privacy and Trust Principles. A record of your acceptance will be stored at the Data and Research Center.',
             isHTML: true,
-            onTrue: function() {
-                window.location = location;
+            onTrue: function () {
+                if (count > 10000) {
+                    workQueueExportWarningModel(location);
+                } else {
+                    window.location = location;
+                }
             },
             btnTextTrue: 'Accept'
         });
     });
+
     var url = window.location.href;
 
     var surveys = $('#workqueue').data('surveys');
@@ -46,6 +65,7 @@ $(document).ready(function() {
       { name: 'generalConsent', data: 'generalConsent', class: 'text-center' },
       { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
+      { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
       { name: 'withdrawal', data: 'withdrawal', class: 'text-center' },
       { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
