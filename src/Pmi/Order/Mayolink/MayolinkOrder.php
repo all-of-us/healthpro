@@ -7,8 +7,12 @@ use Pmi\Order\Order;
 
 class MayolinkOrder
 {
-    protected $ordersEndpoint = 'https://test.orders.mayomedicallaboratories.com';
+    protected $ordersEndpoint;
+
+    // This namespace is the same across all environments, regardless of the endpoint.
+    // Also, note that this is just an XML namespace and is never used to make a request
     protected $nameSpace = 'http://orders.mayomedicallaboratories.com';
+
     protected $labelPdf = 'orders/labels.xml';
     protected $createOrder = 'orders/create.xml';
     protected $userName;
@@ -20,11 +24,12 @@ class MayolinkOrder
     {
         $this->app = $app;
         $this->client = new HttpClient(['cookies' => true]);
-        if ($app->getConfig('ml_orders_endpoint')) {
-            $this->ordersEndpoint = $app->getConfig('ml_orders_endpoint');
-        }
+        $this->ordersEndpoint = $app->getConfig('ml_orders_endpoint');
         $this->userName = $app->getConfig('ml_username');
         $this->password = $app->getConfig('ml_password');
+        if (empty($this->ordersEndpoint) || empty($this->userName) || empty($this->password)) {
+            throw new \Exception('MayoLINK connection is not configured.');
+        }
     }
 
     public function createOrder($options)
