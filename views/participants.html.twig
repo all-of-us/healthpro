@@ -43,3 +43,10 @@
         </div>
     </div>
 {% endblock %}
+{% block pagejs %}
+    <script>
+        $(document).ready(function() {
+            $('.loginPhone').inputmask({"mask": "(999) 999-9999"});
+        });
+    </script>
+{% endblock %}
