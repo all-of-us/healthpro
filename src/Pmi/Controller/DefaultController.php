@@ -205,7 +205,8 @@ class DefaultController extends AbstractController
                     new Constraints\Type('string')
                 ],
                 'attr' => [
-                    'placeholder' => '9999999999'
+                    'placeholder' => '(999) 999-9999',
+                    'class' => 'loginPhone'
                 ]
             ])
             ->getForm();
@@ -215,6 +216,9 @@ class DefaultController extends AbstractController
         if ($emailForm->isValid() || $phoneForm->isValid()) {
             $form = $emailForm->isValid() ? $emailForm : $phoneForm;
             $searchParameters = $form->getData();
+            if ($phoneForm->isValid()) {
+                $searchParameters = preg_replace('/[^0-9]/', '', $searchParameters);
+            }
             try {
                 $searchResults = $app['pmi.drc.participants']->search($searchParameters);
                 if (count($searchResults) == 1) {
