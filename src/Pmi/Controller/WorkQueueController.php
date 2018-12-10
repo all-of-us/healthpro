@@ -299,6 +299,9 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Biospecimens Site';
             $headers[] = 'Withdrawal Reason';
+            $headers[] = 'Language of General Consent';
+            $headers[] = 'DV-only EHR Sharing Status';
+            $headers[] = 'DV-only EHR Sharing Date';
             fputcsv($output, $headers);
 
             for ($i = 0; $i < ceil(WorkQueue::LIMIT_EXPORT / WorkQueue::LIMIT_EXPORT_PAGE_SIZE); $i++) {
@@ -365,6 +368,9 @@ class WorkQueueController extends AbstractController
                     }
                     $row[] = $participant->orderCreatedSite;
                     $row[] = $participant->withdrawalReason;
+                    $row[] = $participant->primaryLanguage;
+                    $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForDvElectronicHealthRecordsSharing);
+                    $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingTime, $app->getUserTimezone());
                     fputcsv($output, $row);
                 }
                 unset($participants);

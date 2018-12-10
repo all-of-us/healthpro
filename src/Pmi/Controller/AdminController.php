@@ -3,7 +3,6 @@ namespace Pmi\Controller;
 
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -207,7 +206,7 @@ class AdminController extends AbstractController
                 'disabled' => $disabled,
             ])
             ->add('mayolink_account', Type\TextType::class, [
-                'label' => 'MayoLink Account',
+                'label' => 'MayoLINK Account',
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
                 'disabled' => $disabled && $isProd,
@@ -286,7 +285,16 @@ class AdminController extends AbstractController
 
     public function missingMeasurementsAction(Application $app, Request $request, $_route)
     {
-        $missing = $app['em']->getRepository('evaluations')->fetchBySQL('finalized_ts is not null and rdr_id is null');
+        $query = "
+            SELECT e.*
+            FROM evaluations e
+            LEFT JOIN evaluations_history eh ON e.history_id = eh.id
+            WHERE e.finalized_ts is not null
+              AND e.rdr_id is null
+              AND (eh.type != 'cancel'
+              OR eh.type is null)
+        ";
+        $missing = $app['db']->fetchAll($query);
         $choices = [];
         foreach ($missing as $physicalMeasurements) {
             $choices[$physicalMeasurements['id']] = $physicalMeasurements['id'];
@@ -296,38 +304,40 @@ class AdminController extends AbstractController
                 'multiple' => true,
                 'expanded' => true,
                 'choices' => $choices,
-                'choice_label' => function ($value, $key, $index) {
-                    return ' ';
-                }
+                'choice_label' => false
             ])
             ->getForm();
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted()) {
             $ids = $form->get('ids')->getData();
-            $repository = $app['em']->getRepository('evaluations');
-            foreach ($ids as $id) {
-                $evaluationService = new Evaluation();
-                $evaluation = $repository->fetchOneBy(['id' => $id]);
-                if (!$evaluation) {
-                    continue;
-                }
-                $evaluationService->loadFromArray($evaluation, $app);
-                $parentRdrId = null;
-                if ($evaluation['parent_id']) {
-                    $parentEvaluation = $repository->fetchOneBy(['id' => $evaluation['parent_id']]);
-                    if ($parentEvaluation) {
-                        $parentRdrId = $parentEvaluation['rdr_id'];
+            if (!empty($ids) && $form->isValid()) {
+                $repository = $app['em']->getRepository('evaluations');
+                foreach ($ids as $id) {
+                    $evaluationService = new Evaluation();
+                    $evaluation = $repository->fetchOneBy(['id' => $id]);
+                    if (!$evaluation) {
+                        continue;
+                    }
+                    $evaluationService->loadFromArray($evaluation, $app);
+                    $parentRdrId = null;
+                    if ($evaluation['parent_id']) {
+                        $parentEvaluation = $repository->fetchOneBy(['id' => $evaluation['parent_id']]);
+                        if ($parentEvaluation) {
+                            $parentRdrId = $parentEvaluation['rdr_id'];
+                        }
+                    }
+                    $fhir = $evaluationService->getFhir($evaluation['finalized_ts'], $parentRdrId);
+                    if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($evaluation['participant_id'], $fhir)) {
+                        $repository->update($evaluation['id'], ['rdr_id' => $rdrEvalId, 'fhir_version' => \Pmi\Evaluation\Fhir::CURRENT_VERSION]);
+                        $app->addFlashSuccess("#{$id} successfully sent to RDR");
+                    } else {
+                        $app->addFlashError("#{$id} failed sending to RDR: " . $app['pmi.drc.participants']->getLastError());
                     }
                 }
-                $fhir = $evaluationService->getFhir($evaluation['finalized_ts'], $parentRdrId);
-                if ($rdrEvalId = $app['pmi.drc.participants']->createEvaluation($evaluation['participant_id'], $fhir)) {
-                    $repository->update($evaluation['id'], ['rdr_id' => $rdrEvalId, 'fhir_version' => \Pmi\Evaluation\Fhir::CURRENT_VERSION]);
-                    $app->addFlashSuccess("#{$id} successfully sent to RDR");
-                } else {
-                    $app->addFlashError("#{$id} failed sending to RDR: " . $app['pmi.drc.participants']->getLastError());
-                }
+                return $app->redirectToRoute($_route);
+            } else {
+                $app->addFlashError('Please select at least one physical measurements');
             }
-            return $app->redirectToRoute($_route);
         }
         return $app['twig']->render('admin/missing/measurements.html.twig', [
             'missing' => $missing,
@@ -337,7 +347,17 @@ class AdminController extends AbstractController
 
     public function missingOrdersAction(Application $app, Request $request, $_route)
     {
-        $missing = $app['em']->getRepository('orders')->fetchBySQL('finalized_ts is not null and mayo_id is not null and rdr_id is null');
+        $query = "
+            SELECT o.*
+            FROM orders o
+            LEFT JOIN orders_history oh ON o.history_id = oh.id
+            WHERE o.finalized_ts is not null
+              AND o.mayo_id is not null
+              AND o.rdr_id is null
+              AND (oh.type != 'cancel'
+              OR oh.type is null)
+        ";
+        $missing = $app['db']->fetchAll($query);
         $choices = [];
         foreach ($missing as $orders) {
             $choices[$orders['id']] = $orders['id'];
@@ -347,30 +367,32 @@ class AdminController extends AbstractController
                 'multiple' => true,
                 'expanded' => true,
                 'choices' => $choices,
-                'choice_label' => function ($value, $key, $index) {
-                    return ' ';
-                }
+                'choice_label' => false
             ])
             ->getForm();
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted()) {
             $ids = $form->get('ids')->getData();
-            $repository = $app['em']->getRepository('orders');
-            foreach ($ids as $id) {
-                $orderService = new Order($app);
-                $order = $repository->fetchOneBy(['id' => $id]);
-                if (!$order) {
-                    continue;
+            if (!empty($ids) && $form->isValid()) {
+                $repository = $app['em']->getRepository('orders');
+                foreach ($ids as $id) {
+                    $orderService = new Order($app);
+                    $order = $repository->fetchOneBy(['id' => $id]);
+                    if (!$order) {
+                        continue;
+                    }
+                    $orderRdrObject = $orderService->getRdrObject($order);
+                    if ($rdrId = $app['pmi.drc.participants']->createOrder($order['participant_id'], $orderRdrObject)) {
+                        $repository->update($order['id'], ['rdr_id' => $rdrId]);
+                        $app->addFlashSuccess("#{$id} successfully sent to RDR");
+                    } else {
+                        $app->addFlashError("#{$id} failed sending to RDR: " . $app['pmi.drc.participants']->getLastError());
+                    }
                 }
-                $orderRdrObject = $orderService->getRdrObject($order);
-                if ($rdrId = $app['pmi.drc.participants']->createOrder($order['participant_id'], $orderRdrObject)) {
-                    $repository->update($order['id'], ['rdr_id' => $rdrId]);
-                    $app->addFlashSuccess("#{$id} successfully sent to RDR");
-                } else {
-                    $app->addFlashError("#{$id} failed sending to RDR: " . $app['pmi.drc.participants']->getLastError());
-                }
+                return $app->redirectToRoute($_route);
+            } else {
+                $app->addFlashError('Please select at least one order');
             }
-            return $app->redirectToRoute($_route);
         }
         return $app['twig']->render('admin/missing/orders.html.twig', [
             'missing' => $missing,
