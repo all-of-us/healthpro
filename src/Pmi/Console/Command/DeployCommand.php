@@ -574,7 +574,12 @@ class DeployCommand extends Command {
         }
     }
 
-    /** Runs a shell command, displaying output as it is generated. */
+    /**
+     * Runs a shell command, displaying output as it is generated.
+     *
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     * ($type parameter in run callback is required but not used)
+     */
     private function exec($cmd, $mustRun = true, $raw = false)
     {
         $process = new Process($cmd);
