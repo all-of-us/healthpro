@@ -494,7 +494,7 @@ abstract class AbstractApplication extends Application
     {
         $log = new Log($this, $action, $data);
         $log->logSyslog();
-        if (!$this['isUnitTest'] && !$this->isLocal() && $action != Log::REQUEST) {
+        if (!$this['isUnitTest'] && !$this->isPhpDevServer() && $action != Log::REQUEST) {
             $log->logDatastore();
         }
     }
