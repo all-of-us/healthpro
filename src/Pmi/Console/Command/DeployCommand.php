@@ -219,7 +219,7 @@ class DeployCommand extends Command {
         $reallyDeploy = new ConfirmationQuestion("<question>Do you REALLY want to deploy{$destinationText}? (y/n)</question> ",
             false, '/^(y|yes)$/');
         if ($this->local || ($question->ask($input, $output, $gitStatus) && $question->ask($input, $output, $reallyDeploy))) {
-            $this->exec($cmd);
+            $this->exec($cmd, true, true);
             if ($this->isTaggable()) {
                 $this->tagRelease();
             }
@@ -575,13 +575,17 @@ class DeployCommand extends Command {
     }
 
     /** Runs a shell command, displaying output as it is generated. */
-    private function exec($cmd, $mustRun = true)
+    private function exec($cmd, $mustRun = true, $raw = false)
     {
         $process = new Process($cmd);
         $process->setTimeout(null);
         $run = $mustRun ? 'mustRun' : 'run';
-        $process->$run(function($type, $buffer) {
-            $this->out->write($buffer);
+        $process->$run(function($type, $buffer) use ($raw) {
+            if ($raw) {
+                $this->out->write($buffer, false, OutputInterface::OUTPUT_RAW);
+            } else {
+                $this->out->write($buffer);
+            }
         });
         return $process;
     }
