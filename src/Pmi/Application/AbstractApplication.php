@@ -46,7 +46,7 @@ abstract class AbstractApplication extends Application
     ];
 
     /** Determines the environment under which the code is running. */
-    private static function determineEnv()
+    private function determineEnv()
     {
         $env = getenv('PMI_ENV');
         if ($env == self::ENV_LOCAL) {
@@ -59,6 +59,8 @@ abstract class AbstractApplication extends Application
             return self::ENV_STAGING;
         } elseif ($env == self::ENV_PROD) {
             return self::ENV_PROD;
+        } elseif ($this->isPhpDevServer()) {
+            return self::ENV_LOCAL;
         } else {
             throw new Exception("Bad environment: $env");
         }
@@ -67,7 +69,7 @@ abstract class AbstractApplication extends Application
     public function __construct(array $values = array())
     {
         if (!array_key_exists('env', $values)) {
-            $values['env'] = self::determineEnv();
+            $values['env'] = $this->determineEnv();
         }
         if (!array_key_exists('release', $values)) {
             $values['release'] = getenv('PMI_RELEASE') === false ?
@@ -109,7 +111,14 @@ abstract class AbstractApplication extends Application
     {
         return $this['env'] === self::ENV_PROD;
     }
-    
+
+    public function isPhpDevServer()
+    {
+        return
+            isset($_SERVER['SERVER_SOFTWARE']) &&
+            preg_match('/^PHP [0-9\\.]+ Development Server$/', $_SERVER['SERVER_SOFTWARE']);
+    }
+
     public function getName()
     {
         return $this->name;
@@ -150,6 +159,9 @@ abstract class AbstractApplication extends Application
         $this->register(new FormServiceProvider());
         $this->register(new ValidatorServiceProvider());
 
+        if (!$this['isUnitTest']) {
+            $this->register(new SessionServiceProvider());
+        }
         if (isset($this['sessionHandler'])) {
             switch ($this['sessionHandler']) {
                 case 'memcache':
@@ -404,7 +416,6 @@ abstract class AbstractApplication extends Application
 
     protected function enableMemcacheSession()
     {
-        $this->register(new SessionServiceProvider());
         $memcache = new Memcache();
         $handler = new MemcacheSessionHandler($memcache);
         $this['session.storage.handler'] = $handler;
@@ -412,7 +423,6 @@ abstract class AbstractApplication extends Application
 
     protected function enableDatastoreSession()
     {
-        $this->register(new SessionServiceProvider());
         $this['session.storage.handler'] = new DatastoreSessionHandler();
     }
     
@@ -484,7 +494,7 @@ abstract class AbstractApplication extends Application
     {
         $log = new Log($this, $action, $data);
         $log->logSyslog();
-        if (!$this['isUnitTest'] && $action != Log::REQUEST) {
+        if (!$this['isUnitTest'] && !$this->isPhpDevServer() && $action != Log::REQUEST) {
             $log->logDatastore();
         }
     }

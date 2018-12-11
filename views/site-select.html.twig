@@ -10,10 +10,10 @@
                 <span class="glyphicon glyphicon-info-sign"></span>
                 Please select your current site in order to continue.
             </div>
-            <form id="siteSelector" method="POST">
+            <form id="siteSelector" method="POST" action="{{ path('selectSite') }}">
                 <div class="form-group">
                     <label>Choose Site</label>
-                    <select class="form-control site-id">
+                    <select class="form-control" name="site">
                         {% for site in app.user.sites %}
                             <option value="{{ site.email }}"{{ (siteEmail == site.email) ? ' selected' : ''}} >{{ app.getSiteDisplayName(site.id, false)|default(site.name) }}</option>
                         {% endfor %}
@@ -22,35 +22,8 @@
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary site-submit">Continue</button>
+                <button type="submit" class="btn btn-primary">Continue</button>
             </form>
         </div>
     </div>
-{% endblock %}
-
-{% block pagejs %}
-<script>
-$(document).ready(function () {
-    var SiteSelector = Backbone.View.extend({
-        events: {
-            "change .site-id": "switchSite"
-        },
-        switchSite: function() {
-            var siteId = this.$(".site-id").val();
-            if (_.truthy(siteId)) {
-                var path = PMI.path.switchSite.replace("SITE_ID", siteId);
-                this.$el.attr("action", path);
-            }
-            return true;
-        },
-        initialize: function() { this.render(); },
-        render: function() {
-            this.switchSite(); // initialize
-            return this;
-        }
-    });
-    
-    new SiteSelector({el: $("#siteSelector")});
-});
-</script>
 {% endblock %}
