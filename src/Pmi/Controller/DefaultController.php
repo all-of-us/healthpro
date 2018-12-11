@@ -198,6 +198,23 @@ class DefaultController extends AbstractController
 
         $emailForm->handleRequest($request);
 
+        if ($emailForm->isValid()) {
+            $searchParameters = $emailForm->getData();
+            try {
+                $searchResults = $app['pmi.drc.participants']->search($searchParameters);
+                if (count($searchResults) == 1) {
+                    return $app->redirectToRoute('participant', [
+                        'id' => $searchResults[0]->id
+                    ]);
+                }
+                return $app['twig']->render('participants-list.html.twig', [
+                    'participants' => $searchResults
+                ]);
+            } catch (ParticipantSearchExceptionInterface $e) {
+                $emailForm->addError(new FormError($e->getMessage()));
+            }
+        }
+
         $phoneForm = $app['form.factory']->createNamedBuilder('phone', FormType::class)
             ->add('phone', TextType::class, [
                 'constraints' => [
@@ -213,25 +230,26 @@ class DefaultController extends AbstractController
 
         $phoneForm->handleRequest($request);
 
-        if ($emailForm->isValid() || $phoneForm->isValid()) {
-            $form = $emailForm->isValid() ? $emailForm : $phoneForm;
-            $searchParameters = $form->getData();
-            if ($phoneForm->isValid()) {
-                $searchParameters = preg_replace('/[^0-9]/', '', $searchParameters);
-            }
-            try {
-                $searchResults = $app['pmi.drc.participants']->search($searchParameters);
-                if (count($searchResults) == 1) {
-                    return $app->redirectToRoute('participant', [
-                        'id' => $searchResults[0]->id
-                    ]);
+        if ($phoneForm->isValid()) {
+            $phone = preg_replace('/[^0-9]/', '', $phoneForm['phone']->getData());
+            $searchFields = ['loginPhone', 'phone'];
+            foreach ($searchFields as $field) {
+                try {
+                    $searchResults[] = $app['pmi.drc.participants']->search([$field => $phone]);
+                } catch (ParticipantSearchExceptionInterface $e) {
+                    $phoneForm->addError(new FormError($e->getMessage()));
                 }
-                return $app['twig']->render('participants-list.html.twig', [
-                    'participants' => $searchResults
-                ]);
-            } catch (ParticipantSearchExceptionInterface $e) {
-                $form->addError(new FormError($e->getMessage()));
             }
+            $searchResults = array_filter($searchResults); // remove empty elements
+            $searchResults = array_values(array_unique($searchResults, SORT_REGULAR)); // remove duplicates and reset index keys
+            if (count($searchResults) == 1) {
+                return $app->redirectToRoute('participant', [
+                    'id' => $searchResults[0][0]->id
+                ]);
+            }
+            return $app['twig']->render('participants-list.html.twig', [
+                'participants' => $searchResults
+            ]);
         }
 
         $searchForm = $app['form.factory']->createNamedBuilder('search', FormType::class)

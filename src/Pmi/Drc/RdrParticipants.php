@@ -67,9 +67,11 @@ class RdrParticipants
             }
         }
         if (isset($params['phone'])) {
-            $query['loginPhoneNumber'] = ucfirst($params['phone']);
+            $query['phoneNumber'] = ucfirst($params['phone']);
         }
-
+        if (isset($params['loginPhone'])) {
+            $query['loginPhoneNumber'] = ucfirst($params['loginPhone']);
+        }
         if (isset($params['email'])) {
             $query['email'] = strtolower($params['email']);
         }
