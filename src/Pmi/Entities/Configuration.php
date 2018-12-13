@@ -6,9 +6,7 @@ use Pmi\Datastore\Entity;
 
 class Configuration extends Entity
 {
-    protected static function buildSchema() {
-        return (new Schema('Configuration'))
-            ->addString('key')
-            ->addString('value', false);
+    protected static function getKind() {
+        return 'Configuration';
     }
 }

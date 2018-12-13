@@ -132,10 +132,10 @@ class HpoApplication extends AbstractApplication
 
         // unit tests don't have access to Datastore
         // local environment uses yaml file
-        if (!$this['isUnitTest'] && !$this->isPhpDevServer()) {
-            $configs = Configuration::fetchBy([]);
+        if (!$this['isUnitTest'] && !$this->isPhpDevServer() && !$this->isLocal()) {
+            $configs = Configuration::fetchBy();
             foreach ($configs as $config) {
-                $this->configuration[$config->getKey()] = $config->getValue();
+                $this->configuration[$config->key] = $config->value;
             }
         }
         

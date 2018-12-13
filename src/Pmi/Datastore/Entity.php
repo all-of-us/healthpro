@@ -200,19 +200,10 @@ abstract class Entity
         }
     }
 
-    public static function fetchBy(array $criteria)
+    public static function fetchBy()
     {
-        $datastore = new Datastore();
-        list($sql, $parameters) = static::buildSqlAndParameters($criteria);
-        $results = $datastore->fetchAllBySql(self::getSchema(), $sql, $parameters);
-        $entities = [];
-        foreach ($results as $result) {
-            $entity = new static();
-            $entity->gdsEntity = $result;
-            $entity->loadFromGdsEntity($result);
-            $entities[] = $entity;
-        }
-        return $entities;
+        $datastoreClient = new DatastoreClientHelper();
+        return $datastoreClient->fetchAll(static::getKind());
     }
     
     public static function walkEntities(callable $callback, $sql, $params)
