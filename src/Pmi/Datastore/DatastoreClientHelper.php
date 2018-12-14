@@ -32,4 +32,12 @@ class DatastoreClientHelper
         $key = $this->datastore->key($kind, $id);
         return $this->datastore->lookup($key);
     }
+
+    public function upsert($kind, $id, $data)
+    {
+        $key = $this->datastore->key($kind, $id);
+        $task = $this->datastore->entity($key, $data);
+        $this->datastore->upsert($task);
+        return $task;
+    }
 }

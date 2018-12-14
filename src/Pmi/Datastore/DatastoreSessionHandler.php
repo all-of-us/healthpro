@@ -63,17 +63,14 @@ class DatastoreSessionHandler extends AbstractSessionHandler
         }
     }
 
-    public function doWrite($id, $session_data)
+    public function doWrite($id, $sessionData)
     {
         try {
-            $session = Session::fetchOneByName($id);
-            if (!$session) {
-                $session = new Session();
-                $session->setKeyName($id);
-            }
-            $session->setData($session_data);
-            $session->setModified(new DateTime());
-            $session->save();
+            $data = [
+                'data' => $sessionData,
+                'modified' => new DateTime()
+            ];
+            Session::upsertData($id, $data);
             return true;
         } catch (\Exception $e) {
             return false;
