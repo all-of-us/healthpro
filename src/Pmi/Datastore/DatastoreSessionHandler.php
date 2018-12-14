@@ -50,9 +50,9 @@ class DatastoreSessionHandler extends AbstractSessionHandler
     public function doRead($id)
     {
         try {
-            $session = Session::fetchOneByName($id);
+            $session = Session::fetchOneById($id);
             if ($session) {
-                return $session->getData();
+                return $session->data;
             } else {
                 return '';
             }

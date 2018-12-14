@@ -217,4 +217,10 @@ abstract class Entity
         $datastore = new Datastore();
         return $datastore->countEntities(self::getSchema(), $sql, $params, $limit);
     }
+
+    public static function fetchOneById($id)
+    {
+        $datastoreClient = new DatastoreClientHelper();
+        return $datastoreClient->fetchById(static::getKind(), $id);
+    }
 }

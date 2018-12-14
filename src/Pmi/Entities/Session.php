@@ -11,4 +11,8 @@ class Session extends Entity
             ->addDatetime('modified')
             ->addString('data', false);
     }
+
+    protected static function getKind() {
+        return 'Session';
+    }
 }

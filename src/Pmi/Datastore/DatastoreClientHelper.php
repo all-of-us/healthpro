@@ -26,4 +26,10 @@ class DatastoreClientHelper
         $query = $this->datastore->query()->kind($kind);
         return $this->datastore->runQuery($query);
     }
+
+    public function fetchById($kind, $id)
+    {
+        $key = $this->datastore->key($kind, $id);
+        return $this->datastore->lookup($key);
+    }
 }
