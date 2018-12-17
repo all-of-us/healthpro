@@ -40,4 +40,11 @@ class DatastoreClientHelper
         $this->datastore->upsert($task);
         return $task;
     }
+
+    public function delete($kind, $id)
+    {
+        $key = $this->datastore->key($kind, $id);
+        $this->datastore->delete($key);
+        return true;
+    }
 }

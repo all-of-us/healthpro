@@ -15,9 +15,9 @@ class DatastoreSessionHandler extends AbstractSessionHandler
     public function doDestroy($id)
     {
         try {
-            $session = Session::fetchOneByName($id);
+            $session = Session::fetchOneById($id);
             if ($session) {
-                $session->delete();
+                Session::deleteData($id);
             }
         } catch (\Exception $e) {
         }

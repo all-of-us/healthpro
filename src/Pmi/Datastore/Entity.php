@@ -229,4 +229,10 @@ abstract class Entity
         $datastoreClient = new DatastoreClientHelper();
         return $datastoreClient->upsert(static::getKind(), $id, $data);
     }
+
+    public static function deleteData($id)
+    {
+        $datastoreClient = new DatastoreClientHelper();
+        return $datastoreClient->delete(static::getKind(), $id);
+    }
 }
