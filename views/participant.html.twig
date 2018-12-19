@@ -237,11 +237,11 @@
                                         <dd>{{ participant.recontactMethod|default('--') }}</dd>
                                         <dt>Address</dt>
                                         <dd>{{ participant.getAddress(true)|default('--')|nl2br }}</dd>
-                                        <dt>Email</dt>
+                                        <dt>Email <span title="This is either the registration email or the email provided after consent if the participant registered with a phone number" data-toggle="tooltip"><span class="sr-only">What is Email?</span><i class="fa fa-question-circle text-info"></i></span></dt>
                                         <dd>{{ participant.email|default('--') }}</dd>
-                                        <dt>Login Phone</dt>
+                                        <dt>Login Phone <span title="This is the verified SMS number used during registration" data-toggle="tooltip"><span class="sr-only">What is Login Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
                                         <dd>{{ participant.loginPhoneNumber|default('--') }}</dd>
-                                        <dt>Phone</dt>
+                                        <dt>Contact Phone <span title="This is the phone number provided after consent" data-toggle="tooltip"><span class="sr-only">What is Contact Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
                                         <dd>{{ participant.phoneNumber|default('--') }}</dd>
                                     </dl>
                                 </div>
