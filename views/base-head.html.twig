@@ -24,7 +24,6 @@
             "logout": {{ path('logout')|json_encode|raw }},
             "keepAlive": {{ path('keepAlive')|json_encode|raw }},
             "agreeUsage": {{ path('agreeUsage')|json_encode|raw }},
-            "switchSite": {{ path('switchSite', {id: "SITE_ID"})|json_encode|raw }},
             "settings": {{ path('settings')|json_encode|raw }},
             "hideTZWarning": {{ path('hideTZWarning')|json_encode|raw }}
         },

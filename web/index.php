@@ -8,15 +8,17 @@ $app = new HpoApplication();
 $app['templatesDirectory'] = realpath(__DIR__ . '/../views');
 $app['errorTemplate'] = 'error.html.twig';
 
-// Session timeout after 30 minutes (or 24 hours in local dev)
-$app['sessionTimeout'] = $app->isLocal() ? 3600 * 24 : 30 * 60;
-// Display warning 2 minutes before timeout
-$app['sessionWarning'] = 2 * 60;
-$app['sessionHandler'] = 'datastore';
+$app['sessionTimeout'] = 30 * 60; // Session timeout after 30 minutes
+$app['sessionWarning'] = 2 * 60; // Display warning 2 minutes before timeout
 
 if ($app->isLocal()) {
-    $app['twigCacheHandler'] = 'memcache';
+    $app['sessionTimeout'] = 3600 * 24; // Extend session time out in local environment
+    if (!$app->isPhpDevServer()) {
+        $app['twigCacheHandler'] = 'memcache';
+        $app['sessionHandler'] = 'datastore'; // use datastore for dev_appserver local environment
+    }
 } else {
+    $app['sessionHandler'] = 'datastore';
     $app['cacheDirectory'] = realpath(__DIR__ . '/../cache');
     $app['twigCacheHandler'] = 'file';
 }

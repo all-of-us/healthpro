@@ -7,9 +7,9 @@
             {% if order.status == 'edit' or order.status == 'unlock' %}
                 <div class="alert alert-warning" role="alert">
                     {% if order.status == 'edit' %}
-                        This order was edited and finalized so print requisition cannot be generated.
+                        The requisition cannot be generated for edited and finalized orders.
                     {% else %}
-                        Print requisition cannot be generated for unlocked orders.
+                        The requisition cannot be generated for unlocked orders.
                     {% endif %}
                 </div>
             {% elseif order.mayo_id is not empty %}

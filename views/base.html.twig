@@ -117,30 +117,32 @@
         <div class="modal fade" id="siteModal" tabindex="-1" role="dialog" aria-labelledby="siteModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="siteModalLabel">Current site</h4>
-                    </div>
-                    <div class="modal-body">
-                        {% if app.user.sites|length == 0 and app.user.awardees|length == 0 %}
-                            <span class="text-danger">You do not belong to any HPO sites!</span>
-                        {% else %}
-                            <select class="form-control site-id">
-                            {% for site in app.user.sites %}
-                                <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : ''}} >{{ app.getSiteDisplayName(site.id, false)|default(site.name) }}</option>
-                            {% endfor %}
-                            {% for awardee in app.user.awardees %}
-                                <option value="{{ awardee.email }}"{{ (app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>
-                            {% endfor %}
-                        </select>
-                        {% endif %}
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        {% if app.user.sites|length > 0 or app.user.awardees|length > 0 %}
-                        <button type="button" class="btn btn-primary site-submit" data-dismiss="modal">Switch</button>
-                        {% endif %}
-                    </div>
+                    <form method="POST" action="{{ path('selectSite') }}">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="siteModalLabel">Current site</h4>
+                        </div>
+                        <div class="modal-body">
+                            {% if app.user.sites|length == 0 and app.user.awardees|length == 0 %}
+                                <span class="text-danger">You do not belong to any HPO sites!</span>
+                            {% else %}
+                                <select class="form-control" name="site">
+                                {% for site in app.user.sites %}
+                                    <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : ''}} >{{ app.getSiteDisplayName(site.id, false)|default(site.name) }}</option>
+                                {% endfor %}
+                                {% for awardee in app.user.awardees %}
+                                    <option value="{{ awardee.email }}"{{ (app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>
+                                {% endfor %}
+                            </select>
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            {% if app.user.sites|length > 0 or app.user.awardees|length > 0 %}
+                            <button type="submit" class="btn btn-primary">Switch</button>
+                            {% endif %}
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -33,7 +33,7 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('rdr_auth_json')) {
             $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
         }
-        if ($this->getConfig('rdr_disable_cache')) {
+        if ($this->getConfig('rdr_disable_cache') || $this->isPhpDevServer()) {
             $rdrOptions['disable_cache'] = true;
         }
         if ($this->getConfig('cache_time')) {
@@ -131,7 +131,8 @@ class HpoApplication extends AbstractApplication
         }
 
         // unit tests don't have access to Datastore
-        if (!$this['isUnitTest']) {
+        // local environment uses yaml file
+        if (!$this['isUnitTest'] && !$this->isPhpDevServer()) {
             $configs = Configuration::fetchBy([]);
             foreach ($configs as $config) {
                 $this->configuration[$config->getKey()] = $config->getValue();

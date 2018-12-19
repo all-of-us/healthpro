@@ -728,10 +728,10 @@ class OrderController extends AbstractController
                 $result['status'] = 'success';
                 $result['pdf'] = $pdf;
             } else {
-                $result['errorMessage'] = 'Error loading print labels.';
+                $result['errorMessage'] = 'Error loading labels.';
             }         
         } else {
-            $result['errorMessage'] = 'Mayo account number is not set for this site. Please contact the administrator.';
+            $result['errorMessage'] = 'A MayoLINK account number is not set for this site. Please contact an administrator.';
         }
         return $result;
     }
