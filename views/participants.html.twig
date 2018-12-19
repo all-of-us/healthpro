@@ -35,7 +35,7 @@
             <div class="collapse" id="collapsePhone">
                 <hr />
                 <h3><i class="fa fa-phone" aria-hidden="true"></i> Find by Phone</h3>
-                {{ form_start(phoneForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
+                {{ form_start(phoneForm, { attr: { class: 'disable-enter' } }) }}
                 {{ form_widget(phoneForm) }}
                 <p><button type="submit" class="btn btn-primary">Go</button></p>
                 {{ form_end(phoneForm) }}
@@ -48,6 +48,13 @@
         $(document).ready(function () {
             $('.loginPhone').inputmask("(999) 999-9999", {
                 "removeMaskOnSubmit": true
+            });
+
+            $('[name="phone"]').submit(function () {
+                if ($('.loginPhone').inputmask("isComplete") === false) {
+                    alert('Please enter a valid phone number.');
+                    return false;
+                }
             });
         });
     </script>
