@@ -9,8 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -183,7 +181,7 @@ class DefaultController extends AbstractController
         }
 
         $emailForm = $app['form.factory']->createNamedBuilder('email', FormType::class)
-            ->add('email', TextType::class, [
+            ->add('email', Type\EmailType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
@@ -214,7 +212,7 @@ class DefaultController extends AbstractController
         }
 
         $phoneForm = $app['form.factory']->createNamedBuilder('phone', FormType::class)
-            ->add('phone', TextType::class, [
+            ->add('phone', Type\TelType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
@@ -229,11 +227,10 @@ class DefaultController extends AbstractController
         $phoneForm->handleRequest($request);
 
         if ($phoneForm->isValid()) {
-            $phone = preg_replace('/[^0-9]/', '', $phoneForm['phone']->getData());
             $searchFields = ['loginPhone', 'phone'];
             foreach ($searchFields as $field) {
                 try {
-                    $searchResults[] = $app['pmi.drc.participants']->search([$field => $phone]);
+                    $searchResults[] = $app['pmi.drc.participants']->search([$field => $phoneForm['phone']->getData()]);
                 } catch (ParticipantSearchExceptionInterface $e) {
                     $phoneForm->addError(new FormError($e->getMessage()));
                 }

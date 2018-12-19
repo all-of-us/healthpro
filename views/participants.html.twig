@@ -45,8 +45,10 @@
 {% endblock %}
 {% block pagejs %}
     <script>
-        $(document).ready(function() {
-            $('.loginPhone').inputmask({"mask": "(999) 999-9999"});
+        $(document).ready(function () {
+            $('.loginPhone').inputmask("(999) 999-9999", {
+                "removeMaskOnSubmit": true
+            });
         });
     </script>
 {% endblock %}
