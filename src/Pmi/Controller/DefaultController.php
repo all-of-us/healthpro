@@ -5,7 +5,6 @@ use Pmi\Evaluation\Evaluation;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -38,7 +37,7 @@ class DefaultController extends AbstractController
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
     ];
 
-    public function homeAction(Application $app, Request $request)
+    public function homeAction(Application $app)
     {
         $checkTimeZone = $app->hasRole('ROLE_USER') || $app->hasRole('ROLE_ADMIN') || $app->hasRole('ROLE_AWARDEE') || $app->hasRole('ROLE_DV_ADMIN');
         if ($checkTimeZone && !$app->getUserTimezone(false)) {
@@ -60,7 +59,7 @@ class DefaultController extends AbstractController
         }
     }
     
-    public function dashSplashAction(Application $app, Request $request)
+    public function dashSplashAction(Application $app)
     {
         return $app['twig']->render('dash-splash.html.twig');
     }
@@ -73,14 +72,14 @@ class DefaultController extends AbstractController
         return $app->redirect($app->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
 
-    public function loginReturnAction(Application $app, Request $request)
+    public function loginReturnAction(Application $app)
     {
         $app['session']->set('isLoginReturn', true);
         $url = $app['session']->get('loginDestUrl', $app->generateUrl('home'));
         return $app->redirect($url);
     }
     
-    public function timeoutAction(Application $app, Request $request)
+    public function timeoutAction(Application $app)
     {
         return $app['twig']->render('timeout.html.twig');
     }
@@ -122,7 +121,7 @@ class DefaultController extends AbstractController
         return (new JsonResponse())->setData([]);
     }
     
-    public function groupsAction(Application $app, Request $request)
+    public function groupsAction(Application $app)
     {
         $token = $app['security.token_storage']->getToken();
         $user = $token->getUser();
