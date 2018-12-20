@@ -236,7 +236,7 @@ class DefaultController extends AbstractController
                     if (!empty($results)) {
                         // Set search field type
                         foreach ($results as $result) {
-                            $result->fieldType = $field;
+                            $result->searchField = $field;
                         }
                         $searchResults[] = $results;
                     }
