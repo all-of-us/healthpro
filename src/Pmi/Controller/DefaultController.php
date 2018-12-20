@@ -232,9 +232,13 @@ class DefaultController extends AbstractController
             $searchResults = [];
             foreach ($searchFields as $field) {
                 try {
-                    $result = $app['pmi.drc.participants']->search([$field => $phoneForm['phone']->getData()]);
-                    if (!empty($result)) {
-                        $searchResults[] = $result;
+                    $results = $app['pmi.drc.participants']->search([$field => $phoneForm['phone']->getData()]);
+                    if (!empty($results)) {
+                        // Set search field type
+                        foreach ($results as $result) {
+                            $result->fieldType = $field;
+                        }
+                        $searchResults[] = $results;
                     }
                 } catch (ParticipantSearchExceptionInterface $e) {
                     $phoneForm->addError(new FormError($e->getMessage()));
@@ -254,7 +258,8 @@ class DefaultController extends AbstractController
                 ]);
             }
             return $app['twig']->render('participants-list.html.twig', [
-                'participants' => $searchResults
+                'participants' => $searchResults,
+                'searchType' => 'phone'
             ]);
         }
 
