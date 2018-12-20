@@ -267,7 +267,6 @@ class WorkQueueController extends AbstractController
                     'State',
                     'ZIP',
                     'Email',
-                    'Login Phone',
                     'Phone',
                     'Sex',
                     'Gender Identity',
@@ -303,6 +302,9 @@ class WorkQueueController extends AbstractController
             $headers[] = 'Language of General Consent';
             $headers[] = 'DV-only EHR Sharing Status';
             $headers[] = 'DV-only EHR Sharing Date';
+            if ($hasFullDataAccess) {
+                $headers[] = 'Login Phone';
+            }
             fputcsv($output, $headers);
 
             for ($i = 0; $i < ceil(WorkQueue::LIMIT_EXPORT / WorkQueue::LIMIT_EXPORT_PAGE_SIZE); $i++) {
@@ -330,7 +332,6 @@ class WorkQueueController extends AbstractController
                             $participant->state,
                             $participant->zipCode,
                             $participant->email,
-                            $participant->loginPhoneNumber,
                             $participant->phoneNumber,
                             $participant->sex,
                             $participant->genderIdentity,
@@ -373,6 +374,9 @@ class WorkQueueController extends AbstractController
                     $row[] = $participant->primaryLanguage;
                     $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForDvElectronicHealthRecordsSharing);
                     $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingTime, $app->getUserTimezone());
+                    if ($hasFullDataAccess) {
+                        $row[] = $participant->loginPhoneNumber;
+                    }
                     fputcsv($output, $row);
                 }
                 unset($participants);
