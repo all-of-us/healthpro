@@ -252,11 +252,6 @@ class DefaultController extends AbstractController
                 }
                 $searchResults = array_values(array_unique($searchResults, SORT_REGULAR)); // remove duplicates and reset index keys
             }
-            if (count($searchResults) === 1) {
-                return $app->redirectToRoute('participant', [
-                    'id' => $searchResults[0]->id
-                ]);
-            }
             return $app['twig']->render('participants-list.html.twig', [
                 'participants' => $searchResults,
                 'searchType' => 'phone'
