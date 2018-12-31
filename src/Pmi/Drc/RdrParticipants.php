@@ -48,10 +48,10 @@ class RdrParticipants
     {
         $query = [];
         if (isset($params['lastName'])) {
-            $query['lastName'] = ucfirst($params['lastName']);
+            $query['lastName'] = $params['lastName'];
         }
         if (isset($params['firstName'])) {
-            $query['firstName'] = ucfirst($params['firstName']);
+            $query['firstName'] = $params['firstName'];
         }
         if (isset($params['dob'])) {
             try {
@@ -66,7 +66,12 @@ class RdrParticipants
                 throw new Exception\InvalidDobException('Date of birth cannot be a future date');
             }
         }
-
+        if (isset($params['phone'])) {
+            $query['phoneNumber'] = $params['phone'];
+        }
+        if (isset($params['loginPhone'])) {
+            $query['loginPhoneNumber'] = $params['loginPhone'];
+        }
         if (isset($params['email'])) {
             $query['email'] = strtolower($params['email']);
         }

@@ -17,6 +17,7 @@ var ASSETS = {
         NODE_DIR + '/datatables.net-buttons/js/buttons.colVis.js',
         NODE_DIR + '/datatables.net-buttons-bs/js/buttons.bootstrap.js',
         NODE_DIR + '/jsbarcode/dist/barcodes/JsBarcode.code128.min.js',
+        NODE_DIR + '/inputmask/dist/jquery.inputmask.bundle.js',
         ASSETS_DIR + '/js/parsley-comparison.js',
         ASSETS_DIR + '/js/bootstrap-session-timeout.js',
         ASSETS_DIR + '/js/app.js',

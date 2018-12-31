@@ -5,12 +5,9 @@ use Pmi\Evaluation\Evaluation;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -40,7 +37,7 @@ class DefaultController extends AbstractController
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
     ];
 
-    public function homeAction(Application $app, Request $request)
+    public function homeAction(Application $app)
     {
         $checkTimeZone = $app->hasRole('ROLE_USER') || $app->hasRole('ROLE_ADMIN') || $app->hasRole('ROLE_AWARDEE') || $app->hasRole('ROLE_DV_ADMIN');
         if ($checkTimeZone && !$app->getUserTimezone(false)) {
@@ -62,7 +59,7 @@ class DefaultController extends AbstractController
         }
     }
     
-    public function dashSplashAction(Application $app, Request $request)
+    public function dashSplashAction(Application $app)
     {
         return $app['twig']->render('dash-splash.html.twig');
     }
@@ -75,14 +72,14 @@ class DefaultController extends AbstractController
         return $app->redirect($app->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
 
-    public function loginReturnAction(Application $app, Request $request)
+    public function loginReturnAction(Application $app)
     {
         $app['session']->set('isLoginReturn', true);
         $url = $app['session']->get('loginDestUrl', $app->generateUrl('home'));
         return $app->redirect($url);
     }
     
-    public function timeoutAction(Application $app, Request $request)
+    public function timeoutAction(Application $app)
     {
         return $app['twig']->render('timeout.html.twig');
     }
@@ -124,7 +121,7 @@ class DefaultController extends AbstractController
         return (new JsonResponse())->setData([]);
     }
     
-    public function groupsAction(Application $app, Request $request)
+    public function groupsAction(Application $app)
     {
         $token = $app['security.token_storage']->getToken();
         $user = $token->getUser();
@@ -183,7 +180,7 @@ class DefaultController extends AbstractController
         }
 
         $emailForm = $app['form.factory']->createNamedBuilder('email', FormType::class)
-            ->add('email', TextType::class, [
+            ->add('email', Type\EmailType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
@@ -213,6 +210,53 @@ class DefaultController extends AbstractController
             }
         }
 
+        $phoneForm = $app['form.factory']->createNamedBuilder('phone', FormType::class)
+            ->add('phone', Type\TelType::class, [
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => '(999) 999-9999',
+                    'class' => 'loginPhone',
+                    'pattern' => '^\(?\d{3}\)? ?\d{3}-?\d{4}$',
+                    'data-parsley-error-message' => 'This value should be a 10 digit phone number.'
+                ]
+            ])
+            ->getForm();
+
+        $phoneForm->handleRequest($request);
+
+        if ($phoneForm->isValid()) {
+            $searchFields = ['loginPhone', 'phone'];
+            $searchResults = [];
+            foreach ($searchFields as $field) {
+                try {
+                    $results = $app['pmi.drc.participants']->search([$field => $phoneForm['phone']->getData()]);
+                    if (!empty($results)) {
+                        // Set search field type
+                        foreach ($results as $result) {
+                            $result->searchField = $field;
+                        }
+                        $searchResults[] = $results;
+                    }
+                } catch (ParticipantSearchExceptionInterface $e) {
+                    $phoneForm->addError(new FormError($e->getMessage()));
+                }
+            }
+            if (!empty($searchResults)) {
+                if (count($searchResults) === 2) {
+                    $searchResults = array_merge($searchResults[0], $searchResults[1]);
+                } else {
+                    $searchResults = $searchResults[0];
+                }
+                $searchResults = array_values(array_unique($searchResults, SORT_REGULAR)); // remove duplicates and reset index keys
+            }
+            return $app['twig']->render('participants-list.html.twig', [
+                'participants' => $searchResults,
+                'searchType' => 'phone'
+            ]);
+        }
 
         $searchForm = $app['form.factory']->createNamedBuilder('search', FormType::class)
             ->add('lastName', TextType::class, [
@@ -262,7 +306,8 @@ class DefaultController extends AbstractController
         return $app['twig']->render('participants.html.twig', [
             'searchForm' => $searchForm->createView(),
             'idForm' => $idForm->createView(),
-            'emailForm' => $emailForm->createView()
+            'emailForm' => $emailForm->createView(),
+            'phoneForm' => $phoneForm->createView()
         ]);
     }
 

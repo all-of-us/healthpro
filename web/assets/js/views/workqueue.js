@@ -72,6 +72,7 @@ $(document).ready(function() {
       { name: 'contactMethod', visible: false, data: 'contactMethod', orderable: false },
       { name: 'address', visible: false, data: 'address'},
       { name: 'email', visible: false, data: 'email' },
+      { name: 'loginPhone', visible: false, data: 'loginPhone' },
       { name: 'phone', visible: false, data: 'phone' },
       { name: 'ppiStatus', data: 'ppiStatus', class: 'text-center' },
       { name: 'ppiSurveys', data: 'ppiSurveys', class: 'text-center' }
@@ -272,7 +273,7 @@ $(document).ready(function() {
     // Display custom error message
     $.fn.dataTable.ext.errMode = 'none';
     $('#workqueue').on('error.dt', function(e) {
-        alert('An error occured please reload the page and try again');
+        alert('An error occurred please reload the page and try again');
     });
 
     // Scroll to top when performing pagination
