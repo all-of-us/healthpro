@@ -7,6 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Form\FormError;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
+use Pmi\Order\Order;
 
 class BiobankController extends AbstractController
 {
@@ -14,7 +15,8 @@ class BiobankController extends AbstractController
 
     protected static $routes = [
         ['participants', '/participants', ['method' => 'GET|POST']],
-        ['orders', '/orders', ['method' => 'GET|POST']]
+        ['orders', '/orders', ['method' => 'GET|POST']],
+        ['participant', '/participant/{id}', ['method' => 'GET|POST']]
     ];
 
     public function participantsAction(Application $app, Request $request)
@@ -39,7 +41,7 @@ class BiobankController extends AbstractController
             try {
                 $searchResults = $app['pmi.drc.participants']->search($searchParameters);
                 if (count($searchResults) == 1) {
-                    return $app->redirectToRoute('participant', [
+                    return $app->redirectToRoute('biobank_participant', [
                         'id' => $searchResults[0]->id
                     ]);
                 }
@@ -94,6 +96,41 @@ class BiobankController extends AbstractController
 
         return $app['twig']->render('biobank/orders.html.twig', [
             'idForm' => $idForm->createView()
+        ]);
+    }
+
+
+    public function participantAction($id, Application $app, Request $request)
+    {
+        $refresh = $request->query->get('refresh');
+        $participant = $app['pmi.drc.participants']->getById($id, $refresh);
+        if ($refresh) {
+            return $app->redirectToRoute('biobank_participant', [
+                'id' => $id
+            ]);
+        }
+        if (!$participant) {
+            $app->abort(404);
+        }
+
+        $order = new Order($app);
+        $orders = $order->getParticipantOrdersWithHistory($id);
+
+        foreach ($orders as $key => $order) {
+            // Display most recent processed sample time if exists
+            $processedSamplesTs = json_decode($order['processed_samples_ts'], true);
+            if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
+                $processedTs = new \DateTime();
+                $processedTs->setTimestamp(max($processedSamplesTs));
+                $processedTs->setTimezone(new \DateTimeZone($app->getUserTimezone()));
+                $orders[$key]['processed_ts'] = $processedTs;
+            }
+        }
+
+        return $app['twig']->render('biobank/participant.html.twig', [
+            'participant' => $participant,
+            'orders' => $orders,
+            'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled()
         ]);
     }
 }
