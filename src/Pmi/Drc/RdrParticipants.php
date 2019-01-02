@@ -75,6 +75,9 @@ class RdrParticipants
         if (isset($params['email'])) {
             $query['email'] = strtolower($params['email']);
         }
+        if (isset($params['biobankId'])) {
+            $query['biobankId'] = $params['biobankId'];
+        }
 
         return $query;
     }
