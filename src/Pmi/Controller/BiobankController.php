@@ -55,4 +55,45 @@ class BiobankController extends AbstractController
             'idForm' => $idForm->createView()
         ]);
     }
+
+    public function ordersAction(Application $app, Request $request)
+    {
+        $idForm = $app['form.factory']->createNamedBuilder('id', Type\FormType::class)
+            ->add('orderId', Type\TextType::class, [
+                'label' => 'Order ID',
+                'attr' => ['placeholder' => 'Scan barcode or enter order ID'],
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ]
+            ])
+            ->getForm();
+
+        $idForm->handleRequest($request);
+
+        if ($idForm->isValid()) {
+            $id = $idForm->get('orderId')->getData();
+
+            // New barcodes include a 4-digit sample identifier appended to the 10 digit order id
+            // If the string matches this format, remove the sample identifier to get the order id
+            if (preg_match('/^\d{14}$/', $id)) {
+                $id = substr($id, 0, 10);
+            }
+
+            $order = $app['em']->getRepository('orders')->fetchOneBy([
+                'order_id' => $id
+            ]);
+            if ($order) {
+                return $app->redirectToRoute('order', [
+                    'participantId' => $order['participant_id'],
+                    'orderId' => $order['id']
+                ]);
+            }
+            $app->addFlashError('Order ID not found');
+        }
+
+        return $app['twig']->render('biobank/orders.html.twig', [
+            'idForm' => $idForm->createView()
+        ]);
+    }
 }
