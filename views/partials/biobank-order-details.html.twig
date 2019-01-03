@@ -1,0 +1,46 @@
+<dl class="dl-horizontal">
+    <dt>Site</dt>
+    <dd>{{ attribute(order, type~'_site') ? app.getSiteDisplayName(attribute(order, type~'_site'))|default('Unknown') : '--' }}</dd>
+    <dt>User</dt>
+    <dd>{{ attribute(order, type~'_user_id') ? app.getUserEmailById(attribute(order, type~'_user_id'))|default('Unknown') : '--' }}</dd>
+</dl>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Samples</th>
+        <th scope="col">
+            {{ type|capitalize }}
+            {% if type != 'processed' and order.collected_ts is not empty %}
+                <br> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}
+            {% endif %}
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for sample in samplesInfo %}
+        <tr>
+            <td>{{ sample.code }}</td>
+            <td>
+                {% if type != 'processed' %}
+                    {% if sample.collected_ts is defined and sample.collected_ts is not empty %}
+                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                    {% else %}
+                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    {% endif %}
+                {% else %}
+                    {% if sample.process is defined %}
+                        {% if sample.processed_ts is defined and sample.processed_ts is not empty %}
+                            <i class="fa fa-check text-success" aria-hidden="true"></i>
+                            {{ sample.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                        {% else %}
+                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<b>Notes</b>
+<br>{{ attribute(order, type~'_notes') }}

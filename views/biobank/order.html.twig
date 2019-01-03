@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+{% block title %}Participant {{ participant.id }} - {% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-sm-6">
+            <dl class="dl-horizontal">
+                <dt>Participant ID</dt>
+                <dd>{{ participant.id }}</dd>
+                <dt>Biobank ID</dt>
+                <dd>{{ participant.biobankId }}</dd>
+                <dt>Paired Awardee</dt>
+                <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div role="tabpanel">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#collect" aria-controls="collect" role="tab" data-toggle="tab">Collect</a>
+            </li>
+            <li role="presentation" {% if order.processed_samples is empty %} class="disabled" {% endif %}>
+                <a href="#process" aria-controls="collect" role="tab" data-toggle="tab">Process</a>
+            </li>
+            <li role="presentation" {% if order.finalized_samples is empty %} class="disabled" {% endif %}>
+                <a href="#finalize" aria-controls="collect" role="tab" data-toggle="tab">Finalize</a>
+            </li>
+        </ul>
+        <br />
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="collect">
+                {% include 'partials/biobank-order-details.html.twig' with { type: 'collected' } %}
+            </div>
+            <div role="tabpanel" class="tab-pane" id="process">
+                {% include 'partials/biobank-order-details.html.twig' with { type: 'processed' } %}
+            </div>
+            <div role="tabpanel" class="tab-pane" id="finalize">
+                {% include 'partials/biobank-order-details.html.twig' with { type: 'finalized' } %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

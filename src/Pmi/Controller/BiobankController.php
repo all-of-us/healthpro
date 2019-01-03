@@ -16,7 +16,8 @@ class BiobankController extends AbstractController
     protected static $routes = [
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
-        ['participant', '/participant/{id}', ['method' => 'GET|POST']]
+        ['participant', '/participant/{id}', ['method' => 'GET|POST']],
+        ['order', '/participant/{participantId}/order/{orderId}']
     ];
 
     public function participantsAction(Application $app, Request $request)
@@ -131,6 +132,27 @@ class BiobankController extends AbstractController
             'participant' => $participant,
             'orders' => $orders,
             'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled()
+        ]);
+    }
+
+    public function orderAction($participantId, $orderId, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $order = new Order($app);
+        $order->loadOrder($participantId, $orderId);
+        if (!$order->isValid()) {
+            $app->abort(404);
+        }
+        if (!$order->getParticipant()->status || $app->isTestSite()) {
+            $app->abort(403);
+        }
+        return $app['twig']->render('biobank/order.html.twig', [
+            'participant' => $participant,
+            'order' => $order->toArray(),
+            'samplesInfo' => $order->getSamplesInfo(),
         ]);
     }
 }
