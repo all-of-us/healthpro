@@ -563,7 +563,7 @@ class DeployCommand extends Command {
     {
         $this->out->writeln("Running npm audit...");
         $process = $this->exec('npm audit', false);
-        if ($process->getExitCode() == 0) {
+        if ($process->getExitCode() === 0) {
             $this->out->writeln('No node modules have known vulnerabilities');
         } else {
             $this->out->writeln('');
