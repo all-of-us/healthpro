@@ -2,7 +2,7 @@
 {% block title %}Participant {{ participant.id }} - {% endblock %}
 {% block body %}
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <dl class="dl-horizontal">
                 <dt>Participant ID</dt>
                 <dd>{{ participant.id }}</dd>
@@ -12,18 +12,42 @@
                 <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
             </dl>
         </div>
+        <div class="col-sm-4">
+            <p class="lead">
+                Order ID: <strong>{{ order.order_id }}</strong>
+            </p>
+            <h3>
+                <i class="fa fa-medkit" aria-hidden="true"></i>
+                {{ order.created_ts|date('n/j/Y', app.userTimezone) }}
+            </h3>
+        </div>
     </div>
 
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
-                <a href="#collect" aria-controls="collect" role="tab" data-toggle="tab">Collect</a>
+                <a href="#collect" aria-controls="collect" role="tab" data-toggle="tab">
+                    {% if order.collected_ts is not empty %}
+                        <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                    {% endif %}
+                    Collect
+                </a>
             </li>
-            <li role="presentation" {% if order.processed_samples is empty %} class="disabled" {% endif %}>
-                <a href="#process" aria-controls="collect" role="tab" data-toggle="tab">Process</a>
+            <li role="presentation" {% if order.processed_ts is empty %} class="disabled" {% endif %}>
+                <a href="#process" aria-controls="collect" role="tab" data-toggle="tab">
+                    {% if order.processed_ts is not empty %}
+                        <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                    {% endif %}
+                    Process
+                </a>
             </li>
-            <li role="presentation" {% if order.finalized_samples is empty %} class="disabled" {% endif %}>
-                <a href="#finalize" aria-controls="collect" role="tab" data-toggle="tab">Finalize</a>
+            <li role="presentation" {% if order.finalized_ts is empty %} class="disabled" {% endif %}>
+                <a href="#finalize" aria-controls="collect" role="tab" data-toggle="tab">
+                    {% if order.finalized_ts is not empty %}
+                    <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                    {% endif %}
+                    Finalize
+                </a>
             </li>
         </ul>
         <br />
