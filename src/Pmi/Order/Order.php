@@ -1239,7 +1239,28 @@ class Order
         ]);
     }
 
-    public function getSiteUnfinalizedOrders()
+    public function getUnfinalizedOrders()
+    {
+        $ordersQuery = "
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts
+            FROM orders o
+            LEFT JOIN orders_history oh ON o.history_id = oh.id
+            WHERE o.finalized_ts IS NULL
+              AND (oh.type != :type
+              OR oh.type IS NULL)
+            ORDER BY o.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'type' => self::ORDER_CANCEL
+        ]);
+    }
+
+    public function getSiteUnfinalizedOrders($site = null)
     {
         $ordersQuery = "
             SELECT o.*,
@@ -1262,6 +1283,25 @@ class Order
         ]);
     }
 
+    public function getUnlockedOrders()
+    {
+        $ordersQuery = "
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts
+            FROM orders o
+            INNER JOIN orders_history oh ON o.history_id = oh.id
+            WHERE oh.type = :type
+            ORDER BY o.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'type' => self::ORDER_UNLOCK
+        ]);
+    }
+
 
     public function getSiteUnlockedOrders()
     {
@@ -1281,6 +1321,28 @@ class Order
         return $this->app['db']->fetchAll($ordersQuery, [
             'site' => $this->app->getSiteId(),
             'type' => self::ORDER_UNLOCK
+        ]);
+    }
+
+    public function getRecentModifiedOrders()
+    {
+        $ordersQuery = "
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts
+            FROM orders o
+            INNER JOIN orders_history oh ON o.history_id = oh.id
+            WHERE oh.type != :type1
+              AND oh.type != :type2
+              AND oh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
+            ORDER BY oh.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'type1' => self::ORDER_ACTIVE,
+            'type2' => self::ORDER_RESTORE
         ]);
     }
 

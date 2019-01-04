@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Form\FormError;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 use Pmi\Order\Order;
+use Pmi\Review\Review;
 
 class BiobankController extends AbstractController
 {
@@ -17,7 +18,12 @@ class BiobankController extends AbstractController
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
-        ['order', '/participant/{participantId}/order/{orderId}']
+        ['order', '/participant/{participantId}/order/{orderId}'],
+        ['todayParticipants', '/review/today/participants'],
+        ['unfinalizedOrders', '/review/unfinalized/orders'],
+        ['unfinalizedMeasurements', '/review/unfinalized/measurements'],
+        ['measurementsRecentModify', '/review/measurements/recent/modify'],
+        ['ordersRecentModify', '/review/orders/recent/modify']
     ];
 
     public function participantsAction(Application $app, Request $request)
@@ -155,4 +161,58 @@ class BiobankController extends AbstractController
             'samplesInfo' => $order->getSamplesInfo(),
         ]);
     }
+
+    public function todayParticipantsAction(Application $app, Request $request)
+    {
+        // Get beginning of today (at midnight) in user's timezone
+        $startString = 'today';
+        // Allow overriding start time to test in non-prod environments
+        if (!$app->isProd() && intval($request->query->get('days')) > 0) {
+            $startString = '-' . intval($request->query->get('days')) . ' days';
+        }
+        $startTime = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
+        // Get MySQL date/time string in UTC
+        $startTime->setTimezone(new \DateTimezone('UTC'));
+        $today = $startTime->format('Y-m-d H:i:s');
+
+        $review = new Review;
+        // TODO remove measurements and site
+        $site = $app->getSiteId();
+        $participants = $review->getTodayParticipants($app['db'], $today, $site);
+
+        // Preload first 5 names
+        $count = 0;
+        foreach (array_keys($participants) as $id) {
+            $participants[$id]['participant'] = $app['pmi.drc.participants']->getById($id);
+            if (++$count >= 5) {
+                break;
+            }
+        }
+
+        return $app['twig']->render('biobank/today-participants.html.twig', [
+            'participants' => $participants
+        ]);
+    }
+
+    public function unfinalizedOrdersAction(Application $app)
+    {
+        $order = new Order($app);
+        $unlockedOrders = $order->getUnlockedOrders();
+        $unfinalizedOrders = $order->getUnfinalizedOrders();
+        $orders = array_merge($unlockedOrders, $unfinalizedOrders);
+        //print_r($orders); exit;
+        return $app['twig']->render('biobank/unfinalized-orders.html.twig', [
+            'orders' => $orders
+        ]);
+    }
+
+    public function ordersRecentModifyAction(Application $app)
+    {
+        $order = new Order($app);
+        $recentModifyOrders = $order->getRecentModifiedOrders();
+        return $app['twig']->render('biobank/orders-recent-modify.html.twig', [
+            'orders' => $recentModifyOrders
+        ]);
+    }
+
 }
