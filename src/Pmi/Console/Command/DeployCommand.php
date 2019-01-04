@@ -156,7 +156,7 @@ class DeployCommand extends Command {
             // ensure that we are up-to-date with the latest NPM dependencies
             $output->writeln('');
             $output->writeln("Checking NPM dependencies...");
-            $this->exec("npm install");
+            $this->exec("npm install --no-audit"); // npm audit will be run below in the runJsSecurityCheck method
 
             // compile (concat/minify/copy) assets
             $output->writeln('');
