@@ -561,11 +561,11 @@ class DeployCommand extends Command {
 
     private function runJsSecurityCheck()
     {
-        $this->out->writeln("Running RetireJS scanner...");
-        $process = $this->exec("{$this->appDir}/node_modules/retire/bin/retire --nocache --nodepath {$this->appDir}/node_modules --jspath {$this->appDir}/web/assets/dist/js", false);
+        $this->out->writeln("Running npm audit...");
+        $process = $this->exec('npm audit', false);
         if ($process->getExitCode() == 0) {
-            $this->out->writeln('No JS files or node modules have known vulnerabilities');
-        } else {            
+            $this->out->writeln('No node modules have known vulnerabilities');
+        } else {
             $this->out->writeln('');
             $helper = $this->getHelper('question');
             if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerabilities?</error> '))) {
