@@ -176,9 +176,7 @@ class BiobankController extends AbstractController
         $today = $startTime->format('Y-m-d H:i:s');
 
         $review = new Review;
-        // TODO remove measurements and site
-        $site = $app->getSiteId();
-        $participants = $review->getTodayParticipants($app['db'], $today, $site);
+        $participants = $review->getTodayOrderParticipants($app['db'], $today);
 
         // Preload first 5 names
         $count = 0;

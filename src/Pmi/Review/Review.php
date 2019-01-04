@@ -12,9 +12,20 @@ class Review
         'processed_ts' => 'Processed',
         'finalized_ts' => 'Finalized'
     ];
+
     protected static $measurementsStatus = [
         'created_ts' => 'Created',
         'finalized_ts' => 'Finalized'
+    ];
+
+    protected static $emptyParticipant = [
+        'order' => null,
+        'orderCount' => 0,
+        'orderStatus' => '',
+        'finalizedSamples' => null,
+        'physicalMeasurement' => null,
+        'physicalMeasurementCount' => 0,
+        'physicalMeasurementStatus' => ''
     ];
 
     protected function getTodayRows($db, $today, $site)
@@ -47,19 +58,10 @@ class Review
     public function getTodayParticipants($db, $today, $site = null)
     {
         $participants = [];
-        $emptyParticipant = [
-            'order' => null,
-            'orderCount' => 0,
-            'orderStatus' => '',
-            'finalizedSamples' => null,
-            'physicalMeasurement' => null,
-            'physicalMeasurementCount' => 0,
-            'physicalMeasurementStatus' => ''
-        ];
         foreach ($this->getTodayRows($db, $today, $site) as $row) {
             $participantId = $row['participant_id'];
             if (!array_key_exists($participantId, $participants)) {
-                $participants[$participantId] = $emptyParticipant;
+                $participants[$participantId] = self::$emptyParticipant;
             }
             switch ($row['type']) {
                 case 'order':
@@ -94,6 +96,50 @@ class Review
                         $participants[$participantId]['physicalMeasurementCount']++;
                     }
                     break;
+            }
+        }
+
+        return $participants;
+    }
+
+    protected function getTodayOrderRows($db, $today)
+    {
+        $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, ' .
+            'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
+            'oh.type as h_type ' .
+            'FROM orders o ' .
+            'LEFT JOIN orders_history oh ' .
+            'ON o.history_id = oh.id WHERE ' .
+            '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ';
+
+        return $db->fetchAll($ordersQuery, [
+            'today' => $today
+        ]);
+    }
+
+    public function getTodayOrderParticipants($db, $today)
+    {
+        $participants = [];
+        foreach ($this->getTodayOrderRows($db, $today) as $row) {
+            $participantId = $row['participant_id'];
+            if (!array_key_exists($participantId, $participants)) {
+                $participants[$participantId] = self::$emptyParticipant;
+            }
+            if (is_null($participants[$participantId]['order'])) {
+                $participants[$participantId]['order'] = $row;
+                $participants[$participantId]['orderCount'] = 1;
+                // Get order status
+                foreach (self::$orderStatus as $field => $status) {
+                    if ($row[$field]) {
+                        $participants[$participantId]['orderStatus'] = $this->getOrderStatus($row, $status);
+                    }
+                }
+                // Get number of finalized samples
+                if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
+                    $participants[$participantId]['finalizedSamples'] = count($samples);
+                }
+            } else {
+                $participants[$participantId]['orderCount']++;
             }
         }
 
