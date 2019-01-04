@@ -6,43 +6,40 @@
         </div>
     {% endif %}
 </dl>
-<table class="table">
-    <thead>
-    <tr>
-        <th scope="col">Samples</th>
-        <th scope="col">
-            {{ type|capitalize }}
-            {% if type != 'processed' and attribute(order, type~'_ts') is not empty %}
-                <br> {{ attribute(order, type~'_ts')|date('n/j/Y g:ia', app.userTimezone) }}
-            {% endif %}
-        </th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for sample in samplesInfo %}
+<div class="row col-sm-6">
+    <table class="table">
+        <thead>
         <tr>
-            <td>{{ sample.code }}</td>
-            <td>
-                {% if type != 'processed' %}
-                    {% if attribute(sample, type~'_ts') is defined and attribute(sample, type~'_ts') is not empty %}
-                        <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    {% else %}
-                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    {% endif %}
-                {% else %}
-                    {% if sample.process is defined %}
-                        {% if sample.processed_ts is defined and sample.processed_ts is not empty %}
+            <th scope="col" colspan="2">Samples</th>
+            <th scope="col">
+                {{ type|capitalize }}
+                {% if type != 'processed' and attribute(order, type~'_ts') is not empty %}
+                    <br> {{ attribute(order, type~'_ts')|date('n/j/Y g:ia', app.userTimezone) }}
+                {% endif %}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for sample in samplesInfo %}
+            {% if (type == 'processed' and sample.process is defined) or (type != 'processed') %}
+                <tr>
+                    <td>{{ sample.code }}</td>
+                    <td>{{ sample.color }}</td>
+                    <td>
+                        {% if attribute(sample, type~'_ts') is not empty %}
                             <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ sample.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                            {{ type == 'processed' ? sample.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
-                    {% endif %}
-                {% endif %}
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-<b>Notes</b>
-<br>{{ attribute(order, type~'_notes') }}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="row col-sm-12" >
+    <b>Notes</b>
+    <br>{{ attribute(order, type~'_notes') }}
+</div>

@@ -1041,7 +1041,10 @@ class Order
     {
         $samples = [];
         foreach ($this->getRequestedSamples() as $key => $value) {
-            $sample = ['code' => $key];
+            $sample = [
+                'code' => $key,
+                'color' => $this->samplesInformation[$value]['color']
+            ];
             if (!empty($this->order['collected_ts']) && in_array($value, json_decode($this->order['collected_samples']))) {
                 $sample['collected_ts'] = $this->order['collected_ts'];
             }
