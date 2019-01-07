@@ -1,7 +1,0 @@
-[
-    { 
-        "component": "bootstrap",
-        "identifiers" : { "issue": "20184"},
-        "justification" : "https://github.com/twbs/bootstrap/issues/20184 is not a vulnerability in our application because we do not set any data-target attributes dynamically."
-    }
-]
