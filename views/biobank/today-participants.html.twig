@@ -64,16 +64,16 @@
                             <a href="{{ path('biobank_order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.order.order_id }}</a>
                         {% endif %}
                     </td>
-                    <td>
+                    <td data-order="{{ participant.order.created_ts }}">
                         {{ today.displayDate(participant, 'order', 'created_ts') }}
                     </td>
-                    <td>
+                    <td data-order="{{ participant.order.collected_ts }}">
                         {{ today.displayDate(participant, 'order', 'collected_ts') }}
                     </td>
-                    <td>
+                    <td data-order="{{ participant.order.processed_ts }}">
                         {{ today.displayDate(participant, 'order', 'processed_ts') }}
                     </td>
-                    <td>
+                    <td data-order="{{ participant.order.finalized_ts }}">
                         {% set showOrderFinalizedTs = participant.order and participant.order.h_type != 'unlock' and not (participant.order.finalized_ts and participant.order.rdr_id is empty) %}
                         {% if showOrderFinalizedTs %}
                             {{ today.displayDate(participant, 'order', 'finalized_ts') }}
@@ -95,25 +95,12 @@
 {% endblock %} 
 
 {% block pagejs %}
-<script>
-$(document).ready(function() {
-    $('.load-name').each(function() {
-        var td = $(this);
-        $.getJSON({{ path('review_participantNameLookup', { csrf_token: csrf_token('review'), id: '' })|json_encode|raw }} + td.data('participant-id'), function(data) {
-            td.empty();
-            if (data && data.lastName && data.firstName) {
-                var a = $('<a>')
-                    .attr('href', td.data('href'))
-                    .text(data.lastName + ', ' + data.firstName);
-                td.append(a);
-            } else {
-                td.text({{ missingName|json_encode|raw }});
-            }
-        })
-        .fail(function() {
-            td.html('<em>Error loading name</em>');
+    <script>
+        $(document).ready(function () {
+            $('table').DataTable({
+                order: [[3, 'desc']],
+                pageLength: 25
+            });
         });
-    });
-});
-</script>
+    </script>
 {% endblock %}
