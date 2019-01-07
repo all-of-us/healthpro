@@ -27,11 +27,11 @@
             {% for group in videoGroups %}
                 <h4>{{ group.title }}</h4>
                 <div class="list-group">
-                    {% for chapter, video in group.videos %}
+                    {% for video in group.videos %}
                         {% if video.link is not empty %}
-                            <a href="#" class="list-group-item load-video" data-embed-src="{{ video.link }}">{{ chapter }}: {{ video.title }}</a>
+                            <a href="#" class="list-group-item load-video" data-embed-src="{{ video.link }}">{{ video.title }}</a>
                         {% else %}
-                            <div class="list-group-item disabled">{{ chapter }}: {{ video.title }} <em><small>(Coming Soon!)</small></em></div>
+                            <div class="list-group-item disabled">{{ video.title }} <em><small>(Coming Soon!)</small></em></div>
                         {% endif %}
                     {% endfor %}
                 </div>

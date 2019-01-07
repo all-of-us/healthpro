@@ -120,24 +120,24 @@ class HelpController extends AbstractController
         [
             'title' => 'Biobank Video Tutorials for Healthcare Provider Organizations (HPO)',
             'videos' => [
-                'Chapter 1' => [
-                    'title' => 'HPO Creating an Order',
+                [
+                    'title' => 'Chapter 1: HPO Creating an Order',
                     'link' => ''
                 ],
-                'Chapter 3' => [
-                    'title' => 'HPO Blood Collection',
+                [
+                    'title' => 'Chapter 3: HPO Blood Collection',
                     'link' => ''
                 ],
-                'Chapter 5' => [
-                    'title' => 'HPO Urine Collection',
+                [
+                    'title' => 'Chapter 5: HPO Urine Collection',
                     'link' => 'https://www.youtube.com/embed/ANJs1_A_zLs'
                 ],
-                'Chapter 7' => [
-                    'title' => 'HPO Saliva Collection',
+                [
+                    'title' => 'Chapter 7: HPO Saliva Collection',
                     'link' => 'https://www.youtube.com/embed/0WeQCxetXQk'
                 ],
-                'Chapter 9' => [
-                    'title' => 'HPO Ordering Supplies from MML',
+                [
+                    'title' => 'Chapter 9: HPO Ordering Supplies from MML',
                     'link' => 'https://www.youtube.com/embed/6P4nuWNOAQA'
                 ]
             ]
@@ -145,20 +145,20 @@ class HelpController extends AbstractController
         [
             'title' => 'Biobank Video Tutorials for Direct Volunteers (DV)',
             'videos' => [
-                'Chapter 2' => [
-                    'title' => 'DV Registering a KIT',
+                [
+                    'title' => 'Chapter 2: DV Registering a KIT',
                     'link' => 'https://www.youtube.com/embed/X9E6u44w8Ks'
                 ],
-                'Chapter 4' => [
-                    'title' => 'DV Blood Collection & Processing',
+                [
+                    'title' => 'Chapter 4: DV Blood Collection & Processing',
                     'link' => 'https://www.youtube.com/embed/pNSndLIIHQA'
                 ],
-                'Chapter 6' => [
-                    'title' => 'DV Urine Collection',
+                [
+                    'title' => 'Chapter 6: DV Urine Collection',
                     'link' => 'https://www.youtube.com/embed/wVcFsCiyqtA'
                 ],
-                'Chapter 10' => [
-                    'title' => 'DV Packaging & Shipping Specimens',
+                [
+                    'title' => 'Chapter 10: DV Packaging & Shipping Specimens',
                     'link' => 'https://www.youtube.com/embed/yAHGK979kJ0'
                 ]
             ]
