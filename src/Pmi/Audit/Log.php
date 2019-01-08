@@ -95,15 +95,16 @@ class Log
     public function logDatastore()
     {
         $logArray = $this->buildLogArray();
-        $entity = new AuditLog();
-        $entity->setAction($logArray['action']);
-        $entity->setTimestamp($logArray['ts']);
-        $entity->setUser($logArray['user']);
-        $entity->setSite($logArray['site']);
-        $entity->setIp($logArray['ip']);
+        $data = [
+            'action' => $logArray['action'],
+            'timestamp' => $logArray['ts'],
+            'user' => $logArray['user'],
+            'site' => $logArray['site'],
+            'ip' => $logArray['ip']
+        ];
         if ($logArray['data']) {
-            $entity->setData(json_encode($logArray['data']));
+            $data['data'] = json_encode($logArray['data']);
         }
-        $entity->save();
+        AuditLog::insertData($data);
     }
 }

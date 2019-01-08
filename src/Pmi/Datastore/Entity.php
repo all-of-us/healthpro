@@ -224,6 +224,12 @@ abstract class Entity
         return $datastoreClient->fetchById(static::getKind(), $id);
     }
 
+    public static function insertData($data)
+    {
+        $datastoreClient = new DatastoreClientHelper();
+        return $datastoreClient->insert(static::getKind(), $data);
+    }
+
     public static function upsertData($id, $data)
     {
         $datastoreClient = new DatastoreClientHelper();

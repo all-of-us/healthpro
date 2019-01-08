@@ -16,4 +16,9 @@ class AuditLog extends Entity
             ->addString('ip')
             ->addString('data', false);
     }
+
+    protected static function getKind()
+    {
+        return 'AuditLog';
+    }
 }
