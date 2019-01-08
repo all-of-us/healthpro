@@ -162,6 +162,24 @@ class HelpController extends AbstractController
                     'link' => 'https://www.youtube.com/embed/yAHGK979kJ0'
                 ]
             ]
+        ],
+        [
+            'title' => 'Physical Measurements (HPO/DV)',
+            'videos' => [
+                [
+                    'title' => 'Physical Measurements Video Tutorial (HPO/DV)',
+                    'link' => 'https://www.youtube.com/embed/wE-sZoPCfdk'
+                ]
+            ]
+        ],
+        [
+            'title' => 'General (HPO/DV)',
+            'videos' => [
+                [
+                    'title' => 'All of Us Research Program FAQs',
+                    'link' => 'https://www.youtube.com/embed/TE-IyOxazvo'
+                ]
+            ]
         ]
     ];
 
