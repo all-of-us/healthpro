@@ -306,9 +306,13 @@ table.table-samples td {
     color: #dadada;
 }
 
+/* Help */
 .help-footer {
     padding-top: 50px;
     padding-bottom: 20px;
+}
+.help-videos-nav .list-group {
+    margin-bottom: 30px;
 }
 
 .tz-change-btn {
