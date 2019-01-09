@@ -234,23 +234,19 @@ class DefaultController extends AbstractController
                 try {
                     $results = $app['pmi.drc.participants']->search([$field => $phoneForm['phone']->getData()]);
                     if (!empty($results)) {
-                        // Set search field type
                         foreach ($results as $result) {
+                            // Check for duplicates
+                            if (isset($searchResults[$result->id])) {
+                                continue;
+                            }
+                            // Set search field type
                             $result->searchField = $field;
+                            $searchResults[$result->id] = $result;
                         }
-                        $searchResults[] = $results;
                     }
                 } catch (ParticipantSearchExceptionInterface $e) {
                     $phoneForm->addError(new FormError($e->getMessage()));
                 }
-            }
-            if (!empty($searchResults)) {
-                if (count($searchResults) === 2) {
-                    $searchResults = array_merge($searchResults[0], $searchResults[1]);
-                } else {
-                    $searchResults = $searchResults[0];
-                }
-                $searchResults = array_values(array_unique($searchResults, SORT_REGULAR)); // remove duplicates and reset index keys
             }
             return $app['twig']->render('participants-list.html.twig', [
                 'participants' => $searchResults,
