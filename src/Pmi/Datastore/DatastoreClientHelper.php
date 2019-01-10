@@ -54,4 +54,27 @@ class DatastoreClientHelper
         $this->datastore->delete($key);
         return true;
     }
+
+    public function deleteBatch($keys)
+    {
+        $this->datastore->deleteBatch($keys);
+        return true;
+    }
+
+    public function basicQuery($kind, $property, $value, $operator)
+    {
+        $query = $this->datastore->query()
+            ->kind($kind)
+            ->filter($property, $operator, $value);
+        return $this->datastore->runQuery($query);
+    }
+
+    public function getKeys($results)
+    {
+        $keys = [];
+        foreach ($results as $result) {
+            $keys[] = $result->key();
+        }
+        return $keys;
+    }
 }

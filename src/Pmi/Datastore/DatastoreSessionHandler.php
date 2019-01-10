@@ -38,12 +38,8 @@ class DatastoreSessionHandler extends AbstractSessionHandler
 
     public function gc($maxlifetime)
     {
-        $query = 'SELECT * FROM Session WHERE modified < @modified';
         $modified = new DateTime("-{$maxlifetime} seconds");
-        $sessionStore = new \GDS\Store('Session');
-        $results = $sessionStore->fetchAll($query, ['modified' => $modified]);
-        $sessionStore->delete($results);
-
+        Session::gc('modified', $modified, '<');
         return true;
     }
 
