@@ -13,17 +13,6 @@
             </dl>
         </div>
     </div>
-    {% if cacheEnabled %}
-        <div class="row">
-            <div class="col-sm-12 text-center">
-                <small>
-                    Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.userTimezone) }}
-                    <a href="{{ path('biobank_participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px"><i class="fa fa-refresh" aria-hidden="true"></i> refresh</a>
-                </small>
-            </div>
-        </div>
-    {% endif %}
-
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
@@ -46,7 +35,7 @@
                                             {% if loop.index == 6 %}
                                                 <div id="order-overflow">
                                             {% endif %}
-                                            <a href="{{ path('biobank_order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
+                                            <a href="{{ path('biobank_order', { biobankId: participant.biobankId, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                                                 {{ order.created_ts|date('D n/j/Y', app.userTimezone) }}
                                                 <small class="text-muted"><strong>{{ order.order_id }}</strong></small>
                                                 <br/>

@@ -17,8 +17,8 @@ class BiobankController extends AbstractController
     protected static $routes = [
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
-        ['participant', '/participant/{id}', ['method' => 'GET|POST']],
-        ['order', '/participant/{participantId}/order/{orderId}'],
+        ['participant', '/participant/{biobankId}', ['method' => 'GET|POST']],
+        ['order', '/participant/{biobankId}/order/{orderId}'],
         ['todayParticipants', '/review/today/participants'],
         ['unfinalizedOrders', '/review/unfinalized/orders'],
         ['unfinalizedMeasurements', '/review/unfinalized/measurements'],
@@ -107,21 +107,15 @@ class BiobankController extends AbstractController
     }
 
 
-    public function participantAction($id, Application $app, Request $request)
+    public function participantAction($biobankId, Application $app, Request $request)
     {
-        $refresh = $request->query->get('refresh');
-        $participant = $app['pmi.drc.participants']->getById($id, $refresh);
-        if ($refresh) {
-            return $app->redirectToRoute('biobank_participant', [
-                'id' => $id
-            ]);
-        }
+        $participant = $app['pmi.drc.participants']->search(['biobankId' => $biobankId]);
         if (!$participant) {
             $app->abort(404);
         }
-
+        $participant = $participant[0];
         $order = new Order($app);
-        $orders = $order->getParticipantOrdersWithHistory($id);
+        $orders = $order->getParticipantOrdersWithHistory($participant->id);
 
         foreach ($orders as $key => $order) {
             // Display most recent processed sample time if exists
@@ -141,14 +135,15 @@ class BiobankController extends AbstractController
         ]);
     }
 
-    public function orderAction($participantId, $orderId, Application $app, Request $request)
+    public function orderAction($biobankId, $orderId, Application $app, Request $request)
     {
-        $participant = $app['pmi.drc.participants']->getById($participantId);
+        $participant = $app['pmi.drc.participants']->search(['biobankId' =>  $biobankId]);
         if (!$participant) {
             $app->abort(404);
         }
+        $participant = $participant[0];
         $order = new Order($app);
-        $order->loadOrder($participantId, $orderId);
+        $order->loadOrder($participant->id, $orderId);
         if (!$order->isValid()) {
             $app->abort(404);
         }

@@ -365,6 +365,7 @@ class DefaultController extends AbstractController
     {
         $refresh = $request->query->get('refresh');
         $participant = $app['pmi.drc.participants']->getById($id, $refresh);
+        print_r($participant); exit;
         if ($refresh) {
             return $app->redirectToRoute('participant', [
                 'id' => $id
