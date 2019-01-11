@@ -18,6 +18,7 @@ Prerequisites:
 * [NodeJS](https://nodejs.org/) (latest LTS should be fine)
 * [MySQL](https://dev.mysql.com/downloads/mysql/) (version 5.7 used by Google Cloud SQL)
 * [Composer](https://getcomposer.org/doc/00-intro.md#globally)
+* [git-secrets](https://github.com/awslabs/git-secrets/issues/65#issuecomment-446519551)
 
 Install PHP dependencies via Composer:
 

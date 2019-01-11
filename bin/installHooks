@@ -1,13 +1,17 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
-APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
+{ which git-secrets; } || {
+  echo 'git-secrets required and not found. See README for installation instructions.'
+  echo
+  exit 1
+}
 
-echo "installHooks: adding git hooks for development ..."
-if [ -f "${APP_DIR}/.git/hooks/pre-commit" ]
-then
-  echo "installHooks: pre-commit script already installed."
-else
-  cp ${APP_DIR}/bin/git-hooks/pre-commit ${APP_DIR}/.git/hooks/pre-commit
-  chmod +x ${APP_DIR}/.git/hooks/pre-commit
-  echo "installHooks: done!"
-fi
+{
+  git config --remove-section secrets 2>/dev/null
+} || {
+  :
+}
+git secrets --add '"private_key":'
+git secrets --add --allowed 'git secrets --add *'
