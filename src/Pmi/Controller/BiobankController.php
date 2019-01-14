@@ -139,7 +139,12 @@ class BiobankController extends AbstractController
 
     public function orderAction($biobankId, $orderId, Application $app, Request $request)
     {
-        $participant = $app['pmi.drc.participants']->search(['biobankId' =>  $biobankId]);
+        try {
+            $participant = $app['pmi.drc.participants']->search(['biobankId' => $biobankId]);
+        } catch (ParticipantSearchExceptionInterface $e) {
+            $app->abort(404);
+        }
+
         if (!$participant) {
             $app->abort(404);
         }

@@ -47,11 +47,11 @@
         <tbody>
             {% for id, participant in participants %}
                 <tr>
-                    <td><a href="{{ path('biobank_participant', { id: id }) }}">{{ id }}</a></td>
+                    <td><a href="{{ path('biobank_participant', { biobankId: participant.order.biobank_id }) }}">{{ id }}</a></td>
                     <td class="td-left-border">
                         {% if participant.order %}
                             <nobr>
-                                <a href="{{ path('biobank_order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.orderStatus }}</a>
+                                <a href="{{ path('biobank_order', { biobankId: participant.order.biobank_id, orderId: participant.order.id }) }}">{{ participant.orderStatus }}</a>
                                 {% if participant.orderCount > 1 %}
                                     <i class="fa fa-info-circle" aria-hidden="true" title="More than one biobank order for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of biospecimen interactions." data-toggle="tooltip"></i>
                                     <span class="sr-only">More than one biobank order for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of biospecimen interactions.</span>
@@ -61,7 +61,7 @@
                     </td>
                     <td>
                         {% if participant.order %}
-                            <a href="{{ path('biobank_order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.order.order_id }}</a>
+                            <a href="{{ path('biobank_order', { biobankId: participant.order.biobank_id, orderId: participant.order.id }) }}">{{ participant.order.order_id }}</a>
                         {% endif %}
                     </td>
                     <td data-order="{{ participant.order.created_ts }}">

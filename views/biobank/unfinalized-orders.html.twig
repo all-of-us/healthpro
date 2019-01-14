@@ -37,7 +37,7 @@
             {% for order in orders %}
                 <tr>
                     <td>
-                        <a href="{{ path('biobank_order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.order_id }}</a>
+                        <a href="{{ path('biobank_order', { biobankId: order.biobank_id, orderId: order.id }) }}">{{ order.order_id }}</a>
                     </td>
                     <td data-order="{{ order.created_ts }}">
                         {{ today.displayDate(order, 'created_ts') }}
