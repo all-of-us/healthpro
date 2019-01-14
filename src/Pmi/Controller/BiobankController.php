@@ -47,16 +47,13 @@ class BiobankController extends AbstractController
             $searchParameters = $idForm->getData();
             try {
                 $searchResults = $app['pmi.drc.participants']->search($searchParameters);
-                if (count($searchResults) == 1) {
+                if (!empty($searchResults)) {
                     return $app->redirectToRoute('biobank_participant', [
                         'biobankId' => $searchResults[0]->biobankId
                     ]);
                 }
-                return $app['twig']->render('participants-list.html.twig', [
-                    'participants' => $searchResults
-                ]);
             } catch (ParticipantSearchExceptionInterface $e) {
-                $idForm->addError(new FormError($e->getMessage()));
+                $app->addFlashError('Biobank ID not found');
             }
         }
 
@@ -109,8 +106,13 @@ class BiobankController extends AbstractController
 
     public function participantAction($biobankId, Application $app, Request $request)
     {
-        $participant = $app['pmi.drc.participants']->search(['biobankId' => $biobankId]);
-        if (!$participant) {
+        try {
+            $participant = $app['pmi.drc.participants']->search(['biobankId' => $biobankId]);
+        } catch (ParticipantSearchExceptionInterface $e) {
+            $app->abort(404);
+        }
+
+        if (empty($participant)) {
             $app->abort(404);
         }
         $participant = $participant[0];
