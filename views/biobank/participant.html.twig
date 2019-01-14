@@ -10,6 +10,8 @@
                 <dd>{{ participant.biobankId }}</dd>
                 <dt>Paired Awardee</dt>
                 <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
+                <dt>Paired Site</dt>
+                <dd>{{ participant.site ? app.getSiteDisplayName(participant.siteSuffix) : '(not paired)' }}</dd>
             </dl>
         </div>
     </div>

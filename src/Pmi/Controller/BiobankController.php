@@ -49,7 +49,7 @@ class BiobankController extends AbstractController
                 $searchResults = $app['pmi.drc.participants']->search($searchParameters);
                 if (count($searchResults) == 1) {
                     return $app->redirectToRoute('biobank_participant', [
-                        'id' => $searchResults[0]->id
+                        'biobankId' => $searchResults[0]->biobankId
                     ]);
                 }
                 return $app['twig']->render('participants-list.html.twig', [
