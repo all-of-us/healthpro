@@ -2,16 +2,44 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# Checks for whether binary exists
 { which git-secrets; } || {
   echo 'git-secrets required and not found. See README for installation instructions.'
   echo
   exit 1
 }
 
-{
-  git config --remove-section secrets 2>/dev/null
-} || {
+# Unless necessary, do not run `git secrets --install`
+RUN_SETUP=0
+
+hooks=( "commit-msg" "pre-commit" "prepare-commit-msg" )
+for file in "${hooks[@]}"
+do
+  if [[ -f ".git/hooks/${file}" ]]; then
+    if [[ `grep 'git secrets' ./.git/hooks/${file}` ]]; then
+      # Already installed correctly, nothing to do here (:)
+      :
+    else
+      # Throw error message
+      echo "You have an existing ${file} hook, but it is not using git-secrets."
+      echo "Remove or rename this hook to continue."
+      exit 1
+    fi
+  else
+    RUN_SETUP=1
+  fi
+done
+
+# If any of the above files were missing, run the installer
+if [[ $RUN_SETUP == 1 ]]; then
+  git secrets --install
+fi
+
+# Clears existing git-secrets rules from .git/config
+{ git config --remove-section secrets 2>/dev/null; } || {
   :
 }
+
+# Installs rules
 git secrets --add '"private_key":'
 git secrets --add --allowed 'git secrets --add *'
