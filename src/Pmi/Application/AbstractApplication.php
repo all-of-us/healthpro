@@ -65,7 +65,7 @@ abstract class AbstractApplication extends Application
             throw new Exception("Bad environment: $env");
         }
     }
-    
+
     public function __construct(array $values = array())
     {
         if (!array_key_exists('env', $values)) {
@@ -131,7 +131,7 @@ abstract class AbstractApplication extends Application
         if ($this->isLocal()) {
             libxml_disable_entity_loader(false);
         }
-        
+
         // Register *early* before middleware
         if (method_exists($this, 'earlyBeforeCallback')) {
             $this->before([$this, 'earlyBeforeCallback'], Application::EARLY_EVENT);
@@ -172,9 +172,9 @@ abstract class AbstractApplication extends Application
                     break;
             }
         }
-        
+
         $this->loadConfiguration($config);
-        
+
         // configure security and boot before enabling twig so that `is_granted` will be available
         $this->registerSecurity();
         $this->boot();
@@ -189,7 +189,7 @@ abstract class AbstractApplication extends Application
 
     /** Populates $this->configuration */
     abstract protected function loadConfiguration($override = []);
-    
+
     public function getConfig($key)
     {
         if (isset($this->configuration[$key])) {
@@ -203,16 +203,16 @@ abstract class AbstractApplication extends Application
     {
         $this->configuration[$key] = $val;
     }
-    
+
     /** Sets up authentication and firewall. */
     abstract protected function registerSecurity();
-    
+
     public function getGoogleServiceClass()
     {
         return $this['isUnitTest'] ? 'Tests\Pmi\GoogleUserService' :
             'google\appengine\api\users\UserService';
     }
-    
+
     public function getGoogleUser()
     {
         if ($this->getConfig('gae_auth')) {
@@ -222,11 +222,11 @@ abstract class AbstractApplication extends Application
             return $this['session']->get('googleUser');
         }
     }
-    
+
     public function getGoogleLogoutUrl($route = 'home')
     {
         $dest = $this->generateUrl($route, [], true);
-        
+
         if ($this->getConfig('gae_auth')) {
             $cls = $this->getGoogleServiceClass();
             return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
@@ -235,17 +235,17 @@ abstract class AbstractApplication extends Application
             return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
         }
     }
-    
+
     public function getGoogleLoginUrl($route = 'home')
     {
         $dest = $this->generateUrl($route, [], true);
-        
+
         if ($this->getConfig('gae_auth')) {
             $cls = $this->getGoogleServiceClass();
             return class_exists($cls) ? $cls::createLoginURL($dest) : null;
         }
     }
-    
+
     public function getUser()
     {
         $token = $this['security.token_storage']->getToken();
@@ -299,7 +299,7 @@ abstract class AbstractApplication extends Application
     {
         return $this->isLoggedIn() && $this['security.authorization_checker']->isGranted($role);
     }
-    
+
     /** Is the user's session expired? */
     public function isLoginExpired()
     {
@@ -309,12 +309,12 @@ abstract class AbstractApplication extends Application
         $remaining = $this['sessionTimeout'] - $idle;
         return $this->isLoggedIn() && $remaining <= 0;
     }
-    
+
     public function isLoggedIn()
     {
         return $this['security.token_storage']->getToken() && $this['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY');
     }
-    
+
     /**
      * "Upkeep" routes are routes that we typically want to allow through
      * even when workflow dictates otherwise.
@@ -377,7 +377,20 @@ abstract class AbstractApplication extends Application
             return !is_null($this['routes']->get($name));
         }));
 
-        // Register custom Twig function for in-app messaging
+        /**
+         * Display Message
+         *
+         * Register custom Twig function for in-app messaging
+         *
+         * @param string $name Reference to use within template, without the configuration prefix
+         * @param string|false $type Type of message; determines how it is rendered
+         *                     - false - Render contents inline
+         *                     - alert - Bootstrap "info" alert
+         *                     - tooltip - Information icon with tooltip
+         * @param array $options Options for the message
+         *              - closeButton (boolean) - Display a close button for 'alert' type
+         * @return string
+         */
         $this['twig']->addFunction(new Twig_SimpleFunction('display_message', function($name, $type = false, $options = []) {
             $configPrefix = 'messaging_';
             $message = $this->getConfig($configPrefix . $name);
@@ -386,6 +399,9 @@ abstract class AbstractApplication extends Application
             }
             switch ($type) {
                 case 'alert':
+                    if (isset($options['closeButton']) && $options['closeButton']) {
+                        $message .= ' <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                    }
                     return '<div class="alert alert-info">' . $message . '</div>';
                     break;
                 case 'tooltip':
@@ -395,7 +411,7 @@ abstract class AbstractApplication extends Application
                 default:
                     return $message;
             }
-        }, ['is_safe' => ['html']]));        
+        }, ['is_safe' => ['html']]));
 
         // Register custom Twig cache
         if (isset($this['twigCacheHandler'])) {
@@ -425,7 +441,7 @@ abstract class AbstractApplication extends Application
     {
         $this['session.storage.handler'] = new DatastoreSessionHandler();
     }
-    
+
     public function logout()
     {
         $this['security.token_storage']->setToken(null);
@@ -437,7 +453,7 @@ abstract class AbstractApplication extends Application
         if ($this->getName()) {
             $route = $this->getName() . '_' . $route;
         }
-        
+
         if ($absolute) {
             // `login_url` is the URL prefix to use in the event that our site
             // is being reverse-proxied from a different domain (i.e., from the WAF)
@@ -456,7 +472,7 @@ abstract class AbstractApplication extends Application
     {
         return $this->redirect($this->generateUrl($route, $parameters));
     }
-    
+
     public function forwardToRoute($route, Request $request)
     {
         $subRequest = Request::create($this->generateUrl($route), 'GET', $request->request->all(), $request->cookies->all(), array(), $request->server->all());
@@ -483,7 +499,7 @@ abstract class AbstractApplication extends Application
         $string = $this['translator']->trans($string, $translationParams);
         $this->addFlash('notice', $string);
     }
-    
+
     public function addFlashSuccess($string, array $translationParams = [])
     {
         $string = $this['translator']->trans($string, $translationParams);
