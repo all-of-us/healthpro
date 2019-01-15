@@ -96,8 +96,8 @@ class BiobankController extends AbstractController
                 'order_id' => $id
             ]);
             if ($order) {
-                return $app->redirectToRoute('order', [
-                    'participantId' => $order['participant_id'],
+                return $app->redirectToRoute('biobank_order', [
+                    'biobankId' => $order['biobank_id'],
                     'orderId' => $order['id']
                 ]);
             }
