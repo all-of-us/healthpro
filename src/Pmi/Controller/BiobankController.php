@@ -42,7 +42,7 @@ class BiobankController extends AbstractController
                     new Constraints\Type('string')
                 ],
                 'attr' => [
-                    'placeholder' => 'Y000000000'
+                    'placeholder' => 'Enter biobank ID'
                 ]
             ])
             ->getForm();
