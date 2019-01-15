@@ -31,7 +31,9 @@
     <table class="table table-striped table-bordered table-small" id="table-today">
         <thead>
             <tr>
-                <th rowspan="2">Participant ID</th>
+                {% if is_granted('ROLE_SCRIPPS') %}
+                    <th rowspan="2">Participant ID</th>
+                {% endif %}
                 <th colspan="7" class="text-center td-left-border" style="background-color: #f9f9f9">Biobank Order</th>
             </tr>
             <tr>
@@ -47,7 +49,9 @@
         <tbody>
             {% for id, participant in participants %}
                 <tr>
-                    <td><a href="{{ path('biobank_participant', { biobankId: participant.order.biobank_id }) }}">{{ id }}</a></td>
+                    {% if is_granted('ROLE_SCRIPPS') %}
+                        <td><a href="{{ path('biobank_participant', { biobankId: participant.order.biobank_id }) }}">{{ id }}</a></td>
+                    {% endif %}
                     <td class="td-left-border">
                         {% if participant.order %}
                             <nobr>
