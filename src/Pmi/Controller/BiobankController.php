@@ -15,6 +15,7 @@ class BiobankController extends AbstractController
     protected static $name = 'biobank';
 
     protected static $routes = [
+        ['home', '/'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{biobankId}', ['method' => 'GET|POST']],
@@ -25,6 +26,11 @@ class BiobankController extends AbstractController
         ['measurementsRecentModify', '/review/measurements/recent/modify'],
         ['ordersRecentModify', '/review/orders/recent/modify']
     ];
+
+    public function homeAction(Application $app)
+    {
+        return $app['twig']->render('biobank/index.html.twig');
+    }
 
     public function participantsAction(Application $app, Request $request)
     {
