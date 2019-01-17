@@ -23,7 +23,6 @@
         "symfony/twig-bridge": "^3.1",
         "symfony/validator": "^3.1",
         "symfony/yaml": "^3.1",
-        "tomwalder/php-gds": "^2.1",
         "twig/twig": "^1.24",
         "fzaninotto/faker": "^1.6",
         "google/cloud-datastore": "^1.5"
