@@ -233,19 +233,19 @@ class WorkQueueController extends AbstractController
             return $app['twig']->render('workqueue/no-organization.html.twig');
         }
 
-        $hasFullDataAcess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
+        $hasFullDataAccess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
 
         $params = array_filter($request->query->all());
         $params['_count'] = WorkQueue::LIMIT_EXPORT_PAGE_SIZE;
         $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
 
-        $stream = function() use ($app, $params, $organization, $hasFullDataAcess) {
+        $stream = function() use ($app, $params, $organization, $hasFullDataAccess) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
             fwrite($output, "\"\"\n");
-            if ($hasFullDataAcess) {
+            if ($hasFullDataAccess) {
                 $headers = [
                     'PMI ID',
                     'Biobank ID',
@@ -302,12 +302,15 @@ class WorkQueueController extends AbstractController
             $headers[] = 'Language of General Consent';
             $headers[] = 'DV-only EHR Sharing Status';
             $headers[] = 'DV-only EHR Sharing Date';
+            if ($hasFullDataAccess) {
+                $headers[] = 'Login Phone';
+            }
             fputcsv($output, $headers);
 
             for ($i = 0; $i < ceil(WorkQueue::LIMIT_EXPORT / WorkQueue::LIMIT_EXPORT_PAGE_SIZE); $i++) {
                 $participants = $this->participantSummarySearch($organization, $params, $app);
                 foreach ($participants as $participant) {
-                    if ($hasFullDataAcess) {
+                    if ($hasFullDataAccess) {
                         $row = [
                             $participant->id,
                             $participant->biobankId,
@@ -371,6 +374,9 @@ class WorkQueueController extends AbstractController
                     $row[] = $participant->primaryLanguage;
                     $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForDvElectronicHealthRecordsSharing);
                     $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingTime, $app->getUserTimezone());
+                    if ($hasFullDataAccess) {
+                        $row[] = $participant->loginPhoneNumber;
+                    }
                     fputcsv($output, $row);
                 }
                 unset($participants);

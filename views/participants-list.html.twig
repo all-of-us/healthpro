@@ -9,7 +9,20 @@
 
     {% if participants %}
         <table class="table table-striped">
-            <thead><tr><th>Last Name</th><th>First Name</th><th>Date of Birth</th><th>ZIP Code</th><th>Participant Paired Awardee</th><th>Basics Complete</th><th></th></tr></thead>
+            <thead>
+            <tr>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Date of Birth</th>
+                <th>ZIP Code</th>
+                <th>Participant Paired Awardee</th>
+                <th>Basics Complete</th>
+                <th></th>
+                {% if searchType is defined and searchType == 'phone' %}
+                    <th>Matched Phone Number</th>
+                {% endif %}
+            </tr>
+            </thead>
             <tbody>
                 {% for participant in participants %}
                     <tr>
@@ -43,6 +56,17 @@
                                 <span class="label label-danger">Unconsented</span>
                             {% endif %}
                         </td>
+                        {% if searchType is defined and searchType == 'phone' %}
+                            <td>
+                                {% if participant.searchField is defined %}
+                                    {% if participant.searchField == 'loginPhone' %}
+                                        Login Phone <span title="This is the verified SMS number used during registration" data-toggle="tooltip"><span class="sr-only">What is Login Phone?</span><i class="fa fa-question-circle text-info"></i></span>
+                                    {% else %}
+                                        Contact Phone <span title="This is the phone number provided after consent" data-toggle="tooltip"><span class="sr-only">What is Contact Phone?</span><i class="fa fa-question-circle text-info"></i></span>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </tbody>

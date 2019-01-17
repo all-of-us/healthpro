@@ -93,6 +93,12 @@ class DeployCommand extends Command {
                 'If set, deploy locally to your GAE SDK web server'
             )
             ->addOption(
+                'local-php',
+                null,
+                InputOption::VALUE_NONE,
+                'Used in conjuction with --local; Will use PHP\'s built-in development server if set'
+            )
+            ->addOption(
                 'port',
                 'p',
                 InputOption::VALUE_OPTIONAL,
@@ -150,7 +156,7 @@ class DeployCommand extends Command {
             // ensure that we are up-to-date with the latest NPM dependencies
             $output->writeln('');
             $output->writeln("Checking NPM dependencies...");
-            $this->exec("npm install");
+            $this->exec("npm install --no-audit"); // npm audit will be run below in the runJsSecurityCheck method
 
             // compile (concat/minify/copy) assets
             $output->writeln('');
@@ -174,16 +180,20 @@ class DeployCommand extends Command {
         }
 
         if ($this->local) {
-            $cmd = "dev_appserver.py -A pmi-hpo-dev --port={$this->port}";
-            if ($this->phpCgiPath) {
-                $cmd .= " --php_executable_path {$this->phpCgiPath}";
+            if ($input->getOption('local-php')) {
+                $cmd = "php -S localhost:{$this->port} -t web/ web/local-router.php";
+            } else {
+                $cmd = "dev_appserver.py -A pmi-hpo-dev --port={$this->port}";
+                if ($this->phpCgiPath) {
+                    $cmd .= " --php_executable_path {$this->phpCgiPath}";
+                }
+                if ($dsDir = $input->getOption('datastoreDir')) {
+                    $dsDir = rtrim($dsDir, '/');
+                    $dsDir .= '/datastore.db';
+                    $cmd .= " --datastore_path={$dsDir}";
+                }
+                $cmd .= " {$this->appDir}/app.yaml";
             }
-            if ($dsDir = $input->getOption('datastoreDir')) {
-                $dsDir = rtrim($dsDir, '/');
-                $dsDir .= '/datastore.db';
-                $cmd .= " --datastore_path={$dsDir}";
-            }
-            $cmd .= " {$this->appDir}/app.yaml";
         } else {
             $cmd = "gcloud app deploy --quiet --project={$this->appId} {$this->appDir}/app.yaml {$this->appDir}/cron.yaml";
         }
@@ -209,7 +219,7 @@ class DeployCommand extends Command {
         $reallyDeploy = new ConfirmationQuestion("<question>Do you REALLY want to deploy{$destinationText}? (y/n)</question> ",
             false, '/^(y|yes)$/');
         if ($this->local || ($question->ask($input, $output, $gitStatus) && $question->ask($input, $output, $reallyDeploy))) {
-            $this->exec($cmd);
+            $this->exec($cmd, true, true);
             if ($this->isTaggable()) {
                 $this->tagRelease();
             }
@@ -551,11 +561,11 @@ class DeployCommand extends Command {
 
     private function runJsSecurityCheck()
     {
-        $this->out->writeln("Running RetireJS scanner...");
-        $process = $this->exec("{$this->appDir}/node_modules/retire/bin/retire --nocache --nodepath {$this->appDir}/node_modules --jspath {$this->appDir}/web/assets/dist/js", false);
-        if ($process->getExitCode() == 0) {
-            $this->out->writeln('No JS files or node modules have known vulnerabilities');
-        } else {            
+        $this->out->writeln("Running npm audit...");
+        $process = $this->exec('npm audit', false);
+        if ($process->getExitCode() === 0) {
+            $this->out->writeln('No node modules have known vulnerabilities');
+        } else {
             $this->out->writeln('');
             $helper = $this->getHelper('question');
             if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerabilities?</error> '))) {
@@ -564,14 +574,23 @@ class DeployCommand extends Command {
         }
     }
 
-    /** Runs a shell command, displaying output as it is generated. */
-    private function exec($cmd, $mustRun = true)
+    /**
+     * Runs a shell command, displaying output as it is generated.
+     *
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     * ($type parameter in run callback is required but not used)
+     */
+    private function exec($cmd, $mustRun = true, $raw = false)
     {
         $process = new Process($cmd);
         $process->setTimeout(null);
         $run = $mustRun ? 'mustRun' : 'run';
-        $process->$run(function($type, $buffer) {
-            $this->out->write($buffer);
+        $process->$run(function($type, $buffer) use ($raw) {
+            if ($raw) {
+                $this->out->write($buffer, false, OutputInterface::OUTPUT_RAW);
+            } else {
+                $this->out->write($buffer);
+            }
         });
         return $process;
     }

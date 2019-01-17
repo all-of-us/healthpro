@@ -32,6 +32,7 @@ class WorkQueue
         'recontactMethod',
         'streetAddress',
         'email',
+        'loginPhoneNumber',
         'phoneNumber',
         'numCompletedBaselinePPIModules',
         'numCompletedPPIModules',
@@ -290,6 +291,7 @@ class WorkQueue
                 $row['address'] = '';  
             }
             $row['email'] = $e($participant->email);
+            $row['loginPhone'] = $e($participant->loginPhoneNumber);
             $row['phone'] = $e($participant->phoneNumber);
 
             //PPI Surveys
@@ -402,6 +404,9 @@ class WorkQueue
 
     public function generateLink($id, $name)
     {
-        return '<a href="/participant/' . urlencode($id) . '">' . htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a>';;
+        $url = $this->app['url_generator']->generate('participant', ['id' => $id]);
+        $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        return sprintf('<a href="%s">%s</a>', $url, $text);
     }
 }

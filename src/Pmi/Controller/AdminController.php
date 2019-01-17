@@ -206,7 +206,7 @@ class AdminController extends AbstractController
                 'disabled' => $disabled,
             ])
             ->add('mayolink_account', Type\TextType::class, [
-                'label' => 'MayoLink Account',
+                'label' => 'MayoLINK Account',
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
                 'disabled' => $disabled && $isProd,
