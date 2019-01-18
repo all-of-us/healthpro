@@ -1040,10 +1040,11 @@ class Order
     public function getSamplesInfo()
     {
         $samples = [];
+        $samplesInfo = $this->order['type'] === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
         foreach ($this->getRequestedSamples() as $key => $value) {
             $sample = [
                 'code' => $key,
-                'color' => $this->samplesInformation[$value]['color']
+                'color' => isset($samplesInfo[$value]['color']) ? $samplesInfo[$value]['color'] : ''
             ];
             if (!empty($this->order['collected_ts']) && in_array($value, json_decode($this->order['collected_samples']))) {
                 $sample['collected_ts'] = $this->order['collected_ts'];

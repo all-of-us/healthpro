@@ -206,7 +206,6 @@ class BiobankController extends AbstractController
         $unlockedOrders = $order->getUnlockedOrders();
         $unfinalizedOrders = $order->getUnfinalizedOrders();
         $orders = array_merge($unlockedOrders, $unfinalizedOrders);
-        //print_r($orders); exit;
         return $app['twig']->render('biobank/unfinalized-orders.html.twig', [
             'orders' => $orders
         ]);
