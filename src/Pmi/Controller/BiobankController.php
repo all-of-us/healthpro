@@ -18,8 +18,8 @@ class BiobankController extends AbstractController
         ['home', '/'],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
-        ['participant', '/participant/{biobankId}', ['method' => 'GET|POST']],
-        ['order', '/participant/{biobankId}/order/{orderId}'],
+        ['participant', '/{biobankId}'],
+        ['order', '/{biobankId}/order/{orderId}'],
         ['todayParticipants', '/review/today/participants'],
         ['unfinalizedOrders', '/review/unfinalized/orders'],
         ['unfinalizedMeasurements', '/review/unfinalized/measurements'],
@@ -186,7 +186,6 @@ class BiobankController extends AbstractController
         $review = new Review;
         $participants = $review->getTodayOrderParticipants($app['db'], $today);
 
-        // Preload first 5 names
         $count = 0;
         foreach (array_keys($participants) as $id) {
             $participants[$id]['participant'] = $app['pmi.drc.participants']->getById($id);
