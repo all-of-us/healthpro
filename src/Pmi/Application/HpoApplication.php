@@ -417,6 +417,7 @@ class HpoApplication extends AbstractApplication
                     strpos($request->attributes->get('_route'), 'dashboard_') !== 0 &&
                     strpos($request->attributes->get('_route'), 'problem_') !== 0 &&
                     strpos($request->attributes->get('_route'), 'admin_') !== 0 &&
+                    strpos($request->attributes->get('_route'), 'biobank_') !== 0 &&
                     !$this->isUpkeepRoute($request)) {
                 return $this->forwardToRoute('selectSite', $request);
             }
