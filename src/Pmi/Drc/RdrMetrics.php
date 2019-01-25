@@ -26,9 +26,30 @@ class RdrMetrics
         return $responseObject;
     }
 
-    public function metrics2($start_date, $end_date, $stratification, $centers, $enrollment_statuses)
+    /**
+     * Metrics 2 API (MAPI2)
+     *
+     * @param string $start_date YYYY-MM-DD
+     * @param string $end_date YYYY-MM-DD
+     * @param string $stratification
+     * @param array $centers
+     * @param array $enrollment_statuses
+     * @param array $params
+     */
+    public function metrics2($start_date, $end_date, $stratification, $centers, $enrollment_statuses, $params = [])
     {
         $client = $this->rdrHelper->getClient();
+
+        // Additional query parameters
+        $history = (isset($params['history']) && $params['history']) ? 'TRUE' : 'FALSE';
+
+        // Convert arrays to comma separated strings
+        if (is_array($centers)) {
+            $centers = implode(',', $centers);
+        }
+        if (is_array($enrollment_statuses)) {
+            $enrollment_statuses = implode(',', $enrollment_statuses);
+        }
 
         $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime', [
             'query' => [
@@ -37,7 +58,8 @@ class RdrMetrics
                 'endDate' => $end_date,
                 'stratification' => $stratification,
                 'awardee' => $centers,
-                'enrollmentStatus' => $enrollment_statuses
+                'enrollmentStatus' => $enrollment_statuses,
+                'history' => $history
             ]
         ]);
 
