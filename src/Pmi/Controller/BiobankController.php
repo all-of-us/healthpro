@@ -22,8 +22,7 @@ class BiobankController extends AbstractController
         ['order', '/{biobankId}/order/{orderId}'],
         ['todayOrders', '/review/today/orders'],
         ['unfinalizedOrders', '/review/unfinalized/orders'],
-        ['unfinalizedMeasurements', '/review/unfinalized/measurements'],
-        ['measurementsRecentModify', '/review/measurements/recent/modify'],
+        ['unlockedOrders', '/review/unlocked/orders'],
         ['ordersRecentModify', '/review/orders/recent/modify']
     ];
 
@@ -194,11 +193,18 @@ class BiobankController extends AbstractController
     public function unfinalizedOrdersAction(Application $app)
     {
         $order = new Order($app);
-        $unlockedOrders = $order->getUnlockedOrders();
         $unfinalizedOrders = $order->getUnfinalizedOrders();
-        $orders = array_merge($unlockedOrders, $unfinalizedOrders);
         return $app['twig']->render('biobank/unfinalized-orders.html.twig', [
-            'orders' => $orders
+            'orders' => $unfinalizedOrders
+        ]);
+    }
+
+    public function unlockedOrdersAction(Application $app)
+    {
+        $order = new Order($app);
+        $unlockedOrders = $order->getUnlockedOrders();
+        return $app['twig']->render('biobank/unlocked-orders.html.twig', [
+            'orders' => $unlockedOrders
         ]);
     }
 
