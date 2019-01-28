@@ -117,33 +117,24 @@ class Review
         ]);
     }
 
-    public function getTodayOrderParticipants($db, $today)
+    public function getTodayOrders($db, $today)
     {
-        $participants = [];
+        $orders = [];
         foreach ($this->getTodayOrderRows($db, $today) as $row) {
-            $participantId = $row['participant_id'];
-            if (!array_key_exists($participantId, $participants)) {
-                $participants[$participantId] = self::$emptyParticipant;
-            }
-            if (is_null($participants[$participantId]['order'])) {
-                $participants[$participantId]['order'] = $row;
-                $participants[$participantId]['orderCount'] = 1;
-                // Get order status
-                foreach (self::$orderStatus as $field => $status) {
-                    if ($row[$field]) {
-                        $participants[$participantId]['orderStatus'] = $this->getOrderStatus($row, $status);
-                    }
+            // Get order status
+            foreach (self::$orderStatus as $field => $status) {
+                if ($row[$field]) {
+                    $row['orderStatus'] = $this->getOrderStatus($row, $status);
                 }
-                // Get number of finalized samples
-                if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
-                    $participants[$participantId]['finalizedSamples'] = count($samples);
-                }
-            } else {
-                $participants[$participantId]['orderCount']++;
             }
+            // Get number of finalized samples
+            if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
+                $row['finalizedSamples'] = count($samples);
+            }
+            $orders[] = $row;
         }
 
-        return $participants;
+        return $orders;
     }
 
     public function getOrderStatus($row, $status)

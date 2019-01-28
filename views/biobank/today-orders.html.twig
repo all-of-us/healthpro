@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
-{% block title %}Orders Recent Modify - Participant Review - {% endblock %}
+{% block title %}Today - Participant Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
+{% set missingName = '' %}
 
 {% macro displayDate(order, dateType) %}
     {% if order[dateType] %}
@@ -17,29 +18,33 @@
         <h2><i class="fa fa-list" aria-hidden="true"></i> Participant Review</h2>
     </div>
     <ul class="nav nav-tabs">
-        <li role="presentation"><a href="{{ path('biobank_todayOrders') }}">Today's Biobank Orders</a></li>
+        <li role="presentation" class="active"><a href="{{ path('biobank_todayOrders') }}">Today's Biobank Orders</a></li>
         <li role="presentation"><a href="{{ path('biobank_unfinalizedOrders') }}">Unfinalized Biobank Orders</a></li>
-        <li role="presentation" class="active"><a href="{{ path('biobank_ordersRecentModify') }}">Recently Modified Biobank Orders</a></li>
+        <li role="presentation"><a href="{{ path('biobank_ordersRecentModify') }}">Recently Modified Biobank Orders</a></li>
     </ul>
-    <br/>
-    <div class="container">
-        <table class="table table-striped table-bordered">
-            <thead>
+    <br />
+    <table class="table table-striped table-bordered table-small" id="table-today">
+        <thead>
             <tr>
                 <th>Order ID</th>
+                <th class="td-left-border">Status</th>
                 <th>Created</th>
                 <th>Collected</th>
                 <th>Processed</th>
                 <th>Finalized</th>
-                <th>Modified</th>
-                <th>Status</th>
+                <th>Finalized Samples</th>
             </tr>
-            </thead>
-            <tbody>
-            {% for order in orders %}
+        </thead>
+        <tbody>
+            {% for id, order in orders %}
                 <tr>
                     <td>
                         <a href="{{ path('biobank_order', { biobankId: order.biobank_id, orderId: order.id }) }}">{{ order.order_id }}</a>
+                    </td>
+                    <td class="td-left-border">
+                        <nobr>
+                            <a href="{{ path('biobank_order', { biobankId: order.biobank_id, orderId: order.id }) }}">{{ order.orderStatus }}</a>
+                        </nobr>
                     </td>
                     <td data-order="{{ order.created_ts }}">
                         {{ today.displayDate(order, 'created_ts') }}
@@ -50,36 +55,32 @@
                     <td data-order="{{ order.processed_ts }}">
                         {{ today.displayDate(order, 'processed_ts') }}
                     </td>
-                    <td data-order="{{ order.finalized_ts }}">
-                        {% if order.oh_type != 'unlock' %}
+                    <td data-order="{{ order.finalized_ts is defined }}">
+                        {% set showOrderFinalizedTs = order.finalized_ts and order.h_type != 'unlock' and not (order.finalized_ts and order.rdr_id is empty) %}
+                        {% if showOrderFinalizedTs %}
                             {{ today.displayDate(order, 'finalized_ts') }}
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
                     </td>
-                    <td data-order="{{ order.oh_created_ts }}">
-                        {{ today.displayDate(order, 'oh_created_ts') }}
-                    </td>
-                    <td align="center">
-                        {% if order.oh_type == 'edit' %}
-                            <span class="label label-success">Edited &amp; Finalized</span>
-                        {% elseif order.oh_type == 'cancel' %}
-                            <span class="label label-danger">Cancelled</span>
-                        {% elseif order.oh_type == 'unlock'%}
-                            <span class="label label-primary">Unlocked</span>
+                    <td>
+                        {% if showOrderFinalizedTs and order.finalizedSamples %}
+                            {{ order.finalizedSamples }}
+                        {% else %}
+                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
                     </td>
                 </tr>
             {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% endblock %}
+        </tbody>
+    </table>
+{% endblock %} 
+
 {% block pagejs %}
     <script>
         $(document).ready(function () {
             $('table').DataTable({
-                order: [[1, 'desc']],
+                order: [[3, 'desc']],
                 pageLength: 25
             });
         });

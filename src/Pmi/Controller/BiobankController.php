@@ -20,7 +20,7 @@ class BiobankController extends AbstractController
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/{biobankId}'],
         ['order', '/{biobankId}/order/{orderId}'],
-        ['todayParticipants', '/review/today/participants'],
+        ['todayOrders', '/review/today/orders'],
         ['unfinalizedOrders', '/review/unfinalized/orders'],
         ['unfinalizedMeasurements', '/review/unfinalized/measurements'],
         ['measurementsRecentModify', '/review/measurements/recent/modify'],
@@ -170,7 +170,7 @@ class BiobankController extends AbstractController
         ]);
     }
 
-    public function todayParticipantsAction(Application $app, Request $request)
+    public function todayOrdersAction(Application $app, Request $request)
     {
         // Get beginning of today (at midnight) in user's timezone
         $startString = 'today';
@@ -184,18 +184,10 @@ class BiobankController extends AbstractController
         $today = $startTime->format('Y-m-d H:i:s');
 
         $review = new Review;
-        $participants = $review->getTodayOrderParticipants($app['db'], $today);
+        $orders = $review->getTodayOrders($app['db'], $today);
 
-        $count = 0;
-        foreach (array_keys($participants) as $id) {
-            $participants[$id]['participant'] = $app['pmi.drc.participants']->getById($id);
-            if (++$count >= 5) {
-                break;
-            }
-        }
-
-        return $app['twig']->render('biobank/today-participants.html.twig', [
-            'participants' => $participants
+        return $app['twig']->render('biobank/today-orders.html.twig', [
+            'orders' => $orders
         ]);
     }
 
