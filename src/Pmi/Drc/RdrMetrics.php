@@ -53,7 +53,7 @@ class RdrMetrics
 
         $responseObject = [];
         foreach ($this->getDateRangeBins($start_date, $end_date) as $bucket) {
-            $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime', [
+            $request_options = [
                 'query' => [
                     'bucketSize' => 1,
                     'startDate' => $bucket[0],
@@ -63,7 +63,9 @@ class RdrMetrics
                     'enrollmentStatus' => $enrollment_statuses,
                     'history' => $history
                 ]
-            ]);
+            ];
+            error_log(json_encode($request_options));
+            $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime', $request_options);
             $responseObject = array_merge($responseObject, json_decode($response->getBody()->getContents(), true));
         }
 
@@ -99,7 +101,7 @@ class RdrMetrics
         $num_days_in_range = $end - $start;
 
         // Metrics API 2 processes no more than 100 days of data per request
-        $max_days_for_metrics_api_2 = 100 * (24*60*60);
+        $max_days_for_metrics_api_2 = 50 * (24*60*60);
 
         $num_bins = ceil($num_days_in_range / $max_days_for_metrics_api_2);
 

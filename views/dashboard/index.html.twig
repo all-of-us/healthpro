@@ -135,11 +135,42 @@
                         var showAnnot = $('#total-progress-show-annot').is(':checked');
                         var tpWidth = $('#plotly-total-progress').width() - 30;
                         if (centers.length == $('#total-progress .center-filter').length) {
-                            centers = ['ALL'];
+                            centers = [];
+                        }
+
+                        // Switch metricAttr
+                        var stratification;
+                        switch (metricAttr) {
+                          case 'Participant.enrollmentStatus':
+                            stratification = 'ENROLLMENT_STATUS';
+                            break;
+                          case 'Participant.genderIdentity':
+                            stratification = 'GENDER_IDENTITY';
+                            break;
+                          case 'Participant.ageRange':
+                            stratification = 'AGE_RANGE';
+                            break;
+                          case 'Participant.race':
+                            stratification = 'RACE';
+                            break;
+                          case 'Participant':
+                            stratification = 'TOTAL';
+                            break;
+                          default:
+                            setMetricsError(spinnerLoc, 'Not yet implemented.');
+                            return;
                         }
 
                         // load data from metrics API
-                        $.getJSON('/dashboard/metrics_load?csrf_token={{ csrf_token('dashboard') }}&metrics_attribute=' + metricAttr + '&interval=' + tpInterval + '&start_date=' + tpStartDate + '&end_date=' + tpEndDate + '&centers=' + centers, function(data) {
+                        $.getJSON('/dashboard/metrics2_load', {
+                          csrf_token: "{{ csrf_token('dashboard') }}",
+                          stratification: stratification,
+                          interval: tpInterval,
+                          start_date: tpStartDate,
+                          end_date: tpEndDate,
+                          centers: centers
+                        })
+                        .done(function(data) {
                             if (data.length != 0) {
                                 var progressAnnot = [];
                                 var tpLayout = {
@@ -186,6 +217,13 @@
                                 setMetricsError(spinnerLoc);
                             }
 
+                        })
+                        .fail(function(jqXHR) {
+                          try {
+                            setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
+                          } catch (e) {
+                            setMetricsError(spinnerLoc, 'An error occurred while loading data the data');
+                          }
                         });
                     }
                 }

@@ -94,11 +94,58 @@ class DashboardController extends AbstractController
             $enrollment_statuses
         );
 
-        $display_values = [
-            'FULL_PARTICIPANT' => 'Full Participant',
-            'MEMBER' => 'Member',
-            'INTERESTED' => 'Registered'
-        ];
+        if (!$day_counts) {
+            return $app->abort(500, 'No data returned.');
+        }
+
+        switch ($stratification) {
+            case 'ENROLLMENT_STATUS':
+                $display_values = [
+                    'core' => 'Core Participant',
+                    'registered' => 'Member',
+                    'consented' => 'Consented'
+                ];
+                break;
+            case 'GENDER_IDENTITY':
+                $display_values = [
+                    'Man' => 'Man',
+                    'Non-Binary' => 'Non-Binary',
+                    'Other/Additional Options' => 'Other/Additional Options',
+                    'PMI_Skip' => 'PMI_Skip',
+                    'Transgender' => 'Transgender',
+                    'UNMAPPED' => 'UNMAPPED',
+                    'UNSET' => 'UNSET',
+                    'Woman' => 'Woman',
+                ];
+                break;
+            case 'AGE_RANGE':
+                $display_values = [
+                    '0-17' => '0-17',
+                    '18-25' => '18-25',
+                    '26-35' => '26-35',
+                    '36-45' => '36-45',
+                    '46-55' => '46-55',
+                    '56-65' => '56-65',
+                    '66-75' => '66-75',
+                    '76-85' => '76-85',
+                    '86-' => '86 and above',
+                    'UNSET' => 'UNSET'
+                ];
+                break;
+            case 'RACE':
+                $diaplay_values = [
+
+                ];
+                break;
+            case 'TOTAL':
+                $display_values = [
+                    'TOTAL' => 'Total Participants'
+                ];
+                break;
+            default:
+                $display_values = [];
+        }
+
 
         $traces_obj = [];
         $interval_counts = [];
@@ -869,7 +916,7 @@ class DashboardController extends AbstractController
             $enrollment_statuses
         ]));
         $metrics = $memcache->get($memcacheKey);
-        if (!$metrics) {
+        if (1 || !$metrics) {
             try {
                 $metrics = [];
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
@@ -879,7 +926,10 @@ class DashboardController extends AbstractController
                     $end_date,
                     $stratification,
                     $centers,
-                    $enrollment_statuses
+                    $enrollment_statuses,
+                    [
+                        'history' => true
+                    ]
                 );
 
                 // first check if there are counts available for the given date
