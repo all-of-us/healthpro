@@ -84,16 +84,6 @@ class DashboardController extends AbstractController
         $start_date = $this->sanitizeDate($start_date);
         $end_date = $this->sanitizeDate($end_date);
 
-        $seconds_range = strtotime($end_date) - strtotime($start_date);
-        if ($seconds_range > 100 * 24 * 60 * 60) { // 100 days in seconds
-            return $app->json(
-                [
-                    'error' => 'Please select a date range less than 100 days'
-                ],
-                400
-            );
-        }
-
         $day_counts = $this->getMetrics2Object(
             $app,
             $interval,
@@ -871,30 +861,26 @@ class DashboardController extends AbstractController
         $enrollment_statuses
     ) {
         $memcache = new \Memcache();
-        $memcacheKey = 'metrics_api_2_' . $start_date . '_' . $end_date . '_' . $stratification . '_'
-            . $centers . '_' . $enrollment_statuses;
+        $memcacheKey = 'metrics_api_2_' . md5(json_encode([
+            $start_date,
+            $end_date,
+            $stratification,
+            $centers,
+            $enrollment_statuses
+        ]));
         $metrics = $memcache->get($memcacheKey);
         if (!$metrics) {
             try {
                 $metrics = [];
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-                $date_range_bins = $this->getDateRangeBins($start_date, $end_date, $interval);
 
-                for ($i = 0; $i < count($date_range_bins); $i++) {
-                    $bin = $date_range_bins[$i];
-                    $this_start_date = $bin[0];
-                    $this_end_date = $bin[1];
-
-                    $metrics_segment = $metricsApi->metrics2(
-                        $this_start_date,
-                        $this_end_date,
-                        $stratification,
-                        $centers,
-                        $enrollment_statuses
-                    );
-
-                    $metrics += $metrics_segment;
-                }
+                $metrics = $metricsApi->metrics2(
+                    $start_date,
+                    $end_date,
+                    $stratification,
+                    $centers,
+                    $enrollment_statuses
+                );
 
                 // first check if there are counts available for the given date
                 if (count($metrics) == 0) {
@@ -1072,50 +1058,6 @@ class DashboardController extends AbstractController
             $i++;
         }
         return $dates;
-    }
-
-    /**
-     * Get Date Range Bins
-     *
-     * Break up large date ranges segmented by maximum Metrics API 2 range
-     *
-     * @param string $start_date
-     * @param string $end_date
-     *
-     * @return array
-     */
-    private function getDateRangeBins($start_date, $end_date)
-    {
-        $date_range_bins = [];
-
-        $start = strtotime($start_date);
-        $end = strtotime($end_date);
-        $num_days_in_range = $end - $start;
-
-        // Metrics API 2 processes no more than 100 days of data per request
-        $max_days_for_metrics_api_2 = 100 * (24*60*60);
-
-        $num_bins = ceil($num_days_in_range / $max_days_for_metrics_api_2);
-
-        if ($num_bins == 1) {
-            array_push($date_range_bins, [$start_date, $end_date]);
-            return $date_range_bins;
-        }
-
-        $this_date = $start;
-
-        for ($i = 0; $i < $num_bins; $i++) {
-            $this_end_date = $this_date + $max_days_for_metrics_api_2;
-
-            // Convert back to YYYY-MM-DD string format
-            $this_date_str = date('Y-m-d', $this_date);
-            $this_end_date_str = date('Y-m-d', $this_end_date);
-
-            array_push($date_range_bins, [$this_date_str, $this_end_date_str]);
-            $this_date += $max_days_for_metrics_api_2;
-        }
-
-        return $date_range_bins;
     }
 
     /**
