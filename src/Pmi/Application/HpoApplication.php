@@ -458,18 +458,23 @@ class HpoApplication extends AbstractApplication
     public function isValidSite($email)
     {
         $user = $this->getUser();
-        if ($this->isProd() && $user && $user->belongsToSite($email)) {
-            $site = $user->getSite($email);
-            $sites = $this['em']->getRepository('sites')->fetchOneBy([
-                'google_group' => $site->id,
+        if (!$user || !$user->belongsToSite($email)) {
+            return false;
+        }
+        if ($this->isProd()) {
+            $siteGroup = $user->getSite($email);
+            $site = $this['em']->getRepository('sites')->fetchOneBy([
+                'google_group' => $siteGroup->id,
             ]);
-            // check if the site exists and has a mayolink account number
-            if (!empty($sites) && !empty($sites['mayolink_account']) ) {
-                return true;
-            } else {
+            if (!$site) {
+                return false;
+            }
+            if (empty($site['mayolink_account']) && $site['awardee_id'] !== 'TEST') {
+                // Site is invalid if it doesn't have a MayoLINK account id, unless it is in the TEST awardee
                 return false;
             }
         }
+
         return true;
     }
 

@@ -156,7 +156,7 @@ class DeployCommand extends Command {
             // ensure that we are up-to-date with the latest NPM dependencies
             $output->writeln('');
             $output->writeln("Checking NPM dependencies...");
-            $this->exec("npm install");
+            $this->exec("npm install --no-audit"); // npm audit will be run below in the runJsSecurityCheck method
 
             // compile (concat/minify/copy) assets
             $output->writeln('');
@@ -561,11 +561,11 @@ class DeployCommand extends Command {
 
     private function runJsSecurityCheck()
     {
-        $this->out->writeln("Running RetireJS scanner...");
-        $process = $this->exec("{$this->appDir}/node_modules/retire/bin/retire --nocache --nodepath {$this->appDir}/node_modules --jspath {$this->appDir}/web/assets/dist/js", false);
-        if ($process->getExitCode() == 0) {
-            $this->out->writeln('No JS files or node modules have known vulnerabilities');
-        } else {            
+        $this->out->writeln("Running npm audit...");
+        $process = $this->exec('npm audit', false);
+        if ($process->getExitCode() === 0) {
+            $this->out->writeln('No node modules have known vulnerabilities');
+        } else {
             $this->out->writeln('');
             $helper = $this->getHelper('question');
             if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerabilities?</error> '))) {
