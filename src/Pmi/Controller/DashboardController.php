@@ -107,11 +107,19 @@ class DashboardController extends AbstractController
 
         switch ($stratification) {
             case 'ENROLLMENT_STATUS':
-                $display_values = [
-                    'core' => 'Core Participant',
-                    'registered' => 'Member',
-                    'consented' => 'Consented'
-                ];
+                if ($history) {
+                    $display_values = [
+                        'core' => 'Core Participant',
+                        'registered' => 'Member',
+                        'consented' => 'Consented'
+                    ];
+                } else {
+                    $display_values = [
+                        'MEMBER' => 'Member',
+                        'FULL_PARTICIPANT' => 'Full Participant',
+                        'INTERESTED' => 'Interested'
+                    ];
+                }
                 break;
             case 'GENDER_IDENTITY':
                 $display_values = [
@@ -863,6 +871,8 @@ class DashboardController extends AbstractController
      * Main method for retrieving metrics from API; Stores result in memcache with 1 hour expiration;
      * Each entry is comprised of a single day of all available data & facets
      *
+     * @deprecated 2018-10-01 Use ::getMetrics2Object instead.
+     *
      * @param Application $app
      * @param string      $date
      *
@@ -915,38 +925,26 @@ class DashboardController extends AbstractController
         $enrollment_statuses,
         $params = []
     ) {
-        $memcache = new \Memcache();
-        $memcacheKey = 'metrics_api_2_' . md5(json_encode([
-            $start_date,
-            $end_date,
-            $stratification,
-            $centers,
-            $enrollment_statuses,
-            $params
-        ]));
-        $metrics = $memcache->get($memcacheKey);
-        if (1 || !$metrics) {
-            try {
-                $metrics = [];
-                $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
+        try {
+            $metrics = [];
+            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper'], new \Memcache());
 
-                $metrics = $metricsApi->metrics2(
-                    $start_date,
-                    $end_date,
-                    $stratification,
-                    $centers,
-                    $enrollment_statuses,
-                    $params
-                );
+            $metrics = $metricsApi->metrics2(
+                $start_date,
+                $end_date,
+                $stratification,
+                $centers,
+                $enrollment_statuses,
+                $params
+            );
 
-                // first check if there are counts available for the given date
-                if (count($metrics) == 0) {
-                    return false;
-                }
-                $memcache->set($memcacheKey, $metrics, 0, 900); // 900 s = 15 min
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // Return false if no metrics returned
+            if (count($metrics) == 0) {
                 return false;
             }
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            error_log($e->getMessage());
+            return false;
         }
         return $metrics;
     }

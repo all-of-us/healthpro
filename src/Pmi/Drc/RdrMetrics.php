@@ -4,10 +4,18 @@ namespace Pmi\Drc;
 class RdrMetrics
 {
     protected $rdrHelper;
+    protected $memcache;
 
-    public function __construct(RdrHelper $rdrHelper)
+    /**
+     * Constructor
+     *
+     * @param RdrHelper $rdrHelper
+     * @param Memcache|false $memcache
+     */
+    public function __construct(RdrHelper $rdrHelper, $memcache = false)
     {
         $this->rdrHelper = $rdrHelper;
+        $this->memcache = $memcache;
     }
 
     /**
@@ -53,19 +61,34 @@ class RdrMetrics
 
         $responseObject = [];
         foreach ($this->getDateRangeBins($start_date, $end_date) as $bucket) {
-            $request_options = [
-                'query' => [
-                    'bucketSize' => 1,
-                    'startDate' => $bucket[0],
-                    'endDate' => $bucket[1],
-                    'stratification' => $stratification,
-                    'awardee' => $centers,
-                    'enrollmentStatus' => $enrollment_statuses,
-                    'history' => $history
-                ]
+            $query = [
+                'bucketSize' => 1,
+                'startDate' => $bucket[0],
+                'endDate' => $bucket[1],
+                'stratification' => $stratification,
+                'awardee' => $centers,
+                'enrollmentStatus' => $enrollment_statuses,
+                'history' => $history
             ];
-            $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime', $request_options);
-            $responseObject = array_merge($responseObject, json_decode($response->getBody()->getContents(), true));
+
+            $memcacheKey = 'metrics_api_2_' . md5(json_encode($query));
+
+            // If not found in Memcache, make request
+            if (!$this->memcache || !$metrics = $this->memcache->get($memcacheKey)) {
+                $request_options = [
+                    'query' => $query
+                ];
+                $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime', $request_options);
+                $metrics = json_decode($response->getBody()->getContents(), true);
+
+                // Store results in Memcache
+                if ($this->memcache) {
+                    $this->memcache->set($memcacheKey, $metrics, 0, 900); // 900 s = 15 min
+                }
+            }
+
+            // Merge results
+            $responseObject = array_merge($responseObject, $metrics);
         }
 
         return $responseObject;
@@ -99,8 +122,9 @@ class RdrMetrics
         $end = strtotime($end_date);
         $num_days_in_range = $end - $start;
 
-        // Metrics API 2 processes no more than 100 days of data per request
-        $max_days_for_metrics_api_2 = 50 * (24*60*60);
+        // Metrics API 2 processes no more than 600 days of data per request
+        // Store in a smaller amount to avoid having > 1 MiB in Memcache
+        $max_days_for_metrics_api_2 = 200 * (24*60*60);
 
         $num_bins = ceil($num_days_in_range / $max_days_for_metrics_api_2);
 
