@@ -48,7 +48,7 @@
             <li role="presentation" {% if order.finalized_ts is empty %} class="disabled" {% endif %}>
                 <a href="#finalize" aria-controls="collect" role="tab" data-toggle="tab">
                     {% if order.finalized_ts is not empty %}
-                    <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                        <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                     {% endif %}
                     Finalize
                 </a>
