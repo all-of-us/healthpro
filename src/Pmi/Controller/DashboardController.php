@@ -79,6 +79,7 @@ class DashboardController extends AbstractController
         $end_date = $request->get('end_date');
         $centers = $request->get('centers');
         $enrollment_statuses = $request->get('enrollment_statuses');
+        $history = $request->get('history', false);
 
         // set up & sanitize variables
         $start_date = $this->sanitizeDate($start_date);
@@ -91,12 +92,18 @@ class DashboardController extends AbstractController
             $end_date,
             $stratification,
             $centers,
-            $enrollment_statuses
+            $enrollment_statuses,
+            [
+                'history' => $history
+            ]
         );
 
         if (!$day_counts) {
             return $app->abort(500, 'No data returned.');
         }
+
+        // Roll up the extra HPO dimension by date
+        $day_counts = $this->combineHPOsByDate($day_counts);
 
         switch ($stratification) {
             case 'ENROLLMENT_STATUS':
@@ -905,7 +912,8 @@ class DashboardController extends AbstractController
         $end_date,
         $stratification,
         $centers,
-        $enrollment_statuses
+        $enrollment_statuses,
+        $params = []
     ) {
         $memcache = new \Memcache();
         $memcacheKey = 'metrics_api_2_' . md5(json_encode([
@@ -913,7 +921,8 @@ class DashboardController extends AbstractController
             $end_date,
             $stratification,
             $centers,
-            $enrollment_statuses
+            $enrollment_statuses,
+            $params
         ]));
         $metrics = $memcache->get($memcacheKey);
         if (1 || !$metrics) {
@@ -927,9 +936,7 @@ class DashboardController extends AbstractController
                     $stratification,
                     $centers,
                     $enrollment_statuses,
-                    [
-                        'history' => true
-                    ]
+                    $params
                 );
 
                 // first check if there are counts available for the given date
@@ -1168,5 +1175,37 @@ class DashboardController extends AbstractController
     private function sanitizeDate($date_string)
     {
         return date('Y-m-d', strtotime($date_string));
+    }
+
+    /**
+     * Combine HPOs by Date
+     *
+     * Metrics2 data comes back as an ordered array of dates and HPOs. This
+     * method rolls them up by date.
+     *
+     * @param array $day_count Source data from API response
+     * @return array
+     */
+    private function combineHPOsByDate($day_count = [])
+    {
+        $output = [];
+        foreach ($day_count as $row) {
+            // Create the bucket to store the metric if it doesn't exist
+            if (!isset($output[$row['date']])) {
+                $output[$row['date']] = [
+                    'date' => $row['date'],
+                    'metrics' => []
+                ];
+            }
+            // Loop through the metrics and sum them by date
+            foreach ($row['metrics'] as $k => $v) {
+                if (!isset($output[$row['date']]['metrics'][$k])) {
+                    $output[$row['date']]['metrics'][$k] = $v;
+                } else {
+                    $output[$row['date']]['metrics'][$k] += $v;
+                }
+            }
+        }
+        return array_values($output);
     }
 }

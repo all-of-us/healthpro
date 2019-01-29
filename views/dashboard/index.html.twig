@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="col-md-12 col-xs-12 form-group form-group-sm">
                                     <label>Toggle Categories <i class="fa fa-question-circle" title="Click to toggle all categories, or toggle individual categories by clicking the legend entry" data-toggle="tooltip"></i> </label>
-                                    <a href="javascript:;" class="btn btn-default btn-sm" id="toggle-traces" >&nbsp;<i class='fa fa-toggle-on toggle-switch'></i></a>
+                                    <a href="javascript:void(0);" class="btn btn-default btn-sm" id="toggle-traces" >&nbsp;<i class='fa fa-toggle-on toggle-switch'></i></a>
                                 </div>
                             </div>
                         </div>
@@ -168,7 +168,8 @@
                           interval: tpInterval,
                           start_date: tpStartDate,
                           end_date: tpEndDate,
-                          centers: centers
+                          centers: centers,
+                          history: true
                         })
                         .done(function(data) {
                             if (data.length != 0) {

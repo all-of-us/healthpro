@@ -64,7 +64,6 @@ class RdrMetrics
                     'history' => $history
                 ]
             ];
-            error_log(json_encode($request_options));
             $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime', $request_options);
             $responseObject = array_merge($responseObject, json_decode($response->getBody()->getContents(), true));
         }
