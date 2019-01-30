@@ -81,7 +81,7 @@ class RdrMetrics
                 $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime', $request_options);
                 $metrics = json_decode($response->getBody()->getContents(), true);
 
-                // Store results in Memcache
+                // Store results in Memcache if enabled
                 if ($this->memcache) {
                     $this->memcache->set($memcacheKey, $metrics, 0, 900); // 900 s = 15 min
                 }
