@@ -54,7 +54,7 @@
                 </a>
             </li>
             <li role="presentation" {% if order.processed_ts is empty %} class="disabled" {% endif %}>
-                <a href="#process" aria-controls="collect" role="tab" data-toggle="tab">
+                <a href="#process" aria-controls="collect" role="tab" {% if order.processed_ts is not empty %} data-toggle="tab" {% endif %}>
                     {% if order.processed_ts is not empty %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                     {% endif %}
@@ -62,7 +62,7 @@
                 </a>
             </li>
             <li role="presentation" {% if order.finalized_ts is empty %} class="disabled" {% endif %}>
-                <a href="#finalize" aria-controls="collect" role="tab" data-toggle="tab">
+                <a href="#finalize" aria-controls="collect" role="tab" {% if order.finalized_ts is not empty %} data-toggle="tab" {% endif %}>
                     {% if order.finalized_ts is not empty %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                     {% endif %}
@@ -76,10 +76,14 @@
                 {% include 'partials/biobank-order-details.html.twig' with { type: 'collected' } %}
             </div>
             <div role="tabpanel" class="tab-pane" id="process">
-                {% include 'partials/biobank-order-details.html.twig' with { type: 'processed' } %}
+                {% if order.processed_ts is not empty %}
+                    {% include 'partials/biobank-order-details.html.twig' with { type: 'processed' } %}
+                {% endif %}
             </div>
             <div role="tabpanel" class="tab-pane" id="finalize">
-                {% include 'partials/biobank-order-details.html.twig' with { type: 'finalized' } %}
+                {% if order.finalized_ts is not empty %}
+                    {% include 'partials/biobank-order-details.html.twig' with { type: 'finalized' } %}
+                {% endif %}
             </div>
         </div>
     </div>
