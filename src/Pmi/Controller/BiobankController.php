@@ -20,9 +20,9 @@ class BiobankController extends AbstractController
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/{biobankId}'],
         ['order', '/{biobankId}/order/{orderId}'],
-        ['todayOrders', '/review/today/orders'],
-        ['unfinalizedOrders', '/review/unfinalized/orders'],
-        ['unlockedOrders', '/review/unlocked/orders'],
+        ['ordersToday', '/review/orders/today'],
+        ['ordersUnfinalized', '/review/orders/unfinalized'],
+        ['ordersUnlocked', '/review/orders/unlocked'],
         ['ordersRecentModify', '/review/orders/recent/modify']
     ];
 
@@ -169,7 +169,7 @@ class BiobankController extends AbstractController
         ]);
     }
 
-    public function todayOrdersAction(Application $app, Request $request)
+    public function ordersTodayAction(Application $app, Request $request)
     {
         // Get beginning of today (at midnight) in user's timezone
         $startString = 'today';
@@ -185,25 +185,25 @@ class BiobankController extends AbstractController
         $review = new Review;
         $orders = $review->getTodayOrders($app['db'], $today);
 
-        return $app['twig']->render('biobank/today-orders.html.twig', [
+        return $app['twig']->render('biobank/orders-today.html.twig', [
             'orders' => $orders
         ]);
     }
 
-    public function unfinalizedOrdersAction(Application $app)
+    public function ordersUnfinalizedAction(Application $app)
     {
         $order = new Order($app);
         $unfinalizedOrders = $order->getUnfinalizedOrders();
-        return $app['twig']->render('biobank/unfinalized-orders.html.twig', [
+        return $app['twig']->render('biobank/orders-unfinalized.html.twig', [
             'orders' => $unfinalizedOrders
         ]);
     }
 
-    public function unlockedOrdersAction(Application $app)
+    public function ordersUnlockedAction(Application $app)
     {
         $order = new Order($app);
         $unlockedOrders = $order->getUnlockedOrders();
-        return $app['twig']->render('biobank/unlocked-orders.html.twig', [
+        return $app['twig']->render('biobank/orders-unlocked.html.twig', [
             'orders' => $unlockedOrders
         ]);
     }
