@@ -119,7 +119,7 @@ class DashboardController extends AbstractController
                     $display_values = [
                         'MEMBER' => 'Member',
                         'FULL_PARTICIPANT' => 'Full Participant',
-                        'INTERESTED' => 'Interested'
+                        'INTERESTED' => 'Registered'
                     ];
                 }
                 break;
