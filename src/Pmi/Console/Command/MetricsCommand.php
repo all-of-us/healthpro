@@ -83,7 +83,7 @@ class MetricsCommand extends Command
                 'debug',
                 null,
                 InputOption::VALUE_NONE,
-                'Show request debug',
+                'Show request debug'
             )
             ->setDescription('Get current metrics from the RDR.')
         ;
