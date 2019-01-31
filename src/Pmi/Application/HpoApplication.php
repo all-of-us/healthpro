@@ -96,7 +96,7 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/site($|\/)'], ['ROLE_USER', 'ROLE_AWARDEE']],
                 [['path' => '^/help($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
                 [['path' => '^/settings($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
-                [['path' => '^/biobank($|\/)'], 'ROLE_BIOBANK', 'ROLE_SCRIPPS'],
+                [['path' => '^/biobank($|\/)'], ['ROLE_BIOBANK', 'ROLE_SCRIPPS']],
                 [['path' => '^/.*$'], 'ROLE_USER'],
             ]
         ]);
