@@ -1261,7 +1261,7 @@ class Order
         ]);
     }
 
-    public function getSiteUnfinalizedOrders($site = null)
+    public function getSiteUnfinalizedOrders()
     {
         $ordersQuery = "
             SELECT o.*,

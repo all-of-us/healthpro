@@ -109,7 +109,7 @@ class BiobankController extends AbstractController
     }
 
 
-    public function participantAction($biobankId, Application $app, Request $request)
+    public function participantAction($biobankId, Application $app)
     {
         try {
             $participant = $app['pmi.drc.participants']->search(['biobankId' => $biobankId]);
@@ -142,7 +142,7 @@ class BiobankController extends AbstractController
         ]);
     }
 
-    public function orderAction($biobankId, $orderId, Application $app, Request $request)
+    public function orderAction($biobankId, $orderId, Application $app)
     {
         try {
             $participant = $app['pmi.drc.participants']->search(['biobankId' => $biobankId]);
