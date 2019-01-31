@@ -28,6 +28,15 @@ class DashboardController extends AbstractController
     ];
 
     /**
+     * @var array
+     */
+    protected static $color_profiles = [
+        'Blackbody', 'Bluered', 'Blues', 'Custom', 'Earth', 'Electric', 'Greens',
+        'Hot', 'Jet', 'Picnic', 'Portland', 'Rainbow', 'RdBu', 'Reds', 'Viridis',
+        'YlGnBu', 'YlOrRd'
+    ];
+
+    /**
      * Home Action
      *
      * @param Application $app
@@ -36,12 +45,6 @@ class DashboardController extends AbstractController
      */
     public function homeAction(Application $app)
     {
-        $color_profiles = [
-            'Blackbody', 'Bluered', 'Blues', 'Custom', 'Earth', 'Electric', 'Greens',
-            'Hot', 'Jet', 'Picnic', 'Portland', 'Rainbow', 'RdBu', 'Reds', 'Viridis',
-            'YlGnBu', 'YlOrRd'
-        ];
-
         // metrics attributes are hard-coded as we don't have human-readable names in the API yet
         $metrics_attributes = $this->getMetricsDisplayNames();
 
@@ -50,7 +53,7 @@ class DashboardController extends AbstractController
         return $app['twig']->render(
             'dashboard/index.html.twig',
             [
-                'color_profiles' => $color_profiles,
+                'color_profiles' => self::$color_profiles,
                 'metrics_attributes' => $metrics_attributes,
                 'recruitment_centers' => $recruitment_centers
             ]
