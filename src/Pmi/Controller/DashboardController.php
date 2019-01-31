@@ -150,8 +150,8 @@ class DashboardController extends AbstractController
                 ];
                 break;
             case 'RACE':
-                $diaplay_values = [
-
+                $display_values = [
+                    // @TODO
                 ];
                 break;
             case 'TOTAL':
