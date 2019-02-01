@@ -151,7 +151,17 @@ class DashboardController extends AbstractController
                 break;
             case 'RACE':
                 $display_values = [
-                    // @TODO
+                    'American_Indian_Alaska_Native' => 'American Indian or Alaska Native',
+                    'Asian' => 'Asian',
+                    'Black_African_American' => 'Black, African American, or African',
+                    'Middle_Eastern_North_African' => 'Middle Eastern or North African',
+                    'Native_Hawaiian_other_Pacific_Islander' => 'Native Hawaiian or other Pacific Islander',
+                    'White' => 'White',
+                    'Hispanic_Latino_Spanish' => 'Hispanic, Latino, or Spanish',
+                    'None_Of_These_Fully_Describe_Me' => 'None of these fully describe me',
+                    'Prefer_Not_To_Answer' => 'Prefer not to answer',
+                    'Multi_Ancestry' => 'Multi-Ancestry',
+                    'No_Ancestry_Checked' => 'No ancestry checked'
                 ];
                 break;
             case 'TOTAL':
