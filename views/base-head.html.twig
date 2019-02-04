@@ -47,4 +47,11 @@
     gtag('js', new Date());
     gtag('config', {{ app.getConfig('google_analytics_property')|json_encode|raw }});
 </script>
+{% else %}
+<!-- Analytics Tracking Disabled -->
+<script>
+var ga = function () {
+  console.log('Google Analytics Mock:', arguments);
+}
+</script>
 {% endif %}
