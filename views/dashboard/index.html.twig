@@ -212,8 +212,7 @@
                         PLOTS_SHOWN['total-progress-nav'] = true;
                     }
                     // Send pageview event for tab
-                    ga('set', 'page', '/dashboard/total-progress');
-                    ga('send', 'pageview');
+                    ga('send', 'pageview', '/dashboard/total-progress');
                 });
 
                 // re-render on filter change
@@ -420,8 +419,7 @@
                   PLOTS_SHOWN['real-time-nav'] = true;
                 }
                 // Send pageview event for tab
-                ga('set', 'page', '/dashboard/real-time');
-                ga('send', 'pageview');
+                ga('send', 'pageview', '/dashboard/real-time');
               });
 
               // re-render on filter change
@@ -581,8 +579,7 @@
                         PLOTS_SHOWN['participants-by-region-nav'] = true;
                     }
                     // Send pageview event for tab
-                    ga('set', 'page', '/dashboard/participants-by-region');
-                    ga('send', 'pageview');
+                    ga('send', 'pageview', '/dashboard/participants-by-region');
                 });
 
                 // re-render on filter change
@@ -729,8 +726,7 @@
                         PLOTS_SHOWN['participants-by-lifecycle-nav'] = true;
                     }
                     // Send pageview event for tab
-                    ga('set', 'page', '/dashboard/participants-by-lifecycle');
-                    ga('send', 'pageview');
+                    ga('send', 'pageview', '/dashboard/participants-by-lifecycle');
                 });
 
                 // re-render on filter change
