@@ -6,6 +6,8 @@ class RdrMetrics
     protected $rdrHelper;
     protected $memcache;
 
+    const BATCH_DAYS = 200;
+
     /**
      * Constructor
      *
@@ -116,36 +118,30 @@ class RdrMetrics
      */
     private function getDateRangeBins($start_date, $end_date)
     {
-        $date_range_bins = [];
+        $dateRangeBins = [];
+        $startDate = new \DateTime($start_date);
+        $endDate = new \DateTime($end_date);
 
-        $start = strtotime($start_date);
-        $end = strtotime($end_date);
-        $num_days_in_range = $end - $start;
+        $interval = new \DateInterval(sprintf('P%dD', self::BATCH_DAYS));
+        $period = new \DatePeriod($startDate, $interval, $endDate);
 
-        // Metrics API 2 processes no more than 600 days of data per request
-        // Store in a smaller amount to avoid having > 1 MiB in Memcache
-        $max_days_for_metrics_api_2 = 200 * (24*60*60);
+        // Loop through calculated intervals
+        foreach ($period as $i => $intervalDate) {
+            $intervalStartDate = clone $intervalDate;
+            // Add one day for subsequent interval starts
+            if ($i > 0) {
+                $intervalStartDate->add(new \DateInterval('P1D'));
+            }
+            // Set thet end date one period after the interval start
+            $intervalEndDate = clone $intervalDate;
+            $intervalEndDate->add($interval);
 
-        $num_bins = ceil($num_days_in_range / $max_days_for_metrics_api_2);
-
-        if ($num_bins == 1) {
-            array_push($date_range_bins, [$start_date, $end_date]);
-            return $date_range_bins;
+            // Truncate the bin if it exceeds the overall end date
+            if ($intervalEndDate > $endDate) {
+                $intervalEndDate = $endDate;
+            }
+            $dateRangeBins[] = [$intervalStartDate->format('Y-m-d'), $intervalEndDate->format('Y-m-d')];
         }
-
-        $this_date = $start;
-
-        for ($i = 0; $i < $num_bins; $i++) {
-            $this_end_date = $this_date + $max_days_for_metrics_api_2;
-
-            // Convert back to YYYY-MM-DD string format
-            $this_date_str = date('Y-m-d', $this_date);
-            $this_end_date_str = date('Y-m-d', $this_end_date);
-
-            array_push($date_range_bins, [$this_date_str, $this_end_date_str]);
-            $this_date += $max_days_for_metrics_api_2;
-        }
-
-        return $date_range_bins;
+        return $dateRangeBins;
     }
 }
