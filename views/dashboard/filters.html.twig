@@ -10,10 +10,10 @@
                 <div class="panel-body center-filter-panel">
                    <div class="row">
                         <div class="col-xs-12">
-                            <p class="text-center"><a href="javascript:;" class="redraw-plotly btn btn-primary"><span class="fa fa-filter"></span> Filter Results</a></p>
+                            <p class="text-center"><a href="javascript:void(0);" class="redraw-plotly btn btn-primary"><span class="fa fa-filter"></span> Filter Results</a></p>
                             {% if id == 'real-time' %}
                             <hr class="divider" />
-                            <h4>Enrollment Status <a href="javascript:;" class="toggle-all-enrollment-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
+                            <h4>Enrollment Status <a href="javascript:void(0);" class="toggle-all-enrollment-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
                             <!-- TODO: After more facets are supported in Metrics API 2, use passed values instead of hard-coding -->
                             <ul class="list-group enrollment-status-filters">
                                 <li class="list-group-item">
@@ -28,13 +28,13 @@
                             </ul>
                             {% endif %}
                             <hr class="divider" />
-                            <h4>Recruitment Origin <a href="javascript:;" class="toggle-all-center-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
+                            <h4>Recruitment Origin <a href="javascript:void(0);" class="toggle-all-center-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
                             {% for group, centers in recruitment_centers %}
                                 {% set group_id = group|lower|split(' ')|join('-') %}
                                 <ul class="list-group {{ group_id }}-center-filters">
                                     <li class="list-group-item"><h4 class="list-group-item-heading">{{ group }}
                                             {% if centers|length > 1 %}
-                                                <a href="javascript:;" class="toggle-center-filters label label-primary pull-right" data-identifier="{{ group_id }}-center-filters"><span class="fa fa-toggle-on"></span></a>
+                                                <a href="javascript:void(0);" class="toggle-center-filters label label-primary pull-right" data-identifier="{{ group_id }}-center-filters"><span class="fa fa-toggle-on"></span></a>
                                             {% endif %}
                                         </h4>
                                     </li>
@@ -49,7 +49,7 @@
                                 </ul>
                             {% endfor %}
                             <hr class="divider" />
-                            <p class="text-center"><a href="javascript:;" class="redraw-plotly btn btn-primary"><span class="fa fa-filter"></span> Filter Results</a></p>
+                            <p class="text-center"><a href="javascript:void(0);" class="redraw-plotly btn btn-primary"><span class="fa fa-filter"></span> Filter Results</a></p>
                         </div>
                    </div>
                 </div>

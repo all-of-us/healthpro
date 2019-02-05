@@ -23,9 +23,17 @@ class DashboardController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['metricsV2Load', '/metrics2_load'],
-        ['metricsLoad', '/metrics_load'],
         ['metricsLoadRegion', '/metrics_load_region'],
         ['metricsLoadLifecycle', '/metrics_load_lifecycle'],
+    ];
+
+    /**
+     * @var array
+     */
+    protected static $color_profiles = [
+        'Blackbody', 'Bluered', 'Blues', 'Custom', 'Earth', 'Electric', 'Greens',
+        'Hot', 'Jet', 'Picnic', 'Portland', 'Rainbow', 'RdBu', 'Reds', 'Viridis',
+        'YlGnBu', 'YlOrRd'
     ];
 
     /**
@@ -37,12 +45,6 @@ class DashboardController extends AbstractController
      */
     public function homeAction(Application $app)
     {
-        $color_profiles = [
-            'Blackbody', 'Bluered', 'Blues', 'Custom', 'Earth', 'Electric', 'Greens',
-            'Hot', 'Jet', 'Picnic', 'Portland', 'Rainbow', 'RdBu', 'Reds', 'Viridis',
-            'YlGnBu', 'YlOrRd'
-        ];
-
         // metrics attributes are hard-coded as we don't have human-readable names in the API yet
         $metrics_attributes = $this->getMetricsDisplayNames();
 
@@ -51,7 +53,7 @@ class DashboardController extends AbstractController
         return $app['twig']->render(
             'dashboard/index.html.twig',
             [
-                'color_profiles' => $color_profiles,
+                'color_profiles' => self::$color_profiles,
                 'metrics_attributes' => $metrics_attributes,
                 'recruitment_centers' => $recruitment_centers
             ]
@@ -79,20 +81,11 @@ class DashboardController extends AbstractController
         $end_date = $request->get('end_date');
         $centers = $request->get('centers');
         $enrollment_statuses = $request->get('enrollment_statuses');
+        $history = $request->get('history', false);
 
         // set up & sanitize variables
         $start_date = $this->sanitizeDate($start_date);
         $end_date = $this->sanitizeDate($end_date);
-
-        $seconds_range = strtotime($end_date) - strtotime($start_date);
-        if ($seconds_range > 100 * 24 * 60 * 60) { // 100 days in seconds
-            return $app->json(
-                [
-                    'error' => 'Please select a date range less than 100 days'
-                ],
-                400
-            );
-        }
 
         $day_counts = $this->getMetrics2Object(
             $app,
@@ -101,14 +94,85 @@ class DashboardController extends AbstractController
             $end_date,
             $stratification,
             $centers,
-            $enrollment_statuses
+            $enrollment_statuses,
+            [
+                'history' => $history
+            ]
         );
 
-        $display_values = [
-            'FULL_PARTICIPANT' => 'Full Participant',
-            'MEMBER' => 'Member',
-            'INTERESTED' => 'Registered'
-        ];
+        if (!$day_counts) {
+            return $app->abort(500, 'No data returned.');
+        }
+
+        // Roll up the extra HPO dimension by date
+        $day_counts = $this->combineHPOsByDate($day_counts);
+
+        switch ($stratification) {
+            case 'ENROLLMENT_STATUS':
+                if ($history) {
+                    $display_values = [
+                        'core' => 'Core Participant',
+                        'registered' => 'Member',
+                        'consented' => 'Consented'
+                    ];
+                } else {
+                    $display_values = [
+                        'MEMBER' => 'Member',
+                        'FULL_PARTICIPANT' => 'Full Participant',
+                        'INTERESTED' => 'Registered'
+                    ];
+                }
+                break;
+            case 'GENDER_IDENTITY':
+                $display_values = [
+                    'Man' => 'Man',
+                    'Non-Binary' => 'Non-Binary',
+                    'Other/Additional Options' => 'Other/Additional Options',
+                    'PMI_Skip' => 'PMI_Skip',
+                    'Transgender' => 'Transgender',
+                    'UNMAPPED' => 'UNMAPPED',
+                    'UNSET' => 'UNSET',
+                    'Woman' => 'Woman',
+                ];
+                break;
+            case 'AGE_RANGE':
+                $display_values = [
+                    '0-17' => '0-17',
+                    '18-25' => '18-25',
+                    '26-35' => '26-35',
+                    '36-45' => '36-45',
+                    '46-55' => '46-55',
+                    '56-65' => '56-65',
+                    '66-75' => '66-75',
+                    '76-85' => '76-85',
+                    '86-' => '86 and above',
+                    'UNSET' => 'UNSET'
+                ];
+                break;
+            case 'RACE':
+                $display_values = [
+                    'American_Indian_Alaska_Native' => 'American Indian or Alaska Native',
+                    'Asian' => 'Asian',
+                    'Black_African_American' => 'Black, African American, or African',
+                    'Middle_Eastern_North_African' => 'Middle Eastern or North African',
+                    'Native_Hawaiian_other_Pacific_Islander' => 'Native Hawaiian or other Pacific Islander',
+                    'White' => 'White',
+                    'Hispanic_Latino_Spanish' => 'Hispanic, Latino, or Spanish',
+                    'None_Of_These_Fully_Describe_Me' => 'None of these fully describe me',
+                    'Prefer_Not_To_Answer' => 'Prefer not to answer',
+                    'Multi_Ancestry' => 'Multi-Ancestry',
+                    'No_Ancestry_Checked' => 'No ancestry checked'
+                ];
+                break;
+            case 'TOTAL':
+                $display_values = [
+                    'TOTAL' => 'Total Participants'
+                ];
+                break;
+            default:
+                $display_values = [];
+        }
+
 
         $traces_obj = [];
         $interval_counts = [];
@@ -197,191 +261,6 @@ class DashboardController extends AbstractController
             ];
         }
 
-        return $app->json($data);
-    }
-
-    /**
-     * Metrics Load
-     *
-     * Loads data from metrics API (or cache) to display attributes over time
-     *
-     * @param Application $app
-     * @param Request     $request
-     *
-     * @return Response
-     */
-    public function metricsLoadAction(Application $app, Request $request)
-    {
-        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
-            return $app->abort(403);
-        }
-
-        // get request attributes
-        $filter_by = $request->get('metrics_attribute');
-        $interval = $request->get('interval');
-        $start_date = $request->get('start_date');
-        $end_date = $request->get('end_date');
-        $centers = explode(',', $request->get('centers'));
-
-        // set up & sanitize variables
-        $start_date = $this->sanitizeDate($start_date);
-        $control_dates = array_reverse($this->getDashboardDates($start_date, $end_date, $interval));
-        $data = [];
-        $dates = [];
-        $values = [];
-        $hover_text = [];
-
-        // variable used to validate that at least some data was found
-        $error_check = 0;
-
-        // retrieve controlled vocab for entries from metrics cache
-        if ($filter_by == 'Participant') {
-            $entries = [$filter_by];
-        } else {
-            $entries = $this->getMetricsFieldDefinitions($app, $filter_by);
-            try {
-                // check database to see of there are available display values for the requested metric
-                $raw_display = $app['db']->fetchAll(
-                    'SELECT * FROM dashboard_display_values WHERE metric = ?',
-                    [$filter_by]
-                );
-                $display_values = [];
-                foreach ($raw_display as $row) {
-                    $display_values[$row['code']] = $row['display_value'];
-                }
-            } catch (\Exception $e) {
-                $display_values = [];
-            }
-        }
-
-        // if we have no entries to iterate over, halt execution and return empty data
-        // will trigger UI error message
-        if (empty($entries)) {
-            return $app->json($data);
-        }
-
-        // iterate through all requested dates to retrieve data from cache
-        foreach ($control_dates as $date) {
-            if ($this->checkDates($date, $start_date, $end_date, $control_dates)) {
-                // grab date for x axis
-                array_push($dates, $date);
-
-                $metrics = $this->getMetricsObject($app, $date);
-
-                // iterate through list of control values to get counts
-                foreach ($entries as $entry) {
-                    $facet_total = 0;
-                    $participant_total = 0;
-                    // construct lookup key
-                    if ($filter_by == 'Participant') {
-                        $lookup = $filter_by;
-                    } else {
-                        $lookup = $filter_by . "." . $entry;
-                    }
-                    // make sure metrics data exists first, if metrics cache or API fail return value will be false
-                    if (!empty($metrics)) {
-                        // iterate through each center to accumulate a running total to store
-                        foreach ($centers as $center) {
-                            $requested_center = [];
-                            if ($center == 'ALL') {
-                                // first entry is always non-faceted (total counts)
-                                $requested_center = $metrics[0]['entries'];
-                            } else {
-                                foreach ($metrics as $metric) {
-                                    if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $center) {
-                                        $requested_center = $metric['entries'];
-                                    }
-                                }
-                            }
-                            if (!empty($requested_center) && array_key_exists($lookup, $requested_center)) {
-                                $facet_total += $requested_center[$lookup];
-                                $participant_total += $requested_center['Participant'];
-                            }
-                        }
-                        $values[$entry][] = $facet_total;
-
-                        // add to error_check
-                        $error_check += $facet_total;
-
-                        // generate hover text if not doing total participant count
-                        if ($filter_by != 'Participant') {
-                            $hover_text[$entry][] = $this->calculatePercentText($facet_total, $participant_total)
-                                . '<br />' . $date;
-                        }
-                    } else {
-                        // error retrieving metrics data from cache & API, so record error for this date
-                        // acts as fallback in case only some data is missing in query range
-                        $values[$entry][] = 0;
-                        $hover_text[$entry][] = 'Error retrieving data for ' . $date;
-                    }
-                }
-            }
-        }
-
-        // look to see if any values were recorded at all
-        // will return empty data array to trigger error message in UI
-        if ($error_check == 0) {
-            return $app->json($data);
-        }
-
-        // if we got this far, we have data!
-        // assemble data object in Plotly format
-        foreach ($entries as $entry) {
-            if ($filter_by == 'Participant') {
-                $trace_name = 'Total Participants';
-            } else {
-                if (!empty($display_values) && array_key_exists($entry, $display_values)) {
-                    $trace_name = $display_values[$entry];
-                } else {
-                    $trace_name = $entry;
-                }
-            }
-
-            $trace = [
-                "x" => $dates,
-                "y" => $values[$entry],
-                "name" => $trace_name,
-                "type" => "bar"
-            ];
-            // add hover text if needed
-            if ($filter_by != 'Participant') {
-                $trace["text"] = $hover_text[$entry];
-                $trace["hoverinfo"] = "text+name";
-            }
-
-            array_push($data, $trace);
-        }
-
-        // sort alphabetically by trace name, unless looking at registration status (then do reverse sort)
-        if ($filter_by == 'Participant.enrollmentStatus') {
-            usort(
-                $data,
-                function ($a, $b) {
-                    if ($a['name'] == $b['name']) {
-                        return 0;
-                    }
-                    return ($a['name'] > $b['name']) ? 1 : -1;
-                }
-            );
-        } else {
-            usort(
-                $data,
-                function ($a, $b) {
-                    if ($a['name'] == $b['name']) {
-                        return 0;
-                    }
-                    return ($a['name'] > $b['name']) ? -1 : 1;
-                }
-            );
-        }
-
-        // now apply colors since we're in order
-        for ($i = 0; $i < count($data); $i++) {
-            $data[$i]['marker'] = [
-                "color" => $this->getColorBrewerVal($i)
-            ];
-        }
-        // return json
         return $app->json($data);
     }
 
@@ -819,6 +698,8 @@ class DashboardController extends AbstractController
      * Main method for retrieving metrics from API; Stores result in memcache with 1 hour expiration;
      * Each entry is comprised of a single day of all available data & facets
      *
+     * @deprecated 2018-10-01 Use ::getMetrics2Object instead.
+     *
      * @param Application $app
      * @param string      $date
      *
@@ -868,42 +749,29 @@ class DashboardController extends AbstractController
         $end_date,
         $stratification,
         $centers,
-        $enrollment_statuses
+        $enrollment_statuses,
+        $params = []
     ) {
-        $memcache = new \Memcache();
-        $memcacheKey = 'metrics_api_2_' . $start_date . '_' . $end_date . '_' . $stratification . '_'
-            . $centers . '_' . $enrollment_statuses;
-        $metrics = $memcache->get($memcacheKey);
-        if (!$metrics) {
-            try {
-                $metrics = [];
-                $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-                $date_range_bins = $this->getDateRangeBins($start_date, $end_date, $interval);
+        try {
+            $metrics = [];
+            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper'], new \Memcache());
 
-                for ($i = 0; $i < count($date_range_bins); $i++) {
-                    $bin = $date_range_bins[$i];
-                    $this_start_date = $bin[0];
-                    $this_end_date = $bin[1];
+            $metrics = $metricsApi->metrics2(
+                $start_date,
+                $end_date,
+                $stratification,
+                $centers,
+                $enrollment_statuses,
+                $params
+            );
 
-                    $metrics_segment = $metricsApi->metrics2(
-                        $this_start_date,
-                        $this_end_date,
-                        $stratification,
-                        $centers,
-                        $enrollment_statuses
-                    );
-
-                    $metrics += $metrics_segment;
-                }
-
-                // first check if there are counts available for the given date
-                if (count($metrics) == 0) {
-                    return false;
-                }
-                $memcache->set($memcacheKey, $metrics, 0, 900); // 900 s = 15 min
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // Return false if no metrics returned
+            if (count($metrics) == 0) {
                 return false;
             }
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            error_log($e->getMessage());
+            return false;
         }
         return $metrics;
     }
@@ -1075,50 +943,6 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * Get Date Range Bins
-     *
-     * Break up large date ranges segmented by maximum Metrics API 2 range
-     *
-     * @param string $start_date
-     * @param string $end_date
-     *
-     * @return array
-     */
-    private function getDateRangeBins($start_date, $end_date)
-    {
-        $date_range_bins = [];
-
-        $start = strtotime($start_date);
-        $end = strtotime($end_date);
-        $num_days_in_range = $end - $start;
-
-        // Metrics API 2 processes no more than 100 days of data per request
-        $max_days_for_metrics_api_2 = 100 * (24*60*60);
-
-        $num_bins = ceil($num_days_in_range / $max_days_for_metrics_api_2);
-
-        if ($num_bins == 1) {
-            array_push($date_range_bins, [$start_date, $end_date]);
-            return $date_range_bins;
-        }
-
-        $this_date = $start;
-
-        for ($i = 0; $i < $num_bins; $i++) {
-            $this_end_date = $this_date + $max_days_for_metrics_api_2;
-
-            // Convert back to YYYY-MM-DD string format
-            $this_date_str = date('Y-m-d', $this_date);
-            $this_end_date_str = date('Y-m-d', $this_end_date);
-
-            array_push($date_range_bins, [$this_date_str, $this_end_date_str]);
-            $this_date += $max_days_for_metrics_api_2;
-        }
-
-        return $date_range_bins;
-    }
-
-    /**
      * Calculate Percent Text
      *
      * Helper function for calculating percentages of total for entries;
@@ -1176,5 +1000,37 @@ class DashboardController extends AbstractController
     private function sanitizeDate($date_string)
     {
         return date('Y-m-d', strtotime($date_string));
+    }
+
+    /**
+     * Combine HPOs by Date
+     *
+     * Metrics2 data comes back as an ordered array of dates and HPOs. This
+     * method rolls them up by date.
+     *
+     * @param array $day_count Source data from API response
+     * @return array
+     */
+    private function combineHPOsByDate($day_count = [])
+    {
+        $output = [];
+        foreach ($day_count as $row) {
+            // Create the bucket to store the metric if it doesn't exist
+            if (!isset($output[$row['date']])) {
+                $output[$row['date']] = [
+                    'date' => $row['date'],
+                    'metrics' => []
+                ];
+            }
+            // Loop through the metrics and sum them by date
+            foreach ($row['metrics'] as $k => $v) {
+                if (!isset($output[$row['date']]['metrics'][$k])) {
+                    $output[$row['date']]['metrics'][$k] = $v;
+                } else {
+                    $output[$row['date']]['metrics'][$k] += $v;
+                }
+            }
+        }
+        return array_values($output);
     }
 }

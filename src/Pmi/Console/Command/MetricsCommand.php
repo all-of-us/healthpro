@@ -22,7 +22,8 @@ class MetricsCommand extends Command
      *
      * @var array
      */
-    private static $STRATIFICATIONS = ['TOTAL', 'ENROLLMENT_STATUS'];
+    private static $STRATIFICATIONS = ['TOTAL', 'ENROLLMENT_STATUS', 'GENDER_IDENTITY', 'AGE_RANGE', 'RACE', 'EHR_CONSENT', 'EHR_RATIO'];
+    private static $STATUSES = ['INTERESTED', 'MEMBER', 'FULL_PARTICIPANT'];
 
     /**
      * Configure
@@ -67,11 +68,22 @@ class MetricsCommand extends Command
                 'Filter to specified statuses.'
             )
             ->addOption(
+                'history',
+                null,
+                InputOption::VALUE_NONE,
+                'Return cached history of data; required for certain stratifications.'
+            )
+            ->addOption(
                 'pretty',
                 null,
-                InputOption::VALUE_OPTIONAL,
-                'Pretty formatting for JSON ouput',
-                false
+                InputOption::VALUE_NONE,
+                'Pretty formatting for JSON ouput'
+            )
+            ->addOption(
+                'debug',
+                null,
+                InputOption::VALUE_NONE,
+                'Show request debug'
             )
             ->setDescription('Get current metrics from the RDR.')
         ;
@@ -91,9 +103,12 @@ class MetricsCommand extends Command
         $start_date = $input->getOption('start_date');
         $end_date = $input->getOption('end_date');
         $stratification = $input->getOption('stratification');
-        $centers = join(',', $input->getOption('centers'));
-        $statuses = join(',', $input->getOption('statuses'));
+        $centers = $input->getOption('centers');
+        $statuses = $input->getOption('statuses');
         $pretty = ($input->getOption('pretty') !== false) ? JSON_PRETTY_PRINT : 0;
+        $params = [
+            'history' => (bool) $input->getOption('history')
+        ];
 
         // Validate stratification
         if (!in_array($stratification, self::$STRATIFICATIONS)) {
@@ -117,6 +132,24 @@ class MetricsCommand extends Command
             return 1;
         }
 
+        // Validate statuses
+        if (is_string($statuses)) {
+            $statuses = explode(',', $statuses);
+        }
+        if (!empty($statuses)) {
+            foreach ($statuses as $status) {
+                if (!in_array($status, self::$STATUSES)) {
+                    $output->writeln(sprintf(
+                        '<error>Invalid status: "%s"; Valid options: %s</error>',
+                        $status,
+                        join(', ', self::$STATUSES)
+                    ));
+                    // Throw a non-zero exit status
+                    return 1;
+                }
+            }
+        }
+
         putenv('PMI_ENV=' . HpoApplication::ENV_LOCAL);
         $app = new HpoApplication([
             'isUnitTest' => true,
@@ -124,8 +157,19 @@ class MetricsCommand extends Command
         ]);
         $app->setup();
 
+        if ($input->getOption('debug')) {
+            $output->writeln('<info>Debugging Information</info>');
+            $output->writeln('  Start Date:            ' . $start_date);
+            $output->writeln('  End Date:              ' . $end_date);
+            $output->writeln('  Stratification:        ' . $stratification);
+            $output->writeln('  Centers:               ' . json_encode($centers));
+            $output->writeln('  Statuses:              ' . json_encode($statuses));
+            $output->writeln('  Additional Parameters: ' . json_encode($params));
+            $output->writeln('');
+        }
+
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-        $data = $metricsApi->metrics2($start_date, $end_date, $stratification, $centers, $statuses);
+        $data = $metricsApi->metrics2($start_date, $end_date, $stratification, $centers, $statuses, $params);
 
         $output->writeln(json_encode($data, $pretty));
     }
