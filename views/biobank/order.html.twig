@@ -45,7 +45,7 @@
     
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active">
+            <li role="presentation">
                 <a href="#collect" aria-controls="collect" role="tab" data-toggle="tab">
                     {% if order.collected_ts is not empty %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
@@ -72,7 +72,7 @@
         </ul>
         <br />
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="collect">
+            <div role="tabpanel" class="tab-pane" id="collect">
                 {% include 'partials/biobank-order-details.html.twig' with { type: 'collected' } %}
             </div>
             <div role="tabpanel" class="tab-pane" id="process">
@@ -87,4 +87,12 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block pagejs %}
+    <script>
+        $(document).ready(function() {
+            // Switch tab to active step
+            $(".nav-tabs a[href='#{{ currentStep }}']").tab('show');
+        });
+    </script>
 {% endblock %}

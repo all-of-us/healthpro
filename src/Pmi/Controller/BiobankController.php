@@ -162,10 +162,15 @@ class BiobankController extends AbstractController
         if (!$order->getParticipant()->status || $app->isTestSite()) {
             $app->abort(403);
         }
+        // Available steps
+        $steps = ['collect', 'process', 'finalize'];
+        // Set default step if current step not exists in the available steps
+        $currentStep = !in_array($order->getCurrentStep(), $steps) ? 'collect' : $order->getCurrentStep();
         return $app['twig']->render('biobank/order.html.twig', [
             'participant' => $participant,
             'order' => $order->toArray(),
             'samplesInfo' => $order->getSamplesInfo(),
+            'currentStep' => $currentStep
         ]);
     }
 
