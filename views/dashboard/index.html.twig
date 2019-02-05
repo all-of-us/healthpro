@@ -211,6 +211,8 @@
                         renderTotalProgressPlot('spinner');
                         PLOTS_SHOWN['total-progress-nav'] = true;
                     }
+                    // Send pageview event for tab
+                    ga('send', 'pageview', '/dashboard/total-progress');
                 });
 
                 // re-render on filter change
@@ -416,6 +418,8 @@
                   renderRealTimePlot('spinner');
                   PLOTS_SHOWN['real-time-nav'] = true;
                 }
+                // Send pageview event for tab
+                ga('send', 'pageview', '/dashboard/real-time');
               });
 
               // re-render on filter change
@@ -574,6 +578,8 @@
                         renderMapPlot('spinner');
                         PLOTS_SHOWN['participants-by-region-nav'] = true;
                     }
+                    // Send pageview event for tab
+                    ga('send', 'pageview', '/dashboard/participants-by-region');
                 });
 
                 // re-render on filter change
@@ -719,6 +725,8 @@
                         renderLcPlot('spinner');
                         PLOTS_SHOWN['participants-by-lifecycle-nav'] = true;
                     }
+                    // Send pageview event for tab
+                    ga('send', 'pageview', '/dashboard/participants-by-lifecycle');
                 });
 
                 // re-render on filter change
