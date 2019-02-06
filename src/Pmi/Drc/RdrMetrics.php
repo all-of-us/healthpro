@@ -6,7 +6,21 @@ class RdrMetrics
     protected $rdrHelper;
     protected $memcache;
 
-    const BATCH_DAYS = 200;
+    /**
+     * @var int
+     *
+     * Size of date range batches if 'history' flag is true; Maximum of 600, but
+     * reduced so that the payload size < 1 MiB for Memcache
+     */
+    const BATCH_DAYS_HISTORY = 200;
+
+    /**
+     * @var int
+     *
+     * Size of date range batches if 'history' flag is false; Triggers an API
+     * error if exceeded.
+     */
+    const BATCH_DAYS_NO_HISTORY = 100;
 
     /**
      * Constructor
@@ -45,13 +59,20 @@ class RdrMetrics
      * @param array $centers
      * @param array $enrollment_statuses
      * @param array $params
+     *
+     * @return array
      */
     public function metrics2($start_date, $end_date, $stratification, $centers, $enrollment_statuses, $params = [])
     {
         $client = $this->rdrHelper->getClient();
 
-        // Additional query parameters
-        $history = (isset($params['history']) && $params['history']) ? 'TRUE' : 'FALSE';
+        // Handle history flag
+        $history = false;
+        $batch = self::BATCH_DAYS_NO_HISTORY;
+        if (isset($params['history']) && $params['history']) {
+            $history = true;
+            $batch = self::BATCH_DAYS_HISTORY;
+        }
 
         // Convert arrays to comma separated strings
         if (is_array($centers)) {
@@ -62,7 +83,7 @@ class RdrMetrics
         }
 
         $responseObject = [];
-        foreach ($this->getDateRangeBins($start_date, $end_date) as $bucket) {
+        foreach ($this->getDateRangeBins($start_date, $end_date, $batch) as $bucket) {
             $query = [
                 'bucketSize' => 1,
                 'startDate' => $bucket[0],
@@ -70,9 +91,10 @@ class RdrMetrics
                 'stratification' => $stratification,
                 'awardee' => $centers,
                 'enrollmentStatus' => $enrollment_statuses,
-                'history' => $history
+                'history' => $history ? 'TRUE' : 'FALSE'
             ];
 
+            // Generate a cache key
             $memcacheKey = 'metrics_api_2_' . md5(json_encode($query));
 
             // If not found in Memcache, make request
@@ -113,16 +135,17 @@ class RdrMetrics
      *
      * @param string $start_date
      * @param string $end_date
+     * @param int $batch
      *
      * @return array
      */
-    private function getDateRangeBins($start_date, $end_date)
+    private function getDateRangeBins($start_date, $end_date, $batch)
     {
         $dateRangeBins = [];
         $startDate = new \DateTime($start_date);
         $endDate = new \DateTime($end_date);
 
-        $interval = new \DateInterval(sprintf('P%dD', self::BATCH_DAYS));
+        $interval = new \DateInterval(sprintf('P%dD', $batch));
         $period = new \DatePeriod($startDate, $interval, $endDate);
 
         // Loop through calculated intervals
