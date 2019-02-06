@@ -1046,29 +1046,29 @@ class Order
                 'code' => $key,
                 'color' => isset($samplesInfo[$value]['color']) ? $samplesInfo[$value]['color'] : ''
             ];
-            if (in_array($value, json_decode($this->order['collected_samples']))) {
+            if (!empty($this->order['collected_ts'])) {
+                $sample['collected_ts'] = $this->order['collected_ts'];
+            }
+            if (!empty($this->order['collected_samples']) && in_array($value, json_decode($this->order['collected_samples']))) {
                 $sample['collected_checked'] = true;
-                if (!empty($this->order['collected_ts'])) {
-                    $sample['collected_ts'] = $this->order['collected_ts'];
-                }
             }
-            if (in_array($value, json_decode($this->order['finalized_samples']))) {
+            if (!empty($this->order['finalized_ts'])) {
+                $sample['finalized_ts'] = $this->order['finalized_ts'];
+            }
+            if (!empty($this->order['finalized_samples']) && in_array($value, json_decode($this->order['finalized_samples']))) {
                 $sample['finalized_checked'] = true;
-                if (!empty($this->order['finalized_ts'])) {
-                    $sample['finalized_ts'] = $this->order['finalized_ts'];
+            }
+            if (!empty($this->order['processed_samples_ts'])) {
+                $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+                if (!empty($processedSamplesTs[$value])) {
+                    $processedTs = new \DateTime();
+                    $processedTs->setTimestamp($processedSamplesTs[$value]);
+                    $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                    $sample['processed_ts'] = $processedTs;
                 }
             }
-            if (in_array($value, json_decode($this->order['processed_samples']))) {
+            if (!empty($this->order['processed_samples']) && in_array($value, json_decode($this->order['processed_samples']))) {
                 $sample['processed_checked'] = true;
-                if (!empty($this->order['processed_samples_ts'])) {
-                    $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
-                    if (!empty($processedSamplesTs[$value])) {
-                        $processedTs = new \DateTime();
-                        $processedTs->setTimestamp($processedSamplesTs[$value]);
-                        $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
-                        $sample['processed_ts'] = $processedTs;
-                    }
-                }
             }
             if (in_array($value, self::$samplesRequiringProcessing)) {
                 $sample['process'] = true;
