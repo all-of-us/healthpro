@@ -33,7 +33,7 @@
                     <td>{{ sample.color }}</td>
                     <td>
                         {% if attribute(order, type~'_ts') %}
-                            {% if attribute(sample, type~'_ts') is defined and attribute(sample, type~'_ts') is not empty %}
+                            {% if attribute(sample, type~'_checked') is defined and attribute(sample, type~'_ts') is defined and attribute(sample, type~'_ts') is not empty %}
                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
                                 {{ type == 'processed' ? attribute(sample, type~'_ts')|date('n/j/Y g:ia', app.userTimezone) }}
                             {% else %}
