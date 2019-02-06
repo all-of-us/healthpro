@@ -31,7 +31,7 @@
                     <th>Participant ID</th>
                 {% endif %}
                 <th>Order ID</th>
-                <th class="td-left-border">Status</th>
+                <th>Status</th>
                 <th>Created</th>
                 <th>Collected</th>
                 <th>Processed</th>
@@ -50,7 +50,7 @@
                     <td>
                         <a href="{{ path('biobank_order', { biobankId: order.biobank_id, orderId: order.id }) }}">{{ order.order_id }}</a>
                     </td>
-                    <td class="td-left-border">
+                    <td>
                         <nobr>
                             <a href="{{ path('biobank_order', { biobankId: order.biobank_id, orderId: order.id }) }}">{{ order.orderStatus }}</a>
                         </nobr>
@@ -89,7 +89,7 @@
     <script>
         $(document).ready(function () {
             $('table').DataTable({
-                order: [[3, 'desc']],
+                order: [[2, 'desc']],
                 pageLength: 25
             });
         });
