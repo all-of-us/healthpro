@@ -368,6 +368,12 @@
                     $('#loading-modal').modal('show');
                   }
 
+                  // Restrict users to a 100 day date range for real-time requests
+                  if (moment(tpEndDate).diff(moment(tpStartDate), 'days') > 100) {
+                    setMetricsError(spinnerLoc, 'Please select a date range less than 100 days');
+                    return false;
+                  }
+
                   // gather params
                   var tpInterval = $('#real-time-interval').val();
                   var metricTitle = $('#real-time-metric-attribute option:selected').text();
