@@ -111,15 +111,15 @@ class DashboardController extends AbstractController
             case 'ENROLLMENT_STATUS':
                 if ($history) {
                     $display_values = [
-                        'core' => 'Core Participant',
                         'registered' => 'Registered',
-                        'consented' => 'Consented'
+                        'consented' => 'Consented',
+                        'core' => 'Core Participant'
                     ];
                 } else {
                     $display_values = [
+                        'INTERESTED' => 'Registered',
                         'MEMBER' => 'Consented',
-                        'FULL_PARTICIPANT' => 'Core Participant',
-                        'INTERESTED' => 'Registered'
+                        'FULL_PARTICIPANT' => 'Core Participant'
                     ];
                 }
                 break;
@@ -133,6 +133,7 @@ class DashboardController extends AbstractController
                     'UNMAPPED' => 'UNMAPPED',
                     'UNSET' => 'UNSET',
                     'Woman' => 'Woman',
+                    'Prefer not to say' => 'Prefer not to say'
                 ];
                 break;
             case 'AGE_RANGE':
@@ -176,11 +177,13 @@ class DashboardController extends AbstractController
 
         $traces_obj = [];
         $interval_counts = [];
-        $trace_names = $day_counts[0]['metrics'];
+
+        // Reverse the arrays, as the last item added appears as first value in chart
+        $trace_names = array_keys($display_values);
 
         // if we got this far, we have data!
         // assemble data object in Plotly format
-        foreach ($trace_names as $trace_name => $value) {
+        foreach ($trace_names as $trace_name) {
             $trace = [
                 'x' => [],
                 'y' => [],
@@ -231,30 +234,10 @@ class DashboardController extends AbstractController
             array_push($data, $trace);
         }
 
-        // sort alphabetically by trace name, unless looking at enrollment status (then do reverse sort)
-        if ($stratification == 'ENROLLMENT_STATUS') {
-            usort(
-                $data,
-                function ($a, $b) {
-                    if ($a['name'] == $b['name']) {
-                        return 0;
-                    }
-                    return ($a['name'] > $b['name']) ? 1 : -1;
-                }
-            );
-        } else {
-            usort(
-                $data,
-                function ($a, $b) {
-                    if ($a['name'] == $b['name']) {
-                        return 0;
-                    }
-                    return ($a['name'] > $b['name']) ? -1 : 1;
-                }
-            );
-        }
+        // Reverse the array, as Plotly.js will put the first item at the bottom
+        $data = array_reverse($data);
 
-        // now apply colors since we're in order
+        // Apply color based on order of appearance
         for ($i = 0; $i < count($data); $i++) {
             $data[$i]['marker'] = [
                 "color" => $this->getColorBrewerVal($i)
