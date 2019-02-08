@@ -112,13 +112,13 @@ class DashboardController extends AbstractController
                 if ($history) {
                     $display_values = [
                         'core' => 'Core Participant',
-                        'registered' => 'Member',
+                        'registered' => 'Registered',
                         'consented' => 'Consented'
                     ];
                 } else {
                     $display_values = [
-                        'MEMBER' => 'Member',
-                        'FULL_PARTICIPANT' => 'Full Participant',
+                        'MEMBER' => 'Consented',
+                        'FULL_PARTICIPANT' => 'Core Participant',
                         'INTERESTED' => 'Registered'
                     ];
                 }
@@ -592,7 +592,7 @@ class DashboardController extends AbstractController
             'Baseline PPI Modules Complete',
             'Physical Measurements',
             'Samples Received',
-            'Full Participant'
+            'Core Participant'
         ];
 
         foreach ($metrics_keys as $index => $metric_val) {
