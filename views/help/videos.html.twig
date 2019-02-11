@@ -28,8 +28,8 @@
                 <h4>{{ group.title }}</h4>
                 <div class="list-group">
                     {% for video in group.videos %}
-                        {% if video.link is not empty %}
-                            <a href="#" class="list-group-item load-video" data-embed-src="{{ video.link }}">{{ video.title }}</a>
+                        {% if video.youtube_id %}
+                            <a href="#" class="list-group-item load-video" data-embed-src="https://www.youtube.com/embed/{{ video.youtube_id }}">{{ video.title }}</a>
                         {% else %}
                             <div class="list-group-item disabled">{{ video.title }} <em><small>(Coming Soon!)</small></em></div>
                         {% endif %}

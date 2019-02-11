@@ -122,23 +122,23 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'Chapter 1: HPO Creating an Order',
-                    'link' => ''
+                    'youtube_id' => null
                 ],
                 [
                     'title' => 'Chapter 3: HPO Blood Collection',
-                    'link' => ''
+                    'youtube_id' => null
                 ],
                 [
                     'title' => 'Chapter 5: HPO Urine Collection',
-                    'link' => 'https://www.youtube.com/embed/ANJs1_A_zLs'
+                    'youtube_id' => 'ANJs1_A_zLs'
                 ],
                 [
                     'title' => 'Chapter 7: HPO Saliva Collection',
-                    'link' => 'https://www.youtube.com/embed/0WeQCxetXQk'
+                    'youtube_id' => '0WeQCxetXQk'
                 ],
                 [
                     'title' => 'Chapter 9: HPO Ordering Supplies from MML',
-                    'link' => 'https://www.youtube.com/embed/6P4nuWNOAQA'
+                    'youtube_id' => '6P4nuWNOAQA'
                 ]
             ]
         ],
@@ -147,19 +147,19 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'Chapter 2: DV Registering a KIT',
-                    'link' => 'https://www.youtube.com/embed/X9E6u44w8Ks'
+                    'youtube_id' => 'X9E6u44w8Ks'
                 ],
                 [
                     'title' => 'Chapter 4: DV Blood Collection & Processing',
-                    'link' => 'https://www.youtube.com/embed/pNSndLIIHQA'
+                    'youtube_id' => 'pNSndLIIHQA'
                 ],
                 [
                     'title' => 'Chapter 6: DV Urine Collection',
-                    'link' => 'https://www.youtube.com/embed/wVcFsCiyqtA'
+                    'youtube_id' => 'wVcFsCiyqtA'
                 ],
                 [
                     'title' => 'Chapter 10: DV Packaging & Shipping Specimens',
-                    'link' => 'https://www.youtube.com/embed/yAHGK979kJ0'
+                    'youtube_id' => 'yAHGK979kJ0'
                 ]
             ]
         ],
@@ -168,7 +168,7 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'Physical Measurements Video Tutorial (HPO/DV)',
-                    'link' => 'https://www.youtube.com/embed/wE-sZoPCfdk'
+                    'youtube_id' => 'wE-sZoPCfdk'
                 ]
             ]
         ],
@@ -177,7 +177,7 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'All of Us Research Program FAQs',
-                    'link' => 'https://www.youtube.com/embed/TE-IyOxazvo'
+                    'youtube_id' => 'TE-IyOxazvo'
                 ]
             ]
         ]
