@@ -36,7 +36,12 @@ class AdminController extends AbstractController
         ]],
         ['withdrawalNotifications', '/notifications/withdrawal'],
         ['missingMeasurements', '/missing/measurements', ['method' => 'GET|POST']],
-        ['missingOrders', '/missing/orders', ['method' => 'GET|POST']]
+        ['missingOrders', '/missing/orders', ['method' => 'GET|POST']],
+        ['notices', '/notices'],
+        ['notice', '/notice/{id}', [
+            'method' => 'GET|POST',
+            'defaults' => ['id' => null]
+        ]]
     ];
 
     public function homeAction(Application $app)
@@ -396,6 +401,114 @@ class AdminController extends AbstractController
         }
         return $app['twig']->render('admin/missing/orders.html.twig', [
             'missing' => $missing,
+            'form' => $form->createView()
+        ]);
+    }
+
+    public function noticesAction(Application $app)
+    {
+        $notices = $app['em']->getRepository('notices')->fetchBy([], ['id' => 'asc']);
+        return $app['twig']->render('admin/notices/index.html.twig', [
+            'notices' => $notices
+        ]);
+    }
+
+    public function noticeAction($id, Application $app, Request $request)
+    {
+        if ($id) {
+            $notice = $app['em']->getRepository('notices')->fetchOneBy(['id' => $id]);
+            if (!$notice) {
+                $app->abort(404);;
+            }
+        } else {
+            $notice = null;
+        }
+
+        $formData = $notice;
+        if ($formData && isset($formData['id'])) {
+            unset($formData['id']);
+        }
+
+        $builder = $app['form.factory']->createBuilder(FormType::class, $formData);
+        $builder
+            ->add('url', Type\TextType::class, [
+                'label' => 'URL Pattern',
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string'),
+                    new Constraints\Regex('/^[a-zA-Z0-9_\-\/\*]+$/') // valid URL, with asterisks
+                ]
+            ])
+            ->add('message', Type\TextareaType::class, [
+                'required' => true,
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ]
+            ])
+            ->add('full_page', Type\ChoiceType::class, [
+                'label' => 'Full Page?',
+                'required' => true,
+                'choices' => [
+                    'No'=> 0,
+                    'Yes' => 1
+                ]
+            ])
+            ->add('start_ts', Type\DateTimeType::class, [
+                'required' => false,
+                'label' => 'Start Time (optional)',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy h:mm a',
+                'view_timezone' => $app->getUserTimezone(),
+                'model_timezone' => 'UTC',
+                'constraints' => [
+                    new Constraints\DateTime()
+                ]
+            ])
+            ->add('end_ts', Type\DateTimeType::class, [
+                'required' => false,
+                'label' => 'End Time (optional)',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy h:mm a',
+                'view_timezone' => $app->getUserTimezone(),
+                'model_timezone' => 'UTC',
+                'constraints' => [
+                    new Constraints\DateTime()
+                ]
+            ]);
+        $form = $builder->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                if ($notice) {
+                    if ($request->request->has('delete')) {
+                        if ($app['em']->getRepository('notices')->delete($id)) {
+                            $app->log(Log::NOTICE_DELETE, $id);
+                            $app->addFlashNotice('Notice removed');
+                        }
+                    } else {
+                        if ($app['em']->getRepository('notices')->update($id, $form->getData())) {
+                            $app->log(Log::NOTICE_EDIT, $id);
+                            $app->addFlashNotice('Notice updated');
+                        }
+                    }
+                } else {
+                    if ($id = $app['em']->getRepository('notices')->insert($form->getData())) {
+                        $app->log(Log::NOTICE_ADD, $id);
+                        $app->addFlashNotice('Notice added');
+                    }
+                }
+                return $app->redirectToRoute('admin_notices');
+            } else {
+                if (count($form->getErrors()) == 0) {
+                    $form->addError(new FormError('Please correct the errors below'));
+                }
+            }
+        }
+
+        return $app['twig']->render('admin/notices/edit.html.twig', [
+            'notice' => $notice,
             'form' => $form->createView()
         ]);
     }

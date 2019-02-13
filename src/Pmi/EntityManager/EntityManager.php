@@ -20,7 +20,8 @@ class EntityManager
         'awardees' => 'doctrine',
         'missing_notifications_log' => 'doctrine',
         'evaluations_history' => 'doctrine',
-        'orders_history' => 'doctrine'
+        'orders_history' => 'doctrine',
+        'notices' => 'doctrine'
     ];
 
     protected $timezone;
