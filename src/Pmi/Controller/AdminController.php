@@ -13,6 +13,7 @@ use Pmi\Service\WithdrawalService;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Order\Order;
 use Pmi\Service\SiteSyncService;
+use Pmi\Form\NoticeType;
 
 class AdminController extends AbstractController
 {
@@ -424,83 +425,35 @@ class AdminController extends AbstractController
             $notice = null;
         }
 
-        $formData = $notice;
-        if ($formData && isset($formData['id'])) {
-            unset($formData['id']);
-        }
+        $form = $app['form.factory']->createNamed(
+            'form',
+            NoticeType::class,
+            $notice,
+            ['timezone' => $app->getUserTimezone()]
+        );
 
-        $builder = $app['form.factory']->createBuilder(FormType::class, $formData);
-        $builder
-            ->add('url', Type\TextType::class, [
-                'label' => 'URL Pattern',
-                'required' => true,
-                'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Type('string'),
-                    new Constraints\Regex('/^[a-zA-Z0-9_\-\/\*]+$/') // valid URL, with asterisks
-                ]
-            ])
-            ->add('message', Type\TextareaType::class, [
-                'required' => true,
-                'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Type('string')
-                ]
-            ])
-            ->add('full_page', Type\ChoiceType::class, [
-                'label' => 'Full Page?',
-                'required' => true,
-                'choices' => [
-                    'No'=> 0,
-                    'Yes' => 1
-                ]
-            ])
-            ->add('start_ts', Type\DateTimeType::class, [
-                'required' => false,
-                'label' => 'Start Time (optional)',
-                'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
-                'view_timezone' => $app->getUserTimezone(),
-                'model_timezone' => 'UTC',
-                'constraints' => [
-                    new Constraints\DateTime()
-                ]
-            ])
-            ->add('end_ts', Type\DateTimeType::class, [
-                'required' => false,
-                'label' => 'End Time (optional)',
-                'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
-                'view_timezone' => $app->getUserTimezone(),
-                'model_timezone' => 'UTC',
-                'constraints' => [
-                    new Constraints\DateTime()
-                ]
-            ]);
-        $form = $builder->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                if ($notice) {
-                    if ($request->request->has('delete')) {
-                        if ($app['em']->getRepository('notices')->delete($id)) {
-                            $app->log(Log::NOTICE_DELETE, $id);
-                            $app->addFlashNotice('Notice removed');
-                        }
-                    } else {
-                        if ($app['em']->getRepository('notices')->update($id, $form->getData())) {
-                            $app->log(Log::NOTICE_EDIT, $id);
-                            $app->addFlashNotice('Notice updated');
-                        }
-                    }
-                } else {
+                if ($notice === null) {
                     if ($id = $app['em']->getRepository('notices')->insert($form->getData())) {
                         $app->log(Log::NOTICE_ADD, $id);
                         $app->addFlashNotice('Notice added');
                     }
+                } elseif ($request->request->has('delete')) {
+                    if ($app['em']->getRepository('notices')->delete($id)) {
+                        $app->log(Log::NOTICE_DELETE, $id);
+                        $app->addFlashNotice('Notice removed');
+                    }
+                } else {
+                    if ($app['em']->getRepository('notices')->update($id, $form->getData())) {
+                        $app->log(Log::NOTICE_EDIT, $id);
+                        $app->addFlashNotice('Notice updated');
+                    }
                 }
                 return $app->redirectToRoute('admin_notices');
             } else {
+                // Add a form-level error if there are none
                 if (count($form->getErrors()) == 0) {
                     $form->addError(new FormError('Please correct the errors below'));
                 }
