@@ -67,8 +67,7 @@ class NoticeType extends AbstractType
                     'data-on' => 'Enable',
                     'data-off' => 'Disable',
                     'data-onstyle' => 'success'
-                ],
-                'data' => true
+                ]
             ]);
 
         // Convert status field int values into boolean
