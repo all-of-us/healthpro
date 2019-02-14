@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\CallbackTransformer;
 
 class NoticeType extends AbstractType
 {
@@ -69,6 +70,17 @@ class NoticeType extends AbstractType
                 ],
                 'data' => true
             ]);
+
+        // Convert status field int values into boolean
+        $builder->get('status')
+            ->addModelTransformer(new CallbackTransformer(
+                function ($int) {
+                    return (bool)$int;
+                },
+                function ($bool) {
+                    return $bool ? 1 : 0;
+                }
+            ));
     }
 
     public function configureOptions(OptionsResolver $resolver)
