@@ -73,6 +73,14 @@ class HelpController extends AbstractController
                     'title' => 'SOP-020 HPO Biobank Order Downtime Procedure',
                     'filename' => 'SOP-020 HPO Biobank Order Downtime Procedure.pdf'
                 ],
+                'SOP-022' => [
+                    'title' => 'SOP-022 HPO Cancelling, Editing, & Restoring Biobank Orders',
+                    'filename' => 'SOP-022 HPO Cancelling, Editing, & Restoring Biobank Orders.pdf'
+                ],
+                'SOP-026' => [
+                    'title' => 'SOP-026 HPO Biobank Order Review',
+                    'filename' => 'SOP-026 HPO Biobank Order Review.pdf'
+                ],
                 'CHANGES-20170412-HPO' => [
                     'download' => true,
                     'title' => 'HPO SOP Changes Presentation 04-12-2017',
@@ -106,6 +114,14 @@ class HelpController extends AbstractController
                 'SOP-021' => [
                     'title' => 'SOP-021 DV Biobank Order Downtime Procedure',
                     'filename' => 'SOP-021 DV Biobank Order Downtime Procedure.pdf'
+                ],
+                'SOP-023' => [
+                    'title' => 'SOP-023 DV Cancelling, Editing, & Restoring Biobank Orders',
+                    'filename' => 'SOP-023 DV Cancelling, Editing, & Restoring Biobank Orders.pdf'
+                ],
+                'SOP-025' => [
+                    'title' => 'SOP-025 DV Biobank Order Review',
+                    'filename' => 'SOP-025 DV Biobank Order Review.pdf'
                 ],
                 'CHANGES-20170412-DV' => [
                     'download' => true,
