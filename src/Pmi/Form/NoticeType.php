@@ -57,6 +57,17 @@ class NoticeType extends AbstractType
                 'constraints' => [
                     new Constraints\DateTime()
                 ]
+            ])
+            ->add('status', Type\CheckboxType::class, [
+                'label' => false,
+                'required' => false,
+                'attr' => [
+                    'data-toggle' => 'toggle',
+                    'data-on' => 'Enable',
+                    'data-off' => 'Disable',
+                    'data-onstyle' => 'success'
+                ],
+                'data' => true
             ]);
     }
 
