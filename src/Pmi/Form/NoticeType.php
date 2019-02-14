@@ -13,6 +13,16 @@ class NoticeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('status', Type\CheckboxType::class, [
+                'label' => false,
+                'required' => false,
+                'attr' => [
+                    'data-toggle' => 'toggle',
+                    'data-on' => 'Enable',
+                    'data-off' => 'Disable',
+                    'data-onstyle' => 'success'
+                ]
+            ])
             ->add('url', Type\TextType::class, [
                 'label' => 'URL Pattern',
                 'required' => true,
@@ -57,16 +67,6 @@ class NoticeType extends AbstractType
                 'model_timezone' => 'UTC',
                 'constraints' => [
                     new Constraints\DateTime()
-                ]
-            ])
-            ->add('status', Type\CheckboxType::class, [
-                'label' => false,
-                'required' => false,
-                'attr' => [
-                    'data-toggle' => 'toggle',
-                    'data-on' => 'Enable',
-                    'data-off' => 'Disable',
-                    'data-onstyle' => 'success'
                 ]
             ]);
 
