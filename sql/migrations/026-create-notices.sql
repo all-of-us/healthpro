@@ -5,5 +5,6 @@ CREATE TABLE `notices` (
   `full_page` tinyint(1) NOT NULL DEFAULT 0,
   `start_ts` timestamp NULL DEFAULT NULL,
   `end_ts` timestamp NULL DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8mb4;
