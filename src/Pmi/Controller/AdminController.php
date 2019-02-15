@@ -462,7 +462,8 @@ class AdminController extends AbstractController
 
         return $app['twig']->render('admin/notices/edit.html.twig', [
             'notice' => $notice,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'data' => $form->getData()
         ]);
     }
 }
