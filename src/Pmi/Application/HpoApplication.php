@@ -435,16 +435,19 @@ class HpoApplication extends AbstractApplication
             }
         }
 
-        $noticeService = new NoticeService($this['em']);
-        $notices = $noticeService->getCurrentNotices($request->getPathInfo());
-        foreach ($notices as $notice) {
-            if ($notice['full_page']) {
-                return new Response($this['twig']->render('full-page-notice.html.twig', [
-                    'message' => $notice['message']
-                ]));
+        // Prevent notice display in all admin pages
+        if (strpos($request->attributes->get('_route'), 'admin') === false) {
+            $noticeService = new NoticeService($this['em']);
+            $notices = $noticeService->getCurrentNotices($request->getPathInfo());
+            foreach ($notices as $notice) {
+                if ($notice['full_page']) {
+                    return new Response($this['twig']->render('full-page-notice.html.twig', [
+                        'message' => $notice['message']
+                    ]));
+                }
             }
+            $app['twig']->addGlobal('global_notices', $notices);
         }
-        $app['twig']->addGlobal('global_notices', $notices);
     }
 
     protected function afterCallback(Request $request, Response $response)
