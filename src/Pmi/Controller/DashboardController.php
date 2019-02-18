@@ -270,7 +270,6 @@ class DashboardController extends AbstractController
         }
 
         // get request attributes
-        $interval = $request->get('interval');
         $stratification = $request->get('stratification');
         $end_date = $request->get('end_date');
         $centers = $request->get('centers');
@@ -295,7 +294,7 @@ class DashboardController extends AbstractController
         // retrieve metrics from cache, or request new if expired
         $metrics = $this->getMetrics2Object(
             $app,
-            $interval,
+            'DAY', // Not relevant to this call
             date('Y-m-d', strtotime($end_date . '-1 day')), // Previous day for start_date
             $end_date,
             $stratification,
@@ -519,13 +518,11 @@ class DashboardController extends AbstractController
         }
 
         // get request attributes
-        $interval = $request->get('interval');
         $stratification = $request->get('stratification');
         $end_date = $request->get('end_date');
         $centers = $request->get('centers');
         $enrollment_statuses = $request->get('enrollment_statuses');
         $history = $request->get('history', true); // Data available only through history flag
-        $color_profile = $request->get('color_profile');
 
         // Use 'ALL' keyword to send empty filter for awardee
         if ($centers == ['ALL']) {
@@ -535,7 +532,7 @@ class DashboardController extends AbstractController
         // retrieve metrics from cache, or request new if expired
         $metrics = $this->getMetrics2Object(
             $app,
-            $interval,
+            'DAY', // Not relevant to this call
             date('Y-m-d', strtotime($end_date . '-1 day')), // Previous day for start_date
             $end_date,
             $stratification,
