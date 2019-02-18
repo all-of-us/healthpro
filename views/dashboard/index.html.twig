@@ -725,7 +725,15 @@
                             lifecycleCenters = ['ALL'];
                         }
 
-                        $.getJSON('/dashboard/metrics_load_lifecycle?csrf_token={{ csrf_token('dashboard') }}&end_date=' + lcEndDate + '&centers=' + lifecycleCenters, function (data) {
+                        // load data from metrics API
+                        $.getJSON('/dashboard/metrics_load_lifecycle', {
+                          csrf_token: "{{ csrf_token('dashboard') }}",
+                          stratification: 'LIFECYCLE',
+                          end_date: lcEndDate,
+                          centers: lifecycleCenters,
+                          history: true
+                        })
+                        .done(function(data) {
                             if (data.length != 0) {
                                 var lcAnnot = [];
                                 var lcTitle = 'Participant registrations by <b>lifecycle phase</b> as of ' + lcEndDate;

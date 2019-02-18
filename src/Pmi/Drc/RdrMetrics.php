@@ -35,22 +35,6 @@ class RdrMetrics
     }
 
     /**
-     * @deprecated 2018-10-01 Use ::metrics2 instead.
-     */
-    public function metrics($start_date, $end_date)
-    {
-        $client = $this->rdrHelper->getClient();
-        $response = $client->request('POST', 'rdr/v1/Metrics', [
-            'json' => [
-                'start_date' => $start_date,
-                'end_date' => $end_date
-            ]
-        ]);
-        $responseObject = json_decode($response->getBody()->getContents(), true);
-        return $responseObject;
-    }
-
-    /**
      * Metrics 2 API (MAPI2)
      *
      * @param string $start_date YYYY-MM-DD
