@@ -31,6 +31,7 @@ class NoticeService
     {
         $now = (new DateTime())->format('Y-m-d H:i:s');
         $notices = $this->em->getRepository('notices')->fetchBySql(
+            'status = 1 AND ' . 
             '(start_ts is null OR start_ts <= ?) AND ' . 
             '(end_ts is null OR end_ts >= ?)',
             [$now, $now]
