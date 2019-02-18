@@ -45,6 +45,16 @@ class NoticeType extends AbstractType
                 'choices' => [
                     'No'=> 0,
                     'Yes' => 1
+                ],
+                'constraints' => [
+                    new Constraints\Callback(function($isFullPage, $context) {
+                        if ($isFullPage) {
+                            $url = $context->getObject()->getParent()->get('url')->getData();
+                            if (preg_match('/^\/?admin/i', $url)) {
+                                $context->buildViolation('Full page notices cannot be used with admin URLs')->addViolation();
+                            }
+                        }
+                    })
                 ]
             ])
             ->add('start_ts', Type\DateTimeType::class, [
