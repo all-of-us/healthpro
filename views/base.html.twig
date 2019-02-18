@@ -101,7 +101,7 @@
         {% if global_notices is defined and global_notices|length > 0 %}
             {% for notice in global_notices %}
                 <div class="alert alert-warning">
-                    {{ notice.message }}
+                    {{ notice.message|raw }}
                 </div>
             {% endfor %}
         {% endif %}
