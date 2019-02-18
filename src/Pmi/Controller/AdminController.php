@@ -428,7 +428,7 @@ class AdminController extends AbstractController
         $form = $app['form.factory']->createNamed(
             'form',
             NoticeType::class,
-            $notice,
+            $notice ?: ['status' => 1],
             ['timezone' => $app->getUserTimezone()]
         );
 
@@ -462,8 +462,7 @@ class AdminController extends AbstractController
 
         return $app['twig']->render('admin/notices/edit.html.twig', [
             'notice' => $notice,
-            'form' => $form->createView(),
-            'data' => $form->getData()
+            'form' => $form->createView()
         ]);
     }
 }
