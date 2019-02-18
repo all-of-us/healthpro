@@ -117,7 +117,7 @@ class HelpController extends AbstractController
                 ],
                 'SOP-023' => [
                     'title' => 'SOP-023 DV Cancelling, Editing, & Restoring Biobank Orders',
-                    'filename' => 'SOP-023 DV Cancelling, Editing, & Restoring Biobank Orders.pdf'
+                    'filename' => 'SOP-023 DV Cancelling, Editing, & Restoring Biobank Orders .pdf'
                 ],
                 'SOP-025' => [
                     'title' => 'SOP-025 DV Biobank Order Review',
