@@ -866,25 +866,6 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * Check Dates
-     *
-     * Helper function to check date range cutoffs
-     *
-     * @param string $date
-     * @param string $start
-     * @param string $end
-     * @param array  $controls
-     *
-     * @return boolean
-     */
-    private function checkDates($date, $start, $end, $controls)
-    {
-        return strtotime($date) >= strtotime($start)
-            && strtotime($date) <= strtotime($end)
-            && in_array($date, $controls);
-    }
-
-    /**
      * Get Dashboard Dates
      *
      * Helper function to return array of dates segmented by interval
