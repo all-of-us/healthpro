@@ -122,7 +122,7 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'Chapter 1 - Part 1: HPO Creating a Biobank Order (Complete Biobank Orders)',
-                    'youtube_id' => null
+                    'youtube_id' => '_IxvPPBwnUg'
                 ],
                 [
                     'title' => 'Chapter 1 - Part 2: HPO Creating a Biobank Order (1st Visit Partial Orders)',
