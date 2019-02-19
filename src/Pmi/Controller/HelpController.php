@@ -137,24 +137,32 @@ class HelpController extends AbstractController
             'title' => 'Biobank Video Tutorials for Healthcare Provider Organizations (HPO)',
             'videos' => [
                 [
-                    'title' => 'Chapter 1: HPO Creating an Order',
-                    'link' => ''
+                    'title' => 'Chapter 1 - Part 1: HPO Creating a Biobank Order (Complete Biobank Orders)',
+                    'youtube_id' => '_IxvPPBwnUg'
+                ],
+                [
+                    'title' => 'Chapter 1 - Part 2: HPO Creating a Biobank Order (1st Visit Partial Orders)',
+                    'youtube_id' => 'Do-xigAu_ng'
+                ],
+                [
+                    'title' => 'Chapter 1 - Part 3: HPO Creating a Biobank Order (2nd Visit Customized Orders)',
+                    'youtube_id' => 'eh1wiPoHIHg'
                 ],
                 [
                     'title' => 'Chapter 3: HPO Blood Collection',
-                    'link' => ''
+                    'youtube_id' => null
                 ],
                 [
                     'title' => 'Chapter 5: HPO Urine Collection',
-                    'link' => 'https://www.youtube.com/embed/ANJs1_A_zLs'
+                    'youtube_id' => 'IK_M_6jzHdY'
                 ],
                 [
                     'title' => 'Chapter 7: HPO Saliva Collection',
-                    'link' => 'https://www.youtube.com/embed/0WeQCxetXQk'
+                    'youtube_id' => 'wed3vBDyBJk'
                 ],
                 [
                     'title' => 'Chapter 9: HPO Ordering Supplies from MML',
-                    'link' => 'https://www.youtube.com/embed/6P4nuWNOAQA'
+                    'youtube_id' => 'aIPoatfgWSE'
                 ]
             ]
         ],
@@ -163,19 +171,19 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'Chapter 2: DV Registering a KIT',
-                    'link' => 'https://www.youtube.com/embed/X9E6u44w8Ks'
+                    'youtube_id' => 'gjn8NoomEl0'
                 ],
                 [
                     'title' => 'Chapter 4: DV Blood Collection & Processing',
-                    'link' => 'https://www.youtube.com/embed/pNSndLIIHQA'
+                    'youtube_id' => 'ghk8l0Y1Z9Y'
                 ],
                 [
                     'title' => 'Chapter 6: DV Urine Collection',
-                    'link' => 'https://www.youtube.com/embed/wVcFsCiyqtA'
+                    'youtube_id' => 'sj3Z9xHyTCI'
                 ],
                 [
                     'title' => 'Chapter 10: DV Packaging & Shipping Specimens',
-                    'link' => 'https://www.youtube.com/embed/yAHGK979kJ0'
+                    'youtube_id' => 'YB3oVN3xlRM'
                 ]
             ]
         ],
@@ -184,7 +192,7 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'Physical Measurements Video Tutorial (HPO/DV)',
-                    'link' => 'https://www.youtube.com/embed/wE-sZoPCfdk'
+                    'youtube_id' => 'wE-sZoPCfdk'
                 ]
             ]
         ],
@@ -193,7 +201,7 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'All of Us Research Program FAQs',
-                    'link' => 'https://www.youtube.com/embed/TE-IyOxazvo'
+                    'youtube_id' => 'TE-IyOxazvo'
                 ]
             ]
         ]
