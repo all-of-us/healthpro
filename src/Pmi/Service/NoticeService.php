@@ -6,7 +6,6 @@ use DateTime;
 class NoticeService
 {
     private $em;
-    private $timezone;
 
     public function __construct($entityManager)
     {
