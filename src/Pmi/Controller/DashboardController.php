@@ -270,7 +270,6 @@ class DashboardController extends AbstractController
         }
 
         // get request attributes
-        $interval = $request->get('interval');
         $stratification = $request->get('stratification');
         $end_date = $request->get('end_date');
         $centers = $request->get('centers');
@@ -295,7 +294,7 @@ class DashboardController extends AbstractController
         // retrieve metrics from cache, or request new if expired
         $metrics = $this->getMetrics2Object(
             $app,
-            $interval,
+            'DAY', // Not relevant to this call
             date('Y-m-d', strtotime($end_date . '-1 day')), // Previous day for start_date
             $end_date,
             $stratification,
@@ -519,117 +518,74 @@ class DashboardController extends AbstractController
         }
 
         // get request attributes
-        $end_date = $this->sanitizeDate($request->get('end_date'));
-        $centers = explode(',', $request->get('centers'));
+        $stratification = $request->get('stratification');
+        $end_date = $request->get('end_date');
+        $centers = $request->get('centers');
+        $enrollment_statuses = $request->get('enrollment_statuses');
+        $history = $request->get('history', true); // Data available only through history flag
 
-        // get metrics data
-        $metrics = $this->getMetricsObject($app, $end_date);
-        $phases = [];
-        $completed = [];
-        $eligible = [];
-        $completed_text = [];
-        $eligible_text = [];
+        // Use 'ALL' keyword to send empty filter for awardee
+        if ($centers == ['ALL']) {
+            $centers = [];
+        }
 
-        // iterate through list of control values to get counts
+        // retrieve metrics from cache, or request new if expired
+        $metrics = $this->getMetrics2Object(
+            $app,
+            'DAY', // Not relevant to this call
+            date('Y-m-d', strtotime($end_date . '-1 day')), // Previous day for start_date
+            $end_date,
+            $stratification,
+            $centers,
+            $enrollment_statuses,
+            [
+                'history' => $history
+            ]
+        );
+        $metrics = $this->combineHPOsByDate($metrics, $centers);
 
-        // hard coded-list of metrics keys to look for as we only care about certain counts
-        // ordered
-        $metrics_keys = [
-            'Participant',
-            'Participant.consentForStudyEnrollment',
-            'Participant.consentForStudyEnrollmentAndEHR',
-            'Participant.questionnaireOnTheBasics',
-            'Participant.questionnaireOnOverallHealth',
-            'Participant.questionnaireOnLifestyle',
-            'Participant.numCompletedBaselinePPIModules',
-            'Participant.physicalMeasurements',
-            'Participant.samplesToIsolateDNA',
-            'Participant.enrollmentStatus'
-        ];
+        if (!$metrics) {
+            return $app->json([
+                'error' => 'No data matched your criteria.'
+            ], 400);
+        }
 
         $display_values = [
-            'Registered',
-            'Consent: Enrollment',
-            'Consent: Complete',
-            'PPI Module: The Basics',
-            'PPI Module: Overall Health',
-            'PPI Module: Lifestyle',
-            'Baseline PPI Modules Complete',
-            'Physical Measurements',
-            'Samples Received',
-            'Core Participant'
+            'Registered' => 'Registered',
+            'Consent_Enrollment' => 'Primary Consent',
+            'Consent_Complete' => 'Primary+EHR/EHR-lite Consent',
+            'PPI_Module_The_Basics' => 'PPI Module: The Basics',
+            'PPI_Module_Overall_Health' => 'PPI Module: Overall Health',
+            'PPI_Module_Lifestyle' => 'PPI Module: Lifestyle',
+            'Baseline_PPI_Modules_Complete' => 'Baseline PPI Modules Complete',
+            'Physical_Measurements' => 'Physical Measurements',
+            'Samples_Received' => 'Samples Received',
+            'Full_Participant' => 'Core Participant'
         ];
 
-        foreach ($metrics_keys as $index => $metric_val) {
-            if ($metric_val == 'Participant') {
-                $lookup = $metric_val;
-            } elseif ($metric_val == 'Participant.samplesToIsolateDNA') {
-                $lookup = $metric_val . '.RECEIVED';
-            } elseif ($metric_val == 'Participant.enrollmentStatus') {
-                $lookup = $metric_val . '.FULL_PARTICIPANT';
-            } elseif ($metric_val == 'Participant.physicalMeasurements') {
-                $lookup = $metric_val . '.COMPLETED';
-            } elseif ($metric_val == 'Participant.numCompletedBaselinePPIModules') {
-                $lookup = $metric_val . '.3';
-            } else {
-                $lookup = $metric_val . '.SUBMITTED';
-            }
+        $completed = [];
+        $completed_text = [];
+        $not_completed = [];
+        $not_completed_text = [];
+        foreach ($display_values as $display_key => $display_val) {
+            array_push($completed, $metrics[0]['metrics']['completed'][$display_key]);
+            array_push($completed_text, sprintf(
+                '%s: %d',
+                $display_val,
+                $metrics[0]['metrics']['completed'][$display_key]
+            ));
 
-            // make sure metrics data exists first, if metrics cache or API fail return value will be false
-            if (!empty($metrics)) {
-                $facet_total = 0;
-                // iterate through each center to accumulate a running total to store
-                foreach ($centers as $center) {
-                    $requested_center = [];
-                    if ($center == 'ALL') {
-                        // first entry is always non-faceted (total counts)
-                        $requested_center = $metrics[0]['entries'];
-                    } else {
-                        foreach ($metrics as $metric) {
-                            if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $center) {
-                                $requested_center = $metric['entries'];
-                            }
-                        }
-                    }
-                    if (!empty($requested_center) && array_key_exists($lookup, $requested_center)) {
-                        $facet_total += $requested_center[$lookup];
-                    }
-                }
-                $completed[] = $facet_total;
-                $phases[] = $display_values[$index];
-            } else {
-                // error retrieving metrics data from cache & API, so record error for this date
-                // acts as fallback in case only some data is missing in query range
-                $completed[] = 0;
-            }
-        }
-        // now that we have counts (in order), go back through to determine what the elibible numbers are
-        // this is based off of external logic, so cannot be done while assembling counts
-
-        $completed_consent = $completed[1];
-
-        foreach ($metrics_keys as $index => $val) {
-            if ($val == 'Participant') {
-                $eligible[] = 0;
-            } elseif ($val == 'Participant.consentForStudyEnrollment') {
-                $eligible[] = $completed[0] - $completed[$index];
-            } else {
-                $eligible[] = $completed_consent - $completed[$index] < 0 ? 0 : $completed_consent - $completed[$index];
-            }
+            array_push($not_completed, $metrics[0]['metrics']['not_completed'][$display_key]);
+            array_push($not_completed_text, sprintf(
+                '%s: %d',
+                $display_val,
+                $metrics[0]['metrics']['not_completed'][$display_key]
+            ));
         }
 
-        // assemble hover text for completed & eligible traces
-        foreach ($completed as $index => $count) {
-            $total = $count + $eligible[$index];
-            $completed_text[] = $this->calculatePercentText($count, $total);
-            $eligible_text[] = $this->calculatePercentText($eligible[$index], $total);
-        }
-
-
-        // assemble data
         $pipeline_data = [
             [
-                "x" => $phases,
+                "x" => array_values($display_values),
                 "y" => $completed,
                 "text" => $completed_text,
                 "type" => 'bar',
@@ -640,9 +596,9 @@ class DashboardController extends AbstractController
                 ]
             ],
             [
-                "x" => $phases,
-                "y" => $eligible,
-                "text" => $eligible_text,
+                "x" => array_values($display_values),
+                "y" => $not_completed,
+                "text" => $not_completed_text,
                 "type" => 'bar',
                 "hoverinfo" => 'text+name',
                 "name" => 'Eligible, not completed',
@@ -658,41 +614,7 @@ class DashboardController extends AbstractController
     /* Private Methods */
 
     /**
-     * Get Metrics Object
-     *
-     * Main method for retrieving metrics from API; Stores result in memcache with 1 hour expiration;
-     * Each entry is comprised of a single day of all available data & facets
-     *
-     * @deprecated 2018-10-01 Use ::getMetrics2Object instead.
-     *
-     * @param Application $app
-     * @param string      $date
-     *
-     * @return object
-     */
-    private function getMetricsObject(Application $app, $date)
-    {
-        $memcache = new \Memcache();
-        $memcacheKey = 'metrics_api_' . $date;
-        $metrics = $memcache->get($memcacheKey);
-        if (!$metrics) {
-            try {
-                $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-                $metrics = $metricsApi->metrics($date, $date);
-                // first check if there are metrics available for the given date
-                if (!$metrics) {
-                    return false;
-                }
-                $memcache->set($memcacheKey, $metrics, 0, 3600);
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
-                return false;
-            }
-        }
-        return $metrics;
-    }
-
-    /**
-     * Metrics to Object
+     * Get Metrics 2 Object
      *
      * Main method for retrieving near-real-time metrics from API;
      * Stores result in memcache with 15-minute expiration
@@ -960,6 +882,10 @@ class DashboardController extends AbstractController
      */
     private function combineHPOsByDate($day_count = [], $centers = [])
     {
+        if (empty($day_count)) {
+            return [];
+        }
+
         if (!is_array($centers)) {
             $centers = explode(',', $centers);
         }
@@ -980,10 +906,21 @@ class DashboardController extends AbstractController
             }
             // Loop through the metrics and sum them by date
             foreach ($row['metrics'] as $k => $v) {
-                if (!isset($output[$row['date']]['metrics'][$k])) {
-                    $output[$row['date']]['metrics'][$k] = $v;
+                // Nested array of values, e.g. LIFECYCLE
+                if (is_array($v)) {
+                    foreach ($v as $k2 => $v2) {
+                        if (!isset($output[$row['date']]['metrics'][$k][$k2])) {
+                            $output[$row['date']]['metrics'][$k][$k2] = $v2;
+                        } else {
+                            $output[$row['date']]['metrics'][$k][$k2] += $v2;
+                        }
+                    }
                 } else {
-                    $output[$row['date']]['metrics'][$k] += $v;
+                    if (!isset($output[$row['date']]['metrics'][$k])) {
+                        $output[$row['date']]['metrics'][$k] = $v;
+                    } else {
+                        $output[$row['date']]['metrics'][$k] += $v;
+                    }
                 }
             }
         }
