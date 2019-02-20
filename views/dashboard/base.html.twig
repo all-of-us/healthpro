@@ -37,14 +37,24 @@
     </nav>
 
     <div class="container">
-        <div id="flash-notices">
-            {% for flashMessage in app.session.flashbag.get('error') %}
-                <div class="alert alert-danger">{{ flashMessage }}</div>
-            {% endfor %}
-            {% for flashMessage in app.session.flashbag.get('notice') %}
-                <div class="alert alert-info">{{ flashMessage }}</div>
-            {% endfor %}
-        </div>
+      {% if global_notices is defined and global_notices|length > 0 %}
+          {% for notice in global_notices %}
+              <div class="alert alert-warning">
+                  {{ notice.message|raw }}
+              </div>
+          {% endfor %}
+      {% endif %}
+      <div id="flash-notices">
+          {% for flashMessage in app.session.flashbag.get('error') %}
+              <div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
+          {% endfor %}
+          {% for flashMessage in app.session.flashbag.get('notice') %}
+              <div class="alert alert-info"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
+          {% endfor %}
+          {% for flashMessage in app.session.flashbag.get('success') %}
+              <div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
+          {% endfor %}
+      </div>
 
         {% block body %}{% endblock %}
     </div>
