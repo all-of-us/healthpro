@@ -83,6 +83,10 @@ class DashboardController extends AbstractController
         $enrollment_statuses = $request->get('enrollment_statuses');
         $history = $request->get('history', false);
 
+        if ($centers == 'ALL') {
+            $centers = [];
+        }
+
         // set up & sanitize variables
         $start_date = $this->sanitizeDate($start_date);
         $end_date = $this->sanitizeDate($end_date);
@@ -101,7 +105,9 @@ class DashboardController extends AbstractController
         );
 
         if (!$day_counts) {
-            return $app->abort(500, 'No data returned.');
+            return $app->json([
+                'error' => 'No data matched your criteria.'
+            ], 400);
         }
 
         // Roll up the extra HPO dimension by date
@@ -264,10 +270,18 @@ class DashboardController extends AbstractController
         }
 
         // get request attributes
-        $map_mode = $request->get('map_mode');
-        $end_date = $this->sanitizeDate($request->get('end_date'));
+        $interval = $request->get('interval');
+        $stratification = $request->get('stratification');
+        $end_date = $request->get('end_date');
+        $centers = $request->get('centers');
+        $enrollment_statuses = $request->get('enrollment_statuses');
+        $history = $request->get('history', true); // Data available only through history flag
         $color_profile = $request->get('color_profile');
-        $centers = explode(',', $request->get('centers'));
+
+        // Use 'ALL' keyword to send empty filter for awardee
+        if ($centers == ['ALL']) {
+            $centers = [];
+        }
 
         // load custom green color profile for default
         if ($color_profile == 'Custom') {
@@ -279,8 +293,24 @@ class DashboardController extends AbstractController
         };
 
         // retrieve metrics from cache, or request new if expired
-        $metrics = $this->getMetricsObject($app, $end_date);
-        $map_data = [];
+        $metrics = $this->getMetrics2Object(
+            $app,
+            $interval,
+            date('Y-m-d', strtotime($end_date . '-1 day')), // Previous day for start_date
+            $end_date,
+            $stratification,
+            $centers,
+            $enrollment_statuses,
+            [
+                'history' => $history
+            ]
+        );
+
+        if (!$metrics) {
+            return $app->json([
+                'error' => 'No data matched your criteria.'
+            ], 400);
+        }
 
         // keep track of highest value so that we can normalize the color output accordingly
         // max_val will top out at 100
@@ -288,7 +318,14 @@ class DashboardController extends AbstractController
 
         // make sure metrics data exists first, if metrics cache or API fail return value will be false
         if (!empty($metrics)) {
-            if ($map_mode == 'FullParticipant.state') {
+            if ($stratification == 'FULL_STATE') {
+                // Roll up the extra HPO dimension by date
+                $metrics = $this->combineHPOsByDate($metrics, $centers);
+
+                // Grab relevant data
+                $state_metrics = $metrics[0]['metrics'];
+                ksort($state_metrics);
+
                 $state_registrations = [];
                 $total_counts = [];
                 $hover_text = [];
@@ -301,45 +338,21 @@ class DashboardController extends AbstractController
                     $all_states = [];
                 }
 
+                // Find maximum value of array
+                foreach ($state_metrics as $row) {
+                    if ($row > $max_val) {
+                        $max_val = $row;
+                    }
+                }
+
                 // now iterate through states
                 foreach ($all_states as $state) {
+                    array_push($total_counts, $state_metrics[$state['state']]);
+                    array_push($state_registrations, $state_metrics[$state['state']]);
                     array_push($state_names, $state['state']);
-
-                    $state_lookup = $map_mode . ".PIIState_" . $state['state'];
-                    $count = 0;
-
-                    // iterate through each center to accumulate a running total to store
-                    foreach ($centers as $center) {
-                        $requested_center = [];
-                        if ($center == 'ALL') {
-                            $requested_center = $metrics[0]['entries'];
-                        } else {
-                            foreach ($metrics as $metric) {
-                                if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $center) {
-                                    $requested_center = $metric['entries'];
-                                }
-                            }
-                        }
-                        if (!empty($requested_center) && array_key_exists($state_lookup, $requested_center)) {
-                            $count += $requested_center[$state_lookup];
-                        }
-                    }
-
-                    $pct_of_target = round($count / $state['recruitment_target'] * 100, 2);
-
-                    // check if max_val needs to be set
-                    if ($pct_of_target > $max_val) {
-                        $max_val = $pct_of_target;
-                    }
-
-                    // keep track of raw number for table data
-                    array_push($total_counts, $count);
-
-                    array_push($state_registrations, $pct_of_target);
                     array_push(
                         $hover_text,
-                        "<b>" . $pct_of_target . "</b>% (" . $count . ")<br><b>" . $state['state'] . "</b> (Target: "
-                            . number_format($state['recruitment_target']) . ")"
+                        "<b>" . $state_metrics[$state['state']] . "</b><br />" . $state['state']
                     );
                 }
 
@@ -353,103 +366,82 @@ class DashboardController extends AbstractController
                     "colorscale" => $color_profile,
                     "zmin" => 0,
                     // set floor on max accordingly
-                    "zmax" => $max_val > 100 ? 100 : $max_val,
+                    "zmax" => $max_val,
                     "hoverinfo" => 'text',
                     "colorbar" => [
-                        "title" => 'Percentage of target recruitment',
+                        "title" => 'Participants',
                         "titleside" => 'right'
                     ]
                 ];
-            } elseif ($map_mode == 'FullParticipant.censusRegion') {
-                $states_by_region = [];
-                $registrations_by_state = [];
-                $region_text = [];
+            } elseif ($stratification == 'FULL_CENSUS') {
+                // Roll up the extra HPO dimension by date
+                $metrics = $this->combineHPOsByDate($metrics, $centers);
+
+                // Grab relevant data
+                $census_metrics = $metrics[0]['metrics'];
+                ksort($census_metrics);
+
+                $state_registrations = [];
                 $total_counts = [];
-                $census_region_names = [];
+                $hover_text = [];
+                $state_names = [];
+
+                // Pull list of states and census region from database
                 try {
-                    $census_regions = $app['db']->fetchAll("SELECT * FROM census_regions");
+                    $all_states = $app['db']->fetchAll(
+                        "SELECT scr.state, scr.census_region_id, cr.label
+                            FROM state_census_regions scr
+                            LEFT JOIN census_regions cr ON scr.census_region_id = cr.id"
+                    );
                 } catch (\Exception $e) {
-                    $census_regions = [];
+                    return $app->abort(500, 'Unable to load states.');
                 }
 
-                foreach ($census_regions as $region) {
-                    try {
-                        $states = $app['db']->fetchAll(
-                            'SELECT * FROM state_census_regions WHERE census_region_id = ? ORDER BY state',
-                            [$region['id']]
-                        );
-                    } catch (\Exception $e) {
-                        $states = [];
+                // Find maximum value of array
+                foreach ($census_metrics as $row) {
+                    if ($row > $max_val) {
+                        $max_val = $row;
                     }
-                    // grab name for table data
-                    array_push($census_region_names, $region['label']);
-                    $region_states = [];
-                    foreach ($states as $state) {
-                        array_push($region_states, $state["state"]);
-                    }
+                }
 
-                    // build lookup key for census region count (combination of map mode and census region (upcased))
-                    $census_lookup = $map_mode . "." . strtoupper($region['label']);
-                    $count = 0;
+                // now iterate through states
+                foreach ($all_states as $state) {
+                    array_push($total_counts, $census_metrics[strtoupper($state['label'])]);
+                    array_push($state_registrations, $census_metrics[strtoupper($state['label'])]);
+                    array_push($state_names, $state['state']);
+                    array_push(
+                        $hover_text,
+                        "<b>" . $census_metrics[strtoupper($state['label'])] . "</b><br />" . $state['label']
+                    );
+                }
 
-                    // iterate through each center to accumulate a running total to store
-                    foreach ($centers as $center) {
-                        $requested_center = [];
-                        if ($center == 'ALL') {
-                            $requested_center = $metrics[0]['entries'];
-                        } else {
-                            foreach ($metrics as $metric) {
-                                if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $center) {
-                                    $requested_center = $metric['entries'];
-                                }
-                            }
-                        }
-                        if (!empty($requested_center) && array_key_exists($census_lookup, $requested_center)) {
-                            $count += $requested_center[$census_lookup];
-                        }
-                    }
-                    $pct_of_target = round($count / $region['recruitment_target'] * 100, 2);
-
-                    // grab count for table data
-                    array_push($total_counts, $count);
-
-                    // check if max_val needs to be set
-                    if ($pct_of_target > $max_val) {
-                        $max_val = $pct_of_target;
-                    }
-
-                    foreach ($region_states as $state) {
-                        array_push($states_by_region, $state);
-                        array_push($registrations_by_state, $pct_of_target);
-                        array_push(
-                            $region_text,
-                            "<b>" . $pct_of_target . "%</b> (" . $count . ")<br><b>" . $region["label"]
-                                . "</b> (Target: " . number_format($region['recruitment_target']) . ")"
-                        );
-                    }
+                // Title case region labels
+                $regions = [];
+                foreach (array_keys($metrics[0]['metrics']) as $row) {
+                    array_push($regions, ucwords(strtolower($row)));
                 }
 
                 $map_data[] = [
                     'type' => 'choropleth',
                     'locationmode' => 'USA-states',
-                    'locations' => $states_by_region,
-                    'z' => $registrations_by_state,
-                    'text' => $region_text,
+                    'locations' => $state_names,
+                    'regions' => $regions,
+                    'region_counts' => array_values($metrics[0]['metrics']),
+                    'z' => $state_registrations,
                     'counts' => $total_counts,
-                    'regions' => $census_region_names,
+                    'text' => $hover_text,
                     "colorscale" => $color_profile,
                     "zmin" => 0,
                     // set floor on max accordingly
-                    "zmax" => $max_val > 100 ? 100 : $max_val,
-                    "hoverinfo" => "text",
+                    "zmax" => $max_val,
+                    "hoverinfo" => 'text',
                     "colorbar" => [
-                        "title" => 'Percentage of target recruitment',
+                        "title" => 'Participants',
                         "titleside" => 'right'
                     ]
                 ];
-            } elseif ($map_mode == 'FullParticipant.hpoId') {
-                $i = 0;
-
+            } elseif ($stratification == 'FULL_AWARDEE') {
+                $map_data = [];
                 $categorized_centers = $this->getCentersList($app);
                 $recruitment_centers = [];
                 foreach ($categorized_centers as $categories) {
@@ -458,32 +450,31 @@ class DashboardController extends AbstractController
                     }
                 }
 
-                $metrics = $this->getMetricsObject($app, $end_date);
+                // Find the max_val before running through creating the map
+                foreach ($metrics as $metric) {
+                    if ($max_val < $metric['count']) {
+                        $max_val = $metric['count'];
+                    }
+                }
+
+                // Guard against filtering to a zero-count HPO
+                if ($max_val === 0) {
+                    $max_val = 0.001;
+                }
+
+                $i = 0;
                 foreach ($recruitment_centers as $location) {
                     // check if center is requested first before adding to map_data
-                    if ($centers == ['ALL'] || in_array($location['code'], $centers)) {
-                        $hpo_lookup = $map_mode . "." . $location['code'];
+                    if (empty($centers) || in_array($location['code'], $centers)) {
                         $count = 0;
                         // find appropriate entry
                         foreach ($metrics as $metric) {
-                            if (!empty($metric['facets']['hpoId']) && $metric['facets']['hpoId'] == $location['code']) {
-                                $requested_center = $metric['entries'];
+                            if (!empty($metric['hpo']) && $metric['hpo'] == $location['code']) {
+                                $count = $metric['count'];
                             }
                         }
 
-                        if (!empty($requested_center) && array_key_exists($hpo_lookup, $requested_center)) {
-                            $count += $requested_center[$hpo_lookup];
-                        }
-
-                        $pct_of_target = round($count / $location['recruitment_target'] * 100, 2);
-
-                        // check if max_val needs to be set
-                        if ($pct_of_target > $max_val) {
-                            $max_val = $pct_of_target;
-                        }
-
-                        $label = "{$location["label"]} ({$location['category']}): <br><b>" . $pct_of_target .
-                            "%</b> (" . $count . ", Target: " . $location['recruitment_target'] . ")";
+                        $label = "{$location["label"]} ({$location['category']})<br />" . $count;
 
                         $map_data[] = [
                             'type' => 'scattergeo',
@@ -495,25 +486,16 @@ class DashboardController extends AbstractController
                             'hoverinfo' => 'text',
                             'text' => [$label],
                             'marker' => [
-                                'size' => [$pct_of_target],
+                                'size' => ($count/$max_val) * 25,
                                 'color' => $this->getColorBrewerVal($i),
                                 'line' => [
                                     'color' => 'black',
-                                    'width' => 1
+                                    'width' => 0.5
                                 ]
                             ]
                         ];
                         $i++;
                     }
-                }
-
-                // normalize data based on maximum value, check for div / 0 error
-                $map_coefficient = 100.0 / ($max_val == 0 ? 1 : $max_val);
-
-                // reiterate through entries to recalculate bubble size based on new coefficient
-                foreach ($map_data as $index => $map_datum) {
-                    $new_pct = $map_datum['marker']['size'][0] * $map_coefficient;
-                    $map_data[$index]['marker']['size'] = [$new_pct];
                 }
             }
         }
@@ -884,25 +866,6 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * Check Dates
-     *
-     * Helper function to check date range cutoffs
-     *
-     * @param string $date
-     * @param string $start
-     * @param string $end
-     * @param array  $controls
-     *
-     * @return boolean
-     */
-    private function checkDates($date, $start, $end, $controls)
-    {
-        return strtotime($date) >= strtotime($start)
-            && strtotime($date) <= strtotime($end)
-            && in_array($date, $controls);
-    }
-
-    /**
      * Get Dashboard Dates
      *
      * Helper function to return array of dates segmented by interval
@@ -992,12 +955,22 @@ class DashboardController extends AbstractController
      * method rolls them up by date.
      *
      * @param array $day_count Source data from API response
+     * @param array $centers Centers to include, default to all
      * @return array
      */
-    private function combineHPOsByDate($day_count = [])
+    private function combineHPOsByDate($day_count = [], $centers = [])
     {
+        if (!is_array($centers)) {
+            $centers = explode(',', $centers);
+        }
+
         $output = [];
         foreach ($day_count as $row) {
+            // Skip over center if not in list provided
+            if (!empty($centers) && !in_array($row['hpo'], $centers)) {
+                continue;
+            }
+
             // Create the bucket to store the metric if it doesn't exist
             if (!isset($output[$row['date']])) {
                 $output[$row['date']] = [
