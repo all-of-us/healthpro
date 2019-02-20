@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+{% block title %}Edit Notice - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2><i class="fa fa-info-circle" aria-hidden="true"></i> {{ notice ? 'Edit' : 'Create' }} Page Notice</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+            {{ form_start(form, { attr: { class: 'warn-unsaved prevent-resubmit' } }) }}
+            {{ form_errors(form) }}
+            {{ form_rest(form) }}
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a class="btn btn-default" href="{{ path('admin_notices') }}">Cancel</a>
+            {% if notice %}
+                <button type="submit" name="delete" class="btn btn-danger pull-right confirm">Delete</button>
+            {% endif %}
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    $('#form_start_ts, #form_end_ts').pmiDateTimePicker();
+    $('.confirm').on('click', function() {
+        return confirm('Are you sure you want to delete this notice?');
+    });
+});
+</script>
+{% endblock %}
