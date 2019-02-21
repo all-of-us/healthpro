@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Pmi\Entities\Configuration;
 use Pmi\Security\UserProvider;
 use Pmi\Audit\Log;
+use Pmi\Service\NoticeService;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
 class HpoApplication extends AbstractApplication
@@ -435,6 +436,17 @@ class HpoApplication extends AbstractApplication
                 }
             }
         }
+
+        $noticeService = new NoticeService($this['em']);
+        $notices = $noticeService->getCurrentNotices($request->getPathInfo());
+        foreach ($notices as $notice) {
+            if ($notice['full_page']) {
+                return new Response($this['twig']->render('full-page-notice.html.twig', [
+                    'message' => $notice['message']
+                ]));
+            }
+        }
+        $app['twig']->addGlobal('global_notices', $notices);
     }
 
     protected function afterCallback(Request $request, Response $response)
