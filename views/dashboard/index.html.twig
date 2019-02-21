@@ -26,7 +26,7 @@
         <div id="total-progress" class="tab-pane pad active fade in">
             <div class="row">
                 <div id="total-progress-filters" class="col-md-3">
-                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'total-progress'} %}
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'total-progress', show_enrollment_status: false} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -222,7 +222,7 @@
                           try {
                             setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
                           } catch (e) {
-                            setMetricsError(spinnerLoc, 'An error occurred while loading data the data');
+                            setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
                           }
                         });
                     }
@@ -278,7 +278,7 @@
         <div id="real-time" class="tab-pane pad fade">
             <div class="row">
                 <div id="real-time-filters" class="col-md-3">
-                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'real-time'} %}
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'real-time', show_enrollment_status: true} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -437,7 +437,7 @@
                       try {
                         setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
                       } catch (e) {
-                        setMetricsError(spinnerLoc, 'An error occurred while loading data the data');
+                        setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
                       }
                     });
                 }
@@ -491,7 +491,7 @@
         <div id="participants-by-region" class="tab-pane pad fade">
             <div class="row">
                 <div id="participants-by-region-filters" class="col-md-3">
-                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-region'} %}
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-region', show_enrollment_status: true} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -620,7 +620,7 @@
                           try {
                             setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
                           } catch (e) {
-                            setMetricsError(spinnerLoc, 'An error occurred while loading data the data');
+                            setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
                           }
                         });
                     }
@@ -666,7 +666,7 @@
         <div id="participants-by-lifecycle" class="tab-pane pad fade">
             <div class="row">
                 <div class="col-md-3">
-                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-lifecycle'} %}
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-lifecycle', show_enrollment_status: false} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
