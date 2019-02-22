@@ -39,6 +39,9 @@ class Log
     const PROBLEM_NOTIFIY = 'PROBLEM_NOTIFIY';
     const QUEUE_RESEND_EVALUATION = 'QUEUE_RESEND_EVALUATION';
     const MISSING_MEASUREMENTS_ORDERS_NOTIFY = 'MISSING_MEASUREMENTS_ORDERS_NOTIFY';
+    const NOTICE_EDIT = 'NOTICE_EDIT';
+    const NOTICE_ADD = 'NOTICE_ADD';
+    const NOTICE_DELETE = 'NOTICE_DELETE';
 
     public function __construct($app, $action, $data)
     {

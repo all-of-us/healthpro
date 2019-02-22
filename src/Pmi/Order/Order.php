@@ -673,7 +673,7 @@ class Order
     public function editRdrOrder()
     {
         $order = $this->getEditRdrObject();
-        $status = $this->app['pmi.drc.participants']->editOrder($this->participant->id, $this->order['mayo_id'], $order);
+        $status = $this->app['pmi.drc.participants']->editOrder($this->participant->id, $this->order['rdr_id'], $order);
         if ($status) {
             return $this->createOrderHistory(self::ORDER_EDIT);
         }
@@ -1364,11 +1364,11 @@ class Order
             }
         }
         $updateArray = [
-            'collected_samples' => !empty($collectedSamples) ? json_encode($collectedSamples) : [],
+            'collected_samples' => json_encode(!empty($collectedSamples) ? $collectedSamples : []),
             'collected_ts' => !empty($collectedTs) ? $collectedTs : null,
-            'processed_samples' => !empty($processedSamples) ? json_encode($processedSamples) : [],
-            'processed_samples_ts' => !empty($processedSamplesTs) ? json_encode($processedSamplesTs) : [],
-            'finalized_samples' => !empty($finalizedSamples) ? json_encode($finalizedSamples) : [],
+            'processed_samples' => json_encode(!empty($processedSamples) ? $processedSamples : []),
+            'processed_samples_ts' => json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []),
+            'finalized_samples' => json_encode(!empty($finalizedSamples) ? $finalizedSamples : []),
             'finalized_ts' => !empty($finalizedTs) ? $finalizedTs : null,
             'collected_notes' => $collectedNotes,
             'processed_notes' => $processedNotes,

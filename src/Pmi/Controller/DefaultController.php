@@ -15,6 +15,7 @@ use Pmi\Audit\Log;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 use Pmi\WorkQueue\WorkQueue;
 use Pmi\Order\Order;
+use Pmi\Security\User;
 
 class DefaultController extends AbstractController
 {
@@ -140,7 +141,7 @@ class DefaultController extends AbstractController
     {
         if ($request->request->has('site')) {
             $siteId = $request->request->get('site');
-            if (!$app->isValidSite($siteId)) {
+            if (strpos($siteId, User::AWARDEE_PREFIX) !== 0 && !$app->isValidSite($siteId)) {
                 $app->addFlashError("Sorry, there is a problem with your site's configuration. Please contact your site administrator.");
                 return $app['twig']->render('site-select.html.twig', ['siteEmail' => $siteId]);
             }
