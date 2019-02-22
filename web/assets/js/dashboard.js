@@ -197,7 +197,7 @@ function loadRegionTableData(tableTarget, sourceData, plotType, rowLabel) {
     headerRow.append($('<th>').text('Count'));
     var tableBody = $('#' + tableId + '-body');
 
-    if (plotType === 'FullParticipant.state') {
+    if (plotType === 'FULL_STATE') {
         // since there are flat arrays of data, grab the location array and use index to keep position
         $(sourceData[0]['locations']).each(function (i, state) {
             newRow = $('<tr>');
@@ -205,15 +205,15 @@ function loadRegionTableData(tableTarget, sourceData, plotType, rowLabel) {
             newRow.append($('<td>').text(sourceData[0]['counts'][i]));
             tableBody.append(newRow);
         });
-    } else if (plotType === 'FullParticipant.censusRegion') {
+    } else if (plotType === 'FULL_CENSUS') {
         // since there are flat arrays of data, grab the location array and use index to keep position
-        $(sourceData[0]['regions']).each(function (i, state) {
+        $(sourceData[0]['regions']).each(function (i, region) {
             newRow = $('<tr>');
-            newRow.append($('<td>').text(state));
-            newRow.append($('<td>').text(sourceData[0]['counts'][i]));
+            newRow.append($('<td>').text(region));
+            newRow.append($('<td>').text(sourceData[0]['region_counts'][i]));
             tableBody.append(newRow);
         });
-    } else if (plotType === 'FullParticipant.hpoId') {
+    } else if (plotType === 'FULL_AWARDEE') {
         // load scores
         $(sourceData).each(function(index, row) {
             newRow = $('<tr>');

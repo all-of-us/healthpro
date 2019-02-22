@@ -18,6 +18,7 @@ var ASSETS = {
         NODE_DIR + '/datatables.net-buttons-bs/js/buttons.bootstrap.js',
         NODE_DIR + '/jsbarcode/dist/barcodes/JsBarcode.code128.min.js',
         NODE_DIR + '/inputmask/dist/jquery.inputmask.bundle.js',
+        NODE_DIR + '/bootstrap-toggle/js/bootstrap-toggle.js',
         ASSETS_DIR + '/js/parsley-comparison.js',
         ASSETS_DIR + '/js/bootstrap-session-timeout.js',
         ASSETS_DIR + '/js/app.js',
@@ -30,7 +31,8 @@ var ASSETS = {
         NODE_DIR + '/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
         NODE_DIR + '/datatables.net-bs/css/dataTables.bootstrap.css',
         NODE_DIR + '/datatables.net-responsive-bs/css/responsive.bootstrap.css',
-        NODE_DIR + '/datatables.net-buttons-bs/css/buttons.bootstrap.css'
+        NODE_DIR + '/datatables.net-buttons-bs/css/buttons.bootstrap.css',
+        NODE_DIR + '/bootstrap-toggle/css/bootstrap-toggle.css'
     ],
     'csslocal': [
         ASSETS_DIR + '/css/app.css'

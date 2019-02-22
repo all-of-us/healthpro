@@ -673,7 +673,7 @@ class Order
     public function editRdrOrder()
     {
         $order = $this->getEditRdrObject();
-        $status = $this->app['pmi.drc.participants']->editOrder($this->participant->id, $this->order['mayo_id'], $order);
+        $status = $this->app['pmi.drc.participants']->editOrder($this->participant->id, $this->order['rdr_id'], $order);
         if ($status) {
             return $this->createOrderHistory(self::ORDER_EDIT);
         }

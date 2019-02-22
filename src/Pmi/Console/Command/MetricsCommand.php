@@ -22,7 +22,11 @@ class MetricsCommand extends Command
      *
      * @var array
      */
-    private static $STRATIFICATIONS = ['TOTAL', 'ENROLLMENT_STATUS', 'GENDER_IDENTITY', 'AGE_RANGE', 'RACE', 'EHR_CONSENT', 'EHR_RATIO'];
+    private static $STRATIFICATIONS = [
+        'TOTAL', 'ENROLLMENT_STATUS', 'GENDER_IDENTITY', 'AGE_RANGE', 'RACE',
+        'EHR_CONSENT', 'EHR_RATIO', 'FULL_STATE', 'FULL_CENSUS', 'FULL_AWARDEE',
+        'LIFECYCLE'
+    ];
     private static $STATUSES = ['INTERESTED', 'MEMBER', 'FULL_PARTICIPANT'];
 
     /**

@@ -1,7 +1,6 @@
 {% extends 'dashboard/base.html.twig' %}
 {% block title %}Dashboard{% endblock %}
 {% block body %}
-    {{ display_message('dashboard_notice', 'alert', { closeButton: true })|raw }}
     <h2 id="dashboard-heading"><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard <i class="fa fa-question-circle text-info pull-right" style="cursor: pointer;" id="dashboard-help"></i> </h2>
     <div class="modal fade" id="loading-modal" tabindex="-1" role="dialog" aria-labelledby="loading-modal" aria-hidden="true">
         <div class="modal-dialog">
@@ -20,7 +19,7 @@
     <ul class="nav nav-tabs top-pad" role="tablist">
         <li role="presentation" class="active"><a href="#total-progress" role="tab" data-toggle="tab" id="total-progress-nav"><span class="fa fa-users"></span> Total Progress to Date</a></li>
         <li role="presentation"><a href="#real-time" role="tab" data-toggle="tab" id="real-time-nav"><span class="fa fa-clock-o"></span> Real-Time Data</a></li>
-        <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab" id="participants-by-region-nav"><span class="fa fa-globe"></span> Full Participants by Region</a></li>
+        <li role="presentation"><a href="#participants-by-region" role="tab" data-toggle="tab" id="participants-by-region-nav"><span class="fa fa-globe"></span> Participants by Region</a></li>
         <li role="presentation"><a href="#participants-by-lifecycle" role="tab" data-toggle="tab" id="participants-by-lifecycle-nav"><span class="fa fa-sitemap"></span> Participants by Lifecycle Phase</a></li>
     </ul>
     <div id="plotly-tabs" class="tab-content">
@@ -504,9 +503,9 @@
                                 <div class="col-md-12 col-xs-4 form-group form-group-sm">
                                     <label for="map-mode">Display Metric</label>
                                     <select class="form-control region-plot-control" id="map-mode">
-                                        <option value="FullParticipant.state" selected>State</option>
-                                        <option value="FullParticipant.censusRegion">Census Region</option>
-                                        <option value="FullParticipant.hpoId">Recruitment Origin</option>
+                                        <option value="FULL_STATE" selected>State</option>
+                                        <option value="FULL_CENSUS">Census Region</option>
+                                        <option value="FULL_AWARDEE">Recruitment Origin</option>
                                     </select>
                                 </div>
                                 <div class="col-md-12 col-xs-4 form-group form-group-sm">
@@ -569,20 +568,28 @@
                             regionCenters = ['ALL'];
                         }
 
-                        if (mapMode == 'FullParticipant.hpoId') {
+                        if (mapMode == 'FULL_AWARDEE') {
                             $('#map-color-profile').prop('disabled', true);
                         } else {
                             $('#map-color-profile').prop('disabled', false);
                         }
 
                         // load data from metrics API
-                        $.getJSON('/dashboard/metrics_load_region?csrf_token={{ csrf_token('dashboard') }}&map_mode=' + mapMode + '&end_date=' + mapCutoff + '&centers=' + regionCenters + '&color_profile=' + mapColor, function (data) {
+                        $.getJSON('/dashboard/metrics_load_region', {
+                          csrf_token: "{{ csrf_token('dashboard') }}",
+                          stratification: mapMode,
+                          end_date: mapCutoff,
+                          centers: regionCenters,
+                          history: true,
+                          color_profile: mapColor 
+                        })
+                        .done(function(data) {
                             if (data.length != 0) {
                                 if (mapModeText != 'Recruitment Origin') {
                                     mapModeText += ' of residence'
                                 }
                                 var mapLayout = {
-                                    title: "Percentage of target <b>full participants</b> by <b>" + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
+                                    title: "<b>Core Participants</b> by <b>" + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
                                     font: PLOTLY_LABEL_FONT,
                                     width: mapWidth,
                                     height: mapWidth / 1.66,
@@ -608,6 +615,13 @@
                             } else {
                                 setMetricsError(spinnerLoc);
                             }
+                        })
+                        .fail(function(jqXHR) {
+                          try {
+                            setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
+                          } catch (e) {
+                            setMetricsError(spinnerLoc, 'An error occurred while loading data the data');
+                          }
                         });
                     }
                 }
@@ -710,7 +724,15 @@
                             lifecycleCenters = ['ALL'];
                         }
 
-                        $.getJSON('/dashboard/metrics_load_lifecycle?csrf_token={{ csrf_token('dashboard') }}&end_date=' + lcEndDate + '&centers=' + lifecycleCenters, function (data) {
+                        // load data from metrics API
+                        $.getJSON('/dashboard/metrics_load_lifecycle', {
+                          csrf_token: "{{ csrf_token('dashboard') }}",
+                          stratification: 'LIFECYCLE',
+                          end_date: lcEndDate,
+                          centers: lifecycleCenters,
+                          history: true
+                        })
+                        .done(function(data) {
                             if (data.length != 0) {
                                 var lcAnnot = [];
                                 var lcTitle = 'Participant registrations by <b>lifecycle phase</b> as of ' + lcEndDate;
