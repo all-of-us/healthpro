@@ -11,6 +11,18 @@
     </div>
 
     <div class="row">
+        <div class="col-sm-12">
+            <div class="text-right">
+                {% if type == 'gcs' %}
+                    <a href="{{ path('help_videos', { type: 'yt' }) }}"> Back to original</a>
+                {% else %}
+                    Problem loading videos? <a href="{{ path('help_videos', { type: 'gcs' }) }}"> Click Here</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-sm-8 col-sm-push-4">
             <div class="panel panel-default" id="video-panel">
                 <div class="panel-heading">
@@ -18,7 +30,13 @@
                 </div>
                 <div class="panel-body">
                     <div class="embed-responsive embed-responsive-16by9">
-                        <iframe id="video-embed" class="embed-responsive-item" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        {% if type == 'gcs' %}
+                            <video id="video-bucket" controls>
+                                <source src="" type="video/mp4">
+                            </video>
+                        {% else %}
+                            <iframe id="video-embed" class="embed-responsive-item" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -29,7 +47,7 @@
                 <div class="list-group">
                     {% for video in group.videos %}
                         {% if video.youtube_id %}
-                            <a href="#" class="list-group-item load-video" data-embed-src="https://www.youtube.com/embed/{{ video.youtube_id }}">{{ video.title }}</a>
+                            <a href="#" class="list-group-item load-video" data-embed-src="https://www.youtube.com/embed/{{ video.youtube_id }}" data-gcs-src="https://storage.googleapis.com/healthpro-staging.appspot.com/training-videos/{{ video.bucket_filename }}">{{ video.title }}</a>
                         {% else %}
                             <div class="list-group-item disabled">{{ video.title }} <em><small>(Coming Soon!)</small></em></div>
                         {% endif %}
@@ -44,13 +62,19 @@
 {% block pagejs %}
 <script>
 $(document).ready(function() {
-    var loadVideo = function(src) {
+    var type = {{ type|json_encode|raw }};
+    var loadVideo = function (src) {
         $('#video-title').html(src.html());
-        $('iframe#video-embed').attr('src', src.data('embed-src') + '?modestbranding=1&rel=0');
+        if (type === 'gcs') {
+            $('#video-bucket source').attr('src', src.data('gcs-src'));
+            $("#video-bucket")[0].load();
+        } else {
+            $('iframe#video-embed').attr('src', src.data('embed-src') + '?modestbranding=1&rel=0');
+        }
         $('a.load-video').removeClass('active');
         src.addClass('active');
     };
-    $('a.load-video').on('click', function() {
+    $('a.load-video').on('click', function () {
         loadVideo($(this));
         $('html').scrollTop($('#video-panel').offset().top);
         return false;
