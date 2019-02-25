@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Pmi\HttpClient;
 use Silex\Application;
 
@@ -138,31 +139,38 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'Chapter 1 - Part 1: HPO Creating a Biobank Order (Complete Biobank Orders)',
-                    'youtube_id' => '_IxvPPBwnUg'
+                    'youtube_id' => '_IxvPPBwnUg',
+                    'bucket_filename' => 'Chapter 1-Part 1 (Version 2) (updated 1-22-2019).mp4'
                 ],
                 [
                     'title' => 'Chapter 1 - Part 2: HPO Creating a Biobank Order (1st Visit Partial Orders)',
-                    'youtube_id' => 'Do-xigAu_ng'
+                    'youtube_id' => 'Do-xigAu_ng',
+                    'bucket_filename' => 'Chapter 1-Part 2 (Version 2).mp4'
                 ],
                 [
                     'title' => 'Chapter 1 - Part 3: HPO Creating a Biobank Order (2nd Visit Customized Orders)',
-                    'youtube_id' => 'eh1wiPoHIHg'
+                    'youtube_id' => 'eh1wiPoHIHg',
+                    'bucket_filename' => 'Chapter 1-Part 3 (Version 2).mp4'
                 ],
                 [
                     'title' => 'Chapter 3: HPO Blood Collection',
-                    'youtube_id' => null
+                    'youtube_id' => null,
+                    'bucket_filename' => null
                 ],
                 [
                     'title' => 'Chapter 5: HPO Urine Collection',
-                    'youtube_id' => 'IK_M_6jzHdY'
+                    'youtube_id' => 'IK_M_6jzHdY',
+                    'bucket_filename' => 'Chapter 5- HPO Urine Collection (1-28-2019).mp4'
                 ],
                 [
                     'title' => 'Chapter 7: HPO Saliva Collection',
-                    'youtube_id' => 'wed3vBDyBJk'
+                    'youtube_id' => 'wed3vBDyBJk',
+                    'bucket_filename' => 'Chapter 7- HPO Saliva Collection.mp4'
                 ],
                 [
                     'title' => 'Chapter 9: HPO Ordering Supplies from MML',
-                    'youtube_id' => 'aIPoatfgWSE'
+                    'youtube_id' => 'aIPoatfgWSE',
+                    'bucket_filename' => 'Chapter 9-HPO Ordering Supplies from MML 06-13-2017.mp4'
                 ]
             ]
         ],
@@ -171,19 +179,23 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'Chapter 2: DV Registering a KIT',
-                    'youtube_id' => 'gjn8NoomEl0'
+                    'youtube_id' => 'gjn8NoomEl0',
+                    'bucket_filename' => 'Chapter 2-DV Registering a Kit.mp4'
                 ],
                 [
                     'title' => 'Chapter 4: DV Blood Collection & Processing',
-                    'youtube_id' => 'ghk8l0Y1Z9Y'
+                    'youtube_id' => 'ghk8l0Y1Z9Y',
+                    'bucket_filename' => 'Chapter 4-DV Blood Collection _ Processing 07-27-2018.mp4'
                 ],
                 [
                     'title' => 'Chapter 6: DV Urine Collection',
-                    'youtube_id' => 'sj3Z9xHyTCI'
+                    'youtube_id' => 'sj3Z9xHyTCI',
+                    'bucket_filename' => 'Chapter 6-DV Urine Collection 06-14-2017.mp4'
                 ],
                 [
                     'title' => 'Chapter 10: DV Packaging & Shipping Specimens',
-                    'youtube_id' => 'YB3oVN3xlRM'
+                    'youtube_id' => 'YB3oVN3xlRM',
+                    'bucket_filename' => 'Chapter 10-DV Packaging and Shipping Specimens.mp4'
                 ]
             ]
         ],
@@ -192,7 +204,8 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'Physical Measurements Video Tutorial (HPO/DV)',
-                    'youtube_id' => 'wE-sZoPCfdk'
+                    'youtube_id' => 'wE-sZoPCfdk',
+                    'bucket_filename' => '20180327_NIH Scripps_EXAM V12_FINAL_COMPRESSED.mp4'
                 ]
             ]
         ],
@@ -201,7 +214,8 @@ class HelpController extends AbstractController
             'videos' => [
                 [
                     'title' => 'All of Us Research Program FAQs',
-                    'youtube_id' => 'TE-IyOxazvo'
+                    'youtube_id' => 'TE-IyOxazvo',
+                    'bucket_filename' => '20180327_NIH Scripps_FAQ V6_FINAL_COMPRESSED.mp4'
                 ]
             ]
         ]
@@ -227,10 +241,11 @@ class HelpController extends AbstractController
         return $app['twig']->render('help/index.html.twig');
     }
 
-    public function videosAction(Application $app)
+    public function videosAction(Application $app, Request $request)
     {
         return $app['twig']->render('help/videos.html.twig', [
-            'videoGroups' => self::$videoGroups
+            'videoGroups' => self::$videoGroups,
+            'type' => $request->query->get('type', 'yt')
         ]);
     }
 
