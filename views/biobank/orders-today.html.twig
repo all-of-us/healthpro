@@ -45,7 +45,7 @@
                 <tr>
                     {% if is_granted('ROLE_SCRIPPS') %}
                         <td>
-                            <a href="{{ path('biobank_order', { biobankId: order.biobank_id, orderId: order.id }) }}">{{ order.participant_id }}</a>
+                            <a href="{{ path('biobank_participant', { biobankId: order.biobank_id }) }}">{{ order.participant_id }}</a>
                         </td>
                     {% endif %}
                     <td>
