@@ -9,7 +9,7 @@
                     <dd>{{ participant.id }}</dd>
                 {% endif %}
                 <dt>Biobank ID</dt>
-                <dd>{{ participant.biobankId }}</dd>
+                <dd><a href="{{ path('biobank_participant', { biobankId: participant.biobankId }) }}">{{ participant.biobankId }}</a></dd>
                 <dt>Paired Awardee</dt>
                 <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
                 <dt>Paired Site</dt>
