@@ -31,6 +31,7 @@
                     <th>Participant ID</th>
                 {% endif %}
                 <th>Order ID</th>
+                <th>Biobank ID</th>
                 <th>Status</th>
                 <th>Created</th>
                 <th>Collected</th>
@@ -51,9 +52,10 @@
                         <a href="{{ path('biobank_order', { biobankId: order.biobank_id, orderId: order.id }) }}">{{ order.order_id }}</a>
                     </td>
                     <td>
-                        <nobr>
-                            <a href="{{ path('biobank_order', { biobankId: order.biobank_id, orderId: order.id }) }}">{{ order.orderStatus }}</a>
-                        </nobr>
+                        <a href="{{ path('biobank_participant', { biobankId: order.biobank_id }) }}">{{ order.biobank_id }}</a>
+                    </td>
+                    <td>
+                        <nobr>{{ order.orderStatus }}</nobr>
                     </td>
                     <td data-order="{{ order.created_ts }}">
                         {{ today.displayDate(order, 'created_ts') }}
