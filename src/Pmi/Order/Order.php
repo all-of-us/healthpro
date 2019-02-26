@@ -667,7 +667,7 @@ class Order
     public function cancelRestoreRdrOrder($type, $reason)
     {
         $order = $this->getCancelRestoreRdrObject($type, $reason);
-        return $this->app['pmi.drc.participants']->cancelRestoreOrder($type, $this->participant->id, $this->order['mayo_id'], $order);
+        return $this->app['pmi.drc.participants']->cancelRestoreOrder($type, $this->participant->id, $this->order['rdr_id'], $order);
     }
 
     public function editRdrOrder()
