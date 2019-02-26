@@ -35,6 +35,7 @@ ml_mock_order: pmitest
 
 # Path to help documents
 # help_storage_path: https://storage.googleapis.com/pmi-hpo-staging.appspot.com
+# help_videos_path:
 
 # Google Apps configuration
 # Bypass Google Apps auth
