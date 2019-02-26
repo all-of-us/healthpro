@@ -245,7 +245,8 @@ class HelpController extends AbstractController
     {
         return $app['twig']->render('help/videos.html.twig', [
             'videoGroups' => self::$videoGroups,
-            'type' => $request->query->get('type', 'yt')
+            'type' => $request->query->get('type', 'yt'),
+            'gcsBucketPath' => $app->getConfig('gcs_bucket_path')
         ]);
     }
 

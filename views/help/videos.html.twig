@@ -48,7 +48,7 @@
                 <div class="list-group">
                     {% for video in group.videos %}
                         {% if video.youtube_id %}
-                            <a href="#" class="list-group-item load-video" data-embed-src="https://www.youtube.com/embed/{{ video.youtube_id }}" data-gcs-src="https://storage.googleapis.com/healthpro-staging.appspot.com/training-videos/{{ video.bucket_filename }}">{{ video.title }}</a>
+                            <a href="#" class="list-group-item load-video" data-embed-src="{{ video.youtube_id }}" data-gcs-src="{{ video.bucket_filename }}">{{ video.title }}</a>
                         {% else %}
                             <div class="list-group-item disabled">{{ video.title }} <em><small>(Coming Soon!)</small></em></div>
                         {% endif %}
@@ -64,13 +64,15 @@
 <script>
 $(document).ready(function() {
     var type = {{ type|json_encode|raw }};
+    var youTubePath = "https://www.youtube.com/embed";
+    var gcsBucketPath = {{ gcsBucketPath|json_encode|raw }};
     var loadVideo = function (src) {
         $('#video-title').html(src.html());
         if (type === 'gcs') {
-            $('#video-bucket source').attr('src', src.data('gcs-src'));
+            $('#video-bucket source').attr('src', gcsBucketPath + '/' + src.data('gcs-src'));
             $("#video-bucket")[0].load();
         } else {
-            $('iframe#video-embed').attr('src', src.data('embed-src') + '?modestbranding=1&rel=0');
+            $('iframe#video-embed').attr('src', youTubePath + '/' + src.data('embed-src') + '?modestbranding=1&rel=0');
         }
         $('a.load-video').removeClass('active');
         src.addClass('active');
