@@ -33,7 +33,7 @@
                 <th>Order ID</th>
                 <th>Biobank ID</th>
                 <th>Status</th>
-                <th>Created</th>
+                <th class="col-created">Created</th>
                 <th>Collected</th>
                 <th>Processed</th>
                 <th>Finalized</th>
@@ -91,7 +91,7 @@
     <script>
         $(document).ready(function () {
             $('table').DataTable({
-                order: [[2, 'desc']],
+                order: [[$('.col-created').index(), 'desc']],
                 pageLength: 25
             });
         });

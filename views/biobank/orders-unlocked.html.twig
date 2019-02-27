@@ -32,7 +32,7 @@
                 {% endif %}
                 <th>Order ID</th>
                 <th>Biobank ID</th>
-                <th>Created</th>
+                <th class="col-created">Created</th>
                 <th>Collected</th>
                 <th>Processed</th>
                 <th>Finalized</th>
@@ -79,7 +79,7 @@
     <script>
         $(document).ready(function () {
             $('table').DataTable({
-                order: [[1, 'desc']],
+                order: [[$('.col-created').index(), 'desc']],
                 pageLength: 25
             });
         });
