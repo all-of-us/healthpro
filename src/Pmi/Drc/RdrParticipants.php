@@ -104,6 +104,7 @@ class RdrParticipants
         $results = [];
         foreach ($responseObject->entry as $participant) {
             if (isset($participant->resource) && is_object($participant->resource)) {
+                $participant->resource->disableTestAccess = $this->disableTestAccess;
                 if ($result = $this->participantToResult($participant->resource)) {
                     $results[] = $result;
                 }
