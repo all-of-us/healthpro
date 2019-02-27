@@ -36,7 +36,7 @@
                 <th>Collected</th>
                 <th>Processed</th>
                 <th>Finalized</th>
-                <th>Modified</th>
+                <th class="col-modified">Modified</th>
                 <th>Status</th>
             </tr>
             </thead>
@@ -92,7 +92,7 @@
     <script>
         $(document).ready(function () {
             $('table').DataTable({
-                order: [[1, 'desc']],
+                order: [[$('.col-modified').index(), 'desc']],
                 pageLength: 25
             });
         });
