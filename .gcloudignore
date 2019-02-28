@@ -1,0 +1,7 @@
+node_modules/
+.gitignore
+.git/
+nbproject/
+dev_config/
+external/
+deploy_*
