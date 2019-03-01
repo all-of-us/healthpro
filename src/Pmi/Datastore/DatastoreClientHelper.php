@@ -2,7 +2,6 @@
 
 namespace Pmi\Datastore;
 
-use google\appengine\api\app_identity\AppIdentityService;
 use Google\Cloud\Datastore\DatastoreClient;
 
 class DatastoreClientHelper
@@ -13,7 +12,7 @@ class DatastoreClientHelper
     public function __construct()
     {
         # Google Cloud Platform project ID
-        $projectId = AppIdentityService::getApplicationId();
+        $projectId = getenv('GOOGLE_CLOUD_PROJECT');
 
         # Instantiates a client
         $this->datastore = new DatastoreClient([
