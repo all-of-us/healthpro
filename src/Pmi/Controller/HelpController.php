@@ -246,7 +246,7 @@ class HelpController extends AbstractController
         return $app['twig']->render('help/videos.html.twig', [
             'videoGroups' => self::$videoGroups,
             'type' => $request->query->get('type', 'yt'),
-            'helpVideosPath' => $app->getConfig('help_videos_path')
+            'helpVideosPath' => rtrim($app->getConfig('help_videos_path'), '/')
         ]);
     }
 
