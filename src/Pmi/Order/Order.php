@@ -21,6 +21,7 @@ class Order
     const ORDER_RESTORE = 'restore';
     const ORDER_UNLOCK = 'unlock';
     const ORDER_EDIT = 'edit';
+    const ORDER_REVERT = 'revert';
 
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
@@ -1174,17 +1175,30 @@ class Order
             'order_id' => $this->order['id'],
             'user_id' => $this->app->getUser()->getId(),
             'site' => $this->app->getSiteId(),
-            'type' => $type,
+            'type' => $type === self::ORDER_REVERT ? self::ORDER_ACTIVE : $type,
             'created_ts' => new \DateTime()
         ];
         $ordersHistoryRepository = $this->app['em']->getRepository('orders_history');
         $status = false;
-        $ordersHistoryRepository->wrapInTransaction(function () use ($ordersHistoryRepository, $orderHistoryData, &$status) {
+        $ordersHistoryRepository->wrapInTransaction(function () use ($ordersHistoryRepository, $orderHistoryData, &$status, $type) {
             $id = $ordersHistoryRepository->insert($orderHistoryData);
             $this->app->log(Log::ORDER_HISTORY_CREATE, [
                 'id' => $id,
                 'type' => $orderHistoryData['type']
             ]);
+
+            //Get most recent order edit history id if exists while restoring or reverting an order
+            if ($type === self::ORDER_REVERT || $type === self::ORDER_RESTORE) {
+                $ordersQuery = "SELECT oh.id FROM orders_history oh WHERE oh.order_id = :orderId AND oh.type = :type ORDER BY oh.id DESC LIMIT 1";
+                $orderHistory = $this->app['em']->fetchAll($ordersQuery, [
+                    'orderId' => $this->order['id'],
+                    'type' => self::ORDER_EDIT
+                ]);
+                if (!empty($orderHistory)) {
+                    $id = $orderHistory[0]['id'];
+                }
+            }
+
             //Update history id in orders table
             $this->app['em']->getRepository('orders')->update(
                 $this->order['id'],
@@ -1386,7 +1400,7 @@ class Order
         $status = false;
         $ordersRepository->wrapInTransaction(function () use ($ordersRepository, $updateArray, &$status) {
             $ordersRepository->update($this->order['id'], $updateArray);
-            $this->createOrderHistory(self::ORDER_ACTIVE);
+            $this->createOrderHistory(self::ORDER_REVERT);
             $status = true;
         });
         return $status;
