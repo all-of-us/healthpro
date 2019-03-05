@@ -19,7 +19,7 @@ if ($app->isLocal()) {
     }
 } else {
     $app['sessionHandler'] = 'datastore';
-    $app['cacheDirectory'] = realpath(__DIR__ . '/../cache');
+    $app['cacheDirectory'] = sys_get_temp_dir();
     $app['twigCacheHandler'] = 'file';
 }
 
