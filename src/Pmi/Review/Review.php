@@ -105,10 +105,18 @@ class Review
     protected function getTodayOrderRows($db, $today)
     {
         $ordersQuery = 'SELECT o.*, ' .
-            'oh.type as h_type ' .
+            'oh.type as h_type, ' .
+            's.name as created_site_name, ' .
+            'sc.name as collected_site_name, ' .
+            'sp.name as processed_site_name, ' .
+            'sf.name as finalized_site_name ' .
             'FROM orders o ' .
-            'LEFT JOIN orders_history oh ' .
-            'ON o.history_id = oh.id WHERE ' .
+            'LEFT JOIN orders_history oh ON o.history_id = oh.id ' .
+            'LEFT JOIN sites s ON s.site_id = o.site ' .
+            'LEFT JOIN sites sc ON sc.site_id = o.collected_site ' .
+            'LEFT JOIN sites sp ON sp.site_id = o.processed_site ' .
+            'LEFT JOIN sites sf ON sf.site_id = o.finalized_site ' .
+            'WHERE ' .
             '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ' .
             'ORDER BY o.created_ts DESC';
 
