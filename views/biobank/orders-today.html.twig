@@ -3,15 +3,7 @@
 {% block bodycontainer %}container-fluid{% endblock %}
 {% set missingName = '' %}
 
-{% macro displayDate(order, dateType) %}
-    {% if order[dateType] %}
-        {{ order[dateType]|date('n/j/Y g:ia', app.userTimezone) }}
-    {% else %}
-        <i class="fa fa-times text-danger" aria-hidden="true"></i>
-    {% endif %}
-{% endmacro %}
-
-{% import _self as today %}
+{% import 'biobank/partials/display.html.twig' as today %}
 
 {% block body %}
     <div class="page-header">
@@ -34,9 +26,13 @@
                 <th>Biobank ID</th>
                 <th>Status</th>
                 <th class="col-created">Created</th>
+                <th>Created Site</th>
                 <th>Collected</th>
+                <th>Collected Site</th>
                 <th>Processed</th>
+                <th>Processed Site</th>
                 <th>Finalized</th>
+                <th>Finalized Site</th>
                 <th>Finalized Samples</th>
             </tr>
         </thead>
@@ -60,11 +56,20 @@
                     <td data-order="{{ order.created_ts }}">
                         {{ today.displayDate(order, 'created_ts') }}
                     </td>
+                    <td>
+                        {{ today.displaySite(order.created_site_name) }}
+                    </td>
                     <td data-order="{{ order.collected_ts }}">
                         {{ today.displayDate(order, 'collected_ts') }}
                     </td>
+                    <td>
+                        {{ today.displaySite(order.collected_site_name) }}
+                    </td>
                     <td data-order="{{ order.processed_ts }}">
                         {{ today.displayDate(order, 'processed_ts') }}
+                    </td>
+                    <td>
+                        {{ today.displaySite(order.processed_site_name) }}
                     </td>
                     <td data-order="{{ order.finalized_ts is defined }}">
                         {% set showOrderFinalizedTs = order.finalized_ts and order.h_type != 'unlock' and not (order.finalized_ts and order.rdr_id is empty) %}
@@ -73,6 +78,9 @@
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                         {% endif %}
+                    </td>
+                    <td>
+                        {{ today.displaySite(order.finalized_site_name) }}
                     </td>
                     <td>
                         {% if showOrderFinalizedTs and order.finalizedSamples is defined %}

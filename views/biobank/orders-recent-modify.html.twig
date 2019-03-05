@@ -2,15 +2,7 @@
 {% block title %}Orders Recent Modify - Participant Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 
-{% macro displayDate(order, dateType) %}
-    {% if order[dateType] %}
-        {{ order[dateType]|date('n/j/Y g:ia', app.userTimezone) }}
-    {% else %}
-        <i class="fa fa-times text-danger" aria-hidden="true"></i>
-    {% endif %}
-{% endmacro %}
-
-{% import _self as today %}
+{% import 'biobank/partials/display.html.twig' as today %}
 
 {% block body %}
     <div class="page-header">
@@ -23,70 +15,84 @@
         <li role="presentation" class="active"><a href="{{ path('biobank_ordersRecentModify') }}">Recently Modified Biobank Orders</a></li>
     </ul>
     <br/>
-    <div class="container">
-        <table class="table table-striped table-bordered">
-            <thead>
+    <table class="table table-striped table-bordered table-small">
+        <thead>
+        <tr>
+            {% if is_granted('ROLE_SCRIPPS') %}
+                <th>Participant ID</th>
+            {% endif %}
+            <th>Order ID</th>
+            <th>Biobank ID</th>
+            <th>Created</th>
+            <th>Created Site</th>
+            <th>Collected</th>
+            <th>Collected Site</th>
+            <th>Processed</th>
+            <th>Processed Site</th>
+            <th>Finalized</th>
+            <th>Finalized Site</th>
+            <th class="col-modified">Modified</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for order in orders %}
             <tr>
                 {% if is_granted('ROLE_SCRIPPS') %}
-                    <th>Participant ID</th>
+                    <td>
+                        <a href="{{ path('biobank_participant', { biobankId: order.biobank_id }) }}">{{ order.participant_id }}</a>
+                    </td>
                 {% endif %}
-                <th>Order ID</th>
-                <th>Biobank ID</th>
-                <th>Created</th>
-                <th>Collected</th>
-                <th>Processed</th>
-                <th>Finalized</th>
-                <th class="col-modified">Modified</th>
-                <th>Status</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for order in orders %}
-                <tr>
-                    {% if is_granted('ROLE_SCRIPPS') %}
-                        <td>
-                            <a href="{{ path('biobank_participant', { biobankId: order.biobank_id }) }}">{{ order.participant_id }}</a>
-                        </td>
+                <td>
+                    <a href="{{ path('biobank_order', { biobankId: order.biobank_id, orderId: order.id }) }}">{{ order.order_id }}</a>
+                </td>
+                <td>
+                    <a href="{{ path('biobank_participant', { biobankId: order.biobank_id }) }}">{{ order.biobank_id }}</a>
+                </td>
+                <td data-order="{{ order.created_ts }}">
+                    {{ today.displayDate(order, 'created_ts') }}
+                </td>
+                <td>
+                    {{ today.displaySite(order.created_site_name) }}
+                </td>
+                <td data-order="{{ order.collected_ts }}">
+                    {{ today.displayDate(order, 'collected_ts') }}
+                </td>
+                <td>
+                    {{ today.displaySite(order.collected_site_name) }}
+                </td>
+                <td data-order="{{ order.processed_ts }}">
+                    {{ today.displayDate(order, 'processed_ts') }}
+                </td>
+                <td>
+                    {{ today.displaySite(order.processed_site_name) }}
+                </td>
+                <td data-order="{{ order.finalized_ts }}">
+                    {% if order.oh_type != 'unlock' %}
+                        {{ today.displayDate(order, 'finalized_ts') }}
+                    {% else %}
+                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
                     {% endif %}
-                    <td>
-                        <a href="{{ path('biobank_order', { biobankId: order.biobank_id, orderId: order.id }) }}">{{ order.order_id }}</a>
-                    </td>
-                    <td>
-                        <a href="{{ path('biobank_participant', { biobankId: order.biobank_id }) }}">{{ order.biobank_id }}</a>
-                    </td>
-                    <td data-order="{{ order.created_ts }}">
-                        {{ today.displayDate(order, 'created_ts') }}
-                    </td>
-                    <td data-order="{{ order.collected_ts }}">
-                        {{ today.displayDate(order, 'collected_ts') }}
-                    </td>
-                    <td data-order="{{ order.processed_ts }}">
-                        {{ today.displayDate(order, 'processed_ts') }}
-                    </td>
-                    <td data-order="{{ order.finalized_ts }}">
-                        {% if order.oh_type != 'unlock' %}
-                            {{ today.displayDate(order, 'finalized_ts') }}
-                        {% else %}
-                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                        {% endif %}
-                    </td>
-                    <td data-order="{{ order.oh_created_ts }}">
-                        {{ today.displayDate(order, 'oh_created_ts') }}
-                    </td>
-                    <td align="center">
-                        {% if order.oh_type == 'edit' %}
-                            <span class="label label-success">Edited &amp; Finalized</span>
-                        {% elseif order.oh_type == 'cancel' %}
-                            <span class="label label-danger">Cancelled</span>
-                        {% elseif order.oh_type == 'unlock'%}
-                            <span class="label label-primary">Unlocked</span>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </td>
+                <td>
+                    {{ today.displaySite(order.finalized_site_name) }}
+                </td>
+                <td data-order="{{ order.oh_created_ts }}">
+                    {{ today.displayDate(order, 'oh_created_ts') }}
+                </td>
+                <td align="center">
+                    {% if order.oh_type == 'edit' %}
+                        <span class="label label-success">Edited &amp; Finalized</span>
+                    {% elseif order.oh_type == 'cancel' %}
+                        <span class="label label-danger">Cancelled</span>
+                    {% elseif order.oh_type == 'unlock'%}
+                        <span class="label label-primary">Unlocked</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 {% block pagejs %}
     <script>
