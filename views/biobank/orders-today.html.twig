@@ -57,19 +57,19 @@
                         {{ today.displayDate(order, 'created_ts') }}
                     </td>
                     <td>
-                        {{ today.displaySite(order.created_site_name) }}
+                        {{ today.displaySite(order.created_site_name, order.site) }}
                     </td>
                     <td data-order="{{ order.collected_ts }}">
                         {{ today.displayDate(order, 'collected_ts') }}
                     </td>
                     <td>
-                        {{ today.displaySite(order.collected_site_name) }}
+                        {{ today.displaySite(order.collected_site_name, order.collected_site) }}
                     </td>
                     <td data-order="{{ order.processed_ts }}">
                         {{ today.displayDate(order, 'processed_ts') }}
                     </td>
                     <td>
-                        {{ today.displaySite(order.processed_site_name) }}
+                        {{ today.displaySite(order.processed_site_name, order.processed_site) }}
                     </td>
                     <td data-order="{{ order.finalized_ts is defined }}">
                         {% set showOrderFinalizedTs = order.finalized_ts and order.h_type != 'unlock' and not (order.finalized_ts and order.rdr_id is empty) %}
@@ -80,7 +80,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        {{ today.displaySite(order.finalized_site_name) }}
+                        {{ today.displaySite(order.finalized_site_name, order.finalized_site) }}
                     </td>
                     <td>
                         {% if showOrderFinalizedTs and order.finalizedSamples is defined %}

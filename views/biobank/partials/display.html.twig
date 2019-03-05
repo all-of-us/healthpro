@@ -6,10 +6,10 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displaySite(site) %}
-    {% if site is not empty %}
-        {{ site }}
-    {% else %}
+{% macro displaySite(siteName, site) %}
+    {% if siteName is empty and site is empty %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
+    {% else %}
+        {{ siteName ? siteName : site }}
     {% endif %}
 {% endmacro %}
