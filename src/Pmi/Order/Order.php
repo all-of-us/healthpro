@@ -1194,6 +1194,7 @@ class Order
                     'orderId' => $this->order['id'],
                     'type' => self::ORDER_EDIT
                 ]);
+                //Set edit history id if exists
                 if (!empty($orderHistory)) {
                     $id = $orderHistory[0]['id'];
                 }
