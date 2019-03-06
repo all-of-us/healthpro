@@ -2,7 +2,7 @@
 {% block title %}Orders Recent Modify - Participant Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 
-{% import 'biobank/partials/display.html.twig' as today %}
+{% import 'macros/display-text.html.twig' as macros %}
 
 {% block body %}
     <div class="page-header">
@@ -50,35 +50,35 @@
                     <a href="{{ path('biobank_participant', { biobankId: order.biobank_id }) }}">{{ order.biobank_id }}</a>
                 </td>
                 <td data-order="{{ order.created_ts }}">
-                    {{ today.displayDate(order, 'created_ts') }}
+                    {{ macros.displayDate(order, 'created_ts') }}
                 </td>
                 <td>
-                    {{ today.displaySite(order.created_site_name, order.site) }}
+                    {{ macros.displaySite(order.created_site_name, order.site) }}
                 </td>
                 <td data-order="{{ order.collected_ts }}">
-                    {{ today.displayDate(order, 'collected_ts') }}
+                    {{ macros.displayDate(order, 'collected_ts') }}
                 </td>
                 <td>
-                    {{ today.displaySite(order.collected_site_name, order.collected_site) }}
+                    {{ macros.displaySite(order.collected_site_name, order.collected_site) }}
                 </td>
                 <td data-order="{{ order.processed_ts }}">
-                    {{ today.displayDate(order, 'processed_ts') }}
+                    {{ macros.displayDate(order, 'processed_ts') }}
                 </td>
                 <td>
-                    {{ today.displaySite(order.processed_site_name, order.processed_site) }}
+                    {{ macros.displaySite(order.processed_site_name, order.processed_site) }}
                 </td>
                 <td data-order="{{ order.finalized_ts }}">
                     {% if order.oh_type != 'unlock' %}
-                        {{ today.displayDate(order, 'finalized_ts') }}
+                        {{ macros.displayDate(order, 'finalized_ts') }}
                     {% else %}
                         <i class="fa fa-times text-danger" aria-hidden="true"></i>
                     {% endif %}
                 </td>
                 <td>
-                    {{ today.displaySite(order.finalized_site_name, order.finalized_site) }}
+                    {{ macros.displaySite(order.finalized_site_name, order.finalized_site) }}
                 </td>
                 <td data-order="{{ order.oh_created_ts }}">
-                    {{ today.displayDate(order, 'oh_created_ts') }}
+                    {{ macros.displayDate(order, 'oh_created_ts') }}
                 </td>
                 <td align="center">
                     {% if order.oh_type == 'edit' %}
