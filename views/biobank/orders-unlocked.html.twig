@@ -74,7 +74,11 @@
                     {% endif %}
                 </td>
                 <td>
-                    {{ macros.displaySite(order.finalized_site_name, order.finalized_site) }}
+                    {% if order.oh_type != 'unlock' %}
+                        {{ macros.displaySite(order.finalized_site_name, order.finalized_site) }}
+                    {% else %}
+                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}
