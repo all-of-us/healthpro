@@ -125,12 +125,13 @@ class Participant
         $address = '';
         if ($this->streetAddress) {
             $address .= $this->streetAddress;
+            // Check if streetAddress2 is set, RDR doesn't return this field if it's empty
+            if (!empty($this->streetAddress2)) {
+                $address .= $multiline ? "\n" : ', ';
+                $address .= $this->streetAddress2;
+            }
             if ($this->city || $this->state || $this->zipCode) {
-                if ($multiline) {
-                    $address .= "\n";
-                } else {
-                    $address .= ', ';
-                }
+                $address .= $multiline ? "\n" : ', ';
             }
         }
         if ($this->city) {
