@@ -1189,11 +1189,10 @@ class Order
 
             //Get most recent order edit history id if exists while restoring or reverting an order
             if ($type === self::ORDER_REVERT || $type === self::ORDER_RESTORE) {
-                $ordersQuery = "SELECT oh.id FROM orders_history oh WHERE oh.order_id = :orderId AND oh.type = :type ORDER BY oh.id DESC LIMIT 1";
-                $orderHistory = $this->app['em']->fetchAll($ordersQuery, [
-                    'orderId' => $this->order['id'],
-                    'type' => self::ORDER_EDIT
-                ]);
+                $orderHistory = $this->app['em']
+                    ->getRepository('orders_history')
+                    ->fetchBy(['order_id' => $this->order['id'], 'type' => self::ORDER_EDIT], ['id' => 'DESC'], 1);
+
                 //Set edit history id if exists
                 if (!empty($orderHistory)) {
                     $id = $orderHistory[0]['id'];
