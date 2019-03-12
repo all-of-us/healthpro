@@ -41,8 +41,8 @@ class ReviewController extends AbstractController
         $startTime->setTimezone(new \DateTimezone('UTC'));
         $today = $startTime->format('Y-m-d H:i:s');
 
-        $review = new Review;
-        $participants = $review->getTodayParticipants($app['db'], $today, $site);
+        $review = new Review($app['db']);
+        $participants = $review->getTodayParticipants($today, $site);
         
         // Preload first 5 names
         $count = 0;

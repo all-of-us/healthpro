@@ -187,8 +187,8 @@ class BiobankController extends AbstractController
         $startTime->setTimezone(new \DateTimezone('UTC'));
         $today = $startTime->format('Y-m-d H:i:s');
 
-        $review = new Review;
-        $orders = $review->getTodayOrders($app['db'], $today);
+        $review = new Review($app['db']);
+        $orders = $review->getTodayOrders($today);
 
         return $app['twig']->render('biobank/orders-today.html.twig', [
             'orders' => $orders

@@ -6,6 +6,11 @@ use Pmi\Evaluation\Evaluation;
 
 class Review
 {
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
+
     protected static $orderStatus = [
         'created_ts' => 'Created',
         'collected_ts' => 'Collected',
@@ -28,7 +33,7 @@ class Review
         'physicalMeasurementStatus' => ''
     ];
 
-    protected function getTodayRows($db, $today, $site)
+    protected function getTodayRows($today, $site)
     {
         $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, ' .
             'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
@@ -49,16 +54,16 @@ class Review
             'AND (e.site = :site OR e.finalized_site = :site)';
         $query = "($ordersQuery) UNION ($measurementsQuery) ORDER BY latest_ts DESC";
 
-        return $db->fetchAll($query, [
+        return $this->db->fetchAll($query, [
             'today' => $today,
             'site' => $site
         ]);
     }
 
-    public function getTodayParticipants($db, $today, $site = null)
+    public function getTodayParticipants($today, $site = null)
     {
         $participants = [];
-        foreach ($this->getTodayRows($db, $today, $site) as $row) {
+        foreach ($this->getTodayRows($today, $site) as $row) {
             $participantId = $row['participant_id'];
             if (!array_key_exists($participantId, $participants)) {
                 $participants[$participantId] = self::$emptyParticipant;
@@ -102,7 +107,7 @@ class Review
         return $participants;
     }
 
-    protected function getTodayOrderRows($db, $today)
+    protected function getTodayOrderRows($today)
     {
         $ordersQuery = 'SELECT o.*, ' .
             'oh.type as h_type, ' .
@@ -120,15 +125,15 @@ class Review
             '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ' .
             'ORDER BY o.created_ts DESC';
 
-        return $db->fetchAll($ordersQuery, [
+        return $this->db->fetchAll($ordersQuery, [
             'today' => $today
         ]);
     }
 
-    public function getTodayOrders($db, $today)
+    public function getTodayOrders($today)
     {
         $orders = [];
-        foreach ($this->getTodayOrderRows($db, $today) as $row) {
+        foreach ($this->getTodayOrderRows($today) as $row) {
             // Get order status
             foreach (self::$orderStatus as $field => $status) {
                 if ($row[$field]) {
