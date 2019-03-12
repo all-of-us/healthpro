@@ -317,7 +317,7 @@ class DashboardController extends AbstractController
 
         // make sure metrics data exists first, if metrics cache or API fail return value will be false
         if (!empty($metrics)) {
-            if ($stratification == 'FULL_STATE') {
+            if ($stratification == 'GEO_STATE') {
                 // Roll up the extra HPO dimension by date
                 $metrics = $this->combineHPOsByDate($metrics, $centers);
 
@@ -372,7 +372,7 @@ class DashboardController extends AbstractController
                         "titleside" => 'right'
                     ]
                 ];
-            } elseif ($stratification == 'FULL_CENSUS') {
+            } elseif ($stratification == 'GEO_CENSUS') {
                 // Roll up the extra HPO dimension by date
                 $metrics = $this->combineHPOsByDate($metrics, $centers);
 
@@ -439,7 +439,7 @@ class DashboardController extends AbstractController
                         "titleside" => 'right'
                     ]
                 ];
-            } elseif ($stratification == 'FULL_AWARDEE') {
+            } elseif ($stratification == 'GEO_AWARDEE') {
                 $map_data = [];
                 $categorized_centers = $this->getCentersList($app);
                 $recruitment_centers = [];

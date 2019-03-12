@@ -26,7 +26,7 @@
         <div id="total-progress" class="tab-pane pad active fade in">
             <div class="row">
                 <div id="total-progress-filters" class="col-md-3">
-                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'total-progress'} %}
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'total-progress', show_enrollment_status: false} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -222,7 +222,7 @@
                           try {
                             setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
                           } catch (e) {
-                            setMetricsError(spinnerLoc, 'An error occurred while loading data the data');
+                            setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
                           }
                         });
                     }
@@ -278,7 +278,7 @@
         <div id="real-time" class="tab-pane pad fade">
             <div class="row">
                 <div id="real-time-filters" class="col-md-3">
-                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'real-time'} %}
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'real-time', show_enrollment_status: true} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -437,7 +437,7 @@
                       try {
                         setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
                       } catch (e) {
-                        setMetricsError(spinnerLoc, 'An error occurred while loading data the data');
+                        setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
                       }
                     });
                 }
@@ -491,7 +491,7 @@
         <div id="participants-by-region" class="tab-pane pad fade">
             <div class="row">
                 <div id="participants-by-region-filters" class="col-md-3">
-                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-region'} %}
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-region', show_enrollment_status: true} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -503,9 +503,9 @@
                                 <div class="col-md-12 col-xs-4 form-group form-group-sm">
                                     <label for="map-mode">Display Metric</label>
                                     <select class="form-control region-plot-control" id="map-mode">
-                                        <option value="FULL_STATE" selected>State</option>
-                                        <option value="FULL_CENSUS">Census Region</option>
-                                        <option value="FULL_AWARDEE">Recruitment Origin</option>
+                                        <option value="GEO_STATE" selected>State</option>
+                                        <option value="GEO_CENSUS">Census Region</option>
+                                        <option value="GEO_AWARDEE">Recruitment Origin</option>
                                     </select>
                                 </div>
                                 <div class="col-md-12 col-xs-4 form-group form-group-sm">
@@ -540,12 +540,19 @@
             </div>
 
             <script type="text/javascript">
+                // Default to showing only 'Core' participants
+
+
                 // function to grab current filter values and load JSON from load_map_data REST endpoint
                 // success handler calls Plotly.newplot()
                 function renderMapPlot(dialogType) {
                     var regionCenters = loadRecruitmentFilters('participants-by-region');
+                    var enrollmentStatuses = loadEnrollmentFilters('participants-by-region');
                     if (regionCenters.length == 0) {
                         alert('You must select at least one recruitment center to plot results');
+                        return false;
+                    } else if (enrollmentStatuses.length == 0) {
+                        alert('You must select at least one enrollment status to plot results');
                         return false;
                     } else {
                         var spinnerLoc = 'plotly-participants-by-region';
@@ -568,10 +575,25 @@
                             regionCenters = ['ALL'];
                         }
 
-                        if (mapMode == 'FULL_AWARDEE') {
+                        if (mapMode == 'GEO_AWARDEE') {
                             $('#map-color-profile').prop('disabled', true);
                         } else {
                             $('#map-color-profile').prop('disabled', false);
+                        }
+
+                        var enrollmentFilterText = 'Participants';
+                        if (enrollmentStatuses.length < 3) {
+                          var mappedEnrollmentStatuses = [];
+                          if (enrollmentStatuses.indexOf('INTERESTED') !== -1) {
+                            mappedEnrollmentStatuses.push('Registered');
+                          }
+                          if (enrollmentStatuses.indexOf('MEMBER') !== -1) {
+                            mappedEnrollmentStatuses.push('Consented');
+                          }
+                          if (enrollmentStatuses.indexOf('FULL_PARTICIPANT') !== -1) {
+                            mappedEnrollmentStatuses.push('Core');
+                          }
+                          enrollmentFilterText = mappedEnrollmentStatuses.join(', ') + ' Participants';
                         }
 
                         // load data from metrics API
@@ -580,6 +602,7 @@
                           stratification: mapMode,
                           end_date: mapCutoff,
                           centers: regionCenters,
+                          enrollment_statuses: enrollmentStatuses,
                           history: true,
                           color_profile: mapColor 
                         })
@@ -589,7 +612,7 @@
                                     mapModeText += ' of residence'
                                 }
                                 var mapLayout = {
-                                    title: "<b>Core Participants</b> by <b>" + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
+                                    title: '<b>' + enrollmentFilterText + '</b> by <b>' + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
                                     font: PLOTLY_LABEL_FONT,
                                     width: mapWidth,
                                     height: mapWidth / 1.66,
@@ -620,7 +643,7 @@
                           try {
                             setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
                           } catch (e) {
-                            setMetricsError(spinnerLoc, 'An error occurred while loading data the data');
+                            setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
                           }
                         });
                     }
@@ -631,6 +654,10 @@
 
                 // load plot on tab show (to save loading time)
                 $('#participants-by-region-nav').on('shown.bs.tab', function (e) {
+                    // Set default filter to show 'Core' participants only
+                    $('#participants-by-region .enrollment-status-filter').prop('checked', false)
+                    $('#participants-by-region .enrollment-status-filter[value="FULL_PARTICIPANT"]').prop('checked', true)
+
                     // if plot has not been shown yet, render and then store state
                     // this will prevent points render calls once map has been initialized
                     if (!PLOTS_SHOWN['participants-by-region-nav']) {
@@ -666,7 +693,7 @@
         <div id="participants-by-lifecycle" class="tab-pane pad fade">
             <div class="row">
                 <div class="col-md-3">
-                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-lifecycle'} %}
+                    {% include 'dashboard/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'participants-by-lifecycle', show_enrollment_status: false} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
