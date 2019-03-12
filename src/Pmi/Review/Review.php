@@ -152,13 +152,12 @@ class Review
 
     public function getOrderStatus($row, $status)
     {
-        $order = new Order;
         $type = $row['h_type'];
-        if ($type === $order::ORDER_CANCEL) {
+        if ($type === Order::ORDER_CANCEL) {
             $status = 'Cancelled';
-        } elseif ($type === $order::ORDER_UNLOCK) {
+        } elseif ($type === Order::ORDER_UNLOCK) {
             $status = 'Unlocked';
-        } elseif ($type === $order::ORDER_EDIT) {
+        } elseif ($type === Order::ORDER_EDIT) {
             $status = 'Edited & Finalized';
         } elseif (!empty($row['finalized_ts']) && empty($row['rdr_id'])) {
             $status = 'Processed';
@@ -168,8 +167,7 @@ class Review
 
     public function getEvaluationStatus($row, $status)
     {
-        $evaluation = new Evaluation();
-        if ($row['h_type'] === $evaluation::EVALUATION_CANCEL) {
+        if ($row['h_type'] === Evaluation::EVALUATION_CANCEL) {
             $status = 'Cancelled';
         } elseif (!empty($row['parent_id']) && empty($row['rdr_id'])){
             $status = 'Unlocked';
