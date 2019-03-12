@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2>Welcome!</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 col-md-4{% if not path_exists('help_home') %} col-md-offset-2{% endif %}">
+            <a href="{{ path('biobank_participants') }}" class="btn btn-lg btn-default btn-block"><i class="fa fa-user" aria-hidden="true"></i> Participant Lookup</a>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <a href="{{ path('biobank_orders') }}" class="btn btn-lg btn-default btn-block"><i class="fa fa-medkit" aria-hidden="true"></i> Order Lookup</a>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <a href="{{ path('biobank_ordersToday') }}" class="btn btn-lg btn-default btn-block"><i class="fa fa-list" aria-hidden="true"></i> Participant Review</a>
+        </div>
+    </div>
+{% endblock %}

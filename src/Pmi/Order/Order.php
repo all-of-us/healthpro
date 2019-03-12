@@ -1041,15 +1041,25 @@ class Order
     public function getSamplesInfo()
     {
         $samples = [];
+        $samplesInfo = $this->order['type'] === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
         foreach ($this->getRequestedSamples() as $key => $value) {
-            $sample = ['code' => $key];
-            if (!empty($this->order['collected_ts']) && in_array($value, json_decode($this->order['collected_samples']))) {
+            $sample = [
+                'code' => $key,
+                'color' => isset($samplesInfo[$value]['color']) ? $samplesInfo[$value]['color'] : ''
+            ];
+            if (!empty($this->order['collected_ts'])) {
                 $sample['collected_ts'] = $this->order['collected_ts'];
             }
-            if (!empty($this->order['finalized_ts']) && in_array($value, json_decode($this->order['finalized_samples']))) {
+            if (!empty($this->order['collected_samples']) && in_array($value, json_decode($this->order['collected_samples']))) {
+                $sample['collected_checked'] = true;
+            }
+            if (!empty($this->order['finalized_ts'])) {
                 $sample['finalized_ts'] = $this->order['finalized_ts'];
             }
-            if (!empty($this->order['processed_samples_ts']) && in_array($value, json_decode($this->order['processed_samples']))) {
+            if (!empty($this->order['finalized_samples']) && in_array($value, json_decode($this->order['finalized_samples']))) {
+                $sample['finalized_checked'] = true;
+            }
+            if (!empty($this->order['processed_samples_ts'])) {
                 $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
                 if (!empty($processedSamplesTs[$value])) {
                     $processedTs = new \DateTime();
@@ -1057,6 +1067,9 @@ class Order
                     $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
                     $sample['processed_ts'] = $processedTs;
                 }
+            }
+            if (!empty($this->order['processed_samples']) && in_array($value, json_decode($this->order['processed_samples']))) {
+                $sample['processed_checked'] = true;
             }
             if (in_array($value, self::$samplesRequiringProcessing)) {
                 $sample['process'] = true;
@@ -1250,6 +1263,35 @@ class Order
         ]);
     }
 
+    public function getUnfinalizedOrders()
+    {
+        $ordersQuery = "
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts,
+                   s.name as created_site_name,
+                   sc.name as collected_site_name,
+                   sp.name as processed_site_name,
+                   sf.name as finalized_site_name
+            FROM orders o
+            LEFT JOIN orders_history oh ON o.history_id = oh.id
+            LEFT JOIN sites s ON s.site_id = o.site
+            LEFT JOIN sites sc ON sc.site_id = o.collected_site
+            LEFT JOIN sites sp ON sp.site_id = o.processed_site
+            LEFT JOIN sites sf ON sf.site_id = o.finalized_site
+            WHERE o.finalized_ts IS NULL
+              AND (oh.type != :type
+              OR oh.type IS NULL)
+            ORDER BY o.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'type' => self::ORDER_CANCEL
+        ]);
+    }
+
     public function getSiteUnfinalizedOrders()
     {
         $ordersQuery = "
@@ -1273,6 +1315,33 @@ class Order
         ]);
     }
 
+    public function getUnlockedOrders()
+    {
+        $ordersQuery = "
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts,
+                   s.name as created_site_name,
+                   sc.name as collected_site_name,
+                   sp.name as processed_site_name,
+                   sf.name as finalized_site_name
+            FROM orders o
+            INNER JOIN orders_history oh ON o.history_id = oh.id
+            LEFT JOIN sites s ON s.site_id = o.site
+            LEFT JOIN sites sc ON sc.site_id = o.collected_site
+            LEFT JOIN sites sp ON sp.site_id = o.processed_site
+            LEFT JOIN sites sf ON sf.site_id = o.finalized_site
+            WHERE oh.type = :type
+            ORDER BY o.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'type' => self::ORDER_UNLOCK
+        ]);
+    }
+
 
     public function getSiteUnlockedOrders()
     {
@@ -1292,6 +1361,36 @@ class Order
         return $this->app['db']->fetchAll($ordersQuery, [
             'site' => $this->app->getSiteId(),
             'type' => self::ORDER_UNLOCK
+        ]);
+    }
+
+    public function getRecentModifiedOrders()
+    {
+        $ordersQuery = "
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts,
+                   s.name as created_site_name,
+                   sc.name as collected_site_name,
+                   sp.name as processed_site_name,
+                   sf.name as finalized_site_name
+            FROM orders o
+            INNER JOIN orders_history oh ON o.history_id = oh.id
+            LEFT JOIN sites s ON s.site_id = o.site
+            LEFT JOIN sites sc ON sc.site_id = o.collected_site
+            LEFT JOIN sites sp ON sp.site_id = o.processed_site
+            LEFT JOIN sites sf ON sf.site_id = o.finalized_site
+            WHERE oh.type != :type1
+              AND oh.type != :type2
+              AND oh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
+            ORDER BY oh.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'type1' => self::ORDER_ACTIVE,
+            'type2' => self::ORDER_RESTORE
         ]);
     }
 
