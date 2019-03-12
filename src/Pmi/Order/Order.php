@@ -1286,7 +1286,7 @@ class Order
                    oh.user_id AS oh_user_id,
                    oh.site AS oh_site,
                    oh.type AS oh_type,
-                   oh.created_ts AS oh_created_ts,
+                   oh.created_ts AS oh_created_ts
             FROM orders o
             LEFT JOIN orders_history oh ON o.history_id = oh.id
             WHERE o.site = :site
