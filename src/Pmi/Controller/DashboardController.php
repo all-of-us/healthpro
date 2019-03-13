@@ -485,7 +485,7 @@ class DashboardController extends AbstractController
                             'hoverinfo' => 'text',
                             'text' => [$label],
                             'marker' => [
-                                'size' => ($count/$max_val) * 25,
+                                'size' => (($count/$max_val) * 20) + 5,
                                 'color' => $this->getColorBrewerVal($i),
                                 'line' => [
                                     'color' => 'black',
