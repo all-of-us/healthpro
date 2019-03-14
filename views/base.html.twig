@@ -47,6 +47,11 @@
                     {% if is_granted('ROLE_DASHBOARD') %}
                         <li><a href="{{ path('dashboard_home') }}">Dashboard</a></li>
                     {% endif %}
+                    {% if is_granted('ROLE_SCRIPPS') %}
+                        <li><a href="{{ path('biobank_home') }}">Scripps</a></li>
+                    {% elseif is_granted('ROLE_BIOBANK')  %}
+                        <li><a href="{{ path('biobank_home') }}">Biobank</a></li>
+                    {% endif %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if is_granted('IS_AUTHENTICATED_FULLY') %}

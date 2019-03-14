@@ -25,7 +25,7 @@ class MetricsCommand extends Command
     private static $STRATIFICATIONS = [
         'TOTAL', 'ENROLLMENT_STATUS', 'GENDER_IDENTITY', 'AGE_RANGE', 'RACE',
         'EHR_CONSENT', 'EHR_RATIO', 'FULL_STATE', 'FULL_CENSUS', 'FULL_AWARDEE',
-        'LIFECYCLE'
+        'LIFECYCLE', 'GEO_STATE', 'GEO_CENSUS', 'GEO_AWARDEE'
     ];
     private static $STATUSES = ['INTERESTED', 'MEMBER', 'FULL_PARTICIPANT'];
 
