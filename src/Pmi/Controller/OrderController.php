@@ -464,7 +464,7 @@ class OrderController extends AbstractController
                         $app->addFlashError('Failed to finalize the order. Please try again.');
                     }
                 } elseif (empty($finalizeForm['finalized_ts']->getData())) {
-                    $app->addFlashNotice('Order updated but not finalized');
+                    $app->addFlashError('Order updated but not finalized');
                 }
                 return $app->redirectToRoute('orderFinalize', [
                     'participantId' => $participantId,
