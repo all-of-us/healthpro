@@ -126,8 +126,8 @@ class RdrMetrics
     private function getDateRangeBins($start_date, $end_date, $batch)
     {
         $dateRangeBins = [];
-        $startDate = new \DateTime($start_date);
-        $endDate = new \DateTime($end_date);
+        $startDate = new \DateTime($start_date . '00:00:00');
+        $endDate = new \DateTime($end_date . '23:59:59');
 
         $interval = new \DateInterval(sprintf('P%dD', $batch));
         $period = new \DatePeriod($startDate, $interval, $endDate);

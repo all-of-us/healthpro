@@ -12,7 +12,9 @@ class User implements UserInterface
     const TWOFACTOR_GROUP = 'mfa_exception';
     const TWOFACTOR_PREFIX = 'x-site-';
     const ADMIN_DV = 'dv-admin';
-    
+    const BIOBANK_GROUP = 'biospecimen-non-pii';
+    const SCRIPPS_GROUP = 'scripps-non-pii';
+
     private $googleUser;
     private $groups;
     private $sites;
@@ -33,6 +35,8 @@ class User implements UserInterface
         $this->dashboardAccess = $this->computeDashboardAccess();
         $this->adminAccess = $this->computeAdminAccess();
         $this->adminDvAccess = $this->computeAdminDvAccess();
+        $this->biobankAccess = $this->computeBiobankAccess();
+        $this->scrippsAccess = $this->computeScrippsAccess();
     }
     
     public function getGroups()
@@ -108,6 +112,28 @@ class User implements UserInterface
         $hasAccess = false;
         foreach ($this->groups as $group) {
             if (strpos($group->getEmail(), self::ADMIN_DV . '@') === 0) {
+                $hasAccess = true;
+            }
+        }
+        return $hasAccess;
+    }
+
+    private function computeBiobankAccess()
+    {
+        $hasAccess = false;
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::BIOBANK_GROUP . '@') === 0) {
+                $hasAccess = true;
+            }
+        }
+        return $hasAccess;
+    }
+
+    private function computeScrippsAccess()
+    {
+        $hasAccess = false;
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::SCRIPPS_GROUP . '@') === 0) {
                 $hasAccess = true;
             }
         }
@@ -212,6 +238,12 @@ class User implements UserInterface
         }
         if ($this->adminDvAccess) {
             $roles[] = 'ROLE_DV_ADMIN';
+        }
+        if ($this->biobankAccess) {
+            $roles[] = 'ROLE_BIOBANK';
+        }
+        if ($this->scrippsAccess) {
+            $roles[] = 'ROLE_SCRIPPS';
         }
         return $roles;
     }

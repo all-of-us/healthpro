@@ -304,6 +304,7 @@ class WorkQueueController extends AbstractController
             $headers[] = 'DV-only EHR Sharing Date';
             if ($hasFullDataAccess) {
                 $headers[] = 'Login Phone';
+                $headers[] = 'Street Address2';
             }
             fputcsv($output, $headers);
 
@@ -377,6 +378,7 @@ class WorkQueueController extends AbstractController
                     if ($hasFullDataAccess) {
                         $row[] = $participant->loginPhoneNumber;
                     }
+                    $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
                     fputcsv($output, $row);
                 }
                 unset($participants);

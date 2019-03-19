@@ -55,6 +55,8 @@ class DefaultController extends AbstractController
             return $app->redirectToRoute('admin_home');
         } elseif ($app->hasRole('ROLE_DASHBOARD')) {
             return $app->redirectToRoute('dashboard_home');
+        } elseif ($app->hasRole('ROLE_BIOBANK') || $app->hasRole('ROLE_SCRIPPS')) {
+            return $app->redirectToRoute('biobank_home');
         } else {
             return $app->abort(403);
         }

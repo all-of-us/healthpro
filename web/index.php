@@ -37,6 +37,7 @@ $app
     ->mount('/workqueue', new Controller\WorkQueueController())
     ->mount('/problem', new Controller\ProblemReportController())
     ->mount('/review', new Controller\ReviewController())
+    ->mount('/biobank', new Controller\BiobankController())
 ;
 
 $app->run();
