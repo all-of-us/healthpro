@@ -73,7 +73,8 @@
                 <strong>{{ activeStep|capitalize }} by {{ app.getUserEmailById(attribute(order, activeStep~'_user_id'))|default('Unknown') }} at {{ app.getSiteDisplayName(attribute(order, activeStep~'_site')) }}</strong>
             </div>
         {% endif %}
-    {% elseif activeStep == 'finalized' and order.finalized_samples is not empty %}
+    {% endif %}
+    {% if activeStep == 'finalized' and showUnfinalizeMsg and finalizeForm.vars.valid %}
         <div class="alert alert-danger well-sm">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong>Order saved but not finalized. Please finalize the order.</strong>

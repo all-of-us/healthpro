@@ -471,6 +471,7 @@ class OrderController extends AbstractController
             }
         }
         $hasErrors = !empty($order->getErrors()) ? true : false;
+        $showUnfinalizeMsg = empty($order->get('finalized_ts')) && !empty($order->get('finalized_samples')) && empty($app['session']->getFlashBag()->peekAll());
         return $app['twig']->render('order-finalize.html.twig', [
             'participant' => $order->getParticipant(),
             'order' => $order->toArray(),
@@ -479,7 +480,8 @@ class OrderController extends AbstractController
             'version' => $order->version,
             'hasErrors' => $hasErrors,
             'processTabClass' => $order->getProcessTabClass(),
-            'revertForm' => $order->getOrderRevertForm()->createView()
+            'revertForm' => $order->getOrderRevertForm()->createView(),
+            'showUnfinalizeMsg' => $showUnfinalizeMsg
         ]);
     }
 
