@@ -143,6 +143,7 @@ class EvaluationController extends AbstractController
             $evaluationService->loadFromArray($evaluation);
             $evaluation['canCancel'] = $evaluationService->canCancel();
             $evaluation['canRestore'] = $evaluationService->canRestore();
+            $evaluation['reasonDisplayText'] = !empty($evaluation['eh_reason']) ? $evaluationService->getReasonDisplayText() : null;
         } else {
             $evaluation = null;
         }

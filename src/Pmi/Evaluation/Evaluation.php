@@ -757,4 +757,15 @@ class Evaluation
         }
         return false;
     }
+
+    public function getReasonDisplayText()
+    {
+        // Check only cancel reasons
+        foreach (self::$cancelReasons as $value => $key) {
+            if ($key === $this->evaluation['eh_reason']) {
+                return $value;
+            }
+        }
+        return 'Other';
+    }
 }
