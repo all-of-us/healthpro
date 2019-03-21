@@ -74,6 +74,12 @@
             </div>
         {% endif %}
     {% endif %}
+    {% if activeStep == 'finalized' and showUnfinalizeMsg and finalizeForm.vars.valid %}
+        <div class="alert alert-danger well-sm">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>Order saved but not finalized. Please finalize the order.</strong>
+        </div>
+    {% endif %}
 {% endif %}
 <ul class="nav nav-tabs">
     <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
