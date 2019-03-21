@@ -34,6 +34,9 @@
             <strong>
                 Cancelled by {{ app.getUserEmailById(order.oh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.oh_site) }} on {{ order.oh_created_ts|date('F j, Y g:ia', app.userTimezone) }}
             </strong>
+            {% if order.reasonDisplayText is not empty %}
+                <br/><strong>Reason:</strong> {{ order.reasonDisplayText }}
+            {% endif %}
         </div>
     {% endif %}
     {% if app.isDVType and app.reportKitUrl and order.type == 'kit' %}

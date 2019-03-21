@@ -42,8 +42,11 @@
         </dl>
         {% if evaluation and evaluation.eh_type == 'cancel' %}
             <div class="alert alert-danger">
-                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <strong>Cancelled by {{ app.getUserEmailById(evaluation.eh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(evaluation.eh_site) }} on {{ evaluation.eh_created_ts|date('n/j/Y \\a\\t g:ia', app.userTimezone) }}</strong>
+                {% if evaluation.reasonDisplayText is not empty %}
+                    <br/><strong>Reason:</strong> {{ evaluation.reasonDisplayText }}
+                {% endif %}
             </div>
         {% endif %}
         {% if evaluation and evaluation.parent_id is not empty and evaluation.rdr_id is empty %}
