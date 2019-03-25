@@ -38,6 +38,10 @@ class NoticeService
 
         $matches = [];
         foreach ($notices as $notice) {
+            // Ignore full page notices for admin urls
+            if ($notice['full_page'] && strpos($url, 'admin') !== false ) {
+                continue;
+            }
             $regex = $this->patternToRegex($notice['url']);
             if (preg_match($regex, $url)) {
                 $matches[] = $notice;
