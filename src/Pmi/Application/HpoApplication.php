@@ -440,7 +440,8 @@ class HpoApplication extends AbstractApplication
         $noticeService = new NoticeService($this['em']);
         $notices = $noticeService->getCurrentNotices($request->getPathInfo());
         foreach ($notices as $notice) {
-            if ($notice['full_page']) {
+            // Ignore full page notices for admin urls
+            if ($notice['full_page'] && strpos($request->attributes->get('_route'), 'admin_') !== 0) {
                 return new Response($this['twig']->render('full-page-notice.html.twig', [
                     'message' => $notice['message']
                 ]));
