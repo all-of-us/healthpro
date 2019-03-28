@@ -191,7 +191,6 @@ class RdrParticipants
             // Check cache method
             if ($this->cacheMethod === 'memcache') {
                 $cache = new \Memcache();
-                exit;
             } else {
                 $cache = new FilesystemCache();
             }
