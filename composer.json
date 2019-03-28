@@ -25,7 +25,8 @@
         "symfony/yaml": "^3.1",
         "twig/twig": "^1.24",
         "fzaninotto/faker": "^1.6",
-        "google/cloud-datastore": "^1.5"
+        "google/cloud-datastore": "^1.5",
+        "symfony/cache": "^3.4"
     },
     "config": {
         "platform": {
