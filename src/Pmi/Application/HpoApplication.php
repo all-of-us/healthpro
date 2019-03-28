@@ -34,7 +34,10 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('rdr_auth_json')) {
             $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
         }
-        if ($this->getConfig('rdr_disable_cache') || $this->isPhpDevServer()) {
+        if ($this->getConfig('cache_method')) {
+            $rdrOptions['cache_method'] = $this->getConfig('cache_method');
+        }
+        if ($this->getConfig('rdr_disable_cache')) {
             $rdrOptions['disable_cache'] = true;
         }
         if ($this->getConfig('cache_time')) {

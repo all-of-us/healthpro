@@ -5,11 +5,13 @@ use Pmi\Entities\Participant;
 use Pmi\Evaluation\Evaluation;
 use Ramsey\Uuid\Uuid;
 use Pmi\Order\Order;
+use Symfony\Component\Cache\Simple\FilesystemCache;
 
 class RdrParticipants
 {
     protected $rdrHelper;
     protected $client;
+    protected $cacheMethod;
     protected $cacheEnabled = true;
     protected static $resourceEndpoint = 'rdr/v1/';
     protected $nextToken;
@@ -26,6 +28,7 @@ class RdrParticipants
     public function __construct(RdrHelper $rdrHelper)
     {
         $this->rdrHelper = $rdrHelper;
+        $this->cacheMethod = $rdrHelper->getCacheMethod();
         $this->cacheEnabled = $rdrHelper->isCacheEnabled();
         $this->cacheTime = $rdrHelper->getCacheTime();
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
@@ -185,9 +188,15 @@ class RdrParticipants
     public function getById($id, $refresh = null)
     {
         if ($this->cacheEnabled) {
-            $memcache = new \Memcache();
-            $memcacheKey = 'rdr_participant_' . $id;
-            $participant = $refresh != 1 ? $memcache->get($memcacheKey) : null;
+            // Check cache method
+            if ($this->cacheMethod === 'memcache') {
+                $cache = new \Memcache();
+                exit;
+            } else {
+                $cache = new FilesystemCache();
+            }
+            $cacheKey = 'rdr_participant_' . $id;
+            $participant = $refresh != 1 ? $cache->get($cacheKey) : null;
         }
         if (!$this->cacheEnabled || !$participant) {
             try {
@@ -196,7 +205,11 @@ class RdrParticipants
                 $participant->disableTestAccess = $this->disableTestAccess;
                 if ($this->cacheEnabled) {
                     $participant->cacheTime = new \DateTime();
-                    $memcache->set($memcacheKey, $participant, 0, $this->cacheTime);
+                    if ($this->cacheMethod === 'memcache') {
+                        $cache->set($cacheKey, $participant, 0, $this->cacheTime);
+                    } else {
+                        $cache->set($cacheKey, $participant, $this->cacheTime * 60);
+                    }
                 }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
