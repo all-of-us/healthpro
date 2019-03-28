@@ -97,7 +97,8 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/site($|\/)'], ['ROLE_USER', 'ROLE_AWARDEE']],
                 [['path' => '^/help($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
                 [['path' => '^/settings($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
-                [['path' => '^/.*$'], 'ROLE_USER']
+                [['path' => '^/biobank($|\/)'], ['ROLE_BIOBANK', 'ROLE_SCRIPPS']],
+                [['path' => '^/.*$'], 'ROLE_USER'],
             ]
         ]);
     }
@@ -417,6 +418,7 @@ class HpoApplication extends AbstractApplication
                     strpos($request->attributes->get('_route'), 'dashboard_') !== 0 &&
                     strpos($request->attributes->get('_route'), 'problem_') !== 0 &&
                     strpos($request->attributes->get('_route'), 'admin_') !== 0 &&
+                    strpos($request->attributes->get('_route'), 'biobank_') !== 0 &&
                     !$this->isUpkeepRoute($request)) {
                 return $this->forwardToRoute('selectSite', $request);
             }
@@ -438,7 +440,8 @@ class HpoApplication extends AbstractApplication
         $noticeService = new NoticeService($this['em']);
         $notices = $noticeService->getCurrentNotices($request->getPathInfo());
         foreach ($notices as $notice) {
-            if ($notice['full_page']) {
+            // Ignore full page notices for admin urls
+            if ($notice['full_page'] && strpos($request->attributes->get('_route'), 'admin_') !== 0) {
                 return new Response($this['twig']->render('full-page-notice.html.twig', [
                     'message' => $notice['message']
                 ]));

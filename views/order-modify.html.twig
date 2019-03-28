@@ -34,7 +34,7 @@
                     <tr>
                         <td>{{ sample.code }}</td>
                         <td>
-                            {% if sample.collected_ts is defined and sample.collected_ts is not empty %}
+                            {% if sample.collected_checked is defined and sample.collected_ts is defined and sample.collected_ts is not empty %}
                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
                             {% else %}
                                 <i class="fa fa-times text-danger" aria-hidden="true"></i>
@@ -42,7 +42,7 @@
                         </td>
                         <td>
                             {% if sample.process is defined %}
-                                {% if sample.processed_ts is defined and sample.processed_ts is not empty %}
+                                {% if sample.processed_checked is defined and sample.processed_ts is defined and sample.processed_ts is not empty %}
                                     <i class="fa fa-check text-success" aria-hidden="true"></i>
                                     {{ sample.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}
                                 {% else %}
@@ -51,7 +51,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if sample.finalized_ts is defined and sample.finalized_ts is not empty %}
+                            {% if sample.finalized_checked is defined and sample.finalized_ts is defined and sample.finalized_ts is not empty %}
                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
                             {% else %}
                                 <i class="fa fa-times text-danger" aria-hidden="true"></i>

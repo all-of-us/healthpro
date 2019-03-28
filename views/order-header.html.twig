@@ -34,6 +34,9 @@
             <strong>
                 Cancelled by {{ app.getUserEmailById(order.oh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.oh_site) }} on {{ order.oh_created_ts|date('F j, Y g:ia', app.userTimezone) }}
             </strong>
+            {% if order.reasonDisplayText is not empty %}
+                <br/><strong>Reason:</strong> {{ order.reasonDisplayText }}
+            {% endif %}
         </div>
     {% endif %}
     {% if app.isDVType and app.reportKitUrl and order.type == 'kit' %}
@@ -73,6 +76,12 @@
                 <strong>{{ activeStep|capitalize }} by {{ app.getUserEmailById(attribute(order, activeStep~'_user_id'))|default('Unknown') }} at {{ app.getSiteDisplayName(attribute(order, activeStep~'_site')) }}</strong>
             </div>
         {% endif %}
+    {% endif %}
+    {% if activeStep == 'finalized' and showUnfinalizeMsg and finalizeForm.vars.valid %}
+        <div class="alert alert-danger well-sm">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>Order saved but not finalized. Please finalize the order.</strong>
+        </div>
     {% endif %}
 {% endif %}
 <ul class="nav nav-tabs">

@@ -21,6 +21,7 @@ class Order
     const ORDER_RESTORE = 'restore';
     const ORDER_UNLOCK = 'unlock';
     const ORDER_EDIT = 'edit';
+    const ORDER_REVERT = 'revert';
 
     // These labels are a fallback - when displayed, they should be using the
     // sample information below to render a table with more information
@@ -183,6 +184,7 @@ class Order
         $this->participant = $participant;
         $this->version = !empty($this->order['version']) ? $this->order['version'] : 1;
         $this->order['status'] = !empty($this->order['oh_type']) ? $this->order['oh_type'] : self::ORDER_ACTIVE;
+        $this->order['reasonDisplayText'] = $this->getReasonDisplayText();
         $this->order['disabled'] = $this->isOrderDisabled();
         $this->order['formDisabled'] = $this->isOrderFormDisabled();
         $this->order['canCancel'] = $this->canCancel();
@@ -1040,15 +1042,25 @@ class Order
     public function getSamplesInfo()
     {
         $samples = [];
+        $samplesInfo = $this->order['type'] === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
         foreach ($this->getRequestedSamples() as $key => $value) {
-            $sample = ['code' => $key];
-            if (!empty($this->order['collected_ts']) && in_array($value, json_decode($this->order['collected_samples']))) {
+            $sample = [
+                'code' => $key,
+                'color' => isset($samplesInfo[$value]['color']) ? $samplesInfo[$value]['color'] : ''
+            ];
+            if (!empty($this->order['collected_ts'])) {
                 $sample['collected_ts'] = $this->order['collected_ts'];
             }
-            if (!empty($this->order['finalized_ts']) && in_array($value, json_decode($this->order['finalized_samples']))) {
+            if (!empty($this->order['collected_samples']) && in_array($value, json_decode($this->order['collected_samples']))) {
+                $sample['collected_checked'] = true;
+            }
+            if (!empty($this->order['finalized_ts'])) {
                 $sample['finalized_ts'] = $this->order['finalized_ts'];
             }
-            if (!empty($this->order['processed_samples_ts']) && in_array($value, json_decode($this->order['processed_samples']))) {
+            if (!empty($this->order['finalized_samples']) && in_array($value, json_decode($this->order['finalized_samples']))) {
+                $sample['finalized_checked'] = true;
+            }
+            if (!empty($this->order['processed_samples_ts'])) {
                 $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
                 if (!empty($processedSamplesTs[$value])) {
                     $processedTs = new \DateTime();
@@ -1056,6 +1068,9 @@ class Order
                     $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
                     $sample['processed_ts'] = $processedTs;
                 }
+            }
+            if (!empty($this->order['processed_samples']) && in_array($value, json_decode($this->order['processed_samples']))) {
+                $sample['processed_checked'] = true;
             }
             if (in_array($value, self::$samplesRequiringProcessing)) {
                 $sample['process'] = true;
@@ -1174,17 +1189,30 @@ class Order
             'order_id' => $this->order['id'],
             'user_id' => $this->app->getUser()->getId(),
             'site' => $this->app->getSiteId(),
-            'type' => $type,
+            'type' => $type === self::ORDER_REVERT ? self::ORDER_ACTIVE : $type,
             'created_ts' => new \DateTime()
         ];
         $ordersHistoryRepository = $this->app['em']->getRepository('orders_history');
         $status = false;
-        $ordersHistoryRepository->wrapInTransaction(function () use ($ordersHistoryRepository, $orderHistoryData, &$status) {
+        $ordersHistoryRepository->wrapInTransaction(function () use ($ordersHistoryRepository, $orderHistoryData, &$status, $type) {
             $id = $ordersHistoryRepository->insert($orderHistoryData);
             $this->app->log(Log::ORDER_HISTORY_CREATE, [
                 'id' => $id,
                 'type' => $orderHistoryData['type']
             ]);
+
+            //Get most recent order edit history id if exists while restoring or reverting an order
+            if ($type === self::ORDER_REVERT || $type === self::ORDER_RESTORE) {
+                $orderHistory = $this->app['em']
+                    ->getRepository('orders_history')
+                    ->fetchBy(['order_id' => $this->order['id'], 'type' => self::ORDER_EDIT], ['id' => 'DESC'], 1);
+
+                //Set edit history id if exists
+                if (!empty($orderHistory)) {
+                    $id = $orderHistory[0]['id'];
+                }
+            }
+
             //Update history id in orders table
             $this->app['em']->getRepository('orders')->update(
                 $this->order['id'],
@@ -1236,6 +1264,35 @@ class Order
         ]);
     }
 
+    public function getUnfinalizedOrders()
+    {
+        $ordersQuery = "
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts,
+                   s.name as created_site_name,
+                   sc.name as collected_site_name,
+                   sp.name as processed_site_name,
+                   sf.name as finalized_site_name
+            FROM orders o
+            LEFT JOIN orders_history oh ON o.history_id = oh.id
+            LEFT JOIN sites s ON s.site_id = o.site
+            LEFT JOIN sites sc ON sc.site_id = o.collected_site
+            LEFT JOIN sites sp ON sp.site_id = o.processed_site
+            LEFT JOIN sites sf ON sf.site_id = o.finalized_site
+            WHERE o.finalized_ts IS NULL
+              AND (oh.type != :type
+              OR oh.type IS NULL)
+            ORDER BY o.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'type' => self::ORDER_CANCEL
+        ]);
+    }
+
     public function getSiteUnfinalizedOrders()
     {
         $ordersQuery = "
@@ -1259,6 +1316,33 @@ class Order
         ]);
     }
 
+    public function getUnlockedOrders()
+    {
+        $ordersQuery = "
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts,
+                   s.name as created_site_name,
+                   sc.name as collected_site_name,
+                   sp.name as processed_site_name,
+                   sf.name as finalized_site_name
+            FROM orders o
+            INNER JOIN orders_history oh ON o.history_id = oh.id
+            LEFT JOIN sites s ON s.site_id = o.site
+            LEFT JOIN sites sc ON sc.site_id = o.collected_site
+            LEFT JOIN sites sp ON sp.site_id = o.processed_site
+            LEFT JOIN sites sf ON sf.site_id = o.finalized_site
+            WHERE oh.type = :type
+            ORDER BY o.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'type' => self::ORDER_UNLOCK
+        ]);
+    }
+
 
     public function getSiteUnlockedOrders()
     {
@@ -1278,6 +1362,36 @@ class Order
         return $this->app['db']->fetchAll($ordersQuery, [
             'site' => $this->app->getSiteId(),
             'type' => self::ORDER_UNLOCK
+        ]);
+    }
+
+    public function getRecentModifiedOrders()
+    {
+        $ordersQuery = "
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts,
+                   s.name as created_site_name,
+                   sc.name as collected_site_name,
+                   sp.name as processed_site_name,
+                   sf.name as finalized_site_name
+            FROM orders o
+            INNER JOIN orders_history oh ON o.history_id = oh.id
+            LEFT JOIN sites s ON s.site_id = o.site
+            LEFT JOIN sites sc ON sc.site_id = o.collected_site
+            LEFT JOIN sites sp ON sp.site_id = o.processed_site
+            LEFT JOIN sites sf ON sf.site_id = o.finalized_site
+            WHERE oh.type != :type1
+              AND oh.type != :type2
+              AND oh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
+            ORDER BY oh.created_ts DESC
+        ";
+        return $this->app['db']->fetchAll($ordersQuery, [
+            'type1' => self::ORDER_ACTIVE,
+            'type2' => self::ORDER_RESTORE
         ]);
     }
 
@@ -1386,9 +1500,19 @@ class Order
         $status = false;
         $ordersRepository->wrapInTransaction(function () use ($ordersRepository, $updateArray, &$status) {
             $ordersRepository->update($this->order['id'], $updateArray);
-            $this->createOrderHistory(self::ORDER_ACTIVE);
+            $this->createOrderHistory(self::ORDER_REVERT);
             $status = true;
         });
         return $status;
+    }
+
+    public function getReasonDisplayText()
+    {
+        if (empty($this->order['oh_reason'])) {
+            return null;
+        }
+        // Check only cancel reasons
+        $reasonDisplayText = array_search($this->order['oh_reason'], self::$cancelReasons);
+        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 }
