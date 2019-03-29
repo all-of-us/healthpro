@@ -46,7 +46,7 @@ class RdrMetrics
      *
      * @return array
      */
-    public function metrics2($start_date, $end_date, $stratification, $centers, $enrollment_statuses, $params = [])
+    public function metrics($start_date, $end_date, $stratification, $centers, $enrollment_statuses, $params = [])
     {
         $client = $this->rdrHelper->getClient();
 
@@ -102,6 +102,63 @@ class RdrMetrics
         return $responseObject;
     }
 
+
+    /**
+     * Metrics 2 API (MAPI2)
+     *
+     * @param string $mode
+     * @param string $start_date YYYY-MM-DD
+     * @param string $end_date YYYY-MM-DD
+     * @param string $interval
+     * @param array $centers
+     * @param array $params
+     *
+     * @return array
+     */
+    public function ehrMetrics($mode, $start_date, $end_date, $interval, $centers, $params = [])
+    {
+        $client = $this->rdrHelper->getClient();
+
+        // Convert arrays to comma separated strings
+        if (is_array($centers)) {
+            $centers = implode(',', $centers);
+        }
+
+        $query = [
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'interval' => $interval
+        ];
+        if ($centers) {
+            $query['awardee'] = $centers;
+        }
+
+        // Generate a cache key
+        $memcacheKey = 'metrics_ehr_api_' . md5(json_encode([$query, $mode]));
+
+        // If not found in Memcache, make request
+        if (!$this->memcache || !$metrics = $this->memcache->get($memcacheKey)) {
+            $request_options = [
+                'query' => $query
+            ];
+            $endpoint = ($mode) ? 'rdr/v1/MetricsEHR/' . $mode : 'rdr/v1/MetricsEHR';
+            $response = $client->request('GET', $endpoint, $request_options);
+            $metrics = json_decode($response->getBody()->getContents(), true);
+
+            // Store results in Memcache if enabled
+            if ($this->memcache) {
+                $this->memcache->set($memcacheKey, $metrics, 0, 900); // 900 s = 15 min
+            }
+        }
+
+        return $metrics;
+    }
+
+    /**
+     * Metric Fields
+     *
+     * @return object
+     */
     public function metricsFields()
     {
         $client = $this->rdrHelper->getClient();

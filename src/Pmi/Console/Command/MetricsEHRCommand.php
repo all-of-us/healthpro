@@ -15,19 +15,18 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * Allows debugging local with the RDR Metrics API endpoint
  */
-class MetricsCommand extends Command
+class MetricsEHRCommand extends Command
 {
+
     /**
-     * Allowed Stratifications
-     *
      * @var array
      */
-    private static $STRATIFICATIONS = [
-        'TOTAL', 'ENROLLMENT_STATUS', 'GENDER_IDENTITY', 'AGE_RANGE', 'RACE',
-        'EHR_CONSENT', 'EHR_RATIO', 'FULL_STATE', 'FULL_CENSUS', 'FULL_AWARDEE',
-        'LIFECYCLE', 'GEO_STATE', 'GEO_CENSUS', 'GEO_AWARDEE'
-    ];
-    private static $STATUSES = ['INTERESTED', 'MEMBER', 'FULL_PARTICIPANT'];
+    private static $MODES = ['ParticipantsOverTime', 'SitesActiveOverTime', 'Sites'];
+
+    /**
+     * @var array
+     */
+    private static $INTERVALS = ['week', 'month', 'quarter'];
 
     /**
      * Configure
@@ -37,13 +36,13 @@ class MetricsCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('pmi:metrics')
+            ->setName('pmi:metricsehr')
             ->addOption(
                 'start_date',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Date range beginning.',
-                date('Y-m-d', strtotime('today - 7 days'))
+                date('Y-m-d', strtotime('today - 30 days'))
             )
             ->addOption(
                 'end_date',
@@ -53,29 +52,24 @@ class MetricsCommand extends Command
                 date('Y-m-d')
             )
             ->addOption(
-                'stratification',
+                'interval',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'How to stack the returned data.',
-                'ENROLLMENT_STATUS'
+                'Interval of reporting.',
+                'week'
+            )
+            ->addOption(
+                'mode',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Reporting mode.',
+                null
             )
             ->addOption(
                 'centers',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'Filter to specified centers (awardees)'
-            )
-            ->addOption(
-                'statuses',
-                null,
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Filter to specified statuses.'
-            )
-            ->addOption(
-                'history',
-                null,
-                InputOption::VALUE_NONE,
-                'Return cached history of data; required for certain stratifications.'
             )
             ->addOption(
                 'pretty',
@@ -89,7 +83,7 @@ class MetricsCommand extends Command
                 InputOption::VALUE_NONE,
                 'Show request debug'
             )
-            ->setDescription('Get current metrics from the RDR.')
+            ->setDescription('Get current EHR metrics from the RDR.')
         ;
     }
 
@@ -106,20 +100,29 @@ class MetricsCommand extends Command
 
         $start_date = $input->getOption('start_date');
         $end_date = $input->getOption('end_date');
-        $stratification = $input->getOption('stratification');
+        $interval = $input->getOption('interval');
+        $mode = $input->getOption('mode');
         $centers = $input->getOption('centers');
-        $statuses = $input->getOption('statuses');
         $pretty = ($input->getOption('pretty') !== false) ? JSON_PRETTY_PRINT : 0;
-        $params = [
-            'history' => (bool) $input->getOption('history')
-        ];
+        $params = [];
 
-        // Validate stratification
-        if (!in_array($stratification, self::$STRATIFICATIONS)) {
+        // Validate interval
+        if (!in_array($interval, self::$INTERVALS)) {
             $output->writeln(sprintf(
-                '<error>Invalid stratification: "%s"; Valid options: %s</error>',
-                $stratification,
-                join(', ', self::$STRATIFICATIONS)
+                '<error>Invalid interval: "%s"; Valid options: %s</error>',
+                $interval,
+                join(', ', self::$INTERVALS)
+            ));
+            // Throw a non-zero exit status
+            return 1;
+        }
+
+        // Validate mode
+        if (!is_null($mode) && !in_array($mode, self::$MODES)) {
+            $output->writeln(sprintf(
+                '<error>Invalid mode: "%s"; Valid options: %s</error>',
+                $mode,
+                join(', ', self::$MODES)
             ));
             // Throw a non-zero exit status
             return 1;
@@ -136,24 +139,6 @@ class MetricsCommand extends Command
             return 1;
         }
 
-        // Validate statuses
-        if (is_string($statuses)) {
-            $statuses = explode(',', $statuses);
-        }
-        if (!empty($statuses)) {
-            foreach ($statuses as $status) {
-                if (!in_array($status, self::$STATUSES)) {
-                    $output->writeln(sprintf(
-                        '<error>Invalid status: "%s"; Valid options: %s</error>',
-                        $status,
-                        join(', ', self::$STATUSES)
-                    ));
-                    // Throw a non-zero exit status
-                    return 1;
-                }
-            }
-        }
-
         putenv('PMI_ENV=' . HpoApplication::ENV_LOCAL);
         $app = new HpoApplication([
             'isUnitTest' => true,
@@ -163,17 +148,17 @@ class MetricsCommand extends Command
 
         if ($input->getOption('debug')) {
             $output->writeln('<info>Debugging Information</info>');
+            $output->writeln('  Mode:                  ' . $mode);
             $output->writeln('  Start Date:            ' . $start_date);
             $output->writeln('  End Date:              ' . $end_date);
-            $output->writeln('  Stratification:        ' . $stratification);
+            $output->writeln('  Interval:              ' . $interval);
             $output->writeln('  Centers:               ' . json_encode($centers));
-            $output->writeln('  Statuses:              ' . json_encode($statuses));
             $output->writeln('  Additional Parameters: ' . json_encode($params));
             $output->writeln('');
         }
 
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-        $data = $metricsApi->metrics($start_date, $end_date, $stratification, $centers, $statuses, $params);
+        $data = $metricsApi->ehrMetrics($mode, $start_date, $end_date, $interval, $centers, $params);
 
         $output->writeln(json_encode($data, $pretty));
     }

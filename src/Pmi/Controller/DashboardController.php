@@ -21,10 +21,18 @@ class DashboardController extends AbstractController
      * @var array
      */
     protected static $routes = [
+        // Base Routes
         ['home', '/'],
-        ['metricsV2Load', '/metrics2_load'],
+        ['totalProgress', '/total-progress'],
+        ['realTime', '/real-time'],
+        ['participantsByRegion', '/participants-by-region'],
+        ['participantsByLifecycle', '/participants-by-lifecycle'],
+        ['ehr', '/ehr'],
+        // Data Retrieval
+        ['metricsV2Load', '/metrics_load'],
         ['metricsLoadRegion', '/metrics_load_region'],
         ['metricsLoadLifecycle', '/metrics_load_lifecycle'],
+        ['metricsLoadEHR', '/metrics_load_ehr']
     ];
 
     /**
@@ -50,11 +58,118 @@ class DashboardController extends AbstractController
 
         $recruitment_centers = $this->getCentersList($app);
 
+        return $app->redirect('total-progress');
+    }
+
+    /**
+     * Total Progress Action
+     *
+     * @param Application $app
+     *
+     * @return Response
+     */
+    public function totalProgressAction(Application $app)
+    {
+        // metrics attributes are hard-coded as we don't have human-readable names in the API yet
+        $metrics_attributes = $this->getMetricsDisplayNames();
+
+        $recruitment_centers = $this->getCentersList($app);
+
         return $app['twig']->render(
-            'dashboard/index.html.twig',
+            'dashboard/total-progress.html.twig',
             [
                 'color_profiles' => self::$color_profiles,
                 'metrics_attributes' => $metrics_attributes,
+                'recruitment_centers' => $recruitment_centers
+            ]
+        );
+    }
+
+    /**
+     * Real-time Action
+     *
+     * @param Application $app
+     *
+     * @return Response
+     */
+    public function realTimeAction(Application $app)
+    {
+        // metrics attributes are hard-coded as we don't have human-readable names in the API yet
+        $metrics_attributes = $this->getMetricsDisplayNames();
+
+        $recruitment_centers = $this->getCentersList($app);
+
+        return $app['twig']->render(
+            'dashboard/real-time.html.twig',
+            [
+                'color_profiles' => self::$color_profiles,
+                'metrics_attributes' => $metrics_attributes,
+                'recruitment_centers' => $recruitment_centers
+            ]
+        );
+    }
+
+    /**
+     * Participants by Region Action
+     *
+     * @param Application $app
+     *
+     * @return Response
+     */
+    public function participantsByRegionAction(Application $app)
+    {
+        // metrics attributes are hard-coded as we don't have human-readable names in the API yet
+        $metrics_attributes = $this->getMetricsDisplayNames();
+
+        $recruitment_centers = $this->getCentersList($app);
+
+        return $app['twig']->render(
+            'dashboard/participants-by-region.html.twig',
+            [
+                'color_profiles' => self::$color_profiles,
+                'metrics_attributes' => $metrics_attributes,
+                'recruitment_centers' => $recruitment_centers
+            ]
+        );
+    }
+
+    /**
+     * Particpants by Lifecycle Action
+     *
+     * @param Application $app
+     *
+     * @return Response
+     */
+    public function participantsByLifecycleAction(Application $app)
+    {
+        // metrics attributes are hard-coded as we don't have human-readable names in the API yet
+        $metrics_attributes = $this->getMetricsDisplayNames();
+
+        $recruitment_centers = $this->getCentersList($app);
+
+        return $app['twig']->render(
+            'dashboard/participants-by-lifecycle.html.twig',
+            [
+                'color_profiles' => self::$color_profiles,
+                'metrics_attributes' => $metrics_attributes,
+                'recruitment_centers' => $recruitment_centers
+            ]
+        );
+    }
+
+    /**
+     * EHR Metrics
+     *
+     * @param Application $app
+     *
+     * @return Response
+     */
+    public function ehrAction(Application $app)
+    {
+        $recruitment_centers = $this->getCentersList($app);
+        return $app['twig']->render(
+            'dashboard/ehr.html.twig',
+            [
                 'recruitment_centers' => $recruitment_centers
             ]
         );
@@ -91,7 +206,7 @@ class DashboardController extends AbstractController
         $start_date = $this->sanitizeDate($start_date);
         $end_date = $this->sanitizeDate($end_date);
 
-        $day_counts = $this->getMetrics2Object(
+        $day_counts = $this->getMetricsObject(
             $app,
             $interval,
             $start_date,
@@ -292,7 +407,7 @@ class DashboardController extends AbstractController
         };
 
         // retrieve metrics from cache, or request new if expired
-        $metrics = $this->getMetrics2Object(
+        $metrics = $this->getMetricsObject(
             $app,
             'DAY', // Not relevant to this call
             date('Y-m-d', strtotime($end_date . '-1 day')), // Previous day for start_date
@@ -530,7 +645,7 @@ class DashboardController extends AbstractController
         }
 
         // retrieve metrics from cache, or request new if expired
-        $metrics = $this->getMetrics2Object(
+        $metrics = $this->getMetricsObject(
             $app,
             'DAY', // Not relevant to this call
             date('Y-m-d', strtotime($end_date . '-1 day')), // Previous day for start_date
@@ -611,6 +726,89 @@ class DashboardController extends AbstractController
         return $app->json($pipeline_data);
     }
 
+    /**
+     * Metrics Load EHR
+     *
+     * @param Application $app
+     * @param Request     $request
+     *
+     * @return Response
+     */
+    public function metricsLoadEHRAction(Application $app, Request $request)
+    {
+        if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('dashboard', $request->get('csrf_token')))) {
+            return $app->abort(403);
+        }
+
+        // get request attributes
+        $mode = $request->get('mode');
+        $start_date = $request->get('start_date', date('Y-m-d'));
+        $end_date = $request->get('end_date', date('Y-m-d'));
+        $interval = $request->get('interval', 'quarter');
+        $centers = $request->get('centers', []);
+        $params = [];
+
+        $metrics = $this->getMetricsEHRObject($app, $mode, $start_date, $end_date, $interval, $centers, $params);
+
+        switch ($mode) {
+            case 'Sites':
+                $display_values = [
+                    'total_ehr_data_received' => 'Total EHR Data Received',
+                    'total_participants' => 'Participants',
+                    'hpo_display_name' => 'Awardee Name',
+                    'hpo_name' => 'Awardee',
+                    'total_ehr_consented' => 'EHR Consent',
+                    'total_primary_consented' => 'Primary Consent',
+                    'last_ehr_submission_date' => 'Last Submission',
+                    'hpo_id' => 'Identifier',
+                    'total_core_participants' => 'Total Core Participants'
+                ];
+                break;
+            case 'ParticipantsOverTime':
+                $display_values = [
+                    'SITES_ACTIVE' => 'Active Sites',
+                    'EHR_RECEIVED' => 'EHR Received',
+                    'EHR_CONSENTED' => 'EHR Consent'
+                ];
+                break;
+            case 'SitesActiveOverTime':
+                $display_values = [
+                    'SITES_ACTIVE' => 'Active Sites'
+                ];
+                break;
+            default:
+                break;
+        }
+
+        $ehr_data = $metrics;
+        // $ehr_data = [
+        //     [
+        //         "x" => array_values($display_values),
+        //         "y" => $completed,
+        //         "text" => $completed_text,
+        //         "type" => 'bar',
+        //         "hoverinfo" => 'text+name',
+        //         "name" => 'Completed',
+        //         "marker" => [
+        //             "color" => $this->getColorBrewerVal(1)
+        //         ]
+        //     ],
+        //     [
+        //         "x" => array_values($display_values),
+        //         "y" => $not_completed,
+        //         "text" => $not_completed_text,
+        //         "type" => 'bar',
+        //         "hoverinfo" => 'text+name',
+        //         "name" => 'Eligible, not completed',
+        //         "marker" => [
+        //             "color" => $this->getColorBrewerVal(0)
+        //         ]
+        //     ]
+        // ];
+
+        return $app->json($ehr_data);
+    }
+
     /* Private Methods */
 
     /**
@@ -626,10 +824,11 @@ class DashboardController extends AbstractController
      * @param string      $stratification
      * @param string      $centers
      * @param string      $enrollment_statuses
+     * @param array       $params
      *
      * @return array
      */
-    private function getMetrics2Object(
+    private function getMetricsObject(
         Application $app,
         $interval,
         $start_date,
@@ -643,12 +842,60 @@ class DashboardController extends AbstractController
             $metrics = [];
             $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper'], new \Memcache());
 
-            $metrics = $metricsApi->metrics2(
+            $metrics = $metricsApi->metrics(
                 $start_date,
                 $end_date,
                 $stratification,
                 $centers,
                 $enrollment_statuses,
+                $params
+            );
+
+            // Return false if no metrics returned
+            if (count($metrics) == 0) {
+                return false;
+            }
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            error_log($e->getMessage());
+            return false;
+        }
+        return $metrics;
+    }
+
+    /**
+     * Get Metrics EHR Object
+     *
+     * Retrieves data from the Metrics EHR endpoint.
+     *
+     * @param Application $app
+     * @param string      $mode
+     * @param string      $start_date
+     * @param string      $end_date
+     * @param string      $interval
+     * @param string      $centers
+     * @param array       $params
+     *
+     * @return array
+     */
+    private function getMetricsEHRObject(
+        Application $app,
+        $mode,
+        $start_date,
+        $end_date,
+        $interval,
+        $centers,
+        $params = []
+    ) {
+        try {
+            $metrics = [];
+            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper'], new \Memcache());
+
+            $metrics = $metricsApi->ehrMetrics(
+                $mode,
+                $start_date,
+                $end_date,
+                $interval,
+                $centers,
                 $params
             );
 
@@ -873,7 +1120,7 @@ class DashboardController extends AbstractController
     /**
      * Combine HPOs by Date
      *
-     * Metrics2 data comes back as an ordered array of dates and HPOs. This
+     * Metrics data comes back as an ordered array of dates and HPOs. This
      * method rolls them up by date.
      *
      * @param array $day_count Source data from API response
