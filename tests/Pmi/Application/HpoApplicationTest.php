@@ -38,7 +38,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         // gets set to false by the finishCallback()
         $this->assertSame(false, $this->app['session']->get('isLogin'));
     }
-    
+
     public function testTwoFactorDeny()
     {
         $email = 'testTwoFactorDeny@example.com';
@@ -97,7 +97,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         sleep($this->app['sessionTimeout']);
         $this->assertSame(true, $this->app->isLoginExpired());
     }
-    
+
     public function testDashboardTimeout()
     {
         $email = 'testDashboardTimeout@example.com';
@@ -113,7 +113,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         sleep($this->app['sessionTimeout']);
         $this->assertSame(true, $this->app->isLoginExpired());
     }
-    
+
     public function testDashboardRedirect()
     {
         $email = 'testDashboardRedirect@example.com';
@@ -125,7 +125,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $crawler = $client->request('GET', '/');
         $this->assertSame(true, strstr($crawler->html(), '/dashboard/') !== false);
     }
-    
+
     public function testForceSiteSelect()
     {
         $email = 'testForceSiteSelect@example.com';
@@ -136,7 +136,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $crawler = $client->request('GET', '/participants');
         $this->assertEquals(1, count($crawler->filter('#siteSelector')));
     }
-    
+
     public function testDashSplash()
     {
         $email = 'testDashSplash@example.com';
@@ -208,7 +208,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $crawler = $client->request('GET', '/');
         $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')));
     }
-    
+
     public function testSiteAutoselect()
     {
         $email = 'testSiteAutoselect@example.com';
@@ -271,7 +271,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $client->followRedirects();
         $this->assertSame(null, $this->app->getSite());
         $crawler = $client->request('GET', '/dashboard');
-        $this->assertEquals(1, count($crawler->filter('#participants-by-region-nav')));
+        $this->assertEquals(1, count($crawler->filter('#plotly-total-progress')));
     }
 
     public function testHeaders()
