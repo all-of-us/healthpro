@@ -21,7 +21,7 @@ class MetricsEHRCommand extends Command
     /**
      * @var array
      */
-    private static $MODES = ['ParticipantsOverTime', 'SitesActiveOverTime', 'Sites'];
+    private static $MODES = ['ParticipantsOverTime', 'OrganizationsActiveOverTime', 'Organizations'];
 
     /**
      * @var array

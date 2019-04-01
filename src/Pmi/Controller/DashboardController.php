@@ -748,75 +748,102 @@ class DashboardController extends AbstractController
         $centers = $request->get('centers', []);
         $params = [];
 
-        $metrics = $this->getMetricsEHRObject($app, $mode, $start_date, $end_date, $interval, $centers, $params);
+        $metrics = $this->getMetricsEHRObject(
+            $app,
+            $mode,
+            $start_date,
+            $end_date,
+            $interval,
+            $centers,
+            $params
+        );
 
         switch ($mode) {
-            case 'Sites':
+            case 'ParticipantsOverTime':
+                $dates = [];
+                $received = [];
+                $received_text = [];
+                $consented = [];
+                $consented_text = [];
+                foreach ($metrics as $row) {
+                    array_push($dates, $row['date']);
+                    array_push($received, (int) $row['metrics']['EHR_RECEIVED']);
+                    array_push($received_text, number_format($row['metrics']['EHR_RECEIVED']));
+                    array_push($consented, (int) $row['metrics']['EHR_CONSENTED']);
+                    array_push($consented_text, number_format($row['metrics']['EHR_CONSENTED']));
+                }
+                $ehr_data = [
+                    [
+                        "x" => $dates,
+                        "y" => $received,
+                        "text" => $received_text,
+                        "type" => 'bar',
+                        "hoverinfo" => 'text+name',
+                        "name" => 'EHR Data Received',
+                        "marker" => [
+                            "color" => $this->getColorBrewerVal(1)
+                        ]
+                    ],
+                    [
+                        "x" => $dates,
+                        "y" => $consented,
+                        "text" => $consented_text,
+                        "type" => 'bar',
+                        "hoverinfo" => 'text+name',
+                        "name" => 'Total Participants EHR Consent',
+                        "marker" => [
+                            "color" => $this->getColorBrewerVal(0)
+                        ]
+                    ],
+                ];
+                break;
+            case 'OrganizationsActiveOverTime':
+                $dates = [];
+                $organizations = [];
+                $organizations_text = [];
+                foreach ($metrics as $row) {
+                    array_push($dates, $row['date']);
+                    array_push($organizations, (int) $row['metrics']['ORGANIZATIONS_ACTIVE']);
+                    array_push($organizations_text, number_format($row['metrics']['ORGANIZATIONS_ACTIVE']));
+                }
+                $ehr_data = [
+                    [
+                        "x" => $dates,
+                        "y" => $organizations,
+                        "text" => $organizations_text,
+                        "type" => 'bar',
+                        "hoverinfo" => 'text+name',
+                        "name" => 'Active Organizations',
+                        "marker" => [
+                            "color" => $this->getColorBrewerVal(0)
+                        ]
+                    ]
+                ];
+                break;
+            case 'Organizations':
                 $display_values = [
                     'total_ehr_data_received' => 'Total EHR Data Received',
-                    'total_participants' => 'Participants',
-                    'hpo_display_name' => 'Awardee Name',
-                    'hpo_name' => 'Awardee',
-                    'total_ehr_consented' => 'EHR Consent',
-                    'total_primary_consented' => 'Primary Consent',
-                    'last_ehr_submission_date' => 'Last Submission',
-                    'hpo_id' => 'Identifier',
-                    'total_core_participants' => 'Total Core Participants'
+                    'organization_name' => 'Organization',
+                    'total_ehr_consented' => 'Total EHR Consented',
+                    'total_primary_consented' => 'Total Primary Consent',
+                    'organization_id' => 'Identifier',
+                    'last_ehr_submission_date' => 'Last EHR Submission Date',
+                    'total_participants' => 'Total Participants',
+                    'total_core_participants' => 'Total Core',
                 ];
-                break;
-            case 'ParticipantsOverTime':
-                $display_values = [
-                    'SITES_ACTIVE' => 'Active Sites',
-                    'EHR_RECEIVED' => 'EHR Received',
-                    'EHR_CONSENTED' => 'EHR Consent'
-                ];
-                break;
-            case 'SitesActiveOverTime':
-                $display_values = [
-                    'SITES_ACTIVE' => 'Active Sites'
-                ];
+                // Render as a table
+                $ehr_data = [];
+                foreach (array_values($metrics) as $i => $metrics) {
+                    $ehr_data[$i] = [];
+                    foreach ($metrics as $key => $row) {
+                        $ehr_data[$i][$key] = $row;
+                    }
+                }
                 break;
             default:
+                return $app->abort(404, 'Not found.');
                 break;
         }
-
-        $dates = [];
-        $received = [];
-        $received_text = [];
-        $consented = [];
-        $consented_text = [];
-        foreach ($metrics as $row) {
-            array_push($dates, $row['date']);
-            array_push($received, (int) $row['metrics']['EHR_RECEIVED']);
-            array_push($received_text, number_format($row['metrics']['EHR_RECEIVED']));
-            array_push($consented, (int) $row['metrics']['EHR_CONSENTED']);
-            array_push($consented_text, number_format($row['metrics']['EHR_CONSENTED']));
-        }
-
-        $ehr_data = [
-            [
-                "x" => $dates,
-                "y" => $received,
-                "text" => $received_text,
-                "type" => 'bar',
-                "hoverinfo" => 'text+name',
-                "name" => 'EHR data received',
-                "marker" => [
-                    "color" => $this->getColorBrewerVal(1)
-                ]
-            ],
-            [
-                "x" => $dates,
-                "y" => $consented,
-                "text" => $consented_text,
-                "type" => 'bar',
-                "hoverinfo" => 'text+name',
-                "name" => 'Total Participants EHR Consent',
-                "marker" => [
-                    "color" => $this->getColorBrewerVal(0)
-                ]
-            ],
-        ];
 
         return $app->json($ehr_data);
     }
