@@ -780,31 +780,43 @@ class DashboardController extends AbstractController
                 break;
         }
 
-        $ehr_data = $metrics;
-        // $ehr_data = [
-        //     [
-        //         "x" => array_values($display_values),
-        //         "y" => $completed,
-        //         "text" => $completed_text,
-        //         "type" => 'bar',
-        //         "hoverinfo" => 'text+name',
-        //         "name" => 'Completed',
-        //         "marker" => [
-        //             "color" => $this->getColorBrewerVal(1)
-        //         ]
-        //     ],
-        //     [
-        //         "x" => array_values($display_values),
-        //         "y" => $not_completed,
-        //         "text" => $not_completed_text,
-        //         "type" => 'bar',
-        //         "hoverinfo" => 'text+name',
-        //         "name" => 'Eligible, not completed',
-        //         "marker" => [
-        //             "color" => $this->getColorBrewerVal(0)
-        //         ]
-        //     ]
-        // ];
+        $dates = [];
+        $received = [];
+        $received_text = [];
+        $consented = [];
+        $consented_text = [];
+        foreach ($metrics as $row) {
+            array_push($dates, $row['date']);
+            array_push($received, (int) $row['metrics']['EHR_RECEIVED']);
+            array_push($received_text, number_format($row['metrics']['EHR_RECEIVED']));
+            array_push($consented, (int) $row['metrics']['EHR_CONSENTED']);
+            array_push($consented_text, number_format($row['metrics']['EHR_CONSENTED']));
+        }
+
+        $ehr_data = [
+            [
+                "x" => $dates,
+                "y" => $received,
+                "text" => $received_text,
+                "type" => 'bar',
+                "hoverinfo" => 'text+name',
+                "name" => 'EHR data received',
+                "marker" => [
+                    "color" => $this->getColorBrewerVal(1)
+                ]
+            ],
+            [
+                "x" => $dates,
+                "y" => $consented,
+                "text" => $consented_text,
+                "type" => 'bar',
+                "hoverinfo" => 'text+name',
+                "name" => 'Total Participants EHR Consent',
+                "marker" => [
+                    "color" => $this->getColorBrewerVal(0)
+                ]
+            ],
+        ];
 
         return $app->json($ehr_data);
     }

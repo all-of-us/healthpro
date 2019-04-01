@@ -26,7 +26,7 @@
                                     <input type="text" class="form-control datepicker ehr-time-control" id="ehr-end-date" />
                                 </div>
                                 <div class="col-md-12 col-xs-12 form-group form-group-sm">
-                                    <label>Show Column Totals <input type="checkbox" id="ehr-show-annot" class="ehr-control"></label>
+                                    <label>Show Column Totals <input type="checkbox" id="ehr-show-annot" class="ehr-plot-control"></label>
                                 </div>
                             </div>
                         </div>
@@ -88,7 +88,7 @@ function renderMetricsEhrPlots(dialogType) {
         }
 
         // gather params
-        var metricTitle = 'EHR Data';
+        var metricTitle = 'EHR Data Submissions';
         var ehrInterval = $('#ehr-interval').val();
         var showAnnot = $('#ehr-show-annot').is(':checked');
         var ehrParticipantWidth = $('#plotly-ehr-participant').width() - 30;
@@ -100,7 +100,7 @@ function renderMetricsEhrPlots(dialogType) {
         // load data from metrics API
           $.getJSON('/dashboard/metrics_load_ehr', {
             csrf_token: CsrfToken,
-            mode: 'Sites',
+            mode: 'ParticipantsOverTime',
             start_date: ehrStartDate,
             end_date: ehrEndDate,
             interval: 'quarter',
@@ -110,9 +110,9 @@ function renderMetricsEhrPlots(dialogType) {
             if (data.length != 0) {
                 var progressAnnot = [];
                 var ehrParticipantLayout = {
-                    title: 'Count of <b>' + metricTitle+ '</b> by date',
+                    title: 'Count of <b>' + metricTitle+ '</b> by Quarter',
                     font: PLOTLY_LABEL_FONT,
-                    barmode: 'stack',
+                    // barmode: 'stack',
                     width: ehrParticipantWidth,
                     height: ehrParticipantWidth / 1.66,
                     hovermode: 'closest',
@@ -173,30 +173,25 @@ $('#ehr-start-date').val(programStartDateString);
 
 renderMetricsEhrPlots('modal')
 
-// $(document).ready(function () {
-//   var spinnerLoc = 'modal-spinner-target';
-//   var ehrStartDate = $('#ehr-start-date').val();
-//   var ehrEndDate = $('#ehr-end-date').val();
-//   var ehrAwardees = [];
-// 
-//   console.log('launch spinner');
-//   launchSpinner(spinnerLoc);
-// 
-//   $.getJSON('/dashboard/metrics_load_ehr', {
-//     csrf_token: CsrfToken,
-//     mode: 'Sites',
-//     start_date: ehrStartDate,
-//     end_date: ehrEndDate,
-//     interval: 'quarter',
-//     sites: ehrAwardees
-//   })
-//   .done(function (data) {
-//     stopSpinner(spinnerLoc)
-//     console.log('data', data)
-//   })
-//   .fail(function (error) {
-//     window.alert(error)
-//   })
-// })
+// re-render on filter change
+$('.ehr-plot-control').on('change', function() {
+    renderMetricsEhrPlots('spinner');
+});
+
+// re-render on filter change with modal (for time changes, may need new metrics)
+$('.ehr-time-control').on('change', function() {
+    renderMetricsEhrPlots('modal');
+});
+
+// re-render on window resizeEnd if tab is visible
+$( window ).on('resizeEnd', function() {
+    if ($('#plotly-ehr-participant').is(':visible')) {
+        renderMetricsEhrPlots('');
+    }
+});
+
+$('#ehr-participant').find('.redraw-plotly').on('click', function() {
+    renderMetricsEhrPlots('spinner');
+});
 </script>
 {% endblock %}
