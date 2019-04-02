@@ -26,8 +26,9 @@
                                     <label><input type="checkbox" name="enrollment_statuses[]" value="FULL_PARTICIPANT" class="enrollment-status-filter" checked> Core Participant</label>
                                 </li>
                             </ul>
-                            {% endif %}
                             <hr class="divider" />
+                            {% endif %}
+                            {% if show_recruitment_centers == true %}
                             <h4>Recruitment Origin <a href="javascript:void(0);" class="toggle-all-center-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
                             {% for group, centers in recruitment_centers %}
                                 {% set group_id = group|lower|split(' ')|join('-') %}
@@ -49,6 +50,7 @@
                                 </ul>
                             {% endfor %}
                             <hr class="divider" />
+                            {% endif %}
                             <p class="text-center"><a href="javascript:void(0);" class="redraw-plotly btn btn-primary"><span class="fa fa-filter"></span> Filter Results</a></p>
                         </div>
                    </div>
@@ -58,32 +60,45 @@
     </div>
 </div>
 
-<script type="text/javascript">
-    // toggle subgroup
-    $('#{{ id }}').find('.toggle-center-filters').on('click', function(e) {
-        var listGroup = $(e.currentTarget).data('identifier');
-        console.log('toggling ' + listGroup);
-        var cb = $('#{{ id }}').find('.' + listGroup).find('input');
-        cb.prop('checked', !cb.prop('checked'));
-        var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';
-        $(e.currentTarget).find('span').attr('class', "fa " + toggleClass);
-    });
+<script>
+var centerFilterStatuses = {};
+function updateCenterFiltersStatuses() {
+  $('.center-filter').each(function(index, element) {
+    var centerFilter = $(element);
+    var center = centerFilter.val();
+    var isChecked = centerFilter.is(':checked') ? 1 : 0;
+    centerFilterStatuses[center] = isChecked;
+  });
+}
+$(document).on('change', '.center-filter', function() {
+  updateCenterFiltersStatuses();
+});
 
-    // toggle all recruitment origin filters
-    $('#{{ id }}').find('.toggle-all-center-filters').on('click', function(e) {
-        var cb = $('#{{ id }}').find('.center-filter');
-        cb.prop('checked', !cb.prop('checked'));
-        // check first element to determine whether toggle switch should be on or off
-        var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';
-        $(e.currentTarget).find('span').attr('class', "fa " + toggleClass);
-    });
+// toggle subgroup
+$('#{{ id }}').find('.toggle-center-filters').on('click', function(e) {
+  var listGroup = $(e.currentTarget).data('identifier');
+  console.log('toggling ' + listGroup);
+  var cb = $('#{{ id }}').find('.' + listGroup).find('input');
+  cb.prop('checked', !cb.prop('checked'));
+  var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';
+  $(e.currentTarget).find('span').attr('class', "fa " + toggleClass);
+});
 
-    // toggle all enrollment status filters
-    $('#{{ id }}').find('.toggle-all-enrollment-filters').on('click', function(e) {
-      var cb = $('#{{ id }}').find('.enrollment-status-filter');
-      cb.prop('checked', !cb.prop('checked'));
-      // check first element to determine whether toggle switch should be on or off
-      var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';
-      $(e.currentTarget).find('span').attr('class', "fa " + toggleClass);
-    });
+// toggle all recruitment origin filters
+$('#{{ id }}').find('.toggle-all-center-filters').on('click', function(e) {
+  var cb = $('#{{ id }}').find('.center-filter');
+  cb.prop('checked', !cb.prop('checked'));
+  // check first element to determine whether toggle switch should be on or off
+  var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';
+  $(e.currentTarget).find('span').attr('class', "fa " + toggleClass);
+});
+
+// toggle all enrollment status filters
+$('#{{ id }}').find('.toggle-all-enrollment-filters').on('click', function(e) {
+  var cb = $('#{{ id }}').find('.enrollment-status-filter');
+  cb.prop('checked', !cb.prop('checked'));
+  // check first element to determine whether toggle switch should be on or off
+  var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';
+  $(e.currentTarget).find('span').attr('class', "fa " + toggleClass);
+});
 </script>

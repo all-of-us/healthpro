@@ -8,7 +8,7 @@
         <div id="ehr" class="tab-pane pad active fade in">
             <div class="row">
                 <div id="ehr-filters" class="col-md-3">
-                    {% include 'dashboard/partials/filters.html.twig' with {recruitment_centers: recruitment_centers, id: 'ehr', show_enrollment_status: false} %}
+                    {% include 'dashboard/partials/filters.html.twig' with {id: 'ehr', show_recruitment_centers: false, show_enrollment_status: false} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -42,10 +42,20 @@
                   </div>
                   <div class="row">
                     <div class="col-md-12">
+                      <hr />
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
                       <div id="plotly-ehr-organization-count" class="plotly-div"></div>
                       <div class="table-responsive">
                         <div id="table-ehr-organization-count"></div>
                       </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <hr />
                     </div>
                   </div>
                   <div class="row">
@@ -85,214 +95,202 @@ function renderMetricsEhrPlots(dialogType) {
       alert('Your date selection is invalid: The selected cutoff date of ' + ehrEndDate + ' is before ' + ehrStartDate + '. Please select a valid date range.');
       return false;
   }
-  var centers = loadRecruitmentFilters('ehr');
-  if (centers.length == 0) {
-      alert('You must select at least one recruitment center to plot results.');
-      return false;
-    } else {
-        var spinnerLoc = 'plotly-ehr-participants';
-        if (dialogType == 'spinner') {
-            launchSpinner(spinnerLoc);
-        } else if (dialogType == 'modal' ) {
-            spinnerLoc = 'modal-spinner-target';
-            // empty target in case there was an error message beforehand
-            $('#' + spinnerLoc).empty();
-            launchSpinner(spinnerLoc);
-            $('#loading-modal').modal('show');
-        }
+  var spinnerLoc = 'plotly-ehr-participants';
+  if (dialogType == 'spinner') {
+      launchSpinner(spinnerLoc);
+  } else if (dialogType == 'modal' ) {
+      spinnerLoc = 'modal-spinner-target';
+      // empty target in case there was an error message beforehand
+      $('#' + spinnerLoc).empty();
+      launchSpinner(spinnerLoc);
+      $('#loading-modal').modal('show');
+  }
 
-        // gather params
-        var ehrInterval = $('#ehr-interval').val();
-        var showAnnot = $('#ehr-show-annot').is(':checked');
-        var ehrParticipantWidth = $('#plotly-ehr-participant').width() - 30;
-        var ehrSitesWidth = $('#plotly-ehr-sites').width() - 30;
-        if (centers.length == $('#ehr .center-filter').length) {
-            centers = [];
-        }
+  // gather params
+  var ehrInterval = $('#ehr-interval').val();
+  var showAnnot = $('#ehr-show-annot').is(':checked');
+  var ehrParticipantWidth = $('#plotly-ehr-participant').width() - 30;
+  var ehrSitesWidth = $('#plotly-ehr-sites').width() - 30;
 
-        /**
-         * Participants Over Time
-         */
-        $.getJSON('/dashboard/metrics_load_ehr', {
-          csrf_token: CsrfToken,
-          mode: 'ParticipantsOverTime',
-          start_date: ehrStartDate,
-          end_date: ehrEndDate,
-          interval: 'quarter',
-          sites: centers
-        })
-        .done(function(data) {
-            if (data.length != 0) {
-                var progressAnnot = [];
-                var ehrParticipantLayout = {
-                    title: '<b>EHR Consent</b> vs <b>EHR Data</b>',
-                    font: PLOTLY_LABEL_FONT,
-                    width: ehrParticipantWidth,
-                    height: ehrParticipantWidth / 1.66,
-                    hovermode: 'closest',
-                    annotations: progressAnnot,
-                    yaxis: {
-                        fixedrange: true
-                    },
-                    xaxis : {
-                        fixedrange: true
-                    }
-                };
+  /**
+   * Participants Over Time
+   */
+  $.getJSON('/dashboard/metrics_load_ehr', {
+    csrf_token: CsrfToken,
+    mode: 'ParticipantsOverTime',
+    start_date: ehrStartDate,
+    end_date: ehrEndDate,
+    interval: 'quarter'
+  })
+  .done(function(data) {
+      if (data.length != 0) {
+          var progressAnnot = [];
+          var ehrParticipantLayout = {
+              title: '<b>EHR Consent</b> vs <b>EHR Data</b>',
+              font: PLOTLY_LABEL_FONT,
+              width: ehrParticipantWidth,
+              height: ehrParticipantWidth / 1.66,
+              hovermode: 'closest',
+              annotations: progressAnnot,
+              yaxis: {
+                  fixedrange: true
+              },
+              xaxis : {
+                  fixedrange: true
+              }
+          };
 
-                // load column totals if requested
-                if (showAnnot) {
-                    loadBarChartAnnotations(data, progressAnnot);
-                }
-
-                // load table data
-                var ehrParticipantTable = $('#table-ehr-participant');
-                loadTableData(ehrParticipantTable, data, ehrParticipantLayout.title);
-
-                // empty div contents in case there had been an error message before
-                $('#' + spinnerLoc).empty();
-
-                // render plot, remove plotly link and stop spinner
-                Plotly.newPlot('plotly-ehr-participant', data, ehrParticipantLayout, PLOTLY_OPTS);
-                removePlotlyLink('plotly-ehr-participant');
-                stopSpinner(spinnerLoc);
-
-                if (dialogType == 'modal' ) {
-                    $('#loading-modal').modal('hide');
-                }
-
-                // set toggle traces switch to on, regardless of previous state
-                $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
-
-            } else {
-                setMetricsError(spinnerLoc);
-            }
-
-        })
-        .fail(function(jqXHR) {
-          try {
-            setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
-          } catch (e) {
-            setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
+          // load column totals if requested
+          if (showAnnot) {
+              loadBarChartAnnotations(data, progressAnnot);
           }
-        });
 
+          // load table data
+          var ehrParticipantTable = $('#table-ehr-participant');
+          loadTableData(ehrParticipantTable, data, ehrParticipantLayout.title);
 
-        /**
-         * Organizations Active Over Time
-         */
-        $.getJSON('/dashboard/metrics_load_ehr', {
-          csrf_token: CsrfToken,
-          mode: 'OrganizationsActiveOverTime',
-          start_date: ehrStartDate,
-          end_date: ehrEndDate,
-          interval: 'quarter',
-          sites: centers
-        })
-        .done(function(data) {
-            if (data.length != 0) {
-                var progressAnnot = [];
-                var ehrOrganizationCountLayout = {
-                    title: '<b>Organizations</b> providing <b>EHR Data</b>',
-                    font: PLOTLY_LABEL_FONT,
-                    width: ehrSitesWidth,
-                    height: ehrSitesWidth / 1.66,
-                    hovermode: 'closest',
-                    annotations: progressAnnot,
-                    yaxis: {
-                        fixedrange: true
-                    },
-                    xaxis : {
-                        fixedrange: true
-                    }
-                };
+          // empty div contents in case there had been an error message before
+          $('#' + spinnerLoc).empty();
 
-                // load column totals if requested
-                if (showAnnot) {
-                    loadBarChartAnnotations(data, progressAnnot);
-                }
+          // render plot, remove plotly link and stop spinner
+          Plotly.newPlot('plotly-ehr-participant', data, ehrParticipantLayout, PLOTLY_OPTS);
+          removePlotlyLink('plotly-ehr-participant');
+          stopSpinner(spinnerLoc);
 
-                // load table data
-                var ehrParticipantTable = $('#table-ehr-organization-count');
-                loadTableData(ehrParticipantTable, data, ehrOrganizationCountLayout.title);
-
-                // empty div contents in case there had been an error message before
-                $('#' + spinnerLoc).empty();
-
-                // render plot, remove plotly link and stop spinner
-                Plotly.newPlot('plotly-ehr-organization-count', data, ehrOrganizationCountLayout, PLOTLY_OPTS);
-                removePlotlyLink('plotly-ehr-organization-count');
-                stopSpinner(spinnerLoc);
-
-                if (dialogType == 'modal' ) {
-                    $('#loading-modal').modal('hide');
-                }
-
-                // set toggle traces switch to on, regardless of previous state
-                $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
-
-            } else {
-                setMetricsError(spinnerLoc);
-            }
-
-        })
-        .fail(function(jqXHR) {
-          try {
-            setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
-          } catch (e) {
-            setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
+          if (dialogType == 'modal' ) {
+              $('#loading-modal').modal('hide');
           }
-        });
 
-        /**
-         * Organizations Table
-         */
-         $.getJSON('/dashboard/metrics_load_ehr', {
-           csrf_token: CsrfToken,
-           mode: 'Organizations',
-           start_date: ehrStartDate,
-           end_date: ehrEndDate,
-           interval: 'quarter',
-           sites: centers
-         })
-         .done(function(data) {
-             if (data.length != 0) {
-                 // load column totals if requested
-                 if (showAnnot) {
-                     loadBarChartAnnotations(data, progressAnnot);
-                 }
+          // set toggle traces switch to on, regardless of previous state
+          $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
 
-                 // load table data
-                 var ehrOrganizationTable = $('#table-ehr-organizations');
-                 $(ehrOrganizationTable).html('<table class="table table-striped"><thead></thead><tbody></tbody></table>')
-                 $('thead', ehrOrganizationTable).append('<tr><th>Organization</th><th>Total Participants</th><th>Total Primary Consent</th><th>Total EHR Consent</th><th>Total Core</th><th>Total EHR Data Received</th><th>Last EHR Submission Date</th></tr>');
-                 $(data).each(function (i, row) {
-                    var organizationRow = $('<tr />')
-                    organizationRow.append('<td>' + row.organization_name + '</td>')
-                    organizationRow.append('<td>' + row.total_participants + '</td>')
-                    organizationRow.append('<td>' + row.total_primary_consented + '</td>')
-                    organizationRow.append('<td>' + row.total_ehr_consented + '</td>')
-                    organizationRow.append('<td>' + row.total_core_participants + '</td>')
-                    organizationRow.append('<td>' + row.total_ehr_data_received + '</td>')
-                    organizationRow.append('<td>' + (row.last_ehr_submission_date ? row.last_ehr_submission_date : '-') + '</td>')
-                    $('tbody', ehrOrganizationTable).append(organizationRow)
-                 });
+      } else {
+          setMetricsError(spinnerLoc);
+      }
 
-                 // empty div contents in case there had been an error message before
-                 $('#' + spinnerLoc).empty();
-             } else {
-                 setMetricsError(spinnerLoc);
-             }
-
-         })
-         .fail(function(jqXHR) {
-           try {
-             setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
-           } catch (e) {
-             setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
-           }
-         });
+  })
+  .fail(function(jqXHR) {
+    try {
+      setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
+    } catch (e) {
+      setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
     }
+  });
+
+
+  /**
+   * Organizations Active Over Time
+   */
+  $.getJSON('/dashboard/metrics_load_ehr', {
+    csrf_token: CsrfToken,
+    mode: 'OrganizationsActiveOverTime',
+    start_date: ehrStartDate,
+    end_date: ehrEndDate,
+    interval: 'quarter'
+  })
+  .done(function(data) {
+      if (data.length != 0) {
+          var progressAnnot = [];
+          var ehrOrganizationCountLayout = {
+              title: '<b>Organizations</b> providing <b>EHR Data</b>',
+              font: PLOTLY_LABEL_FONT,
+              width: ehrSitesWidth,
+              height: ehrSitesWidth / 1.66,
+              hovermode: 'closest',
+              annotations: progressAnnot,
+              yaxis: {
+                  fixedrange: true
+              },
+              xaxis : {
+                  fixedrange: true
+              }
+          };
+
+          // load column totals if requested
+          if (showAnnot) {
+              loadBarChartAnnotations(data, progressAnnot);
+          }
+
+          // load table data
+          var ehrParticipantTable = $('#table-ehr-organization-count');
+          loadTableData(ehrParticipantTable, data, ehrOrganizationCountLayout.title);
+
+          // empty div contents in case there had been an error message before
+          $('#' + spinnerLoc).empty();
+
+          // render plot, remove plotly link and stop spinner
+          Plotly.newPlot('plotly-ehr-organization-count', data, ehrOrganizationCountLayout, PLOTLY_OPTS);
+          removePlotlyLink('plotly-ehr-organization-count');
+
+          if (dialogType == 'modal' ) {
+              $('#loading-modal').modal('hide');
+          }
+
+          // set toggle traces switch to on, regardless of previous state
+          $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
+
+      } else {
+          setMetricsError(spinnerLoc);
+      }
+
+  })
+  .fail(function(jqXHR) {
+    try {
+      setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
+    } catch (e) {
+      setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
+    }
+  });
+
+  /**
+   * Organizations Table
+   */
+   $.getJSON('/dashboard/metrics_load_ehr', {
+     csrf_token: CsrfToken,
+     mode: 'Organizations',
+     start_date: ehrStartDate,
+     end_date: ehrEndDate,
+     interval: 'quarter'
+   })
+   .done(function(data) {
+       if (data.length != 0) {
+           // load column totals if requested
+           if (showAnnot) {
+               loadBarChartAnnotations(data, progressAnnot);
+           }
+
+           // load table data
+           var ehrOrganizationTable = $('#table-ehr-organizations');
+           $(ehrOrganizationTable).html('<table class="table table-striped"><thead></thead><tbody></tbody></table>')
+           $('thead', ehrOrganizationTable).append('<tr><th>Organization</th><th>Total Participants</th><th>Total Primary Consent</th><th>Total EHR Consent</th><th>Total Core</th><th>Total EHR Data Received</th><th>Last EHR Submission Date</th></tr>');
+           $(data).each(function (i, row) {
+              var organizationRow = $('<tr />')
+              organizationRow.append('<td>' + row.organization_name + '</td>')
+              organizationRow.append('<td>' + row.total_participants + '</td>')
+              organizationRow.append('<td>' + row.total_primary_consented + '</td>')
+              organizationRow.append('<td>' + row.total_ehr_consented + '</td>')
+              organizationRow.append('<td>' + row.total_core_participants + '</td>')
+              organizationRow.append('<td>' + row.total_ehr_data_received + '</td>')
+              organizationRow.append('<td>' + (row.last_ehr_submission_date ? row.last_ehr_submission_date : '-') + '</td>')
+              $('tbody', ehrOrganizationTable).append(organizationRow)
+           });
+
+           // empty div contents in case there had been an error message before
+           $('#' + spinnerLoc).empty();
+       } else {
+           setMetricsError(spinnerLoc);
+       }
+
+   })
+   .fail(function(jqXHR) {
+     try {
+       setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
+     } catch (e) {
+       setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
+     }
+   });
 }
+
 
 var now = new Date();
 var nowString = now.toISOString().split('T')[0];
