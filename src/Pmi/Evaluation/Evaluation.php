@@ -757,4 +757,14 @@ class Evaluation
         }
         return false;
     }
+
+    public function getReasonDisplayText()
+    {
+        if (empty($this->evaluation['eh_reason'])) {
+            return null;
+        }
+        // Check only cancel reasons
+        $reasonDisplayText = array_search($this->evaluation['eh_reason'], self::$cancelReasons);
+        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
+    }
 }

@@ -184,6 +184,7 @@ class Order
         $this->participant = $participant;
         $this->version = !empty($this->order['version']) ? $this->order['version'] : 1;
         $this->order['status'] = !empty($this->order['oh_type']) ? $this->order['oh_type'] : self::ORDER_ACTIVE;
+        $this->order['reasonDisplayText'] = $this->getReasonDisplayText();
         $this->order['disabled'] = $this->isOrderDisabled();
         $this->order['formDisabled'] = $this->isOrderFormDisabled();
         $this->order['canCancel'] = $this->canCancel();
@@ -1503,5 +1504,15 @@ class Order
             $status = true;
         });
         return $status;
+    }
+
+    public function getReasonDisplayText()
+    {
+        if (empty($this->order['oh_reason'])) {
+            return null;
+        }
+        // Check only cancel reasons
+        $reasonDisplayText = array_search($this->order['oh_reason'], self::$cancelReasons);
+        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 }
