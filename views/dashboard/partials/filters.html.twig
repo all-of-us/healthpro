@@ -51,6 +51,21 @@
                             {% endfor %}
                             <hr class="divider" />
                             {% endif %}
+                            {% if show_organizations == true %}
+                            <h4>Organization <a href="javascript:void(0);" class="toggle-all-organization-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
+                            <ul class="list-group organization-filters">
+                                {% for organization in organizations %}
+                                <li class="list-group-item">
+                                    {% if organization['id'] is defined %}
+                                        {% set identifier = organization['id'] %}
+                                    {% endif %}
+                                    <label><input type="checkbox" name="organizations[]" value="{{ identifier }}" class="organization-filter" checked> {{ organization['name'] }} <small>({{ identifier }})</small></label>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            <hr class="divider" />
+                            {% endif %}
+
                             <p class="text-center"><a href="javascript:void(0);" class="redraw-plotly btn btn-primary"><span class="fa fa-filter"></span> Filter Results</a></p>
                         </div>
                    </div>
@@ -87,6 +102,15 @@ $('#{{ id }}').find('.toggle-center-filters').on('click', function(e) {
 // toggle all recruitment origin filters
 $('#{{ id }}').find('.toggle-all-center-filters').on('click', function(e) {
   var cb = $('#{{ id }}').find('.center-filter');
+  cb.prop('checked', !cb.prop('checked'));
+  // check first element to determine whether toggle switch should be on or off
+  var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';
+  $(e.currentTarget).find('span').attr('class', "fa " + toggleClass);
+});
+
+// toggle all organization filters
+$('#{{ id }}').find('.toggle-all-organization-filters').on('click', function(e) {
+  var cb = $('#{{ id }}').find('.organization-filter');
   cb.prop('checked', !cb.prop('checked'));
   // check first element to determine whether toggle switch should be on or off
   var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';

@@ -8,7 +8,7 @@
         <div id="real-time" class="tab-pane pad active fade in">
             <div class="row">
                 <div id="real-time-filters" class="col-md-3">
-                    {% include 'dashboard/partials/filters.html.twig' with {id: 'real-time', show_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: true} %}
+                    {% include 'dashboard/partials/filters.html.twig' with {id: 'real-time', show_organizations: false, show_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: true} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -91,101 +91,101 @@
     if (centers.length == 0) {
       alert('You must select at least one recruitment center to plot results.');
       return false;
-    } else {
-      var spinnerLoc = 'plotly-real-time';
-      if (dialogType == 'spinner') {
-        launchSpinner(spinnerLoc);
-      } else if (dialogType == 'modal' ) {
-        spinnerLoc = 'modal-spinner-target';
-        // empty target in case there was an error message beforehand
-        $('#' + spinnerLoc).empty();
-        launchSpinner(spinnerLoc);
-        $('#loading-modal').modal('show');
-      }
+    }
 
-      // Restrict users to a 100 day date range for real-time requests
-      if (moment(tpEndDate).diff(moment(tpStartDate), 'days') > 100) {
-        setMetricsError(spinnerLoc, 'Please select a date range less than 100 days');
-        return false;
-      }
+    var spinnerLoc = 'plotly-real-time';
+    if (dialogType == 'spinner') {
+      launchSpinner(spinnerLoc);
+    } else if (dialogType == 'modal' ) {
+      spinnerLoc = 'modal-spinner-target';
+      // empty target in case there was an error message beforehand
+      $('#' + spinnerLoc).empty();
+      launchSpinner(spinnerLoc);
+      $('#loading-modal').modal('show');
+    }
 
-      // gather params
-      var tpInterval = $('#real-time-interval').val();
-      var metricTitle = $('#real-time-metric-attribute option:selected').text();
-      var showAnnot = $('#real-time-show-annot').is(':checked');
-      var tpWidth = $('#plotly-real-time').width() - 30;
-      if (centers.length == $('#real-time .center-filter').length) {
-        centers = [''];
-      }
+    // Restrict users to a 100 day date range for real-time requests
+    if (moment(tpEndDate).diff(moment(tpStartDate), 'days') > 100) {
+      setMetricsError(spinnerLoc, 'Please select a date range less than 100 days');
+      return false;
+    }
 
-      // load data from metrics API
-      $.getJSON('/dashboard/metrics_load', {
-        csrf_token: CsrfToken,
-        stratification: 'ENROLLMENT_STATUS',
-        interval: tpInterval,
-        start_date: tpStartDate,
-        end_date: tpEndDate,
-        centers: centers,
-        enrollment_statuses: enrollmentStatuses
-      })
-      .done(function(data) {
-        if (data.length != 0) {
-          var progressAnnot = [];
-          var tpLayout = {
-            title: 'Count of <b>enrollment status</b> by date',
-            font: PLOTLY_LABEL_FONT,
-            barmode: 'stack',
-            width: tpWidth,
-            height: tpWidth / 1.66,
-            hovermode: 'closest',
-            annotations: progressAnnot,
-            yaxis: {
-              fixedrange: true
-            },
-            xaxis : {
-              fixedrange: true
-            }
-          };
+    // gather params
+    var tpInterval = $('#real-time-interval').val();
+    var metricTitle = $('#real-time-metric-attribute option:selected').text();
+    var showAnnot = $('#real-time-show-annot').is(':checked');
+    var tpWidth = $('#plotly-real-time').width() - 30;
+    if (centers.length == $('#real-time .center-filter').length) {
+      centers = [''];
+    }
 
-          // load column totals if requested
-          if (showAnnot) {
-            loadBarChartAnnotations(data, progressAnnot);
+    // load data from metrics API
+    $.getJSON('/dashboard/metrics_load', {
+      csrf_token: CsrfToken,
+      stratification: 'ENROLLMENT_STATUS',
+      interval: tpInterval,
+      start_date: tpStartDate,
+      end_date: tpEndDate,
+      centers: centers,
+      enrollment_statuses: enrollmentStatuses
+    })
+    .done(function(data) {
+      if (data.length != 0) {
+        var progressAnnot = [];
+        var tpLayout = {
+          title: 'Count of <b>enrollment status</b> by date',
+          font: PLOTLY_LABEL_FONT,
+          barmode: 'stack',
+          width: tpWidth,
+          height: tpWidth / 1.66,
+          hovermode: 'closest',
+          annotations: progressAnnot,
+          yaxis: {
+            fixedrange: true
+          },
+          xaxis : {
+            fixedrange: true
           }
+        };
 
-          // load table data
-          var tpTable = $('#real-time-table');
-          loadTableData(tpTable, data, metricTitle);
-
-          // empty div contents in case there had been an error message before
-          $('#' + spinnerLoc).empty();
-
-          // render plot, remove plotly link and stop spinner
-          Plotly.newPlot('plotly-real-time', data, tpLayout, PLOTLY_OPTS);
-          removePlotlyLink('plotly-real-time');
-          stopSpinner(spinnerLoc);
-
-          if (dialogType == 'modal' ) {
-            $('#loading-modal').modal('hide');
-          }
-
-          // set toggle traces switch to on, regardless of previous state
-          $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
-
-        } else {
-          if (data.length === 0) {
-            setMetricsError(spinnerLoc);
-          }
+        // load column totals if requested
+        if (showAnnot) {
+          loadBarChartAnnotations(data, progressAnnot);
         }
 
-      })
-        .fail(function(jqXHR) {
-          try {
-            setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
-          } catch (e) {
-            setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
-          }
-        });
-    }
+        // load table data
+        var tpTable = $('#real-time-table');
+        loadTableData(tpTable, data, metricTitle);
+
+        // empty div contents in case there had been an error message before
+        $('#' + spinnerLoc).empty();
+
+        // render plot, remove plotly link and stop spinner
+        Plotly.newPlot('plotly-real-time', data, tpLayout, PLOTLY_OPTS);
+        removePlotlyLink('plotly-real-time');
+        stopSpinner(spinnerLoc);
+
+        if (dialogType == 'modal' ) {
+          $('#loading-modal').modal('hide');
+        }
+
+        // set toggle traces switch to on, regardless of previous state
+        $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
+
+      } else {
+        if (data.length === 0) {
+          setMetricsError(spinnerLoc);
+        }
+      }
+
+    })
+    .fail(function(jqXHR) {
+      try {
+        setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
+      } catch (e) {
+        setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
+      }
+    });
   }
 
   $('#toggle-traces').on('click', function() {

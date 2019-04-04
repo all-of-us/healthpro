@@ -166,11 +166,11 @@ class DashboardController extends AbstractController
      */
     public function ehrAction(Application $app)
     {
-        $recruitment_centers = $this->getCentersList($app);
+        $organizations = $this->getOrganizationsList($app);
         return $app['twig']->render(
             'dashboard/ehr.html.twig',
             [
-                'recruitment_centers' => $recruitment_centers
+                'organizations' => $organizations
             ]
         );
     }
@@ -745,7 +745,7 @@ class DashboardController extends AbstractController
         $start_date = $request->get('start_date', date('Y-m-d'));
         $end_date = $request->get('end_date', date('Y-m-d'));
         $interval = $request->get('interval', 'quarter');
-        $centers = $request->get('centers', []);
+        $organizations = $request->get('organizations', []);
         $params = [];
 
         $metrics = $this->getMetricsEHRObject(
@@ -754,7 +754,7 @@ class DashboardController extends AbstractController
             $start_date,
             $end_date,
             $interval,
-            $centers,
+            $organizations,
             $params
         );
 
@@ -799,18 +799,18 @@ class DashboardController extends AbstractController
                 break;
             case 'OrganizationsActiveOverTime':
                 $dates = [];
-                $organizations = [];
-                $organizations_text = [];
+                $orgs = [];
+                $orgs_text = [];
                 foreach ($metrics as $row) {
                     array_push($dates, $row['date']);
-                    array_push($organizations, (int) $row['metrics']['ORGANIZATIONS_ACTIVE']);
-                    array_push($organizations_text, number_format($row['metrics']['ORGANIZATIONS_ACTIVE']));
+                    array_push($orgs, (int) $row['metrics']['ORGANIZATIONS_ACTIVE']);
+                    array_push($orgs_text, number_format($row['metrics']['ORGANIZATIONS_ACTIVE']));
                 }
                 $ehr_data = [
                     [
                         "x" => $dates,
-                        "y" => $organizations,
-                        "text" => $organizations_text,
+                        "y" => $orgs,
+                        "text" => $orgs_text,
                         "type" => 'bar',
                         "hoverinfo" => 'text+name',
                         "name" => 'Active Organizations',
@@ -922,7 +922,7 @@ class DashboardController extends AbstractController
         $start_date,
         $end_date,
         $interval,
-        $centers,
+        $organizations,
         $params = []
     ) {
         try {
@@ -934,7 +934,7 @@ class DashboardController extends AbstractController
                 $start_date,
                 $end_date,
                 $interval,
-                $centers,
+                $organizations,
                 $params
             );
 
@@ -1071,6 +1071,15 @@ class DashboardController extends AbstractController
         }
 
         return $recruitment_centers;
+    }
+
+    /**
+     * Get Organizations List
+     */
+    private function getOrganizationsList(Application $app)
+    {
+        $organizations = $app['db']->fetchAll("SELECT id, name FROM organizations");
+        return $organizations;
     }
 
     /**

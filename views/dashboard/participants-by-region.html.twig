@@ -8,7 +8,7 @@
         <div id="participants-by-region" class="tab-pane pad active fade in">
             <div class="row">
                 <div id="participants-by-region-filters" class="col-md-3">
-                    {% include 'dashboard/partials/filters.html.twig' with {id: 'participants-by-region', show_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: true} %}
+                    {% include 'dashboard/partials/filters.html.twig' with {id: 'participants-by-region', show_organizations: false, show_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: true} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -76,99 +76,99 @@
         } else if (enrollmentStatuses.length == 0) {
             alert('You must select at least one enrollment status to plot results');
             return false;
-        } else {
-            var spinnerLoc = 'plotly-participants-by-region';
-            if (dialogType == 'spinner') {
-                launchSpinner(spinnerLoc);
-            } else if (dialogType == 'modal' ) {
-                spinnerLoc = 'modal-spinner-target';
-                // empty target in case there was an error message beforehand
-                $('#' + spinnerLoc).empty();
-                launchSpinner(spinnerLoc);
-                $('#loading-modal').modal('show');
-            }
-            // gather params
-            var mapWidth = $('#plotly-participants-by-region').width() - 30;
-            var mapCutoff = $('#region-plot-end-date').val();
-            var mapMode = $('#map-mode').val();
-            var mapModeText = $('#map-mode option:selected').text();
-            var mapColor = $('#map-color-profile').val();
-            if (regionCenters.length == $('#participants-by-region .center-filter').length) {
-                regionCenters = ['ALL'];
-            }
-
-            if (mapMode == 'GEO_AWARDEE') {
-                $('#map-color-profile').prop('disabled', true);
-            } else {
-                $('#map-color-profile').prop('disabled', false);
-            }
-
-            var enrollmentFilterText = 'Participants';
-            if (enrollmentStatuses.length < 3) {
-              var mappedEnrollmentStatuses = [];
-              if (enrollmentStatuses.indexOf('INTERESTED') !== -1) {
-                mappedEnrollmentStatuses.push('Registered');
-              }
-              if (enrollmentStatuses.indexOf('MEMBER') !== -1) {
-                mappedEnrollmentStatuses.push('Consented');
-              }
-              if (enrollmentStatuses.indexOf('FULL_PARTICIPANT') !== -1) {
-                mappedEnrollmentStatuses.push('Core');
-              }
-              enrollmentFilterText = mappedEnrollmentStatuses.join(', ') + ' Participants';
-            }
-
-            // load data from metrics API
-            $.getJSON('/dashboard/metrics_load_region', {
-              csrf_token: CsrfToken,
-              stratification: mapMode,
-              end_date: mapCutoff,
-              centers: regionCenters,
-              enrollment_statuses: enrollmentStatuses,
-              history: true,
-              color_profile: mapColor 
-            })
-            .done(function(data) {
-                if (data.length != 0) {
-                    if (mapModeText != 'Recruitment Origin') {
-                        mapModeText += ' of residence'
-                    }
-                    var mapLayout = {
-                        title: '<b>' + enrollmentFilterText + '</b> by <b>' + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
-                        font: PLOTLY_LABEL_FONT,
-                        width: mapWidth,
-                        height: mapWidth / 1.66,
-                        geo: GEO_OPTS
-                    };
-
-                    // empty div contents in case there had been an error message before
-                    $('#' + spinnerLoc).empty();
-
-                    // load table data
-                    var regionTable = $('#participants-by-region-table');
-                    loadRegionTableData(regionTable, data, mapMode, mapModeText);
-
-                    // render plot and stop spinner
-                    Plotly.newPlot('plotly-participants-by-region', data, mapLayout, PLOTLY_OPTS);
-                    removePlotlyLink('plotly-participants-by-region');
-                    stopSpinner(spinnerLoc);
-
-                    if (dialogType == 'modal') {
-                        $('#loading-modal').modal('hide');
-                    }
-
-                } else {
-                    setMetricsError(spinnerLoc);
-                }
-            })
-            .fail(function(jqXHR) {
-              try {
-                setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
-              } catch (e) {
-                setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
-              }
-            });
         }
+
+        var spinnerLoc = 'plotly-participants-by-region';
+        if (dialogType == 'spinner') {
+            launchSpinner(spinnerLoc);
+        } else if (dialogType == 'modal' ) {
+            spinnerLoc = 'modal-spinner-target';
+            // empty target in case there was an error message beforehand
+            $('#' + spinnerLoc).empty();
+            launchSpinner(spinnerLoc);
+            $('#loading-modal').modal('show');
+        }
+        // gather params
+        var mapWidth = $('#plotly-participants-by-region').width() - 30;
+        var mapCutoff = $('#region-plot-end-date').val();
+        var mapMode = $('#map-mode').val();
+        var mapModeText = $('#map-mode option:selected').text();
+        var mapColor = $('#map-color-profile').val();
+        if (regionCenters.length == $('#participants-by-region .center-filter').length) {
+            regionCenters = ['ALL'];
+        }
+
+        if (mapMode == 'GEO_AWARDEE') {
+            $('#map-color-profile').prop('disabled', true);
+        } else {
+            $('#map-color-profile').prop('disabled', false);
+        }
+
+        var enrollmentFilterText = 'Participants';
+        if (enrollmentStatuses.length < 3) {
+          var mappedEnrollmentStatuses = [];
+          if (enrollmentStatuses.indexOf('INTERESTED') !== -1) {
+            mappedEnrollmentStatuses.push('Registered');
+          }
+          if (enrollmentStatuses.indexOf('MEMBER') !== -1) {
+            mappedEnrollmentStatuses.push('Consented');
+          }
+          if (enrollmentStatuses.indexOf('FULL_PARTICIPANT') !== -1) {
+            mappedEnrollmentStatuses.push('Core');
+          }
+          enrollmentFilterText = mappedEnrollmentStatuses.join(', ') + ' Participants';
+        }
+
+        // load data from metrics API
+        $.getJSON('/dashboard/metrics_load_region', {
+          csrf_token: CsrfToken,
+          stratification: mapMode,
+          end_date: mapCutoff,
+          centers: regionCenters,
+          enrollment_statuses: enrollmentStatuses,
+          history: true,
+          color_profile: mapColor 
+        })
+        .done(function(data) {
+            if (data.length != 0) {
+                if (mapModeText != 'Recruitment Origin') {
+                    mapModeText += ' of residence'
+                }
+                var mapLayout = {
+                    title: '<b>' + enrollmentFilterText + '</b> by <b>' + mapModeText.toLowerCase() + '</b> as of ' + mapCutoff,
+                    font: PLOTLY_LABEL_FONT,
+                    width: mapWidth,
+                    height: mapWidth / 1.66,
+                    geo: GEO_OPTS
+                };
+
+                // empty div contents in case there had been an error message before
+                $('#' + spinnerLoc).empty();
+
+                // load table data
+                var regionTable = $('#participants-by-region-table');
+                loadRegionTableData(regionTable, data, mapMode, mapModeText);
+
+                // render plot and stop spinner
+                Plotly.newPlot('plotly-participants-by-region', data, mapLayout, PLOTLY_OPTS);
+                removePlotlyLink('plotly-participants-by-region');
+                stopSpinner(spinnerLoc);
+
+                if (dialogType == 'modal') {
+                    $('#loading-modal').modal('hide');
+                }
+
+            } else {
+                setMetricsError(spinnerLoc);
+            }
+        })
+        .fail(function(jqXHR) {
+          try {
+            setMetricsError(spinnerLoc, JSON.parse(jqXHR.responseText).error);
+          } catch (e) {
+            setMetricsError(spinnerLoc, 'An error occurred while loading the data.');
+          }
+        });
     }
 
     var now = new Date().toISOString().split('T')[0];

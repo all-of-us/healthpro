@@ -125,6 +125,15 @@ function loadRecruitmentFilters(id) {
     return centers;
 }
 
+// collect all checked recruitment centers filters
+function loadOrganizationFilters(id) {
+    var centers = [];
+    $('#' + id).find('.organization-filter:checked').each(function() {
+        centers.push($(this).val());
+    });
+    return centers;
+}
+
 // collect all checked enrollment status filters
 // TODO: When Metrics API 2 supports more filters, abstract this code
 function loadEnrollmentFilters(id) {

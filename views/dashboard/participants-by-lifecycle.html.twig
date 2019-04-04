@@ -8,7 +8,7 @@
         <div id="participants-by-lifecycle" class="tab-pane pad active fade in">
             <div class="row">
                 <div class="col-md-3">
-                    {% include 'dashboard/partials/filters.html.twig' with {id: 'participants-by-lifecycle', show_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: false} %}
+                    {% include 'dashboard/partials/filters.html.twig' with {id: 'participants-by-lifecycle', show_organizations: false, how_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: false} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -52,79 +52,80 @@
         if (lifecycleCenters.length == 0) {
             alert('You must select at least one recruitment center to plot results');
             return false;
-        } else {
-            var lcWidth = $('#plotly-participants-by-lifecycle').width() - 30;
-            var spinnerLoc = 'plotly-participants-by-lifecycle';
-            if (dialogType == 'spinner') {
-                launchSpinner(spinnerLoc);
-            } else if (dialogType == 'modal') {
-                spinnerLoc = 'modal-spinner-target';
-                // empty target in case there was an error message beforehand
-                $('#' + spinnerLoc).empty();
-                launchSpinner(spinnerLoc);
-                $('#loading-modal').modal('show');
-            }
-            var lcEndDate = $('#lifecycle-end-date').val();
-            var lcShowAnnot = $('#lifecycle-plot-show-annot').is(':checked');
-
-            if (lifecycleCenters.length == $('#participants-by-lifecycle .center-filter').length) {
-                lifecycleCenters = ['ALL'];
-            }
-
-            // load data from metrics API
-            $.getJSON('/dashboard/metrics_load_lifecycle', {
-              csrf_token: CsrfToken,
-              stratification: 'LIFECYCLE',
-              end_date: lcEndDate,
-              centers: lifecycleCenters,
-              history: true
-            })
-            .done(function(data) {
-                if (data.length != 0) {
-                    var lcAnnot = [];
-                    var lcTitle = 'Participant registrations by <b>lifecycle phase</b> as of ' + lcEndDate;
-                    var lcLayout = {
-                        title: lcTitle,
-                        font: PLOTLY_LABEL_FONT,
-                        barmode: 'stack',
-                        width: lcWidth,
-                        height: lcWidth / 1.66,
-                        annotations: lcAnnot,
-                        xaxis: {
-                            tickangle: -45,
-                            fixedrange: true
-                        },
-                        yaxis: {
-                            fixedrange: true
-                        },
-                        margin: {
-                            b: 150,
-                            pad: 5
-                        }
-                    };
-
-                    // load column totals if requested
-                    if (lcShowAnnot) {
-                        loadBarChartAnnotations(data, lcAnnot);
-                    }
-
-                    // load table data
-                    var lcTable = $('#participants-by-lifecycle-table');
-                    loadTableData(lcTable, data, 'Status');
-
-                    // render plot, remove plotly link and stop spinner
-                    Plotly.newPlot('plotly-participants-by-lifecycle', data, lcLayout, PLOTLY_OPTS);
-                    removePlotlyLink('plotly-participants-by-lifecycle');
-                    stopSpinner(spinnerLoc);
-
-                    if (dialogType == 'modal') {
-                        $('#loading-modal').modal('hide');
-                    }
-                } else {
-                    setMetricsError(spinnerLoc);
-                }
-            });
         }
+
+        var lcWidth = $('#plotly-participants-by-lifecycle').width() - 30;
+        var spinnerLoc = 'plotly-participants-by-lifecycle';
+        if (dialogType == 'spinner') {
+            launchSpinner(spinnerLoc);
+        } else if (dialogType == 'modal') {
+            spinnerLoc = 'modal-spinner-target';
+            // empty target in case there was an error message beforehand
+            $('#' + spinnerLoc).empty();
+            launchSpinner(spinnerLoc);
+            $('#loading-modal').modal('show');
+        }
+        var lcEndDate = $('#lifecycle-end-date').val();
+        var lcShowAnnot = $('#lifecycle-plot-show-annot').is(':checked');
+
+        if (lifecycleCenters.length == $('#participants-by-lifecycle .center-filter').length) {
+            lifecycleCenters = ['ALL'];
+        }
+
+        // load data from metrics API
+        $.getJSON('/dashboard/metrics_load_lifecycle', {
+          csrf_token: CsrfToken,
+          stratification: 'LIFECYCLE',
+          end_date: lcEndDate,
+          centers: lifecycleCenters,
+          history: true
+        })
+        .done(function(data) {
+            if (data.length != 0) {
+                var lcAnnot = [];
+                var lcTitle = 'Participant registrations by <b>lifecycle phase</b> as of ' + lcEndDate;
+                var lcLayout = {
+                    title: lcTitle,
+                    font: PLOTLY_LABEL_FONT,
+                    barmode: 'stack',
+                    width: lcWidth,
+                    height: lcWidth / 1.66,
+                    annotations: lcAnnot,
+                    xaxis: {
+                        tickangle: -45,
+                        fixedrange: true
+                    },
+                    yaxis: {
+                        fixedrange: true
+                    },
+                    margin: {
+                        b: 150,
+                        pad: 5
+                    }
+                };
+
+                // load column totals if requested
+                if (lcShowAnnot) {
+                    loadBarChartAnnotations(data, lcAnnot);
+                }
+
+                // load table data
+                var lcTable = $('#participants-by-lifecycle-table');
+                loadTableData(lcTable, data, 'Status');
+
+                // render plot, remove plotly link and stop spinner
+                Plotly.newPlot('plotly-participants-by-lifecycle', data, lcLayout, PLOTLY_OPTS);
+                removePlotlyLink('plotly-participants-by-lifecycle');
+                stopSpinner(spinnerLoc);
+
+                if (dialogType == 'modal') {
+                    $('#loading-modal').modal('hide');
+                }
+            } else {
+                setMetricsError(spinnerLoc);
+            }
+        });
+
     }
 
     var now = new Date().toISOString().split('T')[0];

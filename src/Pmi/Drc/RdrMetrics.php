@@ -104,24 +104,24 @@ class RdrMetrics
 
 
     /**
-     * Metrics 2 API (MAPI2)
+     * EHR Metrics
      *
      * @param string $mode
      * @param string $start_date YYYY-MM-DD
      * @param string $end_date YYYY-MM-DD
      * @param string $interval
-     * @param array $centers
+     * @param array $organizations
      * @param array $params
      *
      * @return array
      */
-    public function ehrMetrics($mode, $start_date, $end_date, $interval, $centers, $params = [])
+    public function ehrMetrics($mode, $start_date, $end_date, $interval, $organizations, $params = [])
     {
         $client = $this->rdrHelper->getClient();
 
         // Convert arrays to comma separated strings
-        if (is_array($centers)) {
-            $centers = implode(',', $centers);
+        if (is_array($organizations)) {
+            $organizations = implode(',', $organizations);
         }
 
         $query = [
@@ -129,8 +129,8 @@ class RdrMetrics
             'end_date' => $end_date,
             'interval' => $interval
         ];
-        if ($centers) {
-            $query['awardee'] = $centers;
+        if ($organizations) {
+            $query['organization'] = $organizations;
         }
 
         // Generate a cache key

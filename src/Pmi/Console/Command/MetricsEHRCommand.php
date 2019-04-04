@@ -66,10 +66,10 @@ class MetricsEHRCommand extends Command
                 null
             )
             ->addOption(
-                'centers',
+                'organizations',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Filter to specified centers (awardees)'
+                'Filter to specified organizations'
             )
             ->addOption(
                 'pretty',
@@ -102,7 +102,7 @@ class MetricsEHRCommand extends Command
         $end_date = $input->getOption('end_date');
         $interval = $input->getOption('interval');
         $mode = $input->getOption('mode');
-        $centers = $input->getOption('centers');
+        $organizations = $input->getOption('organizations');
         $pretty = ($input->getOption('pretty') !== false) ? JSON_PRETTY_PRINT : 0;
         $params = [];
 
@@ -152,13 +152,13 @@ class MetricsEHRCommand extends Command
             $output->writeln('  Start Date:            ' . $start_date);
             $output->writeln('  End Date:              ' . $end_date);
             $output->writeln('  Interval:              ' . $interval);
-            $output->writeln('  Centers:               ' . json_encode($centers));
+            $output->writeln('  Organizations:         ' . json_encode($organizations));
             $output->writeln('  Additional Parameters: ' . json_encode($params));
             $output->writeln('');
         }
 
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-        $data = $metricsApi->ehrMetrics($mode, $start_date, $end_date, $interval, $centers, $params);
+        $data = $metricsApi->ehrMetrics($mode, $start_date, $end_date, $interval, $organizations, $params);
 
         $output->writeln(json_encode($data, $pretty));
     }
