@@ -94,12 +94,7 @@ function showError(div, msg) {
 /**
  * Render Metrics EHR Plots
  */
-function renderMetricsEhrPlots() {
-    // Add loading icons
-    $('.plotly-div').empty();
-    $('.plotly-div').html('<div class="text-center"><i class="fa fa-spinner fa-spin fa-2x fa-fw"></i> Loading ...</span>');
-    $('.table-div').empty();
-  
+function renderMetricsEhrPlots() {  
     // throw error if date selection is invalid
     var ehrStartDate = $('#ehr-start-date').val();
     var ehrEndDate = $('#ehr-end-date').val();
@@ -124,6 +119,11 @@ function renderMetricsEhrPlots() {
         alert('Your date selection is invalid: The selected cutoff date of ' + ehrEndDate + ' is before ' + ehrStartDate + '. Please select a valid date range.');
         return false;
     }
+
+    // Add loading icons, clear previous errors
+    $('.plotly-div').empty();
+    $('.plotly-div').html('<div class="text-center"><i class="fa fa-spinner fa-spin fa-2x fa-fw"></i> Loading ...</span>');
+    $('.table-div').empty();
 
     // gather params
     var ehrInterval = $('#ehr-interval').val();
