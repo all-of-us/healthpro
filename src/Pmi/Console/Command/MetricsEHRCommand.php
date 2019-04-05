@@ -104,7 +104,6 @@ class MetricsEHRCommand extends Command
         $mode = $input->getOption('mode');
         $organizations = $input->getOption('organizations');
         $pretty = ($input->getOption('pretty') !== false) ? JSON_PRETTY_PRINT : 0;
-        $params = [];
 
         // Validate interval
         if (!in_array($interval, self::$INTERVALS)) {
@@ -158,7 +157,7 @@ class MetricsEHRCommand extends Command
         }
 
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-        $data = $metricsApi->ehrMetrics($mode, $start_date, $end_date, $interval, $organizations, $params);
+        $data = $metricsApi->ehrMetrics($mode, $start_date, $end_date, $interval, $organizations);
 
         $output->writeln(json_encode($data, $pretty));
     }

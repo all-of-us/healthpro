@@ -111,11 +111,10 @@ class RdrMetrics
      * @param string $end_date YYYY-MM-DD
      * @param string $interval
      * @param array $organizations
-     * @param array $params
      *
      * @return array
      */
-    public function ehrMetrics($mode, $start_date, $end_date, $interval, $organizations, $params = [])
+    public function ehrMetrics($mode, $start_date, $end_date, $interval, $organizations)
     {
         $client = $this->rdrHelper->getClient();
 

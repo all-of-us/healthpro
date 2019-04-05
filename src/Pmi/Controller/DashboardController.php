@@ -821,16 +821,6 @@ class DashboardController extends AbstractController
                 ];
                 break;
             case 'Organizations':
-                $display_values = [
-                    'total_ehr_data_received' => 'Total EHR Data Received',
-                    'organization_name' => 'Organization',
-                    'total_ehr_consented' => 'Total EHR Consented',
-                    'total_primary_consented' => 'Total Primary Consent',
-                    'organization_id' => 'Identifier',
-                    'last_ehr_submission_date' => 'Last EHR Submission Date',
-                    'total_participants' => 'Total Participants',
-                    'total_core_participants' => 'Total Core',
-                ];
                 // Render as a table
                 $ehr_data = [];
                 foreach (array_values($metrics) as $i => $metrics) {
