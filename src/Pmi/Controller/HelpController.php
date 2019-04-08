@@ -81,11 +81,6 @@ class HelpController extends AbstractController
                 'SOP-026' => [
                     'title' => 'SOP-026 HPO Biobank Order Review',
                     'filename' => 'SOP-026 HPO Biobank Order Review.pdf'
-                ],
-                'CHANGES-20170412-HPO' => [
-                    'download' => true,
-                    'title' => 'HPO SOP Changes Presentation 04-12-2017',
-                    'filename' => 'HPO SOP Changes Presentation 04-12-2017.pptx'
                 ]
             ]
         ],
@@ -123,11 +118,6 @@ class HelpController extends AbstractController
                 'SOP-025' => [
                     'title' => 'SOP-025 DV Biobank Order Review',
                     'filename' => 'SOP-025 DV Biobank Order Review.pdf'
-                ],
-                'CHANGES-20170412-DV' => [
-                    'download' => true,
-                    'title' => 'DV SOP Changes Presentation 04-12-2017',
-                    'filename' => 'DV SOP Changes Presentation 04-12-2017.pptx'
                 ]
             ]
         ]
