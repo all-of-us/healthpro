@@ -53,16 +53,25 @@
                             {% endif %}
                             {% if show_organizations == true %}
                             <h4>Organization <a href="javascript:void(0);" class="toggle-all-organization-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
-                            <ul class="list-group organization-filters">
-                                {% for organization in organizations %}
-                                <li class="list-group-item">
-                                    {% if organization['id'] is defined %}
-                                        {% set identifier = organization['id'] %}
-                                    {% endif %}
-                                    <label><input type="checkbox" name="organizations[]" value="{{ identifier }}" class="organization-filter" checked> {{ organization['name'] }} <small>({{ identifier }})</small></label>
-                                </li>
-                                {% endfor %}
-                            </ul>
+                            {% for group, orgs in organizations %}
+                                {% set group_id = group|lower|split(' ')|join('-') %}
+                                <ul class="list-group {{ group_id }}-organization-filters">
+                                    <li class="list-group-item"><h4 class="list-group-item-heading">{{ group }}
+                                            {% if orgs|length > 1 %}
+                                                <a href="javascript:void(0);" class="toggle-organization-filters label label-primary pull-right" data-identifier="{{ group_id }}-organization-filters"><span class="fa fa-toggle-on"></span></a>
+                                            {% endif %}
+                                        </h4>
+                                    </li>
+                                    {% for org in orgs %}
+                                        <li class="list-group-item">
+                                            {% if org['id'] is defined %}
+                                                {% set identifier = org['id'] %}
+                                            {% endif %}
+                                            <label><input type="checkbox" name="organizations[]" value="{{ identifier }}" class="organization-filter" checked> {{ org['name'] }}</label>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endfor %}
                             <hr class="divider" />
                             {% endif %}
 
@@ -89,7 +98,7 @@ $(document).on('change', '.center-filter', function() {
   updateCenterFiltersStatuses();
 });
 
-// toggle subgroup
+// toggle center subgroup
 $('#{{ id }}').find('.toggle-center-filters').on('click', function(e) {
   var listGroup = $(e.currentTarget).data('identifier');
   console.log('toggling ' + listGroup);
@@ -113,6 +122,16 @@ $('#{{ id }}').find('.toggle-all-organization-filters').on('click', function(e) 
   var cb = $('#{{ id }}').find('.organization-filter');
   cb.prop('checked', !cb.prop('checked'));
   // check first element to determine whether toggle switch should be on or off
+  var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';
+  $(e.currentTarget).find('span').attr('class', "fa " + toggleClass);
+});
+
+// toggle organization subgroup
+$('#{{ id }}').find('.toggle-organization-filters').on('click', function(e) {
+  var listGroup = $(e.currentTarget).data('identifier');
+  console.log('toggling ' + listGroup);
+  var cb = $('#{{ id }}').find('.' + listGroup).find('input');
+  cb.prop('checked', !cb.prop('checked'));
   var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';
   $(e.currentTarget).find('span').attr('class', "fa " + toggleClass);
 });

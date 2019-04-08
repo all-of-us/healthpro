@@ -1068,8 +1068,14 @@ class DashboardController extends AbstractController
      */
     private function getOrganizationsList(Application $app)
     {
-        $organizations = $app['db']->fetchAll("SELECT id, name FROM organizations");
-        return $organizations;
+        $organizations = $app['db']->fetchAll(
+            "SELECT o.id, o.name, a.id AS awardee_id, a.name AS awardee_name FROM organizations o JOIN sites s ON o.id = s.organization_id JOIN awardees a ON s.awardee_id = a.id WHERE s.type NOT IN ('DV', 'UNSET') GROUP BY o.id, a.id"
+        );
+        $organizations_by_awardee = [];
+        foreach ($organizations as $row) {
+            $organizations_by_awardee[$row['awardee_name']][] = $row;
+        }
+        return $organizations_by_awardee;
     }
 
     /**
