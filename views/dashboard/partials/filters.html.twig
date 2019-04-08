@@ -101,7 +101,6 @@ $(document).on('change', '.center-filter', function() {
 // toggle center subgroup
 $('#{{ id }}').find('.toggle-center-filters').on('click', function(e) {
   var listGroup = $(e.currentTarget).data('identifier');
-  console.log('toggling ' + listGroup);
   var cb = $('#{{ id }}').find('.' + listGroup).find('input');
   cb.prop('checked', !cb.prop('checked'));
   var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';
@@ -129,7 +128,6 @@ $('#{{ id }}').find('.toggle-all-organization-filters').on('click', function(e) 
 // toggle organization subgroup
 $('#{{ id }}').find('.toggle-organization-filters').on('click', function(e) {
   var listGroup = $(e.currentTarget).data('identifier');
-  console.log('toggling ' + listGroup);
   var cb = $('#{{ id }}').find('.' + listGroup).find('input');
   cb.prop('checked', !cb.prop('checked'));
   var toggleClass = cb.is(':checked') ? 'fa-toggle-on' : 'fa-toggle-off';
