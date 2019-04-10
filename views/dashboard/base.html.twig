@@ -55,7 +55,7 @@
               <div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
           {% endfor %}
       </div>
-        <h2 id="dashboard-heading"><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard <i class="fa fa-question-circle text-info pull-right" style="cursor: pointer;" id="dashboard-help"></i> </h2>
+        <h2 id="dashboard-heading"><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard <i class="fa fa-question-circle text-info pull-right" style="cursor: pointer;" id="dashboard-help" data-target="{{ global.request.attributes.get('_route') }}_help_modal"></i> </h2>
         {% block body %}{% endblock %}
     </div>
 
