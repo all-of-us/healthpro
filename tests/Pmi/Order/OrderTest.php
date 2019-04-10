@@ -101,6 +101,12 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             'mayo_id' => 'YZXWVU'
         ]);
         $this->assertSame('finalize', $order->getCurrentStep());
+
+        $order = $this->createOrder([
+            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+            'status' => 'cancel'
+        ]);
+        $this->assertSame('collect', $order->getCurrentStep());
     }
 
     public function testRdrObject()
