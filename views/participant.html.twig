@@ -439,7 +439,7 @@
                             <h3 class="panel-title">Patient Status</h3>
                         </div>
                         <div class="panel-body">
-                            {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+                            {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
                             {{ form_errors(patientStatusForm) }}
                             {{ form_rest(patientStatusForm) }}
                             <button type="submit" class="btn btn-primary">Submit</button>
@@ -476,6 +476,11 @@ $(document).ready(function() {
         height: 50,
         displayValue: true
     });
+
+    // Switch to patient status tab if there is a form error
+    if ($('.patient-status-form').find('div').hasClass('alert-danger')) {
+        $('[href="#patientstatus"]').tab('show');
+    }
 });
 </script>
 {% endblock %}

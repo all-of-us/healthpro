@@ -453,7 +453,11 @@ class DefaultController extends AbstractController
             }
             if ($patientStatusForm->isValid()) {
                 $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
-                $patientStatus->save($id, $patientStatusId, $patientStatusForm);
+                if ($patientStatus->save($id, $patientStatusId, $patientStatusForm)) {
+                    $app->addFlashSuccess('Patient status saved');
+                }
+            } else {
+                $patientStatusForm->addError(new FormError('Please correct the errors below'));
             }
         }
 
