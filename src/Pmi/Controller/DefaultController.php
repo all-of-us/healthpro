@@ -461,7 +461,7 @@ class DefaultController extends AbstractController
             }
         }
         $patientStatusData = $patientStatus->getData($id);
-        //print_r($patientStatusData); exit;
+        $patientStatusHistoryData = $patientStatus->getHistoryData($id);
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
@@ -476,7 +476,8 @@ class DefaultController extends AbstractController
             'samplesAlias' => WorkQueue::$samplesAlias,
             'cancelRoute' => $cancelRoute,
             'patientStatusForm' => $patientStatusForm->createView(),
-            'patientStatusData' => $patientStatusData[0]
+            'patientStatusData' => $patientStatusData[0],
+            'patientStatusHistoryData' => $patientStatusHistoryData
         ]);
     }
 

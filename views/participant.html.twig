@@ -473,6 +473,30 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-7">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Patient Status History</h3>
+                        </div>
+                        <div class="panel-body">
+                            {% for field in patientStatusHistoryData %}
+                                <dl class="dl-horizontal">
+                                    <dt>Status</dt>
+                                    <dd>{{ field.status }}</dd>
+                                    <dt>User</dt>
+                                    <dd>{{ field.user_email }}</dd>
+                                    <dt>Site</dt>
+                                    <dd>{{ field.site_name }}</dd>
+                                    <dt>Date</dt>
+                                    <dd>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
+                                    <dt>Comments</dt>
+                                    <dd>{{ field.comments }}</dd>
+                                </dl>
+                                <hr>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
