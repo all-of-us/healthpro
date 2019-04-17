@@ -91,7 +91,7 @@ class PatientStatus
         return $status;
     }
 
-    public function getData($participantId)
+    public function getOrgPatientStatusData($participantId)
     {
         $query = "
             SELECT ps.id as ps_id,
@@ -123,7 +123,7 @@ class PatientStatus
         return $data;
     }
 
-    public function getHistoryData($participantId)
+    public function getOrgPatientStatusHistoryData($participantId)
     {
         $query = "
             SELECT ps.id as ps_id,
@@ -148,6 +148,42 @@ class PatientStatus
         $results = $this->app['em']->fetchAll($query, [
             'participantId' => $participantId,
             'organization' => $this->app->getSiteOrganizationId()
+        ]);
+        if (!empty($results)) {
+            foreach ($results as $key => $result) {
+                $results[$key]['status'] = array_search($result['status'], self::$patientStatus);
+            }
+        }
+        return $results;
+    }
+
+    public function getAwardeePatientStatusData($participantId)
+    {
+        $query = "
+            SELECT ps.id as ps_id,
+                   ps.organization,
+                   ps.awardee,
+                   psh.id as psh_id,
+                   psh.user_id,
+                   psh.site,
+                   psh.comments,
+                   psh.status,
+                   psh.created_ts,
+                   s.name as site_name,
+                   u.email as user_email,
+                   o.name as organization_name
+            FROM patient_status ps
+            LEFT JOIN patient_status_history psh ON ps.history_id = psh.id
+            LEFT JOIN sites s ON psh.site = s.site_id
+            LEFT JOIN users u ON psh.user_id = u.id
+            LEFT JOIN organizations o ON ps.organization = o.id
+            WHERE ps.participant_id = :participantId
+              AND ps.awardee = :awardee
+            ORDER BY ps.id DESC
+        ";
+        $results = $this->app['em']->fetchAll($query, [
+            'participantId' => $participantId,
+            'awardee' => $this->app->getSiteAwardee()
         ]);
         if (!empty($results)) {
             foreach ($results as $key => $result) {

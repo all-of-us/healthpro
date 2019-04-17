@@ -460,8 +460,9 @@ class DefaultController extends AbstractController
                 $patientStatusForm->addError(new FormError('Please correct the errors below'));
             }
         }
-        $patientStatusData = $patientStatus->getData($id);
-        $patientStatusHistoryData = $patientStatus->getHistoryData($id);
+        $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
+        $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($id);
+        $awardeePatientStatusData = $patientStatus->getAwardeePatientStatusData($id);
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
@@ -476,8 +477,9 @@ class DefaultController extends AbstractController
             'samplesAlias' => WorkQueue::$samplesAlias,
             'cancelRoute' => $cancelRoute,
             'patientStatusForm' => $patientStatusForm->createView(),
-            'patientStatusData' => $patientStatusData[0],
-            'patientStatusHistoryData' => $patientStatusHistoryData
+            'orgPatientStatusData' => !empty($orgPatientStatusData) ? $orgPatientStatusData[0] : null,
+            'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
+            'awardeePatientStatusData' => $awardeePatientStatusData
         ]);
     }
 

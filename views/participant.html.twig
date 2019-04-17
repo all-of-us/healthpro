@@ -433,67 +433,102 @@
                 </div>
             {% endif %}
             <div role="tabpanel" class="tab-pane" id="patientstatus">
-                <div class="col-md-5">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Patient Status</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div id="patient-status-data-box">
-                                {% if patientStatusData is not empty %}
-                                    <div>
-                                        <dl class="dl-horizontal">
-                                            <dt>Status</dt>
-                                            <dd>{{ patientStatusData.status }}</dd>
-                                            <dt>User</dt>
-                                            <dd>{{ patientStatusData.user_email }}</dd>
-                                            <dt>Site</dt>
-                                            <dd>{{ patientStatusData.site_name }}</dd>
-                                            <dt>Date</dt>
-                                            <dd>{{ patientStatusData.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
-                                            <dt>Comments</dt>
-                                            <dd>{{ patientStatusData.comments }}</dd>
-                                        </dl>
-                                    </div>
-                                    <div align="center">
-                                        <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
-                                    </div>
-                                {% endif %}
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Patient Status {{ app.getSiteOrganizationId }}</h3>
                             </div>
-                            <div id="patient-status-form-box">
-                                {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
-                                {{ form_errors(patientStatusForm) }}
-                                {{ form_rest(patientStatusForm) }}
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                                {% if patientStatusData is not empty %}
-                                    <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
-                                {% endif %}
-                                {{ form_end(patientStatusForm) }}
+                            <div class="panel-body">
+                                <div id="patient-status-data-box">
+                                    {% if orgPatientStatusData is not empty %}
+                                        <div>
+                                            <dl class="dl-horizontal">
+                                                <dt>Status</dt>
+                                                <dd>{{ orgPatientStatusData.status }}</dd>
+                                                <dt>User</dt>
+                                                <dd>{{ orgPatientStatusData.user_email }}</dd>
+                                                <dt>Site</dt>
+                                                <dd>{{ orgPatientStatusData.site_name }}</dd>
+                                                <dt>Date</dt>
+                                                <dd>{{ orgPatientStatusData.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
+                                                <dt>Comments</dt>
+                                                <dd>{{ orgPatientStatusData.comments }}</dd>
+                                            </dl>
+                                        </div>
+                                        <div align="center">
+                                            <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div id="patient-status-form-box">
+                                    {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
+                                    {{ form_errors(patientStatusForm) }}
+                                    {{ form_rest(patientStatusForm) }}
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    {% if orgPatientStatusData is not empty %}
+                                        <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
+                                    {% endif %}
+                                    {{ form_end(patientStatusForm) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Patient Status History {{ app.getSiteOrganizationId }}</h3>
+                            </div>
+                            <div class="panel-body">
+                                {% for field in orgPatientStatusHistoryData %}
+                                    <dl class="dl-horizontal">
+                                        <dt>Status</dt>
+                                        <dd>{{ field.status }}</dd>
+                                        <dt>User</dt>
+                                        <dd>{{ field.user_email }}</dd>
+                                        <dt>Site</dt>
+                                        <dd>{{ field.site_name }}</dd>
+                                        <dt>Date</dt>
+                                        <dd>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
+                                        <dt>Comments</dt>
+                                        <dd>{{ field.comments }}</dd>
+                                    </dl>
+                                    <hr>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-7">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Patient Status History</h3>
-                        </div>
-                        <div class="panel-body">
-                            {% for field in patientStatusHistoryData %}
-                                <dl class="dl-horizontal">
-                                    <dt>Status</dt>
-                                    <dd>{{ field.status }}</dd>
-                                    <dt>User</dt>
-                                    <dd>{{ field.user_email }}</dd>
-                                    <dt>Site</dt>
-                                    <dd>{{ field.site_name }}</dd>
-                                    <dt>Date</dt>
-                                    <dd>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
-                                    <dt>Comments</dt>
-                                    <dd>{{ field.comments }}</dd>
-                                </dl>
-                                <hr>
-                            {% endfor %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Patient Status Details {{ app.getSiteAwardee }}</h3>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table">
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>User</th>
+                                        <th>Site</th>
+                                        <th>Organization</th>
+                                        <th>Date</th>
+                                        <th></th>
+                                    </tr>
+                                    {% for field in awardeePatientStatusData %}
+                                        <tr>
+                                            <td>{{ field.status }}</td>
+                                            <td>{{ field.user_email }}</td>
+                                            <td>{{ field.site_name }}</td>
+                                            <td>{{ field.organization_name }}</td>
+                                            <td>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                            <td>
+                                                <small><a>Details</a></small>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -532,9 +567,9 @@ $(document).ready(function() {
         $('[href="#patientstatus"]').tab('show');
     }
 
-    var patientStatusData = {{ patientStatusData|json_encode|raw }};
+    var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};
 
-    if (patientStatusData) {
+    if (orgPatientStatusData) {
         $('#patient-status-data-box').show();
         $('#patient-status-form-box').hide();
     }
