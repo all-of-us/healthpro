@@ -439,11 +439,37 @@
                             <h3 class="panel-title">Patient Status</h3>
                         </div>
                         <div class="panel-body">
-                            {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
-                            {{ form_errors(patientStatusForm) }}
-                            {{ form_rest(patientStatusForm) }}
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            {{ form_end(patientStatusForm) }}
+                            <div id="patient-status-data-box">
+                                {% if patientStatusData is not empty %}
+                                    <div>
+                                        <dl class="dl-horizontal">
+                                            <dt>Status</dt>
+                                            <dd>{{ patientStatusData.status }}</dd>
+                                            <dt>User</dt>
+                                            <dd>{{ patientStatusData.user_email }}</dd>
+                                            <dt>Site</dt>
+                                            <dd>{{ patientStatusData.site_name }}</dd>
+                                            <dt>Date</dt>
+                                            <dd>{{ patientStatusData.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
+                                            <dt>Comments</dt>
+                                            <dd>{{ patientStatusData.comments }}</dd>
+                                        </dl>
+                                    </div>
+                                    <div align="center">
+                                        <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div id="patient-status-form-box">
+                                {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
+                                {{ form_errors(patientStatusForm) }}
+                                {{ form_rest(patientStatusForm) }}
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                                {% if patientStatusData is not empty %}
+                                    <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
+                                {% endif %}
+                                {{ form_end(patientStatusForm) }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -481,6 +507,23 @@ $(document).ready(function() {
     if ($('.patient-status-form').find('div').hasClass('alert-danger')) {
         $('[href="#patientstatus"]').tab('show');
     }
+
+    var patientStatusData = {{ patientStatusData|json_encode|raw }};
+
+    if (patientStatusData) {
+        $('#patient-status-data-box').show();
+        $('#patient-status-form-box').hide();
+    }
+
+    $('.btn-patient-status-update').on('click', function () {
+        $('#patient-status-data-box').hide();
+        $('#patient-status-form-box').show();
+    });
+
+    $('.btn-patient-status-cancel').on('click', function () {
+        $('#patient-status-data-box').show();
+        $('#patient-status-form-box').hide();
+    });
 });
 </script>
 {% endblock %}

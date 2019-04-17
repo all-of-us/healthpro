@@ -441,7 +441,7 @@ class DefaultController extends AbstractController
         }
         // Patient status form
         $patientStatus = new PatientStatus($app);
-        $patientStatusForm = $patientStatus->getPatientStatusForm();
+        $patientStatusForm = $patientStatus->getForm();
         $patientStatusForm->handleRequest($request);
         if ($patientStatusForm->isSubmitted()) {
             $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
@@ -453,14 +453,15 @@ class DefaultController extends AbstractController
             }
             if ($patientStatusForm->isValid()) {
                 $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
-                if ($patientStatus->save($id, $patientStatusId, $patientStatusForm)) {
+                if ($patientStatus->saveData($id, $patientStatusId, $patientStatusForm)) {
                     $app->addFlashSuccess('Patient status saved');
                 }
             } else {
                 $patientStatusForm->addError(new FormError('Please correct the errors below'));
             }
         }
-
+        $patientStatusData = $patientStatus->getData($id);
+        //print_r($patientStatusData); exit;
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
@@ -474,7 +475,8 @@ class DefaultController extends AbstractController
             'surveys' => WorkQueue::$surveys,
             'samplesAlias' => WorkQueue::$samplesAlias,
             'cancelRoute' => $cancelRoute,
-            'patientStatusForm' => $patientStatusForm->createView()
+            'patientStatusForm' => $patientStatusForm->createView(),
+            'patientStatusData' => $patientStatusData[0]
         ]);
     }
 

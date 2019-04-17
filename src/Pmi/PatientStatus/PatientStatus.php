@@ -22,7 +22,7 @@ class PatientStatus
         $this->app = $app;
     }
 
-    public function getPatientStatusForm()
+    public function getForm()
     {
         $patientStatusForm = $this->app['form.factory']->createBuilder(Type\FormType::class)
             ->add('status', Type\ChoiceType::class, [
@@ -43,7 +43,7 @@ class PatientStatus
         return $patientStatusForm->getForm();
     }
 
-    public function save($participantId, $patientStatusId, $form)
+    public function saveData($participantId, $patientStatusId, $form)
     {
         $formData = $form->getData();
         $patientStatusHistoryData = [
@@ -89,5 +89,37 @@ class PatientStatus
             $status = true;
         });
         return $status;
+    }
+
+    public function getData($participantId)
+    {
+        $query = "
+            SELECT ps.id as ps_id,
+                   ps.organization,
+                   ps.awardee,
+                   psh.id as psh_id,
+                   psh.user_id,
+                   psh.site,
+                   psh.comments,
+                   psh.status,
+                   psh.created_ts,
+                   s.name as site_name,
+                   u.email as user_email
+            FROM patient_status ps
+            LEFT JOIN patient_status_history psh ON ps.history_id = psh.id
+            LEFT JOIN sites s ON psh.site = s.site_id
+            LEFT JOIN users u ON psh.user_id = u.id
+            WHERE ps.participant_id = :participantId
+              AND ps.organization = :organization
+            ORDER BY ps.id DESC
+        ";
+        $data = $this->app['em']->fetchAll($query, [
+            'participantId' => $participantId,
+            'organization' => $this->app->getSiteOrganizationId()
+        ]);
+        if (!empty($data)) {
+            $data[0]['status'] = array_search($data[0]['status'], self::$patientStatus);
+        }
+        return $data;
     }
 }
