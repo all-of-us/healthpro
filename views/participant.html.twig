@@ -113,6 +113,9 @@
                     <a href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-toggle="tooltip" data-placement="bottom">Participant Details</a>
                 </li>
             {% endif %}
+            <li role="presentation">
+                <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
+            </li>
         </ul>
         <br />
         <div class="tab-content">
@@ -429,6 +432,22 @@
                     </div>
                 </div>
             {% endif %}
+            <div role="tabpanel" class="tab-pane" id="patientstatus">
+                <div class="col-md-5">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Patient Status</h3>
+                        </div>
+                        <div class="panel-body">
+                            {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+                            {{ form_errors(patientStatusForm) }}
+                            {{ form_rest(patientStatusForm) }}
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            {{ form_end(patientStatusForm) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 {% endif %}

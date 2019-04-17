@@ -2,6 +2,7 @@
 namespace Pmi\Controller;
 
 use Pmi\Evaluation\Evaluation;
+use Pmi\PatientStatus\PatientStatus;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +37,13 @@ class DefaultController extends AbstractController
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['settings', '/settings', ['method' => 'GET|POST']],
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
+        ['patientStatus', '/participant/{id}/patient/status', ['method' => 'GET']]
     ];
+
+    public function patientStatusAction(Application $app, Request $request)
+    {
+        return $app['twig']->render('patient-status.html.twig');
+    }
 
     public function homeAction(Application $app)
     {
@@ -432,6 +439,24 @@ class DefaultController extends AbstractController
                 $cancelRoute = 'orders';
             }
         }
+        // Patient status form
+        $patientStatus = new PatientStatus($app);
+        $patientStatusForm = $patientStatus->getPatientStatusForm();
+        $patientStatusForm->handleRequest($request);
+        if ($patientStatusForm->isSubmitted()) {
+            $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
+                'participant_id' => $id,
+                'organization' => $app->getSiteOrganizationId()
+            ]);
+            if (!empty($patientStatusData) && empty($patientStatusForm['comments']->getData())) {
+                $patientStatusForm['comments']->addError(new FormError('Please enter comment'));
+            }
+            if ($patientStatusForm->isValid()) {
+                $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
+                $patientStatus->save($id, $patientStatusId, $patientStatusForm);
+            }
+        }
+
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
@@ -444,7 +469,8 @@ class DefaultController extends AbstractController
             'samples' => WorkQueue::$samples,
             'surveys' => WorkQueue::$surveys,
             'samplesAlias' => WorkQueue::$samplesAlias,
-            'cancelRoute' => $cancelRoute
+            'cancelRoute' => $cancelRoute,
+            'patientStatusForm' => $patientStatusForm->createView()
         ]);
     }
 
