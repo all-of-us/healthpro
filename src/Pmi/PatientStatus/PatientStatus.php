@@ -123,7 +123,7 @@ class PatientStatus
         return $data;
     }
 
-    public function getOrgPatientStatusHistoryData($participantId)
+    public function getOrgPatientStatusHistoryData($participantId, $organization)
     {
         $query = "
             SELECT ps.id as ps_id,
@@ -147,7 +147,7 @@ class PatientStatus
         ";
         $results = $this->app['em']->fetchAll($query, [
             'participantId' => $participantId,
-            'organization' => $this->app->getSiteOrganizationId()
+            'organization' => $organization
         ]);
         if (!empty($results)) {
             foreach ($results as $key => $result) {

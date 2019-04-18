@@ -523,7 +523,9 @@
                                             <td>{{ field.organization_name }}</td>
                                             <td>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
                                             <td>
-                                                <small><a>Details</a></small>
+                                                <small>
+                                                    <a href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
+                                                </small>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -532,6 +534,12 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div id="patient-status-details-modal" class="modal fade text-center">
+        <div class="modal-dialog">
+            <div class="modal-content">
             </div>
         </div>
     </div>
@@ -582,6 +590,15 @@ $(document).ready(function() {
     $('.btn-patient-status-cancel').on('click', function () {
         $('#patient-status-data-box').show();
         $('#patient-status-form-box').hide();
+    });
+
+    $(".patient-status-details").on('click', function (e) {
+        e.preventDefault();
+        $('#patient-status-details-modal').removeData('bs.modal');
+        $('#patient-status-details-modal').modal({
+            remote: $(this).attr('href')
+        });
+        $('#patient-status-details-modal').modal('show');
     });
 });
 </script>

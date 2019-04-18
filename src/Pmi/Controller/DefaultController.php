@@ -37,13 +37,8 @@ class DefaultController extends AbstractController
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['settings', '/settings', ['method' => 'GET|POST']],
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
-        ['patientStatus', '/participant/{id}/patient/status', ['method' => 'GET']]
+        ['patientStatus', '/participant/{participantId}/patient/status/{patientStatusId}', ['method' => 'GET']]
     ];
-
-    public function patientStatusAction(Application $app, Request $request)
-    {
-        return $app['twig']->render('patient-status.html.twig');
-    }
 
     public function homeAction(Application $app)
     {
@@ -461,7 +456,7 @@ class DefaultController extends AbstractController
             }
         }
         $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
-        $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($id);
+        $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($id, $app->getSiteOrganizationId());
         $awardeePatientStatusData = $patientStatus->getAwardeePatientStatusData($id);
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
@@ -480,6 +475,24 @@ class DefaultController extends AbstractController
             'orgPatientStatusData' => !empty($orgPatientStatusData) ? $orgPatientStatusData[0] : null,
             'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
             'awardeePatientStatusData' => $awardeePatientStatusData
+        ]);
+    }
+
+    public function patientStatusAction($participantId, $patientStatusId, Application $app, Request $request)
+    {
+        $patientStatus = new PatientStatus($app);
+        $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
+            'id' => $patientStatusId,
+            'participant_id' => $participantId
+        ]);
+        if (!empty($patientStatusData)) {
+            $organization = $patientStatusData['organization'];
+            $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($participantId, $organization);
+        } else {
+            $orgPatientStatusHistoryData = [];
+        }
+        return $app['twig']->render('patient-status.html.twig', [
+            'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData
         ]);
     }
 
