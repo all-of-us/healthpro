@@ -102,13 +102,16 @@
                     {% if orgPatientStatusData.status == 'YES' %}
                         <i class="fa fa-check text-success" aria-hidden="true"></i>
                         {{ orgPatientStatusData.display_status }}
+                    {% elseif orgPatientStatusData.status == 'UNKNOWN' or orgPatientStatusData.status == 'NO_ACCESS'%}
+                        <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
+                        {{ orgPatientStatusData.display_status }}
                     {% else %}
-                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        <i class="fa fa-times" aria-hidden="true"></i>
                         {{ orgPatientStatusData.display_status }}
                     {% endif %}
                 {% else %}
-                    <i class="fa fa-question text-warning" aria-hidden="true"></i>
-                    (not Complete)
+                    <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
+                    (not complete)
                 {% endif %}
                 <br />
             </div>
@@ -596,6 +599,12 @@ $(document).ready(function() {
         height: 50,
         displayValue: true
     });
+
+    // Switch to default tab
+    var defaultTab = {{ defaultTab|json_encode|raw }};
+    if (defaultTab == 'patient-status') {
+        $('[href="#patientstatus"]').tab('show');
+    }
 
     // Switch to patient status tab if there is a form error
     if ($('.patient-status-form').find('div').hasClass('alert-danger')) {
