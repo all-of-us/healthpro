@@ -22,7 +22,7 @@ class PatientStatus
         $this->app = $app;
     }
 
-    public function getForm()
+    public function getForm($requireComment = false)
     {
         $patientStatusForm = $this->app['form.factory']->createBuilder(Type\FormType::class)
             ->add('status', Type\ChoiceType::class, [
@@ -37,7 +37,7 @@ class PatientStatus
             ])
             ->add("comments", Type\TextareaType::class, [
                 'label' => 'Comments',
-                'required' => false,
+                'required' => $requireComment,
                 'constraints' => new Constraints\Type('string')
             ]);
         return $patientStatusForm->getForm();

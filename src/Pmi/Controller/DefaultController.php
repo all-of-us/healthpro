@@ -434,9 +434,14 @@ class DefaultController extends AbstractController
                 $cancelRoute = 'orders';
             }
         }
-        // Patient status form
+
+        // Patient Status
         $patientStatus = new PatientStatus($app);
-        $patientStatusForm = $patientStatus->getForm();
+        $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
+        // Determine if comment field is required
+        $isCommentRequired = !empty($orgPatientStatusData) ? true : false;
+        // Get patient status form
+        $patientStatusForm = $patientStatus->getForm($isCommentRequired);
         $patientStatusForm->handleRequest($request);
         if ($patientStatusForm->isSubmitted()) {
             $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
@@ -450,12 +455,13 @@ class DefaultController extends AbstractController
                 $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
                 if ($patientStatus->saveData($id, $patientStatusId, $patientStatusForm)) {
                     $app->addFlashSuccess('Patient status saved');
+                    // Get new form to clear entered data
+                    $patientStatusForm = $patientStatus->getForm($isCommentRequired);
                 }
             } else {
                 $patientStatusForm->addError(new FormError('Please correct the errors below'));
             }
         }
-        $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
         $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($id, $app->getSiteOrganizationId());
         $awardeePatientStatusData = $patientStatus->getAwardeePatientStatusData($id);
         return $app['twig']->render('participant.html.twig', [
