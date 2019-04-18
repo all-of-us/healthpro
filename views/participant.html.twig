@@ -560,9 +560,6 @@
     <div id="patient-status-details-modal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="loading-icon">
-                    Loading.....
-                </div>
             </div>
         </div>
     </div>
@@ -570,6 +567,13 @@
 {% endblock %}
 
 {% block pagejs %}
+    {#Determine default active tab#}
+    {% set defaultTab = 'in-person' %}
+    {% if orgPatientStatusData is empty %}
+        {% set defaultTab = 'patient-status' %}
+    {% elseif orgPatientStatusData.status == 'NO_ACCESS' or orgPatientStatusData.status == 'UNKNOWN' %}
+        {% set defaultTab = 'patient-status' %}
+    {% endif %}
 <script>
 $(document).ready(function() {
     $('#order-overflow-show').on('click', function(e) {
