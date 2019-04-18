@@ -96,6 +96,22 @@
                 {% endif %}
                 <br />
             </div>
+            <div class="status-block patient-status-block">
+                <strong>Patient Status</strong>
+                {% if orgPatientStatusData is not empty  %}
+                    {% if orgPatientStatusData.status == 'YES' %}
+                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                        {{ orgPatientStatusData.display_status }}
+                    {% else %}
+                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        {{ orgPatientStatusData.display_status }}
+                    {% endif %}
+                {% else %}
+                    <i class="fa fa-question text-warning" aria-hidden="true"></i>
+                    (not Complete)
+                {% endif %}
+                <br />
+            </div>
         </div>
     {% endif %}
 
@@ -445,7 +461,7 @@
                                         <div>
                                             <dl class="dl-horizontal">
                                                 <dt>Status</dt>
-                                                <dd>{{ orgPatientStatusData.status }}</dd>
+                                                <dd>{{ orgPatientStatusData.display_status }}</dd>
                                                 <dt>User</dt>
                                                 <dd>{{ orgPatientStatusData.user_email }}</dd>
                                                 <dt>Site</dt>
@@ -474,7 +490,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-7">
+                    {% if orgPatientStatusHistoryData is not empty %}
+                        <div class="col-md-7">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Patient Status History {{ app.getSiteOrganizationId }}</h3>
@@ -483,7 +500,7 @@
                                 {% for field in orgPatientStatusHistoryData %}
                                     <dl class="dl-horizontal">
                                         <dt>Status</dt>
-                                        <dd>{{ field.status }}</dd>
+                                        <dd>{{ field.display_status }}</dd>
                                         <dt>User</dt>
                                         <dd>{{ field.user_email }}</dd>
                                         <dt>Site</dt>
@@ -498,8 +515,10 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
-                <div class="row">
+                {% if awardeePatientStatusData is not empty %}
+                    <div class="row">
                     <div class="col-md-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -517,7 +536,7 @@
                                     </tr>
                                     {% for field in awardeePatientStatusData %}
                                         <tr>
-                                            <td>{{ field.status }}</td>
+                                            <td>{{ field.display_status }}</td>
                                             <td>{{ field.user_email }}</td>
                                             <td>{{ field.site_name }}</td>
                                             <td>{{ field.organization_name }}</td>
@@ -534,6 +553,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -574,6 +594,10 @@ $(document).ready(function() {
     if ($('.patient-status-form').find('div').hasClass('alert-danger')) {
         $('[href="#patientstatus"]').tab('show');
     }
+
+    $('.patient-status-block').on('click', function () {
+        $('[href="#patientstatus"]').tab('show');
+    });
 
     var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};
 

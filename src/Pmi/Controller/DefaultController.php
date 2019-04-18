@@ -491,7 +491,7 @@ class DefaultController extends AbstractController
         } else {
             $orgPatientStatusHistoryData = [];
         }
-        return $app['twig']->render('patient-status.html.twig', [
+        return $app['twig']->render('patient-status-history.html.twig', [
             'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData
         ]);
     }

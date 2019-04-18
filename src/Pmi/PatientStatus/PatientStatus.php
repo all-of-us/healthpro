@@ -118,7 +118,7 @@ class PatientStatus
             'organization' => $this->app->getSiteOrganizationId()
         ]);
         if (!empty($data)) {
-            $data[0]['status'] = array_search($data[0]['status'], self::$patientStatus);
+            $data[0]['display_status'] = array_search($data[0]['status'], self::$patientStatus);
         }
         return $data;
     }
@@ -151,7 +151,7 @@ class PatientStatus
         ]);
         if (!empty($results)) {
             foreach ($results as $key => $result) {
-                $results[$key]['status'] = array_search($result['status'], self::$patientStatus);
+                $results[$key]['display_status'] = array_search($result['status'], self::$patientStatus);
             }
         }
         return $results;
@@ -187,7 +187,7 @@ class PatientStatus
         ]);
         if (!empty($results)) {
             foreach ($results as $key => $result) {
-                $results[$key]['status'] = array_search($result['status'], self::$patientStatus);
+                $results[$key]['display_status'] = array_search($result['status'], self::$patientStatus);
             }
         }
         return $results;

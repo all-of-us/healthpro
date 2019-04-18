@@ -330,3 +330,8 @@ table.table-samples td {
     float: right;
     margin-top: -44px;
 }
+
+.patient-status-block:hover {
+    background: lightgrey;
+    cursor: pointer;
+}
