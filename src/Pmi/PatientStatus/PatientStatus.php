@@ -179,11 +179,13 @@ class PatientStatus
             LEFT JOIN organizations o ON ps.organization = o.id
             WHERE ps.participant_id = :participantId
               AND ps.awardee = :awardee
+              AND ps.organization != :organization
             ORDER BY ps.id DESC
         ";
         $results = $this->app['em']->fetchAll($query, [
             'participantId' => $participantId,
-            'awardee' => $this->app->getSiteAwardee()
+            'awardee' => $this->app->getSiteAwardee(),
+            'organization' => $this->app->getSiteOrganizationId()
         ]);
         if (!empty($results)) {
             foreach ($results as $key => $result) {
