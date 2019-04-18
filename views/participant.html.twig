@@ -453,7 +453,7 @@
                     <div class="col-md-5">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status {{ app.getOrganizationDisplayName(app.getSiteOrganizationId) }}</h3>
+                                <h3 class="panel-title">Patient Status: {{ app.getOrganizationDisplayName(app.getSiteOrganizationId) }}</h3>
                             </div>
                             <div class="panel-body">
                                 <div id="patient-status-data-box">
@@ -494,7 +494,7 @@
                         <div class="col-md-7">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status History {{ app.getOrganizationDisplayName(app.getSiteOrganizationId) }}</h3>
+                                <h3 class="panel-title">Patient Status History: {{ app.getOrganizationDisplayName(app.getSiteOrganizationId) }}</h3>
                             </div>
                             <div class="panel-body">
                                 {% for field in orgPatientStatusHistoryData %}
@@ -522,7 +522,7 @@
                     <div class="col-md-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status Details {{ app.getAwardeeDisplayName(app.getSiteAwardee) }}</h3>
+                                <h3 class="panel-title">Patient Status Details: For other {{ app.getAwardeeDisplayName(app.getSiteAwardee) }} organizations</h3>
                             </div>
                             <div class="panel-body">
                                 <table class="table">
@@ -557,9 +557,12 @@
             </div>
         </div>
     </div>
-    <div id="patient-status-details-modal" class="modal fade text-center">
+    <div id="patient-status-details-modal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
+                <div class="loading-icon">
+                    Loading.....
+                </div>
             </div>
         </div>
     </div>
@@ -623,6 +626,10 @@ $(document).ready(function() {
             remote: $(this).attr('href')
         });
         $('#patient-status-details-modal').modal('show');
+    });
+
+    $('#patient-status-details-modal').on('hidden.bs.modal', function () {
+        $(".modal-body").html("");
     });
 });
 </script>
