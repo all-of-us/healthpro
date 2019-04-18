@@ -486,7 +486,7 @@ class DefaultController extends AbstractController
         ]);
     }
 
-    public function patientStatusAction($participantId, $patientStatusId, Application $app, Request $request)
+    public function patientStatusAction($participantId, $patientStatusId, Application $app)
     {
         $patientStatus = new PatientStatus($app);
         $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
@@ -496,11 +496,14 @@ class DefaultController extends AbstractController
         if (!empty($patientStatusData)) {
             $organization = $patientStatusData['organization'];
             $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($participantId, $organization);
+            $organization = $patientStatusData['organization'];
         } else {
             $orgPatientStatusHistoryData = [];
+            $orgDisplayName = null;
         }
         return $app['twig']->render('patient-status-history.html.twig', [
-            'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData
+            'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
+            'organization' => $organization
         ]);
     }
 
