@@ -452,6 +452,11 @@
                 </div>
             {% endif %}
             <div role="tabpanel" class="tab-pane" id="patientstatus">
+                {% if orgPatientStatusData is empty %}
+                    <div class="alert alert-warning">
+                        Please comple the patient status information for your organization. User should have access to EHR system information for verification.
+                    </div>
+                {% endif %}
                 <div class="row">
                     <div class="col-md-5">
                         <div class="panel panel-default">
@@ -573,8 +578,6 @@
     {#Determine default active tab#}
     {% set defaultTab = 'in-person' %}
     {% if orgPatientStatusData is empty %}
-        {% set defaultTab = 'patient-status' %}
-    {% elseif orgPatientStatusData.status == 'NO_ACCESS' or orgPatientStatusData.status == 'UNKNOWN' %}
         {% set defaultTab = 'patient-status' %}
     {% endif %}
 <script>
