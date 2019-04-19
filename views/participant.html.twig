@@ -99,15 +99,16 @@
             <div class="status-block patient-status-block">
                 <strong>Patient Status</strong>
                 {% if orgPatientStatusData is not empty  %}
+                    {% set displayStatus = orgPatientStatusData.display_status|split(':') %}
                     {% if orgPatientStatusData.status == 'YES' %}
                         <i class="fa fa-check text-success" aria-hidden="true"></i>
-                        {{ orgPatientStatusData.display_status }}
+                        {{ displayStatus|first }}
                     {% elseif orgPatientStatusData.status == 'UNKNOWN' or orgPatientStatusData.status == 'NO_ACCESS'%}
                         <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
-                        {{ orgPatientStatusData.display_status }}
+                        {{ displayStatus|first }}
                     {% else %}
                         <i class="fa fa-times" aria-hidden="true"></i>
-                        {{ orgPatientStatusData.display_status }}
+                        {{ displayStatus|first }}
                     {% endif %}
                 {% else %}
                     <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
