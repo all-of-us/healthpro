@@ -510,21 +510,7 @@
                                 <h3 class="panel-title">Patient Status History: {{ app.getOrganizationDisplayName(app.getSiteOrganizationId) }}</h3>
                             </div>
                             <div class="panel-body">
-                                {% for field in orgPatientStatusHistoryData %}
-                                    <dl class="dl-horizontal">
-                                        <dt>Status</dt>
-                                        <dd>{{ field.display_status }}</dd>
-                                        <dt>User</dt>
-                                        <dd>{{ field.user_email }}</dd>
-                                        <dt>Site</dt>
-                                        <dd>{{ field.site_name }}</dd>
-                                        <dt>Date</dt>
-                                        <dd>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
-                                        <dt>Comments</dt>
-                                        <dd>{{ field.comments }}</dd>
-                                    </dl>
-                                    <hr>
-                                {% endfor %}
+                                {% include 'partials/patient-status-history-dl.html.twig' %}
                             </div>
                         </div>
                     </div>
