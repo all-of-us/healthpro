@@ -248,6 +248,10 @@ class Order
                 break;
             }
         }
+        // For canceled orders set print labels step to collect
+        if ($this->isOrderCancelled() && $step === 'printLabels') {
+            return 'collect';
+        }
         return $step;
     }
 
@@ -270,6 +274,10 @@ class Order
             if (!$this->order["{$column}_ts"]) {
                 break;
             }
+        }
+        // For canceled orders include collect in available steps if not exists
+        if ($this->isOrderCancelled() && !in_array('collect', $steps)) {
+            $steps[] = 'collect';
         }
         return $steps;
     }
