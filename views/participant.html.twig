@@ -536,10 +536,10 @@
                                     </tr>
                                     {% for field in awardeePatientStatusData %}
                                         <tr>
-                                            <td>{{ field.organization_name }}</td>
+                                            <td>{{ field.organization_name|default(field.organization) }}</td>
                                             <td>{{ field.display_status }}</td>
                                             <td>{{ field.user_email }}</td>
-                                            <td>{{ field.site_name }}</td>
+                                            <td>{{ field.site_name|default(field.site) }}</td>
                                             <td>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
                                             <td>
                                                 <small>
