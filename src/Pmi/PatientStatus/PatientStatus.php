@@ -70,14 +70,19 @@ class PatientStatus
             $patientStatusId,
             &$status
         ) {
+            //Create patient status if not exists
             if (!empty($patientStatusId)) {
                 $patientStatusHistoryData['patient_status_id'] = $patientStatusId;
             } else {
                 $id = $patientStatusRepository->insert($patientStatusData);
+                $this->app->log(Log::PATIENT_STATUS, [
+                    'id' => $id
+                ]);
                 $patientStatusHistoryData['patient_status_id'] = $id;
             }
+            //Create patient status history
             $id = $patientStatusHistoryRepository->insert($patientStatusHistoryData);
-            $this->app->log(Log::ORDER_HISTORY_CREATE, [
+            $this->app->log(Log::PATIENT_STATUS_HISTORY, [
                 'id' => $id
             ]);
 
