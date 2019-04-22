@@ -176,20 +176,20 @@ class PatientStatus
                    psh.created_ts,
                    s.name as site_name,
                    u.email as user_email,
-                   o.name as organization_name
+                   o.name as organization_name,
+                   a.name as awardee_name
             FROM patient_status ps
             LEFT JOIN patient_status_history psh ON ps.history_id = psh.id
             LEFT JOIN sites s ON psh.site = s.site_id
             LEFT JOIN users u ON psh.user_id = u.id
             LEFT JOIN organizations o ON ps.organization = o.id
+            LEFT JOIN awardees a ON ps.awardee = a.id
             WHERE ps.participant_id = :participantId
-              AND ps.awardee = :awardee
               AND ps.organization != :organization
             ORDER BY ps.id DESC
         ";
         $results = $this->app['em']->fetchAll($query, [
             'participantId' => $participantId,
-            'awardee' => $this->app->getSiteAwardee(),
             'organization' => $this->app->getSiteOrganizationId()
         ]);
         if (!empty($results)) {

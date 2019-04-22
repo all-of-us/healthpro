@@ -522,12 +522,13 @@
                     <div class="col-md-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status Details: For other {{ app.getAwardeeDisplayName(app.getSiteAwardee) }} organizations</h3>
+                                <h3 class="panel-title">Patient Status Details: For other organizations</h3>
                             </div>
                             <div class="panel-body">
                                 <table class="table">
                                     <thead>
                                         <tr>
+                                            <th>Awardee</th>
                                             <th>Organization</th>
                                             <th>Status</th>
                                             <th>User</th>
@@ -539,6 +540,7 @@
                                     <tbody>
                                     {% for field in awardeePatientStatusData %}
                                         <tr>
+                                            <td>{{ field.awardee_name|default(field.awardee) }}</td>
                                             <td>{{ field.organization_name|default(field.organization) }}</td>
                                             <td>{{ field.display_status }}</td>
                                             <td>{{ field.user_email }}</td>
