@@ -543,7 +543,7 @@
                                             <td>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
                                             <td>
                                                 <small>
-                                                    <a href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
+                                                    <a data-href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
                                                 </small>
                                             </td>
                                         </tr>
@@ -604,6 +604,10 @@ $(document).ready(function() {
     // Switch to patient status tab if there is a form error
     if ($('.patient-status-form').find('div').hasClass('alert-danger')) {
         $('[href="#patientstatus"]').tab('show');
+        // Display form
+        setTimeout(function () {
+            $('.btn-patient-status-update').trigger('click');
+        }, 100);
     }
 
     $('.patient-status-block').on('click', function () {
@@ -631,13 +635,13 @@ $(document).ready(function() {
         e.preventDefault();
         $('#patient-status-details-modal').removeData('bs.modal');
         $('#patient-status-details-modal').modal({
-            remote: $(this).attr('href')
+            remote: $(this).attr('data-href')
         });
         $('#patient-status-details-modal').modal('show');
     });
 
     $('#patient-status-details-modal').on('hidden.bs.modal', function () {
-        $(".modal-body").html("");
+        $(".modal-body").html('');
     });
 });
 </script>
