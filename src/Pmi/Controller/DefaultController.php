@@ -459,6 +459,8 @@ class DefaultController extends AbstractController
                     $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
                     // Get new form
                     $patientStatusForm = $patientStatus->getForm(true);
+                } else {
+                    $app->addFlashError("Failed to create patient status. Please try again.");
                 }
             } else {
                 $patientStatusForm->addError(new FormError('Please correct the errors below'));

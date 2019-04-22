@@ -474,7 +474,7 @@
                                                 <dt>User</dt>
                                                 <dd>{{ orgPatientStatusData.user_email }}</dd>
                                                 <dt>Site</dt>
-                                                <dd>{{ orgPatientStatusData.site_name }}</dd>
+                                                <dd>{{ orgPatientStatusData.site_name|default(orgPatientStatusData.site) }}</dd>
                                                 <dt>Date</dt>
                                                 <dd>{{ orgPatientStatusData.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
                                                 <dt>Comments</dt>
@@ -526,14 +526,17 @@
                             </div>
                             <div class="panel-body">
                                 <table class="table">
-                                    <tr>
-                                        <th>Organization</th>
-                                        <th>Status</th>
-                                        <th>User</th>
-                                        <th>Site</th>
-                                        <th>Date</th>
-                                        <th></th>
-                                    </tr>
+                                    <thead>
+                                        <tr>
+                                            <th>Organization</th>
+                                            <th>Status</th>
+                                            <th>User</th>
+                                            <th>Site</th>
+                                            <th>Date</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                     {% for field in awardeePatientStatusData %}
                                         <tr>
                                             <td>{{ field.organization_name|default(field.organization) }}</td>
@@ -548,6 +551,7 @@
                                             </td>
                                         </tr>
                                     {% endfor %}
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
