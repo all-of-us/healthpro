@@ -96,7 +96,8 @@
                 {% endif %}
                 <br />
             </div>
-            <div class="status-block patient-status-block">
+            {% if app.isDVType is empty %}
+                <div class="status-block patient-status-block">
                 <strong>Patient Status</strong>
                 {% if orgPatientStatusData is not empty  %}
                     {% set displayStatus = orgPatientStatusData.display_status|split(':') %}
@@ -116,6 +117,7 @@
                 {% endif %}
                 <br />
             </div>
+            {% endif %}
         </div>
     {% endif %}
 
@@ -133,9 +135,11 @@
                     <a href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-toggle="tooltip" data-placement="bottom">Participant Details</a>
                 </li>
             {% endif %}
-            <li role="presentation">
-                <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
-            </li>
+            {% if app.isDVType is empty %}
+                <li role="presentation">
+                    <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
+                </li>
+            {% endif %}
         </ul>
         <br />
         <div class="tab-content">
@@ -452,7 +456,8 @@
                     </div>
                 </div>
             {% endif %}
-            <div role="tabpanel" class="tab-pane" id="patientstatus">
+            {% if app.isDVType is empty %}
+                <div role="tabpanel" class="tab-pane" id="patientstatus">
                 {% if orgPatientStatusData is empty %}
                     <div class="alert alert-warning">
                         Please complete the patient status information for your organization. User should have access to EHR system information for verification.
@@ -561,6 +566,7 @@
                 </div>
                 {% endif %}
             </div>
+            {% endif %}
         </div>
     </div>
     {# Patient status history modal window #}
@@ -596,7 +602,12 @@ $(document).ready(function() {
         height: 50,
         displayValue: true
     });
-
+});
+</script>
+{# Paient status tab #}
+{% if app.isDVType is empty %}
+<script>
+$(document).ready(function() {
     var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};
 
     // Switch to default tab if empty
@@ -650,4 +661,5 @@ $(document).ready(function() {
     });
 });
 </script>
+{% endif %}
 {% endblock %}
