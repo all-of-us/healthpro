@@ -2,6 +2,7 @@
 namespace Pmi\Controller;
 
 use Pmi\Evaluation\Evaluation;
+use Pmi\PatientStatus\PatientStatus;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,6 +37,7 @@ class DefaultController extends AbstractController
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['settings', '/settings', ['method' => 'GET|POST']],
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
+        ['patientStatus', '/participant/{participantId}/patient/status/{patientStatusId}', ['method' => 'GET']]
     ];
 
     public function homeAction(Application $app)
@@ -432,6 +434,40 @@ class DefaultController extends AbstractController
                 $cancelRoute = 'orders';
             }
         }
+
+        // Patient Status
+        $patientStatus = new PatientStatus($app);
+        $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
+        // Determine if comment field is required
+        $isCommentRequired = !empty($orgPatientStatusData) ? true : false;
+        // Get patient status form
+        $patientStatusForm = $patientStatus->getForm($isCommentRequired);
+        $patientStatusForm->handleRequest($request);
+        if ($patientStatusForm->isSubmitted()) {
+            $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
+                'participant_id' => $id,
+                'organization' => $app->getSiteOrganizationId()
+            ]);
+            if (!empty($patientStatusData) && empty($patientStatusForm['comments']->getData())) {
+                $patientStatusForm['comments']->addError(new FormError('Please enter comment'));
+            }
+            if ($patientStatusForm->isValid()) {
+                $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
+                if ($patientStatus->saveData($id, $patientStatusId, $patientStatusForm)) {
+                    $app->addFlashSuccess('Patient status saved');
+                    // Load newly entered data
+                    $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
+                    // Get new form
+                    $patientStatusForm = $patientStatus->getForm(true);
+                } else {
+                    $app->addFlashError("Failed to create patient status. Please try again.");
+                }
+            } else {
+                $patientStatusForm->addError(new FormError('Please correct the errors below'));
+            }
+        }
+        $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($id, $app->getSiteOrganizationId());
+        $awardeePatientStatusData = $patientStatus->getAwardeePatientStatusData($id);
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
@@ -444,7 +480,32 @@ class DefaultController extends AbstractController
             'samples' => WorkQueue::$samples,
             'surveys' => WorkQueue::$surveys,
             'samplesAlias' => WorkQueue::$samplesAlias,
-            'cancelRoute' => $cancelRoute
+            'cancelRoute' => $cancelRoute,
+            'patientStatusForm' => $patientStatusForm->createView(),
+            'orgPatientStatusData' => $orgPatientStatusData,
+            'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
+            'awardeePatientStatusData' => $awardeePatientStatusData
+        ]);
+    }
+
+    public function patientStatusAction($participantId, $patientStatusId, Application $app)
+    {
+        $patientStatus = new PatientStatus($app);
+        $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
+            'id' => $patientStatusId,
+            'participant_id' => $participantId
+        ]);
+        if (!empty($patientStatusData)) {
+            $organization = $patientStatusData['organization'];
+            $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($participantId, $organization);
+            $organization = $patientStatusData['organization'];
+        } else {
+            $orgPatientStatusHistoryData = [];
+            $organization = null;
+        }
+        return $app['twig']->render('patient-status-history.html.twig', [
+            'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
+            'organization' => $organization
         ]);
     }
 

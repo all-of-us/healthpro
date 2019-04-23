@@ -21,7 +21,9 @@ class EntityManager
         'missing_notifications_log' => 'doctrine',
         'evaluations_history' => 'doctrine',
         'orders_history' => 'doctrine',
-        'notices' => 'doctrine'
+        'notices' => 'doctrine',
+        'patient_status' => 'doctrine',
+        'patient_status_history' => 'doctrine'
     ];
 
     protected $timezone;

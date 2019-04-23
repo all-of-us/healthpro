@@ -322,6 +322,19 @@ class HpoApplication extends AbstractApplication
         }
     }
 
+    public function getSiteOrganizationId()
+    {
+        if ($this['isUnitTest']) {
+            return null;
+        }
+        $site = $this->getSiteEntity();
+        if (!$site || empty($site['organization_id'])) {
+            return null;
+        } else {
+            return $site['organization_id'];
+        }
+    }
+
     public function getSiteAwardee()
     {
         if ($this['isUnitTest']) {

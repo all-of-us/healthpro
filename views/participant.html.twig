@@ -96,6 +96,26 @@
                 {% endif %}
                 <br />
             </div>
+            <div class="status-block patient-status-block">
+                <strong>Patient Status</strong>
+                {% if orgPatientStatusData is not empty  %}
+                    {% set displayStatus = orgPatientStatusData.display_status|split(':') %}
+                    {% if orgPatientStatusData.status == 'YES' %}
+                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                        {{ displayStatus|first }}
+                    {% elseif orgPatientStatusData.status == 'UNKNOWN' or orgPatientStatusData.status == 'NO_ACCESS'%}
+                        <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
+                        {{ displayStatus|first }}
+                    {% else %}
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        {{ displayStatus|first }}
+                    {% endif %}
+                {% else %}
+                    <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
+                    (not complete)
+                {% endif %}
+                <br />
+            </div>
         </div>
     {% endif %}
 
@@ -113,6 +133,9 @@
                     <a href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-toggle="tooltip" data-placement="bottom">Participant Details</a>
                 </li>
             {% endif %}
+            <li role="presentation">
+                <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
+            </li>
         </ul>
         <br />
         <div class="tab-content">
@@ -429,6 +452,122 @@
                     </div>
                 </div>
             {% endif %}
+            <div role="tabpanel" class="tab-pane" id="patientstatus">
+                {% if orgPatientStatusData is empty %}
+                    <div class="alert alert-warning">
+                        Please complete the patient status information for your organization. User should have access to EHR system information for verification.
+                    </div>
+                {% endif %}
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Patient Status: {{ app.getOrganizationDisplayName(app.getSiteOrganizationId) }}</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div id="patient-status-data-box">
+                                    {% if orgPatientStatusData is not empty %}
+                                        <div>
+                                            <dl class="dl-horizontal">
+                                                <dt>Status</dt>
+                                                <dd>{{ orgPatientStatusData.display_status }}</dd>
+                                                <dt>User</dt>
+                                                <dd>{{ orgPatientStatusData.user_email }}</dd>
+                                                <dt>Site</dt>
+                                                <dd>{{ orgPatientStatusData.site_name|default(orgPatientStatusData.site) }}</dd>
+                                                <dt>Date</dt>
+                                                <dd>{{ orgPatientStatusData.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
+                                                <dt>Comments</dt>
+                                                <dd>{{ orgPatientStatusData.comments }}</dd>
+                                            </dl>
+                                        </div>
+                                        <div align="center">
+                                            <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div id="patient-status-form-box">
+                                    {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
+                                    {{ form_errors(patientStatusForm) }}
+                                    {{ form_rest(patientStatusForm) }}
+                                    {{ form_widget(patientStatusForm.comments) }}
+                                    {% if orgPatientStatusData is not empty %}
+                                        <small class="text-warning">User must enter a reason for updating previous organization status.</small>
+                                        <br><br>
+                                    {% endif %}
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    {% if orgPatientStatusData is not empty %}
+                                        <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
+                                    {% endif %}
+                                    {{ form_end(patientStatusForm) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if orgPatientStatusHistoryData is not empty %}
+                        <div class="col-md-7">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Patient Status History: {{ app.getOrganizationDisplayName(app.getSiteOrganizationId) }}</h3>
+                            </div>
+                            <div class="panel-body">
+                                {% include 'partials/patient-status-history-dl.html.twig' %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if awardeePatientStatusData is not empty %}
+                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Patient Status Details: Other Organizations</h3>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Awardee</th>
+                                            <th>Organization</th>
+                                            <th>Status</th>
+                                            <th>User</th>
+                                            <th>Site</th>
+                                            <th>Date</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for field in awardeePatientStatusData %}
+                                        <tr>
+                                            <td>{{ field.awardee_name|default(field.awardee) }}</td>
+                                            <td>{{ field.organization_name|default(field.organization) }}</td>
+                                            <td>{{ field.display_status }}</td>
+                                            <td>{{ field.user_email }}</td>
+                                            <td>{{ field.site_name|default(field.site) }}</td>
+                                            <td>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                            <td>
+                                                <small>
+                                                    <a data-href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
+                                                </small>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {# Patient status history modal window #}
+    <div id="patient-status-details-modal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            </div>
         </div>
     </div>
 {% endif %}
@@ -456,6 +595,58 @@ $(document).ready(function() {
         width: 2,
         height: 50,
         displayValue: true
+    });
+
+    var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};
+
+    // Switch to default tab if empty
+    if (!orgPatientStatusData) {
+        $('[href="#patientstatus"]').tab('show');
+    }
+
+    // Switch to patient status tab if there is a form error
+    if ($('.patient-status-form').find('div').hasClass('alert-danger')) {
+        $('[href="#patientstatus"]').tab('show');
+        // Display form
+        setTimeout(function () {
+            $('.btn-patient-status-update').trigger('click');
+        }, 100);
+    }
+
+    $('.patient-status-block').on('click', function () {
+        $('[href="#patientstatus"]').tab('show');
+    });
+
+    // Hide form by default if not empty
+    if (orgPatientStatusData) {
+        $('#patient-status-data-box').show();
+        $('#patient-status-form-box').hide();
+    }
+
+    $('.btn-patient-status-update').on('click', function () {
+        $('#patient-status-data-box').hide();
+        $('#patient-status-form-box').show();
+    });
+
+    $('.btn-patient-status-cancel').on('click', function () {
+        $('#patient-status-data-box').show();
+        $('#patient-status-form-box').hide();
+    });
+
+    // Display history in modal window
+    var psDetailsModal = $('#patient-status-details-modal');
+    $(".patient-status-details").on('click', function (e) {
+        e.preventDefault();
+        $(psDetailsModal).removeData('bs.modal');
+        //TODO: Since remote is deprecated use other alternate approach
+        $(psDetailsModal).modal({
+            remote: $(this).attr('data-href')
+        });
+        $(psDetailsModal).modal('show');
+    });
+
+    $(psDetailsModal).on('hidden.bs.modal', function () {
+        $(".modal-body").html('');
     });
 });
 </script>
