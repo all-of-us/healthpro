@@ -96,7 +96,8 @@
                 {% endif %}
                 <br />
             </div>
-            <div class="status-block patient-status-block">
+            {% if not isDVType %}
+                <div class="status-block patient-status-block">
                 <strong>Patient Status</strong>
                 {% if orgPatientStatusData is not empty  %}
                     {% set displayStatus = orgPatientStatusData.display_status|split(':') %}
@@ -116,6 +117,7 @@
                 {% endif %}
                 <br />
             </div>
+            {% endif %}
         </div>
     {% endif %}
 
@@ -133,9 +135,11 @@
                     <a href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-toggle="tooltip" data-placement="bottom">Participant Details</a>
                 </li>
             {% endif %}
-            <li role="presentation">
-                <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
-            </li>
+            {% if not isDVType %}
+                <li role="presentation">
+                    <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
+                </li>
+            {% endif %}
         </ul>
         <br />
         <div class="tab-content">
@@ -452,7 +456,8 @@
                     </div>
                 </div>
             {% endif %}
-            <div role="tabpanel" class="tab-pane" id="patientstatus">
+            {% if not isDVType %}
+                <div role="tabpanel" class="tab-pane" id="patientstatus">
                 {% if orgPatientStatusData is empty %}
                     <div class="alert alert-warning">
                         Please complete the patient status information for your organization. User should have access to EHR system information for verification.
@@ -471,12 +476,6 @@
                                             <dl class="dl-horizontal">
                                                 <dt>Status</dt>
                                                 <dd>{{ orgPatientStatusData.display_status }}</dd>
-                                                <dt>User</dt>
-                                                <dd>{{ orgPatientStatusData.user_email }}</dd>
-                                                <dt>Site</dt>
-                                                <dd>{{ orgPatientStatusData.site_name|default(orgPatientStatusData.site) }}</dd>
-                                                <dt>Date</dt>
-                                                <dd>{{ orgPatientStatusData.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
                                                 <dt>Comments</dt>
                                                 <dd>{{ orgPatientStatusData.comments }}</dd>
                                             </dl>
@@ -561,15 +560,18 @@
                 </div>
                 {% endif %}
             </div>
+            {% endif %}
         </div>
     </div>
-    {# Patient status history modal window #}
-    <div id="patient-status-details-modal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
+    {% if not isDVType %}
+        {# Patient status history modal window #}
+        <div id="patient-status-details-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 {% endif %}
 {% endblock %}
 
@@ -596,7 +598,12 @@ $(document).ready(function() {
         height: 50,
         displayValue: true
     });
-
+});
+</script>
+{# Paient status tab #}
+{% if not isDVType %}
+<script>
+$(document).ready(function() {
     var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};
 
     // Switch to default tab if empty
@@ -646,8 +653,9 @@ $(document).ready(function() {
     });
 
     $(psDetailsModal).on('hidden.bs.modal', function () {
-        $(".modal-body").html('');
+        $("#patient-status-details-modal .modal-body").html('');
     });
 });
 </script>
+{% endif %}
 {% endblock %}

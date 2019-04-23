@@ -435,39 +435,48 @@ class DefaultController extends AbstractController
             }
         }
 
-        // Patient Status
-        $patientStatus = new PatientStatus($app);
-        $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
-        // Determine if comment field is required
-        $isCommentRequired = !empty($orgPatientStatusData) ? true : false;
-        // Get patient status form
-        $patientStatusForm = $patientStatus->getForm($isCommentRequired);
-        $patientStatusForm->handleRequest($request);
-        if ($patientStatusForm->isSubmitted()) {
-            $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
-                'participant_id' => $id,
-                'organization' => $app->getSiteOrganizationId()
-            ]);
-            if (!empty($patientStatusData) && empty($patientStatusForm['comments']->getData())) {
-                $patientStatusForm['comments']->addError(new FormError('Please enter comment'));
-            }
-            if ($patientStatusForm->isValid()) {
-                $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
-                if ($patientStatus->saveData($id, $patientStatusId, $patientStatusForm)) {
-                    $app->addFlashSuccess('Patient status saved');
-                    // Load newly entered data
-                    $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
-                    // Get new form
-                    $patientStatusForm = $patientStatus->getForm(true);
-                } else {
-                    $app->addFlashError("Failed to create patient status. Please try again.");
+        // DVs doesn't have access to patient status tab
+        if (!$app->isDVType()) {
+            // Patient Status
+            $patientStatus = new PatientStatus($app);
+            $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
+            // Determine if comment field is required
+            $isCommentRequired = !empty($orgPatientStatusData) ? true : false;
+            // Get patient status form
+            $patientStatusForm = $patientStatus->getForm($isCommentRequired);
+            $patientStatusForm->handleRequest($request);
+            if ($patientStatusForm->isSubmitted()) {
+                $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
+                    'participant_id' => $id,
+                    'organization' => $app->getSiteOrganizationId()
+                ]);
+                if (!empty($patientStatusData) && empty($patientStatusForm['comments']->getData())) {
+                    $patientStatusForm['comments']->addError(new FormError('Please enter comment'));
                 }
-            } else {
-                $patientStatusForm->addError(new FormError('Please correct the errors below'));
+                if ($patientStatusForm->isValid()) {
+                    $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
+                    if ($patientStatus->saveData($id, $patientStatusId, $patientStatusForm)) {
+                        $app->addFlashSuccess('Patient status saved');
+                        // Load newly entered data
+                        $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
+                        // Get new form
+                        $patientStatusForm = $patientStatus->getForm(true);
+                    } else {
+                        $app->addFlashError("Failed to create patient status. Please try again.");
+                    }
+                } else {
+                    $patientStatusForm->addError(new FormError('Please correct the errors below'));
+                }
             }
+            $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($id, $app->getSiteOrganizationId());
+            $awardeePatientStatusData = $patientStatus->getAwardeePatientStatusData($id);
+            $patientStatusForm = $patientStatusForm->createView();
+        } else {
+            $patientStatusForm = null;
+            $orgPatientStatusData = null;
+            $orgPatientStatusHistoryData = null;
+            $awardeePatientStatusData = null;
         }
-        $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($id, $app->getSiteOrganizationId());
-        $awardeePatientStatusData = $patientStatus->getAwardeePatientStatusData($id);
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
@@ -481,15 +490,19 @@ class DefaultController extends AbstractController
             'surveys' => WorkQueue::$surveys,
             'samplesAlias' => WorkQueue::$samplesAlias,
             'cancelRoute' => $cancelRoute,
-            'patientStatusForm' => $patientStatusForm->createView(),
+            'patientStatusForm' => $patientStatusForm,
             'orgPatientStatusData' => $orgPatientStatusData,
             'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
-            'awardeePatientStatusData' => $awardeePatientStatusData
+            'awardeePatientStatusData' => $awardeePatientStatusData,
+            'isDVType' => $app->isDVType()
         ]);
     }
 
     public function patientStatusAction($participantId, $patientStatusId, Application $app)
     {
+        if ($app->isDVType()) {
+            $app->abort(404);
+        }
         $patientStatus = new PatientStatus($app);
         $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
             'id' => $patientStatusId,
