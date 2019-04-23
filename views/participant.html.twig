@@ -563,13 +563,15 @@
             {% endif %}
         </div>
     </div>
-    {# Patient status history modal window #}
-    <div id="patient-status-details-modal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
+    {% if app.isDVType is empty %}
+        {# Patient status history modal window #}
+        <div id="patient-status-details-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 {% endif %}
 {% endblock %}
 
