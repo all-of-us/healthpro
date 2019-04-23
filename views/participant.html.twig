@@ -96,7 +96,7 @@
                 {% endif %}
                 <br />
             </div>
-            {% if app.isDVType is empty %}
+            {% if not isDVType %}
                 <div class="status-block patient-status-block">
                 <strong>Patient Status</strong>
                 {% if orgPatientStatusData is not empty  %}
@@ -135,7 +135,7 @@
                     <a href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-toggle="tooltip" data-placement="bottom">Participant Details</a>
                 </li>
             {% endif %}
-            {% if app.isDVType is empty %}
+            {% if not isDVType %}
                 <li role="presentation">
                     <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
                 </li>
@@ -456,7 +456,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if app.isDVType is empty %}
+            {% if not isDVType %}
                 <div role="tabpanel" class="tab-pane" id="patientstatus">
                 {% if orgPatientStatusData is empty %}
                     <div class="alert alert-warning">
@@ -563,7 +563,7 @@
             {% endif %}
         </div>
     </div>
-    {% if app.isDVType is empty %}
+    {% if not isDVType %}
         {# Patient status history modal window #}
         <div id="patient-status-details-modal" class="modal fade">
             <div class="modal-dialog">
@@ -601,7 +601,7 @@ $(document).ready(function() {
 });
 </script>
 {# Paient status tab #}
-{% if app.isDVType is empty %}
+{% if not isDVType %}
 <script>
 $(document).ready(function() {
     var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};

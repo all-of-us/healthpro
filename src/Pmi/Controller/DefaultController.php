@@ -493,7 +493,8 @@ class DefaultController extends AbstractController
             'patientStatusForm' => $patientStatusForm,
             'orgPatientStatusData' => $orgPatientStatusData,
             'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
-            'awardeePatientStatusData' => $awardeePatientStatusData
+            'awardeePatientStatusData' => $awardeePatientStatusData,
+            'isDVType' => $app->isDVType()
         ]);
     }
 
