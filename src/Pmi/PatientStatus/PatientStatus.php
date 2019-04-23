@@ -13,8 +13,7 @@ class PatientStatus
         'Yes: Confirmed in EHR system' => 'YES',
         'No: Not found in EHR system' => 'NO',
         'No Access: Unable to check EHR system' => 'NO_ACCESS',
-        'Unknown: Inconclusive search results' => 'UNKNOWN',
-        'Not Applicable: Walgreens, Quest, QTC, EMSI, DV SDBB' => 'NOT_APPLICABLE'
+        'Unknown: Inconclusive search results' => 'UNKNOWN'
     ];
 
     public function __construct($app)
