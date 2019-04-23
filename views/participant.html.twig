@@ -476,12 +476,6 @@
                                             <dl class="dl-horizontal">
                                                 <dt>Status</dt>
                                                 <dd>{{ orgPatientStatusData.display_status }}</dd>
-                                                <dt>User</dt>
-                                                <dd>{{ orgPatientStatusData.user_email }}</dd>
-                                                <dt>Site</dt>
-                                                <dd>{{ orgPatientStatusData.site_name|default(orgPatientStatusData.site) }}</dd>
-                                                <dt>Date</dt>
-                                                <dd>{{ orgPatientStatusData.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
                                                 <dt>Comments</dt>
                                                 <dd>{{ orgPatientStatusData.comments }}</dd>
                                             </dl>
