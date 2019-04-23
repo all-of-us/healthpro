@@ -75,14 +75,14 @@ class PatientStatus
                 $patientStatusHistoryData['patient_status_id'] = $patientStatusId;
             } else {
                 $id = $patientStatusRepository->insert($patientStatusData);
-                $this->app->log(Log::PATIENT_STATUS, [
+                $this->app->log(Log::PATIENT_STATUS_ADD, [
                     'id' => $id
                 ]);
                 $patientStatusHistoryData['patient_status_id'] = $id;
             }
             //Create patient status history
             $id = $patientStatusHistoryRepository->insert($patientStatusHistoryData);
-            $this->app->log(Log::PATIENT_STATUS_HISTORY, [
+            $this->app->log(Log::PATIENT_STATUS_EDIT, [
                 'id' => $id
             ]);
 
@@ -124,8 +124,9 @@ class PatientStatus
         ]);
         if (!empty($data)) {
             $data[0]['display_status'] = array_search($data[0]['status'], self::$patientStatus);
+            return $data[0];
         }
-        return $data;
+        return null;
     }
 
     public function getOrgPatientStatusHistoryData($participantId, $organization)

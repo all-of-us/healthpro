@@ -11,7 +11,7 @@
         <dt>Comments</dt>
         <dd>{{ field.comments }}</dd>
     </dl>
-    {% if key < orgPatientStatusHistoryData|length - 1 %}
+    {% if not loop.last %}
         <hr>
     {% endif %}
 {% endfor %}

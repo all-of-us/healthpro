@@ -482,7 +482,7 @@ class DefaultController extends AbstractController
             'samplesAlias' => WorkQueue::$samplesAlias,
             'cancelRoute' => $cancelRoute,
             'patientStatusForm' => $patientStatusForm->createView(),
-            'orgPatientStatusData' => !empty($orgPatientStatusData) ? $orgPatientStatusData[0] : null,
+            'orgPatientStatusData' => $orgPatientStatusData,
             'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
             'awardeePatientStatusData' => $awardeePatientStatusData
         ]);
