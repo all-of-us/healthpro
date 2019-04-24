@@ -645,10 +645,10 @@ $(document).ready(function() {
     $(".patient-status-details").on('click', function (e) {
         e.preventDefault();
         $(psDetailsModal).removeData('bs.modal');
-        //TODO: Since remote is deprecated use other alternate approach
-        $(psDetailsModal).modal({
-            remote: $(this).attr('data-href')
-        });
+        // Load data from url
+        $("#patient-status-details-modal .modal-content").load(
+            $(this).attr('data-href')
+        );
         $(psDetailsModal).modal('show');
     });
 
