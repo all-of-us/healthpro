@@ -33,7 +33,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             'collected_notes' => null,
             'processed_notes' => null,
             'finalized_notes' => null,
-            'processed_centrifuge_type' => null
+            'processed_centrifuge_type' => null,
+            'status' => 'active'
         ];
         $orderParameters = array_merge($orderParameters, $parameters);
         $order->setOrder($orderParameters);
@@ -100,6 +101,12 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             'mayo_id' => 'YZXWVU'
         ]);
         $this->assertSame('finalize', $order->getCurrentStep());
+
+        $order = $this->createOrder([
+            'created_ts' => new \DateTime('2016-01-01 08:00:00'),
+            'status' => 'cancel'
+        ]);
+        $this->assertSame('collect', $order->getCurrentStep());
     }
 
     public function testRdrObject()
