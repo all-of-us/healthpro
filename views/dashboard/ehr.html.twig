@@ -278,11 +278,10 @@ function renderMetricsEhrPlots() {
 
                     // load table data
                     $(tableDiv).html('<table class="table table-striped"><thead></thead><tbody></tbody></table>')
-                    $('thead', tableDiv).append('<tr><th>Organization</th><th>Total Participants</th><th>Total Primary Consent</th><th>Total EHR Consent</th><th>Total Core</th><th>Total EHR Data Received</th><th>Last EHR Submission Date</th></tr>');
+                    $('thead', tableDiv).append('<tr><th>Organization</th><th>Total Participants</th><th>Total EHR Consent</th><th>Total Core</th><th>Total EHR Data Received</th><th>Last EHR Submission Date</th></tr>');
                     $(data).each(function(i, row) {
                         var organizationRow = $('<tr />')
                         organizationRow.append('<td>' + row.organization_name + '</td>')
-                        organizationRow.append('<td>' + row.total_participants + '</td>')
                         organizationRow.append('<td>' + row.total_primary_consented + '</td>')
                         organizationRow.append('<td>' + row.total_ehr_consented + '</td>')
                         organizationRow.append('<td>' + row.total_core_participants + '</td>')
