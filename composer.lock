@@ -2426,16 +2426,16 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v3.4.20",
+            "version": "v3.4.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "ea61dd57c4399b0b2a4162e1820cd9d0783acd38"
+                "reference": "90454ad44c95d75faf3507d56388056001b74baf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/ea61dd57c4399b0b2a4162e1820cd9d0783acd38",
-                "reference": "ea61dd57c4399b0b2a4162e1820cd9d0783acd38",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/90454ad44c95d75faf3507d56388056001b74baf",
+                "reference": "90454ad44c95d75faf3507d56388056001b74baf",
                 "shasum": ""
             },
             "require": {
@@ -2476,7 +2476,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2018-11-26T10:17:44+00:00"
+            "time": "2019-04-17T14:51:18+00:00"
         },
         {
             "name": "symfony/http-kernel",
@@ -3292,16 +3292,16 @@
         },
         {
             "name": "symfony/security",
-            "version": "v3.4.20",
+            "version": "v3.4.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security.git",
-                "reference": "ee26f3b8aa1fdebcaea2ee573d99d25fd1c179a3"
+                "reference": "fdbff3de6a0486aa10fcc3f0cbfe336d46534f27"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security/zipball/ee26f3b8aa1fdebcaea2ee573d99d25fd1c179a3",
-                "reference": "ee26f3b8aa1fdebcaea2ee573d99d25fd1c179a3",
+                "url": "https://api.github.com/repos/symfony/security/zipball/fdbff3de6a0486aa10fcc3f0cbfe336d46534f27",
+                "reference": "fdbff3de6a0486aa10fcc3f0cbfe336d46534f27",
                 "shasum": ""
             },
             "require": {
@@ -3325,6 +3325,7 @@
                 "symfony/expression-language": "~2.8|~3.0|~4.0",
                 "symfony/finder": "~2.8|~3.0|~4.0",
                 "symfony/ldap": "~3.1|~4.0",
+                "symfony/polyfill-ctype": "~1.8",
                 "symfony/polyfill-intl-icu": "~1.0",
                 "symfony/routing": "~2.8|~3.0|~4.0",
                 "symfony/validator": "^3.2.5|~4.0"
@@ -3370,7 +3371,7 @@
             ],
             "description": "Symfony Security Component",
             "homepage": "https://symfony.com",
-            "time": "2018-12-06T11:25:03+00:00"
+            "time": "2019-04-17T14:49:35+00:00"
         },
         {
             "name": "symfony/translation",
