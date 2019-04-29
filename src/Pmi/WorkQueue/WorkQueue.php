@@ -271,11 +271,11 @@ class WorkQueue
             $row['biobankId'] = $e($participant->biobankId);
             $row['language'] = $e($participant->language);
             $row['participantStatus'] = $e($participant->enrollmentStatus);
-            $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentTime);
+            $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentAuthored);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
-            $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsTime, true, true);
-            $row['dvEhrStatus'] = $this->displayStatus($participant->consentForDvElectronicHealthRecordsSharing, 'SUBMITTED', $participant->consentForDvElectronicHealthRecordsSharingTime, true, true);
-            $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRTime, true);
+            $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsAuthored, true, true);
+            $row['dvEhrStatus'] = $this->displayStatus($participant->consentForDvElectronicHealthRecordsSharing, 'SUBMITTED', $participant->consentForDvElectronicHealthRecordsSharingAuthored, true, true);
+            $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRAuthored, true);
             if ($participant->withdrawalStatus == 'NO_USE') {
                 $row['withdrawal'] = self::HTML_DANGER . ' <span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalTime, $app->getUserTimezone());
             } else {
@@ -305,7 +305,7 @@ class WorkQueue
             foreach (array_keys(self::$surveys) as $field) {
                 $row["ppi{$field}"] = $this->displayStatus($participant->{'questionnaireOn' . $field}, 'SUBMITTED');
                 if (!empty($participant->{'questionnaireOn' . $field . 'Time'})) {
-                    $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn' . $field . 'Time'}, $app->getUserTimezone());
+                    $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn' . $field . 'Authored'}, $app->getUserTimezone());
                 } else {
                     $row["ppi{$field}Time"] = '';
                 }
