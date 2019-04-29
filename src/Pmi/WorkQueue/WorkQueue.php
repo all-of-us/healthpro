@@ -24,9 +24,9 @@ class WorkQueue
         'enrollmentStatus',
         'consentForStudyEnrollmentTime',
         'primaryLanguage',
-        'consentForElectronicHealthRecordsTime',
-        'consentForDvElectronicHealthRecordsSharingTime',
-        'consentForCABoRTime',
+        'consentForElectronicHealthRecordsAuthored',
+        'consentForDvElectronicHealthRecordsSharingAuthored',
+        'consentForCABoRAuthored',
         'withdrawalTime',
         'withdrawalReason',
         'recontactMethod',
@@ -37,19 +37,19 @@ class WorkQueue
         'numCompletedBaselinePPIModules',
         'numCompletedPPIModules',
         'questionnaireOnTheBasics',
-        'questionnaireOnTheBasicsTime',
+        'questionnaireOnTheBasicsAuthored',
         'questionnaireOnOverallHealth',
-        'questionnaireOnOverallHealthTime',
+        'questionnaireOnOverallHealthAuthored',
         'questionnaireOnLifestyle',
-        'questionnaireOnLifestyleTime',
+        'questionnaireOnLifestyleAuthored',
         'questionnaireOnMedicalHistory',
-        'questionnaireOnMedicalHistoryTime',
+        'questionnaireOnMedicalHistoryAuthored',
         'questionnaireOnMedications',
-        'questionnaireOnMedicationsTime',
+        'questionnaireOnMedicationsAuthored',
         'questionnaireOnFamilyHealth',
-        'questionnaireOnFamilyHealthTime',
+        'questionnaireOnFamilyHealthAuthored',
         'questionnaireOnHealthcareAccess',
-        'questionnaireOnHealthcareAccessTime',
+        'questionnaireOnHealthcareAccessAuthored',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -304,7 +304,7 @@ class WorkQueue
             $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
             foreach (array_keys(self::$surveys) as $field) {
                 $row["ppi{$field}"] = $this->displayStatus($participant->{'questionnaireOn' . $field}, 'SUBMITTED');
-                if (!empty($participant->{'questionnaireOn' . $field . 'Time'})) {
+                if (!empty($participant->{'questionnaireOn' . $field . 'Authored'})) {
                     $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn' . $field . 'Authored'}, $app->getUserTimezone());
                 } else {
                     $row["ppi{$field}Time"] = '';
