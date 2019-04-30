@@ -356,7 +356,7 @@ class WorkQueue
             try {
                 $date = new \DateTime($string);
                 $date->setTimezone(new \DateTimeZone($timezone));
-                return $date->format('m/d/Y h:i:s a');
+                return $date->format('m/d/Y h:i a');
             } catch (\Exception $e) {
                 return '';
             }
