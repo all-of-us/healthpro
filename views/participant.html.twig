@@ -51,7 +51,7 @@
                 <strong>General Consent</strong>
                 {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    {{ participant.consentForStudyEnrollmentAuthored ? participant.consentForStudyEnrollmentAuthored|date('n/j/Y h:i a', app.userTimezone) }}
+                    {{ participant.consentForStudyEnrollmentAuthored ? participant.consentForStudyEnrollmentAuthored|date('n/j/Y', app.userTimezone) }}
                 {% else %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
                 {% endif %}
@@ -61,13 +61,13 @@
                 <strong>EHR Consent</strong>
                 {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y h:i a', app.userTimezone) }}
+                    {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y', app.userTimezone) }}
                 {% elseif participant.consentForElectronicHealthRecords == 'INVALID' %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i> (invalid)
-                    {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y h:i a', app.userTimezone) }}
+                    {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y', app.userTimezone) }}
                 {% else %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y h:i a', app.userTimezone) : '(not completed)' }}
+                    {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y', app.userTimezone) : '(not completed)' }}
                 {% endif %}
                 <br />
             </div>
@@ -75,13 +75,13 @@
                 <strong>DV-only EHR Sharing</strong> <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip"><span class="sr-only">What is DV EHR Sharing</span><i class="fa fa-question-circle text-info"></i></span>
                 {% if participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y h:i a', app.userTimezone) }}
+                    {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y', app.userTimezone) }}
                 {% elseif participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED_NOT_SURE' %}
                     <i class="fa fa-question text-warning" aria-hidden="true"></i>
-                    {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y h:i a', app.userTimezone) }}
+                    {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y', app.userTimezone) }}
                 {% else %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y h:i a', app.userTimezone) : '(not completed)' }}
+                    {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y', app.userTimezone) : '(not completed)' }}
                 {% endif %}
                 <br />
             </div>
@@ -89,10 +89,10 @@
                 <strong>CABoR Consent</strong> <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
                 {% if participant.consentForCABoR == 'SUBMITTED' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y h:i a', app.userTimezone) }}
+                    {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y', app.userTimezone) }}
                 {% else %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y h:i a', app.userTimezone) : '(not completed)' }}
+                    {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y', app.userTimezone) : '(not completed)' }}
                 {% endif %}
                 <br />
             </div>
