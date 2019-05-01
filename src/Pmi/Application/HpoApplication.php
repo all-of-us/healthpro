@@ -219,6 +219,7 @@ class HpoApplication extends AbstractApplication
             $this['session']->set('site', $user->getSite($email));
             $this['session']->remove('awardee');
             $this->setNewRoles($user);
+            $this->saveSiteMetaDataInSession();
             return true;
         } elseif ($user && $user->belongsToAwardee($email)) {
             $this['session']->set('awardee', $user->getAwardee($email));
@@ -595,5 +596,18 @@ class HpoApplication extends AbstractApplication
     public function isTestSite()
     {
         return !empty($this->getConfig('disable_test_access')) && $this->getSiteAwardee() === 'TEST';
+    }
+
+    public function saveSiteMetaDataInSession()
+    {
+        $site = $this->getSiteEntity();
+        if (!empty($site)) {
+            $this['session']->set('siteOrganization', $site['organization']);
+            $this['session']->set('siteOrganizationId', $site['organization_id']);
+            $this['session']->set('siteOrganizationDisplayName', $this->getOrganizationDisplayName($site['organization_id']));
+            $this['session']->set('siteAwardee', $site['awardee']);
+            $this['session']->set('siteAwardeeId', $site['awardee_id']);
+            $this['session']->set('siteAwardeeDisplayName', $this->getAwardeeDisplayName($site['awardee_id']));
+        }
     }
 }
