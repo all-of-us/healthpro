@@ -55,7 +55,7 @@ class PatientStatus
         $patientStatusData = [
             'participant_id' => $participantId,
             'organization' => $this->app->getSiteOrganizationId(),
-            'awardee' => $this->app->getSiteAwardee()
+            'awardee' => $this->app->getSiteAwardeeId()
         ];
         $patientStatusRepository = $this->app['em']->getRepository('patient_status');
         $patientStatusHistoryRepository = $this->app['em']->getRepository('patient_status_history');
