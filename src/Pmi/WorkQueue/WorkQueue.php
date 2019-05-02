@@ -22,7 +22,7 @@ class WorkQueue
         'biobankId',
         'language',
         'enrollmentStatus',
-        'consentForStudyEnrollmentTime',
+        'consentForStudyEnrollmentAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
         'consentForDvElectronicHealthRecordsSharingAuthored',
