@@ -340,6 +340,11 @@ class HpoApplication extends AbstractApplication
         return $this['session']->get('siteAwardeeDisplayName');
     }
 
+    public function getCurrentSiteDisplayName()
+    {
+        return $this['session']->get('currentSiteDisplayName');
+    }
+
     public function getAwardeeOrganization()
     {
         if ($this['isUnitTest']) {
@@ -600,6 +605,7 @@ class HpoApplication extends AbstractApplication
             $this['session']->set('siteAwardee', $site['awardee']);
             $this['session']->set('siteAwardeeId', $site['awardee_id']);
             $this['session']->set('siteAwardeeDisplayName', $this->getAwardeeDisplayName($site['awardee_id']));
+            $this['session']->set('currentSiteDisplayName', $this->getAwardeeDisplayName($site['name']));
         }
     }
 }
