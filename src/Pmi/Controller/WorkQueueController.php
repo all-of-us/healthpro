@@ -353,7 +353,7 @@ class WorkQueueController extends AbstractController
                         ];                   
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone());
+                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone(), false);
                     $row[] = $participant->siteSuffix;
                     $row[] = $participant->organization;
                     $row[] = $participant->evaluationFinalizedSite;
@@ -368,7 +368,7 @@ class WorkQueueController extends AbstractController
                             }
                         }
                         $row[] = $participant->{"sampleStatus{$newSample}"} == 'RECEIVED' ? '1' : '0';
-                        $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $app->getUserTimezone(), false);
                     }
                     $row[] = $participant->orderCreatedSite;
                     $row[] = $participant->withdrawalReason;
