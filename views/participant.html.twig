@@ -251,7 +251,7 @@
                                         <dt>General Consent</dt>
                                         <dd>
                                             {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
-                                                {{ participant.consentForStudyEnrollmentAuthored ? participant.consentForStudyEnrollmentAuthored|date('n/j/Y h:i a', app.userTimezone) : '--' }}
+                                                {{ participant.consentForStudyEnrollmentAuthored ? participant.consentForStudyEnrollmentAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
                                             {% else %}
                                                 --
                                             {% endif %}
@@ -259,29 +259,29 @@
                                         <dt>EHR Consent</dt>
                                         <dd>
                                             {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
-                                                {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y h:i a', app.userTimezone) : '--' }}
+                                                {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
                                             {% elseif participant.consentForElectronicHealthRecords == 'INVALID' %}
-                                                (invalid) {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y h:i a', app.userTimezone) : '--' }}
+                                                (invalid) {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
                                             {% else %}
-                                                {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y h:i a', app.userTimezone) : '(not completed)' }}
+                                                {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
                                             {% endif %}
                                         </dd>
                                         <dt>DV-only EHR Sharing</dt>
                                         <dd>
                                             {% if participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED' %}
-                                                {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y h:i a', app.userTimezone) : '--' }}
+                                                {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
                                             {% elseif participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED_NOT_SURE' %}
-                                                {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y h:i a', app.userTimezone) : '--' }}
+                                                {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
                                             {% else %}
-                                                {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y h:i a', app.userTimezone) : '(not completed)' }}
+                                                {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
                                             {% endif %}
                                         </dd>
                                         <dt>CABoR Consent</dt>
                                         <dd>
                                             {% if participant.consentForCABoR == 'SUBMITTED' %}
-                                                {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y h:i a', app.userTimezone) : '--' }}
+                                                {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
                                             {% else %}
-                                                {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y h:i a', app.userTimezone) : '(not completed)' }}
+                                                {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
                                             {% endif %}
                                         </dd>
                                     </dl>
