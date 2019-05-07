@@ -766,7 +766,7 @@ class DashboardController extends AbstractController
                 $consented = [];
                 $consented_text = [];
                 foreach ($metrics as $row) {
-                    array_push($dates, $row['date']);
+                    array_push($dates, $this->formatDateToQuarter($row['date']));
                     array_push($received, (int) $row['metrics']['EHR_RECEIVED']);
                     array_push($received_text, number_format($row['metrics']['EHR_RECEIVED']));
                     array_push($consented, (int) $row['metrics']['EHR_CONSENTED']);
@@ -802,7 +802,7 @@ class DashboardController extends AbstractController
                 $orgs = [];
                 $orgs_text = [];
                 foreach ($metrics as $row) {
-                    array_push($dates, $row['date']);
+                    array_push($dates, $this->formatDateToQuarter($row['date']));
                     array_push($orgs, (int) $row['metrics']['ORGANIZATIONS_ACTIVE']);
                     array_push($orgs_text, number_format($row['metrics']['ORGANIZATIONS_ACTIVE']));
                 }
@@ -1216,5 +1216,22 @@ class DashboardController extends AbstractController
             }
         }
         return array_values($output);
+    }
+
+    /**
+     * Format Date to Quarter
+     *
+     * @param string $date
+     * @return string
+     */
+    private function formatDateToQuarter($date)
+    {
+        $ts = strtotime($date);
+        $output = sprintf(
+            'Q%d %d',
+            ceil((int) date('m', $ts)/3),
+            date('Y', $ts)
+        );
+        return $output;
     }
 }
