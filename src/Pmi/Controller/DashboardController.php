@@ -299,7 +299,6 @@ class DashboardController extends AbstractController
         $traces_obj = [];
         $interval_counts = [];
 
-        // Reverse the arrays, as the last item added appears as first value in chart
         $trace_names = array_keys($display_values);
 
         // if we got this far, we have data!
@@ -821,6 +820,10 @@ class DashboardController extends AbstractController
                 ];
                 break;
             case 'Organizations':
+                // Sort by organization_name
+                usort($metrics, function ($a, $b) {
+                    return strcmp($a['organization_name'], $b['organization_name']);
+                });
                 // Render as a table
                 $ehr_data = [];
                 foreach (array_values($metrics) as $i => $metrics) {
