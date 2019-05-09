@@ -743,7 +743,7 @@ class DashboardController extends AbstractController
         $mode = $request->get('mode');
         $start_date = $request->get('start_date', date('Y-m-d'));
         $end_date = $request->get('end_date', date('Y-m-d'));
-        $interval = $request->get('interval', 'quarter');
+        $interval = $request->get('interval', 'day');
         $organizations = $request->get('organizations', []);
         $params = [];
 
