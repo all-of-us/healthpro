@@ -44,7 +44,7 @@
             <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
         </p>
     {% endif %}
-    <h4 id="heading-count" style="display:none"><span class="count"></span> {{ params|length > 0 ? ' matching' }} participant<span class="plural">s</span> ({{ app.getAwardeeDisplayName(organization) }})</h4>
+    <h4 id="heading-count" style="display:none"><span class="count"></span> {{ params|length > 0 ? ' matching' }} participant<span class="plural">s</span> ({{ app.getSiteAwardeeDisplayName() }})</h4>
     <table class="table table-striped table-bordered table-small" id="workqueue" width="100%" data-surveys="{{ surveys|json_encode() }}" data-samples="{{ samples|json_encode() }}">
         <thead>
             <tr>
