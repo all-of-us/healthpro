@@ -436,7 +436,7 @@ class DefaultController extends AbstractController
         }
 
         // DVs doesn't have access to patient status tab
-        if (!$app->isDVType()) {
+        if (!$app->isDVType() && $participant->statusReason !== 'withdrawal') {
             // Patient Status
             $patientStatus = new PatientStatus($app);
             $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
