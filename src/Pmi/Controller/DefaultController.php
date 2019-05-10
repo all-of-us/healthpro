@@ -505,7 +505,7 @@ class DefaultController extends AbstractController
             $app->abort(404);
         }
         if ($app->isDVType() || $participant->statusReason === 'withdrawal') {
-            $app->abort(404);
+            $app->abort(403);
         }
         $patientStatus = new PatientStatus($app);
         $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
