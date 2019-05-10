@@ -500,7 +500,11 @@ class DefaultController extends AbstractController
 
     public function patientStatusAction($participantId, $patientStatusId, Application $app)
     {
-        if ($app->isDVType()) {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if ($app->isDVType() || $participant->statusReason === 'withdrawal') {
             $app->abort(404);
         }
         $patientStatus = new PatientStatus($app);
