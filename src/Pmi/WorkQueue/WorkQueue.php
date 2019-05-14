@@ -357,9 +357,9 @@ class WorkQueue
                 $date = new \DateTime($string);
                 $date->setTimezone(new \DateTimeZone($timezone));
                 if ($displayTime) {
-                    return $date->format('n/j/Y g:ia');
+                    return $date->format('n/j/Y g:i a');
                 }
-                return $date->format('m/d/Y');
+                return $date->format('n/j/Y');
             } catch (\Exception $e) {
                 return '';
             }
