@@ -436,7 +436,7 @@ class DefaultController extends AbstractController
         }
 
         // DVs doesn't have access to patient status tab
-        if (!$app->isDVType()) {
+        if (!$app->isDVType() && $participant->statusReason !== 'withdrawal') {
             // Patient Status
             $patientStatus = new PatientStatus($app);
             $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
@@ -500,8 +500,12 @@ class DefaultController extends AbstractController
 
     public function patientStatusAction($participantId, $patientStatusId, Application $app)
     {
-        if ($app->isDVType()) {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
             $app->abort(404);
+        }
+        if ($app->isDVType() || $participant->statusReason === 'withdrawal') {
+            $app->abort(403);
         }
         $patientStatus = new PatientStatus($app);
         $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([

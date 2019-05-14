@@ -136,9 +136,15 @@
                 </li>
             {% endif %}
             {% if not isDVType %}
-                <li role="presentation">
-                    <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
-                </li>
+                {% if participant.statusReason != 'withdrawal' %}
+                    <li role="presentation">
+                        <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
+                    </li>
+                {% else %}
+                    <li role="presentation" class="disabled">
+                        <a href="#" title="Patient Status not available because participant is withdrawn" data-toggle="tooltip" data-placement="bottom">Patient Status</a>
+                    </li>
+                {% endif %}
             {% endif %}
         </ul>
         <br />
@@ -495,7 +501,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if not isDVType %}
+            {% if not isDVType and participant.statusReason != 'withdrawal' %}
                 <div role="tabpanel" class="tab-pane" id="patientstatus">
                 {% if orgPatientStatusData is empty %}
                     <div class="alert alert-warning">
@@ -640,7 +646,7 @@ $(document).ready(function() {
 });
 </script>
 {# Paient status tab #}
-{% if not isDVType %}
+{% if not isDVType and participant.statusReason != 'withdrawal' %}
 <script>
 $(document).ready(function() {
     var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};
