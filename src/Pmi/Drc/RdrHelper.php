@@ -3,6 +3,10 @@ namespace Pmi\Drc;
 
 use Pmi\HttpClient;
 
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use Cache\Adapter\Filesystem\FilesystemCachePool;
+
 class RdrHelper
 {
     protected $client;
@@ -52,6 +56,14 @@ class RdrHelper
         } else {
             $endpoint = $this->endpoint;
         }
+
+        $cachePath = realpath(__DIR__ . '/../../../') . '/cache/';
+        $filesystemAdapter = new Local($cachePath);
+        $filesystem = new Filesystem($filesystemAdapter);
+
+        $cache = new FilesystemCachePool($filesystem);
+        $googleClient->setCache($cache);
+
         return $googleClient->authorize(new HttpClient([
             'base_uri' => $endpoint,
             'timeout' => 50
