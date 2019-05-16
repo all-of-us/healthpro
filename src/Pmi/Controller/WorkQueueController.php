@@ -321,11 +321,11 @@ class WorkQueueController extends AbstractController
                             $participant->language,
                             $participant->enrollmentStatus,
                             WorkQueue::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-                            WorkQueue::dateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone()),
+                            WorkQueue::dateFromString($participant->consentForStudyEnrollmentAuthored, $app->getUserTimezone()),
                             WorkQueue::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-                            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone()),
+                            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsAuthored, $app->getUserTimezone()),
                             WorkQueue::csvStatusFromSubmitted($participant->consentForCABoR),
-                            WorkQueue::dateFromString($participant->consentForCABoRTime, $app->getUserTimezone()),
+                            WorkQueue::dateFromString($participant->consentForCABoRAuthored, $app->getUserTimezone()),
                             $participant->withdrawalStatus == 'NO_USE' ? '1' : '0',
                             WorkQueue::dateFromString($participant->withdrawalTime, $app->getUserTimezone()),
                             $participant->streetAddress,
@@ -343,7 +343,7 @@ class WorkQueueController extends AbstractController
                         ];
                         foreach (WorkQueue::$surveys as $survey => $label) {
                             $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                            $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Time"}, $app->getUserTimezone());
+                            $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
                         }
                     } else {
                         $row = [
@@ -353,7 +353,7 @@ class WorkQueueController extends AbstractController
                         ];                   
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone());
+                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone(), false);
                     $row[] = $participant->siteSuffix;
                     $row[] = $participant->organization;
                     $row[] = $participant->evaluationFinalizedSite;
@@ -368,13 +368,13 @@ class WorkQueueController extends AbstractController
                             }
                         }
                         $row[] = $participant->{"sampleStatus{$newSample}"} == 'RECEIVED' ? '1' : '0';
-                        $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $app->getUserTimezone(), false);
                     }
                     $row[] = $participant->orderCreatedSite;
                     $row[] = $participant->withdrawalReason;
                     $row[] = $participant->primaryLanguage;
                     $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForDvElectronicHealthRecordsSharing);
-                    $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingTime, $app->getUserTimezone());
+                    $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingAuthored, $app->getUserTimezone());
                     if ($hasFullDataAccess) {
                         $row[] = $participant->loginPhoneNumber;
                     }

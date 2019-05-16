@@ -51,7 +51,7 @@
                 <strong>General Consent</strong>
                 {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    {{ participant.consentForStudyEnrollmentTime ? participant.consentForStudyEnrollmentTime|date('n/j/Y', app.userTimezone) }}
+                    {{ participant.consentForStudyEnrollmentAuthored ? participant.consentForStudyEnrollmentAuthored|date('n/j/Y', app.userTimezone) }}
                 {% else %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
                 {% endif %}
@@ -61,13 +61,13 @@
                 <strong>EHR Consent</strong>
                 {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y', app.userTimezone) }}
+                    {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y', app.userTimezone) }}
                 {% elseif participant.consentForElectronicHealthRecords == 'INVALID' %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i> (invalid)
-                    {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y', app.userTimezone) }}
+                    {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y', app.userTimezone) }}
                 {% else %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y', app.userTimezone) : '(not completed)' }}
+                    {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y', app.userTimezone) : '(not completed)' }}
                 {% endif %}
                 <br />
             </div>
@@ -75,13 +75,13 @@
                 <strong>DV-only EHR Sharing</strong> <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip"><span class="sr-only">What is DV EHR Sharing</span><i class="fa fa-question-circle text-info"></i></span>
                 {% if participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    {{ participant.consentForDvElectronicHealthRecordsSharingTime ? participant.consentForDvElectronicHealthRecordsSharingTime|date('n/j/Y', app.userTimezone) }}
+                    {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y', app.userTimezone) }}
                 {% elseif participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED_NOT_SURE' %}
                     <i class="fa fa-question text-warning" aria-hidden="true"></i>
-                    {{ participant.consentForDvElectronicHealthRecordsSharingTime ? participant.consentForDvElectronicHealthRecordsSharingTime|date('n/j/Y', app.userTimezone) }}
+                    {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y', app.userTimezone) }}
                 {% else %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    {{ participant.consentForDvElectronicHealthRecordsSharingTime ? participant.consentForDvElectronicHealthRecordsSharingTime|date('n/j/Y', app.userTimezone) : '(not completed)' }}
+                    {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y', app.userTimezone) : '(not completed)' }}
                 {% endif %}
                 <br />
             </div>
@@ -89,10 +89,10 @@
                 <strong>CABoR Consent</strong> <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
                 {% if participant.consentForCABoR == 'SUBMITTED' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('n/j/Y', app.userTimezone) }}
+                    {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y', app.userTimezone) }}
                 {% else %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('n/j/Y', app.userTimezone) : '(not completed)' }}
+                    {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y', app.userTimezone) : '(not completed)' }}
                 {% endif %}
                 <br />
             </div>
@@ -136,9 +136,15 @@
                 </li>
             {% endif %}
             {% if not isDVType %}
-                <li role="presentation">
-                    <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
-                </li>
+                {% if participant.statusReason != 'withdrawal' %}
+                    <li role="presentation">
+                        <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
+                    </li>
+                {% else %}
+                    <li role="presentation" class="disabled">
+                        <a href="#" title="Patient Status not available because participant is withdrawn" data-toggle="tooltip" data-placement="bottom">Patient Status</a>
+                    </li>
+                {% endif %}
             {% endif %}
         </ul>
         <br />
@@ -222,13 +228,16 @@
                                 </div>
                                 <div class="panel-body">
                                     <p>{{ errorMessage }}</p>
-                                    {% if participant.statusReason == 'withdrawal' and participant.withdrawalReason is not empty %}
-                                        <p>
-                                            <strong>Reason:</strong> {{ participant.withdrawalReason }}
-                                            {% if participant.withdrawalReasonJustification is not empty %}
-                                                <br /><strong>Justification:</strong> {{ participant.withdrawalReasonJustification }}
-                                            {% endif %}
-                                        </p>
+                                    {% if participant.statusReason == 'withdrawal' %}
+                                        <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalTime|date('n/j/Y g:ia', app.userTimezone) }}</p>
+                                        {% if participant.withdrawalReason is not empty %}
+                                            <p>
+                                                <strong>Reason:</strong> {{ participant.withdrawalReason }}
+                                                {% if participant.withdrawalReasonJustification is not empty %}
+                                                    <br/><strong>Justification:</strong> {{ participant.withdrawalReasonJustification }}
+                                                {% endif %}
+                                            </p>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                             </div>
@@ -248,6 +257,42 @@
                                     <dl class="dl-vertical">
                                         <dt>Language of General Consent</dt>
                                         <dd>{{ participant.primaryLanguage|default('--') }}</dd>
+                                        <dt>General Consent</dt>
+                                        <dd>
+                                            {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
+                                                {{ participant.consentForStudyEnrollmentAuthored ? participant.consentForStudyEnrollmentAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% else %}
+                                                --
+                                            {% endif %}
+                                        </dd>
+                                        <dt>EHR Consent</dt>
+                                        <dd>
+                                            {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
+                                                {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% elseif participant.consentForElectronicHealthRecords == 'INVALID' %}
+                                                (invalid) {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% else %}
+                                                {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
+                                            {% endif %}
+                                        </dd>
+                                        <dt>DV-only EHR Sharing</dt>
+                                        <dd>
+                                            {% if participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED' %}
+                                                {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% elseif participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED_NOT_SURE' %}
+                                                {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% else %}
+                                                {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
+                                            {% endif %}
+                                        </dd>
+                                        <dt>CABoR Consent</dt>
+                                        <dd>
+                                            {% if participant.consentForCABoR == 'SUBMITTED' %}
+                                                {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% else %}
+                                                {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
+                                            {% endif %}
+                                        </dd>
                                     </dl>
                                 </div>
                             </div>
@@ -319,8 +364,8 @@
                                                 <strong>{{ label }}</strong>
                                                 {% if attribute(participant, 'questionnaireOn' ~ field) == 'SUBMITTED' %}
                                                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                                    {% if attribute(participant, 'questionnaireOn' ~ field ~ 'Time') %}
-                                                        <small>{{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time')|date('m/d/Y', app.userTimezone) }}</small>
+                                                    {% if attribute(participant, 'questionnaireOn' ~ field ~ 'Authored') %}
+                                                        <small>{{ attribute(participant, 'questionnaireOn' ~ field ~ 'Authored')|date('n/j/Y g:ia', app.userTimezone) }}</small>
                                                     {% endif %}
                                                 {% else %}
                                                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
@@ -456,7 +501,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if not isDVType %}
+            {% if not isDVType and participant.statusReason != 'withdrawal' %}
                 <div role="tabpanel" class="tab-pane" id="patientstatus">
                 {% if orgPatientStatusData is empty %}
                     <div class="alert alert-warning">
@@ -467,7 +512,7 @@
                     <div class="col-md-5">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status: {{ app.getOrganizationDisplayName(app.getSiteOrganizationId) }}</h3>
+                                <h3 class="panel-title">Patient Status: {{ app.getSiteOrganizationDisplayName() }}</h3>
                             </div>
                             <div class="panel-body">
                                 <div id="patient-status-data-box">
@@ -507,7 +552,7 @@
                         <div class="col-md-7">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status History: {{ app.getOrganizationDisplayName(app.getSiteOrganizationId) }}</h3>
+                                <h3 class="panel-title">Patient Status History: {{ app.getSiteOrganizationDisplayName() }}</h3>
                             </div>
                             <div class="panel-body">
                                 {% include 'partials/patient-status-history-dl.html.twig' %}
@@ -601,7 +646,7 @@ $(document).ready(function() {
 });
 </script>
 {# Paient status tab #}
-{% if not isDVType %}
+{% if not isDVType and participant.statusReason != 'withdrawal' %}
 <script>
 $(document).ready(function() {
     var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};
@@ -645,10 +690,10 @@ $(document).ready(function() {
     $(".patient-status-details").on('click', function (e) {
         e.preventDefault();
         $(psDetailsModal).removeData('bs.modal');
-        //TODO: Since remote is deprecated use other alternate approach
-        $(psDetailsModal).modal({
-            remote: $(this).attr('data-href')
-        });
+        // Load data from url
+        $("#patient-status-details-modal .modal-content").load(
+            $(this).attr('data-href')
+        );
         $(psDetailsModal).modal('show');
     });
 
