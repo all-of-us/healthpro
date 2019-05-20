@@ -504,7 +504,7 @@ class DefaultController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if ($app->isDVType() || $participant->statusReason === 'withdrawal') {
+        if ($app->isDVType() || $participant->statusReason === 'withdrawal' || $participant->statusReason === 'test-participant' || $app->isTestSite()) {
             $app->abort(403);
         }
         $patientStatus = new PatientStatus($app);
