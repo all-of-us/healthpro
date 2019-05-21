@@ -497,7 +497,7 @@
             {% endif %}
             {% if not isDVType %}
                 <div role="tabpanel" class="tab-pane" id="patientstatus">
-                    {% if participant.statusReason != 'withdrawal' and participant.statusReason != 'test-participant' and not app.isTestSite %}
+                    {% if canViewPatientStatus %}
                         {% if orgPatientStatusData is empty %}
                             <div class="alert alert-warning">
                                 Please complete the patient status information for your organization. User should have access to EHR system information for verification.
@@ -628,7 +628,7 @@
             {% endif %}
         </div>
     </div>
-    {% if not isDVType and participant.statusReason != 'withdrawal' and participant.statusReason != 'test-participant' and not app.isTestSite %}
+    {% if canViewPatientStatus %}
         {# Patient status history modal window #}
         <div id="patient-status-details-modal" class="modal fade">
             <div class="modal-dialog">
@@ -666,7 +666,7 @@ $(document).ready(function() {
 });
 </script>
 {# Paient status tab #}
-{% if not isDVType and participant.statusReason != 'withdrawal' and participant.statusReason != 'test-participant' and not app.isTestSite %}
+{% if canViewPatientStatus %}
 <script>
 $(document).ready(function() {
     var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};
