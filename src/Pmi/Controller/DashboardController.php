@@ -233,13 +233,13 @@ class DashboardController extends AbstractController
                 if ($history) {
                     $display_values = [
                         'registered' => 'Registered',
-                        'consented' => 'Consented',
+                        'consented' => 'Fully Consented',
                         'core' => 'Core Participant'
                     ];
                 } else {
                     $display_values = [
                         'INTERESTED' => 'Registered',
-                        'MEMBER' => 'Consented',
+                        'MEMBER' => 'Fully Consented',
                         'FULL_PARTICIPANT' => 'Core Participant'
                     ];
                 }
