@@ -9,18 +9,19 @@
         <ul>
           <li><strong>Enrollment Status:</strong>
             <ul>
-              <li><strong>Registered:</strong> A person who created an account by entering a name and either a mobile phone number or an email address and has chosen a language preference but has not yet completed the informed consent process. A registered participant has a unique AoURP participant identifier (PID).</li>
-              <li><strong>Participant:</strong> A person who has completed the informed consent process and is enrolled in AoURP. This individual has not yet signed the HIPAA Authorization/EHR Consent (if available and where relevant, based on AoURP capacity to effectively search for and access records) or the DV EHR Intent to Share agreement.</li>
+              <li><strong>Registered:</strong> A person who created an account by entering a name and either a mobile phone number or an email address and has chosen a language preference but has not yet completed the informed consent process. A registered participant has a unique AoURP participant identifier (PID). All registered individuals will remain in the Registered status until the primary consent is signed.</li>
+              <li><strong>Participant:</strong> A person who has completed the informed consent process and is enrolled in AoURP will become an official Participant.  All Participants will have the opportunity to respond to the HIPAA Authorization/EHR Consent or the DV EHR Intent to Share agreement. If the participant agrees to the sharing EHR data, this person will move to the next status: Fully Consented. If the individual does not agree to share EHR data, the status will remain as a participant. Participants do then have the ability to complete PPI questionnaires and become eligible for PM&amp;B, but will not be considered Core Participants.</li>
               <li>
-                <strong>Fully Consented:</strong> A person who meets the eligibility and inclusion criteria and is enrolled in AoURP. A consented individual has completed the primary informed consent process and the HIPAA Authorization/EHR consent (if available and where relevant, based on AoURP capacity to effectively search for and access records). A consented individual hasn’t yet participated in any research program activities such as completion of questionnaires or providing physical measurements and biospecimens.
+                <strong>Fully Consented:</strong> A person who meets the eligibility and inclusion criteria and is enrolled in AoURP. A Fully Consented participant has completed the primary informed consent process and the HIPAA Authorization/EHR consent (if available and where relevant, based on AoURP capacity to effectively search for and access records). A Fully Consented participant will have the opportunity to participate in research program activities research program activities such as completion of questionnaires or providing physical measurements and biospecimens.
                 <ul>
                   <li><em>Note:</em> DV Participants who have completed the primary informed consent process and the DV EHR Intent to Share are included in Consented participant counts.</li>
                 </ul>
               </li>
               <li>
-                <strong>Core Participant:</strong> A person who completed the required PPI modules and provided physical measurements and biospecimens. A core participant can contribute to other activities such as providing digital health data using sensor modules and/or wearables, if available.
+                <strong>Core Participant:</strong> Any Fully Consented person who completes the required PPI modules and provides physical measurements and biospecimens is eligible for Core Participant status. A core participant can contribute to other activities such as providing digital health data using sensor modules and/or wearables, if available.
                 <ul>
-                  <li><em>Note:</em> Core Participant status requires receipt of sample for sequencing at the biobank.</li>
+                  <li><em>Note 1:</em> Core Participant status requires receipt of sample for sequencing at the biobank.</li>
+                  <li><em>Note 2:</em> If a Core Participant changes the response to share EHR data at any point, the status will revert to <strong>Participant</strong>.</em></li>
                 </ul>
               </li>
             </ul>
@@ -46,7 +47,7 @@
           <li>
             <strong>Total Registered Participants</strong>
             <ul>
-              <li>This plot will show the total number of individuals with a unique AoURP participant identifier (PID) over time.</li>
+              <li>This plot will show the total number of individuals with a unique AoURP participant identifier (PID) over time. This calculation will be the sum total of all persons in the Registered, Participant, Fully Consented, and Core Participant statuses.</li>
             </ul>
           </li>
         </ul>
@@ -76,18 +77,19 @@
         <ul>
           <li><strong>Enrollment Status:</strong>
             <ul>
-              <li><strong>Registered:</strong> A person who created an account by entering a name and either a mobile phone number or an email address and has chosen a language preference but has not yet completed the informed consent process. A registered participant has a unique AoURP participant identifier (PID).</li>
-              <li><strong>Participant:</strong> A person who has completed the informed consent process and is enrolled in AoURP. This individual has not yet signed the HIPAA Authorization/EHR Consent (if available and where relevant, based on AoURP capacity to effectively search for and access records) or the DV EHR Intent to Share agreement.</li>
+              <li><strong>Registered:</strong> A person who created an account by entering a name and either a mobile phone number or an email address and has chosen a language preference but has not yet completed the informed consent process. A registered participant has a unique AoURP participant identifier (PID). All registered individuals will remain in the Registered status until the primary consent is signed.</li>
+              <li><strong>Participant:</strong> A person who has completed the informed consent process and is enrolled in AoURP will become an official Participant.  All Participants will have the opportunity to respond to the HIPAA Authorization/EHR Consent or the DV EHR Intent to Share agreement. If the participant agrees to the sharing EHR data, this person will move to the next status: Fully Consented. If the individual does not agree to share EHR data, the status will remain as a participant. Participants do then have the ability to complete PPI questionnaires and become eligible for PM&amp;B, but will not be considered Core Participants.</li>
               <li>
-                <strong>Fully Consented:</strong> A person who meets the eligibility and inclusion criteria and is enrolled in AoURP. A consented individual has completed the primary informed consent process and the HIPAA Authorization/EHR consent (if available and where relevant, based on AoURP capacity to effectively search for and access records). A consented individual hasn’t yet participated in any research program activities such as completion of questionnaires or providing physical measurements and biospecimens.
+                <strong>Fully Consented:</strong> A person who meets the eligibility and inclusion criteria and is enrolled in AoURP. A Fully Consented participant has completed the primary informed consent process and the HIPAA Authorization/EHR consent (if available and where relevant, based on AoURP capacity to effectively search for and access records). A Fully Consented participant will have the opportunity to participate in research program activities research program activities such as completion of questionnaires or providing physical measurements and biospecimens.
                 <ul>
                   <li><em>Note:</em> DV Participants who have completed the primary informed consent process and the DV EHR Intent to Share are included in Consented participant counts.</li>
                 </ul>
               </li>
               <li>
-                <strong>Core Participant:</strong> A person who completed the required PPI modules and provided physical measurements and biospecimens. A core participant can contribute to other activities such as providing digital health data using sensor modules and/or wearables, if available.
+                <strong>Core Participant:</strong> Any Fully Consented person who completes the required PPI modules and provides physical measurements and biospecimens is eligible for Core Participant status. A core participant can contribute to other activities such as providing digital health data using sensor modules and/or wearables, if available.
                 <ul>
-                  <li><strong><em>Note for Real Time Data calculations:</em> Core Participant status is calculated based on the collection of a biosample and does NOT require receipt of sample for sequencing at the biobank.</strong></li>
+                  <li><strong><em>Note 1 for Real Time Data calculations:</em> Core Participant status is calculated based on the collection of a biosample and does NOT require receipt of sample for sequencing at the biobank.</strong></li>
+                  <li><em>Note 2:</em> If a Core Participant changes the response to share EHR data at any point, the status will revert to <strong>Participant</strong>./li>
                 </ul>
               </li>
             </ul>
