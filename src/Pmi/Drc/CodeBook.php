@@ -118,9 +118,9 @@ class CodeBook
         'HLS_AND_MORE_THAN_ONE_OTHER_RACE' => 'H/L/S and more than one other race',
         'MORE_THAN_ONE_RACE' => 'More than one race',
         'OTHER_RACE' => 'Other',
-        'INTERESTED' => 'Registered',
-        'MEMBER' => 'Member',
-        'FULL_PARTICIPANT' => 'Full Participant',
+        'INTERESTED' => 'Participant',
+        'MEMBER' => 'Fully Consented',
+        'FULL_PARTICIPANT' => 'Core Participant',
         'en' => 'English',
         'es' => 'Spanish'
     ];
