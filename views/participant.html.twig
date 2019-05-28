@@ -222,13 +222,16 @@
                                 </div>
                                 <div class="panel-body">
                                     <p>{{ errorMessage }}</p>
-                                    {% if participant.statusReason == 'withdrawal' and participant.withdrawalReason is not empty %}
-                                        <p>
-                                            <strong>Reason:</strong> {{ participant.withdrawalReason }}
-                                            {% if participant.withdrawalReasonJustification is not empty %}
-                                                <br /><strong>Justification:</strong> {{ participant.withdrawalReasonJustification }}
-                                            {% endif %}
-                                        </p>
+                                    {% if participant.statusReason == 'withdrawal' %}
+                                        <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalTime|date('n/j/Y g:ia', app.userTimezone) }}</p>
+                                        {% if participant.withdrawalReason is not empty %}
+                                            <p>
+                                                <strong>Reason:</strong> {{ participant.withdrawalReason }}
+                                                {% if participant.withdrawalReasonJustification is not empty %}
+                                                    <br/><strong>Justification:</strong> {{ participant.withdrawalReasonJustification }}
+                                                {% endif %}
+                                            </p>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                             </div>
@@ -248,6 +251,42 @@
                                     <dl class="dl-vertical">
                                         <dt>Language of General Consent</dt>
                                         <dd>{{ participant.primaryLanguage|default('--') }}</dd>
+                                        <dt>General Consent</dt>
+                                        <dd>
+                                            {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
+                                                {{ participant.consentForStudyEnrollmentTime ? participant.consentForStudyEnrollmentTime|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% else %}
+                                                --
+                                            {% endif %}
+                                        </dd>
+                                        <dt>EHR Consent</dt>
+                                        <dd>
+                                            {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
+                                                {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% elseif participant.consentForElectronicHealthRecords == 'INVALID' %}
+                                                (invalid) {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% else %}
+                                                {{ participant.consentForElectronicHealthRecordsTime ? participant.consentForElectronicHealthRecordsTime|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
+                                            {% endif %}
+                                        </dd>
+                                        <dt>DV-only EHR Sharing</dt>
+                                        <dd>
+                                            {% if participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED' %}
+                                                {{ participant.consentForDvElectronicHealthRecordsSharingTime ? participant.consentForDvElectronicHealthRecordsSharingTime|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% elseif participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED_NOT_SURE' %}
+                                                {{ participant.consentForDvElectronicHealthRecordsSharingTime ? participant.consentForDvElectronicHealthRecordsSharingTime|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% else %}
+                                                {{ participant.consentForDvElectronicHealthRecordsSharingTime ? participant.consentForDvElectronicHealthRecordsSharingTime|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
+                                            {% endif %}
+                                        </dd>
+                                        <dt>CABoR Consent</dt>
+                                        <dd>
+                                            {% if participant.consentForCABoR == 'SUBMITTED' %}
+                                                {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% else %}
+                                                {{ participant.consentForCABoRTime ? participant.consentForCABoRTime|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
+                                            {% endif %}
+                                        </dd>
                                     </dl>
                                 </div>
                             </div>
@@ -320,7 +359,7 @@
                                                 {% if attribute(participant, 'questionnaireOn' ~ field) == 'SUBMITTED' %}
                                                     <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                     {% if attribute(participant, 'questionnaireOn' ~ field ~ 'Time') %}
-                                                        <small>{{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time')|date('m/d/Y', app.userTimezone) }}</small>
+                                                        <small>{{ attribute(participant, 'questionnaireOn' ~ field ~ 'Time')|date('n/j/Y g:ia', app.userTimezone) }}</small>
                                                     {% endif %}
                                                 {% else %}
                                                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
@@ -458,112 +497,138 @@
             {% endif %}
             {% if not isDVType %}
                 <div role="tabpanel" class="tab-pane" id="patientstatus">
-                {% if orgPatientStatusData is empty %}
-                    <div class="alert alert-warning">
-                        Please complete the patient status information for your organization. User should have access to EHR system information for verification.
-                    </div>
-                {% endif %}
-                <div class="row">
-                    <div class="col-md-5">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status: {{ app.getOrganizationDisplayName(app.getSiteOrganizationId) }}</h3>
+                    {% if canViewPatientStatus %}
+                        {% if orgPatientStatusData is empty %}
+                            <div class="alert alert-warning">
+                                Please complete the patient status information for your organization. User should have access to EHR system information for verification.
                             </div>
-                            <div class="panel-body">
-                                <div id="patient-status-data-box">
-                                    {% if orgPatientStatusData is not empty %}
-                                        <div>
-                                            <dl class="dl-horizontal">
-                                                <dt>Status</dt>
-                                                <dd>{{ orgPatientStatusData.display_status }}</dd>
-                                                <dt>Comments</dt>
-                                                <dd>{{ orgPatientStatusData.comments }}</dd>
-                                            </dl>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Patient Status: {{ app.getSiteOrganizationDisplayName() }}</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div id="patient-status-data-box">
+                                            {% if orgPatientStatusData is not empty %}
+                                                <div>
+                                                    <dl class="dl-horizontal">
+                                                        <dt>Status</dt>
+                                                        <dd>{{ orgPatientStatusData.display_status }}</dd>
+                                                        <dt>Comments</dt>
+                                                        <dd>{{ orgPatientStatusData.comments }}</dd>
+                                                    </dl>
+                                                </div>
+                                                <div align="center">
+                                                    <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
+                                                </div>
+                                            {% endif %}
                                         </div>
-                                        <div align="center">
-                                            <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
+                                        <div id="patient-status-form-box">
+                                            {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
+                                            {{ form_errors(patientStatusForm) }}
+                                            {{ form_rest(patientStatusForm) }}
+                                            {{ form_widget(patientStatusForm.comments) }}
+                                            {% if orgPatientStatusData is not empty %}
+                                                <small class="text-warning">User must enter a reason for updating previous organization status.</small>
+                                                <br><br>
+                                            {% endif %}
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                            {% if orgPatientStatusData is not empty %}
+                                                <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
+                                            {% endif %}
+                                            {{ form_end(patientStatusForm) }}
                                         </div>
-                                    {% endif %}
+                                    </div>
                                 </div>
-                                <div id="patient-status-form-box">
-                                    {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
-                                    {{ form_errors(patientStatusForm) }}
-                                    {{ form_rest(patientStatusForm) }}
-                                    {{ form_widget(patientStatusForm.comments) }}
-                                    {% if orgPatientStatusData is not empty %}
-                                        <small class="text-warning">User must enter a reason for updating previous organization status.</small>
-                                        <br><br>
-                                    {% endif %}
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                    {% if orgPatientStatusData is not empty %}
-                                        <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
-                                    {% endif %}
-                                    {{ form_end(patientStatusForm) }}
+                            </div>
+                            {% if orgPatientStatusHistoryData is not empty %}
+                                <div class="col-md-7">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Patient Status History: {{ app.getSiteOrganizationDisplayName() }}</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        {% include 'partials/patient-status-history-dl.html.twig' %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if awardeePatientStatusData is not empty %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Patient Status Details: Other Organizations</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Awardee</th>
+                                                    <th>Organization</th>
+                                                    <th>Status</th>
+                                                    <th>User</th>
+                                                    <th>Site</th>
+                                                    <th>Date</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for field in awardeePatientStatusData %}
+                                                <tr>
+                                                    <td>{{ field.awardee_name|default(field.awardee) }}</td>
+                                                    <td>{{ field.organization_name|default(field.organization) }}</td>
+                                                    <td>{{ field.display_status }}</td>
+                                                    <td>{{ field.user_email }}</td>
+                                                    <td>{{ field.site_name|default(field.site) }}</td>
+                                                    <td>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                                    <td>
+                                                        <small>
+                                                            <a data-href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
+                                                        </small>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="row">
+                            <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                                <div class="panel panel-danger">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> {{ errorTitle }}</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <p>{{ errorMessage }}</p>
+                                        {% if participant.statusReason == 'withdrawal' %}
+                                            <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalTime|date('n/j/Y g:ia', app.userTimezone) }}</p>
+                                            {% if participant.withdrawalReason is not empty %}
+                                                <p>
+                                                    <strong>Reason:</strong> {{ participant.withdrawalReason }}
+                                                    {% if participant.withdrawalReasonJustification is not empty %}
+                                                        <br/><strong>Justification:</strong> {{ participant.withdrawalReasonJustification }}
+                                                    {% endif %}
+                                                </p>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    {% if orgPatientStatusHistoryData is not empty %}
-                        <div class="col-md-7">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status History: {{ app.getOrganizationDisplayName(app.getSiteOrganizationId) }}</h3>
-                            </div>
-                            <div class="panel-body">
-                                {% include 'partials/patient-status-history-dl.html.twig' %}
-                            </div>
-                        </div>
-                    </div>
                     {% endif %}
                 </div>
-                {% if awardeePatientStatusData is not empty %}
-                    <div class="row">
-                    <div class="col-md-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status Details: Other Organizations</h3>
-                            </div>
-                            <div class="panel-body">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Awardee</th>
-                                            <th>Organization</th>
-                                            <th>Status</th>
-                                            <th>User</th>
-                                            <th>Site</th>
-                                            <th>Date</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for field in awardeePatientStatusData %}
-                                        <tr>
-                                            <td>{{ field.awardee_name|default(field.awardee) }}</td>
-                                            <td>{{ field.organization_name|default(field.organization) }}</td>
-                                            <td>{{ field.display_status }}</td>
-                                            <td>{{ field.user_email }}</td>
-                                            <td>{{ field.site_name|default(field.site) }}</td>
-                                            <td>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
-                                            <td>
-                                                <small>
-                                                    <a data-href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
-                                                </small>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
             {% endif %}
         </div>
     </div>
-    {% if not isDVType %}
+    {% if canViewPatientStatus %}
         {# Patient status history modal window #}
         <div id="patient-status-details-modal" class="modal fade">
             <div class="modal-dialog">
@@ -601,7 +666,7 @@ $(document).ready(function() {
 });
 </script>
 {# Paient status tab #}
-{% if not isDVType %}
+{% if canViewPatientStatus %}
 <script>
 $(document).ready(function() {
     var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};

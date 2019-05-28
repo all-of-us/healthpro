@@ -435,8 +435,9 @@ class DefaultController extends AbstractController
             }
         }
 
-        // DVs doesn't have access to patient status tab
-        if (!$app->isDVType()) {
+        $patientStatus = new PatientStatus($app);
+        // Check if patient status is allowed for this participant
+        if ($patientStatus->hasAccess($participant)) {
             // Patient Status
             $patientStatus = new PatientStatus($app);
             $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
@@ -471,11 +472,13 @@ class DefaultController extends AbstractController
             $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($id, $app->getSiteOrganizationId());
             $awardeePatientStatusData = $patientStatus->getAwardeePatientStatusData($id);
             $patientStatusForm = $patientStatusForm->createView();
+            $canViewPatientStatus = $patientStatus->hasAccess($participant);
         } else {
             $patientStatusForm = null;
             $orgPatientStatusData = null;
             $orgPatientStatusHistoryData = null;
             $awardeePatientStatusData = null;
+            $canViewPatientStatus = false;
         }
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
@@ -494,16 +497,21 @@ class DefaultController extends AbstractController
             'orgPatientStatusData' => $orgPatientStatusData,
             'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
             'awardeePatientStatusData' => $awardeePatientStatusData,
-            'isDVType' => $app->isDVType()
+            'isDVType' => $app->isDVType(),
+            'canViewPatientStatus' => $canViewPatientStatus
         ]);
     }
 
     public function patientStatusAction($participantId, $patientStatusId, Application $app)
     {
-        if ($app->isDVType()) {
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
             $app->abort(404);
         }
         $patientStatus = new PatientStatus($app);
+        if (!$patientStatus->hasAccess($participant)) {
+            $app->abort(403);
+        }
         $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
             'id' => $patientStatusId,
             'participant_id' => $participantId

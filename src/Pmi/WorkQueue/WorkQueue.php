@@ -99,9 +99,9 @@ class WorkQueue
         'enrollmentStatus' => [
             'label' => 'Participant Status',
             'options' => [
-                'Registered' => 'INTERESTED',
-                'Member' => 'MEMBER',
-                'Full Participant' => 'FULL_PARTICIPANT'
+                'Participant' => 'INTERESTED',
+                'Fully Consented' => 'MEMBER',
+                'Core Participant' => 'FULL_PARTICIPANT'
             ]
         ],
         'consentForElectronicHealthRecords' => [
@@ -314,7 +314,7 @@ class WorkQueue
             //In-Person Enrollment
             $row['pairedSite'] = $this->app->getSiteDisplayName($e($participant->siteSuffix));
             $row['pairedOrganization'] = $this->app->getOrganizationDisplayName($e($participant->organization));
-            $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsFinalizedTime);
+            $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsFinalizedTime, false, false, false);
             $row['evaluationFinalizedSite'] = $this->app->getSiteDisplayName($e($participant->evaluationFinalizedSite));
             $row['biobankDnaStatus'] = $this->displayStatus($participant->samplesToIsolateDNA, 'RECEIVED');
             if ($participant->numBaselineSamplesArrived >= 7) {
@@ -332,7 +332,7 @@ class WorkQueue
                 }
                 $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED');
                 if (!empty($participant->{'sampleStatus' . $newSample . 'Time'})) {
-                    $row["sample{$sample}Time"] = self::dateFromString($participant->{'sampleStatus' . $newSample . 'Time'}, $app->getUserTimezone());
+                    $row["sample{$sample}Time"] = self::dateFromString($participant->{'sampleStatus' . $newSample . 'Time'}, $app->getUserTimezone(), false);
                 } else {
                     $row["sample{$sample}Time"] = '';
                 }
@@ -350,13 +350,16 @@ class WorkQueue
         return $rows;
     }
 
-    public static function dateFromString($string, $timezone)
+    public static function dateFromString($string, $timezone, $displayTime = true)
     {
         if (!empty($string)) {
             try {
                 $date = new \DateTime($string);
                 $date->setTimezone(new \DateTimeZone($timezone));
-                return $date->format('m/d/Y');
+                if ($displayTime) {
+                    return $date->format('n/j/Y g:i a');
+                }
+                return $date->format('n/j/Y');
             } catch (\Exception $e) {
                 return '';
             }
@@ -382,22 +385,22 @@ class WorkQueue
         }
     }
 
-    public function displayStatus($value, $successStatus, $time = null, $showNotCompleteText = false, $checkInvalidStatus = false)
+    public function displayStatus($value, $successStatus, $time = null, $showNotCompleteText = false, $checkInvalidStatus = false, $displayTime = true)
     {
         if ($value === $successStatus) {
             if (!empty($time)) {
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone());
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
             }
             return self::HTML_SUCCESS;
         } elseif ($value === "{$successStatus}_NOT_SURE") {
             if (!empty($time)) {
-                return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone());
+                return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
             }
             return self::HTML_WARNING;
         } elseif ($checkInvalidStatus && ($value === 'INVALID' || $value === 'SUBMITTED_INVALID')) {
-            return !empty($time) ? self::HTML_DANGER . ' (invalid) ' . self::dateFromString($time, $this->app->getUserTimezone()) : self::HTML_DANGER . ' (invalid)';
+            return !empty($time) ? self::HTML_DANGER . ' (invalid) ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) : self::HTML_DANGER . ' (invalid)';
         } elseif ($showNotCompleteText) {
-            return !empty($time) ? self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone()) : self::HTML_DANGER . ' (not completed)';
+            return !empty($time) ? self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) : self::HTML_DANGER . ' (not completed)';
         }
         return self::HTML_DANGER;
     }

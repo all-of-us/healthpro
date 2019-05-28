@@ -55,7 +55,7 @@ class PatientStatus
         $patientStatusData = [
             'participant_id' => $participantId,
             'organization' => $this->app->getSiteOrganizationId(),
-            'awardee' => $this->app->getSiteAwardee()
+            'awardee' => $this->app->getSiteAwardeeId()
         ];
         $patientStatusRepository = $this->app['em']->getRepository('patient_status');
         $patientStatusHistoryRepository = $this->app['em']->getRepository('patient_status_history');
@@ -198,5 +198,14 @@ class PatientStatus
             }
         }
         return $results;
+    }
+
+    public function hasAccess($participant)
+    {
+        return
+            !$this->app->isDVType() &&
+            $participant->statusReason !== 'withdrawal' &&
+            $participant->statusReason !== 'test-participant' &&
+            !$this->app->isTestSite();
     }
 }
