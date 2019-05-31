@@ -136,15 +136,9 @@
                 </li>
             {% endif %}
             {% if not isDVType %}
-                {% if participant.statusReason != 'withdrawal' %}
-                    <li role="presentation">
-                        <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
-                    </li>
-                {% else %}
-                    <li role="presentation" class="disabled">
-                        <a href="#" title="Patient Status not available because participant is withdrawn" data-toggle="tooltip" data-placement="bottom">Patient Status</a>
-                    </li>
-                {% endif %}
+                <li role="presentation">
+                    <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
+                </li>
             {% endif %}
         </ul>
         <br />
@@ -501,114 +495,140 @@
                     </div>
                 </div>
             {% endif %}
-            {% if not isDVType and participant.statusReason != 'withdrawal' %}
+            {% if not isDVType %}
                 <div role="tabpanel" class="tab-pane" id="patientstatus">
-                {% if orgPatientStatusData is empty %}
-                    <div class="alert alert-warning">
-                        Please complete the patient status information for your organization. User should have access to EHR system information for verification.
-                    </div>
-                {% endif %}
-                <div class="row">
-                    <div class="col-md-5">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status: {{ app.getSiteOrganizationDisplayName() }}</h3>
+                    {% if canViewPatientStatus %}
+                        {% if orgPatientStatusData is empty %}
+                            <div class="alert alert-warning">
+                                Please complete the patient status information for your organization. User should have access to EHR system information for verification.
                             </div>
-                            <div class="panel-body">
-                                <div id="patient-status-data-box">
-                                    {% if orgPatientStatusData is not empty %}
-                                        <div>
-                                            <dl class="dl-horizontal">
-                                                <dt>Status</dt>
-                                                <dd>{{ orgPatientStatusData.display_status }}</dd>
-                                                <dt>Comments</dt>
-                                                <dd>{{ orgPatientStatusData.comments }}</dd>
-                                            </dl>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Patient Status: {{ app.getSiteOrganizationDisplayName() }}</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div id="patient-status-data-box">
+                                            {% if orgPatientStatusData is not empty %}
+                                                <div>
+                                                    <dl class="dl-horizontal">
+                                                        <dt>Status</dt>
+                                                        <dd>{{ orgPatientStatusData.display_status }}</dd>
+                                                        <dt>Comments</dt>
+                                                        <dd>{{ orgPatientStatusData.comments }}</dd>
+                                                    </dl>
+                                                </div>
+                                                <div align="center">
+                                                    <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
+                                                </div>
+                                            {% endif %}
                                         </div>
-                                        <div align="center">
-                                            <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
+                                        <div id="patient-status-form-box">
+                                            {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
+                                            {{ form_errors(patientStatusForm) }}
+                                            {{ form_rest(patientStatusForm) }}
+                                            {{ form_widget(patientStatusForm.comments) }}
+                                            {% if orgPatientStatusData is not empty %}
+                                                <small class="text-warning">User must enter a reason for updating previous organization status.</small>
+                                                <br><br>
+                                            {% endif %}
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                            {% if orgPatientStatusData is not empty %}
+                                                <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
+                                            {% endif %}
+                                            {{ form_end(patientStatusForm) }}
                                         </div>
-                                    {% endif %}
+                                    </div>
                                 </div>
-                                <div id="patient-status-form-box">
-                                    {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
-                                    {{ form_errors(patientStatusForm) }}
-                                    {{ form_rest(patientStatusForm) }}
-                                    {{ form_widget(patientStatusForm.comments) }}
-                                    {% if orgPatientStatusData is not empty %}
-                                        <small class="text-warning">User must enter a reason for updating previous organization status.</small>
-                                        <br><br>
-                                    {% endif %}
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                    {% if orgPatientStatusData is not empty %}
-                                        <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
-                                    {% endif %}
-                                    {{ form_end(patientStatusForm) }}
+                            </div>
+                            {% if orgPatientStatusHistoryData is not empty %}
+                                <div class="col-md-7">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Patient Status History: {{ app.getSiteOrganizationDisplayName() }}</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        {% include 'partials/patient-status-history-dl.html.twig' %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if awardeePatientStatusData is not empty %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Patient Status Details: Other Organizations</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Awardee</th>
+                                                    <th>Organization</th>
+                                                    <th>Status</th>
+                                                    <th>User</th>
+                                                    <th>Site</th>
+                                                    <th>Date</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for field in awardeePatientStatusData %}
+                                                <tr>
+                                                    <td>{{ field.awardee_name|default(field.awardee) }}</td>
+                                                    <td>{{ field.organization_name|default(field.organization) }}</td>
+                                                    <td>{{ field.display_status }}</td>
+                                                    <td>{{ field.user_email }}</td>
+                                                    <td>{{ field.site_name|default(field.site) }}</td>
+                                                    <td>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                                    <td>
+                                                        <small>
+                                                            <a data-href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
+                                                        </small>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="row">
+                            <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                                <div class="panel panel-danger">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> {{ errorTitle }}</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <p>{{ errorMessage }}</p>
+                                        {% if participant.statusReason == 'withdrawal' %}
+                                            <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalTime|date('n/j/Y g:ia', app.userTimezone) }}</p>
+                                            {% if participant.withdrawalReason is not empty %}
+                                                <p>
+                                                    <strong>Reason:</strong> {{ participant.withdrawalReason }}
+                                                    {% if participant.withdrawalReasonJustification is not empty %}
+                                                        <br/><strong>Justification:</strong> {{ participant.withdrawalReasonJustification }}
+                                                    {% endif %}
+                                                </p>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    {% if orgPatientStatusHistoryData is not empty %}
-                        <div class="col-md-7">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status History: {{ app.getSiteOrganizationDisplayName() }}</h3>
-                            </div>
-                            <div class="panel-body">
-                                {% include 'partials/patient-status-history-dl.html.twig' %}
-                            </div>
-                        </div>
-                    </div>
                     {% endif %}
                 </div>
-                {% if awardeePatientStatusData is not empty %}
-                    <div class="row">
-                    <div class="col-md-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Patient Status Details: Other Organizations</h3>
-                            </div>
-                            <div class="panel-body">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Awardee</th>
-                                            <th>Organization</th>
-                                            <th>Status</th>
-                                            <th>User</th>
-                                            <th>Site</th>
-                                            <th>Date</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for field in awardeePatientStatusData %}
-                                        <tr>
-                                            <td>{{ field.awardee_name|default(field.awardee) }}</td>
-                                            <td>{{ field.organization_name|default(field.organization) }}</td>
-                                            <td>{{ field.display_status }}</td>
-                                            <td>{{ field.user_email }}</td>
-                                            <td>{{ field.site_name|default(field.site) }}</td>
-                                            <td>{{ field.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
-                                            <td>
-                                                <small>
-                                                    <a data-href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
-                                                </small>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
             {% endif %}
         </div>
     </div>
-    {% if not isDVType %}
+    {% if canViewPatientStatus %}
         {# Patient status history modal window #}
         <div id="patient-status-details-modal" class="modal fade">
             <div class="modal-dialog">
@@ -646,7 +666,7 @@ $(document).ready(function() {
 });
 </script>
 {# Paient status tab #}
-{% if not isDVType and participant.statusReason != 'withdrawal' %}
+{% if canViewPatientStatus %}
 <script>
 $(document).ready(function() {
     var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};

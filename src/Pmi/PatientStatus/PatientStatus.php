@@ -199,4 +199,13 @@ class PatientStatus
         }
         return $results;
     }
+
+    public function hasAccess($participant)
+    {
+        return
+            !$this->app->isDVType() &&
+            $participant->statusReason !== 'withdrawal' &&
+            $participant->statusReason !== 'test-participant' &&
+            !$this->app->isTestSite();
+    }
 }

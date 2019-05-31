@@ -99,9 +99,9 @@ class WorkQueue
         'enrollmentStatus' => [
             'label' => 'Participant Status',
             'options' => [
-                'Registered' => 'INTERESTED',
-                'Member' => 'MEMBER',
-                'Full Participant' => 'FULL_PARTICIPANT'
+                'Participant' => 'INTERESTED',
+                'Fully Consented' => 'MEMBER',
+                'Core Participant' => 'FULL_PARTICIPANT'
             ]
         ],
         'consentForElectronicHealthRecords' => [
