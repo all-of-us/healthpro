@@ -208,4 +208,26 @@ class PatientStatus
             $participant->statusReason !== 'test-participant' &&
             !$this->app->isTestSite();
     }
+
+    public function getRdrObject($participantId, $formData)
+    {
+        $obj = new \StdClass();
+        $obj->subject = 'Patient/' . $participantId;
+        $obj->awardee = $this->app->getSiteAwardeeId();
+        $obj->organization = $this->app->getSiteOrganizationId();
+        $obj->patient_status = $formData['status'];
+        $obj->user = $this->app->getUser()->getEmail();
+        $obj->site = $this->app->getSiteIdWithPrefix();
+        $authored = new \DateTime('UTC');
+        $obj->authored = $authored->format('Y-m-d\TH:i:s\Z');
+        $obj->comment = $formData['comments'];
+        return $obj;
+    }
+
+    public function sendToRdr($participantId, $form, $method)
+    {
+        $formData = $form->getData();
+        $data = $this->getRdrObject($participantId, $formData);
+        $this->app['pmi.drc.participants']->createPatientStatus($participantId, $this->app->getSiteOrganizationId(), $data, $method);
+    }
 }

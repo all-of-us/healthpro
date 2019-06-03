@@ -374,4 +374,20 @@ class RdrParticipants
     {
         return $this->cacheEnabled;
     }
+
+    public function createPatientStatus($participantId, $organizationId, $data, $method)
+    {
+        try {
+            $response = $this->getClient()->request($method, "PatientStatus/{$participantId}/Organization/$organizationId", [
+                'json' => $data
+            ]);
+            if ($response->getStatusCode() === 200) {
+                return true;
+            }
+            return true;
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+    }
 }
