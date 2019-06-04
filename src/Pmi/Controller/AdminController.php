@@ -42,7 +42,8 @@ class AdminController extends AbstractController
         ['notice', '/notice/{id}', [
             'method' => 'GET|POST',
             'defaults' => ['id' => null]
-        ]]
+        ]],
+        ['patientStatusRdrJson', '/patientstatus/{participantId}/organization/{organizationId}/rdr.json', ['method' => 'GET']]
     ];
 
     public function homeAction(Application $app)
@@ -464,5 +465,11 @@ class AdminController extends AbstractController
             'notice' => $notice,
             'form' => $form->createView()
         ]);
+    }
+
+    public function patientStatusRdrJsonAction($participantId, $organizationId, Application $app)
+    {
+        $object = $app['pmi.drc.participants']->getPatientStatus($participantId, $organizationId);
+        return $app->jsonPrettyPrint($object);
     }
 }

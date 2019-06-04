@@ -388,4 +388,19 @@ class RdrParticipants
             return false;
         }
     }
+
+    public function getPatientStatus($participantId, $organizationId)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "PatientStatus/{$participantId}/Organization/{$organizationId}");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result)) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
 }
