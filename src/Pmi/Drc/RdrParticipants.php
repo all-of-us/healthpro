@@ -381,9 +381,7 @@ class RdrParticipants
             $response = $this->getClient()->request($method, "PatientStatus/{$participantId}/Organization/$organizationId", [
                 'json' => $data
             ]);
-            if ($response->getStatusCode() === 200) {
-                return true;
-            }
+            //TODO: Check for response object when rdr fixes the issue
             return true;
         } catch (\Exception $e) {
             $this->rdrHelper->logException($e);

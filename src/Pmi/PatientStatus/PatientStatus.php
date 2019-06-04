@@ -8,6 +8,17 @@ use Pmi\Audit\Log;
 class PatientStatus
 {
     protected $app;
+    protected $participantId;
+    protected $patientStatusId;
+    protected $organizationId;
+    protected $awardeeId;
+    protected $userId;
+    protected $userEmail;
+    protected $siteId;
+    protected $siteWithPrefix;
+    protected $comments;
+    protected $status;
+    protected $createdTs;
 
     public static $patientStatus = [
         'Yes: Confirmed in EHR system' => 'YES',
@@ -42,20 +53,19 @@ class PatientStatus
         return $patientStatusForm->getForm();
     }
 
-    public function saveData($participantId, $patientStatusId, $form)
+    public function saveData()
     {
-        $formData = $form->getData();
         $patientStatusHistoryData = [
-            'user_id' => $this->app->getUser()->getId(),
-            'site' => $this->app->getSiteId(),
-            'comments' => $formData['comments'],
-            'status' => $formData['status'],
-            'created_ts' => new \DateTime()
+            'user_id' => $this->userId,
+            'site' => $this->siteId,
+            'comments' => $this->comments,
+            'status' => $this->status,
+            'created_ts' => $this->createdTs
         ];
         $patientStatusData = [
-            'participant_id' => $participantId,
-            'organization' => $this->app->getSiteOrganizationId(),
-            'awardee' => $this->app->getSiteAwardeeId()
+            'participant_id' => $this->participantId,
+            'organization' => $this->organizationId,
+            'awardee' => $this->awardeeId
         ];
         $patientStatusRepository = $this->app['em']->getRepository('patient_status');
         $patientStatusHistoryRepository = $this->app['em']->getRepository('patient_status_history');
@@ -65,13 +75,11 @@ class PatientStatus
             $patientStatusHistoryRepository,
             $patientStatusHistoryData,
             $patientStatusData,
-            $participantId,
-            $patientStatusId,
             &$status
         ) {
             //Create patient status if not exists
-            if (!empty($patientStatusId)) {
-                $patientStatusHistoryData['patient_status_id'] = $patientStatusId;
+            if (!empty($this->patientStatusId)) {
+                $patientStatusHistoryData['patient_status_id'] = $this->patientStatusId;
             } else {
                 $id = $patientStatusRepository->insert($patientStatusData);
                 $this->app->log(Log::PATIENT_STATUS_ADD, [
@@ -209,25 +217,40 @@ class PatientStatus
             !$this->app->isTestSite();
     }
 
-    public function getRdrObject($participantId, $formData)
+    public function loadData($participantId, $patientStatusId, $form)
+    {
+        $formData = $form->getData();
+        $this->participantId = $participantId;
+        $this->patientStatusId = $patientStatusId;
+        $this->organizationId = $this->app->getSiteOrganizationId();
+        $this->awardeeId = $this->app->getSiteAwardeeId();
+        $this->userId = $this->app->getUser()->getId();
+        $this->userEmail = $this->app->getUser()->getEmail();
+        $this->siteId = $this->app->getSiteId();
+        $this->siteWithPrefix = $this->app->getSiteIdWithPrefix();
+        $this->comments = $formData['comments'];
+        $this->status = $formData['status'];
+        $this->createdTs = new \DateTime();
+    }
+
+    public function getRdrObject()
     {
         $obj = new \StdClass();
-        $obj->subject = 'Patient/' . $participantId;
-        $obj->awardee = $this->app->getSiteAwardeeId();
-        $obj->organization = $this->app->getSiteOrganizationId();
-        $obj->patient_status = $formData['status'];
-        $obj->user = $this->app->getUser()->getEmail();
-        $obj->site = $this->app->getSiteIdWithPrefix();
-        $authored = new \DateTime('UTC');
-        $obj->authored = $authored->format('Y-m-d\TH:i:s\Z');
-        $obj->comment = $formData['comments'];
+        $obj->subject = 'Patient/' . $this->participantId;
+        $obj->awardee = $this->awardeeId;
+        $obj->organization = $this->organizationId;
+        $obj->patient_status = $this->status;
+        $obj->user = $this->userEmail;
+        $obj->site = $this->siteWithPrefix;
+        $obj->authored = $this->createdTs->format('Y-m-d\TH:i:s\Z');
+        $obj->comment = $this->comments;
         return $obj;
     }
 
-    public function sendToRdr($participantId, $form, $method)
+    public function sendToRdr()
     {
-        $formData = $form->getData();
-        $data = $this->getRdrObject($participantId, $formData);
-        $this->app['pmi.drc.participants']->createPatientStatus($participantId, $this->app->getSiteOrganizationId(), $data, $method);
+        $postData = $this->getRdrObject();
+        $method = $this->patientStatusId ? 'PUT' : 'POST';
+        return $this->app['pmi.drc.participants']->createPatientStatus($this->participantId, $this->organizationId, $postData, $method);
     }
 }
