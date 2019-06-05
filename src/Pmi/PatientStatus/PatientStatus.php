@@ -253,4 +253,17 @@ class PatientStatus
         $method = $this->patientStatusId ? 'PUT' : 'POST';
         return $this->app['pmi.drc.participants']->createPatientStatus($this->participantId, $this->organizationId, $postData, $method);
     }
+
+    // Used to send previously created patient statuses to rdr
+    public function loadDataFromDb($patientStatus, $patientStatusHistory)
+    {
+        $this->participantId = $patientStatus['participant_id'];
+        $this->organizationId = $patientStatus['organization'];
+        $this->awardeeId = $patientStatus['awardee'];
+        $this->userEmail = $patientStatusHistory['user_email'];
+        $this->siteWithPrefix = \Pmi\Security\User::SITE_PREFIX . $patientStatusHistory['site'];
+        $this->comments = $patientStatusHistory['comments'];
+        $this->status = $patientStatusHistory['status'];
+        $this->createdTs = new \DateTime($patientStatusHistory['authored']);
+    }
 }

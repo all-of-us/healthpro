@@ -10,6 +10,7 @@ use Pmi\Service\WithdrawalService;
 use Pmi\Service\EvaluationsQueueService;
 use Pmi\Service\SiteSyncService;
 use Pmi\Service\NotifyMissingMeasurementsAndOrdersService;
+use Pmi\Service\PatientStatusService;
 
 /**
  * NOTE: all /cron routes should be protected by `login: admin` in app.yaml
@@ -25,6 +26,7 @@ class CronController extends AbstractController
         ['sites', '/sites'],
         ['awardeesAndOrganizations', '/awardees-organizations'],
         ['missingMeasurementsOrders', '/missing-measurements-orders'],
+        ['sendPatientStatusToRdr', '/send-patient-status-rdr'],
     ];
     
     /**
@@ -120,6 +122,16 @@ class CronController extends AbstractController
         $notifyMissing = new NotifyMissingMeasurementsAndOrdersService($app);
         $notifyMissing->sendEmails();
 
+        return (new JsonResponse())->setData(true);
+    }
+
+    public function sendPatientStatusToRdrAction(Application $app, Request $request)
+    {
+        if (!$this->isAdmin($request)) {
+            throw new AccessDeniedHttpException();
+        }
+        $patientStatusService = new PatientStatusService($app);
+        $patientStatusService->sendPatientStatusToRdr();
         return (new JsonResponse())->setData(true);
     }
 }
