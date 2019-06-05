@@ -759,23 +759,12 @@ class DashboardController extends AbstractController
 
         switch ($mode) {
             case 'ParticipantsOverTime':
-                $dates = [];
-                $received = [];
-                $received_text = [];
-                $consented = [];
-                $consented_text = [];
-                foreach ($metrics as $row) {
-                    array_push($dates, $row['date']);
-                    array_push($received, (int) $row['metrics']['EHR_RECEIVED']);
-                    array_push($received_text, number_format($row['metrics']['EHR_RECEIVED']));
-                    array_push($consented, (int) $row['metrics']['EHR_CONSENTED']);
-                    array_push($consented_text, number_format($row['metrics']['EHR_CONSENTED']));
-                }
+                $dates = [date('Y-m-d')];
                 $ehr_data = [
                     [
                         "x" => $dates,
-                        "y" => $received,
-                        "text" => $received_text,
+                        "y" => [(int) $metrics['EHR_RECEIVED']],
+                        "text" => [number_format($metrics['EHR_RECEIVED'])],
                         "type" => 'bar',
                         "hoverinfo" => 'text+name',
                         "name" => 'EHR Data Received',
@@ -785,8 +774,8 @@ class DashboardController extends AbstractController
                     ],
                     [
                         "x" => $dates,
-                        "y" => $consented,
-                        "text" => $consented_text,
+                        "y" => [(int) $metrics['EHR_CONSENTED']],
+                        "text" => [number_format($metrics['EHR_CONSENTED'])],
                         "type" => 'bar',
                         "hoverinfo" => 'text+name',
                         "name" => 'Total Participants EHR Consent',
