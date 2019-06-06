@@ -32,6 +32,7 @@ class PatientStatusService
                 FROM patient_status_history psh
                 LEFT JOIN users u ON psh.user_id = u.id
                 WHERE psh.patient_status_id = :patientStatusId
+                  AND rdr_ts is null
                 ORDER BY psh.id ASC
             ";
             $patientStatusHistories = $this->em->fetchAll($query, [
@@ -40,6 +41,8 @@ class PatientStatusService
             foreach ($patientStatusHistories as $patientStatusHistory) {
                 $patientStatusObj->loadDataFromDb($patientStatus, $patientStatusHistory);
                 if ($patientStatusObj->sendToRdr()) {
+                    $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_ts' => new \DateTime()]);
+                } else {
                     syslog(LOG_ERR, "#{$patientStatusHistory['id']} failed sending to RDR: " .$this->rdr->getLastError());
                 }
             }
