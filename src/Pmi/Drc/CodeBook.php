@@ -28,6 +28,7 @@ class CodeBook
         'GenderIdentity_NonBinary' => 'Non-binary',
         'GenderIdentity_Transgender' => 'Transgender',
         'GenderIdentity_AdditionalOptions' => 'Other',
+        'GenderIdentity_MoreThanOne' => 'More Than One Gender Identity',
         'SexualOrientation_Straight' => 'Straight',
         'SexualOrientation_Gay' => 'Gay',
         'SexualOrientation_Lesbian' => 'Lesbian',
