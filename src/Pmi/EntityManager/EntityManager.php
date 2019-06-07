@@ -23,7 +23,8 @@ class EntityManager
         'orders_history' => 'doctrine',
         'notices' => 'doctrine',
         'patient_status' => 'doctrine',
-        'patient_status_history' => 'doctrine'
+        'patient_status_history' => 'doctrine',
+        'rdr_patient_status_log' => 'doctrine'
     ];
 
     protected $timezone;
