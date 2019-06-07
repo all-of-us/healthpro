@@ -2,6 +2,7 @@
 namespace Pmi\Drc;
 
 use Pmi\HttpClient;
+use Cache\Adapter\Memcache\MemcacheCachePool;
 
 class RdrHelper
 {
@@ -52,6 +53,12 @@ class RdrHelper
         } else {
             $endpoint = $this->endpoint;
         }
+
+        $client = new \Memcache();
+        $cachePool = new MemcacheCachePool($client);
+
+        $googleClient->setCache($cachePool);
+
         return $googleClient->authorize(new HttpClient([
             'base_uri' => $endpoint,
             'timeout' => 50
