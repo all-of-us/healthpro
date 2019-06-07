@@ -27,7 +27,7 @@ class MetricsCommand extends Command
         'EHR_CONSENT', 'EHR_RATIO', 'FULL_STATE', 'FULL_CENSUS', 'FULL_AWARDEE',
         'LIFECYCLE', 'GEO_STATE', 'GEO_CENSUS', 'GEO_AWARDEE'
     ];
-    private static $STATUSES = ['INTERESTED', 'MEMBER', 'FULL_PARTICIPANT'];
+    private static $STATUSES = ['INTERESTED', 'PARTICIPANT', 'MEMBER', 'FULL_PARTICIPANT'];
 
     /**
      * Configure
