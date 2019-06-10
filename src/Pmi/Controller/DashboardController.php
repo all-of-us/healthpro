@@ -13,6 +13,11 @@ use Pmi\Drc\RdrMetrics;
 class DashboardController extends AbstractController
 {
     /**
+     * @var int
+     */
+    const API_VERSION = 2;
+
+    /**
      * @var string
      */
     protected static $name = 'dashboard';
@@ -215,7 +220,8 @@ class DashboardController extends AbstractController
             $centers,
             $enrollment_statuses,
             [
-                'history' => $history
+                'history' => $history,
+                'version' => self::API_VERSION
             ]
         );
 
@@ -239,10 +245,10 @@ class DashboardController extends AbstractController
                     ];
                 } else {
                     $display_values = [
-                        'INTERESTED' => 'Registered',
+                        'REGISTERED' => 'Registered',
                         'PARTICIPANT' => 'Participant',
-                        'MEMBER' => 'Fully Consented',
-                        'FULL_PARTICIPANT' => 'Core Participant'
+                        'FULLY_CONSENTED' => 'Fully Consented',
+                        'CORE_PARTICIPANT' => 'Core Participant'
                     ];
                 }
                 break;
