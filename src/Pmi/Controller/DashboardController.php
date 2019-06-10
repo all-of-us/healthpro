@@ -13,6 +13,11 @@ use Pmi\Drc\RdrMetrics;
 class DashboardController extends AbstractController
 {
     /**
+     * @var int
+     */
+    const API_VERSION = 2;
+
+    /**
      * @var string
      */
     protected static $name = 'dashboard';
@@ -215,7 +220,8 @@ class DashboardController extends AbstractController
             $centers,
             $enrollment_statuses,
             [
-                'history' => $history
+                'history' => $history,
+                'version' => self::API_VERSION
             ]
         );
 
@@ -233,14 +239,16 @@ class DashboardController extends AbstractController
                 if ($history) {
                     $display_values = [
                         'registered' => 'Registered',
+                        'participant' => 'Participant',
                         'consented' => 'Fully Consented',
                         'core' => 'Core Participant'
                     ];
                 } else {
                     $display_values = [
-                        'INTERESTED' => 'Registered',
-                        'MEMBER' => 'Fully Consented',
-                        'FULL_PARTICIPANT' => 'Core Participant'
+                        'REGISTERED' => 'Registered',
+                        'PARTICIPANT' => 'Participant',
+                        'FULLY_CONSENTED' => 'Fully Consented',
+                        'CORE_PARTICIPANT' => 'Core Participant'
                     ];
                 }
                 break;
@@ -339,12 +347,22 @@ class DashboardController extends AbstractController
             $total = 0;
 
             foreach ($traces as $trace_name => $value) {
+                if (!isset($traces_obj[$trace_name])
+                    || !is_array($traces_obj[$trace_name])
+                    || !is_array($traces_obj[$trace_name]['x'])
+                    || !is_array($traces_obj[$trace_name]['y'])
+                ) {
+                    continue;
+                }
                 $total += $value;
                 array_push($traces_obj[$trace_name]['x'], $date);
                 array_push($traces_obj[$trace_name]['y'], $value);
             }
 
             foreach ($traces as $trace_name => $value) {
+                if (!isset($traces_obj[$trace_name])) {
+                    continue;
+                }
                 $text = $this->calculatePercentText($value, $total) . '<br />' . $date;
                 array_push($traces_obj[$trace_name]['text'], $text);
             }
@@ -417,7 +435,8 @@ class DashboardController extends AbstractController
             $centers,
             $enrollment_statuses,
             [
-                'history' => $history
+                'history' => $history,
+                'version' => self::API_VERSION
             ]
         );
 
