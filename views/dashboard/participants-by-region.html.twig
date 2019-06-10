@@ -101,19 +101,22 @@
             $('#map-color-profile').prop('disabled', false);
         }
 
-        var enrollmentFilterText = 'Participants';
-        if (enrollmentStatuses.length < 3) {
+        var enrollmentFilterText = 'All Enrollment Statuses';
+        if (enrollmentStatuses.length < 4) {
           var mappedEnrollmentStatuses = [];
-          if (enrollmentStatuses.indexOf('INTERESTED') !== -1) {
+          if (enrollmentStatuses.indexOf('REGISTERED') !== -1) {
             mappedEnrollmentStatuses.push('Registered');
           }
-          if (enrollmentStatuses.indexOf('MEMBER') !== -1) {
+          if (enrollmentStatuses.indexOf('PARTICIPANT') !== -1) {
+            mappedEnrollmentStatuses.push('Participant');
+          }
+          if (enrollmentStatuses.indexOf('FULLY_CONSENTED') !== -1) {
             mappedEnrollmentStatuses.push('Fully Consented');
           }
-          if (enrollmentStatuses.indexOf('FULL_PARTICIPANT') !== -1) {
-            mappedEnrollmentStatuses.push('Core');
+          if (enrollmentStatuses.indexOf('CORE_PARTICIPANT') !== -1) {
+            mappedEnrollmentStatuses.push('Core Participant');
           }
-          enrollmentFilterText = mappedEnrollmentStatuses.join(', ') + ' Participants';
+          enrollmentFilterText = mappedEnrollmentStatuses.join(', ');
         }
 
         // load data from metrics API
