@@ -27,10 +27,7 @@ class MetricsCommand extends Command
         'EHR_CONSENT', 'EHR_RATIO', 'FULL_STATE', 'FULL_CENSUS', 'FULL_AWARDEE',
         'LIFECYCLE', 'GEO_STATE', 'GEO_CENSUS', 'GEO_AWARDEE'
     ];
-    private static $STATUSES = [
-        'REGISTERED', 'INTERESTED', 'PARTICIPANT', 'MEMBER', 'FULL_PARTICIPANT',
-        'CORE_PARTICIPANT'
-     ];
+    private static $STATUSES = ['INTERESTED', 'MEMBER', 'FULL_PARTICIPANT'];
 
     /**
      * Configure
@@ -81,13 +78,6 @@ class MetricsCommand extends Command
                 'Return cached history of data; required for certain stratifications.'
             )
             ->addOption(
-                'api_version',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The version of the API to use when making the metrics call.',
-                '1'
-            )
-            ->addOption(
                 'pretty',
                 null,
                 InputOption::VALUE_NONE,
@@ -119,10 +109,8 @@ class MetricsCommand extends Command
         $stratification = $input->getOption('stratification');
         $centers = $input->getOption('centers');
         $statuses = $input->getOption('statuses');
-        $version = $input->getOption('api_version');
         $pretty = ($input->getOption('pretty') !== false) ? JSON_PRETTY_PRINT : 0;
         $params = [
-            'version' => (int) $version,
             'history' => (bool) $input->getOption('history')
         ];
 
