@@ -76,3 +76,5 @@ sites_use_rdr: true
 
 # Disables test user and test awardee participant write access when set to true
 # disable_test_access: false
+
+#patient_status_queue_limit: 10
