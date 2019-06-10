@@ -62,6 +62,9 @@
 
 {% block pagejs %}
 <script type="text/javascript">
+    // Default to showing only 'Core' participants
+
+
     // function to grab current filter values and load JSON from load_map_data REST endpoint
     // success handler calls Plotly.newplot()
     function renderMapPlot(dialogType) {
@@ -173,7 +176,7 @@
 
     // Set default filter to show 'Core' participants only
     $('#participants-by-region .enrollment-status-filter').prop('checked', false)
-    $('#participants-by-region .enrollment-status-filter[value="CORE_PARTICIPANT"]').prop('checked', true)
+    $('#participants-by-region .enrollment-status-filter[value="FULL_PARTICIPANT"]').prop('checked', true)
 
     // if plot has not been shown yet, render and then store state
     // this will prevent points render calls once map has been initialized
