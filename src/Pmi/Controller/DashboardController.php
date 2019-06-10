@@ -262,7 +262,8 @@ class DashboardController extends AbstractController
                     'UNMAPPED' => 'UNMAPPED',
                     'UNSET' => 'UNSET',
                     'Woman' => 'Woman',
-                    'Prefer not to say' => 'Prefer not to say'
+                    'Prefer not to say' => 'Prefer not to say',
+                    'More than one gender identity' => 'More than one gender identity'
                 ];
                 break;
             case 'AGE_RANGE':
