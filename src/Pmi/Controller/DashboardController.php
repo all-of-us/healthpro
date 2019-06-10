@@ -424,7 +424,8 @@ class DashboardController extends AbstractController
             $centers,
             $enrollment_statuses,
             [
-                'history' => $history
+                'history' => $history,
+                'version' => self::API_VERSION
             ]
         );
 
