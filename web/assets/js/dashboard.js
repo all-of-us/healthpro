@@ -75,7 +75,9 @@ function launchSpinner(divId) {
 }
 
 function stopSpinner(divId) {
-    $('#' + divId).data('spinner').stop();
+    if ($('#' + divId).data('spinner')) {
+        $('#' + divId).data('spinner').stop();
+    }
 }
 
 function removePlotlyLink(divId) {
