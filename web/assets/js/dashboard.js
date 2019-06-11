@@ -189,12 +189,14 @@ function loadTableData(tableTarget, sourceData, colTitle) {
     // load scores
     var tableBody = $('#' + tableId + '-body');
     $($(sourceData).get().reverse()).each(function(index, row) {
-        var newRow = $('<tr>');
-        newRow.append($('<td>').text(row['name']));
-        $(row['y']).each(function(i, count) {
-            newRow.append($('<td>').text(count));
-        });
-        tableBody.append(newRow);
+        if (row.y.length) {
+          var newRow = $('<tr>');
+          newRow.append($('<td>').text(row['name']));
+          $(row['y']).each(function(i, count) {
+              newRow.append($('<td>').text(count));
+          });
+          tableBody.append(newRow);
+        }
     });
 }
 
