@@ -44,6 +44,7 @@ class Log
     const NOTICE_DELETE = 'NOTICE_DELETE';
     const PATIENT_STATUS_ADD = 'PATIENT_STATUS_ADD';
     const PATIENT_STATUS_EDIT = 'PATIENT_STATUS_EDIT';
+    const PATIENT_STATUS_HISTORY_ADD = 'PATIENT_STATUS_HISTORY_ADD';
 
     public function __construct($app, $action, $data)
     {

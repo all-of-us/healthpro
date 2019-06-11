@@ -91,7 +91,7 @@ class PatientStatus
             }
             //Create patient status history
             $id = $patientStatusHistoryRepository->insert($patientStatusHistoryData);
-            $this->app->log(Log::PATIENT_STATUS_EDIT, [
+            $this->app->log(Log::PATIENT_STATUS_HISTORY_ADD, [
                 'id' => $id
             ]);
 
@@ -100,6 +100,13 @@ class PatientStatus
                 $patientStatusHistoryData['patient_status_id'],
                 ['history_id' => $id]
             );
+
+            //Log if it's a patient status edit
+            if (!empty($this->patientStatusId)) {
+                $this->app->log(Log::PATIENT_STATUS_EDIT, [
+                    'id' => $this->patientStatusId
+                ]);
+            }
             $status = true;
         });
         return $status;
