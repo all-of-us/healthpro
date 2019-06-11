@@ -21,7 +21,6 @@ class PatientStatusService
     {
         $limit = $this->app->getConfig('patient_status_queue_limit');
         $patientStatuses = $this->em->getRepository('patient_status')->fetchBySql("id not in (select patient_status_id from rdr_patient_status_log) limit 0, $limit");
-        error_log(print_r($patientStatuses, true));
         $patientStatusObj = new PatientStatus($this->app);
         foreach ($patientStatuses as $patientStatus) {
             $query = "
@@ -44,16 +43,22 @@ class PatientStatusService
                 $patientStatusObj->loadDataFromDb($patientStatus, $patientStatusHistory);
                 if ($patientStatusObj->sendToRdr()) {
                     $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_ts' => new \DateTime()]);
+                    $this->app->log(Log::PATIENT_STATUS_HISTORY_EDIT, [
+                        'id' => $patientStatusHistory['id']
+                    ]);
                 } else {
                     syslog(LOG_ERR, "#{$patientStatusHistory['id']} failed sending to RDR: " .$this->rdr->getLastError());
                 }
             }
             // Log entry in database after all the patient status history records has been successfully sent to rdr
-            $this->em->getRepository('rdr_patient_status_log')->insert([
+            $id = $this->em->getRepository('rdr_patient_status_log')->insert([
                     'patient_status_id' => $patientStatus['id'],
                     'created_ts' => new \DateTime()
                 ]
             );
+            $this->app->log(Log::RDR_PATIENT_STATUS_LOG_ADD, [
+                'id' => $id
+            ]);
         }
     }
 }
