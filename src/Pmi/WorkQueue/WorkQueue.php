@@ -18,6 +18,10 @@ class WorkQueue
         'lastName',
         'firstName',
         'dateOfBirth',
+        'patientStatus',
+        'patientStatus',
+        'patientStatus',
+        'patientStatus',
         'participantId',
         'biobankId',
         'language',
@@ -267,6 +271,10 @@ class WorkQueue
             } else {
                 $row['dateOfBirth'] = '';
             }
+            $row['patientStatusYes'] = $this->getPatientStatus($participant->patientStatus, 'YES');
+            $row['patientStatusNo'] = $this->getPatientStatus($participant->patientStatus, 'NO');
+            $row['patientStatusUnknown'] = $this->getPatientStatus($participant->patientStatus, 'UNKNOWN');
+            $row['patientStatusNoAccess'] = $this->getPatientStatus($participant->patientStatus, 'NO_ACCESS');
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
             $row['language'] = $e($participant->language);
@@ -411,5 +419,16 @@ class WorkQueue
         $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         return sprintf('<a href="%s">%s</a>', $url, $text);
+    }
+
+    public function getPatientStatus($patientStatuses, $type)
+    {
+        $organizations = [];
+        foreach ($patientStatuses as $patientStatus) {
+            if ($patientStatus->status == $type) {
+                $organizations[] = $patientStatus->organization;
+            }
+        }
+        return implode(',', $organizations);
     }
 }
