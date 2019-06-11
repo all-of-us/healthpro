@@ -381,12 +381,15 @@ class RdrParticipants
             $response = $this->getClient()->request($method, "PatientStatus/{$participantId}/Organization/$organizationId", [
                 'json' => $data
             ]);
-            //TODO: Check for response object when rdr fixes the issue
-            return true;
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->authored)) {
+                return true;
+            }
         } catch (\Exception $e) {
             $this->rdrHelper->logException($e);
             return false;
         }
+        return false;
     }
 
     public function getPatientStatus($participantId, $organizationId)
