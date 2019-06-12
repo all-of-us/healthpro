@@ -436,9 +436,9 @@ class WorkQueue
         $organizations = [];
         foreach ($patientStatuses as $patientStatus) {
             if ($patientStatus->status == $type) {
-                $organizations[] = $patientStatus->organization;
+                $organizations[] = $this->app->getOrganizationDisplayName($patientStatus->organization);
             }
         }
-        return implode(',', $organizations);
+        return implode(', ', $organizations);
     }
 }
