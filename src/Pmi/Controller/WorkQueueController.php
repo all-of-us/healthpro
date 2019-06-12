@@ -90,6 +90,10 @@ class WorkQueueController extends AbstractController
         if (!empty($params['organization_id'])) {
             $rdrParams['organization'] = $params['organization_id'];
         }
+        // Patient status query parameter format Organization:Status
+        if (!empty($params['patientStatus'])) {
+            $rdrParams['patientStatus'] = $app->getSiteOrganizationId(). ':' .$params['patientStatus'];
+        }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($params['ageRange'])) {

@@ -108,6 +108,16 @@ class WorkQueue
                 'Core Participant' => 'FULL_PARTICIPANT'
             ]
         ],
+        'patientStatus' => [
+            'label' => 'Patient Status',
+            'options' => [
+                'Yes' => 'YES',
+                'No' => 'NO',
+                'Unknown' => 'UNKNOWN',
+                'No Access' => 'NO_ACCESS',
+                'Unset' => 'UNSET'
+            ]
+        ],
         'consentForElectronicHealthRecords' => [
             'label' => 'EHR Consent Status',
             'options' => [
