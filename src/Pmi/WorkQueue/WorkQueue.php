@@ -113,9 +113,9 @@ class WorkQueue
             'options' => [
                 'Yes' => 'YES',
                 'No' => 'NO',
-                'Unknown' => 'UNKNOWN',
-                'No Access' => 'NO_ACCESS',
-                'Unset' => 'UNSET'
+                'Unknown' => 'NO_ACCESS',
+                'No Access' => 'UNKNOWN',
+                'Not Completed' => 'UNSET'
             ]
         ],
         'consentForElectronicHealthRecords' => [
@@ -283,8 +283,8 @@ class WorkQueue
             }
             $row['patientStatusYes'] = $this->getPatientStatus($participant->patientStatus, 'YES');
             $row['patientStatusNo'] = $this->getPatientStatus($participant->patientStatus, 'NO');
-            $row['patientStatusUnknown'] = $this->getPatientStatus($participant->patientStatus, 'UNKNOWN');
-            $row['patientStatusNoAccess'] = $this->getPatientStatus($participant->patientStatus, 'NO_ACCESS');
+            $row['patientStatusUnknown'] = $this->getPatientStatus($participant->patientStatus, 'NO_ACCESS');
+            $row['patientStatusNoAccess'] = $this->getPatientStatus($participant->patientStatus, 'UNKNOWN');
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
             $row['language'] = $e($participant->language);
