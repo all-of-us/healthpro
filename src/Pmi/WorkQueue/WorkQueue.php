@@ -431,12 +431,16 @@ class WorkQueue
         return sprintf('<a href="%s">%s</a>', $url, $text);
     }
 
-    public function getPatientStatus($patientStatuses, $type)
+    public function getPatientStatus($patientStatuses, $value, $type = 'wq')
     {
         $organizations = [];
         foreach ($patientStatuses as $patientStatus) {
-            if ($patientStatus->status == $type) {
-                $organizations[] = $this->app->getOrganizationDisplayName($patientStatus->organization);
+            if ($patientStatus->status === $value) {
+                if ($type === 'export') {
+                    $organizations[] = $patientStatus->organization;
+                } else {
+                    $organizations[] = $this->app->getOrganizationDisplayName($patientStatus->organization);
+                }
             }
         }
         return implode(', ', $organizations);

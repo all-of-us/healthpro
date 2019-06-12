@@ -309,6 +309,10 @@ class WorkQueueController extends AbstractController
             if ($hasFullDataAccess) {
                 $headers[] = 'Login Phone';
                 $headers[] = 'Street Address2';
+                $headers[] = 'Yes';
+                $headers[] = 'No';
+                $headers[] = 'No Access';
+                $headers[] = 'Unknown';
             }
             fputcsv($output, $headers);
 
@@ -381,8 +385,13 @@ class WorkQueueController extends AbstractController
                     $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingTime, $app->getUserTimezone());
                     if ($hasFullDataAccess) {
                         $row[] = $participant->loginPhoneNumber;
+                        $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
+                        $workQueue = new WorkQueue;
+                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'YES', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'NO',  'export');
+                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'NO ACCESS', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'UNKNOWN', 'export');
                     }
-                    $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
                     fputcsv($output, $row);
                 }
                 unset($participants);
