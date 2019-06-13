@@ -25,7 +25,8 @@
         "symfony/yaml": "^3.1",
         "tomwalder/php-gds": "^2.1",
         "twig/twig": "^1.24",
-        "fzaninotto/faker": "^1.6"
+        "fzaninotto/faker": "^1.6",
+        "cache/memcache-adapter": "^0.2.2"
     },
     "config": {
         "platform": {
