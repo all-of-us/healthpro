@@ -43,7 +43,8 @@ class AdminController extends AbstractController
             'method' => 'GET|POST',
             'defaults' => ['id' => null]
         ]],
-        ['patientStatusRdrJson', '/patientstatus/{participantId}/organization/{organizationId}/rdr.json', ['method' => 'GET']]
+        ['patientStatusRdrJson', '/patientstatus/{participantId}/organization/{organizationId}/rdr.json', ['method' => 'GET']],
+        ['patientStatusHistoryRdrJson', '/patientstatus/{participantId}/organization/{organizationId}/history/rdr.json', ['method' => 'GET']]
     ];
 
     public function homeAction(Application $app)
@@ -470,6 +471,12 @@ class AdminController extends AbstractController
     public function patientStatusRdrJsonAction($participantId, $organizationId, Application $app)
     {
         $object = $app['pmi.drc.participants']->getPatientStatus($participantId, $organizationId);
+        return $app->jsonPrettyPrint($object);
+    }
+
+    public function patientStatusHistoryRdrJsonAction($participantId, $organizationId, Application $app)
+    {
+        $object = $app['pmi.drc.participants']->getPatientStatusHistory($participantId, $organizationId);
         return $app->jsonPrettyPrint($object);
     }
 }

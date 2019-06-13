@@ -406,4 +406,19 @@ class RdrParticipants
         }
         return false;
     }
+
+    public function getPatientStatusHistory($participantId, $organizationId)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "PatientStatus/{$participantId}/Organization/{$organizationId}/History");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_array($result)) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
 }
