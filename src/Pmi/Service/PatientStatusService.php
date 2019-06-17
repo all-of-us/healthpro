@@ -15,6 +15,7 @@ class PatientStatusService
         $this->app = $app;
         $this->db = $app['db'];
         $this->em = $app['em'];
+        $this->rdr = $app['pmi.drc.participants'];
     }
 
     public function sendPatientStatusToRdr()
@@ -47,7 +48,7 @@ class PatientStatusService
                         'id' => $patientStatusHistory['id']
                     ]);
                 } else {
-                    syslog(LOG_ERR, "#{$patientStatusHistory['id']} failed sending to RDR: " .$this->rdr->getLastError());
+                    syslog(LOG_ERR, "#{$patientStatusHistory['id']} failed sending to RDR: " . $this->rdr->getLastError());
                 }
             }
             // Log entry in database after all the patient status history records has been successfully sent to rdr
