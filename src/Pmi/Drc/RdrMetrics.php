@@ -52,10 +52,14 @@ class RdrMetrics
 
         // Handle history flag
         $history = false;
+        $version = null;
         $batch = self::BATCH_DAYS_NO_HISTORY;
         if (isset($params['history']) && $params['history']) {
             $history = true;
             $batch = self::BATCH_DAYS_HISTORY;
+        }
+        if (isset($params['version']) && $params['version']) {
+            $version = $params['version'];
         }
 
         // Convert arrays to comma separated strings
@@ -75,7 +79,8 @@ class RdrMetrics
                 'stratification' => $stratification,
                 'awardee' => $centers,
                 'enrollmentStatus' => $enrollment_statuses,
-                'history' => $history ? 'TRUE' : 'FALSE'
+                'history' => $history ? 'TRUE' : 'FALSE',
+                'version' => $version ? $version : null
             ];
 
             // Generate a cache key
