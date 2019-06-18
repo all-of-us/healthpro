@@ -13,6 +13,11 @@ use Pmi\Drc\RdrMetrics;
 class DashboardController extends AbstractController
 {
     /**
+     * @var int
+     */
+    const API_VERSION = 2;
+
+    /**
      * @var string
      */
     protected static $name = 'dashboard';
@@ -215,7 +220,8 @@ class DashboardController extends AbstractController
             $centers,
             $enrollment_statuses,
             [
-                'history' => $history
+                'history' => $history,
+                'version' => self::API_VERSION
             ]
         );
 
@@ -233,14 +239,16 @@ class DashboardController extends AbstractController
                 if ($history) {
                     $display_values = [
                         'registered' => 'Registered',
+                        'participant' => 'Participant',
                         'consented' => 'Fully Consented',
                         'core' => 'Core Participant'
                     ];
                 } else {
                     $display_values = [
-                        'INTERESTED' => 'Registered',
-                        'MEMBER' => 'Fully Consented',
-                        'FULL_PARTICIPANT' => 'Core Participant'
+                        'REGISTERED' => 'Registered',
+                        'PARTICIPANT' => 'Participant',
+                        'FULLY_CONSENTED' => 'Fully Consented',
+                        'CORE_PARTICIPANT' => 'Core Participant'
                     ];
                 }
                 break;
@@ -300,7 +308,6 @@ class DashboardController extends AbstractController
         $traces_obj = [];
         $interval_counts = [];
 
-        // Reverse the arrays, as the last item added appears as first value in chart
         $trace_names = array_keys($display_values);
 
         // if we got this far, we have data!
@@ -339,12 +346,22 @@ class DashboardController extends AbstractController
             $total = 0;
 
             foreach ($traces as $trace_name => $value) {
+                if (!isset($traces_obj[$trace_name])
+                    || !is_array($traces_obj[$trace_name])
+                    || !is_array($traces_obj[$trace_name]['x'])
+                    || !is_array($traces_obj[$trace_name]['y'])
+                ) {
+                    continue;
+                }
                 $total += $value;
                 array_push($traces_obj[$trace_name]['x'], $date);
                 array_push($traces_obj[$trace_name]['y'], $value);
             }
 
             foreach ($traces as $trace_name => $value) {
+                if (!isset($traces_obj[$trace_name])) {
+                    continue;
+                }
                 $text = $this->calculatePercentText($value, $total) . '<br />' . $date;
                 array_push($traces_obj[$trace_name]['text'], $text);
             }
@@ -417,7 +434,8 @@ class DashboardController extends AbstractController
             $centers,
             $enrollment_statuses,
             [
-                'history' => $history
+                'history' => $history,
+                'version' => self::API_VERSION
             ]
         );
 
@@ -745,7 +763,7 @@ class DashboardController extends AbstractController
         $mode = $request->get('mode');
         $start_date = $request->get('start_date', date('Y-m-d'));
         $end_date = $request->get('end_date', date('Y-m-d'));
-        $interval = $request->get('interval', 'quarter');
+        $interval = $request->get('interval', 'day');
         $organizations = $request->get('organizations', []);
         $params = [];
 
@@ -761,23 +779,12 @@ class DashboardController extends AbstractController
 
         switch ($mode) {
             case 'ParticipantsOverTime':
-                $dates = [];
-                $received = [];
-                $received_text = [];
-                $consented = [];
-                $consented_text = [];
-                foreach ($metrics as $row) {
-                    array_push($dates, $row['date']);
-                    array_push($received, (int) $row['metrics']['EHR_RECEIVED']);
-                    array_push($received_text, number_format($row['metrics']['EHR_RECEIVED']));
-                    array_push($consented, (int) $row['metrics']['EHR_CONSENTED']);
-                    array_push($consented_text, number_format($row['metrics']['EHR_CONSENTED']));
-                }
+                $dates = [date('Y-m-d')];
                 $ehr_data = [
                     [
                         "x" => $dates,
-                        "y" => $received,
-                        "text" => $received_text,
+                        "y" => [(int) $metrics['EHR_RECEIVED']],
+                        "text" => [number_format($metrics['EHR_RECEIVED'])],
                         "type" => 'bar',
                         "hoverinfo" => 'text+name',
                         "name" => 'EHR Data Received',
@@ -787,8 +794,8 @@ class DashboardController extends AbstractController
                     ],
                     [
                         "x" => $dates,
-                        "y" => $consented,
-                        "text" => $consented_text,
+                        "y" => [(int) $metrics['EHR_CONSENTED']],
+                        "text" => [number_format($metrics['EHR_CONSENTED'])],
                         "type" => 'bar',
                         "hoverinfo" => 'text+name',
                         "name" => 'Total Participants EHR Consent',
@@ -822,6 +829,10 @@ class DashboardController extends AbstractController
                 ];
                 break;
             case 'Organizations':
+                // Sort by organization_name
+                usort($metrics, function ($a, $b) {
+                    return strcmp($a['organization_name'], $b['organization_name']);
+                });
                 // Render as a table
                 $ehr_data = [];
                 foreach (array_values($metrics) as $i => $metrics) {
