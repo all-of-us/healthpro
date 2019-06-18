@@ -134,6 +134,7 @@ class WorkQueue
                 'Woman' => 'GenderIdentity_Woman',
                 'Non-binary' => 'GenderIdentity_NonBinary',
                 'Transgender' => 'GenderIdentity_Transgender',
+                'More Than One Gender Identity' => 'GenderIdentity_MoreThanOne',
                 'Other' => 'GenderIdentity_AdditionalOptions'
             ]
         ],
