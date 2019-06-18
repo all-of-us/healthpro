@@ -142,6 +142,9 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $filters = WorkQueue::$filters;
 
+        // Display current organization in the default patient status filter drop down label
+        $filters['patientStatus']['label'] = 'Patient Status at ' . $app->getOrganizationDisplayName($app->getSiteOrganizationId());
+
         if ($app->hasRole('ROLE_AWARDEE')) {
             // Add organizations to filters
             // ToDo: change organization key and variable names to awardee
