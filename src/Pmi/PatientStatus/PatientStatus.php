@@ -223,7 +223,8 @@ class PatientStatus
             !$this->app->isDVType() &&
             $participant->statusReason !== 'withdrawal' &&
             $participant->statusReason !== 'test-participant' &&
-            !$this->app->isTestSite();
+            !$this->app->isTestSite() &&
+            empty($this->app->getConfig('disable_patient_status_message'));
     }
 
     public function loadData($participantId, $patientStatusId, $form)
