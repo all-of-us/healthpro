@@ -113,8 +113,8 @@ class WorkQueue
             'options' => [
                 'Yes' => 'YES',
                 'No' => 'NO',
-                'Unknown' => 'NO_ACCESS',
-                'No Access' => 'UNKNOWN',
+                'No Access' => 'NO_ACCESS',
+                'Unknown' => 'UNKNOWN',
                 'Not Completed' => 'UNSET'
             ]
         ],
