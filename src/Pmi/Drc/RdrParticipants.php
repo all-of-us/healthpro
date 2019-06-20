@@ -375,10 +375,11 @@ class RdrParticipants
         return $this->cacheEnabled;
     }
 
-    public function createPatientStatus($participantId, $organizationId, $data, $method)
+    public function createPatientStatus($participantId, $organizationId, $data)
     {
+        // RDR supports PUT for both create and update requests
         try {
-            $response = $this->getClient()->request($method, "PatientStatus/{$participantId}/Organization/$organizationId", [
+            $response = $this->getClient()->request('PUT', "PatientStatus/{$participantId}/Organization/$organizationId", [
                 'json' => $data
             ]);
             $result = json_decode($response->getBody()->getContents());

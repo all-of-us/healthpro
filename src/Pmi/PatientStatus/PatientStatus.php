@@ -19,7 +19,6 @@ class PatientStatus
     protected $comments;
     protected $status;
     protected $createdTs;
-    protected $method;
 
     public static $patientStatus = [
         'Yes: Confirmed in EHR system' => 'YES',
@@ -241,7 +240,6 @@ class PatientStatus
         $this->comments = $formData['comments'];
         $this->status = $formData['status'];
         $this->createdTs = new \DateTime();
-        $this->method = $this->patientStatusId ? 'PUT' : 'POST';
     }
 
     public function getRdrObject()
@@ -261,7 +259,7 @@ class PatientStatus
     public function sendToRdr()
     {
         $postData = $this->getRdrObject();
-        return $this->app['pmi.drc.participants']->createPatientStatus($this->participantId, $this->organizationId, $postData, $this->method);
+        return $this->app['pmi.drc.participants']->createPatientStatus($this->participantId, $this->organizationId, $postData);
     }
 
     // Used to send previously created patient statuses to rdr
@@ -275,13 +273,5 @@ class PatientStatus
         $this->comments = $patientStatusHistory['comments'];
         $this->status = $patientStatusHistory['status'];
         $this->createdTs = new \DateTime($patientStatusHistory['authored']);
-
-        // Determine http method
-        $hasNoRdrTs = $this->app['em']->getRepository('patient_status_history')->fetchBy([
-            'patient_status_id' => $patientStatus['id'],
-            'rdr_ts' => null,
-        ]);
-
-        $this->method = $hasNoRdrTs ? 'POST' : 'PUT';
     }
 }
