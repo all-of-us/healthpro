@@ -21,7 +21,15 @@ class PatientStatusService
     public function sendPatientStatusToRdr()
     {
         $limit = $this->app->getConfig('patient_status_queue_limit');
-        $patientStatuses = $this->em->getRepository('patient_status')->fetchBySql("id not in (select patient_status_id from rdr_patient_status_log) limit 0, $limit");
+        $query = "
+                SELECT ps.*,
+                       rpsl.created_ts
+                FROM patient_status ps
+                LEFT JOIN rdr_patient_status_log rpsl ON ps.id = rpsl.patient_status_id
+                WHERE rpsl.created_ts is null
+                limit {$limit}
+            ";
+        $patientStatuses = $this->em->fetchAll($query, []);
         $patientStatusObj = new PatientStatus($this->app);
         foreach ($patientStatuses as $patientStatus) {
             $query = "
