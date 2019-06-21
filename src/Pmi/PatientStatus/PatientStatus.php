@@ -226,9 +226,8 @@ class PatientStatus
             empty($this->app->getConfig('disable_patient_status_message'));
     }
 
-    public function loadData($participantId, $patientStatusId, $form)
+    public function loadData($participantId, $patientStatusId, $formData)
     {
-        $formData = $form->getData();
         $this->participantId = $participantId;
         $this->patientStatusId = $patientStatusId;
         $this->organizationId = $this->app->getSiteOrganizationId();

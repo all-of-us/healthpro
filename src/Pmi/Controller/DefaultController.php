@@ -456,7 +456,7 @@ class DefaultController extends AbstractController
                 }
                 if ($patientStatusForm->isValid()) {
                     $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
-                    $patientStatus->loadData($id, $patientStatusId, $patientStatusForm);
+                    $patientStatus->loadData($id, $patientStatusId, $patientStatusForm->getData());
                     if ($patientStatus->sendToRdr() && $patientStatus->saveData()) {
                         $app->addFlashSuccess('Patient status saved');
                         // Load newly entered data
