@@ -602,11 +602,16 @@
                     {% else %}
                         <div class="row">
                             <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
-                                <div class="panel panel-danger">
-                                    <div class="panel-heading">
+                                {% if app.getConfig('disable_patient_status_message') is not empty %}
+                                    <div class="alert alert-warning">
+                                        {{ app.getConfig('disable_patient_status_message') }}
+                                    </div>
+                                {% else %}
+                                    <div class="panel panel-danger">
+                                        <div class="panel-heading">
                                         <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> {{ errorTitle }}</h3>
                                     </div>
-                                    <div class="panel-body">
+                                        <div class="panel-body">
                                         <p>{{ errorMessage }}</p>
                                         {% if participant.statusReason == 'withdrawal' %}
                                             <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalTime|date('n/j/Y g:ia', app.userTimezone) }}</p>
@@ -620,7 +625,8 @@
                                             {% endif %}
                                         {% endif %}
                                     </div>
-                                </div>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     {% endif %}
