@@ -6,6 +6,7 @@ CREATE TABLE `patient_status_history` (
   `status` varchar(50) NOT NULL,
   `comments` text DEFAULT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `rdr_ts` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`patient_status_id`)
   REFERENCES patient_status(`id`)
