@@ -262,11 +262,11 @@ class PatientStatus
     }
 
     // Used to send previously created patient statuses to rdr
-    public function loadDataFromDb($patientStatus, $patientStatusHistory)
+    public function loadDataFromDb($patientStatusHistory)
     {
-        $this->participantId = $patientStatus['participant_id'];
-        $this->organizationId = $patientStatus['organization'];
-        $this->awardeeId = $patientStatus['awardee'];
+        $this->participantId = $patientStatusHistory['participant_id'];
+        $this->organizationId = $patientStatusHistory['organization'];
+        $this->awardeeId = $patientStatusHistory['awardee'];
         $this->userEmail = $patientStatusHistory['user_email'];
         $this->siteWithPrefix = \Pmi\Security\User::SITE_PREFIX . $patientStatusHistory['site'];
         $this->comments = $patientStatusHistory['comments'];
