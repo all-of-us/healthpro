@@ -317,10 +317,10 @@ class WorkQueueController extends AbstractController
             if ($hasFullDataAccess) {
                 $headers[] = 'Login Phone';
                 $headers[] = 'Street Address2';
-                $headers[] = 'Yes';
-                $headers[] = 'No';
-                $headers[] = 'No Access';
-                $headers[] = 'Unknown';
+                $headers[] = 'Patient Status: Yes';
+                $headers[] = 'Patient Status: No';
+                $headers[] = 'Patient Status: No Access';
+                $headers[] = 'Patient Status: Unknown';
             }
             fputcsv($output, $headers);
 
