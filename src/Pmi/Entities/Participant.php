@@ -18,6 +18,7 @@ class Participant
     public $orderCreatedSite;
     public $age;
     public $disableTestAccess;
+    public $patientStatus;
 
     public function __construct($rdrParticipant = null)
     {
@@ -103,6 +104,11 @@ class Participant
 
         if (!empty($participant->biospecimenSourceSite) && $participant->biospecimenSourceSite !== 'UNSET') {
             $this->orderCreatedSite = $this->getSiteSuffix($participant->biospecimenSourceSite);
+        }
+
+        // Patient status
+        if (isset($participant->patientStatus)) {
+            $this->patientStatus = $participant->patientStatus;
         }
     }
 

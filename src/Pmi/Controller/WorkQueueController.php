@@ -90,6 +90,10 @@ class WorkQueueController extends AbstractController
         if (!empty($params['organization_id'])) {
             $rdrParams['organization'] = $params['organization_id'];
         }
+        // Patient status query parameter format Organization:Status
+        if (!empty($params['patientStatus'])) {
+            $rdrParams['patientStatus'] = $app->getSiteOrganizationId() . ':' . $params['patientStatus'];
+        }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($params['ageRange'])) {
@@ -159,6 +163,14 @@ class WorkQueueController extends AbstractController
             }
             // Save selected (or default) organization in session
             $app['session']->set('awardeeOrganization', $organization);
+
+            // Remove patient status filter for awardee
+            unset($filters['patientStatus']);
+        }
+
+        // Display current organization in the default patient status filter drop down label
+        if (isset($filters['patientStatus'])) {
+            $filters['patientStatus']['label'] = 'Patient Status at ' . $app->getOrganizationDisplayName($app->getSiteOrganizationId());
         }
 
         $sites = $app->getSitesFromOrganization($organization);
@@ -305,6 +317,10 @@ class WorkQueueController extends AbstractController
             if ($hasFullDataAccess) {
                 $headers[] = 'Login Phone';
                 $headers[] = 'Street Address2';
+                $headers[] = 'Patient Status: Yes';
+                $headers[] = 'Patient Status: No';
+                $headers[] = 'Patient Status: No Access';
+                $headers[] = 'Patient Status: Unknown';
             }
             fputcsv($output, $headers);
 
@@ -377,8 +393,13 @@ class WorkQueueController extends AbstractController
                     $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingTime, $app->getUserTimezone());
                     if ($hasFullDataAccess) {
                         $row[] = $participant->loginPhoneNumber;
+                        $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
+                        $workQueue = new WorkQueue;
+                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'YES', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'NO',  'export');
+                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'NO ACCESS', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'UNKNOWN', 'export');
                     }
-                    $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
                     fputcsv($output, $row);
                 }
                 unset($participants);
