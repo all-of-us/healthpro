@@ -444,6 +444,6 @@ class WorkQueue
                 }
             }
         }
-        return implode(', ', $organizations);
+        return implode('; ', $organizations);
     }
 }
