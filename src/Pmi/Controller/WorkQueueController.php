@@ -377,8 +377,8 @@ class WorkQueueController extends AbstractController
                     $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingTime, $app->getUserTimezone());
                     if ($hasFullDataAccess) {
                         $row[] = $participant->loginPhoneNumber;
+                        $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
                     }
-                    $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
                     fputcsv($output, $row);
                 }
                 unset($participants);
