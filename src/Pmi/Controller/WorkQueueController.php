@@ -394,19 +394,11 @@ class WorkQueueController extends AbstractController
                     if ($hasFullDataAccess) {
                         $row[] = $participant->loginPhoneNumber;
                         $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
-                        // Clear patient status for withdrawn participants
-                        if ($participant->withdrawalStatus === 'NO_USE') {
-                            $row[] = '';
-                            $row[] = '';
-                            $row[] = '';
-                            $row[] = '';
-                        } else {
-                            $workQueue = new WorkQueue;
-                            $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'YES', 'export');
-                            $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'NO', 'export');
-                            $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'NO ACCESS', 'export');
-                            $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'UNKNOWN', 'export');
-                        }
+                        $workQueue = new WorkQueue;
+                        $row[] = $workQueue->getPatientStatus($participant, 'YES', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant, 'NO', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant, 'NO ACCESS', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant, 'UNKNOWN', 'export');
                     }
                     fputcsv($output, $row);
                 }
