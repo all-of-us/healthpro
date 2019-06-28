@@ -395,10 +395,10 @@ class WorkQueueController extends AbstractController
                         $row[] = $participant->loginPhoneNumber;
                         $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
                         $workQueue = new WorkQueue;
-                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'YES', 'export');
-                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'NO',  'export');
-                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'NO ACCESS', 'export');
-                        $row[] = $workQueue->getPatientStatus($participant->patientStatus, 'UNKNOWN', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant, 'YES', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant, 'NO', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant, 'NO ACCESS', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant, 'UNKNOWN', 'export');
                     }
                     fputcsv($output, $row);
                 }

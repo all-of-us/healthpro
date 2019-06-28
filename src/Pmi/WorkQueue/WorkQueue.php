@@ -282,10 +282,10 @@ class WorkQueue
             } else {
                 $row['dateOfBirth'] = '';
             }
-            $row['patientStatusYes'] = $this->getPatientStatus($participant->patientStatus, 'YES');
-            $row['patientStatusNo'] = $this->getPatientStatus($participant->patientStatus, 'NO');
-            $row['patientStatusUnknown'] = $this->getPatientStatus($participant->patientStatus, 'NO_ACCESS');
-            $row['patientStatusNoAccess'] = $this->getPatientStatus($participant->patientStatus, 'UNKNOWN');
+            $row['patientStatusYes'] = $this->getPatientStatus($participant, 'YES');
+            $row['patientStatusNo'] = $this->getPatientStatus($participant, 'NO');
+            $row['patientStatusUnknown'] = $this->getPatientStatus($participant, 'NO_ACCESS');
+            $row['patientStatusNoAccess'] = $this->getPatientStatus($participant, 'UNKNOWN');
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
             $row['language'] = $e($participant->language);
@@ -432,10 +432,14 @@ class WorkQueue
         return sprintf('<a href="%s">%s</a>', $url, $text);
     }
 
-    public function getPatientStatus($patientStatuses, $value, $type = 'wq')
+    public function getPatientStatus($participant, $value, $type = 'wq')
     {
+        // Clear patient status for withdrawn participants
+        if ($participant->withdrawalStatus === 'NO_USE') {
+            return '';
+        }
         $organizations = [];
-        foreach ($patientStatuses as $patientStatus) {
+        foreach ($participant->patientStatus as $patientStatus) {
             if ($patientStatus->status === $value) {
                 if ($type === 'export') {
                     $organizations[] = $patientStatus->organization;
