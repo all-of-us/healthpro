@@ -282,10 +282,18 @@ class WorkQueue
             } else {
                 $row['dateOfBirth'] = '';
             }
-            $row['patientStatusYes'] = $this->getPatientStatus($participant->patientStatus, 'YES');
-            $row['patientStatusNo'] = $this->getPatientStatus($participant->patientStatus, 'NO');
-            $row['patientStatusUnknown'] = $this->getPatientStatus($participant->patientStatus, 'NO_ACCESS');
-            $row['patientStatusNoAccess'] = $this->getPatientStatus($participant->patientStatus, 'UNKNOWN');
+            // Clear patient status for withdrawn participants
+            if ($participant->withdrawalStatus === 'NO_USE') {
+                $row['patientStatusYes'] = '';
+                $row['patientStatusNo'] = '';
+                $row['patientStatusUnknown'] = '';
+                $row['patientStatusNoAccess'] = '';
+            } else {
+                $row['patientStatusYes'] = $this->getPatientStatus($participant->patientStatus, 'YES');
+                $row['patientStatusNo'] = $this->getPatientStatus($participant->patientStatus, 'NO');
+                $row['patientStatusUnknown'] = $this->getPatientStatus($participant->patientStatus, 'NO_ACCESS');
+                $row['patientStatusNoAccess'] = $this->getPatientStatus($participant->patientStatus, 'UNKNOWN');
+            }
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
             $row['language'] = $e($participant->language);
