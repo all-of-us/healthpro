@@ -69,6 +69,10 @@ $(document).ready(function() {
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
       { name: 'withdrawal', data: 'withdrawal', class: 'text-center' },
       { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
+      { name: 'patientStatusYes', visible: false, data: 'patientStatusYes', orderable: false },
+      { name: 'patientStatusNo', visible: false, data: 'patientStatusNo', orderable: false },
+      { name: 'patientStatusUnknown', visible: false, data: 'patientStatusUnknown', orderable: false },
+      { name: 'patientStatusNoAccess', visible: false, data: 'patientStatusNoAccess', orderable: false },
       { name: 'contactMethod', visible: false, data: 'contactMethod', orderable: false },
       { name: 'address', visible: false, data: 'address'},
       { name: 'email', visible: false, data: 'email' },
@@ -118,7 +122,7 @@ $(document).ready(function() {
             url: url,
             type: "POST"
         },
-        order: [[7, 'desc']],
+        order: [[11, 'desc']],
         dom: 'lBrtip',
         columns: tableColumns,
         pageLength: 25,
@@ -141,7 +145,8 @@ $(document).ready(function() {
                     '.col-group-inperson:not(.col-group-default)',
                     '.col-group-inperson-time',
                     '.col-group-demographics',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-patient-status'
                 ]
             },
             {
@@ -157,7 +162,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-inperson-time',
                     '.col-group-demographics',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-patient-status'
                 ]
             },
             {
@@ -173,7 +179,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-inperson-time',
                     '.col-group-demographics',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-patient-status'
                 ]
             },
             {
@@ -189,7 +196,8 @@ $(document).ready(function() {
                     '.col-group-ppi-time',
                     '.col-group-inperson-time',
                     '.col-group-demographics',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-patient-status'
                 ]
             },
             {
@@ -205,7 +213,8 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-demographics',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-patient-status'
                 ]
             },
             {
@@ -217,6 +226,25 @@ $(document).ready(function() {
                 ],
                 hide: [
                     '.col-group-info',
+                    '.col-group-inperson',
+                    '.col-group-inperson-time',
+                    '.col-group-ppi',
+                    '.col-group-ppi-time',
+                    '.col-group-contact',
+                    '.col-group-patient-status'
+                ]
+            },
+            {
+                extend: 'colvisGroup',
+                text: 'Patient Status',
+                show: [
+                    'dateOfBirth:name',
+                    '.col-group-default',
+                    '.col-group-patient-status'
+                ],
+                hide: [
+                    '.col-group-demographics',
+                    '.col-group-info:not(.col-group-default)',
                     '.col-group-inperson',
                     '.col-group-inperson-time',
                     '.col-group-ppi',
@@ -238,7 +266,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-inperson-time',
                     '.col-group-ppi',
-                    '.col-group-ppi-time'
+                    '.col-group-ppi-time',
+                    '.col-group-patient-status'
                 ]
             },
             {

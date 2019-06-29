@@ -18,6 +18,10 @@ class WorkQueue
         'lastName',
         'firstName',
         'dateOfBirth',
+        'patientStatus',
+        'patientStatus',
+        'patientStatus',
+        'patientStatus',
         'participantId',
         'biobankId',
         'language',
@@ -102,6 +106,16 @@ class WorkQueue
                 'Participant' => 'INTERESTED',
                 'Fully Consented' => 'MEMBER',
                 'Core Participant' => 'FULL_PARTICIPANT'
+            ]
+        ],
+        'patientStatus' => [
+            'label' => 'Patient Status',
+            'options' => [
+                'Yes' => 'YES',
+                'No' => 'NO',
+                'No Access' => 'NO_ACCESS',
+                'Unknown' => 'UNKNOWN',
+                'Not Completed' => 'UNSET'
             ]
         ],
         'consentForElectronicHealthRecords' => [
@@ -268,6 +282,10 @@ class WorkQueue
             } else {
                 $row['dateOfBirth'] = '';
             }
+            $row['patientStatusYes'] = $this->getPatientStatus($participant, 'YES');
+            $row['patientStatusNo'] = $this->getPatientStatus($participant, 'NO');
+            $row['patientStatusUnknown'] = $this->getPatientStatus($participant, 'NO_ACCESS');
+            $row['patientStatusNoAccess'] = $this->getPatientStatus($participant, 'UNKNOWN');
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
             $row['language'] = $e($participant->language);
@@ -412,5 +430,24 @@ class WorkQueue
         $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         return sprintf('<a href="%s">%s</a>', $url, $text);
+    }
+
+    public function getPatientStatus($participant, $value, $type = 'wq')
+    {
+        // Clear patient status for withdrawn participants
+        if ($participant->withdrawalStatus === 'NO_USE') {
+            return '';
+        }
+        $organizations = [];
+        foreach ($participant->patientStatus as $patientStatus) {
+            if ($patientStatus->status === $value) {
+                if ($type === 'export') {
+                    $organizations[] = $patientStatus->organization;
+                } else {
+                    $organizations[] = $this->app->getOrganizationDisplayName($patientStatus->organization);
+                }
+            }
+        }
+        return implode('; ', $organizations);
     }
 }

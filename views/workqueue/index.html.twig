@@ -64,6 +64,8 @@
                 <th rowspan="2" class="col-group-default col-group-info">Withdrawal</th>
                 <th rowspan="2" class="col-group-info">Withdrawal Reason</th>
 
+                <th colspan="4" class="topheader multiheader-patient-status">Patient Status</th>
+
                 <th colspan="5" class="topheader multiheader-contact">Contact</th>
 
                 <th colspan="{{ 2 * (surveys|length) + 2 }}" class="topheader multiheader-survey">PPI Survey Completion</th>
@@ -73,6 +75,11 @@
                 <th colspan="5" class="topheader multiheader-demographics">Demographics</th>
             </tr>
             <tr>
+                <th class="secondaryheader col-group-patient-status multiheader-patient-status">Yes</th>
+                <th class="secondaryheader col-group-patient-status multiheader-patient-status">No</th>
+                <th class="secondaryheader col-group-patient-status multiheader-patient-status">No Access</th>
+                <th class="secondaryheader col-group-patient-status multiheader-patient-status">Unknown</th>
+
                 <th class="secondaryheader col-group-contact multiheader-contact">Contact Method</th>
                 <th class="secondaryheader col-group-contact multiheader-contact">Address</th>
                 <th class="secondaryheader col-group-contact multiheader-contact">Email <span title="This is either the registration email or the email provided after consent if the participant registered with a phone number" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span></th>
