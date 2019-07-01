@@ -380,7 +380,7 @@ abstract class AbstractApplication extends Application
         // Convert a string into a slug
         $this['twig']->addFilter(new Twig_SimpleFilter('slugify', function ($text) {
             $output = trim(strtolower($text));
-            $output = str_replace([' ', '-', '(', ')', ':'], '-', $output);
+            $output = preg_replace('/[^a-z0-9]/', '-', $output);
             return $output;
         }));
 

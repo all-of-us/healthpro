@@ -54,10 +54,12 @@ class RdrHelper
             $endpoint = $this->endpoint;
         }
 
-        $client = new \Memcache();
-        $cachePool = new MemcacheCachePool($client);
+        if (class_exists('Memcache')) {
+            $client = new \Memcache();
+            $cachePool = new MemcacheCachePool($client);
 
-        $googleClient->setCache($cachePool);
+            $googleClient->setCache($cachePool);
+        }
 
         return $googleClient->authorize(new HttpClient([
             'base_uri' => $endpoint,
