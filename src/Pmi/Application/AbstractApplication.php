@@ -373,8 +373,15 @@ abstract class AbstractApplication extends Application
         }));
 
         // Register custom Twig path_exists function
-        $this['twig']->addFunction(new Twig_SimpleFunction('path_exists', function($name) {
+        $this['twig']->addFunction(new Twig_SimpleFunction('path_exists', function ($name) {
             return !is_null($this['routes']->get($name));
+        }));
+
+        // Convert a string into a slug
+        $this['twig']->addFilter(new Twig_SimpleFilter('slugify', function ($text) {
+            $output = trim(strtolower($text));
+            $output = str_replace([' ', '-', '(', ')', ':'], '-', $output);
+            return $output;
         }));
 
         /**
