@@ -119,6 +119,14 @@ class WorkQueueController extends AbstractController
         return $results;
     }
 
+    private function getExportConfiguration(Application $app)
+    {
+        return [
+            'limit' => $app->getConfig('workqueue_export_limit') ?: WorkQueue::LIMIT_EXPORT,
+            'pageSize' => $app->getConfig('workqueue_export_page_size') ?: WorkQueue::LIMIT_EXPORT_PAGE_SIZE
+        ];
+    }
+
     public function indexAction(Application $app, Request $request)
     {
         if ($app->hasRole('ROLE_USER')) {
@@ -223,7 +231,8 @@ class WorkQueueController extends AbstractController
                 'organization' => $organization,
                 'isRdrError' => $this->rdrError,
                 'samplesAlias' => WorkQueue::$samplesAlias,
-                'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload)
+                'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload),
+                'exportConfiguration' => $this->getExportConfiguration($app)
             ]);
         }
     }
@@ -245,8 +254,9 @@ class WorkQueueController extends AbstractController
             return $app['twig']->render('workqueue/no-organization.html.twig');
         }
 
-        $limit = $app->getConfig('workqueue_export_limit') ?: WorkQueue::LIMIT_EXPORT;
-        $pageSize = $app->getConfig('workqueue_export_page_size') ?: WorkQueue::LIMIT_EXPORT_PAGE_SIZE;
+        $exportConfiguration = $this->getExportConfiguration($app);
+        $limit = $exportConfiguration['limit'];
+        $pageSize = $exportConfiguration['pageSize'];
 
         $hasFullDataAccess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
 
