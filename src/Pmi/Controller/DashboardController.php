@@ -761,18 +761,14 @@ class DashboardController extends AbstractController
 
         // get request attributes
         $mode = $request->get('mode');
-        $start_date = $request->get('start_date', date('Y-m-d'));
         $end_date = $request->get('end_date', date('Y-m-d'));
-        $interval = $request->get('interval', 'day');
         $organizations = $request->get('organizations', []);
         $params = [];
 
         $metrics = $this->getMetricsEHRObject(
             $app,
             $mode,
-            $start_date,
             $end_date,
-            $interval,
             $organizations,
             $params
         );
@@ -910,9 +906,7 @@ class DashboardController extends AbstractController
      *
      * @param Application $app
      * @param string      $mode
-     * @param string      $start_date
      * @param string      $end_date
-     * @param string      $interval
      * @param string      $centers
      * @param array       $params
      *
@@ -921,9 +915,7 @@ class DashboardController extends AbstractController
     private function getMetricsEHRObject(
         Application $app,
         $mode,
-        $start_date,
         $end_date,
-        $interval,
         $organizations,
         $params = []
     ) {
@@ -933,9 +925,7 @@ class DashboardController extends AbstractController
 
             $metrics = $metricsApi->ehrMetrics(
                 $mode,
-                $start_date,
                 $end_date,
-                $interval,
                 $organizations,
                 $params
             );

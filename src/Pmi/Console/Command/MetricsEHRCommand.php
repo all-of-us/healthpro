@@ -21,12 +21,7 @@ class MetricsEHRCommand extends Command
     /**
      * @var array
      */
-    private static $MODES = ['ParticipantsOverTime', 'OrganizationsActiveOverTime', 'Organizations'];
-
-    /**
-     * @var array
-     */
-    private static $INTERVALS = ['week', 'month', 'quarter'];
+    private static $MODES = ['ParticipantsOverTime', 'Organizations'];
 
     /**
      * Configure
@@ -38,25 +33,11 @@ class MetricsEHRCommand extends Command
         $this
             ->setName('pmi:metricsehr')
             ->addOption(
-                'start_date',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Date range beginning.',
-                date('Y-m-d', strtotime('today - 30 days'))
-            )
-            ->addOption(
                 'end_date',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Date range ending.',
                 date('Y-m-d')
-            )
-            ->addOption(
-                'interval',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Interval of reporting.',
-                'week'
             )
             ->addOption(
                 'mode',
@@ -98,23 +79,10 @@ class MetricsEHRCommand extends Command
     {
         $output->setFormatter(new OutputFormatter(true));
 
-        $start_date = $input->getOption('start_date');
         $end_date = $input->getOption('end_date');
-        $interval = $input->getOption('interval');
         $mode = $input->getOption('mode');
         $organizations = $input->getOption('organizations');
         $pretty = ($input->getOption('pretty') !== false) ? JSON_PRETTY_PRINT : 0;
-
-        // Validate interval
-        if (!in_array($interval, self::$INTERVALS)) {
-            $output->writeln(sprintf(
-                '<error>Invalid interval: "%s"; Valid options: %s</error>',
-                $interval,
-                join(', ', self::$INTERVALS)
-            ));
-            // Throw a non-zero exit status
-            return 1;
-        }
 
         // Validate mode
         if (!is_null($mode) && !in_array($mode, self::$MODES)) {
@@ -122,17 +90,6 @@ class MetricsEHRCommand extends Command
                 '<error>Invalid mode: "%s"; Valid options: %s</error>',
                 $mode,
                 join(', ', self::$MODES)
-            ));
-            // Throw a non-zero exit status
-            return 1;
-        }
-
-        // Validate start and end dates
-        if ((bool) !strtotime($start_date) || (bool) !strtotime($end_date)) {
-            $output->writeln(sprintf(
-                '<error>Invalid dates: "%s", "%s"</error>',
-                $start_date,
-                $end_date
             ));
             // Throw a non-zero exit status
             return 1;
@@ -157,7 +114,7 @@ class MetricsEHRCommand extends Command
         }
 
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-        $data = $metricsApi->ehrMetrics($mode, $start_date, $end_date, $interval, $organizations);
+        $data = $metricsApi->ehrMetrics($mode, $end_date, $organizations);
 
         $output->writeln(json_encode($data, $pretty));
     }
