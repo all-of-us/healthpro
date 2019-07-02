@@ -245,13 +245,16 @@ class WorkQueueController extends AbstractController
             return $app['twig']->render('workqueue/no-organization.html.twig');
         }
 
+        $limit = $app->getConfig('workqueue_export_limit') ?: WorkQueue::LIMIT_EXPORT;
+        $pageSize = $app->getConfig('workqueue_export_page_size') ?: WorkQueue::LIMIT_EXPORT_PAGE_SIZE;
+
         $hasFullDataAccess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
 
         $params = array_filter($request->query->all());
-        $params['_count'] = WorkQueue::LIMIT_EXPORT_PAGE_SIZE;
+        $params['_count'] = $pageSize;
         $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
 
-        $stream = function() use ($app, $params, $organization, $hasFullDataAccess) {
+        $stream = function() use ($app, $params, $organization, $hasFullDataAccess, $limit, $pageSize) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -324,7 +327,7 @@ class WorkQueueController extends AbstractController
             }
             fputcsv($output, $headers);
 
-            for ($i = 0; $i < ceil(WorkQueue::LIMIT_EXPORT / WorkQueue::LIMIT_EXPORT_PAGE_SIZE); $i++) {
+            for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
                 $participants = $this->participantSummarySearch($organization, $params, $app);
                 foreach ($participants as $participant) {
                     if ($hasFullDataAccess) {
