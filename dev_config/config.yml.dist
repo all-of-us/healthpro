@@ -80,3 +80,7 @@ sites_use_rdr: true
 # patient_status_queue_limit: 10
 
 # disable_patient_status_message:
+
+# Work Queue export limits
+workqueue_export_limit: 10000
+workqueue_export_page_size: 1000
