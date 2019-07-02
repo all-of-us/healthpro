@@ -22,8 +22,8 @@ $(document).ready(function() {
 
     var workQueueExportWarningModel = function (location) {
         var exportLimitFormatted = exportLimit;
-        if (typeof Intl === 'object' && typeof Intl.NumberFormat() === 'object') {
-            exportLimitFormatted = Intl.NumberFormat().format(exportLimit);
+        if (window.Intl && typeof window.Intl === 'object') {
+            exportLimitFormatted = new Intl.NumberFormat().format(exportLimit);
         }
         new PmiConfirmModal({
             title: 'Warning',
