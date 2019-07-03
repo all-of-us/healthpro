@@ -3,7 +3,6 @@ namespace Pmi\WorkQueue;
 
 class WorkQueue
 {
-    const LIMIT_DEFAULT = 1000;
     const LIMIT_EXPORT = 10000;
     const LIMIT_EXPORT_PAGE_SIZE = 1000;
 
