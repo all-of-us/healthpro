@@ -105,11 +105,8 @@ class MetricsEHRCommand extends Command
         if ($input->getOption('debug')) {
             $output->writeln('<info>Debugging Information</info>');
             $output->writeln('  Mode:                  ' . $mode);
-            $output->writeln('  Start Date:            ' . $start_date);
             $output->writeln('  End Date:              ' . $end_date);
-            $output->writeln('  Interval:              ' . $interval);
             $output->writeln('  Organizations:         ' . json_encode($organizations));
-            $output->writeln('  Additional Parameters: ' . json_encode($params));
             $output->writeln('');
         }
 
