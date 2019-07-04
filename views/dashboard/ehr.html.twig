@@ -14,10 +14,10 @@
                     </script>
                 </div>
                 <div class="col-md-9">
-                  <div id="plotly-ehr-participant" class="plotly-div"></div>
+                  <div id="plotly-ehr-participants" class="plotly-div"></div>
                   <div class="col-md-12">
                     <div class="table-responsive">
-                      <div id="table-ehr-participant" class="table-div"></div>
+                      <div id="table-ehr-participants" class="table-div"></div>
                     </div>
                   </div>
                   <div class="row">
@@ -75,16 +75,15 @@ function renderMetricsEhrPlots() {
     $('.table-div').empty();
 
     // gather params
-    var ehrInterval = $('#ehr-interval').val();
-    var ehrParticipantWidth = $('#plotly-ehr-participant').width() - 30;
+    var ehrParticipantWidth = $('#plotly-ehr-participants').width() - 30;
     var ehrSitesWidth = $('#plotly-ehr-sites').width() - 30;
 
     /**
      * Participants Over Time
      */
     function updateParticipantsOverTime() {
-        var plotlyDiv = $('#plotly-ehr-participant');
-        var tableDiv = $('#table-ehr-participant');
+        var plotlyDiv = $('#plotly-ehr-participants');
+        var tableDiv = $('#table-ehr-participants');
         $.getJSON('/dashboard/metrics_load_ehr', {
                 csrf_token: CsrfToken,
                 mode: 'ParticipantsOverTime',
@@ -115,8 +114,8 @@ function renderMetricsEhrPlots() {
                     loadTableData(tableDiv, data, ehrParticipantLayout.title);
 
                     // render plot, remove plotly link
-                    Plotly.newPlot('plotly-ehr-participant', data, ehrParticipantLayout, PLOTLY_OPTS);
-                    removePlotlyLink('plotly-ehr-participant');
+                    Plotly.newPlot('plotly-ehr-participants', data, ehrParticipantLayout, PLOTLY_OPTS);
+                    removePlotlyLink('plotly-ehr-participants');
 
                     // set toggle traces switch to on, regardless of previous state
                     $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
@@ -142,7 +141,6 @@ function renderMetricsEhrPlots() {
         $.getJSON('/dashboard/metrics_load_ehr', {
                 csrf_token: CsrfToken,
                 mode: 'Organizations',
-                interval: 'quarter',
                 organizations: ehrOrganizations
             })
             .done(function(data) {
@@ -226,7 +224,7 @@ $('.ehr-time-control').on('change', function() {
 
 // re-render on window resizeEnd if tab is visible
 $(window).on('resizeEnd', function() {
-    if ($('#plotly-ehr-participant').is(':visible')) {
+    if ($('#plotly-ehr-participants').is(':visible')) {
         renderMetricsEhrPlots();
     }
 });
