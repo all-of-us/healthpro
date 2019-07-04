@@ -225,6 +225,8 @@ class HpoApplication extends AbstractApplication
             $this['session']->set('awardee', $user->getAwardee($email));
             $this['session']->remove('site');
             $this->setNewRoles($user);
+            // Clears previously set site meta data
+            $this->saveSiteMetaDataInSession();
             return true;
         } else {
             return false;
