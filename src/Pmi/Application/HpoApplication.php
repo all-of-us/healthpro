@@ -219,11 +219,14 @@ class HpoApplication extends AbstractApplication
             $this['session']->set('site', $user->getSite($email));
             $this['session']->remove('awardee');
             $this->setNewRoles($user);
+            $this->saveSiteMetaDataInSession();
             return true;
         } elseif ($user && $user->belongsToAwardee($email)) {
             $this['session']->set('awardee', $user->getAwardee($email));
             $this['session']->remove('site');
             $this->setNewRoles($user);
+            // Clears previously set site meta data
+            $this->saveSiteMetaDataInSession();
             return true;
         } else {
             return false;
@@ -311,27 +314,37 @@ class HpoApplication extends AbstractApplication
 
     public function getSiteOrganization()
     {
-        if ($this['isUnitTest']) {
-            return null;
-        }
-        $site = $this->getSiteEntity();
-        if (!$site || empty($site['organization'])) {
-            return null;
-        } else {
-            return $site['organization'];
-        }
+        return $this['session']->get('siteOrganization');
+    }
+
+    public function getSiteOrganizationId()
+    {
+        return $this['session']->get('siteOrganizationId');
+    }
+
+    public function getSiteOrganizationDisplayName()
+    {
+        return $this['session']->get('siteOrganizationDisplayName');
     }
 
     public function getSiteAwardee()
     {
-        if ($this['isUnitTest']) {
-            return null;
-        }
-        $site = $this->getSiteEntity();
-        if (!$site || empty($site['awardee_id'])) {
-            return null;
-        }
-        return $site['awardee_id'];
+        return $this['session']->get('siteAwardee');
+    }
+
+    public function getSiteAwardeeId()
+    {
+        return $this['session']->get('siteAwardeeId');
+    }
+
+    public function getSiteAwardeeDisplayName()
+    {
+        return $this['session']->get('siteAwardeeDisplayName');
+    }
+
+    public function getCurrentSiteDisplayName()
+    {
+        return $this['session']->get('currentSiteDisplayName');
     }
 
     public function getAwardeeOrganization()
@@ -581,6 +594,28 @@ class HpoApplication extends AbstractApplication
      */
     public function isTestSite()
     {
-        return !empty($this->getConfig('disable_test_access')) && $this->getSiteAwardee() === 'TEST';
+        return !empty($this->getConfig('disable_test_access')) && $this->getSiteAwardeeId() === 'TEST';
+    }
+
+    public function saveSiteMetaDataInSession()
+    {
+        $site = $this->getSiteEntity();
+        if (!empty($site)) {
+            $this['session']->set('siteOrganization', $site['organization']);
+            $this['session']->set('siteOrganizationId', $site['organization_id']);
+            $this['session']->set('siteOrganizationDisplayName', $this->getOrganizationDisplayName($site['organization_id']));
+            $this['session']->set('siteAwardee', $site['awardee']);
+            $this['session']->set('siteAwardeeId', $site['awardee_id']);
+            $this['session']->set('siteAwardeeDisplayName', $this->getAwardeeDisplayName($site['awardee_id']));
+            $this['session']->set('currentSiteDisplayName', $this->getAwardeeDisplayName($site['name']));
+        } else {
+            $this['session']->remove('siteOrganization');
+            $this['session']->remove('siteOrganizationId');
+            $this['session']->remove('siteOrganizationDisplayName');
+            $this['session']->remove('siteAwardee');
+            $this['session']->remove('siteAwardeeId');
+            $this['session']->remove('siteAwardeeDisplayName');
+            $this['session']->remove('currentSiteDisplayName');
+        }
     }
 }

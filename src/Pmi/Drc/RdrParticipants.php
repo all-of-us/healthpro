@@ -374,4 +374,52 @@ class RdrParticipants
     {
         return $this->cacheEnabled;
     }
+
+    public function createPatientStatus($participantId, $organizationId, $data)
+    {
+        // RDR supports PUT for both create and update requests
+        try {
+            $response = $this->getClient()->request('PUT', "PatientStatus/{$participantId}/Organization/$organizationId", [
+                'json' => $data
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->authored)) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function getPatientStatus($participantId, $organizationId)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "PatientStatus/{$participantId}/Organization/{$organizationId}");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result)) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function getPatientStatusHistory($participantId, $organizationId)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "PatientStatus/{$participantId}/Organization/{$organizationId}/History");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_array($result)) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
 }

@@ -25,3 +25,7 @@ cron:
   schedule: every sat 04:00
   target: ah-builtin-python-bundle
   timezone: America/Chicago
+- description: "Send patient status to RDR"
+  url: /cron/send-patient-status-rdr
+  schedule: 29 of feb 00:00
+  timezone: America/Chicago

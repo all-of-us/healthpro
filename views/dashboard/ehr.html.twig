@@ -1,0 +1,243 @@
+{% extends 'dashboard/base.html.twig' %}
+{% block title %}Dashboard{% endblock %}
+{% block body %}
+    {% include 'dashboard/partials/modal-loading-cached-metrics.html.twig' %}
+    <br />
+    {% include 'dashboard/partials/tabs.html.twig' with {active_tab: 'ehr'} %}
+    <div id="plotly-tabs" class="tab-content">
+        <div id="ehr" class="tab-pane pad active fade in">
+            <div class="row">
+                <div id="ehr-filters" class="col-md-3">
+                    {% include 'dashboard/partials/filters.html.twig' with {id: 'ehr', show_organizations: true, show_recruitment_centers: false, show_enrollment_status: false} %}
+                    <script>
+                    $('#ehr-filters-content').removeClass('collapse')
+                    </script>
+                </div>
+                <div class="col-md-9">
+                  <div id="plotly-ehr-participant" class="plotly-div"></div>
+                  <div class="col-md-12">
+                    <div class="table-responsive">
+                      <div id="table-ehr-participant" class="table-div"></div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <hr />
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <hr />
+                    </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-12">
+                          <h4 class="text-center">Organization Data</h4>
+                          <div class="table-responsive">
+                            <div id="table-ehr-organizations" class="table-div"></div>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'dashboard/partials/modal-dashboard-help.html.twig' %}
+{% endblock %}
+
+{% block pagejs %}
+<script>
+/**
+ * Error Messages
+ */
+var ErrorMessages = {
+    no_data: 'No data returned from the metrics endpoint.',
+    general: 'Error encountered while retrieving the data'
+}
+
+/**
+ * Show Error
+ */
+function showError(div, msg) {
+  $(div).empty()
+  $(div).append('<div class="alert alert-danger">' + msg + '</div>')
+}
+
+/**
+ * Render Metrics EHR Plots
+ */
+function renderMetricsEhrPlots() {  
+    // throw error if date selection is invalid
+    var ehrOrganizations = loadOrganizationFilters('ehr');
+    if (ehrOrganizations.length == 0) {
+        alert('You must select at least one organization to plot results');
+        return false;
+    }
+
+    // Add loading icons, clear previous errors
+    $('.plotly-div').empty();
+    $('.plotly-div').html('<div class="text-center"><i class="fa fa-spinner fa-spin fa-2x fa-fw"></i> Loading ...</span>');
+    $('.table-div').empty();
+
+    // gather params
+    var ehrInterval = $('#ehr-interval').val();
+    var ehrParticipantWidth = $('#plotly-ehr-participant').width() - 30;
+    var ehrSitesWidth = $('#plotly-ehr-sites').width() - 30;
+
+    /**
+     * Participants Over Time
+     */
+    function updateParticipantsOverTime() {
+        var plotlyDiv = $('#plotly-ehr-participant');
+        var tableDiv = $('#table-ehr-participant');
+        $.getJSON('/dashboard/metrics_load_ehr', {
+                csrf_token: CsrfToken,
+                mode: 'ParticipantsOverTime',
+                organizations: ehrOrganizations
+            })
+            .done(function(data) {
+                $(plotlyDiv).empty();
+                $(tableDiv).empty();
+                if (data.length != 0) {
+                    var progressAnnot = [];
+                    var ehrParticipantLayout = {
+                        title: '<b>EHR Consent</b> vs <b>EHR Data</b>',
+                        font: PLOTLY_LABEL_FONT,
+                        width: ehrParticipantWidth,
+                        height: ehrParticipantWidth / 1.66,
+                        hovermode: 'closest',
+                        annotations: progressAnnot,
+                        yaxis: {
+                            fixedrange: true
+                        },
+                        xaxis: {
+                            fixedrange: false,
+                             tickformat: '%Y-%m-%d'
+                        }
+                    };
+
+                    // load table data
+                    loadTableData(tableDiv, data, ehrParticipantLayout.title);
+
+                    // render plot, remove plotly link
+                    Plotly.newPlot('plotly-ehr-participant', data, ehrParticipantLayout, PLOTLY_OPTS);
+                    removePlotlyLink('plotly-ehr-participant');
+
+                    // set toggle traces switch to on, regardless of previous state
+                    $('#toggle-traces .toggle-switch').attr('class', 'fa fa-toggle-on toggle-switch');
+                } else {
+                    showError(plotlyDiv, ErrorMessages.no_data)
+                }
+
+            })
+            .fail(function(jqXHR) {
+                try {
+                    showError(plotlyDiv, JSON.parse(jqXHR.responseText).error);
+                } catch (e) {
+                    showError(plotlyDiv, ErrorMessages.general);
+                }
+            });
+    }
+
+    /**
+     * Organizations Table
+     */
+    function updateOrganizations() {
+        var tableDiv = $('#table-ehr-organizations')
+        $.getJSON('/dashboard/metrics_load_ehr', {
+                csrf_token: CsrfToken,
+                mode: 'Organizations',
+                interval: 'quarter',
+                organizations: ehrOrganizations
+            })
+            .done(function(data) {
+                $(tableDiv).empty()
+                if (data.length != 0) {
+                    // load table data
+                    $(tableDiv).html('<table class="table table-striped"><thead></thead><tbody></tbody></table>')
+                    $('thead', tableDiv).append('<tr><th>Organization</th><th>Total Participants</th><th>Total EHR Consent</th><th>Total Core</th><th>Total EHR Data Received</th><th>Last EHR Submission Date</th></tr>');
+                    // Calculate totals to show at top
+                    var columnTotals = {
+                      total_primary_consented: 0,
+                      total_ehr_consented: 0,
+                      total_core_participants: 0,
+                      total_ehr_data_received: 0
+                    }
+                    $(data).each(function(i, row) {
+                      columnTotals.total_primary_consented += row.total_primary_consented
+                      columnTotals.total_ehr_consented += row.total_ehr_consented
+                      columnTotals.total_core_participants += row.total_core_participants
+                      columnTotals.total_ehr_data_received += row.total_ehr_data_received
+                    });
+                    var totalRow = $('<tr class="info" />')
+                    totalRow.append('<td>Total</td>')
+                    totalRow.append('<td>' +  columnTotals.total_primary_consented + '</td>')
+                    totalRow.append('<td>' +  columnTotals.total_ehr_consented + '</td>')
+                    totalRow.append('<td>' +  columnTotals.total_core_participants + '</td>')
+                    totalRow.append('<td>' +  columnTotals.total_ehr_data_received + '</td>')
+                    totalRow.append('<td>&nbsp;</td>')
+                    totalRow.css({fontWeight: 'bold'})
+                    $('tbody', tableDiv).append(totalRow)
+                    // Render row level data
+                    $(data).each(function(i, row) {
+                        var organizationRow = $('<tr />')
+                        organizationRow.append('<td>' + row.organization_name + '</td>')
+                        organizationRow.append('<td>' + row.total_primary_consented + '</td>')
+                        organizationRow.append('<td>' + row.total_ehr_consented + '</td>')
+                        organizationRow.append('<td>' + row.total_core_participants + '</td>')
+                        organizationRow.append('<td>' + row.total_ehr_data_received + '</td>')
+                        organizationRow.append('<td>' + (row.last_ehr_submission_date ? row.last_ehr_submission_date : '-') + '</td>')
+                        $('tbody', tableDiv).append(organizationRow)
+                    });
+                } else {
+                    showError(plotlyDiv, ErrorMessages.no_data);
+                }
+
+            })
+            .fail(function(jqXHR) {
+                try {
+                    showError(plotlyDiv, JSON.parse(jqXHR.responseText).error);
+                } catch (e) {
+                    showError(plotlyDiv, ErrorMessages.general);
+                }
+            });
+    }
+
+    // Call them in sequence
+    $.when(updateParticipantsOverTime(), updateOrganizations()).done(function() {
+        $('#loading-modal').modal('hide');
+    });
+
+}
+
+var now = new Date();
+var nowString = now.toISOString().split('T')[0];
+var programStartDate = new Date('May 1, 2018');
+var programStartDateString = new Date(programStartDate).toISOString().split('T')[0];
+$('#ehr-end-date').val(nowString);
+$('#ehr-start-date').val(programStartDateString);
+
+renderMetricsEhrPlots()
+
+// re-render on filter change
+$('.ehr-plot-control').on('change', function() {
+    renderMetricsEhrPlots();
+});
+
+// re-render on filter change with modal (for time changes, may need new metrics)
+$('.ehr-time-control').on('change', function() {
+    renderMetricsEhrPlots();
+});
+
+// re-render on window resizeEnd if tab is visible
+$(window).on('resizeEnd', function() {
+    if ($('#plotly-ehr-participant').is(':visible')) {
+        renderMetricsEhrPlots();
+    }
+});
+
+$('#ehr').find('.redraw-plotly').on('click', function() {
+    renderMetricsEhrPlots();
+});
+</script>
+{% endblock %}

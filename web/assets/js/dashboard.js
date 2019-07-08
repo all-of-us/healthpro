@@ -75,7 +75,9 @@ function launchSpinner(divId) {
 }
 
 function stopSpinner(divId) {
-    $('#' + divId).data('spinner').stop();
+    if ($('#' + divId).data('spinner')) {
+        $('#' + divId).data('spinner').stop();
+    }
 }
 
 function removePlotlyLink(divId) {
@@ -90,17 +92,17 @@ function loadBarChartAnnotations(plotlyData, annotationsArray, interval) {
         fontSize = 10;
     }
     /* eslint-disable security/detect-object-injection */
-    for (var i = 0; i < plotlyData[0]['x'].length ; i++){
+    for (var i = 0; i < plotlyData[0].x.length ; i++){
         var total = 0;
         plotlyData.map(function(el) {
-            var c = parseInt(el['y'][i]);
+            var c = parseInt(el.y[i]);
             if (isNaN(c)) {
                 c = 0;
             }
             total += c;
         });
         var annot = {
-            x: plotlyData[0]['x'][i],
+            x: plotlyData[0].x[i],
             y: total,
             text: total,
             xanchor: 'center',
@@ -120,6 +122,15 @@ function loadBarChartAnnotations(plotlyData, annotationsArray, interval) {
 function loadRecruitmentFilters(id) {
     var centers = [];
     $('#' + id).find('.center-filter:checked').each(function() {
+        centers.push($(this).val());
+    });
+    return centers;
+}
+
+// collect all checked recruitment centers filters
+function loadOrganizationFilters(id) {
+    var centers = [];
+    $('#' + id).find('.organization-filter:checked').each(function() {
         centers.push($(this).val());
     });
     return centers;
@@ -171,19 +182,22 @@ function loadTableData(tableTarget, sourceData, colTitle) {
     var tableId = tableTarget.attr('id');
     tableTarget.html("<table class='table table-striped table-condensed raw-data-table'><thead><tr id='" + tableId + "-headers'><th>" + colTitle + "</th></tr></thead><tbody id='" + tableId + "-body'></tbody></table>");
     var headerRow = $('#' + tableId + '-headers');
-    $(sourceData[0]['x']).each(function(i, date) {
+    $(sourceData[0].x).each(function(i, date) {
         headerRow.append($("<th>").text(date));
     });
 
     // load scores
     var tableBody = $('#' + tableId + '-body');
     $($(sourceData).get().reverse()).each(function(index, row) {
-        var newRow = $('<tr>');
-        newRow.append($('<td>').text(row['name']));
-        $(row['y']).each(function(i, count) {
-            newRow.append($('<td>').text(count));
-        });
-        tableBody.append(newRow);
+        // Ignore row if no data provided
+        if (row.y.length) {
+          var newRow = $('<tr>');
+          newRow.append($('<td>').text(row.name));
+          $(row.y).each(function(i, count) {
+              newRow.append($('<td>').text(count));
+          });
+          tableBody.append(newRow);
+        }
     });
 }
 
@@ -199,26 +213,26 @@ function loadRegionTableData(tableTarget, sourceData, plotType, rowLabel) {
 
     if (plotType === 'GEO_STATE') {
         // since there are flat arrays of data, grab the location array and use index to keep position
-        $(sourceData[0]['locations']).each(function (i, state) {
+        $(sourceData[0].locations).each(function (i, state) {
             newRow = $('<tr>');
             newRow.append($('<td>').text(state));
-            newRow.append($('<td>').text(sourceData[0]['counts'][i]));
+            newRow.append($('<td>').text(sourceData[0].counts[i]));
             tableBody.append(newRow);
         });
     } else if (plotType === 'GEO_CENSUS') {
         // since there are flat arrays of data, grab the location array and use index to keep position
-        $(sourceData[0]['regions']).each(function (i, region) {
+        $(sourceData[0].regions).each(function (i, region) {
             newRow = $('<tr>');
             newRow.append($('<td>').text(region));
-            newRow.append($('<td>').text(sourceData[0]['region_counts'][i]));
+            newRow.append($('<td>').text(sourceData[0].region_counts[i]));
             tableBody.append(newRow);
         });
     } else if (plotType === 'GEO_AWARDEE') {
         // load scores
         $(sourceData).each(function(index, row) {
             newRow = $('<tr>');
-            newRow.append($('<td>').text(row['name']));
-            newRow.append($('<td>').text(row['count']));
+            newRow.append($('<td>').text(row.name));
+            newRow.append($('<td>').text(row.count));
             tableBody.append(newRow);
         });
     }

@@ -90,6 +90,10 @@ class WorkQueueController extends AbstractController
         if (!empty($params['organization_id'])) {
             $rdrParams['organization'] = $params['organization_id'];
         }
+        // Patient status query parameter format Organization:Status
+        if (!empty($params['patientStatus'])) {
+            $rdrParams['patientStatus'] = $app->getSiteOrganizationId() . ':' . $params['patientStatus'];
+        }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($params['ageRange'])) {
@@ -113,6 +117,14 @@ class WorkQueueController extends AbstractController
             $this->rdrError = true;
         }
         return $results;
+    }
+
+    private function getExportConfiguration(Application $app)
+    {
+        return [
+            'limit' => $app->getConfig('workqueue_export_limit') ?: WorkQueue::LIMIT_EXPORT,
+            'pageSize' => $app->getConfig('workqueue_export_page_size') ?: WorkQueue::LIMIT_EXPORT_PAGE_SIZE
+        ];
     }
 
     public function indexAction(Application $app, Request $request)
@@ -159,6 +171,14 @@ class WorkQueueController extends AbstractController
             }
             // Save selected (or default) organization in session
             $app['session']->set('awardeeOrganization', $organization);
+
+            // Remove patient status filter for awardee
+            unset($filters['patientStatus']);
+        }
+
+        // Display current organization in the default patient status filter drop down label
+        if (isset($filters['patientStatus'])) {
+            $filters['patientStatus']['label'] = 'Patient Status at ' . $app->getOrganizationDisplayName($app->getSiteOrganizationId());
         }
 
         $sites = $app->getSitesFromOrganization($organization);
@@ -211,7 +231,8 @@ class WorkQueueController extends AbstractController
                 'organization' => $organization,
                 'isRdrError' => $this->rdrError,
                 'samplesAlias' => WorkQueue::$samplesAlias,
-                'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload)
+                'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload),
+                'exportConfiguration' => $this->getExportConfiguration($app)
             ]);
         }
     }
@@ -233,13 +254,17 @@ class WorkQueueController extends AbstractController
             return $app['twig']->render('workqueue/no-organization.html.twig');
         }
 
+        $exportConfiguration = $this->getExportConfiguration($app);
+        $limit = $exportConfiguration['limit'];
+        $pageSize = $exportConfiguration['pageSize'];
+
         $hasFullDataAccess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
 
         $params = array_filter($request->query->all());
-        $params['_count'] = WorkQueue::LIMIT_EXPORT_PAGE_SIZE;
+        $params['_count'] = $pageSize;
         $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
 
-        $stream = function() use ($app, $params, $organization, $hasFullDataAccess) {
+        $stream = function() use ($app, $params, $organization, $hasFullDataAccess, $limit, $pageSize) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -305,10 +330,14 @@ class WorkQueueController extends AbstractController
             if ($hasFullDataAccess) {
                 $headers[] = 'Login Phone';
                 $headers[] = 'Street Address2';
+                $headers[] = 'Patient Status: Yes';
+                $headers[] = 'Patient Status: No';
+                $headers[] = 'Patient Status: No Access';
+                $headers[] = 'Patient Status: Unknown';
             }
             fputcsv($output, $headers);
 
-            for ($i = 0; $i < ceil(WorkQueue::LIMIT_EXPORT / WorkQueue::LIMIT_EXPORT_PAGE_SIZE); $i++) {
+            for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
                 $participants = $this->participantSummarySearch($organization, $params, $app);
                 foreach ($participants as $participant) {
                     if ($hasFullDataAccess) {
@@ -353,7 +382,7 @@ class WorkQueueController extends AbstractController
                         ];                   
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone());
+                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone(), false);
                     $row[] = $participant->siteSuffix;
                     $row[] = $participant->organization;
                     $row[] = $participant->evaluationFinalizedSite;
@@ -368,7 +397,7 @@ class WorkQueueController extends AbstractController
                             }
                         }
                         $row[] = $participant->{"sampleStatus{$newSample}"} == 'RECEIVED' ? '1' : '0';
-                        $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $app->getUserTimezone(), false);
                     }
                     $row[] = $participant->orderCreatedSite;
                     $row[] = $participant->withdrawalReason;
@@ -377,8 +406,13 @@ class WorkQueueController extends AbstractController
                     $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingTime, $app->getUserTimezone());
                     if ($hasFullDataAccess) {
                         $row[] = $participant->loginPhoneNumber;
+                        $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
+                        $workQueue = new WorkQueue;
+                        $row[] = $workQueue->getPatientStatus($participant, 'YES', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant, 'NO', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant, 'NO ACCESS', 'export');
+                        $row[] = $workQueue->getPatientStatus($participant, 'UNKNOWN', 'export');
                     }
-                    $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
                     fputcsv($output, $row);
                 }
                 unset($participants);

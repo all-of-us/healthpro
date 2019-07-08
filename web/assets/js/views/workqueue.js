@@ -18,10 +18,16 @@ $(document).ready(function() {
         $('#filters').submit();
     });
 
+    var exportLimit = $('#workqueue').data('export-limit');
+
     var workQueueExportWarningModel = function (location) {
+        var exportLimitFormatted = exportLimit;
+        if (window.Intl && typeof window.Intl === 'object') {
+            exportLimitFormatted = new Intl.NumberFormat().format(exportLimit);
+        }
         new PmiConfirmModal({
             title: 'Warning',
-            msg: 'Note that the export reaches the limit of 10,000 participants. If your intent was to capture all participants, you may need to apply filters to ensure each export is less than 10,000 or utilize the Ops Data API. Please contact <em>sysadmin@pmi-ops.org</em> for more information.',
+            msg: 'Note that the export reaches the limit of ' + exportLimitFormatted + ' participants. If your intent was to capture all participants, you may need to apply filters to ensure each export is less than ' + exportLimitFormatted + ' or utilize the Ops Data API. Please contact <em>sysadmin@pmi-ops.org</em> for more information.',
             isHTML: true,
             onTrue: function () {
                 window.location = location;
@@ -38,7 +44,7 @@ $(document).ready(function() {
             msg: 'The file you are about to download contains information that is sensitive and confidential. By clicking "accept" you agree not to distribute either the file or its contents, and to adhere to the <em>All of Us</em> Privacy and Trust Principles. A record of your acceptance will be stored at the Data and Research Center.',
             isHTML: true,
             onTrue: function () {
-                if (count > 10000) {
+                if (count > exportLimit) {
                     workQueueExportWarningModel(location);
                 } else {
                     window.location = location;
@@ -69,6 +75,10 @@ $(document).ready(function() {
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
       { name: 'withdrawal', data: 'withdrawal', class: 'text-center' },
       { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
+      { name: 'patientStatusYes', visible: false, data: 'patientStatusYes', orderable: false },
+      { name: 'patientStatusNo', visible: false, data: 'patientStatusNo', orderable: false },
+      { name: 'patientStatusUnknown', visible: false, data: 'patientStatusUnknown', orderable: false },
+      { name: 'patientStatusNoAccess', visible: false, data: 'patientStatusNoAccess', orderable: false },
       { name: 'contactMethod', visible: false, data: 'contactMethod', orderable: false },
       { name: 'address', visible: false, data: 'address'},
       { name: 'email', visible: false, data: 'email' },
@@ -141,7 +151,8 @@ $(document).ready(function() {
                     '.col-group-inperson:not(.col-group-default)',
                     '.col-group-inperson-time',
                     '.col-group-demographics',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-patient-status'
                 ]
             },
             {
@@ -157,7 +168,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-inperson-time',
                     '.col-group-demographics',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-patient-status'
                 ]
             },
             {
@@ -173,7 +185,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-inperson-time',
                     '.col-group-demographics',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-patient-status'
                 ]
             },
             {
@@ -189,7 +202,8 @@ $(document).ready(function() {
                     '.col-group-ppi-time',
                     '.col-group-inperson-time',
                     '.col-group-demographics',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-patient-status'
                 ]
             },
             {
@@ -205,7 +219,8 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-demographics',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-patient-status'
                 ]
             },
             {
@@ -217,6 +232,25 @@ $(document).ready(function() {
                 ],
                 hide: [
                     '.col-group-info',
+                    '.col-group-inperson',
+                    '.col-group-inperson-time',
+                    '.col-group-ppi',
+                    '.col-group-ppi-time',
+                    '.col-group-contact',
+                    '.col-group-patient-status'
+                ]
+            },
+            {
+                extend: 'colvisGroup',
+                text: 'Patient Status',
+                show: [
+                    'dateOfBirth:name',
+                    '.col-group-default',
+                    '.col-group-patient-status'
+                ],
+                hide: [
+                    '.col-group-demographics',
+                    '.col-group-info:not(.col-group-default)',
                     '.col-group-inperson',
                     '.col-group-inperson-time',
                     '.col-group-ppi',
@@ -238,7 +272,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-inperson-time',
                     '.col-group-ppi',
-                    '.col-group-ppi-time'
+                    '.col-group-ppi-time',
+                    '.col-group-patient-status'
                 ]
             },
             {
