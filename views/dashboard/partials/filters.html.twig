@@ -34,7 +34,7 @@
                             {% if show_recruitment_centers == true %}
                             <h4>Recruitment Origin <a href="javascript:void(0);" class="toggle-all-center-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
                             {% for group, centers in recruitment_centers %}
-                                {% set group_id = group|lower|split(' ')|join('-') %}
+                                {% set group_id = group|slugify %}
                                 <ul class="list-group {{ group_id }}-center-filters">
                                     <li class="list-group-item"><h4 class="list-group-item-heading">{{ group }}
                                             {% if centers|length > 1 %}
@@ -57,7 +57,7 @@
                             {% if show_organizations == true %}
                             <h4>Organization <a href="javascript:void(0);" class="toggle-all-organization-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
                             {% for group, orgs in organizations %}
-                                {% set group_id = group|lower|split(' ')|join('-') %}
+                                {% set group_id = group|slugify %}
                                 <ul class="list-group {{ group_id }}-organization-filters">
                                     <li class="list-group-item"><h4 class="list-group-item-heading">{{ group }}
                                             {% if orgs|length > 1 %}
