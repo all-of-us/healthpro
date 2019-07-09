@@ -23,6 +23,7 @@ class HpoApplication extends AbstractApplication
 
         $rdrOptions = [];
         if ($this->isLocal()) {
+            putenv('DATASTORE_EMULATOR_HOST=' . self::DATASTORE_EMULATOR_HOST);
             $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
             if (file_exists($keyFile)) {
                 $rdrOptions['key_file'] = $keyFile;

@@ -31,6 +31,7 @@ abstract class AbstractApplication extends Application
     const ENV_STABLE  = 'stable';  // security testing / training environment
     const ENV_PROD  = 'prod';  // production environment
     const DEFAULT_TIMEZONE = 'America/New_York';
+    const DATASTORE_EMULATOR_HOST = 'localhost:8081';
 
     protected $name;
     protected $configuration = [];
