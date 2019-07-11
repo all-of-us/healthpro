@@ -98,7 +98,6 @@ $(document).ready(function() {
     tableColumns.push(
       { name: 'pairedSite', data: 'pairedSite' },
       { name: 'pairedOrganization', data: 'pairedOrganization' },
-      { name: 'numberDistinctVisits', visible: false, data: 'numberDistinctVisits', class: 'text-center' },
       { name: 'physicalMeasurementsStatus', data: 'physicalMeasurementsStatus', class: 'text-center' },
       { name: 'evaluationFinalizedSite', visible: false, data: 'evaluationFinalizedSite', orderable: false },
       { name: 'biobankDnaStatus', data: 'biobankDnaStatus', class: 'text-center' },

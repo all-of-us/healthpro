@@ -335,7 +335,6 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Patient Status: No Access';
                 $headers[] = 'Patient Status: Unknown';
             }
-            $headers[] = 'PM&B Visits';
             fputcsv($output, $headers);
 
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
@@ -414,7 +413,6 @@ class WorkQueueController extends AbstractController
                         $row[] = $workQueue->getPatientStatus($participant, 'NO ACCESS', 'export');
                         $row[] = $workQueue->getPatientStatus($participant, 'UNKNOWN', 'export');
                     }
-                    $row[] = $participant->numberDistinctVisits;
                     fputcsv($output, $row);
                 }
                 unset($participants);
