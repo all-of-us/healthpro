@@ -47,7 +47,8 @@ var gulp = require('gulp');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
-var cssnano = require('gulp-cssnano');
+var postcss = require('gulp-postcss');
+var cssnano = require('cssnano');
 var cssconcat = require('gulp-concat-css');
 var sourcemaps = require('gulp-sourcemaps');
 var merge = require('merge-stream');
@@ -59,8 +60,8 @@ gulp.task('compile-js', function() {
         .pipe(concat('all.js'))
         .pipe(gulp.dest(destDir))
         .pipe(sourcemaps.init())
-            .pipe(uglify())
-            .pipe(rename('all.min.js'))
+        .pipe(uglify())
+        .pipe(rename('all.min.js'))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(destDir));
 });
@@ -74,7 +75,7 @@ gulp.task('compile-css', function() {
     var lib = gulp.src(ASSETS.css)
         .pipe(concat('lib.css'))
         .pipe(gulp.dest(destDir))
-        .pipe(cssnano({zindex: false}))
+        .pipe(postcss([cssnano()]))
         .pipe(rename('lib.min.css'))
         .pipe(gulp.dest(destDir));
 
@@ -83,8 +84,8 @@ gulp.task('compile-css', function() {
         .pipe(cssconcat(cssDir + '/app.css'))
         .pipe(gulp.dest(localDestDir))
         .pipe(sourcemaps.init())
-            .pipe(cssnano({zindex: false}))
-            .pipe(rename(cssDir + '/app.min.css'))
+        .pipe(postcss([cssnano()]))
+        .pipe(rename(cssDir + '/app.min.css'))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(localDestDir));
 
