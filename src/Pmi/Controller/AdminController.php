@@ -519,6 +519,7 @@ class AdminController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
+        ksort($participant);
         return $app['twig']->render('admin/testing/participant.html.twig', [
             'participant' => $participant
         ]);
