@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+{% block title %}Participants - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2><i class="fa fa-user" aria-hidden="true"></i> RDR Participant Summary Details</h2>
+    </div>
+    <a href="{{ path('admin_participants') }}" class="pull-right">Return to Participant Lookup</a>
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-bordered">
+                {% for key,value in participant %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td>
+                            {% if value is iterable %}
+                                {{ value|json_encode }}
+                            {% else %}
+                                {{ value }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endblock %}
