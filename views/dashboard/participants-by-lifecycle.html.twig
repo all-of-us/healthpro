@@ -28,15 +28,32 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-9 plotly-div" id="plotly-participants-by-lifecycle"></div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <h4 class="text-center">Raw Data</h4>
-                    <div class="table-responsive">
-                        <div id="participants-by-lifecycle-table"></div>
+                <div class="col-md-9 plotly-div">
+                  <!-- Overview -->
+                  <div id="plotly-participants-by-lifecycle-overview"></div>
+                  <div class="table-responsive">
+                      <div id="participants-by-lifecycle-overview-table"></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <hr />
                     </div>
-                </div>
+                  </div>
+                  <!-- Baseline PPI -->
+                  <div id="plotly-participants-by-lifecycle-baseline"></div>
+                  <div class="table-responsive">
+                      <div id="participants-by-lifecycle-baseline-table"></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <hr />
+                    </div>
+                  </div>
+                  <!-- Retention PPI -->
+                  <div id="plotly-participants-by-lifecycle-retention"></div>
+                  <div class="table-responsive">
+                      <div id="participants-by-lifecycle-retention-table"></div>
+                  </div>
             </div>
         </div>
     </div>
@@ -54,8 +71,8 @@
             return false;
         }
 
-        var lcWidth = $('#plotly-participants-by-lifecycle').width() - 30;
-        var spinnerLoc = 'plotly-participants-by-lifecycle';
+        var lcWidth = $('#plotly-participants-by-lifecycle-overview').width() - 30;
+        var spinnerLoc = 'plotly-participants-by-lifecycle-overview';
         if (dialogType == 'spinner') {
             launchSpinner(spinnerLoc);
         } else if (dialogType == 'modal') {
@@ -72,10 +89,13 @@
             lifecycleCenters = ['ALL'];
         }
 
-        // load data from metrics API
+        /**
+         * Overview
+         */
         $.getJSON('/dashboard/metrics_load_lifecycle', {
           csrf_token: CsrfToken,
           stratification: 'LIFECYCLE',
+          mode: 'overview',
           end_date: lcEndDate,
           centers: lifecycleCenters,
           history: true
@@ -110,12 +130,126 @@
                 }
 
                 // load table data
-                var lcTable = $('#participants-by-lifecycle-table');
+                var lcTable = $('#participants-by-lifecycle-overview-table');
                 loadTableData(lcTable, data, 'Status');
 
                 // render plot, remove plotly link and stop spinner
-                Plotly.newPlot('plotly-participants-by-lifecycle', data, lcLayout, PLOTLY_OPTS);
-                removePlotlyLink('plotly-participants-by-lifecycle');
+                Plotly.newPlot('plotly-participants-by-lifecycle-overview', data, lcLayout, PLOTLY_OPTS);
+                removePlotlyLink('plotly-participants-by-lifecycle-overview');
+                stopSpinner(spinnerLoc);
+
+                if (dialogType == 'modal') {
+                    $('#loading-modal').modal('hide');
+                }
+            } else {
+                setMetricsError(spinnerLoc);
+            }
+        });
+
+        /**
+         * PPI Baseline
+         */
+        $.getJSON('/dashboard/metrics_load_lifecycle', {
+          csrf_token: CsrfToken,
+          stratification: 'LIFECYCLE',
+          mode: 'ppi_baseline',
+          end_date: lcEndDate,
+          centers: lifecycleCenters,
+          history: true
+        })
+        .done(function(data) {
+            if (data.length != 0) {
+                var lcAnnot = [];
+                var lcTitle = '<b>Baseline PPI Module Completion</b> as of ' + lcEndDate;
+                var lcLayout = {
+                    title: lcTitle,
+                    font: PLOTLY_LABEL_FONT,
+                    barmode: 'stack',
+                    width: lcWidth,
+                    height: lcWidth / 1.66,
+                    annotations: lcAnnot,
+                    xaxis: {
+                        tickangle: -45,
+                        fixedrange: true
+                    },
+                    yaxis: {
+                        fixedrange: true
+                    },
+                    margin: {
+                        b: 150,
+                        pad: 5
+                    }
+                };
+
+                // load column totals if requested
+                if (lcShowAnnot) {
+                    loadBarChartAnnotations(data, lcAnnot);
+                }
+
+                // load table data
+                var lcTable = $('#participants-by-lifecycle-baseline-table');
+                loadTableData(lcTable, data, 'Status');
+
+                // render plot, remove plotly link and stop spinner
+                Plotly.newPlot('plotly-participants-by-lifecycle-baseline', data, lcLayout, PLOTLY_OPTS);
+                removePlotlyLink('plotly-participants-by-lifecycle-baseline');
+                stopSpinner(spinnerLoc);
+
+                if (dialogType == 'modal') {
+                    $('#loading-modal').modal('hide');
+                }
+            } else {
+                setMetricsError(spinnerLoc);
+            }
+        });
+
+        /**
+         * PPI Retention
+         */
+        $.getJSON('/dashboard/metrics_load_lifecycle', {
+          csrf_token: CsrfToken,
+          stratification: 'LIFECYCLE',
+          mode: 'ppi_retention',
+          end_date: lcEndDate,
+          centers: lifecycleCenters,
+          history: true
+        })
+        .done(function(data) {
+            if (data.length != 0) {
+                var lcAnnot = [];
+                var lcTitle = '<b>Retention PPI Module Completion</b> as of ' + lcEndDate;
+                var lcLayout = {
+                    title: lcTitle,
+                    font: PLOTLY_LABEL_FONT,
+                    barmode: 'stack',
+                    width: lcWidth,
+                    height: lcWidth / 1.66,
+                    annotations: lcAnnot,
+                    xaxis: {
+                        tickangle: -45,
+                        fixedrange: true
+                    },
+                    yaxis: {
+                        fixedrange: true
+                    },
+                    margin: {
+                        b: 150,
+                        pad: 5
+                    }
+                };
+
+                // load column totals if requested
+                if (lcShowAnnot) {
+                    loadBarChartAnnotations(data, lcAnnot);
+                }
+
+                // load table data
+                var lcTable = $('#participants-by-lifecycle-retention-table');
+                loadTableData(lcTable, data, 'Status');
+
+                // render plot, remove plotly link and stop spinner
+                Plotly.newPlot('plotly-participants-by-lifecycle-retention', data, lcLayout, PLOTLY_OPTS);
+                removePlotlyLink('plotly-participants-by-lifecycle-retention');
                 stopSpinner(spinnerLoc);
 
                 if (dialogType == 'modal') {

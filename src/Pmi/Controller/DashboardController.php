@@ -652,6 +652,7 @@ class DashboardController extends AbstractController
         }
 
         // get request attributes
+        $mode = $request->get('mode');
         $stratification = $request->get('stratification');
         $end_date = $request->get('end_date');
         $centers = $request->get('centers');
@@ -684,24 +685,51 @@ class DashboardController extends AbstractController
             ], 400);
         }
 
-        $display_values = [
-            'Registered' => 'Registered',
-            'Consent_Enrollment' => 'Primary Consent',
-            'Consent_Complete' => 'Primary+EHR/EHR-lite Consent',
-            'PPI_Module_The_Basics' => 'PPI Module: The Basics',
-            'PPI_Module_Overall_Health' => 'PPI Module: Overall Health',
-            'PPI_Module_Lifestyle' => 'PPI Module: Lifestyle',
-            'Baseline_PPI_Modules_Complete' => 'Baseline PPI Modules Complete',
-            'Physical_Measurements' => 'Physical Measurements',
-            'Samples_Received' => 'Samples Received',
-            'Full_Participant' => 'Core Participant'
-        ];
+        switch ($mode) {
+            case 'ppi_baseline':
+                $display_values = [
+                    'PPI_Module_The_Basics' => 'PPI Module: The Basics',
+                    'PPI_Module_Overall_Health' => 'PPI Module: Overall Health',
+                    'PPI_Module_Lifestyle' => 'PPI Module: Lifestyle',
+                    'Baseline_PPI_Modules_Complete' => 'Baseline PPI Modules Complete',
+                ];
+                break;
+            case 'ppi_retention':
+                $display_values = [
+                    'PPI_Module_Healthcare_Access' => 'PPI Module: Healthcare Access and Utilization',
+                    'PPI_Module_Family_Health' => 'PPI Module: Family History',
+                    'PPI_Module_Medical_History' => 'PPI Module: Personal Medical History',
+                    'PPI_Retention_Modules_Complete' => '3 Retention Modules Complete',
+                ];
+                break;
+            case 'overview':
+            default:
+                $display_values = [
+                    'Registered' => 'Registered',
+                    'Consent_Enrollment' => 'Primary Consent',
+                    'Consent_Complete' => 'Primary+EHR/EHR-lite Consent',
+                    'Baseline_PPI_Modules_Complete' => 'Baseline PPI Modules Complete',
+                    'PPI_Retention_Modules_Complete' => '3 Retention Modules Complete',
+                    'Physical_Measurements' => 'Physical Measurements',
+                    'Samples_Received' => 'Samples Received',
+                    'Full_Participant' => 'Core Participant'
+                ];
+                break;
+        }
 
         $completed = [];
         $completed_text = [];
         $not_completed = [];
         $not_completed_text = [];
         foreach ($display_values as $display_key => $display_val) {
+            // Guard against empty values
+            if (!isset($metrics[0]['metrics']['completed'][$display_key])) {
+                $metrics[0]['metrics']['completed'][$display_key] = null;
+            }
+            if (!isset($metrics[0]['metrics']['not_completed'][$display_key])) {
+                $metrics[0]['metrics']['not_completed'][$display_key] = null;
+            }
+
             array_push($completed, $metrics[0]['metrics']['completed'][$display_key]);
             array_push($completed_text, sprintf(
                 '%s: %d',
@@ -741,6 +769,7 @@ class DashboardController extends AbstractController
                 ]
             ]
         ];
+
         // return json
         return $app->json($pipeline_data);
     }
