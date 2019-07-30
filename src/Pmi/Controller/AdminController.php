@@ -44,7 +44,9 @@ class AdminController extends AbstractController
             'defaults' => ['id' => null]
         ]],
         ['patientStatusRdrJson', '/patientstatus/{participantId}/organization/{organizationId}/rdr.json', ['method' => 'GET']],
-        ['patientStatusHistoryRdrJson', '/patientstatus/{participantId}/organization/{organizationId}/history/rdr.json', ['method' => 'GET']]
+        ['patientStatusHistoryRdrJson', '/patientstatus/{participantId}/organization/{organizationId}/history/rdr.json', ['method' => 'GET']],
+        ['participants', '/testing/participants', ['method' => 'GET|POST']],
+        ['participant', '/testing/participant/{id}', ['method' => 'GET']],
     ];
 
     public function homeAction(Application $app)
@@ -478,5 +480,48 @@ class AdminController extends AbstractController
     {
         $object = $app['pmi.drc.participants']->getPatientStatusHistory($participantId, $organizationId);
         return $app->jsonPrettyPrint($object);
+    }
+
+    public function participantsAction(Application $app, Request $request)
+    {
+        $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
+            ->add('participantId', Type\TextType::class, [
+                'label' => 'Participant ID',
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'placeholder' => 'P000000000'
+                ]
+            ])
+            ->getForm();
+
+        $idForm->handleRequest($request);
+
+        if ($idForm->isValid()) {
+            $id = $idForm->get('participantId')->getData();
+            $participant = $app['pmi.drc.participants']->getById($id);
+            if ($participant) {
+                return $app->redirectToRoute('admin_participant', ['id' => $id]);
+            }
+            $app->addFlashError('Participant ID not found');
+        }
+
+        return $app['twig']->render('admin/testing/participants.html.twig', [
+            'idForm' => $idForm->createView()
+        ]);
+    }
+
+    public function participantAction($id, Application $app, Request $request)
+    {
+        $participant = $app['pmi.drc.participants']->getByIdRaw($id);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        ksort($participant);
+        return $app['twig']->render('admin/testing/participant.html.twig', [
+            'participant' => $participant
+        ]);
     }
 }
