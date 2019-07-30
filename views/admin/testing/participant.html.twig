@@ -5,22 +5,18 @@
         <h2><i class="fa fa-user" aria-hidden="true"></i> RDR Participant Summary Details</h2>
     </div>
     <a href="{{ path('admin_participants') }}" class="pull-right">Return to Participant Summary Lookup</a>
-    <div class="row">
-        <div class="col-sm-12">
-            <table class="table table-bordered table-striped">
-                {% for key,value in participant %}
-                    <tr>
-                        <td>{{ key }}</td>
-                        <td>
-                            {% if value is iterable %}
-                                {{ value|json_encode }}
-                            {% else %}
-                                {{ value }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
+    <table class="table table-bordered table-striped">
+        {% for key,value in participant %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>
+                    {% if value is iterable %}
+                        {{ value|json_encode }}
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
 {% endblock %}
