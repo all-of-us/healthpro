@@ -657,7 +657,6 @@ class DashboardController extends AbstractController
         $end_date = $request->get('end_date');
         $centers = $request->get('centers');
         $enrollment_statuses = $request->get('enrollment_statuses');
-        $history = $request->get('history', true); // Data available only through history flag
 
         // Use 'ALL' keyword to send empty filter for awardee
         if ($centers == ['ALL']) {
@@ -674,7 +673,8 @@ class DashboardController extends AbstractController
             $centers,
             $enrollment_statuses,
             [
-                'history' => $history
+                'history' => true,
+                'version' => self::API_VERSION
             ]
         );
         $metrics = $this->combineHPOsByDate($metrics, $centers);
