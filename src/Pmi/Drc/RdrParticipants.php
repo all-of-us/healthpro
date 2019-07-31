@@ -422,4 +422,15 @@ class RdrParticipants
         }
         return false;
     }
+
+    public function getByIdRaw($id)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
+            $participant = json_decode($response->getBody()->getContents(), true);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            return false;
+        }
+        return $participant;
+    }
 }

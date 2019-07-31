@@ -808,17 +808,6 @@ class DashboardController extends AbstractController
                 $ehr_data = [
                     [
                         "x" => $dates,
-                        "y" => [(int) $metrics['EHR_RECEIVED']],
-                        "text" => [number_format($metrics['EHR_RECEIVED'])],
-                        "type" => 'bar',
-                        "hoverinfo" => 'text+name',
-                        "name" => 'EHR Data Received',
-                        "marker" => [
-                            "color" => $this->getColorBrewerVal(1)
-                        ]
-                    ],
-                    [
-                        "x" => $dates,
                         "y" => [(int) $metrics['EHR_CONSENTED']],
                         "text" => [number_format($metrics['EHR_CONSENTED'])],
                         "type" => 'bar',
@@ -828,6 +817,17 @@ class DashboardController extends AbstractController
                             "color" => $this->getColorBrewerVal(0)
                         ]
                     ],
+                    [
+                        "x" => $dates,
+                        "y" => [(int) $metrics['EHR_RECEIVED']],
+                        "text" => [number_format($metrics['EHR_RECEIVED'])],
+                        "type" => 'bar',
+                        "hoverinfo" => 'text+name',
+                        "name" => 'EHR Data Received',
+                        "marker" => [
+                            "color" => $this->getColorBrewerVal(1)
+                        ]
+                    ]
                 ];
                 break;
             case 'OrganizationsActiveOverTime':
