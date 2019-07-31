@@ -92,10 +92,16 @@ function renderMetricsEhrPlots() {
             .done(function(data) {
                 $(plotlyDiv).empty();
                 $(tableDiv).empty();
+                var plotlyTitle = '<b>EHR Consent</b> vs <b>EHR Data</b>';
+                if (ehrOrganizations.length == $('.organization-filter').length) {
+                  plotlyTitle += ' for <b>All Organizations</b>';
+                } else {
+                  plotlyTitle += ' for <b>Selected Organizations</b>';
+                }
                 if (data.length != 0) {
                     var progressAnnot = [];
                     var ehrParticipantLayout = {
-                        title: '<b>EHR Consent</b> vs <b>EHR Data</b>',
+                        title: plotlyTitle,
                         font: PLOTLY_LABEL_FONT,
                         width: ehrParticipantWidth,
                         height: ehrParticipantWidth / 1.66,
