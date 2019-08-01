@@ -92,10 +92,16 @@ function renderMetricsEhrPlots() {
             .done(function(data) {
                 $(plotlyDiv).empty();
                 $(tableDiv).empty();
+                var plotlyTitle = '<b>EHR Consent</b> vs <b>EHR Data</b>';
+                if (ehrOrganizations.length == $('.organization-filter').length) {
+                  plotlyTitle += ' for <b>All Organizations</b>';
+                } else {
+                  plotlyTitle += ' for <b>Selected Organizations</b>';
+                }
                 if (data.length != 0) {
                     var progressAnnot = [];
                     var ehrParticipantLayout = {
-                        title: '<b>EHR Consent</b> vs <b>EHR Data</b>',
+                        title: plotlyTitle,
                         font: PLOTLY_LABEL_FONT,
                         width: ehrParticipantWidth,
                         height: ehrParticipantWidth / 1.66,
@@ -147,8 +153,13 @@ function renderMetricsEhrPlots() {
                 $(tableDiv).empty()
                 if (data.length != 0) {
                     // load table data
-                    $(tableDiv).html('<table class="table table-striped"><thead></thead><tbody></tbody></table>')
-                    $('thead', tableDiv).append('<tr><th>Organization</th><th>Total Participants</th><th>Total EHR Consent</th><th>Total Core</th><th>Total EHR Data Received</th><th>Last EHR Submission Date</th></tr>');
+                    $(tableDiv).html('<table id="table_ehr_data" class="table table-striped"><thead><tr></tr></thead><tbody></tbody></table>')
+                    $('thead tr', tableDiv).append($('<th id="th_organization">Organization</th>'));
+                    $('thead tr', tableDiv).append($('<th id="th_total_participants">Total Participants</th>'));
+                    $('thead tr', tableDiv).append($('<th id="th_total_ehr_consent">Total EHR Consent</th>'));
+                    $('thead tr', tableDiv).append($('<th id="th_total_core">Total Core</th>'));
+                    $('thead tr', tableDiv).append($('<th id="th_total_ehr_data_received">Total EHR Data Received</th>'));
+                    $('thead tr', tableDiv).append($('<th id="th_last_ehr_submission_date">Last EHR Submission Date</th>'));
                     // Calculate totals to show at top
                     var columnTotals = {
                       total_primary_consented: 0,
@@ -162,25 +173,41 @@ function renderMetricsEhrPlots() {
                       columnTotals.total_core_participants += row.total_core_participants
                       columnTotals.total_ehr_data_received += row.total_ehr_data_received
                     });
+                    // Render total row as part of thead
                     var totalRow = $('<tr class="info" />')
-                    totalRow.append('<td>Total</td>')
-                    totalRow.append('<td>' +  columnTotals.total_primary_consented + '</td>')
-                    totalRow.append('<td>' +  columnTotals.total_ehr_consented + '</td>')
-                    totalRow.append('<td>' +  columnTotals.total_core_participants + '</td>')
-                    totalRow.append('<td>' +  columnTotals.total_ehr_data_received + '</td>')
-                    totalRow.append('<td>&nbsp;</td>')
+                    totalRow.append('<th>Total</th>')
+                    totalRow.append('<th class="text-right">' +  columnTotals.total_primary_consented + '</th>')
+                    totalRow.append('<th class="text-right">' +  columnTotals.total_ehr_consented + '</th>')
+                    totalRow.append('<th class="text-right">' +  columnTotals.total_core_participants + '</th>')
+                    totalRow.append('<th class="text-right">' +  columnTotals.total_ehr_data_received + '</th>')
+                    totalRow.append('<th>&nbsp;</th>')
                     totalRow.css({fontWeight: 'bold'})
-                    $('tbody', tableDiv).append(totalRow)
+                    $('thead', tableDiv).append(totalRow)
                     // Render row level data
                     $(data).each(function(i, row) {
                         var organizationRow = $('<tr />')
                         organizationRow.append('<td>' + row.organization_name + '</td>')
-                        organizationRow.append('<td>' + row.total_primary_consented + '</td>')
-                        organizationRow.append('<td>' + row.total_ehr_consented + '</td>')
-                        organizationRow.append('<td>' + row.total_core_participants + '</td>')
-                        organizationRow.append('<td>' + row.total_ehr_data_received + '</td>')
-                        organizationRow.append('<td>' + (row.last_ehr_submission_date ? row.last_ehr_submission_date : '-') + '</td>')
+                        organizationRow.append('<td class="text-right">' + row.total_primary_consented + '</td>')
+                        organizationRow.append('<td class="text-right">' + row.total_ehr_consented + '</td>')
+                        organizationRow.append('<td class="text-right">' + row.total_core_participants + '</td>')
+                        organizationRow.append('<td class="text-right">' + row.total_ehr_data_received + '</td>')
+                        organizationRow.append('<td class="text-right">' + (row.last_ehr_submission_date ? row.last_ehr_submission_date : '-') + '</td>')
                         $('tbody', tableDiv).append(organizationRow)
+                    });
+                    // Add tooltips to rendered table columns
+                    var infoIcon = $('<a tabindex="0" role="button" data-trigger="hover" data-toggle="popover"><i class="fa fa-question-circle"></i></a>').css({marginLeft: '0.5em', color: 'black'});
+                    $('#th_total_participants').append(infoIcon.clone().attr('title', 'Total Participants').data('content', 'The count of individuals who have signed the AOURP primary consent and are paired with the organization listed').popover({container: 'body', html: 'true'}))
+                    $('#th_total_ehr_consent').append(infoIcon.clone().attr('title', 'Total EHR Consent').data('content', 'The count of participants who have signed the EHR consent').popover({container: 'body', html: 'true'}))
+                    $('#th_total_core').append(infoIcon.clone().attr('title', 'Core Participants').data('content', 'Total number of participants with a PID, signed primary consent, signed EHR Consent, completed the first three PPI Modules, submitted Physical Measurements and have a Biosample that has been received at the Biobank for sequencing').popover({container: 'body', html: 'true'}))
+                    $('#th_total_ehr_data_received').append(infoIcon.clone().attr('title', 'EHR Data Received').data('content', 'Total number of paired participants with EHR data; <strong>Note:</strong> Not all organizations listed are involved in the EHR data upload process. If an organization is listed as having paired participants with EHR Data, but does not list any EHR Submission date in the next column, the data will have been uploaded by an associated organization').popover({container: 'body', html: 'true'}))
+                    $('#th_last_ehr_submission_date').append(infoIcon.clone().attr('title', 'Last EHR Submission Date').data('content', 'Most recent date of EHR data upload by organization, pulled from bucket logs; <strong>Note:</strong> Not all organizations listed are involved in the EHR data upload process').popover({container: 'body', html: 'true'}))
+
+                    // Add DataTable controls
+                    $('#table_ehr_data').DataTable({
+                      sortCellsTop: true,
+                      paging: false,
+                      searching: false,
+                      info: false
                     });
                 } else {
                     showError(plotlyDiv, ErrorMessages.no_data);
