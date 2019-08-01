@@ -484,6 +484,9 @@ class AdminController extends AbstractController
 
     public function participantsAction(Application $app, Request $request)
     {
+        if ($app->isProd()) {
+            $app->abort(404);
+        }
         $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
             ->add('participantId', Type\TextType::class, [
                 'label' => 'Participant ID',
@@ -515,6 +518,9 @@ class AdminController extends AbstractController
 
     public function participantAction($id, Application $app, Request $request)
     {
+        if ($app->isProd()) {
+            $app->abort(404);
+        }
         $participant = $app['pmi.drc.participants']->getByIdRaw($id);
         if (!$participant) {
             $app->abort(404);
