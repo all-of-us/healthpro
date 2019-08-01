@@ -24,10 +24,10 @@ class CodeBookTest extends \PHPUnit_Framework_TestCase
     public function testAgeRangeConversion()
     {
         $ten = (new \DateTime('-10 years'))->format('Y-m-d');
-        $twenty = (new \DateTime('-20 years'))->format('Y-m-d');
+        $twenty = (new \DateTime('-21 years'))->format('Y-m-d');
         $eighty = (new \DateTime('-80 years'))->format('Y-m-d');
 
-        $this->assertSame(["le{$ten}", "ge{$twenty}"], CodeBook::ageRangeToDob('10-20'));
+        $this->assertSame(["le{$ten}", "gt{$twenty}"], CodeBook::ageRangeToDob('10-20'));
         $this->assertSame(["le{$eighty}"], CodeBook::ageRangeToDob('80-'));
     }
 }
