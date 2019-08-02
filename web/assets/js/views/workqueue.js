@@ -62,6 +62,7 @@ $(document).ready(function() {
     var tableColumns = [];
     tableColumns.push(
       { name: 'lastName', data: 'lastName' },
+      { name: 'middleName', data: 'middleName' },
       { name: 'firstName', data: 'firstName' },
       { name: 'dateOfBirth', data: 'dateOfBirth' },
       { name: 'participantId', visible: false, data: 'participantId' },
