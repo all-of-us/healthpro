@@ -148,8 +148,9 @@ class CodeBook
         $parameters[] = 'le' . $start->format('Y-m-d');
 
         if (isset($matches[2])) {
-            $end = new \DateTime("-{$matches[2]} years");
-            $parameters[] = 'ge' . $end->format('Y-m-d');
+            $endRange = $matches[2] + 1;
+            $end = new \DateTime("-{$endRange} years");
+            $parameters[] = 'gt' . $end->format('Y-m-d');
         }
 
         return $parameters;
