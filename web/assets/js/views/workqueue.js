@@ -62,6 +62,7 @@ $(document).ready(function() {
     var tableColumns = [];
     tableColumns.push(
       { name: 'lastName', data: 'lastName' },
+      { name: 'middleName', data: 'middleName' },
       { name: 'firstName', data: 'firstName' },
       { name: 'dateOfBirth', data: 'dateOfBirth' },
       { name: 'participantId', visible: false, data: 'participantId' },
@@ -128,7 +129,7 @@ $(document).ready(function() {
             url: url,
             type: "POST"
         },
-        order: [[7, 'desc']],
+        order: [[8, 'desc']],
         dom: 'lBrtip',
         columns: tableColumns,
         pageLength: 25,
