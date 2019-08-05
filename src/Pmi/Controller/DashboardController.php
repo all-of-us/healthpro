@@ -688,17 +688,17 @@ class DashboardController extends AbstractController
         switch ($mode) {
             case 'ppi_baseline':
                 $display_values = [
-                    'PPI_Module_The_Basics' => 'PPI Module: The Basics',
-                    'PPI_Module_Overall_Health' => 'PPI Module: Overall Health',
-                    'PPI_Module_Lifestyle' => 'PPI Module: Lifestyle',
-                    'Baseline_PPI_Modules_Complete' => 'Baseline PPI Modules Complete',
+                    'PPI_Module_The_Basics' => 'The Basics',
+                    'PPI_Module_Overall_Health' => 'Overall Health',
+                    'PPI_Module_Lifestyle' => 'Lifestyle',
+                    'Baseline_PPI_Modules_Complete' => '3 Baseline Modules Complete',
                 ];
                 break;
             case 'ppi_retention':
                 $display_values = [
-                    'PPI_Module_Healthcare_Access' => 'PPI Module: Healthcare Access and Utilization',
-                    'PPI_Module_Family_Health' => 'PPI Module: Family History',
-                    'PPI_Module_Medical_History' => 'PPI Module: Personal Medical History',
+                    'PPI_Module_Healthcare_Access' => 'Healthcare Access and Utilization',
+                    'PPI_Module_Family_Health' => 'Family History',
+                    'PPI_Module_Medical_History' => 'Personal Medical History',
                     'PPI_Retention_Modules_Complete' => '3 Retention Modules Complete',
                 ];
                 break;
@@ -709,7 +709,7 @@ class DashboardController extends AbstractController
                     'Consent_Enrollment' => 'Primary Consent',
                     'Consent_Complete' => 'Primary+EHR/EHR-lite Consent',
                     'Baseline_PPI_Modules_Complete' => 'Baseline PPI Modules Complete',
-                    'PPI_Retention_Modules_Complete' => '3 Retention Modules Complete',
+                    'PPI_Retention_Modules_Complete' => 'Retention PPI Modules Complete',
                     'Physical_Measurements' => 'Physical Measurements',
                     'Samples_Received' => 'Samples Received',
                     'Full_Participant' => 'Core Participant'
