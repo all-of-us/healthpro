@@ -15,7 +15,6 @@ class WorkQueue
     // These are used to map a DataTables column index to an RDR field for sorting
     public static $wQColumns = [
         'lastName',
-        'middleName',
         'firstName',
         'dateOfBirth',
         'participantId',
@@ -269,11 +268,12 @@ class WorkQueue
             //Identifiers and status
             if($app->hasRole('ROLE_USER')) {
                 $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
-                $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
-                $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
             } else {
                 $row['lastName'] = $e($participant->lastName);
-                $row['middleName'] = $e($participant->middleName);
+            }
+            if ($app->hasRole('ROLE_USER')) {
+                $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
+            } else {
                 $row['firstName'] = $e($participant->firstName);
             }
             if (!empty($participant->dob)) {

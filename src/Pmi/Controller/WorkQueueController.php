@@ -334,7 +334,6 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Patient Status: No';
                 $headers[] = 'Patient Status: No Access';
                 $headers[] = 'Patient Status: Unknown';
-                $headers[] = 'Middle Initial';
             }
             fputcsv($output, $headers);
 
@@ -413,7 +412,6 @@ class WorkQueueController extends AbstractController
                         $row[] = $workQueue->getPatientStatus($participant, 'NO', 'export');
                         $row[] = $workQueue->getPatientStatus($participant, 'NO ACCESS', 'export');
                         $row[] = $workQueue->getPatientStatus($participant, 'UNKNOWN', 'export');
-                        $row[] = $participant->middleName;
                     }
                     fputcsv($output, $row);
                 }
