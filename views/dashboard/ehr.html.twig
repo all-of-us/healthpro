@@ -175,7 +175,7 @@ function renderMetricsEhrPlots() {
                       columnTotals.total_ehr_data_received += row.total_ehr_data_received
                     });
                     // Calculate EHR percentage
-                    columnTotals.total_percent = ((columnTotals.total_ehr_data_received/columnTotals.total_ehr_consented)*100).toFixed(2)
+                    columnTotals.total_percent = ((columnTotals.total_ehr_data_received/columnTotals.total_ehr_consented)*100).toFixed(0)
                     // Render total row as part of thead
                     var totalRow = $('<tr class="info" />')
                     totalRow.append('<th>Total</th>')
@@ -190,7 +190,12 @@ function renderMetricsEhrPlots() {
                     // Render row level data
                     $(data).each(function(i, row) {
                         if (row.total_ehr_consented > 0 && row.total_ehr_data_received > 0) {
-                            row.total_percent = ((row.total_ehr_data_received/row.total_ehr_consented)*100).toFixed(2)
+                            row.total_percent = ((row.total_ehr_data_received/row.total_ehr_consented)*100)
+                            if (row.total_percent < 1) {
+                              row.total_percent = row.total_percent.toFixed(1)
+                            } else {
+                              row.total_percent = row.total_percent.toFixed(0)
+                            }
                         } else {
                             row.total_percent = false;
                         }
