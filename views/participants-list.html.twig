@@ -12,7 +12,6 @@
             <thead>
             <tr>
                 <th>Last Name</th>
-                <th>Middle Initial</th>
                 <th>First Name</th>
                 <th>Date of Birth</th>
                 <th>ZIP Code</th>
@@ -28,7 +27,6 @@
                 {% for participant in participants %}
                     <tr>
                         <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}</a></td>
-                        <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.middleName }}</a></td>
                         <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a></td>
                         <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.dob ? participant.dob|date('n/j/Y') }}</a></td>
                         <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.zipCode }}</a></td>
