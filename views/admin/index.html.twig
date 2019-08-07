@@ -19,5 +19,8 @@
 
     <div class="text-center small" style="margin-top: 100px;">
         <strong>Debug tools:</strong> <a href="{{ path('admin_missingMeasurements') }}">Missing Physical Measurements</a> &bull; <a href="{{ path('admin_missingOrders') }}">Missing Biobank Orders</a>
+        {% if not app.isProd %}
+            &bull; <a href="{{ path('admin_participants') }}">Testing</a>
+        {% endif %}
     </div>
 {% endblock %}
