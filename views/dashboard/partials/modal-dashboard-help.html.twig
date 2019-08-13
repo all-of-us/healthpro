@@ -142,7 +142,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-          <h2>Participant by Lifecycle Phase</h2>
+          <h2>Participants by Lifecycle Phase</h2>
       </div>
       <div class="modal-body">
         <p>The Participants by Lifecycle Phase is a bar chart showing the progression of participants through the registration process. This measures counts at various milestones and gates 'eligibility' based on how many participants have completed the upstream events. The time points show are:</p>
@@ -150,18 +150,23 @@
           <li><strong>Registered</strong></li>
           <li><strong>Primary Consent</strong></li>
           <li><strong>Primary + EHR/EHR-lite Consent</strong></li>
-          <li><strong>PPI Module: The Basics</strong></li>
-          <li><strong>PPI Module: Overall Health</strong></li>
-          <li><strong>PPI Module: Lifestyle</strong></li>
-          <li><strong>Baseline PPI Modules Complete (3 previous PPI modules)</strong></li>
+          <li><strong>Baseline PPI Modules Complete (PPI 1-3)</strong></li>
           <li><strong>Physical Measurements recorded</strong></li>
           <li><strong>Samples Received</strong></li>
           <li><strong>Core Participant</strong></li>
+          <li><strong>Retention Modules Complete (PPI 4-6)*</strong>
+            <ul>
+              <li>*Eligibility for Retention Modules is defined as any participant that is 90 days post-completion of the primary consent and completion of all three Baseline PPI Modules (PPI 1-3). There is no requirement that a participant be a core participant to be offered the Retention Modules.</li>
+            </ul>
+          </li>
         </ul>
         <p>For the Registration, Consent, PPI modules, and Physical Measurements milestones, we are counting participants who have completed these milestones. Samples Received is defined as participants for whom <em>4ml of blood or saliva</em> has been collected and received at the Biobank for sequencing. Core Participants are defined as any participant that has completed all of the previous milestones.</p>
         <p>Eligibility for Consent is defined as any participant that has registered. Eligibility for any milestone from PPI modules onward is defined as any participant that has completed the primary consent.</p>
+        <p>Eligibility for Retention Modules is defined as any participant that is 90 days post-completion of the primary consent and completion of all three Baseline PPI Modules (PPI 1-3).</p>
+        <h3>Individual PPI Module Metrics</h3>
+        <p>The two bar charts below the Participants by Lifecycle Phase visualization provide metrics on overall eligibility and completion counts of individual PPI Modules, separated into views of Baseline Modules (PPI 1-3) and Retention Modules (PPI 4-6). Eligibility for Baseline Modules is defined as any participant that has completed the primary consent. Eligibility for Retention Modules is defined as any participant that is 90 days post-completion of the primary consent and completion of all three Baseline Modules.</p>
         <h3>General Usage/ Plot Options</h3>
-        <p>To view any individual metric, select it from the dropdown in the Plot Options pane and the associated plot will automatically update. Every plot has an end date that specifies the last day of metrics used to compute the plot. Changing any value in the <strong>Plot Options</strong> pane will cause the associated plot to automatically update.</p>
+        <p>To view any individual metric, select it from the dropdown in the <strong>Plot Options</strong> pane and the associated plot will automatically update. Every plot has an end date that specifies the last day of metrics used to compute the plot. Changing any value in the Plot Options pane will cause the associated plot to automatically update.</p>
         <h3>Advanced Filters</h3>
         <p>With any plot, you can filter the source data by selecting individual or groups of Awardees or, where available, Organizations. This action will calculate the selected metric by only using data corresponding to the selection(s). To view this data, select the desired centers individually and click <strong>Filter Results</strong>. You can also select/deselect entire groups or all centers by using the <strong>Group</strong> or <strong>All</strong> toggles, respectively.</p>
         <h3>Using Plots</h3>
