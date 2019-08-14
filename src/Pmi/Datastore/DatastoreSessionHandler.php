@@ -17,7 +17,8 @@ class DatastoreSessionHandler extends AbstractSessionHandler
         try {
             $session = Session::fetchOneById($id);
             if ($session) {
-                Session::deleteData($id);
+                $session = new Session();
+                $session->delete($id);
             }
         } catch (\Exception $e) {
         }
@@ -39,7 +40,8 @@ class DatastoreSessionHandler extends AbstractSessionHandler
     public function gc($maxlifetime)
     {
         $modified = new DateTime("-{$maxlifetime} seconds");
-        Session::gc('modified', $modified, '<');
+        $session = new Session();
+        $session->gc('modified', $modified, '<');
         return true;
     }
 
@@ -66,7 +68,9 @@ class DatastoreSessionHandler extends AbstractSessionHandler
                 'data' => $sessionData,
                 'modified' => new DateTime()
             ];
-            Session::upsertData($id, $data);
+            $session = new Session();
+            $session->setData($data);
+            $session->update($id);
             return true;
         } catch (\Exception $e) {
             return false;

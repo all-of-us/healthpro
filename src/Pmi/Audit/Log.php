@@ -112,6 +112,8 @@ class Log
         if ($logArray['data']) {
             $data['data'] = json_encode($logArray['data']);
         }
-        AuditLog::insertData($data);
+        $auditLog = new AuditLog();
+        $auditLog->setData($data);
+        $auditLog->save();
     }
 }

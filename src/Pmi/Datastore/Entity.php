@@ -3,6 +3,8 @@ namespace Pmi\Datastore;
 
 abstract class Entity
 {
+    protected $data = [];
+
     public static function fetchBy()
     {
         $datastoreClient = new DatastoreClientHelper();
@@ -15,25 +17,30 @@ abstract class Entity
         return $datastoreClient->fetchById(static::getKind(), $id);
     }
 
-    public static function insertData($data)
+    public function setData($data)
     {
-        $datastoreClient = new DatastoreClientHelper();
-        return $datastoreClient->insert(static::getKind(), $data);
+        $this->data = $data;
     }
 
-    public static function upsertData($id, $data)
+    public function save()
     {
         $datastoreClient = new DatastoreClientHelper();
-        return $datastoreClient->upsert(static::getKind(), $id, $data);
+        return $datastoreClient->insert(static::getKind(), $this->data);
     }
 
-    public static function deleteData($id)
+    public function update($id)
+    {
+        $datastoreClient = new DatastoreClientHelper();
+        return $datastoreClient->upsert(static::getKind(), $id, $this->data);
+    }
+
+    public static function delete($id)
     {
         $datastoreClient = new DatastoreClientHelper();
         return $datastoreClient->delete(static::getKind(), $id);
     }
 
-    public static function gc($property, $value, $operator)
+    public function gc($property, $value, $operator)
     {
         $datastoreClient = new DatastoreClientHelper();
         $results = $datastoreClient->basicQuery(static::getKind(), $property, $value, $operator);
