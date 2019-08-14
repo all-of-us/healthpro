@@ -709,10 +709,10 @@ class DashboardController extends AbstractController
                     'Consent_Enrollment' => 'Primary Consent',
                     'Consent_Complete' => 'Primary+EHR/EHR-lite Consent',
                     'Baseline_PPI_Modules_Complete' => 'Baseline PPI Modules Complete',
-                    'PPI_Retention_Modules_Complete' => 'Retention PPI Modules Complete',
                     'Physical_Measurements' => 'Physical Measurements',
                     'Samples_Received' => 'Samples Received',
-                    'Full_Participant' => 'Core Participant'
+                    'Full_Participant' => 'Core Participant',
+                    'PPI_Retention_Modules_Complete' => 'Retention PPI Modules Complete'
                 ];
                 break;
         }
