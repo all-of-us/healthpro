@@ -41,7 +41,8 @@ class DatastoreSessionHandler extends AbstractSessionHandler
     {
         $modified = new DateTime("-{$maxlifetime} seconds");
         $session = new Session();
-        $session->gc('modified', $modified, '<');
+        $results = $session->getBatch('modified', $modified, '<');
+        $session->deleteBatch($results);
         return true;
     }
 
