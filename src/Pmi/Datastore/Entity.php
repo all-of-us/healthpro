@@ -5,6 +5,8 @@ abstract class Entity
 {
     protected $data = [];
 
+    protected $id;
+
     public static function fetchBy()
     {
         $datastoreClient = new DatastoreClientHelper();
@@ -15,6 +17,11 @@ abstract class Entity
     {
         $datastoreClient = new DatastoreClientHelper();
         return $datastoreClient->fetchById(static::getKind(), $id);
+    }
+
+    public function setKeyName($id)
+    {
+        $this->id = $id;
     }
 
     public function setData($data)
@@ -28,16 +35,16 @@ abstract class Entity
         return $datastoreClient->insert(static::getKind(), $this->data);
     }
 
-    public function update($id)
+    public function update()
     {
         $datastoreClient = new DatastoreClientHelper();
-        return $datastoreClient->upsert(static::getKind(), $id, $this->data);
+        return $datastoreClient->upsert(static::getKind(), $this->id, $this->data);
     }
 
-    public static function delete($id)
+    public function delete()
     {
         $datastoreClient = new DatastoreClientHelper();
-        return $datastoreClient->delete(static::getKind(), $id);
+        return $datastoreClient->delete(static::getKind(), $this->id);
     }
 
     public function getBatch($property, $value, $operator)

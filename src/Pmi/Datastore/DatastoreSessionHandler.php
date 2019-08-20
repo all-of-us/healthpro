@@ -18,7 +18,8 @@ class DatastoreSessionHandler extends AbstractSessionHandler
             $session = Session::fetchOneById($id);
             if ($session) {
                 $session = new Session();
-                $session->delete($id);
+                $session->setKeyName($id);
+                $session->delete();
             }
         } catch (\Exception $e) {
         }
@@ -70,8 +71,9 @@ class DatastoreSessionHandler extends AbstractSessionHandler
                 'modified' => new DateTime()
             ];
             $session = new Session();
+            $session->setKeyName($id);
             $session->setData($data);
-            $session->update($id);
+            $session->update();
             return true;
         } catch (\Exception $e) {
             return false;
