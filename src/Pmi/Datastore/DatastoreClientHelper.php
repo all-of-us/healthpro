@@ -33,17 +33,17 @@ class DatastoreClientHelper
         return $this->datastore->lookup($key);
     }
 
-    public function insert($kind, $data)
+    public function insert($kind, $data, $excludeIndexes)
     {
-        $task = $this->datastore->entity($kind, $data);
+        $task = $this->datastore->entity($kind, $data, ['excludeFromIndexes' => $excludeIndexes]);
         $this->datastore->insert($task);
         return $task;
     }
 
-    public function upsert($kind, $id, $data)
+    public function upsert($kind, $id, $data, $excludeIndexes)
     {
         $key = $this->datastore->key($kind, $id);
-        $task = $this->datastore->entity($key, $data, ['excludeFromIndexes' => ['data']]);
+        $task = $this->datastore->entity($key, $data, ['excludeFromIndexes' => $excludeIndexes]);
         $this->datastore->upsert($task);
         return $task;
     }

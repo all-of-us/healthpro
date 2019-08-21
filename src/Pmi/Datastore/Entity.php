@@ -7,6 +7,8 @@ abstract class Entity
 
     protected $id;
 
+    protected $excludeIndexes = [];
+
     public static function fetchBy()
     {
         $datastoreClient = new DatastoreClientHelper();
@@ -32,13 +34,13 @@ abstract class Entity
     public function save()
     {
         $datastoreClient = new DatastoreClientHelper();
-        return $datastoreClient->insert(static::getKind(), $this->data);
+        return $datastoreClient->insert(static::getKind(), $this->data, $this->excludeIndexes);
     }
 
     public function update()
     {
         $datastoreClient = new DatastoreClientHelper();
-        return $datastoreClient->upsert(static::getKind(), $this->id, $this->data);
+        return $datastoreClient->upsert(static::getKind(), $this->id, $this->data, $this->excludeIndexes);
     }
 
     public function delete()
