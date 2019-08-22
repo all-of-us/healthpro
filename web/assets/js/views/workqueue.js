@@ -62,8 +62,8 @@ $(document).ready(function() {
     var tableColumns = [];
     tableColumns.push(
       { name: 'lastName', data: 'lastName' },
-      { name: 'middleName', data: 'middleName' },
       { name: 'firstName', data: 'firstName' },
+      { name: 'middleName', data: 'middleName' },
       { name: 'dateOfBirth', data: 'dateOfBirth' },
       { name: 'participantId', visible: false, data: 'participantId' },
       { name: 'biobankId', visible: false, data: 'biobankId' },
