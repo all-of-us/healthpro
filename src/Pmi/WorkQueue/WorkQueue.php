@@ -15,8 +15,8 @@ class WorkQueue
     // These are used to map a DataTables column index to an RDR field for sorting
     public static $wQColumns = [
         'lastName',
-        'middleName',
         'firstName',
+        'middleName',
         'dateOfBirth',
         'participantId',
         'biobankId',
@@ -273,8 +273,8 @@ class WorkQueue
                 $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
             } else {
                 $row['lastName'] = $e($participant->lastName);
-                $row['middleName'] = $e($participant->middleName);
                 $row['firstName'] = $e($participant->firstName);
+                $row['middleName'] = $e($participant->middleName);
             }
             if (!empty($participant->dob)) {
                 $row['dateOfBirth'] = $participant->dob->format('m/d/Y'); 
