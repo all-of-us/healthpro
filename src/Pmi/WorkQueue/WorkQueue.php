@@ -16,6 +16,7 @@ class WorkQueue
     public static $wQColumns = [
         'lastName',
         'firstName',
+        'middleName',
         'dateOfBirth',
         'participantId',
         'biobankId',
@@ -268,13 +269,12 @@ class WorkQueue
             //Identifiers and status
             if($app->hasRole('ROLE_USER')) {
                 $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
-            } else {
-                $row['lastName'] = $e($participant->lastName);
-            }
-            if ($app->hasRole('ROLE_USER')) {
+                $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
                 $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
             } else {
+                $row['lastName'] = $e($participant->lastName);
                 $row['firstName'] = $e($participant->firstName);
+                $row['middleName'] = $e($participant->middleName);
             }
             if (!empty($participant->dob)) {
                 $row['dateOfBirth'] = $participant->dob->format('m/d/Y'); 
