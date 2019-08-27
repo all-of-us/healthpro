@@ -63,6 +63,7 @@ $(document).ready(function() {
     tableColumns.push(
       { name: 'lastName', data: 'lastName' },
       { name: 'firstName', data: 'firstName' },
+      { name: 'middleName', data: 'middleName' },
       { name: 'dateOfBirth', data: 'dateOfBirth' },
       { name: 'participantId', visible: false, data: 'participantId' },
       { name: 'biobankId', visible: false, data: 'biobankId' },
@@ -128,7 +129,7 @@ $(document).ready(function() {
             url: url,
             type: "POST"
         },
-        order: [[7, 'desc']],
+        order: [[8, 'desc']],
         dom: 'lBrtip',
         columns: tableColumns,
         pageLength: 25,
