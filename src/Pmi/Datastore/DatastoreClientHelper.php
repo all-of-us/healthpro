@@ -4,6 +4,8 @@ namespace Pmi\Datastore;
 
 use google\appengine\api\app_identity\AppIdentityService;
 use Google\Cloud\Datastore\DatastoreClient;
+use Google\Auth\HttpHandler\Guzzle6HttpHandler;
+use Pmi\HttpClient;
 
 class DatastoreClientHelper
 {
@@ -15,9 +17,13 @@ class DatastoreClientHelper
         # Google Cloud Platform project ID
         $projectId = AppIdentityService::getApplicationId();
 
-        # Instantiates a client
+        # Custom http client used to set httpHandler
+        $client = new HttpClient();
+
+        # Instantiates a Datastore client
         $this->datastore = new DatastoreClient([
-            'projectId' => $projectId
+            'projectId' => $projectId,
+            'httpHandler' => new Guzzle6HttpHandler($client),
         ]);
     }
 
