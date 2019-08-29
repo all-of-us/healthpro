@@ -23,6 +23,7 @@ class HpoApplication extends AbstractApplication
 
         $rdrOptions = [];
         if ($this->isLocal()) {
+            putenv('DATASTORE_EMULATOR_HOST=' . self::DATASTORE_EMULATOR_HOST);
             $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
             if (file_exists($keyFile)) {
                 $rdrOptions['key_file'] = $keyFile;
@@ -134,10 +135,10 @@ class HpoApplication extends AbstractApplication
 
         // unit tests don't have access to Datastore
         // local environment uses yaml file
-        if (!$this['isUnitTest'] && !$this->isPhpDevServer()) {
-            $configs = Configuration::fetchBy([]);
+        if (!$this['isUnitTest'] && !$this->isPhpDevServer() && !$this->isLocal()) {
+            $configs = Configuration::fetchBy();
             foreach ($configs as $config) {
-                $this->configuration[$config->getKey()] = $config->getValue();
+                $this->configuration[$config->key] = $config->value;
             }
         }
         

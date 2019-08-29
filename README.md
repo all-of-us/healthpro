@@ -36,6 +36,9 @@ Initialize assets, recompile on the fly and reload the browser as assets change 
 
 `./bin/gulp browser-sync --option localhost:8080`
 
+Run local Datastore emulator
+`gcloud beta emulators datastore start`
+
 Run local App Engine dev server:
 
 `./bin/console pmi:deploy --local`
