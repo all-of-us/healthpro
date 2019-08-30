@@ -1,0 +1,25 @@
+version: '2'
+services:
+    mysql:
+        environment:
+            MYSQL_ROOT_PASSWORD: ~
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+            MYSQL_DATABASE: hpo
+        container_name: healthpro-mysql
+        hostname: healthpro-mysql
+        image: mysql:5.7
+        ports:
+            - "53306:3306"
+
+    web:
+        build:
+            context: ./docker
+            dockerfile: Dockerfile
+        container_name: healthpro-web
+        hostname: healthpro-web
+        links:
+            - mysql
+        ports:
+            - "8080:8080"
+        volumes:
+            - .:/app

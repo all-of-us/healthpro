@@ -141,7 +141,7 @@ class DeployCommand extends Command {
             $output->writeln("Compiling assets...");
             $this->exec("{$this->appDir}/bin/gulp compile");
         }
-        
+
         // security checks
         $this->runSecurityCheck();
         $this->out->writeln('');
@@ -153,7 +153,7 @@ class DeployCommand extends Command {
         }
 
         if ($this->local) {
-            $cmd = "php -S localhost:{$this->port} -t web/ web/local-router.php";
+            $cmd = "php -S 0.0.0.0:{$this->port} -t web/ web/local-router.php";
         } else {
             $cmd = "gcloud app deploy --quiet --project={$this->appId} {$this->appDir}/app.yaml {$this->appDir}/cron.yaml";
         }
@@ -223,7 +223,7 @@ class DeployCommand extends Command {
     {
         return !$this->local && in_array($this->appId, self::$STABLE_APP_IDS);
     }
-    
+
     private function isStaging()
     {
         return !$this->local && in_array($this->appId, self::$STAGING_APP_IDS);
@@ -315,14 +315,14 @@ class DeployCommand extends Command {
         if (!file_exists($distFile)) {
             throw new Exception("Couldn't find $distFile");
         }
-        
+
         $yaml = new Parser();
         $config = $yaml->parse(file_get_contents($distFile));
-        
+
         // do this prior to excluding crons so developers are notified about
         // missing backups well in advance of to deploying to production
         $this->checkCronBackups($config);
-        
+
         // adjust crons depending on environment
         $crons = [];
         foreach ($config['cron'] as $c) {
@@ -339,7 +339,7 @@ class DeployCommand extends Command {
             $crons[] = $c;
         }
         $config['cron'] = $crons;
-        
+
         $dumper = new Dumper();
         file_put_contents($configFile, count($crons) ? $dumper->dump($config, PHP_INT_MAX) : 'cron:');
     }
@@ -359,7 +359,7 @@ class DeployCommand extends Command {
                 }
             }
         }
-        
+
         $pmiKinds = [];
         $files = glob("{$this->appDir}/src/Pmi/Entities/*.php");
         if (count($files) === 0) {
@@ -514,7 +514,7 @@ class DeployCommand extends Command {
                     }
                 }
                 if (!empty($advisories)) {
-                    $newVulnerabilities[$key]['advisories'] = $advisories; 
+                    $newVulnerabilities[$key]['advisories'] = $advisories;
                 } else {
                     unset($newVulnerabilities[$key]);
                 }
