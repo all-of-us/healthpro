@@ -330,11 +330,6 @@ class DeployCommand extends Command {
         $yaml = new Parser();
         $config = $yaml->parse(file_get_contents($distFile));
 
-        // require admin login for developer GAE sites
-        if ($this->isDev() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS)) {
-            $this->requireAdminLogin($config);
-        }
-
         // crash the deploy if our handlers are not secure
         $this->checkHandlerSecurity($config);
 
@@ -450,14 +445,6 @@ class DeployCommand extends Command {
         }
     }
 
-    /** Tell all handlers to require admin login. */
-    private function requireAdminLogin(&$config)
-    {
-        foreach (array_keys($config['handlers']) as $idx) {
-            $config['handlers'][$idx]['login'] = 'admin';
-        }
-    }
-
     /** Tell all handlers to require Google login. */
     private function requireGoogleLogin(&$config)
     {
@@ -479,8 +466,6 @@ class DeployCommand extends Command {
         foreach ($config['handlers'] as $handler) {
             if (empty($handler['secure']) || $handler['secure'] !== 'always') {
                 throw new \Exception("Handler URL '{$handler['url']}' does not force SSL!");
-            } elseif ($this->isDev() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS) && (empty($handler['login']) || $handler['login'] !== 'admin')) {
-                throw new \Exception("Handler URL '{$handler['url']}' does not require login!");
             }
         }
         $this->out->writeln('... all ' . count($config['handlers']) . " handlers are secure.");
