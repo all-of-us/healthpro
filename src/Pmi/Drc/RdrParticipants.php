@@ -191,7 +191,7 @@ class RdrParticipants
             $cache = new CacheHelper;
             $key = 'rdr_participant_' . $id;
             $data = $refresh != 1 ? $cache->get($this->cacheMethod, $key) : null;
-            if (!empty($data)) {
+            if (!empty($data) && new \DateTime() < $data['expire']) {
                 $participant = (object) $data['data'];
             }
         }
@@ -201,10 +201,11 @@ class RdrParticipants
                 $participant = json_decode($response->getBody()->getContents());
                 $participant->disableTestAccess = $this->disableTestAccess;
                 if ($this->cacheEnabled) {
-                    $participant->cacheTime = new \DateTime();
+                    $cacheTimeInMins = $this->cacheTime/60;
+                    $expireTime = new \DateTime('+' . $cacheTimeInMins . 'minutes');
                     $data = [
                         'data' => $participant,
-                        'modified' => new \DateTime()
+                        'expire' => $expireTime
                     ];
                     $cache->set($this->cacheMethod, $key, $data);
                 }
