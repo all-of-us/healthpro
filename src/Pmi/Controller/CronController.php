@@ -2,6 +2,7 @@
 namespace Pmi\Controller;
 
 use google\appengine\api\users\UserService;
+use Pmi\Service\CacheService;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,6 +28,7 @@ class CronController extends AbstractController
         ['awardeesAndOrganizations', '/awardees-organizations'],
         ['missingMeasurementsOrders', '/missing-measurements-orders'],
         ['sendPatientStatusToRdr', '/send-patient-status-rdr'],
+        ['deleteCacheKeys', '/delete-cache-keys']
     ];
     
     /**
@@ -132,6 +134,18 @@ class CronController extends AbstractController
         }
         $patientStatusService = new PatientStatusService($app);
         $patientStatusService->sendPatientStatusToRdr();
+        return (new JsonResponse())->setData(true);
+    }
+
+    public function deleteCacheKeysAction(Request $request)
+    {
+        if (!$this->isAdmin($request)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $cache = new CacheService();
+        $cache->deleteKeys();
+
         return (new JsonResponse())->setData(true);
     }
 }
