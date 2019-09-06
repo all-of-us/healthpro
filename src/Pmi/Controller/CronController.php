@@ -1,7 +1,6 @@
 <?php
 namespace Pmi\Controller;
 
-use google\appengine\api\users\UserService;
 use Pmi\Service\CacheService;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,11 +57,6 @@ class CronController extends AbstractController
             throw new AccessDeniedHttpException();
         }
 
-        $user = UserService::getCurrentUser();
-        if ($user) {
-            $email = $user->getEmail();
-            error_log("Cron ping test requested by $email [" . $request->getClientIp() . "]");
-        }
         if ($request->headers->get('X-Appengine-Cron') === 'true') {
             error_log('Cron ping test requested by Appengine-Cron');
         }
