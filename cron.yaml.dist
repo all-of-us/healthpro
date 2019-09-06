@@ -31,5 +31,5 @@ cron:
   timezone: America/Chicago
 - description: "Delete datastore cache keys"
   url: /cron/delete-cache-keys
-  schedule: 29 of feb 00:00
+  schedule: every 1 hours
   timezone: America/Chicago
