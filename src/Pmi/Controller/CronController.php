@@ -37,8 +37,7 @@ class CronController extends AbstractController
      */
     private function isAdmin(Request $request)
     {
-        return UserService::isCurrentUserAdmin() ||
-            $request->headers->get('X-Appengine-Cron') === 'true';
+        return $request->headers->get('X-Appengine-Cron') === 'true';
     }
 
     public function withdrawalAction(Application $app, Request $request)
