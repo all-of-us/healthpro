@@ -84,3 +84,6 @@ sites_use_rdr: true
 # Work Queue export limits
 workqueue_export_limit: 10000
 workqueue_export_page_size: 1000
+
+# Cache method
+cache_method: datastore

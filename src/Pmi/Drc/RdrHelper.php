@@ -11,6 +11,7 @@ class RdrHelper
     protected $options = [];
     protected $cacheEnabled = true;
     protected $cacheTime = 300;
+    protected $cacheMethod = 'memcache';
     protected $lastError;
     protected $disableTestAccess = false;
 
@@ -25,6 +26,9 @@ class RdrHelper
             }
             if (!empty($options['cache_time'])) {
                 $this->cacheTime  = $options['cache_time'];
+            }
+            if (!empty($options['cache_method'])) {
+                $this->cacheMethod  = $options['cache_method'];
             }
             if (!empty($options['disable_test_access'])) {
                 $this->disableTestAccess  = $options['disable_test_access'];
@@ -75,6 +79,11 @@ class RdrHelper
     public function getCacheTime()
     {
         return $this->cacheTime;
+    }
+
+    public function getCacheMethod()
+    {
+        return $this->cacheMethod;
     }
 
     public function logException(\Exception $e)

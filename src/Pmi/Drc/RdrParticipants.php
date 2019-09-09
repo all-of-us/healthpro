@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Drc;
 
+use Pmi\Cache\CacheHelper;
 use Pmi\Entities\Participant;
 use Pmi\Evaluation\Evaluation;
 use Ramsey\Uuid\Uuid;
@@ -15,6 +16,7 @@ class RdrParticipants
     protected $nextToken;
     protected $total;
     protected $disableTestAccess;
+    protected $cacheMethod;
 
     // Expected RDR response status
     const EVALUATION_CANCEL_STATUS = 'CANCELLED';
@@ -28,6 +30,7 @@ class RdrParticipants
         $this->rdrHelper = $rdrHelper;
         $this->cacheEnabled = $rdrHelper->isCacheEnabled();
         $this->cacheTime = $rdrHelper->getCacheTime();
+        $this->cacheMethod = $rdrHelper->getCacheMethod();
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
     }
 
@@ -185,18 +188,25 @@ class RdrParticipants
     public function getById($id, $refresh = null)
     {
         if ($this->cacheEnabled) {
-            $memcache = new \Memcache();
-            $memcacheKey = 'rdr_participant_' . $id;
-            $participant = $refresh != 1 ? $memcache->get($memcacheKey) : null;
+            $cache = new CacheHelper;
+            $key = 'rdr_participant_' . $id;
+            $data = $refresh != 1 ? $cache->get($this->cacheMethod, $key) : null;
+            if (!empty($data) && new \DateTime() < $data['expire']) {
+                $participant = (object) $data['data'];
+            }
         }
-        if (!$this->cacheEnabled || !$participant) {
+        if (!$this->cacheEnabled || empty($participant)) {
             try {
                 $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
                 $participant = json_decode($response->getBody()->getContents());
                 $participant->disableTestAccess = $this->disableTestAccess;
                 if ($this->cacheEnabled) {
-                    $participant->cacheTime = new \DateTime();
-                    $memcache->set($memcacheKey, $participant, 0, $this->cacheTime);
+                    $expireTime = new \DateTime('+' . $this->cacheTime . 'seconds');
+                    $data = [
+                        'data' => $participant,
+                        'expire' => $expireTime
+                    ];
+                    $cache->set($this->cacheMethod, $key, $data);
                 }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;

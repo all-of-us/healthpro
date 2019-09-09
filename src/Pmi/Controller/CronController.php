@@ -1,7 +1,7 @@
 <?php
 namespace Pmi\Controller;
 
-use google\appengine\api\users\UserService;
+use Pmi\Service\CacheService;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,6 +27,7 @@ class CronController extends AbstractController
         ['awardeesAndOrganizations', '/awardees-organizations'],
         ['missingMeasurementsOrders', '/missing-measurements-orders'],
         ['sendPatientStatusToRdr', '/send-patient-status-rdr'],
+        ['deleteCacheKeys', '/delete-cache-keys']
     ];
     
     /**
@@ -35,8 +36,7 @@ class CronController extends AbstractController
      */
     private function isAdmin(Request $request)
     {
-        return UserService::isCurrentUserAdmin() ||
-            $request->headers->get('X-Appengine-Cron') === 'true';
+        return $request->headers->get('X-Appengine-Cron') === 'true';
     }
 
     public function withdrawalAction(Application $app, Request $request)
@@ -57,11 +57,6 @@ class CronController extends AbstractController
             throw new AccessDeniedHttpException();
         }
 
-        $user = UserService::getCurrentUser();
-        if ($user) {
-            $email = $user->getEmail();
-            error_log("Cron ping test requested by $email [" . $request->getClientIp() . "]");
-        }
         if ($request->headers->get('X-Appengine-Cron') === 'true') {
             error_log('Cron ping test requested by Appengine-Cron');
         }
@@ -132,6 +127,18 @@ class CronController extends AbstractController
         }
         $patientStatusService = new PatientStatusService($app);
         $patientStatusService->sendPatientStatusToRdr();
+        return (new JsonResponse())->setData(true);
+    }
+
+    public function deleteCacheKeysAction(Request $request)
+    {
+        if (!$this->isAdmin($request)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $cache = new CacheService();
+        $cache->deleteKeys();
+
         return (new JsonResponse())->setData(true);
     }
 }
