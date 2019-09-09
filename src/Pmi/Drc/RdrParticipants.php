@@ -201,8 +201,7 @@ class RdrParticipants
                 $participant = json_decode($response->getBody()->getContents());
                 $participant->disableTestAccess = $this->disableTestAccess;
                 if ($this->cacheEnabled) {
-                    $cacheTimeInMins = $this->cacheTime/60;
-                    $expireTime = new \DateTime('+' . $cacheTimeInMins . 'minutes');
+                    $expireTime = new \DateTime('+' . $this->cacheTime . 'seconds');
                     $data = [
                         'data' => $participant,
                         'expire' => $expireTime
