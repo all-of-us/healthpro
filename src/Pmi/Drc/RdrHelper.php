@@ -11,7 +11,7 @@ class RdrHelper
     protected $options = [];
     protected $cacheEnabled = true;
     protected $cacheTime = 300;
-    protected $cacheMethod = 'memcache';
+    protected $cacheMethod = 'datastore';
     protected $lastError;
     protected $disableTestAccess = false;
 
