@@ -3,6 +3,7 @@ namespace Pmi\Audit;
 
 use Pmi\Entities\AuditLog;
 use Symfony\Component\HttpFoundation\Request;
+use Google\Cloud\Logging\LoggingClient;
 
 class Log
 {
@@ -96,7 +97,17 @@ class Log
         if ($logArray['data']) {
             $syslogData[] = json_encode($logArray['data']);
         }
-        syslog(LOG_INFO, implode(" ", $syslogData));
+
+        if ($this->app->isLocal()) {
+            syslog(LOG_INFO, implode(" ", $syslogData));
+        } else {
+            $logging = new LoggingClient();
+            $logName = 'INFO';
+            $logger = $logging->logger($logName);
+            $text = $logArray['ip'] . '-' . $logArray['user'] . '-' . $logArray['site'] . '-' . $logArray['data'];
+            $entry = $logger->entry($text);
+            $logger->write($entry);
+        }
     }
 
     public function logDatastore()
