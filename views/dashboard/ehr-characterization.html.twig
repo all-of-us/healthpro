@@ -1,0 +1,18 @@
+{% extends 'dashboard/base.html.twig' %}
+{% block title %}Dashboard{% endblock %}
+{% block body %}
+    <br />
+    {% include 'dashboard/partials/tabs.html.twig' with {active_tab: 'ehr-characterization'} %}
+    <div id="plotly-tabs" class="tab-content">
+        <div id="ehr" class="tab-pane pad active fade in">
+            <div class="embed-responsive embed-responsive-16by9" style="min-height: 600px;">
+              <iframe class="embed-responsive-item" src="/assets/lib/curation_report/index.html" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+    {% include 'dashboard/partials/modal-dashboard-help.html.twig' %}
+{% endblock %}
+
+{% block pagejs %}
+
+{% endblock %}

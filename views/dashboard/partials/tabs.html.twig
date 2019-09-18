@@ -3,7 +3,13 @@
     <li role="presentation"{% if active_tab == 'real-time' %} class="active"{% endif %}><a href="/dashboard/real-time" role="tab"><span class="fa fa-clock-o"></span> Real-Time Data</a></li>
     <li role="presentation"{% if active_tab == 'participants-by-region' %} class="active"{% endif %}><a href="/dashboard/participants-by-region" role="tab"><span class="fa fa-globe"></span> Participants by Region</a></li>
     <li role="presentation"{% if active_tab == 'participants-by-lifecycle' %} class="active"{% endif %}><a href="/dashboard/participants-by-lifecycle" role="tab"><span class="fa fa-sitemap"></span> Participants by Lifecycle Phase</a></li>
-    <li role="presentation"{% if active_tab == 'ehr' %} class="active"{% endif %}><a href="{{ path('dashboard_ehr') }}" role="tab"><span class="fa fa-medkit"></span> EHR Data</a></li>
+    <li role="presentation"{% if active_tab == 'ehr' or active_tab == 'ehr-characterization' %} class="active"{% endif %}><a href="{{ path('dashboard_ehr') }}" role="tab"><span class="fa fa-medkit"></span> EHR Data</a></li>
 </ul>
-
+{% if active_tab == 'ehr' or active_tab == 'ehr-characterization' %}
+<br />
+<ul class="nav nav-pills top-pad" role="tablist">
+  <li role="presentation"{% if active_tab == 'ehr' %} class="active"{% endif %}><a href="{{ path('dashboard_ehr') }}" role="tab">EHR Data Volume</a></li>
+  <li role="presentation"{% if active_tab == 'ehr-characterization' %} class="active"{% endif %}><a href="{{ path('dashboard_ehrCharacterization') }}" role="tab">EHR Data Characterization</a></li>
+</ul>
+{% endif %}
 <br />

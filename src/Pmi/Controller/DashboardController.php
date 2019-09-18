@@ -33,6 +33,8 @@ class DashboardController extends AbstractController
         ['participantsByRegion', '/participants-by-region'],
         ['participantsByLifecycle', '/participants-by-lifecycle'],
         ['ehr', '/ehr'],
+        ['ehrCharacterization', '/ehr-characterization'],
+        ['ehrCharacterizationData', '/ehr-characterization-data'],
         // Data Retrieval
         ['metricsV2Load', '/metrics_load'],
         ['metricsLoadRegion', '/metrics_load_region'],
@@ -178,6 +180,37 @@ class DashboardController extends AbstractController
                 'organizations' => $organizations
             ]
         );
+    }
+
+    /**
+     * EHR Characterization Report
+     *
+     * @param Application $app
+     *
+     * @return Response
+     */
+    public function ehrCharacterizationAction(Application $app)
+    {
+        $organizations = $this->getOrganizationsList($app);
+        return $app['twig']->render(
+            'dashboard/ehr-characterization.html.twig',
+            [
+                'organizations' => $organizations
+            ]
+        );
+    }
+
+    /**
+     * EHR Characterization Data
+     *
+     * @param Application $app
+     *
+     * @return Response
+     */
+    public function ehrCharacterizationDataAction(Application $app)
+    {
+        $data = []; // @todo - retrieve from GC Storage
+        return $app->json($data);
     }
 
     /**
