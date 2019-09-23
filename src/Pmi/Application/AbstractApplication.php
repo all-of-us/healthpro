@@ -375,7 +375,7 @@ abstract class AbstractApplication extends Application
 
             // syslog 500 errors
             if ($code >= 500) {
-                Util::logException($e);
+                $this->logException($e);
             }
 
             // If not in debug mode or error is < 500, render the error template
@@ -548,6 +548,12 @@ abstract class AbstractApplication extends Application
         if (!$this['isUnitTest'] && !$this->isPhpDevServer() && $action != Log::REQUEST) {
             $log->logDatastore();
         }
+    }
+
+    public function logException(\Exception $exception)
+    {
+        $this['logger']->critical($exception->getMessage());
+        $this['logger']->info(substr($exception->getTraceAsString(), 0, 5120)); // log the first 5KB of the stack trace
     }
 
     /**
