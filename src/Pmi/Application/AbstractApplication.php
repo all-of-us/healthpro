@@ -3,6 +3,8 @@ namespace Pmi\Application;
 
 use Exception;
 use Memcache;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Logger;
 use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
@@ -11,6 +13,8 @@ use Silex\Application;
 use Silex\Provider\CsrfServiceProvider;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\LocaleServiceProvider;
+use Silex\Provider\MonologServiceProvider;
+use Silex\Provider\Routing\LazyRequestMatcher;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
@@ -18,8 +22,9 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
+use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Twig_SimpleFilter;
 use Twig_SimpleFunction;
 
@@ -153,6 +158,29 @@ abstract class AbstractApplication extends Application
         $this->register(new TranslationServiceProvider(), [
             'locale_fallbacks' => ['en'],
         ]);
+
+        // Register logging service
+        $this->register(new MonologServiceProvider(), [
+            // adjust 400 errors to debug log level
+            'monolog.exception.logger_filter' => $this->protect(function ($e) {
+                if ($e instanceof HttpExceptionInterface && $e->getStatusCode() < 500) {
+                    return Logger::DEBUG;
+                }
+                return Logger::CRITICAL;
+            }),
+        ]);
+        // Add syslog handler
+        $this->extend('monolog', function($monolog, $app) {
+            $monolog->pushHandler(new SyslogHandler('healthpro', LOG_USER, Logger::INFO));
+            return $monolog;
+        });
+        // Override routing.listener to disable routing info logging (see RoutingServiceProvider)
+        $this['routing.listener'] = function ($app) {
+            $urlMatcher = new LazyRequestMatcher(function () use ($app) {
+                return $app['request_matcher'];
+            });
+            return new RouterListener($urlMatcher, $app['request_stack'], $app['request_context'], null, null, isset($app['debug']) ? $app['debug'] : false);
+        };
 
         // Register Form service
         $this->register(new CsrfServiceProvider());
