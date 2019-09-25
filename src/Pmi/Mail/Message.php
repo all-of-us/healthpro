@@ -112,8 +112,8 @@ class Message
                 try {
                     $mandrill->send($this->to, $this->from, $this->subject, $this->content, $tags);
                 } catch (\Exception $e) {
-                    syslog(LOG_ERR, "Error sending Mandrill message");
-                    syslog(LOG_ERR, $e->getMessage());
+                    $this->app['logger']->error("Error sending Mandrill message");
+                    $this->app['logger']->error($e->getMessage());
                 }
                 break;
 
@@ -122,7 +122,7 @@ class Message
         }
 
         if ($this->app->isLocal()) {
-            syslog(LOG_INFO, "Message contents:\n---\n{$this->content}\n---\n");
+            $this->app['logger']->info("Message contents:\n---\n{$this->content}\n---\n");
         }
 
         return $this;
@@ -160,7 +160,7 @@ class Message
     {
         // Add informational log to mimic GAE mail service logging
         if ($this->app->isLocal()) {
-            syslog(LOG_INFO, "Sending via Mandrill:\n" . 
+            $this->app['logger']->info("Sending via Mandrill:\n" . 
                 "\tFrom: {$this->from}\n" . 
                 "\tTo: " . implode(', ', $this->to) . "\n" .
                 "\tSubject: {$this->subject}\n" .
