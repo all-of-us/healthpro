@@ -3,6 +3,7 @@ namespace Pmi\Application;
 
 use Exception;
 use Memcache;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 use Pmi\Audit\Log;
@@ -167,11 +168,15 @@ abstract class AbstractApplication extends Application
                     return Logger::DEBUG;
                 }
                 return Logger::CRITICAL;
-            }),
+            })
         ]);
         // Add syslog handler
         $this->extend('monolog', function($monolog, $app) {
-            $monolog->pushHandler(new SyslogHandler('healthpro', LOG_USER, Logger::INFO));
+            $handler = new SyslogHandler(false, LOG_USER, Logger::INFO);
+            $formatter = new LineFormatter("%message% %context% %extra%", null, true);
+            $formatter->includeStacktraces();
+            $handler->setFormatter($formatter);
+            $monolog->pushHandler($handler);
             return $monolog;
         });
         // Override routing.listener to disable routing info logging (see RoutingServiceProvider)
