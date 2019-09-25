@@ -175,6 +175,7 @@ abstract class AbstractApplication extends Application
             $handler = new SyslogHandler(false, LOG_USER, Logger::INFO);
             $formatter = new LineFormatter("%message% %context% %extra%", null, true);
             $formatter->includeStacktraces();
+            $formatter->ignoreEmptyContextAndExtra();
             $handler->setFormatter($formatter);
             $monolog->pushHandler($handler);
             return $monolog;
