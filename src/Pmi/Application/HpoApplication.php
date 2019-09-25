@@ -43,6 +43,7 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('disable_test_access')) {
             $rdrOptions['disable_test_access'] = $this->getConfig('disable_test_access');
         }
+        $rdrOptions['logger'] = $this['logger'];
 
         $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
         if ($this->participantSource == 'mock') {
