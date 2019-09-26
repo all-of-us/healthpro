@@ -164,8 +164,10 @@ abstract class AbstractApplication extends Application
         $this->register(new MonologServiceProvider(), [
             // adjust 400 errors to debug log level
             'monolog.exception.logger_filter' => $this->protect(function ($e) {
-                if ($e instanceof HttpExceptionInterface && $e->getStatusCode() < 500) {
+                if ($e instanceof HttpExceptionInterface && $e->getStatusCode() == 404) {
                     return Logger::DEBUG;
+                } elseif ($e instanceof HttpExceptionInterface && $e->getStatusCode() < 500) {
+                    return Logger::INFO;
                 }
                 return Logger::CRITICAL;
             })
@@ -378,12 +380,6 @@ abstract class AbstractApplication extends Application
 
         // Set error callback using error template
         $this->error(function (Exception $e, $request, $code) {
-
-            // syslog 500 errors
-            if ($code >= 500) {
-                $this->logException($e);
-            }
-
             // If not in debug mode or error is < 500, render the error template
             if (isset($this['errorTemplate']) && (!$this['debug'] || $code < 500)) {
                 return $this['twig']->render($this['errorTemplate'], ['code' => $code]);
