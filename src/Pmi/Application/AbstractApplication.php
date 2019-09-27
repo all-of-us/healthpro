@@ -554,8 +554,7 @@ abstract class AbstractApplication extends Application
 
     public function logException(\Exception $exception)
     {
-        $this['logger']->critical($exception->getMessage());
-        $this['logger']->info(substr($exception->getTraceAsString(), 0, 5120)); // log the first 5KB of the stack trace
+        $this['logger']->critical('Caught Exception', ['exception' => $exception]);
     }
 
     /**
