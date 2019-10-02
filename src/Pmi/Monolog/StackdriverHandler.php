@@ -57,7 +57,8 @@ class StackdriverHandler extends AbstractProcessingHandler
     private function getEntryFromRecord(array $record)
     {
         $entryOptions = [
-            'severity' => $record['level_name']
+            'severity' => $record['level_name'],
+            'timestamp' => $record['datetime']
         ];
         if (isset($record['extra']['trace_header'])) {
             if ($trace = $this->getTraceFromHeader($record['extra']['trace_header'])) {
