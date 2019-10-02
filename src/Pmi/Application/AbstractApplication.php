@@ -193,7 +193,10 @@ abstract class AbstractApplication extends Application
         // Add custom Stackdriver handler
         $this->extend('monolog', function($monolog, $app) {
             if ($app->isLocal() && !$app->getConfig('local_stackdriver_logging')) {
-                return;
+                return $monolog;
+            }
+            if ($app['isUnitTest']) {
+                return $monolog;
             }
 
             $clientConfig = [];
