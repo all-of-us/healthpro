@@ -84,7 +84,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
                 }
                 return $this->buildCredentials($this->app->getGoogleUser());
             } catch (\Exception $e) {
-                Util::logException($e);
+                $this->app->logException($e);
                 throw new AuthenticationException(self::OAUTH_FAILURE_MESSAGE);
             }
         } elseif ($this->app->getConfig('gae_auth') && $this->app->getGoogleUser()) {

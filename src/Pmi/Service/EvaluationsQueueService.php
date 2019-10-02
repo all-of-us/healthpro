@@ -47,7 +47,7 @@ class EvaluationsQueueService
                 ]);
             } else {
                 $this->em->getRepository('evaluations_queue')->update($queue['id'], ['attempted_ts' => $now]);
-                syslog(LOG_ERR, "#{$evalId} failed sending to RDR: " .$this->rdr->getLastError());
+                $this->app['logger']->error("#{$evalId} failed sending to RDR: " .$this->rdr->getLastError());
             }
         }
     }
