@@ -4,6 +4,7 @@ namespace Pmi\Application;
 use Exception;
 use Memcache;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\BufferHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 use Pmi\Audit\Log;
@@ -208,14 +209,15 @@ abstract class AbstractApplication extends Application
                 ];
             }
             $handler = new StackdriverHandler($clientConfig, Logger::INFO);
-            $handler->pushProcessor(function ($record) use ($app) {
+            $handlerBuffer = new BufferHandler($handler);
+            $handlerBuffer->pushProcessor(function ($record) use ($app) {
                 $traceHeader = $app['request_stack']->getCurrentRequest()->headers->get('X-Cloud-Trace-Context');
                 if ($traceHeader) {
                     $record['extra']['trace_header'] = $traceHeader;
                 }
                 return $record;
             });
-            $monolog->pushHandler($handler);
+            $monolog->pushHandler($handlerBuffer);
             return $monolog;
         });
         // Override routing.listener to disable routing info logging (see RoutingServiceProvider)
