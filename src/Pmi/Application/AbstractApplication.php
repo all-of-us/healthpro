@@ -175,7 +175,11 @@ abstract class AbstractApplication extends Application
         ]);
         // Add syslog handler
         $this->extend('monolog', function($monolog, $app) {
-            $handler = new SyslogHandler(false, LOG_USER, Logger::INFO);
+            if ($app->isLocal()) {
+                $handler = new SyslogHandler(false, LOG_USER, Logger::INFO, true, LOG_PID|LOG_PERROR);
+            } else {
+                $handler = new SyslogHandler(false, LOG_USER, Logger::INFO);
+            }
             $formatter = new LineFormatter("%message% %context% %extra%", null, true);
             $formatter->includeStacktraces();
             $formatter->ignoreEmptyContextAndExtra();
