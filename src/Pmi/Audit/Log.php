@@ -97,9 +97,9 @@ class Log
         if ($logArray['data']) {
             $syslogData[] = json_encode($logArray['data']);
         }
-        if ($this->app->isLocal()) {
-            syslog(LOG_INFO, implode(" ", $syslogData));
-        } else {
+        $this->app['logger']->info(implode(' ', $syslogData));
+
+        if (!$this->app->isLocal()) {
             $logging = new LoggingClient();
             /*
              * The log name could be set to 'appengine.googleapis.com%2Frequest_log' which is where the default GAE logs go,

@@ -3,6 +3,9 @@ namespace Pmi\Application;
 
 use Exception;
 use Memcache;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Logger;
 use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
@@ -11,6 +14,8 @@ use Silex\Application;
 use Silex\Provider\CsrfServiceProvider;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\LocaleServiceProvider;
+use Silex\Provider\MonologServiceProvider;
+use Silex\Provider\Routing\LazyRequestMatcher;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
@@ -18,8 +23,9 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
+use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Twig_SimpleFilter;
 use Twig_SimpleFunction;
 
@@ -154,6 +160,36 @@ abstract class AbstractApplication extends Application
         $this->register(new TranslationServiceProvider(), [
             'locale_fallbacks' => ['en'],
         ]);
+
+        // Register logging service
+        $this->register(new MonologServiceProvider(), [
+            // adjust 400 errors to debug log level
+            'monolog.exception.logger_filter' => $this->protect(function ($e) {
+                if ($e instanceof HttpExceptionInterface && $e->getStatusCode() == 404) {
+                    return Logger::DEBUG;
+                } elseif ($e instanceof HttpExceptionInterface && $e->getStatusCode() < 500) {
+                    return Logger::INFO;
+                }
+                return Logger::CRITICAL;
+            })
+        ]);
+        // Add syslog handler
+        $this->extend('monolog', function($monolog, $app) {
+            $handler = new SyslogHandler(false, LOG_USER, Logger::INFO);
+            $formatter = new LineFormatter("%message% %context% %extra%", null, true);
+            $formatter->includeStacktraces();
+            $formatter->ignoreEmptyContextAndExtra();
+            $handler->setFormatter($formatter);
+            $monolog->pushHandler($handler);
+            return $monolog;
+        });
+        // Override routing.listener to disable routing info logging (see RoutingServiceProvider)
+        $this['routing.listener'] = function ($app) {
+            $urlMatcher = new LazyRequestMatcher(function () use ($app) {
+                return $app['request_matcher'];
+            });
+            return new RouterListener($urlMatcher, $app['request_stack'], $app['request_context'], null, null, isset($app['debug']) ? $app['debug'] : false);
+        };
 
         // Register Form service
         $this->register(new CsrfServiceProvider());
@@ -345,12 +381,6 @@ abstract class AbstractApplication extends Application
 
         // Set error callback using error template
         $this->error(function (Exception $e, $request, $code) {
-
-            // syslog 500 errors
-            if ($code >= 500) {
-                Util::logException($e);
-            }
-
             // If not in debug mode or error is < 500, render the error template
             if (isset($this['errorTemplate']) && (!$this['debug'] || $code < 500)) {
                 return $this['twig']->render($this['errorTemplate'], ['code' => $code]);
@@ -521,6 +551,11 @@ abstract class AbstractApplication extends Application
         if (!$this['isUnitTest'] && !$this->isPhpDevServer() && $action != Log::REQUEST) {
             $log->logDatastore();
         }
+    }
+
+    public function logException(\Exception $exception)
+    {
+        $this['logger']->critical('Caught Exception', ['exception' => $exception]);
     }
 
     /**

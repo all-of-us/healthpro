@@ -14,6 +14,7 @@ class RdrHelper
     protected $cacheMethod = 'datastore';
     protected $lastError;
     protected $disableTestAccess = false;
+    protected $logger;
 
     public function __construct(array $options)
     {
@@ -33,6 +34,7 @@ class RdrHelper
             if (!empty($options['disable_test_access'])) {
                 $this->disableTestAccess  = $options['disable_test_access'];
             }
+            $this->logger = $options['logger'];
             $this->options = $options;
         }
     }
@@ -90,16 +92,16 @@ class RdrHelper
     {
         $this->lastError = $e->getMessage();
         if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
-            syslog(LOG_CRIT, $e->getMessage());
+            $this->logger->critical($e->getMessage());
             $response = $e->getResponse();
             $responseCode = $response->getStatusCode();
             $contents = $response->getBody()->getContents();
-            syslog(LOG_INFO, "Response code: {$responseCode}");
-            syslog(LOG_INFO, "Response body: {$contents}");
+            $this->logger->info("Response code: {$responseCode}");
+            $this->logger->info("Response body: {$contents}");
             $this->lastError = $contents;
         } else {
             // No response - request probably timed out
-            syslog(LOG_ERR, $e->getMessage());
+            $this->logger->error($e->getMessage());
         }
     }
 

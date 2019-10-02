@@ -49,7 +49,7 @@ class PatientStatusService
                     'id' => $patientStatusHistory['id']
                 ]);
             } else {
-                syslog(LOG_ERR, "#{$patientStatusHistory['id']} failed sending to RDR: " . $this->rdr->getLastError());
+                $this->app['logger']->error("#{$patientStatusHistory['id']} failed sending to RDR: " . $this->rdr->getLastError());
             }
         }
     }
