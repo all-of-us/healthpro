@@ -3,7 +3,6 @@ namespace Pmi\Audit;
 
 use Pmi\Entities\AuditLog;
 use Symfony\Component\HttpFoundation\Request;
-use Google\Cloud\Logging\LoggingClient;
 
 class Log
 {
@@ -98,33 +97,6 @@ class Log
             $syslogData[] = json_encode($logArray['data']);
         }
         $this->app['logger']->info(implode(' ', $syslogData));
-
-        if (!$this->app->isLocal()) {
-            $logging = new LoggingClient();
-            /*
-             * The log name could be set to 'appengine.googleapis.com%2Frequest_log' which is where the default GAE logs go,
-             * but when you do that, matching the trace id doesn't add the new entry as a child of the original one.
-             * Setting the log name to something custom (like 'healthpro.log'), but still under the gae_app type accomplishes
-             * the goal of having the custom log merged with the original request log.
-             * Unfortunately, the severity does not bubble up.
-             */
-            $logger = $logging->logger('healthpro.log', ['resource' => [
-                'type' => 'gae_app'
-            ]]);
-            $traceContext = $this->app['request_stack']->getCurrentRequest()->headers->get('X-Cloud-Trace-Context');
-            // trace context has the format: TRACE_ID/SPAN_ID;o=TRACE_TRUE
-            if ($traceContext && preg_match('/^([0-9a-f]+)\//', $traceContext, $m)) {
-                $traceId = $m[1];
-                $projectId = getenv('GOOGLE_CLOUD_PROJECT');
-                $logTrace = "projects/{$projectId}/traces/{$traceId}";
-            }
-            $text = implode(" ", $syslogData);
-            $entry = $logger->entry($text, [
-                'severity' => 'INFO',
-                'trace' => $logTrace
-            ]);
-            $logger->write($entry);
-        }
     }
 
     public function logDatastore()

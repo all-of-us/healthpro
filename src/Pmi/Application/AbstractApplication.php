@@ -8,6 +8,7 @@ use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
+use Pmi\Monolog\StackdriverHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
 use Pmi\Util;
 use Silex\Application;
@@ -156,6 +157,8 @@ abstract class AbstractApplication extends Application
             $this->finish([$this, 'finishCallback']);
         }
 
+        $this->loadConfiguration($config);
+
         $this->register(new LocaleServiceProvider());
         $this->register(new TranslationServiceProvider(), [
             'locale_fallbacks' => ['en'],
@@ -187,6 +190,31 @@ abstract class AbstractApplication extends Application
             $monolog->pushHandler($handler);
             return $monolog;
         });
+        // Add custom Stackdriver handler
+        $this->extend('monolog', function($monolog, $app) {
+            if ($app->isLocal() && !$app->getConfig('local_stackdriver_logging')) {
+                return;
+            }
+
+            $clientConfig = [];
+            if ($app->isLocal()) {
+                // Reuse service account key used for RDR auth
+                $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
+                $clientConfig = [
+                    'keyFilePath' => $keyFile
+                ];
+            }
+            $handler = new StackdriverHandler($clientConfig, Logger::INFO);
+            $handler->pushProcessor(function ($record) use ($app) {
+                $traceHeader = $app['request_stack']->getCurrentRequest()->headers->get('X-Cloud-Trace-Context');
+                if ($traceHeader) {
+                    $record['extra']['trace_header'] = $traceHeader;
+                }
+                return $record;
+            });
+            $monolog->pushHandler($handler);
+            return $monolog;
+        });
         // Override routing.listener to disable routing info logging (see RoutingServiceProvider)
         $this['routing.listener'] = function ($app) {
             $urlMatcher = new LazyRequestMatcher(function () use ($app) {
@@ -213,8 +241,6 @@ abstract class AbstractApplication extends Application
                     break;
             }
         }
-
-        $this->loadConfiguration($config);
 
         // configure security and boot before enabling twig so that `is_granted` will be available
         $this->registerSecurity();
