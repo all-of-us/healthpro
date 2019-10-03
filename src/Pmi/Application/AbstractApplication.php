@@ -4,10 +4,12 @@ namespace Pmi\Application;
 use Exception;
 use Memcache;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\BufferHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
+use Pmi\Monolog\StackdriverHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
 use Pmi\Util;
 use Silex\Application;
@@ -156,6 +158,8 @@ abstract class AbstractApplication extends Application
             $this->finish([$this, 'finishCallback']);
         }
 
+        $this->loadConfiguration($config);
+
         $this->register(new LocaleServiceProvider());
         $this->register(new TranslationServiceProvider(), [
             'locale_fallbacks' => ['en'],
@@ -175,12 +179,45 @@ abstract class AbstractApplication extends Application
         ]);
         // Add syslog handler
         $this->extend('monolog', function($monolog, $app) {
-            $handler = new SyslogHandler(false, LOG_USER, Logger::INFO);
+            if ($app->isLocal()) {
+                $handler = new SyslogHandler(false, LOG_USER, Logger::INFO, true, LOG_PID|LOG_PERROR);
+            } else {
+                $handler = new SyslogHandler(false, LOG_USER, Logger::INFO);
+            }
             $formatter = new LineFormatter("%message% %context% %extra%", null, true);
             $formatter->includeStacktraces();
             $formatter->ignoreEmptyContextAndExtra();
             $handler->setFormatter($formatter);
             $monolog->pushHandler($handler);
+            return $monolog;
+        });
+        // Add custom Stackdriver handler
+        $this->extend('monolog', function($monolog, $app) {
+            if ($app->isLocal() && !$app->getConfig('local_stackdriver_logging')) {
+                return $monolog;
+            }
+            if ($app['isUnitTest']) {
+                return $monolog;
+            }
+
+            $clientConfig = [];
+            if ($app->isLocal()) {
+                // Reuse service account key used for RDR auth
+                $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
+                $clientConfig = [
+                    'keyFilePath' => $keyFile
+                ];
+            }
+            $handler = new StackdriverHandler($clientConfig, Logger::INFO);
+            $handlerBuffer = new BufferHandler($handler, 0, Logger::INFO);
+            $handlerBuffer->pushProcessor(function ($record) use ($app) {
+                $traceHeader = $app['request_stack']->getCurrentRequest()->headers->get('X-Cloud-Trace-Context');
+                if ($traceHeader) {
+                    $record['extra']['trace_header'] = $traceHeader;
+                }
+                return $record;
+            });
+            $monolog->pushHandler($handlerBuffer);
             return $monolog;
         });
         // Override routing.listener to disable routing info logging (see RoutingServiceProvider)
@@ -209,8 +246,6 @@ abstract class AbstractApplication extends Application
                     break;
             }
         }
-
-        $this->loadConfiguration($config);
 
         // configure security and boot before enabling twig so that `is_granted` will be available
         $this->registerSecurity();
