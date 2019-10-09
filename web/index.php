@@ -13,14 +13,10 @@ $app['sessionWarning'] = 2 * 60; // Display warning 2 minutes before timeout
 
 if ($app->isLocal()) {
     $app['sessionTimeout'] = 3600 * 24; // Extend session time out in local environment
-    if (!$app->isPhpDevServer()) {
-        $app['twigCacheHandler'] = 'memcache';
-        $app['sessionHandler'] = 'datastore'; // use datastore for dev_appserver local environment
-    }
 } else {
     $app['sessionHandler'] = 'datastore';
-    $app['cacheDirectory'] = sys_get_temp_dir();
     $app['twigCacheHandler'] = 'file';
+    $app['twigCacheDirectory'] = realpath(__DIR__ . '/../cache') . '/twig';
 }
 
 $app

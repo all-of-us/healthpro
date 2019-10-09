@@ -2,7 +2,6 @@
 namespace Pmi\Drc;
 
 use Pmi\HttpClient;
-use Cache\Adapter\Memcache\MemcacheCachePool;
 
 class RdrHelper
 {
@@ -58,13 +57,6 @@ class RdrHelper
             $endpoint = $this->endpoint . $resourceEndpoint;
         } else {
             $endpoint = $this->endpoint;
-        }
-
-        if (class_exists('\Memcache')) {
-            $client = new \Memcache();
-            $cachePool = new MemcacheCachePool($client);
-
-            $googleClient->setCache($cachePool);
         }
 
         return $googleClient->authorize(new HttpClient([
