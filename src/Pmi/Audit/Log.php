@@ -96,7 +96,7 @@ class Log
         if ($logArray['data']) {
             $syslogData[] = json_encode($logArray['data']);
         }
-        syslog(LOG_INFO, implode(" ", $syslogData));
+        $this->app['logger']->info(implode(' ', $syslogData));
     }
 
     public function logDatastore()

@@ -29,7 +29,7 @@ class UserProvider implements UserProviderInterface
                 $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
                 $this->app['session']->set('googlegroups', $groups);
             } catch (\Exception $e) {
-                Util::logException($e);
+                $this->app->logException($e);
                 throw new AuthenticationException('Failed to retrieve group permissions');
             }
         }
