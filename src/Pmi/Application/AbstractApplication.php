@@ -238,6 +238,8 @@ abstract class AbstractApplication extends Application
             }
         }
 
+        $this->registerCache();
+
         // configure security and boot before enabling twig so that `is_granted` will be available
         $this->registerSecurity();
         $this->boot();
@@ -574,5 +576,10 @@ abstract class AbstractApplication extends Application
     public function getTimeZones()
     {
         return self::$timezoneOptions;
+    }
+
+    public function registerCache()
+    {
+        $this['cache'] = new \Symfony\Component\Cache\Adapter\FilesystemAdapter();
     }
 }

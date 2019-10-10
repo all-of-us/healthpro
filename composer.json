@@ -26,11 +26,12 @@
         "twig/twig": "^1.24",
         "fzaninotto/faker": "^1.6",
         "google/cloud-datastore": "^1.5",
-        "google/cloud-logging": "^1.18"
+        "google/cloud-logging": "^1.18",
+        "symfony/cache": "^4.3"
     },
     "config": {
         "platform": {
-            "php": "5.5.9"
+            "php": "7.2"
         }
     },
     "require-dev": {

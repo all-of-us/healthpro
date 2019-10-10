@@ -10,10 +10,10 @@ class RdrHelper
     protected $options = [];
     protected $cacheEnabled = true;
     protected $cacheTime = 300;
-    protected $cacheMethod = 'datastore';
     protected $lastError;
     protected $disableTestAccess = false;
     protected $logger;
+    protected $cache;
 
     public function __construct(array $options)
     {
@@ -27,13 +27,11 @@ class RdrHelper
             if (!empty($options['cache_time'])) {
                 $this->cacheTime  = $options['cache_time'];
             }
-            if (!empty($options['cache_method'])) {
-                $this->cacheMethod  = $options['cache_method'];
-            }
             if (!empty($options['disable_test_access'])) {
                 $this->disableTestAccess  = $options['disable_test_access'];
             }
             $this->logger = $options['logger'];
+            $this->cache = $options['cache'];
             $this->options = $options;
         }
     }
@@ -59,6 +57,8 @@ class RdrHelper
             $endpoint = $this->endpoint;
         }
 
+        $googleClient->setCache($this->cache);
+
         return $googleClient->authorize(new HttpClient([
             'base_uri' => $endpoint,
             'timeout' => 50
@@ -75,9 +75,9 @@ class RdrHelper
         return $this->cacheTime;
     }
 
-    public function getCacheMethod()
+    public function getCache()
     {
-        return $this->cacheMethod;
+        return $this->cache;
     }
 
     public function logException(\Exception $e)

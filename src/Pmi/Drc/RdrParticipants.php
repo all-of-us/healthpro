@@ -4,19 +4,21 @@ namespace Pmi\Drc;
 use Pmi\Cache\CacheHelper;
 use Pmi\Entities\Participant;
 use Pmi\Evaluation\Evaluation;
-use Ramsey\Uuid\Uuid;
 use Pmi\Order\Order;
+use Ramsey\Uuid\Uuid;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class RdrParticipants
 {
     protected $rdrHelper;
     protected $client;
     protected $cacheEnabled = true;
+    protected $cache;
+    protected $cacheTime;
     protected static $resourceEndpoint = 'rdr/v1/';
     protected $nextToken;
     protected $total;
     protected $disableTestAccess;
-    protected $cacheMethod;
 
     // Expected RDR response status
     const EVALUATION_CANCEL_STATUS = 'CANCELLED';
@@ -29,8 +31,8 @@ class RdrParticipants
     {
         $this->rdrHelper = $rdrHelper;
         $this->cacheEnabled = $rdrHelper->isCacheEnabled();
+        $this->cache = $rdrHelper->getCache();
         $this->cacheTime = $rdrHelper->getCacheTime();
-        $this->cacheMethod = $rdrHelper->getCacheMethod();
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
     }
 
@@ -185,34 +187,40 @@ class RdrParticipants
         return $this->total;
     }
 
+    private function getParticipantSummary($id)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
+            $participant = json_decode($response->getBody()->getContents());
+            $participant->disableTestAccess = $this->disableTestAccess;
+            return $participant;
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            return false;
+        }
+    }
+
     public function getById($id, $refresh = null)
     {
         if ($this->cacheEnabled) {
-            $cache = new CacheHelper;
-            $key = 'rdr_participant_' . $id;
-            $data = $refresh != 1 ? $cache->get($this->cacheMethod, $key) : null;
-            if (!empty($data) && new \DateTime() < $data['expire']) {
-                $participant = (object) $data['data'];
+            $cacheKey = 'rdr_participant_' . $id;
+            $beta = $refresh ? INF : null; // set early expiration to infinite to refresh
+            $participant = $this->cache->get($cacheKey, function (ItemInterface $item) use ($id) {
+                $item->expiresAfter($this->cacheTime);
+                $participant = $this->getParticipantSummary($id);
+                $participant->cacheTime = new \DateTime();
+                return $participant;
+            }, $beta);
+            if (!$participant) {
+                $this->cache->delete($cacheKey);
             }
+        } else {
+            $participant = $this->getParticipantSummary($id);
         }
-        if (!$this->cacheEnabled || empty($participant)) {
-            try {
-                $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
-                $participant = json_decode($response->getBody()->getContents());
-                $participant->disableTestAccess = $this->disableTestAccess;
-                if ($this->cacheEnabled) {
-                    $expireTime = new \DateTime('+' . $this->cacheTime . 'seconds');
-                    $data = [
-                        'data' => $participant,
-                        'expire' => $expireTime
-                    ];
-                    $cache->set($this->cacheMethod, $key, $data);
-                }
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
-                return false;
-            }
+        if ($participant) {
+            return $this->participantToResult($participant);
+        } else {
+            return false;
         }
-        return $this->participantToResult($participant);
     }
 
     public function createParticipant($participant)
