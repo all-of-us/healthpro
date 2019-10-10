@@ -1,18 +1,278 @@
 {% extends 'dashboard/base.html.twig' %}
 {% block title %}Dashboard{% endblock %}
 {% block body %}
-    <br />
-    {% include 'dashboard/partials/tabs.html.twig' with {active_tab: 'ehr-characterization'} %}
-    <div id="plotly-tabs" class="tab-content">
+  <br />
+  {% include 'dashboard/partials/tabs.html.twig' with {active_tab: 'ehr-characterization'} %}
+  <div class="row">
+    <div class="col-md-3">
+      <div class="nav nav-pills nav-stacked" aria-orientation="vertical">
+        <li role="presentation" class="active"><a href="#personReport">Person</a></li>
+        <li role="presentation"><a href="#dataDensityReport">Data Density</a></li>
+        <li role="presentation"><a href="#achillesReport">Achilles</a></li>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div id="plotly-tabs" class="tab-content">
         <div id="ehr" class="tab-pane pad active fade in">
-            <div class="embed-responsive embed-responsive-16by9" style="min-height: 600px;">
-              <iframe class="embed-responsive-item" src="/assets/lib/curation_report/index.html" allowfullscreen></iframe>
+          <h3 id="personReport">Person</h3>
+          <hr />
+          <div class="row">
+            <div class="col-md-12">
+              <div id="plotly-ehr-year-of-birth" class="plotly-div"></div>
             </div>
+            <div class="col-md-12">
+              <div id="plotly-ehr-population-by-gender" class="plotly-div"></div>
+            </div>
+            <div class="col-md-12">
+              <div id="plotly-ehr-population-by-race" class="plotly-div"></div>
+            </div>
+            <div class="col-md-12">
+              <div id="plotly-ehr-population-by-ethnicity" class="plotly-div"></div>
+            </div>
+          </div>
+          <p><br /></p>
+          <h3 id="dataDensityReport">Data Density</h3>
+          <hr />
+          <div id="plotly-ehr-total-rows" class="plotly-div"></div>
+          <div id="plotly-ehr-records-per-person" class="plotly-div"></div>
+          <div id="plotly-ehr-concepts-per-person" class="plotly-div"></div>
+          <h3 id="achillesReport">Achilles Report</h3>
+          <hr />
+          <table id="ehr-errors-table" class="table table-sm">
+            <thead>
+              <th>Message Type</th>
+              <th>Message</th>
+            </thead>
+          </table>
         </div>
     </div>
-    {% include 'dashboard/partials/modal-dashboard-help.html.twig' %}
+  </div>
+  {% include 'dashboard/partials/modal-dashboard-help.html.twig' %}
 {% endblock %}
 
 {% block pagejs %}
+<script>
+// Add loading icons, clear previous errors
+$('.plotly-div').empty();
+$('.plotly-div').html('<div class="text-center"><i class="fa fa-spinner fa-spin fa-2x fa-fw"></i> Loading ...</span>');
+$('.table-div').empty();
 
+// gather params
+var ehrPlotlyWidth = $('#plotly-ehr-year-of-birth').width() - 30;
+
+/**
+ * Error Messages
+ */
+var ErrorMessages = {
+    no_data: 'No data returned from the metrics endpoint.',
+    general: 'Error encountered while retrieving the data'
+}
+
+/**
+ * Show Error
+ */
+function showError(div, msg) {
+  $(div).empty()
+  $(div).append('<div class="alert alert-danger">' + msg + '</div>')
+}
+
+/**
+ * Render Metric Plots
+ */
+function renderMetricPlots() {
+
+  /**
+   * Person
+   */
+  function updatePersonGraphs() {
+      var plotlyDiv,
+          plotlyTitle,
+          plotlyLayout;
+      $.getJSON('/dashboard/ehr-characterization-data?mode=person', {
+              csrf_token: CsrfToken
+          })
+          .done(function(data) {
+              // Year of Birth
+              plotlyDiv = $('#plotly-ehr-year-of-birth').empty();
+              plotlyTitle = '<b>Year of Birth</b>';
+              if (data.year.length != 0) {
+                  plotlyLayout = {
+                      title: plotlyTitle,
+                      font: PLOTLY_LABEL_FONT,
+                      width: $(plotlyDiv).width() - 30,
+                      height: ($(plotlyDiv).width() - 30) / 1.66,
+                      hovermode: 'closest',
+                      annotations: [],
+                      yaxis: {},
+                      xaxis: {}
+                  };
+                  Plotly.newPlot($(plotlyDiv).attr('id'), data.year, plotlyLayout, PLOTLY_OPTS);
+                  removePlotlyLink($(plotlyDiv).attr('id'));
+              } else {
+                  showError(plotlyDiv, ErrorMessages.no_data)
+              }
+
+              // Population by Gender
+              plotlyDiv = $('#plotly-ehr-population-by-gender').empty();
+              plotlyTitle = '<b>Pouplation by Gender</b>';
+              if (data.gender.length != 0) {
+                  plotlyLayout = {
+                      title: plotlyTitle,
+                      font: PLOTLY_LABEL_FONT,
+                      hovermode: 'closest'
+                  };
+                  Plotly.newPlot($(plotlyDiv).attr('id'), data.gender, plotlyLayout, PLOTLY_OPTS);
+                  removePlotlyLink($(plotlyDiv).attr('id'));
+              } else {
+                  showError(plotlyDiv, ErrorMessages.no_data)
+              }
+
+              // Population by Race
+              plotlyDiv = $('#plotly-ehr-population-by-race').empty();
+              plotlyTitle = '<b>Pouplation by Race</b>';
+              if (data.race.length != 0) {
+                  plotlyLayout = {
+                      title: plotlyTitle,
+                      font: PLOTLY_LABEL_FONT,
+                      hovermode: 'closest'
+                  };
+                  Plotly.newPlot($(plotlyDiv).attr('id'), data.race, plotlyLayout, PLOTLY_OPTS);
+                  removePlotlyLink($(plotlyDiv).attr('id'));
+              } else {
+                  showError(plotlyDiv, ErrorMessages.no_data)
+              }
+
+              // Population by Ethnicity
+              plotlyDiv = $('#plotly-ehr-population-by-ethnicity').empty();
+              plotlyTitle = '<b>Pouplation by Ethnicity</b>';
+              if (data.ethnicity.length != 0) {
+                  plotlyLayout = {
+                      title: plotlyTitle,
+                      font: PLOTLY_LABEL_FONT,
+                      hovermode: 'closest'
+                  };
+                  Plotly.newPlot($(plotlyDiv).attr('id'), data.ethnicity, plotlyLayout, PLOTLY_OPTS);
+                  removePlotlyLink($(plotlyDiv).attr('id'));
+              } else {
+                  showError(plotlyDiv, ErrorMessages.no_data)
+              }
+
+          })
+          .fail(function(jqXHR) {
+              try {
+                  showError(plotlyDiv, JSON.parse(jqXHR.responseText).error);
+              } catch (e) {
+                  showError(plotlyDiv, ErrorMessages.general);
+              }
+          });
+  }
+
+  /**
+   * Density
+   */
+  function updateDataDensityGraphs() {
+      var plotlyDiv,
+          plotlyTitle,
+          plotlyLayout;
+      $.getJSON('/dashboard/ehr-characterization-data?mode=density', {
+              csrf_token: CsrfToken
+          })
+          .done(function(data) {
+              // Total Rows
+              plotlyDiv = $('#plotly-ehr-total-rows').empty();
+              plotlyTitle = '<b>Total Rows</b>';
+              if (data.totalRows.length != 0) {
+                  plotlyLayout = {
+                      title: plotlyTitle,
+                      font: PLOTLY_LABEL_FONT,
+                      width: $(plotlyDiv).width() - 30,
+                      height: ($(plotlyDiv).width() - 30) / 1.66,
+                      hovermode: 'closest',
+                      annotations: [],
+                      yaxis: {},
+                      xaxis: {}
+                  };
+                  Plotly.newPlot($(plotlyDiv).attr('id'), data.totalRows, plotlyLayout, PLOTLY_OPTS);
+                  removePlotlyLink($(plotlyDiv).attr('id'));
+              } else {
+                  showError(plotlyDiv, ErrorMessages.no_data)
+              }
+
+              // Records Per Person
+              plotlyDiv = $('#plotly-ehr-records-per-person').empty();
+              plotlyTitle = '<b>Records Per Person</b>';
+              if (data.recordsPerPerson.length != 0) {
+                  plotlyLayout = {
+                      title: plotlyTitle,
+                      font: PLOTLY_LABEL_FONT,
+                      hovermode: 'closest'
+                  };
+                  Plotly.newPlot($(plotlyDiv).attr('id'), data.recordsPerPerson, plotlyLayout, PLOTLY_OPTS);
+                  removePlotlyLink($(plotlyDiv).attr('id'));
+              } else {
+                  showError(plotlyDiv, ErrorMessages.no_data)
+              }
+
+              // Population by Race
+              plotlyDiv = $('#plotly-ehr-concepts-per-person').empty();
+              plotlyTitle = '<b>Pouplation by Race</b>';
+              if (data.conceptsPerPerson.length != 0) {
+                  plotlyLayout = {
+                      title: plotlyTitle,
+                      font: PLOTLY_LABEL_FONT,
+                      hovermode: 'closest'
+                  };
+                  Plotly.newPlot($(plotlyDiv).attr('id'), data.conceptsPerPerson, plotlyLayout, PLOTLY_OPTS);
+                  removePlotlyLink($(plotlyDiv).attr('id'));
+              } else {
+                  showError(plotlyDiv, ErrorMessages.no_data)
+              }
+
+          })
+          .fail(function(jqXHR) {
+              try {
+                  showError(plotlyDiv, JSON.parse(jqXHR.responseText).error);
+              } catch (e) {
+                  showError(plotlyDiv, ErrorMessages.general);
+              }
+          });
+  }
+
+  // Call them in sequence
+  $.when(
+    updatePersonGraphs(), updateDataDensityGraphs()
+  ).done(function() {
+      $('#loading-modal').modal('hide');
+  });
+}
+
+renderMetricPlots()
+
+/**
+ * Errors Table
+ */
+$(document).ready(function () {
+  $('#ehr-errors-table').DataTable({
+    ajax: '/dashboard/ehr-characterization-data?mode=achillesheel',
+    paging: false,
+    columns: [
+      { data: 'type' },
+      { data: 'message', width: '85%' }
+    ],
+    rowCallback: function(row, data) {
+      if (data.type == 'ERROR') {
+        $(row).addClass('alert alert-danger');
+      }
+      if (data.type == 'WARNING') {
+        $(row).addClass('alert alert-warning');
+      }
+      if (data.type == 'NOTIFICATION') {
+        $(row).addClass('alert alert-info');
+      }
+    },
+    order: []
+  });  
+})
+
+</script>
 {% endblock %}

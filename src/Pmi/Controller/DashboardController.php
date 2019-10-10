@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Drc\RdrMetrics;
+use Pmi\Service\StorageService;
 
 /**
  * Dashboard Controller
@@ -35,6 +36,7 @@ class DashboardController extends AbstractController
         ['ehr', '/ehr'],
         ['ehrCharacterization', '/ehr-characterization'],
         ['ehrCharacterizationData', '/ehr-characterization-data'],
+
         // Data Retrieval
         ['metricsV2Load', '/metrics_load'],
         ['metricsLoadRegion', '/metrics_load_region'],
@@ -191,12 +193,8 @@ class DashboardController extends AbstractController
      */
     public function ehrCharacterizationAction(Application $app)
     {
-        $organizations = $this->getOrganizationsList($app);
         return $app['twig']->render(
-            'dashboard/ehr-characterization.html.twig',
-            [
-                'organizations' => $organizations
-            ]
+            'dashboard/ehr-characterization.html.twig'
         );
     }
 
@@ -207,10 +205,143 @@ class DashboardController extends AbstractController
      *
      * @return Response
      */
-    public function ehrCharacterizationDataAction(Application $app)
+    public function ehrCharacterizationDataAction(Application $app, Request $request)
     {
-        $data = []; // @todo - retrieve from GC Storage
-        return $app->json($data);
+        $rootPath = $app->getConfig('rdr_curation_report_path');
+        preg_match('/https\:\/\/storage\.googleapis\.com\/(.*)\.appspot\.com\/(.*)/i', $rootPath, $matches);
+        $project = $matches[1];
+        $bucket = $matches[2];
+
+        $output = [];
+
+        $storageService = new StorageService([
+            'keyFile' => (array) json_decode(file_get_contents(dirname(__FILE__) . '/../../../dev_config/rdr_key.json', true)),
+            'suppressKeyFileNotice' => true
+        ]);
+
+        // $object = $storageService->getObject($bucket, 'index.html');
+        // $output = $object->downloadAsString();
+        // return new Response($output);
+
+        switch ($request->get('mode')) {
+            case 'person':
+                $person = json_decode(file_get_contents(dirname(__FILE__) . '/../../../cache/curation_report/person.json'));
+                $person_intervals = range($person->BIRTH_YEAR_HISTOGRAM->MIN, $person->BIRTH_YEAR_HISTOGRAM->MAX);
+                $person_output = [];
+                foreach ($person_intervals as $i => $interval) {
+                    $person_output[$i] = 0;
+                }
+                foreach ($person->BIRTH_YEAR_HISTOGRAM->DATA->COUNT_VALUE as $i => $value) {
+                    $person_output[$person->BIRTH_YEAR_HISTOGRAM->DATA->INTERVAL_INDEX[$i]] = $value;
+                }
+
+                return $app->json([
+                    'year' => [
+                        [
+                            "x" => $person_intervals,
+                            "y" => array_values($person_output),
+                            "text" => array_values($person_output),
+                            "type" => 'bar',
+                            "hoverinfo" => 'text+name',
+                            "name" => 'People',
+                            "marker" => [
+                                "color" => $this->getColorBrewerVal(1)
+                            ]
+                        ]
+                    ],
+                    'gender' => [
+                        [
+                            "labels" => $person->GENDER_DATA->CONCEPT_NAME,
+                            "values" => $person->GENDER_DATA->COUNT_VALUE,
+                            "type" => 'pie',
+                            "hoverinfo" => 'value+label',
+                            "name" => 'People'
+                        ]
+                    ],
+                    'race' => [
+                        [
+                            "labels" => $person->RACE_DATA->CONCEPT_NAME,
+                            "values" => $person->RACE_DATA->COUNT_VALUE,
+                            "type" => 'pie',
+                            "hoverinfo" => 'value+label',
+                            "name" => 'People'
+                        ]
+                    ],
+                    'ethnicity' => [
+                        [
+                            "labels" => $person->ETHNICITY_DATA->CONCEPT_NAME,
+                            "values" => $person->ETHNICITY_DATA->COUNT_VALUE,
+                            "type" => 'pie',
+                            "hoverinfo" => 'value+label',
+                            "name" => 'People'
+                        ]
+                    ]
+                ]);
+                break;
+            case 'density':
+                $density = json_decode(file_get_contents(dirname(__FILE__) . '/../../../cache/curation_report/pitt/datadensity.json'));
+
+                $totalRecords = [];
+                foreach ($density->TOTAL_RECORDS->SERIES_NAME as $i => $incidentType) {
+                    if (!isset($ouput[$incidentType])) {
+                        $ouput[$incidentType] = [];
+                    }
+                    $month = $density->TOTAL_RECORDS->X_CALENDAR_MONTH[$i];
+                    $totalRecords[$incidentType]['x'][] = substr($month, 0, 4) . '-' . substr($month, 4, 5) . '-01';
+                    $totalRecords[$incidentType]['y'][] = $density->TOTAL_RECORDS->Y_RECORD_COUNT[$i];
+                    $totalRecords[$incidentType]['text'][] = $density->TOTAL_RECORDS->Y_RECORD_COUNT[$i];
+                    $totalRecords[$incidentType]['type'] = 'line';
+                    $totalRecords[$incidentType]['hoverinfo'] = 'text+name';
+                    $totalRecords[$incidentType]['name'] = $incidentType;
+                }
+
+                $recordsPerPerson = [];
+                foreach ($density->RECORDS_PER_PERSON->SERIES_NAME as $i => $personType) {
+                    if (!isset($ouput[$personType])) {
+                        $recordsPerPerson[$personType] = [];
+                    }
+                    $month = $density->RECORDS_PER_PERSON->X_CALENDAR_MONTH[$i];
+                    $recordsPerPerson[$personType]['x'][] = substr($month, 0, 4) . '-' . substr($month, 4, 5) . '-01';
+                    $recordsPerPerson[$personType]['y'][] = $density->RECORDS_PER_PERSON->Y_RECORD_COUNT[$i];
+                    $recordsPerPerson[$personType]['text'][] = $density->RECORDS_PER_PERSON->Y_RECORD_COUNT[$i];
+                    $recordsPerPerson[$personType]['type'] = 'line';
+                    $recordsPerPerson[$personType]['hoverinfo'] = 'text+name';
+                    $recordsPerPerson[$personType]['name'] = $personType;
+                }
+
+                $conceptsPerPerson = [];
+                // foreach ($density->CONCEPTS_PER_PERSON->CATEGORY as $i => $category) {
+                //     $conceptsPerPerson[$category]['x'][] = $category,
+                //     $conceptsPerPerson[$category]['y'][] = $density->CONCEPTS_PER_PERSON->Y_RECORD_COUNT[$i];
+                //     $conceptsPerPerson[$category]['text'][] = $density->CONCEPTS_PER_PERSON->Y_RECORD_COUNT[$i];
+                //     $conceptsPerPerson[$category]['type'] = 'line';
+                //     $conceptsPerPerson[$category]['hoverinfo'] = 'text+name';
+                //     $conceptsPerPerson[$category]['name'] = $personType;
+                // }
+
+                return $app->json([
+                    'totalRows' => array_values($totalRecords),
+                    'recordsPerPerson' => array_values($recordsPerPerson),
+                    'conceptsPerPerson' => array_values($conceptsPerPerson)
+                ]);
+                break;
+            case 'achillesheel':
+                $errors = json_decode(file_get_contents(dirname(__FILE__) . '/../../../cache/curation_report/pitt/achillesheel.json'));
+                $output = [];
+                foreach ($errors->MESSAGES->ATTRIBUTEVALUE as $row) {
+                    preg_match('/^(\w+)\:(.*)/', $row, $matches);
+                    $output[] = [
+                        'type' => $matches[1],
+                        'message' => trim($matches[2])
+                    ];
+                }
+                return $app->json([
+                    'data' => $output
+                ]);
+                break;
+        }
+
+        $app->abort(404);
     }
 
     /**

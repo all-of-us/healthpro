@@ -20,7 +20,7 @@ mysql_host: 127.0.0.1
 #   Note: Store service account key in rdr_key.json
 # Override API endpoint if necessary
 # rdr_endpoint: https://pmi-drc-api-test.appspot.com/
-
+# rdr_curation_report_path: https://storage.googleapis.com/pmi-drc-api-test.appspot.com/transfer-bucket-name
 
 #
 # MayoLINK configuration
