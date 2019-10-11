@@ -580,6 +580,6 @@ abstract class AbstractApplication extends Application
 
     public function registerCache()
     {
-        $this['cache'] = new \Symfony\Component\Cache\Adapter\FilesystemAdapter();
+        $this['cache'] = new \Pmi\Cache\DatastoreAdapter();
     }
 }

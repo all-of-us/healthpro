@@ -199,7 +199,7 @@ class RdrParticipants
         }
     }
 
-    public function getById($id, $refresh = null)
+    public function getByIdUsingCacheContract($id, $refresh = null)
     {
         if ($this->cacheEnabled) {
             $cacheKey = 'rdr_participant_' . $id;
@@ -215,6 +215,34 @@ class RdrParticipants
             }
         } else {
             $participant = $this->getParticipantSummary($id);
+        }
+        if ($participant) {
+            return $this->participantToResult($participant);
+        } else {
+            return false;
+        }
+    }
+
+    public function getById($id, $refresh = null)
+    {
+        $participant = false;
+        $cacheKey = 'rdr_participant_' . $id;
+
+        if ($this->cacheEnabled && !$refresh) {
+            $cacheItem = $this->cache->getItem($cacheKey);
+            if ($cacheItem->isHit()) {
+                $participant = $cacheItem->get();
+            }
+        }
+        if (!$participant) {
+            $participant = $this->getParticipantSummary($id);
+            if ($participant && $this->cacheEnabled) {
+                $participant->cacheTime = new \DateTime();
+                $cacheItem = $this->cache->getItem($cacheKey);
+                $cacheItem->expiresAfter($this->cacheTime);
+                $cacheItem->set($participant);
+                $this->cache->save($cacheItem);
+            }
         }
         if ($participant) {
             return $this->participantToResult($participant);
