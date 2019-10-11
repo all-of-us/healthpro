@@ -177,7 +177,7 @@ abstract class AbstractApplication extends Application
         ]);
         // Add syslog handler
         $this->extend('monolog', function($monolog, $app) {
-            if ($app->isLocal()) {
+            if ($app->isLocal() && !$app['isUnitTest']) {
                 $handler = new SyslogHandler(false, LOG_USER, Logger::INFO, true, LOG_PID|LOG_PERROR);
             } else {
                 $handler = new SyslogHandler(false, LOG_USER, Logger::INFO);

@@ -906,7 +906,7 @@ class DashboardController extends AbstractController
     ) {
         try {
             $metrics = [];
-            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper'], new \Memcache());
+            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
 
             $metrics = $metricsApi->metrics(
                 $start_date,
@@ -950,7 +950,7 @@ class DashboardController extends AbstractController
     ) {
         try {
             $metrics = [];
-            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper'], new \Memcache());
+            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
 
             $metrics = $metricsApi->ehrMetrics(
                 $mode,
@@ -983,15 +983,16 @@ class DashboardController extends AbstractController
      */
     private function getMetricsFieldDefinitions(Application $app, $field_key)
     {
-        $memcache = new \Memcache();
-        $memcacheKey = 'metrics_api_field_definitions';
-        $definitions = $memcache->get($memcacheKey);
+        //$memcache = new \Memcache();
+        //$memcacheKey = 'metrics_api_field_definitions';
+        //$definitions = $memcache->get($memcacheKey);
+        $definitions = false;
         if (!$definitions) {
             try {
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
                 $definitions = $metricsApi->metricsFields();
                 // set expiration to one hour
-                $memcache->set($memcacheKey, $definitions, 0, 3600);
+                // $memcache->set($memcacheKey, $definitions, 0, 3600);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
             }
