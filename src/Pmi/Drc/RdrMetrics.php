@@ -4,13 +4,13 @@ namespace Pmi\Drc;
 class RdrMetrics
 {
     protected $rdrHelper;
-    protected $memcache;
+    protected $cache;
 
     /**
      * @var int
      *
      * Size of date range batches if 'history' flag is true; Maximum of 600, but
-     * reduced so that the payload size < 1 MiB for Memcache
+     * reduced so that the payload size < 1 MiB for caching
      */
     const BATCH_DAYS_HISTORY = 200;
 
@@ -26,12 +26,11 @@ class RdrMetrics
      * Constructor
      *
      * @param RdrHelper $rdrHelper
-     * @param Memcache|false $memcache
      */
-    public function __construct(RdrHelper $rdrHelper, $memcache = false)
+    public function __construct(RdrHelper $rdrHelper)
     {
         $this->rdrHelper = $rdrHelper;
-        $this->memcache = $memcache;
+        $this->cache = $rdrHelper->getCache();
     }
 
     /**
@@ -84,19 +83,28 @@ class RdrMetrics
             ];
 
             // Generate a cache key
-            $memcacheKey = 'metrics_api_2_' . md5(json_encode($query));
+            $cacheKey = 'metrics_api_2_' . md5(json_encode($query));
 
-            // If not found in Memcache, make request
-            if (!$this->memcache || !$metrics = $this->memcache->get($memcacheKey)) {
+            $metrics = null;
+            if ($this->cache) {
+                // Check cache
+                $cacheItem = $this->cache->getItem($cacheKey);
+                if ($cacheItem->isHit()) {
+                    $metrics = $cacheItem->get();
+                }
+            }
+            if (!$metrics) {
                 $request_options = [
                     'query' => $query
                 ];
                 $response = $client->request('GET', 'rdr/v1/ParticipantCountsOverTime', $request_options);
                 $metrics = json_decode($response->getBody()->getContents(), true);
 
-                // Store results in Memcache if enabled
-                if ($this->memcache) {
-                    $this->memcache->set($memcacheKey, $metrics, 0, 900); // 900 s = 15 min
+                // Store results in cache if enabled
+                if ($this->cache && $metrics) {
+                    $cacheItem->set($metrics);
+                    $cacheItem->expiresAfter(900); // 15 minutes
+                    $this->cache->save($cacheItem);
                 }
             }
 
@@ -134,10 +142,17 @@ class RdrMetrics
         }
 
         // Generate a cache key
-        $memcacheKey = 'metrics_ehr_api_' . md5(json_encode($query));
+        $cacheKey = 'metrics_ehr_api_' . md5(json_encode($query));
 
-        // If not found in Memcache, make request
-        if (!$this->memcache || !$metrics = $this->memcache->get($memcacheKey)) {
+        $metrics = null;
+        if ($this->cache) {
+            // Check cache
+            $cacheItem = $this->cache->getItem($cacheKey);
+            if ($cacheItem->isHit()) {
+                $metrics = $cacheItem->get();
+            }
+        }
+        if (!$metrics) {
             $request_options = [
                 'query' => $query
             ];
@@ -145,11 +160,14 @@ class RdrMetrics
             $response = $client->request('GET', $endpoint, $request_options);
             $metrics = json_decode($response->getBody()->getContents(), true);
 
-            // Store results in Memcache if enabled
-            if ($this->memcache) {
-                $this->memcache->set($memcacheKey, $metrics, 0, 900); // 900 s = 15 min
+            // Store results in cache if enabled
+            if ($this->cache && $metrics) {
+                $cacheItem->set($metrics);
+                $cacheItem->expiresAfter(900); // 15 minutes
+                $this->cache->save($cacheItem);
             }
         }
+
         // Allowing the consolidated call to behave as if two different endpoints were used
         switch ($mode) {
             case 'Organizations':
