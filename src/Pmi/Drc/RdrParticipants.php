@@ -1,7 +1,6 @@
 <?php
 namespace Pmi\Drc;
 
-use Pmi\Cache\CacheHelper;
 use Pmi\Entities\Participant;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Order\Order;
