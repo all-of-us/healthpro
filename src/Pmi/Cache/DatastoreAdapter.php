@@ -23,7 +23,7 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
             $cache = new Cache();
             $cacheItem = $cache->fetchOneById($id);
             if ($cacheItem) {
-                if ($cacheItem['expire'] instanceof \DateTime && $cacheItem['expire'] <= new \DateTime()) {
+                if ($cacheItem['expire'] instanceof \DateTimeInterface && $cacheItem['expire'] < new \DateTime()) {
                     continue;
                 }
                 $values[$id] = $this->marshaller->unmarshall($cacheItem['data']);
@@ -34,23 +34,27 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
 
     protected function doHave($id)
     {
-        return false;
-    }
-
-    protected function doClear($namespace)
-    {
-        return true;
+        return (bool) $this->doFetch([$id]);
     }
 
     protected function doDelete(array $ids)
     {
+        foreach ($ids as $id) {
+            $cache = new Cache();
+            $cache->setKeyName($id);
+            $cache->delete();
+        }
         return true;
     }
 
     protected function doSave(array $values, $lifetime)
     {
         $values = $this->marshaller->marshall($values, $failed);
-        $expireTime = new \DateTime('+' . $lifetime . 'seconds');
+        if ($lifetime === 0) {
+            $expireTime = null;
+        } else {
+            $expireTime = new \DateTime('+' . $lifetime . 'seconds');
+        }
         foreach ($values as $key => $value) {
             $data = [
                 'data' => $value,
@@ -65,8 +69,21 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
         return $failed;
     }
 
-    public function prune()
+    protected function doClear($namespace)
     {
+        $cache = new Cache();
+        $results = $cache->getBatch();
+        $cache->deleteBatch($results);
+
+        return true;
+    }
+
+    public function prune()
+    {        
+        $cache = new Cache();
+        $results = $cache->getBatch('expire', new \DateTime(), '<');
+        $cache->deleteBatch($results);
+
         return true;
     }
 }
