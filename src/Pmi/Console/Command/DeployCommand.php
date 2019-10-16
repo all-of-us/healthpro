@@ -162,11 +162,6 @@ class DeployCommand extends Command {
             $output->writeln('');
             $output->writeln("Compiling assets...");
             $this->exec("{$this->appDir}/bin/gulp compile");
-
-            // warmup twig cache
-            $output->writeln('');
-            $output->writeln('Warming up Twig cache...');
-            $this->exec("{$this->appDir}/bin/phpcli bin/console pmi:twig");
         }
         
         // security checks
