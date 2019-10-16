@@ -1,7 +1,6 @@
 <?php
 namespace Pmi\Controller;
 
-use Pmi\Service\CacheService;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -130,14 +129,13 @@ class CronController extends AbstractController
         return (new JsonResponse())->setData(true);
     }
 
-    public function deleteCacheKeysAction(Request $request)
+    public function deleteCacheKeysAction(Application $app, Request $request)
     {
         if (!$this->isAdmin($request)) {
             throw new AccessDeniedHttpException();
         }
 
-        $cache = new CacheService();
-        $cache->deleteKeys();
+        $app['cache']->prune();
 
         return (new JsonResponse())->setData(true);
     }

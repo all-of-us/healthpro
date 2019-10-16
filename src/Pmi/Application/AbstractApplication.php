@@ -2,7 +2,6 @@
 namespace Pmi\Application;
 
 use Exception;
-use Memcache;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\BufferHandler;
 use Monolog\Handler\SyslogHandler;
@@ -24,7 +23,6 @@ use Silex\Provider\ValidatorServiceProvider;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -235,17 +233,12 @@ abstract class AbstractApplication extends Application
 
         if (!$this['isUnitTest']) {
             $this->register(new SessionServiceProvider());
-        }
-        if (isset($this['sessionHandler'])) {
-            switch ($this['sessionHandler']) {
-                case 'memcache':
-                    $this->enableMemcacheSession();
-                    break;
-                case 'datastore':
-                    $this->enableDatastoreSession();
-                    break;
+            if (isset($this['sessionHandler']) && $this['sessionHandler'] === 'datastore') {
+                $this['session.storage.handler'] = new DatastoreSessionHandler();
             }
         }
+
+        $this->registerCache();
 
         // configure security and boot before enabling twig so that `is_granted` will be available
         $this->registerSecurity();
@@ -487,32 +480,9 @@ abstract class AbstractApplication extends Application
         }, ['is_safe' => ['html']]));
 
         // Register custom Twig cache
-        if (isset($this['twigCacheHandler'])) {
-            switch ($this['twigCacheHandler']) {
-                case 'memcache':
-                    if (class_exists('Memcache')) {
-                        $this['twig']->setCache(new \Pmi\Twig\Cache\Memcache());
-                    }
-                    break;
-                case 'file':
-                    if (isset($this['cacheDirectory'])) {
-                        $this['twig']->setCache(new \Twig_Cache_Filesystem($this['cacheDirectory'] . '/twig'));
-                    }
-                    break;
-            }
+        if (isset($this['twigCacheHandler']) && $this['twigCacheHandler'] === 'file') {
+            $this['twig']->setCache(new \Twig_Cache_Filesystem($this['twigCacheDirectory']));
         }
-    }
-
-    protected function enableMemcacheSession()
-    {
-        $memcache = new Memcache();
-        $handler = new MemcacheSessionHandler($memcache);
-        $this['session.storage.handler'] = $handler;
-    }
-
-    protected function enableDatastoreSession()
-    {
-        $this['session.storage.handler'] = new DatastoreSessionHandler();
     }
 
     public function logout()
@@ -606,5 +576,10 @@ abstract class AbstractApplication extends Application
     public function getTimeZones()
     {
         return self::$timezoneOptions;
+    }
+
+    public function registerCache()
+    {
+        $this['cache'] = new \Pmi\Cache\DatastoreAdapter();
     }
 }
