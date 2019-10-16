@@ -38,8 +38,8 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('rdr_disable_cache')) {
             $rdrOptions['disable_cache'] = true;
         }
-        if ($this->getConfig('cache_time')) {
-            $rdrOptions['cache_time'] = $this->getConfig('cache_time');
+        if (intval($this->getConfig('cache_time'))) {
+            $rdrOptions['cache_time'] = intval($this->getConfig('cache_time'));
         }
         if ($this->getConfig('disable_test_access')) {
             $rdrOptions['disable_test_access'] = $this->getConfig('disable_test_access');
