@@ -35,6 +35,7 @@ Initialize assets and recompile on the fly as assets change:
 `./bin/gulp`
 
 Run local Datastore emulator
+
 `gcloud beta emulators datastore start`
 
 Run local App Engine dev server:
