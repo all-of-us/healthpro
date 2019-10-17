@@ -133,12 +133,6 @@ abstract class AbstractApplication extends Application
 
     public function setup($config = [])
     {
-        // GAE SDK dev AppServer has a conflict with loading external XML entities
-        // https://github.com/GoogleCloudPlatform/appengine-symfony-starter-project/blob/master/src/AppEngine/Environment.php#L52-L69
-        if ($this->isLocal()) {
-            libxml_disable_entity_loader(false);
-        }
-
         // Register *early* before middleware
         if (method_exists($this, 'earlyBeforeCallback')) {
             $this->before([$this, 'earlyBeforeCallback'], Application::EARLY_EVENT);

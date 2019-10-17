@@ -10,15 +10,17 @@ HealthPro is being developed to facilitate in-person enrollment and other operat
 
 Prerequisites:
 
-* [Google Cloud and App Engine SDK](https://cloud.google.com/appengine/docs/standard/php/download)
-    1. Download Google Cloud SDK
-    2. Run `install.sh` so that `gcloud` is available from path
+* [Google Cloud SDK](https://cloud.google.com/sdk/docs/)
+    1. Follow platform-specific instructions for downloading and installing the [Google Cloud SDK](https://cloud.google.com/sdk/docs/)
+    2. Run the optional `install.sh` command so that `gcloud` is available from path
     3. Run `gcloud init`
-    4. Run `gcloud components install app-engine-php` to install App Engine PHP SDK
+    4. Install additional gcloud components:
+        * `gcloud components install app-engine-php`
+        * `gcloud components install cloud-datastore-emulator`
 * [NodeJS](https://nodejs.org/) (latest LTS should be fine)
-* [MySQL](https://dev.mysql.com/downloads/mysql/) (version 5.7 used by Google Cloud SQL)
+* [MySQL](https://dev.mysql.com/downloads/mysql/) (select version 5.7 which is used by Google Cloud SQL)
 * [Composer](https://getcomposer.org/doc/00-intro.md#globally)
-* [git-secrets](https://github.com/awslabs/git-secrets/issues/65#issuecomment-446519551)
+* [git-secrets](https://github.com/awslabs/git-secrets#installing-git-secrets)
 
 Install PHP dependencies via Composer:
 
@@ -32,11 +34,8 @@ Initialize assets and recompile on the fly as assets change:
 
 `./bin/gulp`
 
-Initialize assets, recompile on the fly and reload the browser as assets change (Optional):
-
-`./bin/gulp browser-sync --option localhost:8080`
-
 Run local Datastore emulator
+
 `gcloud beta emulators datastore start`
 
 Run local App Engine dev server:
@@ -51,3 +50,9 @@ Configure your local development parameters by copying the `dev_config/config.ym
 
 #### MySQL database configuration
 Create a new MySQL for this application.  Configure the MySQL connection in `config.yml`.  Then, import the SQL scripts in `/sql` into the new database.
+
+## Browser sync (optional)
+
+Use the following command to enable Browsersync which will reload your browswer as compiled assets are updated.
+
+`./bin/gulp browser-sync --option localhost:8080`

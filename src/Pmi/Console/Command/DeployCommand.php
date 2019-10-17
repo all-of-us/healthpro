@@ -75,12 +75,6 @@ class DeployCommand extends Command {
                 $appDir
             )
             ->addOption(
-                'phpCgiPath',
-                'c',
-                InputOption::VALUE_OPTIONAL,
-                'Path to the php-cgi binary'
-            )
-            ->addOption(
                 'appId',
                 'i',
                 InputOption::VALUE_OPTIONAL,
@@ -91,12 +85,6 @@ class DeployCommand extends Command {
                 'l',
                 InputOption::VALUE_NONE,
                 'If set, deploy locally to your GAE SDK web server'
-            )
-            ->addOption(
-                'local-php',
-                null,
-                InputOption::VALUE_NONE,
-                'Used in conjuction with --local; Will use PHP\'s built-in development server if set'
             )
             ->addOption(
                 'port',
@@ -112,12 +100,6 @@ class DeployCommand extends Command {
                 'Release version used in tagging and cache busting',
                 date('YmdHis')
             )
-            ->addOption(
-                'datastoreDir',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Specify local Datastore directory (use with --local option)'
-            )
         ;
     }
 
@@ -130,7 +112,6 @@ class DeployCommand extends Command {
         $this->local = (boolean) $input->getOption('local');
         $this->port = (integer) $input->getOption('port');
         $this->release = $input->getOption('release');
-        $this->phpCgiPath = $input->getOption('phpCgiPath');
 
         if (!$this->appId && !$this->local) {
             throw new InvalidOptionException('Please specify --appId (-i) or --local');
@@ -142,9 +123,6 @@ class DeployCommand extends Command {
         }
         // ensure shell commands (like `git`) are executed from inside repo
         chdir($this->appDir);
-
-        // deal with GAE conflict with libxml_disable_entity_loader()
-        $this->patchLibxmlDisable();
 
         // generate config files
         $this->generateAppConfig();
@@ -175,20 +153,7 @@ class DeployCommand extends Command {
         }
 
         if ($this->local) {
-            if ($input->getOption('local-php')) {
-                $cmd = "php -S localhost:{$this->port} -t web/ web/local-router.php";
-            } else {
-                $cmd = "dev_appserver.py -A pmi-hpo-dev --port={$this->port}";
-                if ($this->phpCgiPath) {
-                    $cmd .= " --php_executable_path {$this->phpCgiPath}";
-                }
-                if ($dsDir = $input->getOption('datastoreDir')) {
-                    $dsDir = rtrim($dsDir, '/');
-                    $dsDir .= '/datastore.db';
-                    $cmd .= " --datastore_path={$dsDir}";
-                }
-                $cmd .= " {$this->appDir}/app.yaml";
-            }
+            $cmd = "php -S localhost:{$this->port} -t web/ web/local-router.php";
         } else {
             $cmd = "gcloud app deploy --quiet --project={$this->appId} {$this->appDir}/app.yaml {$this->appDir}/cron.yaml";
         }
@@ -283,34 +248,6 @@ class DeployCommand extends Command {
         $this->exec("git tag $tag");
         $this->out->writeln("<info>Pushing tag...</info>");
         $this->exec("git push origin $tag");
-    }
-
-    /**
-     * GAE disables the libxml_disable_entity_loader() function for security,
-     * but several Symfony files try to call it (also for security). This results
-     * in a PHP warning on every page that will always be visible to app admins
-     * due to this: http://stackoverflow.com/a/23026196/1402028
-     * Rather than override GAE by enabling this insecure function, comment out
-     * the calls.
-     */
-    private function patchLibxmlDisable()
-    {
-        $files = [
-            'symfony/translation/Loader/XliffFileLoader.php',
-            'symfony/config/Util/XmlUtils.php'
-        ];
-        foreach ($files as $file) {
-            $filename = "{$this->appDir}/vendor/{$file}";
-            $contents = file_get_contents($filename);
-
-            // Added the negation for the new line character because if the previous line is blank,
-            // the match would include the leading new line and place the comment on the previous line.
-            $patched = preg_replace('#^[^/\n][^/].*libxml_disable_entity_loader\(.*$#m', '//$0', $contents);
-
-            if ($contents !== $patched) {
-                file_put_contents($filename, $patched);
-            }
-        }
     }
 
     /** Generate app configuration. */
@@ -440,20 +377,6 @@ class DeployCommand extends Command {
         }
     }
 
-    /** Tell all handlers to require Google login. */
-    private function requireGoogleLogin(&$config)
-    {
-        foreach (array_keys($config['handlers']) as $idx) {
-            $route = trim($config['handlers'][$idx]['url']);
-            // so we can display a user-friendly message when the session times
-            // out, rather than the Google account selector
-            if ($route === '/timeout') {
-                continue;
-            }
-            $config['handlers'][$idx]['login'] = 'required';
-        }
-    }
-
     /** Check all handlers for security concerns. */
     private function checkHandlerSecurity($config)
     {
@@ -574,7 +497,6 @@ class DeployCommand extends Command {
         });
         return $process;
     }
-
 
     private function removeSensioIgnoredVulnerabilities($vulnerabilities)
     {
