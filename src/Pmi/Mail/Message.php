@@ -1,15 +1,12 @@
 <?php
 namespace Pmi\Mail;
 
-use google\appengine\api\mail\Message as GoogleMessage;
-use google\appengine\api\app_identity\AppIdentityService;
 use Pmi\Application\AbstractApplication;
 use Pmi\Mail\Mandrill;
 
 class Message
 {
     const PHP_MAIL = 0;
-    const GOOGLE_MESSAGE = 1;
     const MANDRILL = 2;
     const TEST_SUB_PREFIX = '[TEST] ';
 
@@ -27,11 +24,9 @@ class Message
             case 'mandrill':
                 $this->method = self::MANDRILL;
                 break;
-            case 'php_mail':
+            default:
                 $this->method = self::PHP_MAIL;
                 break;
-            default:
-                $this->method = self::GOOGLE_MESSAGE;
         }
         $this->app = $app;
         $this->from = $this->getDefaultSender();
@@ -83,24 +78,14 @@ class Message
     public function send()
     {
         switch ($this->method) {
-            case self::GOOGLE_MESSAGE:
-                $googleMessage = new GoogleMessage();
-                $googleMessage->setSender($this->from);
-                foreach ($this->to as $address) {
-                    $googleMessage->addTo($address);
-                }
-                $googleMessage->setSubject($this->subject);
-                $googleMessage->setTextBody($this->content);
-                $googleMessage->send();
-                break;
-
             case self::PHP_MAIL:
+                $this->localLog('mail()');
                 $to = join(', ', $this->to);
                 mail($to, $this->subject, $this->content, "From: {$this->from}");
                 break;
 
             case self::MANDRILL:
-                $this->localLog();
+                $this->localLog('Mandrill');
                 $tags = [
                     'healthpro',
                     $this->app['env']
@@ -119,10 +104,6 @@ class Message
 
             default:
                 throw new \Exception('Unexpected mail message method: ' . $this->method);
-        }
-
-        if ($this->app->isLocal()) {
-            $this->app['logger']->info("Message contents:\n---\n{$this->content}\n---\n");
         }
 
         return $this;
@@ -148,24 +129,19 @@ class Message
 
     protected function getDefaultSender()
     {
-        if ($this->method === self::MANDRILL) {
-            return 'donotreply@pmi-ops.org';
-        } else {
-            $applicationId = AppIdentityService::getApplicationId();
-            return "donotreply@{$applicationId}.appspotmail.com";
-        }
+        return 'donotreply@pmi-ops.org';
     }
 
-    protected function localLog()
+    protected function localLog($method)
     {
-        // Add informational log to mimic GAE mail service logging
         if ($this->app->isLocal()) {
-            $this->app['logger']->info("Sending via Mandrill:\n" . 
+            $this->app['logger']->info("Sending via {$method}:\n" . 
                 "\tFrom: {$this->from}\n" . 
                 "\tTo: " . implode(', ', $this->to) . "\n" .
                 "\tSubject: {$this->subject}\n" .
                 "\tBody data length: " . strlen($this->content)
             );
+            $this->app['logger']->info("Message contents:\n---\n{$this->content}\n---\n");
         }
     }
 }
