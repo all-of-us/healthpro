@@ -6,8 +6,8 @@ use Pmi\Mail\Mandrill;
 
 class Message
 {
-    const PHP_MAIL = 0;
     const MANDRILL = 2;
+    const LOG_ONLY = 3;
     const TEST_SUB_PREFIX = '[TEST] ';
 
     protected $app;
@@ -25,7 +25,7 @@ class Message
                 $this->method = self::MANDRILL;
                 break;
             default:
-                $this->method = self::PHP_MAIL;
+                $this->method = self::LOG_ONLY;
                 break;
         }
         $this->app = $app;
@@ -78,10 +78,8 @@ class Message
     public function send()
     {
         switch ($this->method) {
-            case self::PHP_MAIL:
-                $this->localLog('mail()');
-                $to = join(', ', $this->to);
-                mail($to, $this->subject, $this->content, "From: {$this->from}");
+            case self::LOG_ONLY:
+                $this->localLog('[suppressed]');
                 break;
 
             case self::MANDRILL:
