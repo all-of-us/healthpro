@@ -73,9 +73,17 @@ class Log
             // http://symfony.com/doc/3.4/deployment/proxies.html#but-what-if-the-ip-of-my-reverse-proxy-changes-constantly
             $trustedProxies = ['127.0.0.1', $request->server->get('REMOTE_ADDR')];
             $originalTrustedProxies = Request::getTrustedProxies();
-            Request::setTrustedProxies($trustedProxies);
-            $logArray['ip'] = $request->getClientIp();
+            // specififying HEADER_X_FORWARDED_FOR because App Engine 2nd Gen also adds a FORWARDED
+            Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_FOR);
+
+            // getClientIps reverses the order, so we want the last ip which will be the user's origin ip
+            $ips = $request->getClientIps();
+            $logArray['ip'] = array_pop($ips);
+
+            // reset trusted proxies
             Request::setTrustedProxies($originalTrustedProxies);
+
+            // identify cron user
             if ($logArray['user'] === null && $request->headers->get('X-Appengine-Cron') === 'true') {
                 $logArray['user'] = 'Appengine-Cron';
             }
