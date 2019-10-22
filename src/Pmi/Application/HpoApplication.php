@@ -70,7 +70,7 @@ class HpoApplication extends AbstractApplication
         $app = $this;
         // include `/` in common routes because homeAction will redirect based on role
         $commonRegex = '^/(logout|login-return|keepalive|client-timeout|agree)?$';
-        $anonRegex = '^/(timeout$|login$|cron\/)'; // cron uses GAE auth, so no need for Silex auth
+        $anonRegex = '^/(timeout$|login$|cron\/|_ah\/)'; // cron and _ah controllers check for internal requests
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
                 'anonymous' => [
