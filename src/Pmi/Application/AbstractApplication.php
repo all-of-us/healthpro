@@ -575,5 +575,6 @@ abstract class AbstractApplication extends Application
     public function registerCache()
     {
         $this['cache'] = new \Pmi\Cache\DatastoreAdapter();
+        $this['cache']->setLogger($this['logger']);
     }
 }
