@@ -5,8 +5,14 @@ RUN mkdir -p /usr/share/man/man1
 
 # Install baseline packages
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
-      && apt-get update && apt-get install -y default-mysql-client git-all nodejs openjdk-11-jdk \
-      && docker-php-ext-install pdo_mysql
+      && apt-get update \
+      && apt-get install -y \
+        default-mysql-client \
+        git-all \
+        nodejs \
+        openjdk-11-jdk \
+      && docker-php-ext-install pdo_mysql \
+      && rm -rf /var/lib/apt/lists/*
 
 # Google Cloud Tools
 WORKDIR /opt
