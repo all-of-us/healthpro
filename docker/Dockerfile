@@ -6,7 +6,7 @@ RUN mkdir -p /usr/share/man/man1
 # Install baseline packages
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
       && apt-get update \
-      && apt-get install -y \
+      && apt-get install -y --no-install-recommends \
         default-mysql-client \
         git-all \
         nodejs \
@@ -17,9 +17,11 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
 # Google Cloud Tools
 WORKDIR /opt
 
-RUN curl -Os https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-267.0.0-linux-x86_64.tar.gz \
+RUN export CLOUDSDK_PYTHON=/usr/bin/python3 \
+      && curl -Os https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-267.0.0-linux-x86_64.tar.gz \
       && tar -xzf google-cloud-sdk-267.0.0-linux-x86_64.tar.gz \
-      && /opt/google-cloud-sdk/install.sh --quiet --path-update true --additional-components beta cloud-datastore-emulator \
+      && /opt/google-cloud-sdk/install.sh --quiet --path-update true \
+      && /opt/google-cloud-sdk/bin/gcloud components install --quiet beta cloud-datastore-emulator \
       && /opt/google-cloud-sdk/bin/gcloud config set project pmi-hpo-dev
 
 # Start emulator and the web server
