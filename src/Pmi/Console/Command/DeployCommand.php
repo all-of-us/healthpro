@@ -42,11 +42,6 @@ class DeployCommand extends Command {
         'pmi-hpo-test'
     ];
 
-    /** Don't require `login: admin` for these application IDs. */
-    private static $SKIP_ADMIN_APP_IDS = [
-        'pmi-hpo-dev' // this is behind a WAF so we don't want GAE login
-    ];
-
     /** Apply enhanced instance class and scaling for these application IDs. */
     private static $SCALE_APP_IDS = [
         'healthpro-prod'
