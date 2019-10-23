@@ -11,9 +11,6 @@ use Pmi\Service\SiteSyncService;
 use Pmi\Service\NotifyMissingMeasurementsAndOrdersService;
 use Pmi\Service\PatientStatusService;
 
-/**
- * NOTE: all /cron routes should be protected by `login: admin` in app.yaml
- */
 class CronController extends AbstractController
 {
     protected static $name = 'cron';
@@ -28,56 +25,59 @@ class CronController extends AbstractController
         ['sendPatientStatusToRdr', '/send-patient-status-rdr'],
         ['deleteCacheKeys', '/delete-cache-keys']
     ];
-    
-    /**
-     * Provides a second layer of protection for cron actions beyond the
-     * `login: admin` config that should exist in app.yaml for /cron routes.
-     */
-    private function isAdmin(Request $request)
+
+    private function isAllowed(Application $app, Request $request)
     {
-        return $request->headers->get('X-Appengine-Cron') === 'true';
+        return $request->headers->get('X-Appengine-Cron') === 'true' || $app->isLocal();
+    }
+
+    private function getAccessDeniedResponse()
+    {
+        return new JsonResponse(['success' => false, 'error' => 'Access denied'], 403);
     }
 
     public function withdrawalAction(Application $app, Request $request)
     {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
         }
 
         $withdrawal = new WithdrawalService($app);
         $withdrawal->sendWithdrawalEmails();
 
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
-    
+
+
     public function pingTestAction(Application $app, Request $request)
     {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
-        }
-
-        if ($request->headers->get('X-Appengine-Cron') === 'true') {
-            error_log('Cron ping test requested by Appengine-Cron');
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
         }
         
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
 
     public function resendEvaluationsToRdrAction(Application $app, Request $request)
     {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
         }
+
         $withdrawal = new EvaluationsQueueService($app);
         $withdrawal->resendEvaluationsToRdr();
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
 
     public function sitesAction(Application $app, Request $request)
     {
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
+        }
+
         $action = $request->get('action');
         if (!in_array($action, ['sync', 'preview'])) {
-            return (new JsonResponse())->setData(['error' => 'Invalid action']);
+            return new JsonResponse(['success' => false, 'error' => 'Invalid action'], 400);
         }
 
         $siteSync = new SiteSyncService(
@@ -87,56 +87,61 @@ class CronController extends AbstractController
         $isProd = $app->isProd();
         if ($action === 'sync') {
             if (!$app->getConfig('sites_use_rdr')) {
-                return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
+                return new JsonResponse(['success' => false, 'error' => 'RDR Awardee API disabled']);
             }
             $results = $siteSync->sync($isProd);
         } else {
             $results = $siteSync->dryRun($isProd);
         }
-        return (new JsonResponse())->setData($results);
+        return new JsonResponse(['success' => true, 'result' => $results]);
     }
 
-    public function awardeesAndOrganizationsAction(Application $app)
+    public function awardeesAndOrganizationsAction(Application $app, Request $request)
     {
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
+        }
+
         $siteSync = new SiteSyncService(
             $app['pmi.drc.rdrhelper']->getClient(),
             $app['em']
         );
         $siteSync->syncAwardees();
         $siteSync->syncOrganizations();
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
 
     public function missingMeasurementsOrdersAction(Application $app, Request $request)
     {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
         }
 
         $notifyMissing = new NotifyMissingMeasurementsAndOrdersService($app);
         $notifyMissing->sendEmails();
 
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
 
     public function sendPatientStatusToRdrAction(Application $app, Request $request)
     {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
         }
+
         $patientStatusService = new PatientStatusService($app);
         $patientStatusService->sendPatientStatusToRdr();
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
 
     public function deleteCacheKeysAction(Application $app, Request $request)
     {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
         }
 
         $app['cache']->prune();
 
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
 }
