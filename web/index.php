@@ -35,6 +35,7 @@ $app
     ->mount('/problem', new Controller\ProblemReportController())
     ->mount('/review', new Controller\ReviewController())
     ->mount('/biobank', new Controller\BiobankController())
+    ->mount('/_ah', new Controller\AppEngineController())
 ;
 
 $app->run();

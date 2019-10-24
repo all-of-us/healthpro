@@ -27,5 +27,8 @@ handlers:
   script: auto
   secure: always
 
+inbound_services:
+- warmup
+
 env_variables:
   PMI_ENV: 'dev'
