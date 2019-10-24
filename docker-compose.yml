@@ -14,9 +14,7 @@ services:
             - ./sql/healthpro:/docker-entrypoint-initdb.d
 
     web:
-        build:
-            context: ./docker
-            dockerfile: Dockerfile
+        build: .
         container_name: healthpro-web
         hostname: healthpro-web
         links:
