@@ -6,3 +6,9 @@ for FILE in $FILES
 do
   mysql -h healthpro-mysql -u root hpo < $FILE
 done
+
+FILES="${APP_DIR}/sql/dashboards/*"
+for FILE in $FILES
+do
+  mysql -h healthpro-mysql -u root hpo < $FILE
+done
