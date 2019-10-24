@@ -7,10 +7,10 @@ RUN mkdir -p /usr/share/man/man1
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
       && apt-get update \
       && apt-get install -y --no-install-recommends \
-        default-mysql-client=1.0.5 \
-        git-all=1:2.20.1-2 \
-        nodejs=12.11.1-1nodesource1 \
-        openjdk-11-jdk=11.0.5+10-1~deb10u1 \
+        default-mysql-client \
+        git-all \
+        nodejs \
+        openjdk-11-jdk \
       && docker-php-ext-install pdo_mysql \
       && rm -rf /var/lib/apt/lists/*
 
