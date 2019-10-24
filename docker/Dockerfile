@@ -7,6 +7,7 @@ RUN mkdir -p /usr/share/man/man1
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
       && apt-get update \
       && apt-get install -y --no-install-recommends \
+        libpython2.7-stdlib \
         default-mysql-client \
         git-all \
         nodejs \
@@ -16,7 +17,7 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
 
 # Google Cloud Tools
 WORKDIR /opt
-RUN export CLOUDSDK_PYTHON=/usr/bin/python3 \
+RUN export CLOUDSDK_PYTHON=/usr/bin/python \
       && curl -Os https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-267.0.0-linux-x86_64.tar.gz \
       && tar -xzf google-cloud-sdk-267.0.0-linux-x86_64.tar.gz \
       && /opt/google-cloud-sdk/install.sh --quiet --path-update true \
@@ -28,4 +29,4 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Start emulator and the web server
 WORKDIR /app
-CMD ["/bin/sh", "-c", "gcloud beta emulators datastore start & bin/console pmi:deploy --local 2>&1"]
+CMD ["/bin/sh", "-c", "/opt/google-cloud-sdk/bin/gcloud beta emulators datastore start & bin/console pmi:deploy --local 2>&1"]
