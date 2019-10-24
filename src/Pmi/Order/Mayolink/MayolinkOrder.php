@@ -44,7 +44,7 @@ class MayolinkOrder
                 'body' => $xml
             ]);            
         } catch (\Exception $e) {
-            syslog(LOG_CRIT, $e->getMessage());
+            $this->app['logger']->critical($e->getMessage());
             return false;
         }
         if ($response->getStatusCode() !== 201) {
@@ -68,7 +68,7 @@ class MayolinkOrder
                 'body' => $xml
             ]);            
         } catch (\Exception $e) {
-            syslog(LOG_CRIT, $e->getMessage());
+            $this->app['logger']->critical($e->getMessage());
             return false;
         }
         if ($response->getStatusCode() !== 200) {
@@ -87,7 +87,7 @@ class MayolinkOrder
                 'auth' => [$this->userName, $this->password]
             ]);            
         } catch (\Exception $e) {
-            syslog(LOG_CRIT, $e->getMessage());
+            $this->app['logger']->critical($e->getMessage());
             return false;       
         }
         if ($response->getStatusCode() !== 200) {
