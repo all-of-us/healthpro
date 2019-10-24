@@ -10,6 +10,8 @@ services:
         image: mysql:5.7
         ports:
             - "53306:3306"
+        volumes:
+            - ./sql/healthpro:/docker-entrypoint-initdb.d
 
     web:
         build:
