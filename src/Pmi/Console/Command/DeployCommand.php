@@ -136,7 +136,7 @@ class DeployCommand extends Command {
             $output->writeln("Compiling assets...");
             $this->exec("{$this->appDir}/bin/gulp compile");
         }
-        
+
         // security checks
         $this->runSecurityCheck();
         $this->out->writeln('');
@@ -148,7 +148,7 @@ class DeployCommand extends Command {
         }
 
         if ($this->local) {
-            $cmd = "php -S localhost:{$this->port} -t web/ web/local-router.php";
+            $cmd = "php -S 0.0.0.0:{$this->port} -t web/ web/local-router.php";
         } else {
             $cmd = "gcloud app deploy --quiet --project={$this->appId} {$this->appDir}/app.yaml {$this->appDir}/cron.yaml";
         }
@@ -218,7 +218,7 @@ class DeployCommand extends Command {
     {
         return !$this->local && in_array($this->appId, self::$STABLE_APP_IDS);
     }
-    
+
     private function isStaging()
     {
         return !$this->local && in_array($this->appId, self::$STAGING_APP_IDS);
@@ -465,7 +465,7 @@ class DeployCommand extends Command {
                     }
                 }
                 if (!empty($advisories)) {
-                    $newVulnerabilities[$key]['advisories'] = $advisories; 
+                    $newVulnerabilities[$key]['advisories'] = $advisories;
                 } else {
                     unset($newVulnerabilities[$key]);
                 }
