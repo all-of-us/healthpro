@@ -42,11 +42,6 @@ class DeployCommand extends Command {
         'pmi-hpo-test'
     ];
 
-    /** Don't require `login: admin` for these application IDs. */
-    private static $SKIP_ADMIN_APP_IDS = [
-        'pmi-hpo-dev' // this is behind a WAF so we don't want GAE login
-    ];
-
     /** Apply enhanced instance class and scaling for these application IDs. */
     private static $SCALE_APP_IDS = [
         'healthpro-prod'
@@ -319,22 +314,11 @@ class DeployCommand extends Command {
         $yaml = new Parser();
         $config = $yaml->parse(file_get_contents($distFile));
 
-        // do this prior to excluding crons so developers are notified about
-        // missing backups well in advance of to deploying to production
-        $this->checkCronBackups($config);
-
         // adjust crons depending on environment
         $crons = [];
         foreach ($config['cron'] as $c) {
             if (stristr($c['url'], '/ping-test') !== false && $this->isProd()) {
                 continue;
-            } elseif (stristr($c['url'], '/_ah/datastore_admin/backup.create') !== false) {
-                // enable DS backup only in production and test sites
-                if (!$this->isProd() && !$this->isStable() && !$this->isStaging()) {
-                    continue;
-                } else {
-                    $c['url'] = str_replace('{BUCKET_PREFIX}', $this->appId, $c['url']);
-                }
             }
             $crons[] = $c;
         }
@@ -342,39 +326,6 @@ class DeployCommand extends Command {
 
         $dumper = new Dumper();
         file_put_contents($configFile, count($crons) ? $dumper->dump($config, PHP_INT_MAX) : 'cron:');
-    }
-
-    private function checkCronBackups($config)
-    {
-        $cronKinds = [];
-        foreach ($config['cron'] as $c) {
-            if (stripos($c['url'], '/_ah/datastore_admin/backup.create') === 0) {
-                if (strlen($c['url']) > 2000) {
-                    throw new \Exception("URL character limit exceeded: {$c['url']}");
-                }
-                if (preg_match_all('/kind=(\w+)/', $c['url'], $m) > 0) {
-                    foreach ($m[1] as $kind) {
-                        $cronKinds[$kind] = $kind;
-                    }
-                }
-            }
-        }
-
-        $pmiKinds = [];
-        $files = glob("{$this->appDir}/src/Pmi/Entities/*.php");
-        if (count($files) === 0) {
-            throw new \Exception("No Datastore entity classes were found!");
-        }
-        foreach ($files as $file) {
-            $entity = basename($file, '.php');
-            $pmiKinds[$entity] = $entity;
-        }
-
-        foreach ($cronKinds as $kind) {
-            if (empty($pmiKinds[$kind])) {
-                throw new \Exception("No entity exists for datastore backup of kind {$kind}!");
-            }
-        }
     }
 
     /** Check all handlers for security concerns. */
