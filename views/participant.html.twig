@@ -223,7 +223,9 @@
                                 <div class="panel-body">
                                     <p>{{ errorMessage }}</p>
                                     {% if participant.statusReason == 'withdrawal' %}
-                                        <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalAuthored|date('n/j/Y g:ia', app.userTimezone) }}</p>
+                                        {% if participant.withdrawalAuthored is not empty %}
+                                            <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalAuthored|date('n/j/Y g:ia', app.userTimezone) }}</p>
+                                        {% endif %}
                                         {% if participant.withdrawalReason is not empty %}
                                             <p>
                                                 <strong>Reason:</strong> {{ participant.withdrawalReason }}
@@ -614,7 +616,9 @@
                                         <div class="panel-body">
                                         <p>{{ errorMessage }}</p>
                                         {% if participant.statusReason == 'withdrawal' %}
-                                            <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalAuthored|date('n/j/Y g:ia', app.userTimezone) }}</p>
+                                            {% if participant.withdrawalAuthored is not empty %}
+                                                <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalAuthored ? participant.withdrawalAuthored|date('n/j/Y g:ia', app.userTimezone) }}</p>
+                                            {% endif %}
                                             {% if participant.withdrawalReason is not empty %}
                                                 <p>
                                                     <strong>Reason:</strong> {{ participant.withdrawalReason }}
