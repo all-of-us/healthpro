@@ -48,7 +48,7 @@ class BiobankController extends AbstractController
                         $bioBankIdPrefix = preg_quote($bioBankIdPrefix, '/');
                         if (!preg_match("/^{$bioBankIdPrefix}\d*$/", $bioBankId)) {
                             $context
-                                ->buildViolation('Invalid biobank ID')
+                                ->buildViolation("Invalid biobank ID. Must be in the format of {$bioBankIdPrefix}000000000")
                                 ->addViolation();
                         }
                     })
