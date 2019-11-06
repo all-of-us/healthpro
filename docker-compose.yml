@@ -2,7 +2,7 @@ version: '2'
 services:
     mysql:
         environment:
-            MYSQL_ROOT_PASSWORD: ~
+            MYSQL_ROOT_PASSWORD: ''
             MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
             MYSQL_DATABASE: hpo
         container_name: healthpro-mysql

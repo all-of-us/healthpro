@@ -13,3 +13,4 @@ php.ini
 /bin/GeoLite2-Country.mmdb
 ci/*.secret
 /deploy_*.txt
+/docker-compose.override.yml
