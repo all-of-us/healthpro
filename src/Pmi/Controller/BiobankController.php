@@ -70,6 +70,7 @@ class BiobankController extends AbstractController
                         'biobankId' => $searchResults[0]->biobankId
                     ]);
                 }
+                $app->addFlashError('Biobank ID not found');
             } catch (ParticipantSearchExceptionInterface $e) {
                 $app->addFlashError('Biobank ID not found');
             }
