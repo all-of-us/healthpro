@@ -8,7 +8,7 @@
         <div id="participants-by-lifecycle" class="tab-pane pad active fade in">
             <div class="row">
                 <div class="col-md-3">
-                    {% include 'dashboard/partials/filters.html.twig' with {id: 'participants-by-lifecycle', show_organizations: false, show_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: false} %}
+                    {% include 'dashboard/partials/filters.html.twig' with {id: 'participants-by-lifecycle', show_organizations: false, show_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: true} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -66,6 +66,7 @@
     // success handler calls Plotly.newplot()
     function renderLcPlot(dialogType) {
         var lifecycleCenters = loadRecruitmentFilters('participants-by-lifecycle');
+        var enrollmentStatuses = loadEnrollmentFilters('participants-by-lifecycle');
         if (lifecycleCenters.length == 0) {
             alert('You must select at least one recruitment center to plot results');
             return false;
@@ -98,6 +99,7 @@
           mode: 'overview',
           end_date: lcEndDate,
           centers: lifecycleCenters,
+          enrollment_statuses: enrollmentStatuses,
           history: true
         })
         .done(function(data) {
@@ -155,6 +157,7 @@
           mode: 'ppi_baseline',
           end_date: lcEndDate,
           centers: lifecycleCenters,
+          enrollment_statuses: enrollmentStatuses,
           history: true
         })
         .done(function(data) {
@@ -212,6 +215,7 @@
           mode: 'ppi_retention',
           end_date: lcEndDate,
           centers: lifecycleCenters,
+          enrollment_statuses: enrollmentStatuses,
           history: true
         })
         .done(function(data) {
