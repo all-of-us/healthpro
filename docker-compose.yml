@@ -2,7 +2,7 @@ version: '2'
 services:
     mysql:
         environment:
-            MYSQL_ROOT_PASSWORD: ~
+            MYSQL_ROOT_PASSWORD: ''
             MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
             MYSQL_DATABASE: hpo
         container_name: healthpro-mysql
@@ -14,6 +14,11 @@ services:
             - ./sql/healthpro:/docker-entrypoint-initdb.d
 
     web:
+        environment:
+            MYSQL_HOST: healthpro-mysql
+            MYSQL_DATABASE: hpo
+            MYSQL_USER: root
+            MYSQL_PASSWORD: ''
         build: .
         container_name: healthpro-web
         hostname: healthpro-web

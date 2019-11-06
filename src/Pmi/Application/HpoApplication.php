@@ -156,6 +156,21 @@ class HpoApplication extends AbstractApplication
         $schema = $this->getConfig('mysql_schema');
         $user = $this->getConfig('mysql_user');
         $password = $this->getConfig('mysql_password');
+        if ($this->isLocal()) {
+            // look for Docker environment variables override
+            if (getenv('MYSQL_HOST')) {
+                $host = getenv('MYSQL_HOST');
+            }
+            if (getenv('MYSQL_DATABASE')) {
+                $schema = getenv('MYSQL_DATABASE');
+            }
+            if (getenv('MYSQL_USER')) {
+                $user = getenv('MYSQL_USER');
+            }
+            if (getenv('MYSQL_PASSWORD') !== false) {
+                $password = getenv('MYSQL_PASSWORD');
+            }
+        }
         if ($socket) {
             $options = [
                 'driver' => 'pdo_mysql',
