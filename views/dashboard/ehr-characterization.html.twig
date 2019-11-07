@@ -213,9 +213,9 @@ function renderMetricPlots() {
                   showError(plotlyDiv, ErrorMessages.no_data)
               }
 
-              // Population by Race
+              // Concepts Per Person
               plotlyDiv = $('#plotly-ehr-concepts-per-person').empty();
-              plotlyTitle = '<b>Pouplation by Race</b>';
+              plotlyTitle = '<b>Concepts Per Person</b>';
               if (data.conceptsPerPerson.length != 0) {
                   plotlyLayout = {
                       title: plotlyTitle,

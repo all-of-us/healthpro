@@ -27,7 +27,7 @@
         "twig/twig": "^1.24",
         "fzaninotto/faker": "^1.6",
         "cache/memcache-adapter": "^0.2.2",
-        "google/cloud-storage": "^1.14"
+        "google/cloud-storage": "^1.15"
     },
     "config": {
         "platform": {

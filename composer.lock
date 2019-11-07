@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "baa17d402e2b0c07a7701baa4768a15d",
+    "content-hash": "712483177733d19fbf4a133a874bc233",
     "packages": [
         {
             "name": "cache/adapter-common",
@@ -1066,16 +1066,16 @@
         },
         {
             "name": "google/cloud-storage",
-            "version": "v1.14.0",
+            "version": "v1.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-storage.git",
-                "reference": "7315239270318e618f025791b20ac8cc2586ccf0"
+                "reference": "003eb1a735d77f8196f816c4a921199d15c4a82c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-storage/zipball/7315239270318e618f025791b20ac8cc2586ccf0",
-                "reference": "7315239270318e618f025791b20ac8cc2586ccf0",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-storage/zipball/003eb1a735d77f8196f816c4a921199d15c4a82c",
+                "reference": "003eb1a735d77f8196f816c4a921199d15c4a82c",
                 "shasum": ""
             },
             "require": {
@@ -1113,7 +1113,7 @@
                 "Apache-2.0"
             ],
             "description": "Cloud Storage Client for PHP",
-            "time": "2019-08-07T20:57:43+00:00"
+            "time": "2019-10-28T19:05:44+00:00"
         },
         {
             "name": "google/crc32",

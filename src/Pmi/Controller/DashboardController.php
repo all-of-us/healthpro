@@ -219,13 +219,10 @@ class DashboardController extends AbstractController
             'suppressKeyFileNotice' => true
         ]);
 
-        // $object = $storageService->getObject($bucket, 'index.html');
-        // $output = $object->downloadAsString();
-        // return new Response($output);
-
         switch ($request->get('mode')) {
             case 'person':
-                $person = json_decode(file_get_contents(dirname(__FILE__) . '/../../../cache/curation_report/person.json'));
+                $object = $storageService->getObject($bucket, 'curation_report/data/combined20191004v2/person.json');
+                $person = json_decode($object->downloadAsString());
                 $person_intervals = range($person->BIRTH_YEAR_HISTOGRAM->MIN, $person->BIRTH_YEAR_HISTOGRAM->MAX);
                 $person_output = [];
                 foreach ($person_intervals as $i => $interval) {
@@ -279,7 +276,8 @@ class DashboardController extends AbstractController
                 ]);
                 break;
             case 'density':
-                $density = json_decode(file_get_contents(dirname(__FILE__) . '/../../../cache/curation_report/pitt/datadensity.json'));
+                $object = $storageService->getObject($bucket, 'curation_report/data/combined20191004v2/datadensity.json');
+                $density = json_decode($object->downloadAsString());
 
                 $totalRecords = [];
                 foreach ($density->TOTAL_RECORDS->SERIES_NAME as $i => $incidentType) {
@@ -310,14 +308,30 @@ class DashboardController extends AbstractController
                 }
 
                 $conceptsPerPerson = [];
-                // foreach ($density->CONCEPTS_PER_PERSON->CATEGORY as $i => $category) {
-                //     $conceptsPerPerson[$category]['x'][] = $category,
-                //     $conceptsPerPerson[$category]['y'][] = $density->CONCEPTS_PER_PERSON->Y_RECORD_COUNT[$i];
-                //     $conceptsPerPerson[$category]['text'][] = $density->CONCEPTS_PER_PERSON->Y_RECORD_COUNT[$i];
-                //     $conceptsPerPerson[$category]['type'] = 'line';
-                //     $conceptsPerPerson[$category]['hoverinfo'] = 'text+name';
-                //     $conceptsPerPerson[$category]['name'] = $personType;
-                // }
+                foreach ($density->CONCEPTS_PER_PERSON->CATEGORY as $i => $category) {
+                    // $conceptsPerPerson[$category]['x'][] = $category;
+                    $conceptsPerPerson[$category]['y'] = [
+                        // $density->CONCEPTS_PER_PERSON->MIN_VALUE[$i],
+                        $density->CONCEPTS_PER_PERSON->P10_VALUE[$i],
+                        $density->CONCEPTS_PER_PERSON->P25_VALUE[$i],
+                        // $density->CONCEPTS_PER_PERSON->MEDIAN_VALUE[$i],
+                        $density->CONCEPTS_PER_PERSON->P75_VALUE[$i],
+                        $density->CONCEPTS_PER_PERSON->P90_VALUE[$i],
+                        // $density->CONCEPTS_PER_PERSON->MAX_VALUE[$i]
+                    ];
+                    $conceptsPerPerson[$category]['text'] = [
+                        // $density->CONCEPTS_PER_PERSON->MIN_VALUE[$i],
+                        $density->CONCEPTS_PER_PERSON->P10_VALUE[$i],
+                        $density->CONCEPTS_PER_PERSON->P25_VALUE[$i],
+                        // $density->CONCEPTS_PER_PERSON->MEDIAN_VALUE[$i],
+                        $density->CONCEPTS_PER_PERSON->P75_VALUE[$i],
+                        $density->CONCEPTS_PER_PERSON->P90_VALUE[$i],
+                        // $density->CONCEPTS_PER_PERSON->MAX_VALUE[$i]
+                    ];
+                    $conceptsPerPerson[$category]['type'] = 'box';
+                    $conceptsPerPerson[$category]['hoverinfo'] = 'y+text';
+                    $conceptsPerPerson[$category]['name'] = $category;
+                }
 
                 return $app->json([
                     'totalRows' => array_values($totalRecords),
@@ -326,7 +340,8 @@ class DashboardController extends AbstractController
                 ]);
                 break;
             case 'achillesheel':
-                $errors = json_decode(file_get_contents(dirname(__FILE__) . '/../../../cache/curation_report/pitt/achillesheel.json'));
+                $object = $storageService->getObject($bucket, 'curation_report/data/combined20191004v2/achillesheel.json');
+                $errors = json_decode($object->downloadAsString());
                 $output = [];
                 foreach ($errors->MESSAGES->ATTRIBUTEVALUE as $row) {
                     preg_match('/^(\w+)\:(.*)/', $row, $matches);
