@@ -262,7 +262,7 @@ class WorkQueueController extends AbstractController
 
         $params = array_filter($request->query->all());
         $params['_count'] = $pageSize;
-        $params['_sort:desc'] = 'consentForStudyEnrollmentTime';
+        $params['_sort:desc'] = 'consentForStudyEnrollmentAuthored';
 
         $stream = function() use ($app, $params, $organization, $hasFullDataAccess, $limit, $pageSize) {
             $output = fopen('php://output', 'w');
@@ -351,13 +351,13 @@ class WorkQueueController extends AbstractController
                             $participant->language,
                             $participant->enrollmentStatus,
                             WorkQueue::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-                            WorkQueue::dateFromString($participant->consentForStudyEnrollmentTime, $app->getUserTimezone()),
+                            WorkQueue::dateFromString($participant->consentForStudyEnrollmentAuthored, $app->getUserTimezone()),
                             WorkQueue::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-                            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsTime, $app->getUserTimezone()),
+                            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsAuthored, $app->getUserTimezone()),
                             WorkQueue::csvStatusFromSubmitted($participant->consentForCABoR),
-                            WorkQueue::dateFromString($participant->consentForCABoRTime, $app->getUserTimezone()),
+                            WorkQueue::dateFromString($participant->consentForCABoRAuthored, $app->getUserTimezone()),
                             $participant->withdrawalStatus == 'NO_USE' ? '1' : '0',
-                            WorkQueue::dateFromString($participant->withdrawalTime, $app->getUserTimezone()),
+                            WorkQueue::dateFromString($participant->withdrawalAuthored, $app->getUserTimezone()),
                             $participant->streetAddress,
                             $participant->city,
                             $participant->state,
@@ -373,7 +373,7 @@ class WorkQueueController extends AbstractController
                         ];
                         foreach (WorkQueue::$surveys as $survey => $label) {
                             $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                            $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Time"}, $app->getUserTimezone());
+                            $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
                         }
                     } else {
                         $row = [
@@ -404,7 +404,7 @@ class WorkQueueController extends AbstractController
                     $row[] = $participant->withdrawalReason;
                     $row[] = $participant->primaryLanguage;
                     $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForDvElectronicHealthRecordsSharing);
-                    $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingTime, $app->getUserTimezone());
+                    $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingAuthored, $app->getUserTimezone());
                     if ($hasFullDataAccess) {
                         $row[] = $participant->loginPhoneNumber;
                         $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
