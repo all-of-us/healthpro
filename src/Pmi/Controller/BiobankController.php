@@ -34,25 +34,20 @@ class BiobankController extends AbstractController
     public function participantsAction(Application $app, Request $request)
     {
         $bioBankIdPrefix = $app->getConfig('biobank_id_prefix');
+        $constraints = [
+            new Constraints\NotBlank(),
+            new Constraints\Type('string')
+        ];
+        if (!empty($bioBankIdPrefix)) {
+            $constraints[] = new Constraints\Regex([
+                'pattern' => "/^{$bioBankIdPrefix}\d+$/",
+                'message' => "Invalid biobank ID. Must be in the format of {$bioBankIdPrefix}000000000"
+            ]);
+        }
         $idForm = $app['form.factory']->createNamedBuilder('id', Type\FormType::class)
             ->add('biobankId', Type\TextType::class, [
                 'label' => 'Biobank ID',
-                'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Type('string'),
-                    new Constraints\Callback(function($bioBankId, $context) use ($bioBankIdPrefix) {
-                        if (empty($bioBankIdPrefix)) {
-                            return;
-                        }
-                        $bioBankId = trim($bioBankId);
-                        $bioBankIdPrefix = preg_quote($bioBankIdPrefix, '/');
-                        if (!preg_match("/^{$bioBankIdPrefix}\d*$/", $bioBankId)) {
-                            $context
-                                ->buildViolation("Invalid biobank ID. Must be in the format of {$bioBankIdPrefix}000000000")
-                                ->addViolation();
-                        }
-                    })
-                ],
+                'constraints' => $constraints,
                 'attr' => [
                     'placeholder' => !empty($bioBankIdPrefix) ? $bioBankIdPrefix . '000000000' : 'Enter biobank ID'
                 ]
