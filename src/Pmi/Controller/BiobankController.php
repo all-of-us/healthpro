@@ -39,9 +39,9 @@ class BiobankController extends AbstractController
             new Constraints\Type('string')
         ];
         if (!empty($bioBankIdPrefix)) {
-            $bioBankIdPrefix = preg_quote($bioBankIdPrefix, '/');
+            $bioBankIdPrefixQuote = preg_quote($bioBankIdPrefix, '/');
             $constraints[] = new Constraints\Regex([
-                'pattern' => "/^{$bioBankIdPrefix}\d+$/",
+                'pattern' => "/^{$bioBankIdPrefixQuote}\d+$/",
                 'message' => "Invalid biobank ID. Must be in the format of {$bioBankIdPrefix}000000000"
             ]);
         }
