@@ -54,7 +54,7 @@ class BiobankController extends AbstractController
                     })
                 ],
                 'attr' => [
-                    'placeholder' => $bioBankIdPrefix ? $bioBankIdPrefix . '000000000' : 'Enter biobank ID'
+                    'placeholder' => !empty($bioBankIdPrefix) ? $bioBankIdPrefix . '000000000' : 'Enter biobank ID'
                 ]
             ])
             ->getForm();
