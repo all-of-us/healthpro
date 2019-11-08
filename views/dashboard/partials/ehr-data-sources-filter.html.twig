@@ -1,0 +1,5 @@
+<select name="ehr_data_source">
+    {% for source in ehr_data_sources %}
+    <option value="{{ source.folder }}">{{ source.name }}</option>
+    {% endfor %}
+</select>

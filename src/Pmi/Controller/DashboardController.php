@@ -193,8 +193,22 @@ class DashboardController extends AbstractController
      */
     public function ehrCharacterizationAction(Application $app)
     {
+        $storageService = new StorageService([
+            'keyFile' => (array) json_decode(file_get_contents(dirname(__FILE__) . '/../../../dev_config/rdr_key.json', true)),
+            'suppressKeyFileNotice' => true
+        ]);
+
+        $rootPath = $app->getConfig('rdr_curation_report_path');
+        preg_match('/https\:\/\/storage\.googleapis\.com\/(.*)\.appspot\.com\/(.*)/i', $rootPath, $matches);
+        $bucket = $matches[2];
+
+        $object = $storageService->getObject($bucket, 'curation_report/data/datasources.json');
+        $ehrDataSources = json_decode($object->downloadAsString())->datasources;
         return $app['twig']->render(
-            'dashboard/ehr-characterization.html.twig'
+            'dashboard/ehr-characterization.html.twig', [
+                'ehr_data_sources' => $ehrDataSources
+            ]
+
         );
     }
 
@@ -209,7 +223,6 @@ class DashboardController extends AbstractController
     {
         $rootPath = $app->getConfig('rdr_curation_report_path');
         preg_match('/https\:\/\/storage\.googleapis\.com\/(.*)\.appspot\.com\/(.*)/i', $rootPath, $matches);
-        $project = $matches[1];
         $bucket = $matches[2];
 
         $output = [];

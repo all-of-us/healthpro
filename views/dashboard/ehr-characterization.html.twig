@@ -31,11 +31,17 @@
             </div>
           </div>
           <p><br /></p>
+          <div class="pull-right">
+            {% include 'dashboard/partials/ehr-data-sources-filter.html.twig' %}
+          </div>
           <h3 id="dataDensityReport">Data Density</h3>
           <hr />
           <div id="plotly-ehr-total-rows" class="plotly-div"></div>
           <div id="plotly-ehr-records-per-person" class="plotly-div"></div>
           <div id="plotly-ehr-concepts-per-person" class="plotly-div"></div>
+          <div class="pull-right">
+            {% include 'dashboard/partials/ehr-data-sources-filter.html.twig' %}
+          </div>
           <h3 id="achillesReport">Achilles Report</h3>
           <hr />
           <table id="ehr-errors-table" class="table table-sm">
