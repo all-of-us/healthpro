@@ -79,35 +79,20 @@ class CronController extends AbstractController
         return (new JsonResponse())->setData(true);
     }
 
-    public function sitesAction(Application $app, Request $request)
+    public function sitesAction(Application $app)
     {
-        $action = $request->get('action');
-        if (!in_array($action, ['sync', 'preview'])) {
-            return (new JsonResponse())->setData(['error' => 'Invalid action']);
-        }
-
-        $siteSync = new SiteSyncService(
-            $app['pmi.drc.rdrhelper']->getClient(),
-            $app['em']
-        );
+        $siteSync = new SiteSyncService($app);
         $isProd = $app->isProd();
-        if ($action === 'sync') {
-            if (!$app->getConfig('sites_use_rdr')) {
-                return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
-            }
-            $results = $siteSync->sync($isProd);
-        } else {
-            $results = $siteSync->dryRun($isProd);
+        if (!$app->getConfig('sites_use_rdr')) {
+            return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
         }
+        $results = $siteSync->sync($isProd);
         return (new JsonResponse())->setData($results);
     }
 
     public function awardeesAndOrganizationsAction(Application $app)
     {
-        $siteSync = new SiteSyncService(
-            $app['pmi.drc.rdrhelper']->getClient(),
-            $app['em']
-        );
+        $siteSync = new SiteSyncService($app);
         $siteSync->syncAwardees();
         $siteSync->syncOrganizations();
         return (new JsonResponse())->setData(true);

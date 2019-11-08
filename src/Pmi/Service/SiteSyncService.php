@@ -1,17 +1,21 @@
 <?php
 namespace Pmi\Service;
 
+use Pmi\Audit\Log;
+
 class SiteSyncService
 {
+    private $app;
     private $rdrClient;
     private $em;
     private $orgEndpoint = 'rdr/v1/Awardee?_inactive=true';
     private $entries;
 
-    public function __construct($rdrClient, $entityManager)
+    public function __construct($app)
     {
-        $this->rdrClient = $rdrClient;
-        $this->em = $entityManager;
+        $this->app = $app;
+        $this->rdrClient = $app['pmi.drc.rdrhelper']->getClient();
+        $this->em = $app['em'];
     }
 
     private function getAwardeeEntriesFromRdr()
@@ -107,13 +111,19 @@ class SiteSyncService
                             ];
                             if (!$preview) {
                                 $sitesRepository->update($primaryId, $siteData);
+                                $this->app->log(Log::SITE_EDIT, [
+                                    'id' => $primaryId,
+                                    'old' => $existing,
+                                    'new' => $siteData
+                                ]);
                             }
                         }
                         unset($deleted[array_search($siteId, $deleted)]);
                     } else {
                         $created[] = $siteData;
                         if (!$preview) {
-                            $sitesRepository->insert($siteData);
+                            $insertId = $sitesRepository->insert($siteData);
+                            $this->app->log(Log::SITE_ADD, $insertId);
                         }
                     }
                 }
@@ -123,6 +133,7 @@ class SiteSyncService
         if (!$preview) {
             foreach ($deleted as $siteId) {
                 $sitesRepository->delete($existingSites[$siteId]['id']);
+                $this->app->log(Log::SITE_DELETE, $existingSites[$siteId]['id']);
             }
         }
 

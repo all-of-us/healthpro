@@ -56,10 +56,7 @@ class AdminController extends AbstractController
 
     public function siteSyncAction(Application $app, Request $request)
     {
-        $siteSync = new SiteSyncService(
-            $app['pmi.drc.rdrhelper']->getClient(),
-            $app['em']
-        );
+        $siteSync = new SiteSyncService($app);
         $isProd = $app->isProd();
         $preview = $siteSync->dryRun($isProd);
 
