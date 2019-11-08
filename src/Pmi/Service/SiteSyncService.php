@@ -162,10 +162,11 @@ class SiteSyncService
         $awardeesRepository->wrapInTransaction(function() use ($awardeesRepository, $awardeesMap) {
             $awardeesRepository->truncate();
             foreach ($awardeesMap as $id => $name) {
-                $awardeesRepository->insert([
+                $awardeeId = $awardeesRepository->insert([
                     'id' => $id,
                     'name' => $name
                 ]);
+                $this->app->log(Log::AWARDEE_ADD, $awardeeId);
             }
         });
     }
@@ -190,10 +191,11 @@ class SiteSyncService
         $organizationsRepository->wrapInTransaction(function() use ($organizationsRepository, $organizationsMap) {
             $organizationsRepository->truncate();
             foreach ($organizationsMap as $id => $name) {
-                $organizationsRepository->insert([
+                $organizationId = $organizationsRepository->insert([
                     'id' => $id,
                     'name' => $name
                 ]);
+                $this->app->log(Log::ORGANIZATION_ADD, $organizationId);
             }
         });
     }
