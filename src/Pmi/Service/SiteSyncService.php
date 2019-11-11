@@ -35,7 +35,7 @@ class SiteSyncService
     private function getSitesFromDb()
     {
         $sitesRepository = $this->em->getRepository('sites');
-        $sites = $sitesRepository->fetchBy([]);
+        $sites = $sitesRepository->fetchBy(['deleted' => 0]);
         $sitesById = [];
         foreach ($sites as $site) {
             $sitesById[$site['google_group']] = $site;
@@ -132,7 +132,7 @@ class SiteSyncService
         $deleted = array_values($deleted);
         if (!$preview) {
             foreach ($deleted as $siteId) {
-                $sitesRepository->delete($existingSites[$siteId]['id']);
+                $sitesRepository->update($existingSites[$siteId]['id'], ['deleted' => 1]);
                 $this->app->log(Log::SITE_DELETE, $existingSites[$siteId]['id']);
             }
         }
