@@ -122,8 +122,8 @@ class SiteSyncService
                     } else {
                         $created[] = $siteData;
                         if (!$preview) {
-                            $insertId = $sitesRepository->insert($siteData);
-                            $this->app->log(Log::SITE_ADD, $insertId);
+                            $siteInsertId = $sitesRepository->insert($siteData);
+                            $this->app->log(Log::SITE_ADD, $siteInsertId);
                         }
                     }
                 }
