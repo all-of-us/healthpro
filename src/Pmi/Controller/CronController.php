@@ -81,17 +81,20 @@ class CronController extends AbstractController
 
     public function sitesAction(Application $app)
     {
-        $siteSync = new SiteSyncService($app);
-        $isProd = $app->isProd();
         if (!$app->getConfig('sites_use_rdr')) {
             return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
         }
+        $siteSync = new SiteSyncService($app);
+        $isProd = $app->isProd();
         $siteSync->sync($isProd);
         return (new JsonResponse())->setData(true);
     }
 
     public function awardeesAndOrganizationsAction(Application $app)
     {
+        if (!$app->getConfig('sites_use_rdr')) {
+            return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
+        }
         $siteSync = new SiteSyncService($app);
         $siteSync->syncAwardees();
         $siteSync->syncOrganizations();
