@@ -506,6 +506,7 @@ class Order
             ]);
             if ($this->app->isDVType()) {
                 $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
+                    'deleted' => 0,
                     'google_group' => $this->app->getSiteId()
                 ]);
                 if ($this->order['type'] !== 'saliva' && !empty($enabledSamples) && empty($sites['centrifuge_type'])) {
