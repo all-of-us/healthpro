@@ -14,5 +14,6 @@ CREATE TABLE `sites` (
   `email` varchar(512) DEFAULT NULL,
   `centrifuge_type` varchar(50) NULL DEFAULT NULL,
   `workqueue_download` varchar(50) NOT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8mb4;

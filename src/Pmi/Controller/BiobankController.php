@@ -33,15 +33,24 @@ class BiobankController extends AbstractController
 
     public function participantsAction(Application $app, Request $request)
     {
+        $bioBankIdPrefix = $app->getConfig('biobank_id_prefix');
+        $constraints = [
+            new Constraints\NotBlank(),
+            new Constraints\Type('string')
+        ];
+        if (!empty($bioBankIdPrefix)) {
+            $bioBankIdPrefixQuote = preg_quote($bioBankIdPrefix, '/');
+            $constraints[] = new Constraints\Regex([
+                'pattern' => "/^{$bioBankIdPrefixQuote}\d+$/",
+                'message' => "Invalid biobank ID. Must be in the format of {$bioBankIdPrefix}000000000"
+            ]);
+        }
         $idForm = $app['form.factory']->createNamedBuilder('id', Type\FormType::class)
             ->add('biobankId', Type\TextType::class, [
                 'label' => 'Biobank ID',
-                'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Type('string')
-                ],
+                'constraints' => $constraints,
                 'attr' => [
-                    'placeholder' => 'Enter biobank ID'
+                    'placeholder' => !empty($bioBankIdPrefix) ? $bioBankIdPrefix . '000000000' : 'Enter biobank ID'
                 ]
             ])
             ->getForm();
@@ -57,6 +66,7 @@ class BiobankController extends AbstractController
                         'biobankId' => $searchResults[0]->biobankId
                     ]);
                 }
+                $app->addFlashError('Biobank ID not found');
             } catch (ParticipantSearchExceptionInterface $e) {
                 $app->addFlashError('Biobank ID not found');
             }
