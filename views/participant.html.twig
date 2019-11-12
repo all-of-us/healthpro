@@ -209,7 +209,13 @@
                         {% set errorMessage = 'This participant has consented but has not completed "The Basics" survey in the participant app and is therefore ineligible for physical measurements and biospecimen collection. Please direct the participant to complete "The Basics" survey in the participant application to enable in person enrollment or contact the help desk if needed.' %}
                     {% elseif participant.statusReason == 'withdrawal' %}
                         {% set errorTitle = 'Withdrawn participant' %}
-                        {% set errorMessage = 'This participant has withdrawn from the All of Us Research Program. No new data can be collected or sent for this participant. Staff must also follow all site-specific SOPs to ensure all All of Us Research Program data are removed from all local systems for this participant.' %}
+                        {% if participant.withdrawalAuthored is empty %}
+                            {% set errorMessage = 'Please be advised that prior to August 23rd, 2019, the "withdrawal time" captured and displayed for participants represents the date/time at which the DRC received notification of withdrawal. While in most cases this should be not long after the date/time at which the participant withdrew (the "authored withdrawal time"), due to occasional sync errors or service disruptions, this time can be up to several days after the authored withdrawal time. For participants who withdrew on or after August 23rd, the authored withdrawal time is displayed.' %}
+                            {% set withDrawalTime = participant.withdrawalTime  %}
+                        {% else %}
+                            {% set errorMessage = 'This participant has withdrawn from the All of Us Research Program. No new data can be collected or sent for this participant. Staff must also follow all site-specific SOPs to ensure all All of Us Research Program data are removed from all local systems for this participant.' %}
+                            {% set withDrawalTime = participant.withdrawalAuthored  %}
+                        {% endif %}
                     {% else %}
                         {% set errorTitle = 'Consent not complete' %}
                         {% set errorMessage = 'This participant has not completed consent for enrollment.' %}
@@ -223,8 +229,8 @@
                                 <div class="panel-body">
                                     <p>{{ errorMessage }}</p>
                                     {% if participant.statusReason == 'withdrawal' %}
-                                        {% if participant.withdrawalAuthored is not empty %}
-                                            <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalAuthored|date('n/j/Y g:ia', app.userTimezone) }}</p>
+                                        {% if withDrawalTime is not empty %}
+                                            <p><strong>Withdrawal Time:</strong> {{ withDrawalTime|date('n/j/Y g:ia', app.userTimezone) }}</p>
                                         {% endif %}
                                         {% if participant.withdrawalReason is not empty %}
                                             <p>
@@ -616,8 +622,8 @@
                                         <div class="panel-body">
                                         <p>{{ errorMessage }}</p>
                                         {% if participant.statusReason == 'withdrawal' %}
-                                            {% if participant.withdrawalAuthored is not empty %}
-                                                <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalAuthored|date('n/j/Y g:ia', app.userTimezone) }}</p>
+                                            {% if withDrawalTime is not empty %}
+                                                <p><strong>Withdrawal Time:</strong> {{ withDrawalTime|date('n/j/Y g:ia', app.userTimezone) }}</p>
                                             {% endif %}
                                             {% if participant.withdrawalReason is not empty %}
                                                 <p>
