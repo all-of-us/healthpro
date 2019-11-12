@@ -1,0 +1,13 @@
+{% if participant.statusReason == 'withdrawal' %}
+    {% if withDrawalTime is not empty %}
+        <p><strong>Withdrawal Time:</strong> {{ withDrawalTime|date('n/j/Y g:ia', app.userTimezone) }}</p>
+    {% endif %}
+    {% if participant.withdrawalReason is not empty %}
+        <p>
+            <strong>Reason:</strong> {{ participant.withdrawalReason }}
+            {% if participant.withdrawalReasonJustification is not empty %}
+                <br/><strong>Justification:</strong> {{ participant.withdrawalReasonJustification }}
+            {% endif %}
+        </p>
+    {% endif %}
+{% endif %}
