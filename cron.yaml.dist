@@ -29,3 +29,11 @@ cron:
   url: /cron/send-patient-status-rdr
   schedule: 29 of feb 00:00
   timezone: America/Chicago
+- description: "Sync sites meta data"
+  url: /cron/sites
+  schedule: every day 20:00
+  timezone: America/Chicago
+- description: "Sync awardees and organizations"
+  url: /cron/awardees-organizations
+  schedule: every day 20:01
+  timezone: America/Chicago

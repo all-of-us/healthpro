@@ -442,6 +442,7 @@ class WorkQueueController extends AbstractController
     public function getSiteWorkQueueDownload($app)
     {
         $site = $app['em']->getRepository('sites')->fetchOneBy([
+            'deleted' => 0,
             'google_group' => $app->getSiteId()
         ]);
         return !empty($site) ? $site['workqueue_download'] : null;
