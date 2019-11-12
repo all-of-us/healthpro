@@ -55,6 +55,7 @@ class SiteSyncService
 
     public function sync($isProd, $preview = false)
     {
+        $sitesCount = 0;
         $created = [];
         $modified = [];
         $sitesRepository = $this->em->getRepository('sites');
@@ -71,6 +72,7 @@ class SiteSyncService
                     continue;
                 }
                 foreach ($organization->sites as $site) {
+                    $sitesCount++;
                     $existing = false;
                     $primaryId = null;
                     $siteData = [];
@@ -131,6 +133,9 @@ class SiteSyncService
         }
         $deleted = array_values($deleted);
         if (!$preview) {
+            if ($sitesCount === 0) {
+                throw new \Exception('No sites found');
+            }
             foreach ($deleted as $siteId) {
                 $sitesRepository->update($existingSites[$siteId]['id'], ['deleted' => 1]);
                 $this->app->log(Log::SITE_DELETE, $existingSites[$siteId]['id']);
@@ -157,6 +162,9 @@ class SiteSyncService
                 continue;
             }
             $awardeesMap[$awardee->id] = $awardee->displayName;
+        }
+        if (empty($awardeesMap)) {
+            throw new \Exception('No awardees found');
         }
         $awardeesRepository = $this->em->getRepository('awardees');
         $awardeesRepository->wrapInTransaction(function() use ($awardeesRepository, $awardeesMap) {
@@ -186,6 +194,9 @@ class SiteSyncService
                 }
                 $organizationsMap[$organization->id] = $organization->displayName;
             }
+        }
+        if (empty($organizationsMap)) {
+            throw new \Exception('No organizations found');
         }
         $organizationsRepository = $this->em->getRepository('organizations');
         $organizationsRepository->wrapInTransaction(function() use ($organizationsRepository, $organizationsMap) {
