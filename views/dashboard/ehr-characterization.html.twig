@@ -15,7 +15,7 @@
       <div id="plotly-tabs" class="tab-content">
         <div id="ehr-person" class="tab-pane pad active fade in">
           <div class="pull-right">
-            {% include 'dashboard/partials/ehr-data-sources-filter.html.twig' %}
+            {% include 'dashboard/partials/ehr-data-sources-filter.html.twig' with {id: 'person-filter'} %}
           </div>
           <h3 id="personReport">Person</h3>
           <hr />
@@ -36,7 +36,7 @@
         </div>
         <div id="ehr-datadensity" class="tab-pane pad fade in">
           <div class="pull-right">
-            {% include 'dashboard/partials/ehr-data-sources-filter.html.twig' %}
+            {% include 'dashboard/partials/ehr-data-sources-filter.html.twig' with {id: 'datadensity-filter'}  %}
           </div>
           <h3 id="dataDensityReport">Data Density</h3>
           <hr />
@@ -46,7 +46,7 @@
         </div>
         <div id="ehr-achilles" class="tab-pane pad fade in">
           <div class="pull-right">
-            {% include 'dashboard/partials/ehr-data-sources-filter.html.twig' %}
+            {% include 'dashboard/partials/ehr-data-sources-filter.html.twig' with {id: 'achillesheel-filter'}  %}
           </div>
           <h3 id="achillesReport">Achilles Report</h3>
           <hr />
@@ -101,7 +101,9 @@ function renderMetricPlots() {
       var plotlyDiv,
           plotlyTitle,
           plotlyLayout;
-      $.getJSON('/dashboard/ehr-characterization-data?mode=person', {
+      $.getJSON('/dashboard/ehr-characterization-data', {
+              mode: 'person',
+              source: $('#person-filter').val(),
               csrf_token: CsrfToken
           })
           .done(function(data) {
@@ -187,7 +189,9 @@ function renderMetricPlots() {
       var plotlyDiv,
           plotlyTitle,
           plotlyLayout;
-      $.getJSON('/dashboard/ehr-characterization-data?mode=density', {
+      $.getJSON('/dashboard/ehr-characterization-data', {
+              mode: 'density',
+              source: $('#datadensity-filter').val(),
               csrf_token: CsrfToken
           })
           .done(function(data) {
@@ -251,41 +255,59 @@ function renderMetricPlots() {
           });
   }
 
+  /**
+   * Errors Table
+   */
+  function updateAchillesHeelTable() {
+    // Clean up previous instance if present
+    $('#ehr-errors-table').dataTable().fnDestroy();
+    $('#ehr-errors-table').DataTable({
+      ajax: {
+        url: '/dashboard/ehr-characterization-data',
+        data: {
+          mode: 'achillesheel',
+          source: $('#achillesheel-filter').val(),
+          csrf_token: CsrfToken
+        }
+      },
+      paging: false,
+      columns: [
+        { data: 'type' },
+        { data: 'message', width: '85%' }
+      ],
+      rowCallback: function(row, data) {
+        if (data.type == 'ERROR') {
+          $(row).addClass('alert alert-danger');
+        }
+        if (data.type == 'WARNING') {
+          $(row).addClass('alert alert-warning');
+        }
+        if (data.type == 'NOTIFICATION') {
+          $(row).addClass('alert alert-info');
+        }
+      },
+      order: []
+    });
+  }
+
+  // Listen on change event
+  $('select[name="ehr_data_source"]').on('change', function () {
+    $.when(
+      updatePersonGraphs(), updateDataDensityGraphs(), updateAchillesHeelTable()
+    ).done(function() {
+        $('#loading-modal').modal('hide');
+    });
+  })
+
   // Call them in sequence
   $.when(
-    updatePersonGraphs(), updateDataDensityGraphs()
+    updatePersonGraphs(), updateDataDensityGraphs(), updateAchillesHeelTable()
   ).done(function() {
       $('#loading-modal').modal('hide');
   });
 }
 
 renderMetricPlots()
-
-/**
- * Errors Table
- */
-$(document).ready(function () {
-  $('#ehr-errors-table').DataTable({
-    ajax: '/dashboard/ehr-characterization-data?mode=achillesheel',
-    paging: false,
-    columns: [
-      { data: 'type' },
-      { data: 'message', width: '85%' }
-    ],
-    rowCallback: function(row, data) {
-      if (data.type == 'ERROR') {
-        $(row).addClass('alert alert-danger');
-      }
-      if (data.type == 'WARNING') {
-        $(row).addClass('alert alert-warning');
-      }
-      if (data.type == 'NOTIFICATION') {
-        $(row).addClass('alert alert-info');
-      }
-    },
-    order: []
-  });  
-})
 
 </script>
 {% endblock %}

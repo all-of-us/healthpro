@@ -193,17 +193,7 @@ class DashboardController extends AbstractController
      */
     public function ehrCharacterizationAction(Application $app)
     {
-        $storageService = new StorageService([
-            'keyFile' => (array) json_decode(file_get_contents(dirname(__FILE__) . '/../../../dev_config/rdr_key.json', true)),
-            'suppressKeyFileNotice' => true
-        ]);
-
-        $rootPath = $app->getConfig('rdr_curation_report_path');
-        preg_match('/https\:\/\/storage\.googleapis\.com\/(.*)\.appspot\.com\/(.*)/i', $rootPath, $matches);
-        $bucket = $matches[2];
-
-        $object = $storageService->getObject($bucket, 'curation_report/data/datasources.json');
-        $ehrDataSources = json_decode($object->downloadAsString())->datasources;
+        $ehrDataSources = $this->getEhrDataSources($app);
         return $app['twig']->render(
             'dashboard/ehr-characterization.html.twig', [
                 'ehr_data_sources' => $ehrDataSources
@@ -232,9 +222,20 @@ class DashboardController extends AbstractController
             'suppressKeyFileNotice' => true
         ]);
 
+        $dataSource = $request->get('source');
+
+        // Data source must be in list to be accepted
+        $dataSources = [];
+        foreach ($this->getEhrDataSources($app) as $source) {
+            $dataSources[] = $source->folder;
+        }
+        if (!$dataSource || !in_array($dataSource, $dataSources)) {
+            return $app->abort(500, 'Must specify valid source.');
+        }
+
         switch ($request->get('mode')) {
             case 'person':
-                $object = $storageService->getObject($bucket, 'curation_report/data/combined20191004v2/person.json');
+                $object = $storageService->getObject($bucket, "curation_report/data/{$dataSource}/person.json");
                 $person = json_decode($object->downloadAsString());
                 $person_intervals = range($person->BIRTH_YEAR_HISTOGRAM->MIN, $person->BIRTH_YEAR_HISTOGRAM->MAX);
                 $person_output = [];
@@ -289,7 +290,7 @@ class DashboardController extends AbstractController
                 ]);
                 break;
             case 'density':
-                $object = $storageService->getObject($bucket, 'curation_report/data/combined20191004v2/datadensity.json');
+                $object = $storageService->getObject($bucket, "curation_report/data/{$dataSource}/datadensity.json");
                 $density = json_decode($object->downloadAsString());
 
                 $totalRecords = [];
@@ -353,7 +354,7 @@ class DashboardController extends AbstractController
                 ]);
                 break;
             case 'achillesheel':
-                $object = $storageService->getObject($bucket, 'curation_report/data/combined20191004v2/achillesheel.json');
+                $object = $storageService->getObject($bucket, "curation_report/data/{$dataSource}/achillesheel.json");
                 $errors = json_decode($object->downloadAsString());
                 $output = [];
                 foreach ($errors->MESSAGES->ATTRIBUTEVALUE as $row) {
@@ -1440,4 +1441,23 @@ class DashboardController extends AbstractController
         }
         return array_values($output);
     }
+
+    /**
+     * Get List of EHR Data Sources
+     */
+    private function getEhrDataSources(Application $app)
+    {
+        $storageService = new StorageService([
+            'keyFile' => (array) json_decode(file_get_contents(dirname(__FILE__) . '/../../../dev_config/rdr_key.json', true)),
+            'suppressKeyFileNotice' => true
+        ]);
+
+        $rootPath = $app->getConfig('rdr_curation_report_path');
+        preg_match('/https\:\/\/storage\.googleapis\.com\/(.*)\.appspot\.com\/(.*)/i', $rootPath, $matches);
+        $bucket = $matches[2];
+
+        $object = $storageService->getObject($bucket, 'curation_report/data/datasources.json');
+        return json_decode($object->downloadAsString())->datasources;
+    }
+
 }

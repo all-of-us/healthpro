@@ -1,4 +1,4 @@
-<select name="ehr_data_source">
+<select name="ehr_data_source" id="{{ id }}">
     {% for source in ehr_data_sources %}
     <option value="{{ source.folder }}">{{ source.name }}</option>
     {% endfor %}
