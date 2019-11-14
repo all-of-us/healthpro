@@ -357,10 +357,15 @@ class DashboardController extends AbstractController
                 $object = $storageService->getObject($bucket, "curation_report/data/{$dataSource}/achillesheel.json");
                 $errors = json_decode($object->downloadAsString());
                 $output = [];
-                foreach ($errors->MESSAGES->ATTRIBUTEVALUE as $row) {
-                    preg_match('/^(\w+)\:(.*)/', $row, $matches);
+                foreach ($errors->MESSAGES->ATTRIBUTEVALUE as $i => $row) {
+                    preg_match('/^(\w+)\:\s?(.*)/', $row, $matches);
+                    // // Filter out 'NOTIFICATION' type
+                    // if (!$matches || $matches[1] == 'NOTIFICATION') {
+                    //     continue;
+                    // }
                     $output[] = [
                         'type' => $matches[1],
+                        'count' => $errors->MESSAGES->ATTRIBUTENAME[$i],
                         'message' => trim($matches[2])
                     ];
                 }

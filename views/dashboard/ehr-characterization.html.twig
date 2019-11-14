@@ -53,6 +53,7 @@
           <table id="ehr-errors-table" class="table table-sm" style="width:100%">
             <thead>
               <th>Message Type</th>
+              <th>Record Count</th>
               <th>Message</th>
             </thead>
           </table>
@@ -261,7 +262,7 @@ function renderMetricPlots() {
   function updateAchillesHeelTable() {
     // Clean up previous instance if present
     $('#ehr-errors-table').dataTable().fnDestroy();
-    $('#ehr-errors-table').DataTable({
+    $('#ehr-errors-table').dataTable({
       ajax: {
         url: '/dashboard/ehr-characterization-data',
         data: {
@@ -273,7 +274,8 @@ function renderMetricPlots() {
       paging: false,
       columns: [
         { data: 'type' },
-        { data: 'message', width: '85%' }
+        { data: 'count' },
+        { data: 'message' }
       ],
       rowCallback: function(row, data) {
         if (data.type == 'ERROR') {
@@ -286,7 +288,7 @@ function renderMetricPlots() {
           $(row).addClass('alert alert-info');
         }
       },
-      order: []
+      order: [[ 0, 'asc' ], [ 1, 'desc' ]]
     });
   }
 
