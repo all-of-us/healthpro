@@ -345,6 +345,7 @@ class OrderController extends AbstractController
                 }
                 if ($order->get('type') !== 'saliva') {
                     $site = $app['em']->getRepository('sites')->fetchOneBy([
+                        'deleted' => 0,
                         'google_group' => $app->getSiteId()
                     ]);
                     if ($processForm->has('processed_centrifuge_type')) {
@@ -561,7 +562,7 @@ class OrderController extends AbstractController
             $app->abort(404);
         }
         $siteAccounts = [];
-        foreach ($app['em']->getRepository('sites')->fetchBy([]) as $site) {
+        foreach ($app['em']->getRepository('sites')->fetchBy(['deleted' => 0]) as $site) {
             $siteAccounts[$site['google_group']] = $site['mayolink_account'];
         }
         $orders = $app['db']->fetchAll("SELECT finalized_ts, site, biobank_id, mayo_id FROM orders WHERE finalized_ts is not null and site != '' and biobank_id !=''");
@@ -700,7 +701,7 @@ class OrderController extends AbstractController
         $orderData = $order->toArray();
         // Set collected time to created date at midnight local time
         $collectedAt = new \DateTime($orderData['created_ts']->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
-        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $app->getSiteId()])) {
             $mayoClientId = $site['mayolink_account'];
         }
         // Check if mayo account number exists
@@ -748,7 +749,7 @@ class OrderController extends AbstractController
         $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
         $orderData = $order->toArray();
         $participant = $app['pmi.drc.participants']->getById($participantId);
-        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['google_group' => $app->getSiteId()])) {
+        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $app->getSiteId()])) {
             $mayoClientId = $site['mayolink_account'];
         }
         // Check if mayo account number exists

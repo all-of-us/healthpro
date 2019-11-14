@@ -56,10 +56,7 @@ class AdminController extends AbstractController
 
     public function siteSyncAction(Application $app, Request $request)
     {
-        $siteSync = new SiteSyncService(
-            $app['pmi.drc.rdrhelper']->getClient(),
-            $app['em']
-        );
+        $siteSync = new SiteSyncService($app);
         $isProd = $app->isProd();
         $preview = $siteSync->dryRun($isProd);
 
@@ -90,7 +87,7 @@ class AdminController extends AbstractController
 
     public function sitesAction(Application $app)
     {
-        $sites = $app['em']->getRepository('sites')->fetchBy([], ['name' => 'asc']);
+        $sites = $app['em']->getRepository('sites')->fetchBy(['deleted' => 0], ['name' => 'asc']);
         return $app['twig']->render('admin/sites/index.html.twig', [
             'sites' => $sites,
             'sync' => $app->getConfig('sites_use_rdr')
@@ -102,6 +99,7 @@ class AdminController extends AbstractController
         $syncEnabled = $app->getConfig('sites_use_rdr');
         if ($siteId) {
             $site = $app['em']->getRepository('sites')->fetchOneBy([
+                'deleted' => 0,
                 'id' => $siteId
             ]);
             if (!$site) {
@@ -127,12 +125,12 @@ class AdminController extends AbstractController
         if ($siteEditForm->isSubmitted()) {
             if ($siteEditForm->isValid() && !$syncEnabled) {
                 if ($site) {
-                    $duplicateGoogleGroup = $app['em']->getRepository('sites')->fetchBySql('google_group = ? and id != ?', [
+                    $duplicateGoogleGroup = $app['em']->getRepository('sites')->fetchBySql('deleted = 0 and google_group = ? and id != ?', [
                         $siteEditForm['google_group']->getData(),
                         $siteId
                     ]);
                 } else {
-                    $duplicateGoogleGroup = $app['em']->getRepository('sites')->fetchBySql('google_group = ?', [
+                    $duplicateGoogleGroup = $app['em']->getRepository('sites')->fetchBySql('deleted = 0 and google_group = ?', [
                         $siteEditForm['google_group']->getData()
                     ]);
                 }

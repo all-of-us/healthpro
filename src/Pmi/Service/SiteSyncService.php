@@ -1,17 +1,21 @@
 <?php
 namespace Pmi\Service;
 
+use Pmi\Audit\Log;
+
 class SiteSyncService
 {
+    private $app;
     private $rdrClient;
     private $em;
     private $orgEndpoint = 'rdr/v1/Awardee?_inactive=true';
     private $entries;
 
-    public function __construct($rdrClient, $entityManager)
+    public function __construct($app)
     {
-        $this->rdrClient = $rdrClient;
-        $this->em = $entityManager;
+        $this->app = $app;
+        $this->rdrClient = $app['pmi.drc.rdrhelper']->getClient();
+        $this->em = $app['em'];
     }
 
     private function getAwardeeEntriesFromRdr()
@@ -31,7 +35,7 @@ class SiteSyncService
     private function getSitesFromDb()
     {
         $sitesRepository = $this->em->getRepository('sites');
-        $sites = $sitesRepository->fetchBy([]);
+        $sites = $sitesRepository->fetchBy(['deleted' => 0]);
         $sitesById = [];
         foreach ($sites as $site) {
             $sitesById[$site['google_group']] = $site;
@@ -51,6 +55,7 @@ class SiteSyncService
 
     public function sync($isProd, $preview = false)
     {
+        $sitesCount = 0;
         $created = [];
         $modified = [];
         $sitesRepository = $this->em->getRepository('sites');
@@ -67,6 +72,7 @@ class SiteSyncService
                     continue;
                 }
                 foreach ($organization->sites as $site) {
+                    $sitesCount++;
                     $existing = false;
                     $primaryId = null;
                     $siteData = [];
@@ -107,13 +113,19 @@ class SiteSyncService
                             ];
                             if (!$preview) {
                                 $sitesRepository->update($primaryId, $siteData);
+                                $this->app->log(Log::SITE_EDIT, [
+                                    'id' => $primaryId,
+                                    'old' => $existing,
+                                    'new' => $siteData
+                                ]);
                             }
                         }
                         unset($deleted[array_search($siteId, $deleted)]);
                     } else {
                         $created[] = $siteData;
                         if (!$preview) {
-                            $sitesRepository->insert($siteData);
+                            $siteInsertId = $sitesRepository->insert($siteData);
+                            $this->app->log(Log::SITE_ADD, $siteInsertId);
                         }
                     }
                 }
@@ -121,8 +133,12 @@ class SiteSyncService
         }
         $deleted = array_values($deleted);
         if (!$preview) {
+            if ($sitesCount === 0) {
+                throw new \Exception('No sites found');
+            }
             foreach ($deleted as $siteId) {
-                $sitesRepository->delete($existingSites[$siteId]['id']);
+                $sitesRepository->update($existingSites[$siteId]['id'], ['deleted' => 1]);
+                $this->app->log(Log::SITE_DELETE, $existingSites[$siteId]['id']);
             }
         }
 
@@ -147,6 +163,9 @@ class SiteSyncService
             }
             $awardeesMap[$awardee->id] = $awardee->displayName;
         }
+        if (empty($awardeesMap)) {
+            throw new \Exception('No awardees found');
+        }
         $awardeesRepository = $this->em->getRepository('awardees');
         $awardeesRepository->wrapInTransaction(function() use ($awardeesRepository, $awardeesMap) {
             $awardeesRepository->truncate();
@@ -155,6 +174,7 @@ class SiteSyncService
                     'id' => $id,
                     'name' => $name
                 ]);
+                $this->app->log(Log::AWARDEE_ADD, $id);
             }
         });
     }
@@ -175,6 +195,9 @@ class SiteSyncService
                 $organizationsMap[$organization->id] = $organization->displayName;
             }
         }
+        if (empty($organizationsMap)) {
+            throw new \Exception('No organizations found');
+        }
         $organizationsRepository = $this->em->getRepository('organizations');
         $organizationsRepository->wrapInTransaction(function() use ($organizationsRepository, $organizationsMap) {
             $organizationsRepository->truncate();
@@ -183,6 +206,7 @@ class SiteSyncService
                     'id' => $id,
                     'name' => $name
                 ]);
+                $this->app->log(Log::ORGANIZATION_ADD, $id);
             }
         });
     }

@@ -46,6 +46,8 @@ class Log
     const PATIENT_STATUS_EDIT = 'PATIENT_STATUS_EDIT';
     const PATIENT_STATUS_HISTORY_ADD = 'PATIENT_STATUS_HISTORY_ADD';
     const PATIENT_STATUS_HISTORY_EDIT = 'PATIENT_STATUS_HISTORY_EDIT';
+    const AWARDEE_ADD = 'AWARDEE_ADD';
+    const ORGANIZATION_ADD = 'ORGANIZATION_ADD';
 
     public function __construct($app, $action, $data)
     {
