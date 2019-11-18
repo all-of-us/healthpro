@@ -222,19 +222,7 @@
                                 </div>
                                 <div class="panel-body">
                                     <p>{{ errorMessage }}</p>
-                                    {% if participant.statusReason == 'withdrawal' %}
-                                        {% if participant.withdrawalAuthored is not empty %}
-                                            <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalAuthored|date('n/j/Y g:ia', app.userTimezone) }}</p>
-                                        {% endif %}
-                                        {% if participant.withdrawalReason is not empty %}
-                                            <p>
-                                                <strong>Reason:</strong> {{ participant.withdrawalReason }}
-                                                {% if participant.withdrawalReasonJustification is not empty %}
-                                                    <br/><strong>Justification:</strong> {{ participant.withdrawalReasonJustification }}
-                                                {% endif %}
-                                            </p>
-                                        {% endif %}
-                                    {% endif %}
+                                    {% include 'partials/participant-withdrawn-notice.html.twig' %}
                                 </div>
                             </div>
                         </div>
@@ -615,19 +603,7 @@
                                     </div>
                                         <div class="panel-body">
                                         <p>{{ errorMessage }}</p>
-                                        {% if participant.statusReason == 'withdrawal' %}
-                                            {% if participant.withdrawalAuthored is not empty %}
-                                                <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalAuthored|date('n/j/Y g:ia', app.userTimezone) }}</p>
-                                            {% endif %}
-                                            {% if participant.withdrawalReason is not empty %}
-                                                <p>
-                                                    <strong>Reason:</strong> {{ participant.withdrawalReason }}
-                                                    {% if participant.withdrawalReasonJustification is not empty %}
-                                                        <br/><strong>Justification:</strong> {{ participant.withdrawalReasonJustification }}
-                                                    {% endif %}
-                                                </p>
-                                            {% endif %}
-                                        {% endif %}
+                                        {% include 'partials/participant-withdrawn-notice.html.twig' %}
                                     </div>
                                     </div>
                                 {% endif %}
