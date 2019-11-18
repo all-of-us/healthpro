@@ -6,7 +6,7 @@
 {% block title %}Process - Order {{ order.order_id }} - {% endblock %}
 {% block body %}
     {% include 'order-header.html.twig' with { active: 'process' } %}
-    {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+    {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit process-form' } }) }}
         {{ form_errors(processForm) }}
         {% if processForm.processed_samples is defined %}
             <div class="form-group{% if not processForm.processed_samples.vars.valid %} has-error{% endif %}">
@@ -134,6 +134,20 @@ $(document).ready(function () {
 
     var orderView = new PMI.views['OrderSubPage']({
         el: $("body")
+    });
+
+    $('.process-form button[type="submit"]').on('click', function () {
+        var message = '';
+        $('input[name="form[processed_samples][]"]').each(function () {
+            //Select samples that are unchecked and not disabled
+            if ($(this).prop('checked') === false && $(this).prop('disabled') === false) {
+                message = 'Warning: At least one sample that was collected was not processed. Are you sure you wish to continue?';
+                return false;
+            }
+        });
+        if (message) {
+            return confirm(message);
+        }
     });
 });
 </script>
