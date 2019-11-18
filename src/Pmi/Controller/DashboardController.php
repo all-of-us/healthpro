@@ -239,7 +239,7 @@ class DashboardController extends AbstractController
                 $person = json_decode($object->downloadAsString());
                 $person_intervals = range($person->BIRTH_YEAR_HISTOGRAM->MIN, $person->BIRTH_YEAR_HISTOGRAM->MAX);
                 $person_output = [];
-                foreach ($person_intervals as $i => $interval) {
+                foreach (array_keys($person_intervals) as $i) {
                     $person_output[$i] = 0;
                 }
                 foreach ($person->BIRTH_YEAR_HISTOGRAM->DATA->COUNT_VALUE as $i => $value) {
