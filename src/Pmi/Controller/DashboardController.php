@@ -359,10 +359,10 @@ class DashboardController extends AbstractController
                 $output = [];
                 foreach ($errors->MESSAGES->ATTRIBUTEVALUE as $i => $row) {
                     preg_match('/^(\w+)\:\s?(.*)/', $row, $matches);
-                    // // Filter out 'NOTIFICATION' type
-                    // if (!$matches || $matches[1] == 'NOTIFICATION') {
-                    //     continue;
-                    // }
+                    // Filter out 'NOTIFICATION' type
+                    if (!$matches || $matches[1] == 'NOTIFICATION') {
+                        continue;
+                    }
                     $output[] = [
                         'type' => $matches[1],
                         'count' => $errors->MESSAGES->ATTRIBUTENAME[$i],
