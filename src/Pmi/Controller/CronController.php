@@ -69,43 +69,23 @@ class CronController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    public function sitesAction(Application $app, Request $request)
+    public function sitesAction(Application $app)
     {
-        if (!$this->isAllowed($app, $request)) {
-            return $this->getAccessDeniedResponse();
+        if (!$app->getConfig('sites_use_rdr')) {
+            return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
         }
-
-        $action = $request->get('action');
-        if (!in_array($action, ['sync', 'preview'])) {
-            return new JsonResponse(['success' => false, 'error' => 'Invalid action'], 400);
-        }
-
-        $siteSync = new SiteSyncService(
-            $app['pmi.drc.rdrhelper']->getClient(),
-            $app['em']
-        );
+        $siteSync = new SiteSyncService($app);
         $isProd = $app->isProd();
-        if ($action === 'sync') {
-            if (!$app->getConfig('sites_use_rdr')) {
-                return new JsonResponse(['success' => false, 'error' => 'RDR Awardee API disabled']);
-            }
-            $results = $siteSync->sync($isProd);
-        } else {
-            $results = $siteSync->dryRun($isProd);
-        }
-        return new JsonResponse(['success' => true, 'result' => $results]);
+        $siteSync->sync($isProd);
+        return (new JsonResponse())->setData(true);
     }
 
     public function awardeesAndOrganizationsAction(Application $app, Request $request)
     {
-        if (!$this->isAllowed($app, $request)) {
-            return $this->getAccessDeniedResponse();
+        if (!$app->getConfig('sites_use_rdr')) {
+            return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
         }
-
-        $siteSync = new SiteSyncService(
-            $app['pmi.drc.rdrhelper']->getClient(),
-            $app['em']
-        );
+        $siteSync = new SiteSyncService($app);
         $siteSync->syncAwardees();
         $siteSync->syncOrganizations();
         return new JsonResponse(['success' => true]);

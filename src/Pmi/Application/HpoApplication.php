@@ -316,7 +316,7 @@ class HpoApplication extends AbstractApplication
         }
         return $this['em']
             ->getRepository('sites')
-            ->fetchOneBy(['google_group' => $googleGroup]);
+            ->fetchOneBy(['deleted' => 0, 'google_group' => $googleGroup]);
     }
 
     public function getAwardeeEntity()
@@ -327,7 +327,7 @@ class HpoApplication extends AbstractApplication
         }
         return $this['em']
             ->getRepository('sites')
-            ->fetchBy(['awardee' => $googleGroup]);
+            ->fetchBy(['deleted' => 0, 'awardee' => $googleGroup]);
     }
 
     public function getSiteOrganization()
@@ -391,6 +391,7 @@ class HpoApplication extends AbstractApplication
     public function getSitesFromOrganization($org)
     {
         return $this['em']->getRepository('sites')->fetchBy([
+            'deleted' => 0,
             'status' => 1,
             'organization' => $org,
         ]);
@@ -398,6 +399,7 @@ class HpoApplication extends AbstractApplication
 
     public function isDVType() {
         $site = $this['em']->getRepository('sites')->fetchBy([
+            'deleted' => 0,
             'google_group' => $this->getSiteId(),
             'type' => 'DV'
         ]);
@@ -508,6 +510,7 @@ class HpoApplication extends AbstractApplication
         if ($this->isProd()) {
             $siteGroup = $user->getSite($email);
             $site = $this['em']->getRepository('sites')->fetchOneBy([
+                'deleted' => 0,
                 'google_group' => $siteGroup->id,
             ]);
             if (!$site) {
@@ -550,6 +553,7 @@ class HpoApplication extends AbstractApplication
                 $siteName = $this->siteNameMapper[$siteSuffix];
             } else {
                 $site = $this['em']->getRepository('sites')->fetchOneBy([
+                    'deleted' => 0,
                     'google_group' => $siteSuffix
                 ]);
                 if (!empty($site)) {
