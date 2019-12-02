@@ -1,7 +1,4 @@
 <?php
-// output syslog to standard error to match previous behavior of dev_appserver.py
-openlog('HEALTHPRO', LOG_PERROR, LOG_USER);
-
 if (preg_match('#^/assets/#', $_SERVER["REQUEST_URI"])) {
     // always pass through for static assets
     return false;

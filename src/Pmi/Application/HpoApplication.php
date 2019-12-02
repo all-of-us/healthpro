@@ -23,6 +23,7 @@ class HpoApplication extends AbstractApplication
 
         $rdrOptions = [];
         if ($this->isLocal()) {
+            putenv('DATASTORE_EMULATOR_HOST=' . self::DATASTORE_EMULATOR_HOST);
             $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
             if (file_exists($keyFile)) {
                 $rdrOptions['key_file'] = $keyFile;
@@ -34,16 +35,17 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('rdr_auth_json')) {
             $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
         }
-        if ($this->getConfig('rdr_disable_cache') || $this->isPhpDevServer()) {
+        if ($this->getConfig('rdr_disable_cache')) {
             $rdrOptions['disable_cache'] = true;
         }
-        if ($this->getConfig('cache_time')) {
-            $rdrOptions['cache_time'] = $this->getConfig('cache_time');
+        if (intval($this->getConfig('cache_time'))) {
+            $rdrOptions['cache_time'] = intval($this->getConfig('cache_time'));
         }
         if ($this->getConfig('disable_test_access')) {
             $rdrOptions['disable_test_access'] = $this->getConfig('disable_test_access');
         }
         $rdrOptions['logger'] = $this['logger'];
+        $rdrOptions['cache'] = $this['cache'];
 
         $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
         if ($this->participantSource == 'mock') {
@@ -68,7 +70,7 @@ class HpoApplication extends AbstractApplication
         $app = $this;
         // include `/` in common routes because homeAction will redirect based on role
         $commonRegex = '^/(logout|login-return|keepalive|client-timeout|agree)?$';
-        $anonRegex = '^/(timeout$|login$|cron\/)'; // cron uses GAE auth, so no need for Silex auth
+        $anonRegex = '^/(timeout$|login$|cron\/|_ah\/)'; // cron and _ah controllers have their own access control
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
                 'anonymous' => [
@@ -135,10 +137,10 @@ class HpoApplication extends AbstractApplication
 
         // unit tests don't have access to Datastore
         // local environment uses yaml file
-        if (!$this['isUnitTest'] && !$this->isPhpDevServer()) {
-            $configs = Configuration::fetchBy([]);
+        if (!$this['isUnitTest'] && !$this->isPhpDevServer() && !$this->isLocal()) {
+            $configs = Configuration::fetchBy();
             foreach ($configs as $config) {
-                $this->configuration[$config->getKey()] = $config->getValue();
+                $this->configuration[$config->key] = $config->value;
             }
         }
         
@@ -154,6 +156,21 @@ class HpoApplication extends AbstractApplication
         $schema = $this->getConfig('mysql_schema');
         $user = $this->getConfig('mysql_user');
         $password = $this->getConfig('mysql_password');
+        if ($this->isLocal()) {
+            // look for Docker environment variables override
+            if (getenv('MYSQL_HOST')) {
+                $host = getenv('MYSQL_HOST');
+            }
+            if (getenv('MYSQL_DATABASE')) {
+                $schema = getenv('MYSQL_DATABASE');
+            }
+            if (getenv('MYSQL_USER')) {
+                $user = getenv('MYSQL_USER');
+            }
+            if (getenv('MYSQL_PASSWORD') !== false) {
+                $password = getenv('MYSQL_PASSWORD');
+            }
+        }
         if ($socket) {
             $options = [
                 'driver' => 'pdo_mysql',

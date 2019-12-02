@@ -42,11 +42,6 @@ class DeployCommand extends Command {
         'pmi-hpo-test'
     ];
 
-    /** Don't require `login: admin` for these application IDs. */
-    private static $SKIP_ADMIN_APP_IDS = [
-        'pmi-hpo-dev' // this is behind a WAF so we don't want GAE login
-    ];
-
     /** Apply enhanced instance class and scaling for these application IDs. */
     private static $SCALE_APP_IDS = [
         'healthpro-prod'
@@ -75,12 +70,6 @@ class DeployCommand extends Command {
                 $appDir
             )
             ->addOption(
-                'phpCgiPath',
-                'c',
-                InputOption::VALUE_OPTIONAL,
-                'Path to the php-cgi binary'
-            )
-            ->addOption(
                 'appId',
                 'i',
                 InputOption::VALUE_OPTIONAL,
@@ -91,12 +80,6 @@ class DeployCommand extends Command {
                 'l',
                 InputOption::VALUE_NONE,
                 'If set, deploy locally to your GAE SDK web server'
-            )
-            ->addOption(
-                'local-php',
-                null,
-                InputOption::VALUE_NONE,
-                'Used in conjuction with --local; Will use PHP\'s built-in development server if set'
             )
             ->addOption(
                 'port',
@@ -112,12 +95,6 @@ class DeployCommand extends Command {
                 'Release version used in tagging and cache busting',
                 date('YmdHis')
             )
-            ->addOption(
-                'datastoreDir',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Specify local Datastore directory (use with --local option)'
-            )
         ;
     }
 
@@ -130,7 +107,6 @@ class DeployCommand extends Command {
         $this->local = (boolean) $input->getOption('local');
         $this->port = (integer) $input->getOption('port');
         $this->release = $input->getOption('release');
-        $this->phpCgiPath = $input->getOption('phpCgiPath');
 
         if (!$this->appId && !$this->local) {
             throw new InvalidOptionException('Please specify --appId (-i) or --local');
@@ -142,9 +118,6 @@ class DeployCommand extends Command {
         }
         // ensure shell commands (like `git`) are executed from inside repo
         chdir($this->appDir);
-
-        // deal with GAE conflict with libxml_disable_entity_loader()
-        $this->patchLibxmlDisable();
 
         // generate config files
         $this->generateAppConfig();
@@ -162,13 +135,8 @@ class DeployCommand extends Command {
             $output->writeln('');
             $output->writeln("Compiling assets...");
             $this->exec("{$this->appDir}/bin/gulp compile");
-
-            // warmup twig cache
-            $output->writeln('');
-            $output->writeln('Warming up Twig cache...');
-            $this->exec("{$this->appDir}/bin/phpcli bin/console pmi:twig");
         }
-        
+
         // security checks
         $this->runSecurityCheck();
         $this->out->writeln('');
@@ -180,20 +148,7 @@ class DeployCommand extends Command {
         }
 
         if ($this->local) {
-            if ($input->getOption('local-php')) {
-                $cmd = "php -S localhost:{$this->port} -t web/ web/local-router.php";
-            } else {
-                $cmd = "dev_appserver.py -A pmi-hpo-dev --port={$this->port}";
-                if ($this->phpCgiPath) {
-                    $cmd .= " --php_executable_path {$this->phpCgiPath}";
-                }
-                if ($dsDir = $input->getOption('datastoreDir')) {
-                    $dsDir = rtrim($dsDir, '/');
-                    $dsDir .= '/datastore.db';
-                    $cmd .= " --datastore_path={$dsDir}";
-                }
-                $cmd .= " {$this->appDir}/app.yaml";
-            }
+            $cmd = "php -S 0.0.0.0:{$this->port} -t web/ web/local-router.php";
         } else {
             $cmd = "gcloud app deploy --quiet --project={$this->appId} {$this->appDir}/app.yaml {$this->appDir}/cron.yaml";
         }
@@ -263,7 +218,7 @@ class DeployCommand extends Command {
     {
         return !$this->local && in_array($this->appId, self::$STABLE_APP_IDS);
     }
-    
+
     private function isStaging()
     {
         return !$this->local && in_array($this->appId, self::$STAGING_APP_IDS);
@@ -290,34 +245,6 @@ class DeployCommand extends Command {
         $this->exec("git push origin $tag");
     }
 
-    /**
-     * GAE disables the libxml_disable_entity_loader() function for security,
-     * but several Symfony files try to call it (also for security). This results
-     * in a PHP warning on every page that will always be visible to app admins
-     * due to this: http://stackoverflow.com/a/23026196/1402028
-     * Rather than override GAE by enabling this insecure function, comment out
-     * the calls.
-     */
-    private function patchLibxmlDisable()
-    {
-        $files = [
-            'symfony/translation/Loader/XliffFileLoader.php',
-            'symfony/config/Util/XmlUtils.php'
-        ];
-        foreach ($files as $file) {
-            $filename = "{$this->appDir}/vendor/{$file}";
-            $contents = file_get_contents($filename);
-
-            // Added the negation for the new line character because if the previous line is blank,
-            // the match would include the leading new line and place the comment on the previous line.
-            $patched = preg_replace('#^[^/\n][^/].*libxml_disable_entity_loader\(.*$#m', '//$0', $contents);
-
-            if ($contents !== $patched) {
-                file_put_contents($filename, $patched);
-            }
-        }
-    }
-
     /** Generate app configuration. */
     private function generateAppConfig()
     {
@@ -329,11 +256,6 @@ class DeployCommand extends Command {
 
         $yaml = new Parser();
         $config = $yaml->parse(file_get_contents($distFile));
-
-        // require admin login for developer GAE sites
-        if ($this->isDev() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS)) {
-            $this->requireAdminLogin($config);
-        }
 
         // crash the deploy if our handlers are not secure
         $this->checkHandlerSecurity($config);
@@ -388,88 +310,22 @@ class DeployCommand extends Command {
         if (!file_exists($distFile)) {
             throw new Exception("Couldn't find $distFile");
         }
-        
+
         $yaml = new Parser();
         $config = $yaml->parse(file_get_contents($distFile));
-        
-        // do this prior to excluding crons so developers are notified about
-        // missing backups well in advance of to deploying to production
-        $this->checkCronBackups($config);
-        
+
         // adjust crons depending on environment
         $crons = [];
         foreach ($config['cron'] as $c) {
             if (stristr($c['url'], '/ping-test') !== false && $this->isProd()) {
                 continue;
-            } elseif (stristr($c['url'], '/_ah/datastore_admin/backup.create') !== false) {
-                // enable DS backup only in production and test sites
-                if (!$this->isProd() && !$this->isStable() && !$this->isStaging()) {
-                    continue;
-                } else {
-                    $c['url'] = str_replace('{BUCKET_PREFIX}', $this->appId, $c['url']);
-                }
             }
             $crons[] = $c;
         }
         $config['cron'] = $crons;
-        
+
         $dumper = new Dumper();
         file_put_contents($configFile, count($crons) ? $dumper->dump($config, PHP_INT_MAX) : 'cron:');
-    }
-
-    private function checkCronBackups($config)
-    {
-        $cronKinds = [];
-        foreach ($config['cron'] as $c) {
-            if (stripos($c['url'], '/_ah/datastore_admin/backup.create') === 0) {
-                if (strlen($c['url']) > 2000) {
-                    throw new \Exception("URL character limit exceeded: {$c['url']}");
-                }
-                if (preg_match_all('/kind=(\w+)/', $c['url'], $m) > 0) {
-                    foreach ($m[1] as $kind) {
-                        $cronKinds[$kind] = $kind;
-                    }
-                }
-            }
-        }
-        
-        $pmiKinds = [];
-        $files = glob("{$this->appDir}/src/Pmi/Entities/*.php");
-        if (count($files) === 0) {
-            throw new \Exception("No Datastore entity classes were found!");
-        }
-        foreach ($files as $file) {
-            $entity = basename($file, '.php');
-            $pmiKinds[$entity] = $entity;
-        }
-
-        foreach ($cronKinds as $kind) {
-            if (empty($pmiKinds[$kind])) {
-                throw new \Exception("No entity exists for datastore backup of kind {$kind}!");
-            }
-        }
-    }
-
-    /** Tell all handlers to require admin login. */
-    private function requireAdminLogin(&$config)
-    {
-        foreach (array_keys($config['handlers']) as $idx) {
-            $config['handlers'][$idx]['login'] = 'admin';
-        }
-    }
-
-    /** Tell all handlers to require Google login. */
-    private function requireGoogleLogin(&$config)
-    {
-        foreach (array_keys($config['handlers']) as $idx) {
-            $route = trim($config['handlers'][$idx]['url']);
-            // so we can display a user-friendly message when the session times
-            // out, rather than the Google account selector
-            if ($route === '/timeout') {
-                continue;
-            }
-            $config['handlers'][$idx]['login'] = 'required';
-        }
     }
 
     /** Check all handlers for security concerns. */
@@ -479,8 +335,6 @@ class DeployCommand extends Command {
         foreach ($config['handlers'] as $handler) {
             if (empty($handler['secure']) || $handler['secure'] !== 'always') {
                 throw new \Exception("Handler URL '{$handler['url']}' does not force SSL!");
-            } elseif ($this->isDev() && !in_array($this->appId, self::$SKIP_ADMIN_APP_IDS) && (empty($handler['login']) || $handler['login'] !== 'admin')) {
-                throw new \Exception("Handler URL '{$handler['url']}' does not require login!");
             }
         }
         $this->out->writeln('... all ' . count($config['handlers']) . " handlers are secure.");
@@ -595,7 +449,6 @@ class DeployCommand extends Command {
         return $process;
     }
 
-
     private function removeSensioIgnoredVulnerabilities($vulnerabilities)
     {
         $newVulnerabilities = $vulnerabilities;
@@ -612,7 +465,7 @@ class DeployCommand extends Command {
                     }
                 }
                 if (!empty($advisories)) {
-                    $newVulnerabilities[$key]['advisories'] = $advisories; 
+                    $newVulnerabilities[$key]['advisories'] = $advisories;
                 } else {
                     unset($newVulnerabilities[$key]);
                 }

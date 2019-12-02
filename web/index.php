@@ -11,16 +11,13 @@ $app['errorTemplate'] = 'error.html.twig';
 $app['sessionTimeout'] = 30 * 60; // Session timeout after 30 minutes
 $app['sessionWarning'] = 2 * 60; // Display warning 2 minutes before timeout
 
+$app['twigCacheHandler'] = 'file';
+$app['twigCacheDirectory'] = sys_get_temp_dir() . '/healthpro/twig';
+
 if ($app->isLocal()) {
     $app['sessionTimeout'] = 3600 * 24; // Extend session time out in local environment
-    if (!$app->isPhpDevServer()) {
-        $app['twigCacheHandler'] = 'memcache';
-        $app['sessionHandler'] = 'datastore'; // use datastore for dev_appserver local environment
-    }
 } else {
     $app['sessionHandler'] = 'datastore';
-    $app['cacheDirectory'] = realpath(__DIR__ . '/../cache');
-    $app['twigCacheHandler'] = 'file';
 }
 
 $app
@@ -38,6 +35,7 @@ $app
     ->mount('/problem', new Controller\ProblemReportController())
     ->mount('/review', new Controller\ReviewController())
     ->mount('/biobank', new Controller\BiobankController())
+    ->mount('/_ah', new Controller\AppEngineController())
 ;
 
 $app->run();
