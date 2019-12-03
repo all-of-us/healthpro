@@ -169,6 +169,13 @@ class WorkQueue
                 'More than one race' => 'MORE_THAN_ONE_RACE',
                 'Other' => 'OTHER_RACE'
             ]
+        ],
+        'participantOrigin' => [
+            'label' => 'Participant Origination',
+            'options' => [
+                'PTSC Portal' => 'vibrent',
+                'DV Pilot Portal' => 'careevolution'
+            ]
         ]
     ];
 
