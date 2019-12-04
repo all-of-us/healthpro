@@ -11,6 +11,10 @@
     <dd>{{ participant.genderIdentity|default('--') }}</dd>
     <dt>Participant Status</dt>
     <dd>{{ participant.enrollmentStatus|default('--') }}</dd>
+    {% if app.isDvType %}
+        <dt>Participant Origination</dt>
+        <dd>{{ participant.participantOrigin|default('--') }}</dd>
+    {% endif %}
     <dt>Paired Awardee</dt>
     <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
 </dl>
