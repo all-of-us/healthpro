@@ -22,6 +22,7 @@ class WorkQueue
         'biobankId',
         'language',
         'enrollmentStatus',
+        'participantOrigin',
         'consentForStudyEnrollmentAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
@@ -296,6 +297,7 @@ class WorkQueue
             $row['biobankId'] = $e($participant->biobankId);
             $row['language'] = $e($participant->language);
             $row['participantStatus'] = $e($participant->enrollmentStatus);
+            $row['participantOrigin'] = $e($participant->participantOrigin);
             $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentAuthored);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsAuthored, true, true);
