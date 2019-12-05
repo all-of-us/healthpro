@@ -2,7 +2,6 @@
 namespace Pmi\Drc;
 
 use Pmi\HttpClient;
-use Cache\Adapter\Memcache\MemcacheCachePool;
 
 class RdrHelper
 {
@@ -14,6 +13,7 @@ class RdrHelper
     protected $lastError;
     protected $disableTestAccess = false;
     protected $logger;
+    protected $cache;
 
     public function __construct(array $options)
     {
@@ -31,6 +31,7 @@ class RdrHelper
                 $this->disableTestAccess  = $options['disable_test_access'];
             }
             $this->logger = $options['logger'];
+            $this->cache = $options['cache'];
             $this->options = $options;
         }
     }
@@ -56,12 +57,7 @@ class RdrHelper
             $endpoint = $this->endpoint;
         }
 
-        if (class_exists('\Memcache')) {
-            $client = new \Memcache();
-            $cachePool = new MemcacheCachePool($client);
-
-            $googleClient->setCache($cachePool);
-        }
+        $googleClient->setCache($this->cache);
 
         return $googleClient->authorize(new HttpClient([
             'base_uri' => $endpoint,
@@ -77,6 +73,11 @@ class RdrHelper
     public function getCacheTime()
     {
         return $this->cacheTime;
+    }
+
+    public function getCache()
+    {
+        return $this->cache;
     }
 
     public function logException(\Exception $e)
