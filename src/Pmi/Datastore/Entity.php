@@ -9,6 +9,8 @@ abstract class Entity
 
     protected $excludeIndexes = [];
 
+    protected $limit = null;
+
     public static function fetchBy()
     {
         $datastoreClient = new DatastoreClientHelper();
@@ -55,7 +57,7 @@ abstract class Entity
         if ($property === null) {
             $results = $datastoreClient->fetchAll(static::getKind());
         } else {
-            $results = $datastoreClient->basicQuery(static::getKind(), $property, $value, $operator);
+            $results = $datastoreClient->basicQuery(static::getKind(), $property, $value, $operator, $this->limit);
         }
 
         return $results;
