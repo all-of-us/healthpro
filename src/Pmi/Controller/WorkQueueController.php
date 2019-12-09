@@ -336,6 +336,7 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Patient Status: Unknown';
                 $headers[] = 'Middle Initial';
             }
+            $headers[] = 'Core Participant Date';
             fputcsv($output, $headers);
 
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
@@ -415,6 +416,7 @@ class WorkQueueController extends AbstractController
                         $row[] = $workQueue->getPatientStatus($participant, 'UNKNOWN', 'export');
                         $row[] = $participant->middleName;
                     }
+                    $row[] = $participant->enrollmentStatusCoreStoredSampleTime;
                     fputcsv($output, $row);
                 }
                 unset($participants);
