@@ -10,7 +10,7 @@ use Pmi\Service\EvaluationsQueueService;
 use Pmi\Service\SiteSyncService;
 use Pmi\Service\NotifyMissingMeasurementsAndOrdersService;
 use Pmi\Service\PatientStatusService;
-use Pmi\Datastore\DatastoreSessionHandler;
+use Pmi\Service\SessionService;
 
 class CronController extends AbstractController
 {
@@ -133,8 +133,8 @@ class CronController extends AbstractController
             return $this->getAccessDeniedResponse();
         }
 
-        $dataStoreSessionHandler =  new DatastoreSessionHandler($app->getConfig('ds_clean_up_limit'));
-        $dataStoreSessionHandler->gc($app['sessionTimeout']);
+        $sessionService = new SessionService($app);
+        $sessionService->deleteKeys();
 
         return new JsonResponse(['success' => true]);
     }
