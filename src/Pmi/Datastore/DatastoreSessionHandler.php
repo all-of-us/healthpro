@@ -7,6 +7,13 @@ use DateTime;
 
 class DatastoreSessionHandler extends AbstractSessionHandler
 {
+    private $limit;
+
+    public function __construct($limit = null)
+    {
+        $this->limit = $limit;
+    }
+
     public function close()
     {
         return true;
@@ -42,7 +49,7 @@ class DatastoreSessionHandler extends AbstractSessionHandler
     {
         $modified = new DateTime("-{$maxlifetime} seconds");
         $session = new Session();
-        $results = $session->getBatch('modified', $modified, '<');
+        $results = $session->getBatch('modified', $modified, '<', $this->limit);
         $session->deleteBatch($results);
         return true;
     }

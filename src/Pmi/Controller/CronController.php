@@ -10,6 +10,7 @@ use Pmi\Service\EvaluationsQueueService;
 use Pmi\Service\SiteSyncService;
 use Pmi\Service\NotifyMissingMeasurementsAndOrdersService;
 use Pmi\Service\PatientStatusService;
+use Pmi\Datastore\DatastoreSessionHandler;
 
 class CronController extends AbstractController
 {
@@ -23,7 +24,8 @@ class CronController extends AbstractController
         ['awardeesAndOrganizations', '/awardees-organizations'],
         ['missingMeasurementsOrders', '/missing-measurements-orders'],
         ['sendPatientStatusToRdr', '/send-patient-status-rdr'],
-        ['deleteCacheKeys', '/delete-cache-keys']
+        ['deleteCacheKeys', '/delete-cache-keys'],
+        ['deleteSessionKeys', '/delete-session-keys']
     ];
 
     private function isAllowed(Application $app, Request $request)
@@ -121,6 +123,18 @@ class CronController extends AbstractController
         }
 
         $app['cache']->prune();
+
+        return new JsonResponse(['success' => true]);
+    }
+
+    public function deleteSessionKeysAction(Application $app, Request $request)
+    {
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
+        }
+
+        $dataStoreSessionHandler =  new DatastoreSessionHandler($app->getConfig('ds_clean_up_limit'));
+        $dataStoreSessionHandler->gc($app['sessionTimeout']);
 
         return new JsonResponse(['success' => true]);
     }
