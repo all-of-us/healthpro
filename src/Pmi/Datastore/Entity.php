@@ -51,13 +51,13 @@ abstract class Entity
         return $datastoreClient->delete(static::getKind(), $this->id);
     }
 
-    public function getBatch($property = null, $value = null, $operator = null)
+    public function getBatch($property = null, $value = null, $operator = null, $limit = null)
     {
         $datastoreClient = new DatastoreClientHelper();
         if ($property === null) {
-            $results = $datastoreClient->fetchAll(static::getKind());
+            $results = $datastoreClient->fetchAll(static::getKind(), $limit);
         } else {
-            $results = $datastoreClient->basicQuery(static::getKind(), $property, $value, $operator);
+            $results = $datastoreClient->basicQuery(static::getKind(), $property, $value, $operator, $limit);
         }
 
         return $results;

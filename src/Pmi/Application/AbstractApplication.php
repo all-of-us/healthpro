@@ -574,7 +574,7 @@ abstract class AbstractApplication extends Application
 
     public function registerCache()
     {
-        $this['cache'] = new \Pmi\Cache\DatastoreAdapter();
+        $this['cache'] = new \Pmi\Cache\DatastoreAdapter($this->getConfig('ds_clean_up_limit'));
         $this['cache']->setLogger($this['logger']);
     }
 }
