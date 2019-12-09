@@ -2,12 +2,13 @@
 namespace Pmi\Application;
 
 use Exception;
-use Memcache;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\BufferHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
+use Pmi\Monolog\StackdriverHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
 use Pmi\Util;
 use Silex\Application;
@@ -22,7 +23,6 @@ use Silex\Provider\ValidatorServiceProvider;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -37,6 +37,7 @@ abstract class AbstractApplication extends Application
     const ENV_STABLE  = 'stable';  // security testing / training environment
     const ENV_PROD  = 'prod';  // production environment
     const DEFAULT_TIMEZONE = 'America/New_York';
+    const DATASTORE_EMULATOR_HOST = 'localhost:8081';
 
     protected $name;
     protected $configuration = [];
@@ -132,12 +133,6 @@ abstract class AbstractApplication extends Application
 
     public function setup($config = [])
     {
-        // GAE SDK dev AppServer has a conflict with loading external XML entities
-        // https://github.com/GoogleCloudPlatform/appengine-symfony-starter-project/blob/master/src/AppEngine/Environment.php#L52-L69
-        if ($this->isLocal()) {
-            libxml_disable_entity_loader(false);
-        }
-
         // Register *early* before middleware
         if (method_exists($this, 'earlyBeforeCallback')) {
             $this->before([$this, 'earlyBeforeCallback'], Application::EARLY_EVENT);
@@ -154,6 +149,8 @@ abstract class AbstractApplication extends Application
         if (method_exists($this, 'finishCallback')) {
             $this->finish([$this, 'finishCallback']);
         }
+
+        $this->loadConfiguration($config);
 
         $this->register(new LocaleServiceProvider());
         $this->register(new TranslationServiceProvider(), [
@@ -174,12 +171,45 @@ abstract class AbstractApplication extends Application
         ]);
         // Add syslog handler
         $this->extend('monolog', function($monolog, $app) {
-            $handler = new SyslogHandler(false, LOG_USER, Logger::INFO);
+            if ($app->isLocal() && !$app['isUnitTest']) {
+                $handler = new SyslogHandler(false, LOG_USER, Logger::INFO, true, LOG_PID|LOG_PERROR);
+            } else {
+                $handler = new SyslogHandler(false, LOG_USER, Logger::INFO);
+            }
             $formatter = new LineFormatter("%message% %context% %extra%", null, true);
             $formatter->includeStacktraces();
             $formatter->ignoreEmptyContextAndExtra();
             $handler->setFormatter($formatter);
             $monolog->pushHandler($handler);
+            return $monolog;
+        });
+        // Add custom Stackdriver handler
+        $this->extend('monolog', function($monolog, $app) {
+            if ($app->isLocal() && !$app->getConfig('local_stackdriver_logging')) {
+                return $monolog;
+            }
+            if ($app['isUnitTest']) {
+                return $monolog;
+            }
+
+            $clientConfig = [];
+            if ($app->isLocal()) {
+                // Reuse service account key used for RDR auth
+                $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
+                $clientConfig = [
+                    'keyFilePath' => $keyFile
+                ];
+            }
+            $handler = new StackdriverHandler($clientConfig, Logger::INFO);
+            $handlerBuffer = new BufferHandler($handler, 0, Logger::INFO);
+            $handlerBuffer->pushProcessor(function ($record) use ($app) {
+                $traceHeader = $app['request_stack']->getCurrentRequest()->headers->get('X-Cloud-Trace-Context');
+                if ($traceHeader) {
+                    $record['extra']['trace_header'] = $traceHeader;
+                }
+                return $record;
+            });
+            $monolog->pushHandler($handlerBuffer);
             return $monolog;
         });
         // Override routing.listener to disable routing info logging (see RoutingServiceProvider)
@@ -197,19 +227,12 @@ abstract class AbstractApplication extends Application
 
         if (!$this['isUnitTest']) {
             $this->register(new SessionServiceProvider());
-        }
-        if (isset($this['sessionHandler'])) {
-            switch ($this['sessionHandler']) {
-                case 'memcache':
-                    $this->enableMemcacheSession();
-                    break;
-                case 'datastore':
-                    $this->enableDatastoreSession();
-                    break;
+            if (isset($this['sessionHandler']) && $this['sessionHandler'] === 'datastore') {
+                $this['session.storage.handler'] = new DatastoreSessionHandler();
             }
         }
 
-        $this->loadConfiguration($config);
+        $this->registerCache();
 
         // configure security and boot before enabling twig so that `is_granted` will be available
         $this->registerSecurity();
@@ -451,32 +474,9 @@ abstract class AbstractApplication extends Application
         }, ['is_safe' => ['html']]));
 
         // Register custom Twig cache
-        if (isset($this['twigCacheHandler'])) {
-            switch ($this['twigCacheHandler']) {
-                case 'memcache':
-                    if (class_exists('Memcache')) {
-                        $this['twig']->setCache(new \Pmi\Twig\Cache\Memcache());
-                    }
-                    break;
-                case 'file':
-                    if (isset($this['cacheDirectory'])) {
-                        $this['twig']->setCache(new \Twig_Cache_Filesystem($this['cacheDirectory'] . '/twig'));
-                    }
-                    break;
-            }
+        if (isset($this['twigCacheHandler']) && $this['twigCacheHandler'] === 'file') {
+            $this['twig']->setCache(new \Twig_Cache_Filesystem($this['twigCacheDirectory']));
         }
-    }
-
-    protected function enableMemcacheSession()
-    {
-        $memcache = new Memcache();
-        $handler = new MemcacheSessionHandler($memcache);
-        $this['session.storage.handler'] = $handler;
-    }
-
-    protected function enableDatastoreSession()
-    {
-        $this['session.storage.handler'] = new DatastoreSessionHandler();
     }
 
     public function logout()
@@ -570,5 +570,11 @@ abstract class AbstractApplication extends Application
     public function getTimeZones()
     {
         return self::$timezoneOptions;
+    }
+
+    public function registerCache()
+    {
+        $this['cache'] = new \Pmi\Cache\DatastoreAdapter();
+        $this['cache']->setLogger($this['logger']);
     }
 }

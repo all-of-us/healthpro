@@ -3,14 +3,17 @@ namespace Pmi\Drc;
 
 use Pmi\Entities\Participant;
 use Pmi\Evaluation\Evaluation;
-use Ramsey\Uuid\Uuid;
 use Pmi\Order\Order;
+use Ramsey\Uuid\Uuid;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class RdrParticipants
 {
     protected $rdrHelper;
     protected $client;
     protected $cacheEnabled = true;
+    protected $cache;
+    protected $cacheTime;
     protected static $resourceEndpoint = 'rdr/v1/';
     protected $nextToken;
     protected $total;
@@ -27,6 +30,7 @@ class RdrParticipants
     {
         $this->rdrHelper = $rdrHelper;
         $this->cacheEnabled = $rdrHelper->isCacheEnabled();
+        $this->cache = $rdrHelper->getCache();
         $this->cacheTime = $rdrHelper->getCacheTime();
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
     }
@@ -182,27 +186,68 @@ class RdrParticipants
         return $this->total;
     }
 
-    public function getById($id, $refresh = null)
+    private function getParticipantSummary($id)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
+            $participant = json_decode($response->getBody()->getContents());
+            $participant->disableTestAccess = $this->disableTestAccess;
+            return $participant;
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            return false;
+        }
+    }
+
+    public function getByIdUsingCacheContract($id, $refresh = null)
     {
         if ($this->cacheEnabled) {
-            $memcache = new \Memcache();
-            $memcacheKey = 'rdr_participant_' . $id;
-            $participant = $refresh != 1 ? $memcache->get($memcacheKey) : null;
+            $cacheKey = 'rdr_participant_' . $id;
+            $beta = $refresh ? INF : null; // set early expiration to infinite to refresh
+            $participant = $this->cache->get($cacheKey, function (ItemInterface $item) use ($id) {
+                $item->expiresAfter($this->cacheTime);
+                $participant = $this->getParticipantSummary($id);
+                $participant->cacheTime = new \DateTime();
+                return $participant;
+            }, $beta);
+            if (!$participant) {
+                $this->cache->delete($cacheKey);
+            }
+        } else {
+            $participant = $this->getParticipantSummary($id);
         }
-        if (!$this->cacheEnabled || !$participant) {
-            try {
-                $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
-                $participant = json_decode($response->getBody()->getContents());
-                $participant->disableTestAccess = $this->disableTestAccess;
-                if ($this->cacheEnabled) {
-                    $participant->cacheTime = new \DateTime();
-                    $memcache->set($memcacheKey, $participant, 0, $this->cacheTime);
-                }
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
-                return false;
+        if ($participant) {
+            return $this->participantToResult($participant);
+        } else {
+            return false;
+        }
+    }
+
+    public function getById($id, $refresh = null)
+    {
+        $participant = false;
+        $cacheKey = 'rdr_participant_' . $id;
+
+        if ($this->cacheEnabled && !$refresh) {
+            $cacheItem = $this->cache->getItem($cacheKey);
+            if ($cacheItem->isHit()) {
+                $participant = $cacheItem->get();
             }
         }
-        return $this->participantToResult($participant);
+        if (!$participant) {
+            $participant = $this->getParticipantSummary($id);
+            if ($participant && $this->cacheEnabled) {
+                $participant->cacheTime = new \DateTime();
+                $cacheItem = $this->cache->getItem($cacheKey);
+                $cacheItem->expiresAfter($this->cacheTime);
+                $cacheItem->set($participant);
+                $this->cache->save($cacheItem);
+            }
+        }
+        if ($participant) {
+            return $this->participantToResult($participant);
+        } else {
+            return false;
+        }
     }
 
     public function createParticipant($participant)

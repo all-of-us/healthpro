@@ -1,7 +1,6 @@
 <?php
 namespace Pmi\Controller;
 
-use google\appengine\api\users\UserService;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,9 +11,6 @@ use Pmi\Service\SiteSyncService;
 use Pmi\Service\NotifyMissingMeasurementsAndOrdersService;
 use Pmi\Service\PatientStatusService;
 
-/**
- * NOTE: all /cron routes should be protected by `login: admin` in app.yaml
- */
 class CronController extends AbstractController
 {
     protected static $name = 'cron';
@@ -27,56 +23,50 @@ class CronController extends AbstractController
         ['awardeesAndOrganizations', '/awardees-organizations'],
         ['missingMeasurementsOrders', '/missing-measurements-orders'],
         ['sendPatientStatusToRdr', '/send-patient-status-rdr'],
+        ['deleteCacheKeys', '/delete-cache-keys']
     ];
-    
-    /**
-     * Provides a second layer of protection for cron actions beyond the
-     * `login: admin` config that should exist in app.yaml for /cron routes.
-     */
-    private function isAdmin(Request $request)
+
+    private function isAllowed(Application $app, Request $request)
     {
-        return UserService::isCurrentUserAdmin() ||
-            $request->headers->get('X-Appengine-Cron') === 'true';
+        return $request->headers->get('X-Appengine-Cron') === 'true' || $app->isLocal();
+    }
+
+    private function getAccessDeniedResponse()
+    {
+        return new JsonResponse(['success' => false, 'error' => 'Access denied'], 403);
     }
 
     public function withdrawalAction(Application $app, Request $request)
     {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
         }
 
         $withdrawal = new WithdrawalService($app);
         $withdrawal->sendWithdrawalEmails();
 
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
-    
+
+
     public function pingTestAction(Application $app, Request $request)
     {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
-        }
-
-        $user = UserService::getCurrentUser();
-        if ($user) {
-            $email = $user->getEmail();
-            error_log("Cron ping test requested by $email [" . $request->getClientIp() . "]");
-        }
-        if ($request->headers->get('X-Appengine-Cron') === 'true') {
-            error_log('Cron ping test requested by Appengine-Cron');
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
         }
         
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
 
     public function resendEvaluationsToRdrAction(Application $app, Request $request)
     {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
         }
+
         $withdrawal = new EvaluationsQueueService($app);
         $withdrawal->resendEvaluationsToRdr();
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
 
     public function sitesAction(Application $app)
@@ -90,7 +80,7 @@ class CronController extends AbstractController
         return (new JsonResponse())->setData(true);
     }
 
-    public function awardeesAndOrganizationsAction(Application $app)
+    public function awardeesAndOrganizationsAction(Application $app, Request $request)
     {
         if (!$app->getConfig('sites_use_rdr')) {
             return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
@@ -98,28 +88,40 @@ class CronController extends AbstractController
         $siteSync = new SiteSyncService($app);
         $siteSync->syncAwardees();
         $siteSync->syncOrganizations();
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
 
     public function missingMeasurementsOrdersAction(Application $app, Request $request)
     {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
         }
 
         $notifyMissing = new NotifyMissingMeasurementsAndOrdersService($app);
         $notifyMissing->sendEmails();
 
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
     }
 
     public function sendPatientStatusToRdrAction(Application $app, Request $request)
     {
-        if (!$this->isAdmin($request)) {
-            throw new AccessDeniedHttpException();
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
         }
+
         $patientStatusService = new PatientStatusService($app);
         $patientStatusService->sendPatientStatusToRdr();
-        return (new JsonResponse())->setData(true);
+        return new JsonResponse(['success' => true]);
+    }
+
+    public function deleteCacheKeysAction(Application $app, Request $request)
+    {
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
+        }
+
+        $app['cache']->prune();
+
+        return new JsonResponse(['success' => true]);
     }
 }

@@ -1,15 +1,7 @@
-runtime: php55
-api_version: 1
+runtime: php72
 
-skip_files:
-- ^(.*/)?node_modules.*$
-- ^(.*/)?bower_components.*$
-- ^(.*/)?\.gitignore$
-- ^(.*/)?\.git$
-- ^(.*/)?nbproject$
-- '^(.*/)?dev_config$'
-- ^(.*/)?external$
-- ^deploy_.*\.txt$
+# default is `public/index.php` or `index.php`
+entrypoint: serve web/index.php
 
 handlers:
 - url: /robots.txt
@@ -26,15 +18,17 @@ handlers:
   http_headers:
     X-Content-Type-Options: nosniff
 - url: /cron/.*
-  script: web/index.php
+  script: auto
   secure: always
-  login: admin
 - url: /timeout
-  script: web/index.php
+  script: auto
   secure: always
 - url: /.*
-  script: web/index.php
+  script: auto
   secure: always
+
+inbound_services:
+- warmup
 
 env_variables:
   PMI_ENV: 'dev'

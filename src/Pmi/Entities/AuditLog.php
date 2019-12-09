@@ -1,19 +1,14 @@
 <?php
 namespace Pmi\Entities;
 
-use GDS\Schema;
 use Pmi\Datastore\Entity;
 
 class AuditLog extends Entity
 {
-    protected static function buildSchema()
+    protected $excludeIndexes = ['data'];
+
+    protected static function getKind()
     {
-        return (new Schema('AuditLog'))
-            ->addString('action')
-            ->addString('user')
-            ->addString('site')
-            ->addDatetime('timestamp')
-            ->addString('ip')
-            ->addString('data', false);
+        return 'AuditLog';
     }
 }

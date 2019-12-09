@@ -3,12 +3,12 @@ namespace Pmi\Entities;
 
 use Pmi\Datastore\Entity;
 
-class Configuration extends Entity
+class Cache extends Entity
 {
-    protected $excludeIndexes = ['value'];
+    protected $excludeIndexes = ['data'];
 
     protected static function getKind()
     {
-        return 'Configuration';
+        return 'Cache';
     }
 }

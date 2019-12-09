@@ -14,7 +14,7 @@
 mysql_schema: hpo
 mysql_user: root
 mysql_password: ~
-mysql_host: 127.0.0.1
+mysql_host: healthpro-mysql
 
 # RDR API
 #   Note: Store service account key in rdr_key.json
@@ -56,9 +56,6 @@ gaApplicationName: PMI DRC HPO
 gaDomain: staging.pmi-ops.org
 gaAdminEmail: hpo-api@staging.pmi-ops.org
 
-# use Google App Engine auth via UserService instead of Google OAuth
-gae_auth: 1
-
 # require user to have two-factor authentication enabled
 enforce2fa: 0
 
@@ -84,3 +81,7 @@ sites_use_rdr: true
 # Work Queue export limits
 workqueue_export_limit: 10000
 workqueue_export_page_size: 1000
+
+# Enable Stackdriver locally. When set to true, will send logs to the project
+# associated with the service account you are using to connect to the RDR.
+# local_stackdriver_logging: false

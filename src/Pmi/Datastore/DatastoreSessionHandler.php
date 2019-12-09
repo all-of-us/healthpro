@@ -15,8 +15,10 @@ class DatastoreSessionHandler extends AbstractSessionHandler
     public function doDestroy($id)
     {
         try {
-            $session = Session::fetchOneByName($id);
+            $session = Session::fetchOneById($id);
             if ($session) {
+                $session = new Session();
+                $session->setKeyName($id);
                 $session->delete();
             }
         } catch (\Exception $e) {
@@ -38,21 +40,19 @@ class DatastoreSessionHandler extends AbstractSessionHandler
 
     public function gc($maxlifetime)
     {
-        $query = 'SELECT * FROM Session WHERE modified < @modified';
         $modified = new DateTime("-{$maxlifetime} seconds");
-        $sessionStore = new \GDS\Store('Session');
-        $results = $sessionStore->fetchAll($query, ['modified' => $modified]);
-        $sessionStore->delete($results);
-
+        $session = new Session();
+        $results = $session->getBatch('modified', $modified, '<');
+        $session->deleteBatch($results);
         return true;
     }
 
     public function doRead($id)
     {
         try {
-            $session = Session::fetchOneByName($id);
+            $session = Session::fetchOneById($id);
             if ($session) {
-                return $session->getData();
+                return $session->data;
             } else {
                 return '';
             }
@@ -63,17 +63,17 @@ class DatastoreSessionHandler extends AbstractSessionHandler
         }
     }
 
-    public function doWrite($id, $session_data)
+    public function doWrite($id, $sessionData)
     {
         try {
-            $session = Session::fetchOneByName($id);
-            if (!$session) {
-                $session = new Session();
-                $session->setKeyName($id);
-            }
-            $session->setData($session_data);
-            $session->setModified(new DateTime());
-            $session->save();
+            $data = [
+                'data' => $sessionData,
+                'modified' => new DateTime()
+            ];
+            $session = new Session();
+            $session->setKeyName($id);
+            $session->setData($data);
+            $session->update();
             return true;
         } catch (\Exception $e) {
             return false;

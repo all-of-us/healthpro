@@ -1079,7 +1079,7 @@ class DashboardController extends AbstractController
      * Get Metrics 2 Object
      *
      * Main method for retrieving near-real-time metrics from API;
-     * Stores result in memcache with 15-minute expiration
+     * Caches result with 15-minute expiration
      *
      * @param Application $app
      * @param string      $interval
@@ -1104,7 +1104,7 @@ class DashboardController extends AbstractController
     ) {
         try {
             $metrics = [];
-            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper'], new \Memcache());
+            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
 
             $metrics = $metricsApi->metrics(
                 $start_date,
@@ -1148,7 +1148,7 @@ class DashboardController extends AbstractController
     ) {
         try {
             $metrics = [];
-            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper'], new \Memcache());
+            $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
 
             $metrics = $metricsApi->ehrMetrics(
                 $mode,
@@ -1181,15 +1181,22 @@ class DashboardController extends AbstractController
      */
     private function getMetricsFieldDefinitions(Application $app, $field_key)
     {
-        $memcache = new \Memcache();
-        $memcacheKey = 'metrics_api_field_definitions';
-        $definitions = $memcache->get($memcacheKey);
+        $definitions = false;
+        if ($app['cache']) {
+            $cacheItem = $app['cache']->getItem('metrics_api_field_definitions');
+            if ($cacheItem->isHit()) {
+                $definitions = $cacheItem->get();
+            }
+        }
         if (!$definitions) {
             try {
                 $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
                 $definitions = $metricsApi->metricsFields();
-                // set expiration to one hour
-                $memcache->set($memcacheKey, $definitions, 0, 3600);
+                if ($app['cache'] && $definitions) {
+                    $cacheItem->set($definitions);
+                    $cacheItem->expiresAfter(3600);
+                    $app['cache']->save($cacheItem);
+                }
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 return false;
             }
