@@ -9,7 +9,7 @@ abstract class Entity
 
     protected $excludeIndexes = [];
 
-    protected $limit = null;
+    protected $writeLimit = 500;
 
     public static function fetchBy()
     {
@@ -57,7 +57,7 @@ abstract class Entity
         if ($property === null) {
             $results = $datastoreClient->fetchAll(static::getKind());
         } else {
-            $results = $datastoreClient->basicQuery(static::getKind(), $property, $value, $operator, $this->limit);
+            $results = $datastoreClient->basicQuery(static::getKind(), $property, $value, $operator);
         }
 
         return $results;
@@ -67,6 +67,11 @@ abstract class Entity
     {
         $datastoreClient = new DatastoreClientHelper();
         $keys = $datastoreClient->getKeys($results);
-        return $datastoreClient->deleteBatch($keys);
+        $count = ceil(count($keys) / $this->writeLimit);
+        for ($i = 0; $i < $count; $i++) {
+            $offset = $i * $this->writeLimit;
+            $datastoreClient->deleteBatch(array_slice($keys, $offset, $this->writeLimit));
+        }
+        return true;
     }
 }

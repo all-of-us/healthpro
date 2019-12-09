@@ -62,14 +62,11 @@ class DatastoreClientHelper
         return true;
     }
 
-    public function basicQuery($kind, $property, $value, $operator, $limit)
+    public function basicQuery($kind, $property, $value, $operator)
     {
         $query = $this->datastore->query()
             ->kind($kind)
             ->filter($property, $operator, $value);
-        if ($limit) {
-            $query = $query->limit($limit);
-        }
         return $this->datastore->runQuery($query);
     }
 
