@@ -27,7 +27,8 @@
         "fzaninotto/faker": "^1.6",
         "google/cloud-datastore": "^1.5",
         "google/cloud-logging": "^1.18",
-        "symfony/cache": "^4.3"
+        "symfony/cache": "^4.3",
+        "google/cloud-storage": "^1.16"
     },
     "config": {
         "platform": {
