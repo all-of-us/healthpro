@@ -10,9 +10,12 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
 {
     private $marshaller;
 
-    public function __construct()
+    private $limit;
+
+    public function __construct($limit)
     {
         $this->marshaller = new DefaultMarshaller();
+        $this->limit = $limit;
         parent::__construct();
     }
 
@@ -72,7 +75,7 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
     protected function doClear($namespace)
     {
         $cache = new Cache();
-        $results = $cache->getBatch();
+        $results = $cache->getBatch(null, null, null, $this->limit);
         $cache->deleteBatch($results);
 
         return true;
@@ -81,7 +84,7 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
     public function prune()
     {        
         $cache = new Cache();
-        $results = $cache->getBatch('expire', new \DateTime(), '<');
+        $results = $cache->getBatch('expire', new \DateTime(), '<', $this->limit);
         $cache->deleteBatch($results);
 
         return true;
