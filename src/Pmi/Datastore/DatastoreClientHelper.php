@@ -26,7 +26,7 @@ class DatastoreClientHelper
     {
         $query = $this->datastore->query()->kind($kind);
         if ($limit) {
-            $query = $query->limit($limit);
+            $query->limit($limit);
         }
         return $this->datastore->runQuery($query);
     }
@@ -71,7 +71,7 @@ class DatastoreClientHelper
             ->kind($kind)
             ->filter($property, $operator, $value);
         if ($limit) {
-            $query = $query->limit($limit);
+            $query->limit($limit);
         }
         return $this->datastore->runQuery($query);
     }
