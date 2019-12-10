@@ -11,6 +11,7 @@ class HelpController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['videos', '/videos'],
+        ['videosPlaylist', '/videos/{id}'],
         ['faq', '/faq'],
         ['sop', '/sop'],
         ['sopView', '/sop/{id}'],
@@ -124,8 +125,7 @@ class HelpController extends AbstractController
     ];
 
     private static $videoPlaylists = [
-        [
-            'id' => 'biobank-hpo',
+        'biobank-hpo' => [
             'tab_title' => 'HPO Biobank',
             'title' => 'Biobank Video Tutorials for Healthcare Provider Organizations (HPO)',
             'type' => 'kaltura',
@@ -133,8 +133,7 @@ class HelpController extends AbstractController
             'player_id' => 'kaltura_player_5d13d51bcc56d',
             'playlist_id' => '0_j87i59jj'
         ],
-        [
-            'id' => 'biobank-dv',
+        'biobank-dv' => [
             'tab_title' => 'DV Biobank',
             'title' => 'Biobank Video Tutorials for Direct Volunteers (DV)',
             'type' => 'kaltura',
@@ -142,8 +141,7 @@ class HelpController extends AbstractController
             'player_id' => 'kaltura_player_5d13dbf851c3b',
             'playlist_id' => '0_7mrmfvqa'
         ],
-        [
-            'id' => 'other',
+        'other' => [
             'tab_title' => 'Other',
             'type' => 'youtube',
             'groups' =>  [
@@ -191,25 +189,33 @@ class HelpController extends AbstractController
         return $app['twig']->render('help/index.html.twig');
     }
 
-    public function videosAction(Application $app, Request $request)
+    public function videosAction(Application $app)
     {
-        if ($request->query->get('type')) {
-            // If type parameter is set, user is toggling between video sources on the 'Other' tab
-            $active = 'other';
+        if ($app->isDVType()) {
+            $id = 'biobank-dv';
         } else {
-            if ($app->isDVType()) {
-                $active = 'biobank-dv';
-            } else {
-                $active = 'biobank-hpo';
-            }
+            $id = 'biobank-hpo';
         }
 
-        return $app['twig']->render('help/videos.html.twig', [
+        return $app->redirectToRoute('help_videosPlaylist', ['id' => $id]);
+    }
+
+    public function videosPlaylistAction($id, Application $app, Request $request)
+    {
+        if (!array_key_exists($id, self::$videoPlaylists)) {
+            $app->abort(404);
+        }
+
+        $parameters = [
             'videoPlaylists' => self::$videoPlaylists,
-            'type' => $request->query->get('type', 'yt'),
-            'helpVideosPath' => rtrim($app->getConfig('help_videos_path'), '/'),
-            'active' => $active
-        ]);
+            'active' => $id
+        ];
+        if ($id === 'other') {
+            $parameters['type'] = $request->query->get('type', 'yt');
+            $parameters['helpVideosPath'] = rtrim($app->getConfig('help_videos_path'), '/');
+        }
+
+        return $app['twig']->render('help/videos.html.twig', $parameters);
     }
 
     public function faqAction(Application $app)
