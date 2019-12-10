@@ -15,6 +15,10 @@
             ({{ participant.enrollmentStatusCoreStoredSampleTime|date('n/j/Y', app.userTimezone) }})
         {% endif %}
     </dd>
+    {% if app.isDvType %}
+        <dt>Participant Origination</dt>
+        <dd>{{ participant.participantOrigin|default('--') }}</dd>
+    {% endif %}
     <dt>Paired Awardee</dt>
     <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
 </dl>

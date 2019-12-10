@@ -79,6 +79,9 @@ class WorkQueueController extends AbstractController
         if (!empty($params['race'])) {
             $rdrParams['race'] = $params['race'];
         }
+        if (!empty($params['participantOrigin'])) {
+            $rdrParams['participantOrigin'] = $params['participantOrigin'];
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];
@@ -336,6 +339,7 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Patient Status: Unknown';
                 $headers[] = 'Middle Initial';
             }
+            $headers[] = 'Participant Origination';
             $headers[] = 'Core Participant Date';
             fputcsv($output, $headers);
 
@@ -416,6 +420,7 @@ class WorkQueueController extends AbstractController
                         $row[] = $workQueue->getPatientStatus($participant, 'UNKNOWN', 'export');
                         $row[] = $participant->middleName;
                     }
+                    $row[] = $participant->participantOrigin;
                     $row[] = $participant->enrollmentStatusCoreStoredSampleTime;
                     fputcsv($output, $row);
                 }

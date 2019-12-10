@@ -22,6 +22,7 @@ class WorkQueue
         'biobankId',
         'language',
         'enrollmentStatus',
+        'participantOrigin',
         'consentForStudyEnrollmentAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
@@ -169,6 +170,13 @@ class WorkQueue
                 'More than one race' => 'MORE_THAN_ONE_RACE',
                 'Other' => 'OTHER_RACE'
             ]
+        ],
+        'participantOrigin' => [
+            'label' => 'Participant Origination',
+            'options' => [
+                'PTSC Portal' => 'vibrent',
+                'DV Pilot Portal' => 'careevolution'
+            ]
         ]
     ];
 
@@ -288,6 +296,7 @@ class WorkQueue
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
             $row['language'] = $e($participant->language);
+            $row['participantOrigin'] = $e($participant->participantOrigin);
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
             $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentAuthored);
