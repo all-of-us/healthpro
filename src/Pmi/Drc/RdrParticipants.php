@@ -224,13 +224,21 @@ class RdrParticipants
 
     public function getById($id, $refresh = null)
     {
+        if (!is_string($id) || !preg_match('/^\w+$/', $id)) {
+            return false;
+        }
+
         $participant = false;
         $cacheKey = 'rdr_participant_' . $id;
 
         if ($this->cacheEnabled && !$refresh) {
-            $cacheItem = $this->cache->getItem($cacheKey);
-            if ($cacheItem->isHit()) {
-                $participant = $cacheItem->get();
+            try {
+                $cacheItem = $this->cache->getItem($cacheKey);
+                if ($cacheItem->isHit()) {
+                    $participant = $cacheItem->get();
+                }
+            } catch (\Exception $e) {
+                $this->rdrHelper->getLogger()->error($e);
             }
         }
         if (!$participant) {
