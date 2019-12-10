@@ -317,6 +317,9 @@ table.table-samples td {
 .help-videos-nav .list-group {
     margin-bottom: 30px;
 }
+.help-kaltura-embed {
+    min-width: 600px;
+}
 
 .tz-change-btn {
     padding:2px 6px;
