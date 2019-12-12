@@ -60,6 +60,9 @@ class StackdriverHandler extends AbstractProcessingHandler
             'severity' => $record['level_name'],
             'timestamp' => $record['datetime']
         ];
+        if (isset($record['extra']['httpRequest'])) {
+            $entryOptions['httpRequest'] = $record['extra']['httpRequest'];
+        }
         if (isset($record['extra']['trace_header'])) {
             if ($trace = $this->getTraceFromHeader($record['extra']['trace_header'])) {
                 $entryOptions['trace'] = $trace;

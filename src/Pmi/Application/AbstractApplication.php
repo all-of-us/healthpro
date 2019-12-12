@@ -203,8 +203,12 @@ abstract class AbstractApplication extends Application
             $handler = new StackdriverHandler($clientConfig, Logger::INFO);
             $handlerBuffer = new BufferHandler($handler, 0, Logger::INFO);
             $handlerBuffer->pushProcessor(function ($record) use ($app) {
-                $traceHeader = $app['request_stack']->getCurrentRequest()->headers->get('X-Cloud-Trace-Context');
-                if ($traceHeader) {
+                $request = $app['request_stack']->getCurrentRequest();
+                $record['extra']['httpRequest'] = [
+                    'requestMethod' => $request->getMethod(),
+                    'requestUrl' => $request->getPathInfo()
+                ];
+                if ($traceHeader = $request->headers->get('X-Cloud-Trace-Context')) {
                     $record['extra']['trace_header'] = $traceHeader;
                 }
                 return $record;
