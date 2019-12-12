@@ -85,3 +85,6 @@ workqueue_export_page_size: 1000
 # Enable Stackdriver locally. When set to true, will send logs to the project
 # associated with the service account you are using to connect to the RDR.
 # local_stackdriver_logging: false
+
+# Datastore clean up limit
+ds_clean_up_limit:

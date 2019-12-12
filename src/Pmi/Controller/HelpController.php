@@ -11,6 +11,7 @@ class HelpController extends AbstractController
     protected static $routes = [
         ['home', '/'],
         ['videos', '/videos'],
+        ['videosPlaylist', '/videos/{id}'],
         ['faq', '/faq'],
         ['sop', '/sop'],
         ['sopView', '/sop/{id}'],
@@ -123,89 +124,46 @@ class HelpController extends AbstractController
         ]
     ];
 
-    private static $videoGroups = [
-        [
+    private static $videoPlaylists = [
+        'biobank-hpo' => [
+            'tab_title' => 'HPO Biobank',
             'title' => 'Biobank Video Tutorials for Healthcare Provider Organizations (HPO)',
-            'videos' => [
-                [
-                    'title' => 'Chapter 1 - Part 1: HPO Creating a Biobank Order (Complete Biobank Orders)',
-                    'youtube_id' => '_IxvPPBwnUg',
-                    'filename' => 'Chapter 1-Part 1 (Version 2) (updated 1-22-2019).mp4'
-                ],
-                [
-                    'title' => 'Chapter 1 - Part 2: HPO Creating a Biobank Order (1st Visit Partial Orders)',
-                    'youtube_id' => 'Do-xigAu_ng',
-                    'filename' => 'Chapter 1-Part 2 (Version 2).mp4'
-                ],
-                [
-                    'title' => 'Chapter 1 - Part 3: HPO Creating a Biobank Order (2nd Visit Customized Orders)',
-                    'youtube_id' => 'eh1wiPoHIHg',
-                    'filename' => 'Chapter 1-Part 3 (Version 2).mp4'
-                ],
-                [
-                    'title' => 'Chapter 3: HPO Blood Collection',
-                    'youtube_id' => null,
-                    'filename' => null
-                ],
-                [
-                    'title' => 'Chapter 5: HPO Urine Collection',
-                    'youtube_id' => 'IK_M_6jzHdY',
-                    'filename' => 'Chapter 5- HPO Urine Collection (1-28-2019).mp4'
-                ],
-                [
-                    'title' => 'Chapter 7: HPO Saliva Collection',
-                    'youtube_id' => 'wed3vBDyBJk',
-                    'filename' => 'Chapter 7- HPO Saliva Collection.mp4'
-                ],
-                [
-                    'title' => 'Chapter 9: HPO Ordering Supplies from MML',
-                    'youtube_id' => 'aIPoatfgWSE',
-                    'filename' => 'Chapter 9-HPO Ordering Supplies from MML 06-13-2017.mp4'
-                ]
-            ]
+            'type' => 'kaltura',
+            'widget' => 'https://cdnapisec.kaltura.com/p/1825021/sp/182502100/embedIframeJs/uiconf_id/26524131/partner_id/1825021/widget_id/0_7biqpuyo',
+            'player_id' => 'kaltura_player_5d13d51bcc56d',
+            'playlist_id' => '0_j87i59jj'
         ],
-        [
+        'biobank-dv' => [
+            'tab_title' => 'DV Biobank',
             'title' => 'Biobank Video Tutorials for Direct Volunteers (DV)',
-            'videos' => [
-                [
-                    'title' => 'Chapter 2: DV Registering a KIT',
-                    'youtube_id' => 'gjn8NoomEl0',
-                    'filename' => 'Chapter 2-DV Registering a Kit.mp4'
-                ],
-                [
-                    'title' => 'Chapter 4: DV Blood Collection & Processing',
-                    'youtube_id' => 'ghk8l0Y1Z9Y',
-                    'filename' => 'Chapter 4-DV Blood Collection _ Processing 07-27-2018.mp4'
-                ],
-                [
-                    'title' => 'Chapter 6: DV Urine Collection',
-                    'youtube_id' => 'sj3Z9xHyTCI',
-                    'filename' => 'Chapter 6-DV Urine Collection 06-14-2017.mp4'
-                ],
-                [
-                    'title' => 'Chapter 10: DV Packaging & Shipping Specimens',
-                    'youtube_id' => 'YB3oVN3xlRM',
-                    'filename' => 'Chapter 10-DV Packaging and Shipping Specimens.mp4'
-                ]
-            ]
+            'type' => 'kaltura',
+            'widget' => 'https://cdnapisec.kaltura.com/p/1825021/sp/182502100/embedIframeJs/uiconf_id/26524131/partner_id/1825021/widget_id/0_6rm30l9d',
+            'player_id' => 'kaltura_player_5d13dbf851c3b',
+            'playlist_id' => '0_7mrmfvqa'
         ],
-        [
-            'title' => 'Physical Measurements (HPO/DV)',
-            'videos' => [
+        'other' => [
+            'tab_title' => 'Other',
+            'type' => 'youtube',
+            'groups' =>  [
                 [
-                    'title' => 'Physical Measurements Video Tutorial (HPO/DV)',
-                    'youtube_id' => 'wE-sZoPCfdk',
-                    'filename' => '20180327_NIH Scripps_EXAM V12_FINAL_COMPRESSED.mp4'
-                ]
-            ]
-        ],
-        [
-            'title' => 'General (HPO/DV)',
-            'videos' => [
+                    'title' => 'Physical Measurements (HPO/DV)',
+                    'videos' => [
+                        [
+                            'title' => 'Physical Measurements Video Tutorial (HPO/DV)',
+                            'youtube_id' => 'wE-sZoPCfdk',
+                            'filename' => '20180327_NIH Scripps_EXAM V12_FINAL_COMPRESSED.mp4'
+                        ]
+                    ]
+                ],
                 [
-                    'title' => 'All of Us Research Program FAQs',
-                    'youtube_id' => 'TE-IyOxazvo',
-                    'filename' => '20180327_NIH Scripps_FAQ V6_FINAL_COMPRESSED.mp4'
+                    'title' => 'General (HPO/DV)',
+                    'videos' => [
+                        [
+                            'title' => 'All of Us Research Program FAQs',
+                            'youtube_id' => 'TE-IyOxazvo',
+                            'filename' => '20180327_NIH Scripps_FAQ V6_FINAL_COMPRESSED.mp4'
+                        ]
+                    ]
                 ]
             ]
         ]
@@ -231,13 +189,33 @@ class HelpController extends AbstractController
         return $app['twig']->render('help/index.html.twig');
     }
 
-    public function videosAction(Application $app, Request $request)
+    public function videosAction(Application $app)
     {
-        return $app['twig']->render('help/videos.html.twig', [
-            'videoGroups' => self::$videoGroups,
-            'type' => $request->query->get('type', 'yt'),
-            'helpVideosPath' => rtrim($app->getConfig('help_videos_path'), '/')
-        ]);
+        if ($app->isDVType()) {
+            $id = 'biobank-dv';
+        } else {
+            $id = 'biobank-hpo';
+        }
+
+        return $app->redirectToRoute('help_videosPlaylist', ['id' => $id]);
+    }
+
+    public function videosPlaylistAction($id, Application $app, Request $request)
+    {
+        if (!array_key_exists($id, self::$videoPlaylists)) {
+            $app->abort(404);
+        }
+
+        $parameters = [
+            'videoPlaylists' => self::$videoPlaylists,
+            'active' => $id
+        ];
+        if ($id === 'other') {
+            $parameters['type'] = $request->query->get('type', 'yt');
+            $parameters['helpVideosPath'] = rtrim($app->getConfig('help_videos_path'), '/');
+        }
+
+        return $app['twig']->render('help/videos.html.twig', $parameters);
     }
 
     public function faqAction(Application $app)

@@ -58,6 +58,7 @@ $(document).ready(function() {
 
     var surveys = $('#workqueue').data('surveys');
     var samples = $('#workqueue').data('samples');
+    var isDvType = $('#workqueue').data('dv-type');
 
     var tableColumns = [];
     tableColumns.push(
@@ -69,6 +70,7 @@ $(document).ready(function() {
       { name: 'biobankId', visible: false, data: 'biobankId' },
       { name: 'language', visible: false, data: 'language', orderable: false  },
       { name: 'participantStatus', data: 'participantStatus' },
+      { name: 'participantOrigin', data: 'participantOrigin', visible: !!isDvType },
       { name: 'generalConsent', data: 'generalConsent', class: 'text-center' },
       { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
@@ -129,7 +131,7 @@ $(document).ready(function() {
             url: url,
             type: "POST"
         },
-        order: [[8, 'desc']],
+        order: [[9, 'desc']],
         dom: 'lBrtip',
         columns: tableColumns,
         pageLength: 25,

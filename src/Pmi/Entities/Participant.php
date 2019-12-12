@@ -19,6 +19,7 @@ class Participant
     public $age;
     public $disableTestAccess;
     public $patientStatus;
+    public $isCoreParticipant = false;
 
     public function __construct($rdrParticipant = null)
     {
@@ -109,6 +110,11 @@ class Participant
         // Patient status
         if (isset($participant->patientStatus)) {
             $this->patientStatus = $participant->patientStatus;
+        }
+
+        // Determine core participant
+        if (!empty($participant->enrollmentStatus) && $participant->enrollmentStatus === 'FULL_PARTICIPANT') {
+            $this->isCoreParticipant = true;
         }
     }
 
