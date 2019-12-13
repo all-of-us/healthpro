@@ -812,7 +812,7 @@ class DashboardController extends AbstractController
                         "text" => [number_format($metrics['EHR_CONSENTED'])],
                         "type" => 'bar',
                         "hoverinfo" => 'text+name',
-                        "name" => 'Total Participants EHR Consent',
+                        "name" => 'Total Participants + EHR Consent',
                         "marker" => [
                             "color" => $this->getColorBrewerVal(0)
                         ]
