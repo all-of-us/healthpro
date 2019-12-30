@@ -41,6 +41,7 @@ class RdrMetrics
      * @param string $stratification
      * @param array $centers
      * @param array $enrollment_statuses
+     * @param array $origins
      * @param array $params
      *
      * @return array
@@ -68,6 +69,9 @@ class RdrMetrics
         if (is_array($enrollment_statuses)) {
             $enrollment_statuses = implode(',', $enrollment_statuses);
         }
+        if (is_array($origins)) {
+            $origins = implode(',', $origins);
+        }
 
         $responseObject = [];
         foreach ($this->getDateRangeBins($start_date, $end_date, $batch) as $bucket) {
@@ -78,6 +82,7 @@ class RdrMetrics
                 'stratification' => $stratification,
                 'awardee' => $centers,
                 'enrollmentStatus' => $enrollment_statuses,
+                'origins' => $origins,
                 'history' => $history ? 'TRUE' : 'FALSE',
                 'version' => $version ? $version : null
             ];

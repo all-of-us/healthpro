@@ -201,6 +201,7 @@ class DashboardController extends AbstractController
         $end_date = $request->get('end_date');
         $centers = $request->get('centers');
         $enrollment_statuses = $request->get('enrollment_statuses');
+        $origins = $request->get('origins');
         $history = $request->get('history', false);
 
         if ($centers == 'ALL') {
@@ -219,6 +220,7 @@ class DashboardController extends AbstractController
             $stratification,
             $centers,
             $enrollment_statuses,
+            $origins,
             [
                 'history' => $history,
                 'version' => self::API_VERSION
@@ -407,6 +409,7 @@ class DashboardController extends AbstractController
         $end_date = $request->get('end_date');
         $centers = $request->get('centers');
         $enrollment_statuses = $request->get('enrollment_statuses');
+        $origins = $request->get('origins');
         $history = $request->get('history', true); // Data available only through history flag
         $color_profile = $request->get('color_profile');
 
@@ -433,6 +436,7 @@ class DashboardController extends AbstractController
             $stratification,
             $centers,
             $enrollment_statuses,
+            $origins,
             [
                 'history' => $history,
                 'version' => self::API_VERSION
@@ -657,6 +661,7 @@ class DashboardController extends AbstractController
         $end_date = $request->get('end_date');
         $centers = $request->get('centers');
         $enrollment_statuses = $request->get('enrollment_statuses');
+        $origins = $request->get('origins');
 
         // Use 'ALL' keyword to send empty filter for awardee
         if ($centers == ['ALL']) {
@@ -672,6 +677,7 @@ class DashboardController extends AbstractController
             $stratification,
             $centers,
             $enrollment_statuses,
+            $origins,
             [
                 'history' => true,
                 'version' => self::API_VERSION
@@ -890,6 +896,7 @@ class DashboardController extends AbstractController
      * @param string      $stratification
      * @param string      $centers
      * @param string      $enrollment_statuses
+     * @param string      $origins
      * @param array       $params
      *
      * @return array
@@ -902,6 +909,7 @@ class DashboardController extends AbstractController
         $stratification,
         $centers,
         $enrollment_statuses,
+        $origins,
         $params = []
     ) {
         try {

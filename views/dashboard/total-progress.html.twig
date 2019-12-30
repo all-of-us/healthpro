@@ -105,6 +105,11 @@
             alert('You must select at least one recruitment center to plot results.');
             return false;
         }
+        var participantOriginations = loadParticipantOriginationFilters('total-progress');
+        if (participantOriginations.length == 0) {
+            alert('You must select at least one recruitment origin to plot results.');
+            return false;
+        }
 
         var spinnerLoc = 'plotly-total-progress';
         if (dialogType == 'spinner') {
@@ -158,6 +163,7 @@
           start_date: tpStartDate,
           end_date: tpEndDate,
           enrollment_statuses: enrollmentStatuses,
+          origin: participantOriginations,
           centers: centers,
           history: true
         })
