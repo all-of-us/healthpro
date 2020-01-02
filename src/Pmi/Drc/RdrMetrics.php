@@ -46,7 +46,7 @@ class RdrMetrics
      *
      * @return array
      */
-    public function metrics($start_date, $end_date, $stratification, $centers, $enrollment_statuses, $params = [])
+    public function metrics($start_date, $end_date, $stratification, $centers, $enrollment_statuses, $origins, $params = [])
     {
         $client = $this->rdrHelper->getClient();
 
@@ -82,7 +82,7 @@ class RdrMetrics
                 'stratification' => $stratification,
                 'awardee' => $centers,
                 'enrollmentStatus' => $enrollment_statuses,
-                'origins' => $origins,
+                'origin' => $origins,
                 'history' => $history ? 'TRUE' : 'FALSE',
                 'version' => $version ? $version : null
             ];

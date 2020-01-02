@@ -922,6 +922,7 @@ class DashboardController extends AbstractController
                 $stratification,
                 $centers,
                 $enrollment_statuses,
+                $origins,
                 $params
             );
 
