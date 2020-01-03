@@ -217,9 +217,5 @@ class MetricsCommand extends Command
         $data = $metricsApi->metrics($start_date, $end_date, $stratification, $centers, $statuses, $origins, $params);
 
         $output->writeln(json_encode($data, $pretty));
-
-        if ($input->getOption('debug')) {
-            print $metricsApi->getLastRequest();
-        }
     }
 }
