@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+{% block title %}Metrics - Admin - {% endblock %}
+{% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li><a href="{{ path('admin_home') }}">Admin</a></li>
+        <li class="active">Metrics</li>
+    </ol>
+    <div class="page-header">
+        <h2><i class="fa fa-line-chart" aria-hidden="true"></i> Metrics</h2>
+    </div>
+    <div class="text-right">
+        <form method="GET">
+            <select name="range" id="select-range">
+                {% set currentRange = app.request_stack.currentrequest.query.get('range') %}
+                <option value="month"{% if currentRange == 'month' %} selected="selected"{% endif %}>Last 30 days</option>
+                <option value="week"{% if currentRange == 'week' %} selected="selected"{% endif %}>Last week</option>
+                <option value="year"{% if currentRange == 'year' %} selected="selected"{% endif %}>Last year</option>
+            </select>
+        </form>
+    </div>
+    {% for id, metric in metrics %}
+        <h3>{{ metric.name }}</h3>
+        <p>Total: <strong>{{ metric.total|number_format }}</strong></p>
+        <div id="chart-{{ id }}" style="height: 200px"></div>
+    {% endfor %}
+{% endblock %}
+
+{% block pagejs %}
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(function() {
+        {% for id, metric in metrics %}
+            {{ id }}Table = new google.visualization.DataTable();
+            {{ id }}Table.addColumn('{{ resolution == 'hour' ? 'datetime' : 'date' }}', 'Date');
+            {{ id }}Table.addColumn('number', {{ metric.name|json_encode|raw }});
+            {% for date, count in metric.chart %}
+                {{ id }}Table.addRow([new Date({{ date|date('Y-m-d H:i:s')|json_encode|raw }}), {{ count|json_encode|raw }}]);
+            {% endfor %}
+            {{ id }}Chart = new google.visualization.LineChart(document.getElementById('chart-{{ id }}'));
+            {{ id }}Chart.draw({{ id }}Table);
+        {% endfor %}
+    });
+    $(document).ready(function() {
+        $('#select-range').change(function() {
+            $(this).closest('form').submit();
+        });
+    });
+</script>
+{% endblock %}

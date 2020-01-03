@@ -209,6 +209,7 @@ class HpoApplication extends AbstractApplication
             . " 'unsafe-inline'" // for the places we are using inline JS
             . " www.google-analytics.com www.googletagmanager.com" // Google Analytics
             . " storage.googleapis.com" // for SOP PDFs stored in a Google Storage bucket
+            . " www.gstatic.com" // Google charts
             . " www.youtube.com" // for training videos hosted on YouTube
             . " *.kaltura.com" // for training videos hosted on Kaltura
             . " cdn.plot.ly;" // allow plot.ly remote requests

@@ -30,6 +30,7 @@ $app
     ->mount('/cron', new Controller\CronController())
     ->mount('/dashboard', new Controller\DashboardController())
     ->mount('/admin', new Controller\AdminController())
+    ->mount('/admin/metrics', new Controller\AdminMetricsController())
     ->mount('/help', new Controller\HelpController())
     ->mount('/workqueue', new Controller\WorkQueueController())
     ->mount('/problem', new Controller\ProblemReportController())
