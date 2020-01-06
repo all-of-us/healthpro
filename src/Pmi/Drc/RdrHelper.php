@@ -80,6 +80,11 @@ class RdrHelper
         return $this->cache;
     }
 
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
     public function logException(\Exception $e)
     {
         $this->lastError = $e->getMessage();
