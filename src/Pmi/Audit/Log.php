@@ -62,10 +62,10 @@ class Log
         $logArray['action'] = $this->action;
         $logArray['data'] = $this->data;
         $logArray['ts'] = new \DateTime();
-        $logMetaData = $this->app->getLogMetaData();
-        $logArray['user'] = $logMetaData['user'];
-        $logArray['site'] = $logMetaData['site'];
-        $logArray['ip'] = $logMetaData['ip'];
+        $siteMetaData = $this->app->getSiteMetaData();
+        $logArray['user'] = $siteMetaData['user'];
+        $logArray['site'] = $siteMetaData['site'];
+        $logArray['ip'] = $siteMetaData['ip'];
         return $logArray;
     }
 

@@ -204,13 +204,13 @@ abstract class AbstractApplication extends Application
             $handlerBuffer = new BufferHandler($handler, 0, Logger::INFO);
             $handlerBuffer->pushProcessor(function ($record) use ($app) {
                 $request = $app['request_stack']->getCurrentRequest();
-                $logMetaData = $app->getLogMetaData();
+                $siteMetaData = $app->getSiteMetaData();
                 $record['extra']['labels'] = [
                     'requestMethod' => $request->getMethod(),
                     'requestUrl' => $request->getPathInfo(),
-                    'user' => $logMetaData['user'],
-                    'site' => $logMetaData['site'],
-                    'ip' => $logMetaData['ip']
+                    'user' => $siteMetaData['user'],
+                    'site' => $siteMetaData['site'],
+                    'ip' => $siteMetaData['ip']
                 ];
                 if ($traceHeader = $request->headers->get('X-Cloud-Trace-Context')) {
                     $record['extra']['trace_header'] = $traceHeader;
@@ -586,7 +586,7 @@ abstract class AbstractApplication extends Application
         $this['cache']->setLogger($this['logger']);
     }
 
-    public function getLogMetaData()
+    public function getSiteMetaData()
     {
         if (($user = $this->getUser()) && is_object($user)) {
             $user = $user->getUsername();
