@@ -9,6 +9,8 @@ abstract class Entity
 
     protected $excludeIndexes = [];
 
+    protected $writeLimit = 500;
+
     public static function fetchBy()
     {
         $datastoreClient = new DatastoreClientHelper();
@@ -49,13 +51,13 @@ abstract class Entity
         return $datastoreClient->delete(static::getKind(), $this->id);
     }
 
-    public function getBatch($property = null, $value = null, $operator = null)
+    public function getBatch($property = null, $value = null, $operator = null, $limit = null)
     {
         $datastoreClient = new DatastoreClientHelper();
         if ($property === null) {
-            $results = $datastoreClient->fetchAll(static::getKind());
+            $results = $datastoreClient->fetchAll(static::getKind(), $limit);
         } else {
-            $results = $datastoreClient->basicQuery(static::getKind(), $property, $value, $operator);
+            $results = $datastoreClient->basicQuery(static::getKind(), $property, $value, $operator, $limit);
         }
 
         return $results;
@@ -65,6 +67,11 @@ abstract class Entity
     {
         $datastoreClient = new DatastoreClientHelper();
         $keys = $datastoreClient->getKeys($results);
-        return $datastoreClient->deleteBatch($keys);
+        $count = ceil(count($keys) / $this->writeLimit);
+        for ($i = 0; $i < $count; $i++) {
+            $offset = $i * $this->writeLimit;
+            $datastoreClient->deleteBatch(array_slice($keys, $offset, $this->writeLimit));
+        }
+        return true;
     }
 }

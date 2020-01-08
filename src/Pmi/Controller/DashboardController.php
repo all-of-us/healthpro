@@ -438,14 +438,14 @@ class DashboardController extends AbstractController
                     $display_values = [
                         'registered' => 'Registered',
                         'participant' => 'Participant',
-                        'consented' => 'Fully Consented',
+                        'consented' => 'Participant + EHR Consent',
                         'core' => 'Core Participant'
                     ];
                 } else {
                     $display_values = [
                         'REGISTERED' => 'Registered',
                         'PARTICIPANT' => 'Participant',
-                        'FULLY_CONSENTED' => 'Fully Consented',
+                        'FULLY_CONSENTED' => 'Participant + EHR Consent',
                         'CORE_PARTICIPANT' => 'Core Participant'
                     ];
                 }
@@ -1010,7 +1010,7 @@ class DashboardController extends AbstractController
                         "text" => [number_format($metrics['EHR_CONSENTED'])],
                         "type" => 'bar',
                         "hoverinfo" => 'text+name',
-                        "name" => 'Total Participants EHR Consent',
+                        "name" => 'Total Participants + EHR Consent',
                         "marker" => [
                             "color" => $this->getColorBrewerVal(0)
                         ]

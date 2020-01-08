@@ -22,6 +22,7 @@ class WorkQueue
         'biobankId',
         'language',
         'enrollmentStatus',
+        'participantOrigin',
         'consentForStudyEnrollmentAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
@@ -104,7 +105,7 @@ class WorkQueue
             'label' => 'Participant Status',
             'options' => [
                 'Participant' => 'INTERESTED',
-                'Fully Consented' => 'MEMBER',
+                'Participant + EHR Consent' => 'MEMBER',
                 'Core Participant' => 'FULL_PARTICIPANT'
             ]
         ],
@@ -168,6 +169,13 @@ class WorkQueue
                 'H/L/S and more than one other race' => 'HLS_AND_MORE_THAN_ONE_OTHER_RACE',
                 'More than one race' => 'MORE_THAN_ONE_RACE',
                 'Other' => 'OTHER_RACE'
+            ]
+        ],
+        'participantOrigin' => [
+            'label' => 'Participant Origination',
+            'options' => [
+                'PTSC Portal' => 'vibrent',
+                'DV Pilot Portal' => 'careevolution'
             ]
         ]
     ];
@@ -277,7 +285,7 @@ class WorkQueue
                 $row['middleName'] = $e($participant->middleName);
             }
             if (!empty($participant->dob)) {
-                $row['dateOfBirth'] = $participant->dob->format('m/d/Y'); 
+                $row['dateOfBirth'] = $participant->dob->format('m/d/Y');
             } else {
                 $row['dateOfBirth'] = '';
             }
@@ -288,7 +296,9 @@ class WorkQueue
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
             $row['language'] = $e($participant->language);
-            $row['participantStatus'] = $e($participant->enrollmentStatus);
+            $row['participantOrigin'] = $e($participant->participantOrigin);
+            $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
+            $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
             $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentAuthored);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsAuthored, true, true);
@@ -306,7 +316,7 @@ class WorkQueue
             if ($participant->getAddress()) {
                 $row['address'] = $e($participant->getAddress());
             } else {
-                $row['address'] = '';  
+                $row['address'] = '';
             }
             $row['email'] = $e($participant->email);
             $row['loginPhone'] = $e($participant->loginPhoneNumber);

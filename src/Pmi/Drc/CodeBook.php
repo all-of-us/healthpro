@@ -120,10 +120,12 @@ class CodeBook
         'MORE_THAN_ONE_RACE' => 'More than one race',
         'OTHER_RACE' => 'Other',
         'INTERESTED' => 'Participant',
-        'MEMBER' => 'Fully Consented',
+        'MEMBER' => 'Participant + EHR Consent',
         'FULL_PARTICIPANT' => 'Core Participant',
         'en' => 'English',
-        'es' => 'Spanish'
+        'es' => 'Spanish',
+        'vibrent' => 'PTSC Portal',
+        'careevolution' => 'DV Pilot Portal'
     ];
 
     public static function display($code)

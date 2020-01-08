@@ -9,53 +9,70 @@
     <div class="page-header">
         <h2><i class="fa fa-film" aria-hidden="true"></i> Training Videos</h2>
     </div>
+    <ul class="nav nav-tabs">
+        {% for playlist_id, playlist in videoPlaylists %}
+            <li role="presentation"{% if active == playlist_id %} class="active"{% endif %}><a href="{{ path('help_videosPlaylist', { id: playlist_id }) }}">{{ playlist.tab_title }}</a></li>
+        {% endfor %}
+    </ul>
 
-    <div class="row">
-        <div class="col-sm-8 col-sm-push-4">
-            <div class="panel panel-default" id="video-panel">
-                <div class="panel-heading">
-                    <h3 class="panel-title" id="video-title"></h3>
-                </div>
-                <div class="panel-body">
-                    <div class="embed-responsive embed-responsive-16by9">
-                        {% if type == 'file' %}
-                            <video id="video-file" controls>
-                                <source src="" type="video/mp4">
-                                Your browser does not support the video tag, consider upgrading to a web browser that supports HTML5 video tag.
-                            </video>
-                        {% else %}
-                            <iframe id="video-embed" class="embed-responsive-item" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                        {% endif %}
+    {% set playlist = videoPlaylists[active] %}
+    
+    {% if playlist.type == 'youtube' %}
+        <br />
+        <div class="row">
+            <div class="col-sm-8 col-sm-push-4">
+                <div class="panel panel-default" id="video-panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title" id="video-title"></h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="embed-responsive embed-responsive-16by9">
+                            {% if type == 'file' %}
+                                <video id="video-file" controls>
+                                    <source src="" type="video/mp4">
+                                    Your browser does not support the video tag, consider upgrading to a web browser that supports HTML5 video tag.
+                                </video>
+                            {% else %}
+                                <iframe id="video-embed" class="embed-responsive-item" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
+                <p class="text-right">
+                    {% if type == 'file' %}
+                        Switch back to the <a href="{{ path('help_videosPlaylist', { id: active }) }}">primary video source</a>.
+                    {% else %}
+                        Problem loading videos? Try using the <a href="{{ path('help_videosPlaylist', { id: active, type: 'file' }) }}">alternate video source</a>.
+                    {% endif %}
+                </p>
             </div>
-            <p class="text-right">
-                {% if type == 'file' %}
-                    Switch back to the <a href="{{ path('help_videos') }}">primary video source</a>.
-                {% else %}
-                    Problem loading videos? Try using the <a href="{{ path('help_videos', { type: 'file' }) }}">alternate video source</a>.
-                {% endif %}
-            </p>
+            <div class="col-sm-4 col-sm-pull-8 help-videos-nav">
+                {% for group in playlist.groups %}
+                    <h4>{{ group.title }}</h4>
+                    <div class="list-group">
+                        {% for video in group.videos %}
+                            {% if video.youtube_id %}
+                                <a href="#" class="list-group-item load-video" data-embed-src="{{ video.youtube_id }}" data-file-src="{{ video.filename }}">{{ video.title }}</a>
+                            {% else %}
+                                <div class="list-group-item disabled">{{ video.title }} <em><small>(Coming Soon!)</small></em></div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
         </div>
-        <div class="col-sm-4 col-sm-pull-8 help-videos-nav">
-            {% for group in videoGroups %}
-                <h4>{{ group.title }}</h4>
-                <div class="list-group">
-                    {% for video in group.videos %}
-                        {% if video.youtube_id %}
-                            <a href="#" class="list-group-item load-video" data-embed-src="{{ video.youtube_id }}" data-file-src="{{ video.filename }}">{{ video.title }}</a>
-                        {% else %}
-                            <div class="list-group-item disabled">{{ video.title }} <em><small>(Coming Soon!)</small></em></div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            {% endfor %}
+    {% elseif playlist.type == 'kaltura' %}
+        <h3>{{ playlist.title }}</h3>
+        <div class="embed-responsive embed-responsive-16by9 help-kaltura-embed">
+            <iframe class="embed-responsive-item" src="{{ playlist.widget }}?iframeembed=true&amp;playerId={{ playlist.player_id }}&amp;flashvars[playlistAPI.kpl0Id]={{ playlist.playlist_id }}&amp;flashvars[playlistAPI.autoContinue]=true&amp;flashvars[playlistAPI.autoInsert]=true&amp;flashvars[ks]=&amp;flashvars[streamerType]=auto&amp;flashvars[localizationCode]=en" allowfullscreen webkitallowfullscreen mozAllowFullScreen allow="autoplay *; fullscreen *; encrypted-media *" title="Kaltura Player"></iframe>
         </div>
-    </div>
+    {% endif %}
+
     {% include 'help/footer.html.twig' %}
 {% endblock %}
 
 {% block pagejs %}
+{% if videoPlaylists[active].type == 'youtube' %}
 <script>
 $(document).ready(function() {
     var type = {{ type|json_encode|raw }};
@@ -80,4 +97,5 @@ $(document).ready(function() {
     loadVideo($('a.load-video:first'));
 });
 </script>
+{% endif %}
 {% endblock %}

@@ -210,6 +210,7 @@ class HpoApplication extends AbstractApplication
             . " www.google-analytics.com www.googletagmanager.com" // Google Analytics
             . " storage.googleapis.com" // for SOP PDFs stored in a Google Storage bucket
             . " www.youtube.com" // for training videos hosted on YouTube
+            . " *.kaltura.com" // for training videos hosted on Kaltura
             . " cdn.plot.ly;" // allow plot.ly remote requests
             . " img-src www.google-analytics.com 'self' data:"; // allow Google Analytcs, self, and data: urls for img src
 
