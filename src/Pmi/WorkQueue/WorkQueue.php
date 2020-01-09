@@ -105,7 +105,7 @@ class WorkQueue
             'label' => 'Participant Status',
             'options' => [
                 'Participant' => 'INTERESTED',
-                'Fully Consented' => 'MEMBER',
+                'Participant + EHR Consent' => 'MEMBER',
                 'Core Participant' => 'FULL_PARTICIPANT'
             ]
         ],
@@ -285,7 +285,7 @@ class WorkQueue
                 $row['middleName'] = $e($participant->middleName);
             }
             if (!empty($participant->dob)) {
-                $row['dateOfBirth'] = $participant->dob->format('m/d/Y'); 
+                $row['dateOfBirth'] = $participant->dob->format('m/d/Y');
             } else {
                 $row['dateOfBirth'] = '';
             }
@@ -316,7 +316,7 @@ class WorkQueue
             if ($participant->getAddress()) {
                 $row['address'] = $e($participant->getAddress());
             } else {
-                $row['address'] = '';  
+                $row['address'] = '';
             }
             $row['email'] = $e($participant->email);
             $row['loginPhone'] = $e($participant->loginPhoneNumber);
