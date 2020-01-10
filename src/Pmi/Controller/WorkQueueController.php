@@ -14,7 +14,8 @@ class WorkQueueController extends AbstractController
     protected static $name = 'workqueue';
     protected static $routes = [
         ['index', '/', ['method' => 'GET|POST']],
-        ['export', '/export.csv']
+        ['export', '/export.csv'],
+        ['participant', '/participant/{id}']
     ];
 
     protected $rdrError = false;
@@ -459,4 +460,23 @@ class WorkQueueController extends AbstractController
     {
         return $value === AdminController::DOWNLOAD_DISABLED;
     }
+
+    public function participantAction($id, Application $app, Request $request)
+    {
+        $refresh = $request->query->get('refresh');
+        $participant = $app['pmi.drc.participants']->getById($id, $refresh);
+        if ($refresh) {
+            return $app->redirectToRoute('workqueue_participant', [
+                'id' => $id
+            ]);
+        }
+        if (!$participant) {
+            $app->abort(404);
+        }
+        return $app['twig']->render('workqueue/participant.html.twig',[
+            'participant' => $participant,
+            'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled()
+        ]);
+    }
+
 }

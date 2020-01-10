@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+{% block title %}Participant {{ participant.id }} - {% endblock %}
+{% block body %}
+<div class="page-header">
+    <h2>{{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }} <small>{{ participant.shortId }}</small></h2>
+</div>
+
+<div class="row">
+    <div class="col-sm-6">
+        {% include 'partials/participant-dl.html.twig' %}
+    </div>
+    <div class="col-sm-6 text-center">
+        <svg id="participant-barcode"></svg>
+    </div>
+</div>
+
+{% if cacheEnabled %}
+    <div class="row">
+        <div class="col-sm-12 text-center">
+            <small>
+                Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.userTimezone) }}
+                <a href="{{ path('workqueue_participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px"><i class="fa fa-refresh" aria-hidden="true"></i> refresh</a>
+            </small>
+        </div>
+    </div>
+{% endif %}
+
+<div id="participant-consent-status">
+    <div class="status-block">
+        <strong>General Consent</strong>
+        {% if participant.consentForStudyEnrollment == 'SUBMITTED' %}
+            <i class="fa fa-check text-success" aria-hidden="true"></i>
+            {{ participant.consentForStudyEnrollmentAuthored ? participant.consentForStudyEnrollmentAuthored|date('n/j/Y', app.userTimezone) }}
+        {% else %}
+            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+        {% endif %}
+        <br />
+    </div>
+    <div class="status-block">
+        <strong>EHR Consent</strong>
+        {% if participant.consentForElectronicHealthRecords == 'SUBMITTED' %}
+            <i class="fa fa-check text-success" aria-hidden="true"></i>
+            {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y', app.userTimezone) }}
+        {% elseif participant.consentForElectronicHealthRecords == 'INVALID' %}
+            <i class="fa fa-times text-danger" aria-hidden="true"></i> (invalid)
+            {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y', app.userTimezone) }}
+        {% else %}
+            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+            {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y', app.userTimezone) : '(not completed)' }}
+        {% endif %}
+        <br />
+    </div>
+    <div class="status-block">
+        <strong>DV-only EHR Sharing</strong> <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip"><span class="sr-only">What is DV EHR Sharing</span><i class="fa fa-question-circle text-info"></i></span>
+        {% if participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED' %}
+            <i class="fa fa-check text-success" aria-hidden="true"></i>
+            {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y', app.userTimezone) }}
+        {% elseif participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED_NOT_SURE' %}
+            <i class="fa fa-question text-warning" aria-hidden="true"></i>
+            {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y', app.userTimezone) }}
+        {% else %}
+            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+            {{ participant.consentForDvElectronicHealthRecordsSharingAuthored ? participant.consentForDvElectronicHealthRecordsSharingAuthored|date('n/j/Y', app.userTimezone) : '(not completed)' }}
+        {% endif %}
+        <br />
+    </div>
+    <div class="status-block">
+        <strong>CABoR Consent</strong> <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
+        {% if participant.consentForCABoR == 'SUBMITTED' %}
+            <i class="fa fa-check text-success" aria-hidden="true"></i>
+            {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y', app.userTimezone) }}
+        {% else %}
+            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+            {{ participant.consentForCABoRAuthored ? participant.consentForCABoRAuthored|date('n/j/Y', app.userTimezone) : '(not completed)' }}
+        {% endif %}
+        <br />
+    </div>
+</div>
+{% endblock %}
