@@ -27,4 +27,99 @@
 
 {% set displayPatientStatus = false %}
 {% include 'partials/participant-consent.html.twig' %}
+
+<div role="tabpanel">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#inperson" aria-controls="inperson" role="tab" data-toggle="tab">In-Person Enrollment</a>
+        </li>
+    </ul>
+    <br />
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="inperson">
+            {% if participant.status and not app.isTestSite %}
+                <div class="row">
+                    <div class="col-sm-6 col-lg-4">
+                        {% include 'partials/participant-evaluation-list.html.twig' %}
+                    </div>
+
+                    <div class="col-sm-6 col-lg-4">
+                        {% include 'partials/participant-orders-list.html.twig' %}
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Document Unanticipated Problems</h3>
+                            </div>
+                            <div class="panel-body">
+                                {% for problem in problems %}
+                                {% if loop.index == 6 %}
+                                <div id="problem-overflow">
+                                    {% endif %}
+                                    <a href="{{ path('problemForm', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
+                                        {{ problem.updated_ts|date('D n/j/Y', app.userTimezone) }}
+                                        <br />
+                                        <small class="text-muted">
+                                            {% if problem.finalized_ts %}
+                                                <span class="label label-success">Finalized</span>
+                                                {{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                                <br />
+                                                {% if problem.comment_count > 0 %}
+                                                    <span class="label label-default">{{ problem.comment_count }} comment{{ problem.comment_count > 1 ? 's' }}</span> {{ problem.last_comment_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="label label-danger">Draft</span>
+                                                {{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                                            {% endif %}
+                                        </small>
+                                    </a>
+                                    {% endfor %}
+                                    {% if problems|length > 5 %}
+                                </div>
+                                <a href="#" class="btn btn-block btn-lg btn-default" id="problem-overflow-show">
+                                    <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
+                                </a>
+                                {% endif %}
+                                <a href="{{ path('problemForm', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
+                                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                    New Unanticipated Problem
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                {% if app.isTestSite %}
+                    {% set errorTitle = 'Test user' %}
+                    {% set errorMessage = 'Data collection and entry for test users are prohibited in this environment.' %}
+                {% elseif participant.statusReason == 'test-participant' %}
+                    {% set errorTitle = 'This is not a real participant' %}
+                    {% set errorMessage = 'Data collection and entry for test participants are prohibited in this environment. You may not create a biobank order or collect physical measurements for this participant.' %}
+                {% elseif participant.statusReason == 'basics' %}
+                    {% set errorTitle = 'The Basics survey not complete' %}
+                    {% set errorMessage = 'This participant has consented but has not completed "The Basics" survey in the participant app and is therefore ineligible for physical measurements and biospecimen collection. Please direct the participant to complete "The Basics" survey in the participant application to enable in person enrollment or contact the help desk if needed.' %}
+                {% elseif participant.statusReason == 'withdrawal' %}
+                    {% set errorTitle = 'Withdrawn participant' %}
+                    {% set errorMessage = 'This participant has withdrawn from the All of Us Research Program. No new data can be collected or sent for this participant. Staff must also follow all site-specific SOPs to ensure all All of Us Research Program data are removed from all local systems for this participant.' %}
+                {% else %}
+                    {% set errorTitle = 'Consent not complete' %}
+                    {% set errorMessage = 'This participant has not completed consent for enrollment.' %}
+                {% endif %}
+                <div class="row">
+                    <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                        <div class="panel panel-danger">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> {{ errorTitle }}</h3>
+                            </div>
+                            <div class="panel-body">
+                                <p>{{ errorMessage }}</p>
+                                {% include 'partials/participant-withdrawn-notice.html.twig' %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}
