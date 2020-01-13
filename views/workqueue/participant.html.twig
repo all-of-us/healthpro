@@ -61,3 +61,15 @@
     </div>
 </div>
 {% endblock %}
+
+{% block pagejs %}
+<script>
+    $(document).ready(function() {
+        JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
+            width: 2,
+            height: 50,
+            displayValue: true
+        });
+    });
+</script>
+{% endblock %}

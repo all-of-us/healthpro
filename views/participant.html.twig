@@ -487,28 +487,28 @@
 
 {% block pagejs %}
 <script>
-$(document).ready(function() {
-    $('#order-overflow-show').on('click', function(e) {
-        $(this).hide();
-        $('#order-overflow').show();
-        e.preventDefault();
+    $(document).ready(function() {
+        $('#order-overflow-show').on('click', function(e) {
+            $(this).hide();
+            $('#order-overflow').show();
+            e.preventDefault();
+        });
+        $('#evaluation-overflow-show').on('click', function(e) {
+            $(this).hide();
+            $('#evaluation-overflow').show();
+            e.preventDefault();
+        });
+        $('#problem-overflow-show').on('click', function(e) {
+            $(this).hide();
+            $('#problem-overflow').show();
+            e.preventDefault();
+        });
+        JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
+            width: 2,
+            height: 50,
+            displayValue: true
+        });
     });
-    $('#evaluation-overflow-show').on('click', function(e) {
-        $(this).hide();
-        $('#evaluation-overflow').show();
-        e.preventDefault();
-    });
-    $('#problem-overflow-show').on('click', function(e) {
-        $(this).hide();
-        $('#problem-overflow').show();
-        e.preventDefault();
-    });
-    JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
-        width: 2,
-        height: 50,
-        displayValue: true
-    });
-});
 </script>
 {# Paient status tab #}
 {% if canViewPatientStatus %}
