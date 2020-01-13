@@ -84,45 +84,7 @@
                         </div>
                         {% if app.isDVType %}
                             <div class="col-sm-6 col-lg-4">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Document Unanticipated Problems</h3>
-                                    </div>
-                                    <div class="panel-body">
-                                        {% for problem in problems %}
-                                            {% if loop.index == 6 %}
-                                                <div id="problem-overflow">
-                                            {% endif %}
-                                            <a href="{{ path('problemForm', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
-                                                {{ problem.updated_ts|date('D n/j/Y', app.userTimezone) }}
-                                                <br />
-                                                <small class="text-muted">
-                                                    {% if problem.finalized_ts %}
-                                                        <span class="label label-success">Finalized</span>
-                                                        {{ problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                        <br />
-                                                        {% if problem.comment_count > 0 %}
-                                                            <span class="label label-default">{{ problem.comment_count }} comment{{ problem.comment_count > 1 ? 's' }}</span> {{ problem.last_comment_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                        {% endif %}
-                                                    {% else %}
-                                                        <span class="label label-danger">Draft</span>
-                                                        {{ problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
-                                                    {% endif %}
-                                                </small>
-                                            </a>
-                                        {% endfor %}
-                                        {% if problems|length > 5 %}
-                                            </div>
-                                            <a href="#" class="btn btn-block btn-lg btn-default" id="problem-overflow-show">
-                                                <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
-                                            </a>
-                                        {% endif %}
-                                        <a href="{{ path('problemForm', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
-                                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                                            New Unanticipated Problem
-                                        </a>
-                                    </div>
-                                </div>
+                                {% include 'partials/participant-unanticipated-problems-list.html.twig' %}
                             </div>
                         {% endif %}
                     </div>

@@ -489,7 +489,8 @@ class WorkQueueController extends AbstractController
             'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled(),
             'orders' => $orders,
             'evaluations' => $evaluations,
-            'problems' => $problems
+            'problems' => $problems,
+            'readOnly' => true
         ]);
     }
 
