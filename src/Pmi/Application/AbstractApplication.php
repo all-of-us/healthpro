@@ -204,7 +204,7 @@ abstract class AbstractApplication extends Application
             $handlerBuffer = new BufferHandler($handler, 0, Logger::INFO);
             $handlerBuffer->pushProcessor(function ($record) use ($app) {
                 $request = $app['request_stack']->getCurrentRequest();
-                $siteMetaData = $app->getSiteMetaData();
+                $siteMetaData = $app->getLogMetaData();
                 $record['extra']['labels'] = [
                     'requestMethod' => $request->getMethod(),
                     'requestUrl' => $request->getPathInfo(),
@@ -586,7 +586,7 @@ abstract class AbstractApplication extends Application
         $this['cache']->setLogger($this['logger']);
     }
 
-    public function getSiteMetaData()
+    public function getLogMetaData()
     {
         if (($user = $this->getUser()) && is_object($user)) {
             $user = $user->getUsername();
