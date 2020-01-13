@@ -7,7 +7,7 @@
             {% if type is not defined and loop.index == 6 %}
                 <div id="evaluation-overflow">
             {% endif %}
-            <a href="{{ path('evaluation', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg {% if evalId is defined and evaluation.id == evalId %} btn-warning {% else %} btn-default {% endif %}">
+            <a href="{{ path('evaluation', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg {% if evalId is defined and evaluation.id == evalId %} btn-warning {% else %} btn-default {% endif %} {% if readOnly is defined %} disableClick {% endif %}">
                 {{ evaluation.created_ts|date('D n/j/Y', app.userTimezone) }}<br />
                 <small class="text-muted">
                     {% if evaluation.eh_type == 'cancel' %}

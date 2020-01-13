@@ -341,3 +341,8 @@ table.table-samples td {
     background: lightgrey;
     cursor: pointer;
 }
+
+.disableClick {
+    pointer-events: none;
+    cursor: default;
+}
