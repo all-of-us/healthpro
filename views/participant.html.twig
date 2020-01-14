@@ -46,7 +46,6 @@
     {% endif %}
 
     {% if participant.status or canViewDetails %}
-        {% set displayPatientStatus = not isDVType %}
         {% include 'partials/participant-consent.html.twig' %}
     {% endif %}
 

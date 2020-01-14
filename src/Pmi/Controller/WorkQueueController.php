@@ -478,8 +478,8 @@ class WorkQueueController extends AbstractController
         if (!in_array($participant->awardee, $app->getAwardeeOrganization())) {
             $app->abort(403);
         }
-        $evaluationService = new Evaluation($app);
-        $evaluations = $evaluationService->getEvaluationsWithHistory($id);
+        $evaluation = new Evaluation($app);
+        $evaluations = $evaluation->getEvaluationsWithHistory($id);
 
         $order = new Order($app);
         $orders = $order->getParticipantOrdersWithHistory($id);
@@ -493,6 +493,7 @@ class WorkQueueController extends AbstractController
             'orders' => $orders,
             'evaluations' => $evaluations,
             'problems' => $problems,
+            'displayPatientStatusBlock' => false,
             'readOnly' => true
         ]);
     }
