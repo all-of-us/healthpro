@@ -8,7 +8,7 @@
         <div id="total-progress" class="tab-pane pad active fade in">
             <div class="row">
                 <div id="total-progress-filters" class="col-md-3">
-                    {% include 'dashboard/partials/filters.html.twig' with {id: 'total-progress', show_organizations: false, show_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: true} %}
+                    {% include 'dashboard/partials/filters.html.twig' with {id: 'total-progress', show_organizations: false, show_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: true, show_participant_origination: true} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -105,6 +105,11 @@
             alert('You must select at least one recruitment center to plot results.');
             return false;
         }
+        var participantOriginations = loadParticipantOriginationFilters('total-progress');
+        if (participantOriginations.length == 0) {
+            alert('You must select at least one recruitment origin to plot results.');
+            return false;
+        }
 
         var spinnerLoc = 'plotly-total-progress';
         if (dialogType == 'spinner') {
@@ -158,6 +163,7 @@
           start_date: tpStartDate,
           end_date: tpEndDate,
           enrollment_statuses: enrollmentStatuses,
+          origins: participantOriginations,
           centers: centers,
           history: true
         })

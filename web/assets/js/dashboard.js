@@ -128,6 +128,15 @@ function loadRecruitmentFilters(id) {
 }
 
 // collect all checked recruitment centers filters
+function loadParticipantOriginationFilters(id) {
+    var origins = [];
+    $('#' + id).find('.participant-origination-filter:checked').each(function() {
+        origins.push($(this).val());
+    });
+    return origins;
+}
+
+// collect all checked recruitment centers filters
 function loadOrganizationFilters(id) {
     var centers = [];
     $('#' + id).find('.organization-filter:checked').each(function() {

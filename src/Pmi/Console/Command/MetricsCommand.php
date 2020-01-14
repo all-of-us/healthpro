@@ -25,12 +25,15 @@ class MetricsCommand extends Command
     private static $STRATIFICATIONS = [
         'TOTAL', 'ENROLLMENT_STATUS', 'GENDER_IDENTITY', 'AGE_RANGE', 'RACE',
         'EHR_CONSENT', 'EHR_RATIO', 'FULL_STATE', 'FULL_CENSUS', 'FULL_AWARDEE',
-        'LIFECYCLE', 'GEO_STATE', 'GEO_CENSUS', 'GEO_AWARDEE'
+        'LIFECYCLE', 'GEO_STATE', 'GEO_CENSUS', 'GEO_AWARDEE', 'PARTICIPANT_ORIGIN'
     ];
     private static $STATUSES = [
         'REGISTERED', 'INTERESTED', 'PARTICIPANT', 'MEMBER', 'FULL_PARTICIPANT',
         'CORE_PARTICIPANT'
-     ];
+    ];
+    private static $ORIGINS = [
+        'vibrent','careevolution'
+    ];
 
     /**
      * Configure
@@ -73,6 +76,12 @@ class MetricsCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'Filter to specified statuses.'
+            )
+            ->addOption(
+                'origins',
+                null,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Filter to specified origins.'
             )
             ->addOption(
                 'history',
@@ -119,6 +128,7 @@ class MetricsCommand extends Command
         $stratification = $input->getOption('stratification');
         $centers = $input->getOption('centers');
         $statuses = $input->getOption('statuses');
+        $origins = $input->getOption('origins');
         $version = $input->getOption('api_version');
         $pretty = ($input->getOption('pretty') !== false) ? JSON_PRETTY_PRINT : 0;
         $params = [
@@ -166,6 +176,24 @@ class MetricsCommand extends Command
             }
         }
 
+        // Participant origins
+        if (is_string($origins)) {
+            $origins = explode(',', $origins);
+        }
+        if (!empty($origins)) {
+            foreach ($origins as $origin) {
+                if (!in_array($origin, self::$ORIGINS)) {
+                    $output->writeln(sprintf(
+                        '<error>Invalid status: "%s"; Valid options: %s</error>',
+                        $status,
+                        join(', ', self::$ORIGINS)
+                    ));
+                    // Throw a non-zero exit status
+                    return 1;
+                }
+            }
+        }
+
         putenv('PMI_ENV=' . HpoApplication::ENV_LOCAL);
         $app = new HpoApplication([
             'isUnitTest' => true,
@@ -180,12 +208,13 @@ class MetricsCommand extends Command
             $output->writeln('  Stratification:        ' . $stratification);
             $output->writeln('  Centers:               ' . json_encode($centers));
             $output->writeln('  Statuses:              ' . json_encode($statuses));
+            $output->writeln('  Origins:               ' . json_encode($origins));
             $output->writeln('  Additional Parameters: ' . json_encode($params));
             $output->writeln('');
         }
 
         $metricsApi = new RdrMetrics($app['pmi.drc.rdrhelper']);
-        $data = $metricsApi->metrics($start_date, $end_date, $stratification, $centers, $statuses, $params);
+        $data = $metricsApi->metrics($start_date, $end_date, $stratification, $centers, $statuses, $origins, $params);
 
         $output->writeln(json_encode($data, $pretty));
     }
