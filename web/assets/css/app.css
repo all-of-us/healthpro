@@ -342,7 +342,7 @@ table.table-samples td {
     cursor: pointer;
 }
 
-.disableClick {
+.readOnly {
     pointer-events: none;
     cursor: default;
 }
