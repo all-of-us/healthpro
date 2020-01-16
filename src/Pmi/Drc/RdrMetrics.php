@@ -41,11 +41,12 @@ class RdrMetrics
      * @param string $stratification
      * @param array $centers
      * @param array $enrollment_statuses
+     * @param array $origins
      * @param array $params
      *
      * @return array
      */
-    public function metrics($start_date, $end_date, $stratification, $centers, $enrollment_statuses, $params = [])
+    public function metrics($start_date, $end_date, $stratification, $centers, $enrollment_statuses, $origins, $params = [])
     {
         $client = $this->rdrHelper->getClient();
 
@@ -68,6 +69,9 @@ class RdrMetrics
         if (is_array($enrollment_statuses)) {
             $enrollment_statuses = implode(',', $enrollment_statuses);
         }
+        if (is_array($origins)) {
+            $origins = implode(',', $origins);
+        }
 
         $responseObject = [];
         foreach ($this->getDateRangeBins($start_date, $end_date, $batch) as $bucket) {
@@ -78,6 +82,7 @@ class RdrMetrics
                 'stratification' => $stratification,
                 'awardee' => $centers,
                 'enrollmentStatus' => $enrollment_statuses,
+                'origin' => $origins,
                 'history' => $history ? 'TRUE' : 'FALSE',
                 'version' => $version ? $version : null
             ];

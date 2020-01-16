@@ -11,8 +11,8 @@
                    <div class="row">
                         <div class="col-xs-12">
                             <p class="text-center"><a href="javascript:void(0);" class="redraw-plotly btn btn-primary"><span class="fa fa-filter"></span> Filter Results</a></p>
-                            {% if show_enrollment_status == true %}
                             <hr class="divider" />
+                            {% if show_enrollment_status == true %}
                             <h4>Enrollment Status <a href="javascript:void(0);" class="toggle-all-enrollment-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
                             <!-- TODO: After more facets are supported in Metrics API 2, use passed values instead of hard-coding -->
                             <ul class="list-group enrollment-status-filters">
@@ -33,6 +33,16 @@
                             {% endif %}
                             {% if show_recruitment_centers == true %}
                             <h4>Recruitment Origin <a href="javascript:void(0);" class="toggle-all-center-filters label label-primary pull-right">All <span class="fa fa-toggle-on"></span></a></h4>
+                            {% if show_participant_origination is defined and show_participant_origination == true %}
+                            <ul class="list-group participant-orgination-filters small">
+                                <li class="list-group-item" style="background-color: #f5f5f5;">
+                                    <label><input type="checkbox" name="participant_origination[]" value="careevolution" class="participant-origination-filter" checked> DV Pilot Portal</label>
+                                </li>
+                                <li class="list-group-item" style="background-color: #f5f5f5;">
+                                    <label><input type="checkbox" name="participant_origination[]" value="vibrent" class="participant-origination-filter" checked> PTSC Portal</label>
+                                </li>
+                            </ul>
+                            {% endif %}
                             {% for group, centers in recruitment_centers %}
                                 {% set group_id = group|slugify %}
                                 <ul class="list-group {{ group_id }}-center-filters">
