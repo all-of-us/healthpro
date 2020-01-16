@@ -27,37 +27,25 @@
 
 {% include 'partials/participant-consent.html.twig' %}
 
-<div role="tabpanel">
-    <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active">
-            <a href="#inperson" aria-controls="inperson" role="tab" data-toggle="tab">In-Person Enrollment</a>
-        </li>
-    </ul>
-    <br />
-    <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="inperson">
-            {% if participant.status and not app.isTestSite %}
-                <div class="row">
-                    <div class="col-sm-6 col-lg-4">
-                        {% include 'partials/participant-evaluation-list.html.twig' %}
-                    </div>
-                    <div class="col-sm-6 col-lg-4">
-                        {% include 'partials/participant-orders-list.html.twig' %}
-                    </div>
-                    <div class="col-sm-6 col-lg-4">
-                        {% include 'partials/participant-unanticipated-problems-list.html.twig' %}
-                    </div>
-                </div>
-            {% else %}
-                <div class="row">
-                    <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
-                        {% include 'partials/participant-notice.html.twig' %}
-                    </div>
-                </div>
-            {% endif %}
+{% if participant.status and not app.isTestSite %}
+    <div class="row">
+        <div class="col-sm-6 col-lg-4">
+            {% include 'partials/participant-evaluation-list.html.twig' %}
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            {% include 'partials/participant-orders-list.html.twig' %}
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            {% include 'partials/participant-unanticipated-problems-list.html.twig' %}
         </div>
     </div>
-</div>
+{% else %}
+    <div class="row">
+        <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+            {% include 'partials/participant-notice.html.twig' %}
+        </div>
+    </div>
+{% endif %}
 {% endblock %}
 
 {% block pagejs %}
