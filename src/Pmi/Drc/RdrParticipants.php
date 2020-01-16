@@ -423,6 +423,11 @@ class RdrParticipants
         return $this->rdrHelper->getLastError();
     }
 
+    public function getLastErrorCode()
+    {
+        return $this->rdrHelper->getLastErrorCode();
+    }
+
     public function getCacheEnabled()
     {
         return $this->cacheEnabled;
