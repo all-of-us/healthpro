@@ -275,15 +275,9 @@ class WorkQueue
         foreach ($participants as $participant) {
             $row = [];
             //Identifiers and status
-            if($app->hasRole('ROLE_USER')) {
-                $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
-                $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
-                $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
-            } else {
-                $row['lastName'] = $e($participant->lastName);
-                $row['firstName'] = $e($participant->firstName);
-                $row['middleName'] = $e($participant->middleName);
-            }
+            $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
+            $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
+            $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
             if (!empty($participant->dob)) {
                 $row['dateOfBirth'] = $participant->dob->format('m/d/Y');
             } else {
@@ -435,7 +429,11 @@ class WorkQueue
 
     public function generateLink($id, $name)
     {
-        $url = $this->app['url_generator']->generate('participant', ['id' => $id]);
+        if($this->app->hasRole('ROLE_USER')) {
+            $url = $this->app['url_generator']->generate('participant', ['id' => $id]);
+        } else {
+            $url = $this->app['url_generator']->generate('workqueue_participant', ['id' => $id]);
+        }
         $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         return sprintf('<a href="%s">%s</a>', $url, $text);
