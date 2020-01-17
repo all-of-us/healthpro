@@ -11,7 +11,7 @@
                     <div id="evaluation-overflow">
                 {% endif %}
                 {% if readOnly is defined %}
-                    <a class="btn btn-block btn-lg btn-default readOnly">
+                    <div class="btn btn-block btn-lg btn-default btn-readonly">
                 {% else %}
                     <a href="{{ path('evaluation', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg {% if evalId is defined and evaluation.id == evalId %} btn-warning {% else %} btn-default {% endif %}">
                 {% endif %}
@@ -29,7 +29,11 @@
                             <span class="label label-warning">Edited &amp; Unfinalized</span> {{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}
                         {% endif %}
                     </small>
-                </a>
+                {% if readOnly is defined %}
+                    </div> {# close .btn-readonly div above #}
+                {% else %}
+                    </a>
+                {% endif %}
             {% endfor %}
             {% if type is not defined and evaluations|length > 5 %}
                 </div> {# close .evaluation-overflow div above #}
