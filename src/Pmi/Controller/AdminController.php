@@ -389,19 +389,21 @@ class AdminController extends AbstractController
                     if (!$order) {
                         continue;
                     }
-                    $rdrOrder = $app['pmi.drc.participants']->getOrder($order['participant_id'], $order['mayo_id']);
-                    // Check if order exists in RDR
-                    if (!empty($rdrOrder) && $rdrOrder->id === $order['mayo_id']) {
-                        $repository->update($order['id'], ['rdr_id' => $order['mayo_id']]);
-                        $app->addFlashSuccess("#{$id} successfully reconciled");
-                    } else {
-                        $orderRdrObject = $orderService->getRdrObject($order);
-                        if ($rdrId = $app['pmi.drc.participants']->createOrder($order['participant_id'], $orderRdrObject)) {
-                            $repository->update($order['id'], ['rdr_id' => $rdrId]);
-                            $app->addFlashSuccess("#{$id} successfully sent to RDR");
+                    $orderRdrObject = $orderService->getRdrObject($order);
+                    if ($rdrId = $app['pmi.drc.participants']->createOrder($order['participant_id'], $orderRdrObject)) {
+                        $repository->update($order['id'], ['rdr_id' => $rdrId]);
+                        $app->addFlashSuccess("#{$id} successfully sent to RDR");
+                    } elseif ($app['pmi.drc.participants']->getLastErrorCode() === 409) {
+                        $rdrOrder = $app['pmi.drc.participants']->getOrder($order['participant_id'], $order['mayo_id']);
+                        // Check if order exists in RDR
+                        if (!empty($rdrOrder) && $rdrOrder->id === $order['mayo_id']) {
+                            $repository->update($order['id'], ['rdr_id' => $order['mayo_id']]);
+                            $app->addFlashSuccess("#{$id} successfully reconciled");
                         } else {
-                            $app->addFlashError("#{$id} failed sending to RDR: " . $app['pmi.drc.participants']->getLastError());
+                            $app->addFlashError("#{$id} failed to finalize: " . $app['pmi.drc.participants']->getLastError());
                         }
+                    } else {
+                        $app->addFlashError("#{$id} failed sending to RDR: " . $app['pmi.drc.participants']->getLastError());
                     }
                 }
                 return $app->redirectToRoute($_route);
