@@ -267,10 +267,8 @@ class HpoApplication extends AbstractApplication
             if (($key = array_search('ROLE_USER', $roles)) !== false) {
                 unset($roles[$key]);
             }
-            if ($this->getAwardeeId() !== $user::AWARDEE_SCRIPPS) {
-                if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                    unset($roles[$key]);
-                }
+            if ($this->getAwardeeId() !== $user::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
+                unset($roles[$key]);
             }
         }
         if ($roles != $user->getRoles()) {
