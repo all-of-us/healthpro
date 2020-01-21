@@ -275,9 +275,15 @@ class WorkQueue
         foreach ($participants as $participant) {
             $row = [];
             //Identifiers and status
-            $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
-            $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
-            $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
+            if ($this->app->hasRole('ROLE_USER') || $this->app->hasRole('ROLE_AWARDEE_SCRIPPS')) {
+                $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
+                $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
+                $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
+            } else {
+                $row['lastName'] = $e($participant->lastName);
+                $row['firstName'] = $e($participant->firstName);
+                $row['middleName'] = $e($participant->middleName);
+            }
             if (!empty($participant->dob)) {
                 $row['dateOfBirth'] = $participant->dob->format('m/d/Y');
             } else {

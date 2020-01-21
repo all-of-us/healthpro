@@ -14,6 +14,7 @@ class User implements UserInterface
     const ADMIN_DV = 'dv-admin';
     const BIOBANK_GROUP = 'biospecimen-non-pii';
     const SCRIPPS_GROUP = 'scripps-non-pii';
+    const AWARDEE_SCRIPPS = 'stsi';
 
     private $googleUser;
     private $groups;
@@ -23,6 +24,10 @@ class User implements UserInterface
     private $adminAccess;
     private $info;
     private $timezone;
+    private $adminDvAccess;
+    private $biobankAccess;
+    private $scrippsAccess;
+    private $scrippsAwardee;
     
     public function __construct($googleUser, array $groups, $info = null, $timezone = null)
     {
@@ -80,6 +85,10 @@ class User implements UserInterface
                     'name' => $group->getName(),
                     'id' => $id
                 ];
+                // Check for scripps awardee
+                if ($id === self::AWARDEE_SCRIPPS) {
+                    $this->scrippsAwardee = true;
+                }
             }
         }
         return $awardees;
@@ -244,6 +253,9 @@ class User implements UserInterface
         }
         if ($this->scrippsAccess) {
             $roles[] = 'ROLE_SCRIPPS';
+        }
+        if ($this->scrippsAwardee) {
+            $roles[] = 'ROLE_AWARDEE_SCRIPPS';
         }
         return $roles;
     }
