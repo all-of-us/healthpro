@@ -17,6 +17,9 @@
                 <th>Date of Birth</th>
                 <th>ZIP Code</th>
                 <th>Participant Paired Awardee</th>
+                {% if app.isDVType %}
+                    <th>Participant Origination</th>
+                {% endif %}
                 <th>Basics Complete</th>
                 <th></th>
                 {% if searchType is defined and searchType == 'phone' %}
@@ -43,6 +46,9 @@
                                 <span class="text-muted">Unpaired</span>
                             {% endif %}
                         </td>
+                        {% if app.isDVType %}
+                            <td>{{ participant.participantOrigin }}</td>
+                        {% endif %}
                         <td>
                             {% if not participant.status and participant.statusReason == 'basics' %}
                                 <i class="fa fa-times-circle text-danger" aria-hidden="true"></i>
