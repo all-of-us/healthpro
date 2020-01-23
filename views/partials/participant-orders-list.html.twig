@@ -15,7 +15,7 @@
                 {% elseif biobankView is defined %}
                     <a href="{{ path('biobank_order', { biobankId: participant.biobankId, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {% else %}
-                    <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %} {% if readOnly is defined %} disableClick {% endif %}">
+                    <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {% endif %}
                     {{ order.created_ts|date('D n/j/Y', app.userTimezone) }}
                     <small class="text-muted"><strong>{{ order.order_id }}</strong></small>
