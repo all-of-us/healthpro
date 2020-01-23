@@ -8,7 +8,7 @@
         <div id="participants-by-region" class="tab-pane pad active fade in">
             <div class="row">
                 <div id="participants-by-region-filters" class="col-md-3">
-                    {% include 'dashboard/partials/filters.html.twig' with {id: 'participants-by-region', show_organizations: false, show_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: true} %}
+                    {% include 'dashboard/partials/filters.html.twig' with {id: 'participants-by-region', show_organizations: false, show_recruitment_centers: true, recruitment_centers: recruitment_centers, show_enrollment_status: true, show_participant_origination: true} %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="panel-title">
@@ -74,6 +74,11 @@
             alert('You must select at least one enrollment status to plot results');
             return false;
         }
+        var participantOriginations = loadParticipantOriginationFilters('participants-by-region');
+        if (participantOriginations.length == 0) {
+            alert('You must select at least one recruitment origin to plot results.');
+            return false;
+        }
 
         var spinnerLoc = 'plotly-participants-by-region';
         if (dialogType == 'spinner') {
@@ -126,6 +131,7 @@
           end_date: mapCutoff,
           centers: regionCenters,
           enrollment_statuses: enrollmentStatuses,
+          origins: participantOriginations,
           history: true,
           color_profile: mapColor 
         })

@@ -203,8 +203,16 @@ abstract class AbstractApplication extends Application
             $handler = new StackdriverHandler($clientConfig, Logger::INFO);
             $handlerBuffer = new BufferHandler($handler, 0, Logger::INFO);
             $handlerBuffer->pushProcessor(function ($record) use ($app) {
-                $traceHeader = $app['request_stack']->getCurrentRequest()->headers->get('X-Cloud-Trace-Context');
-                if ($traceHeader) {
+                $request = $app['request_stack']->getCurrentRequest();
+                $siteMetaData = $app->getLogMetaData();
+                $record['extra']['labels'] = [
+                    'requestMethod' => $request->getMethod(),
+                    'requestUrl' => $request->getPathInfo(),
+                    'user' => $siteMetaData['user'],
+                    'site' => $siteMetaData['site'],
+                    'ip' => $siteMetaData['ip']
+                ];
+                if ($traceHeader = $request->headers->get('X-Cloud-Trace-Context')) {
                     $record['extra']['trace_header'] = $traceHeader;
                 }
                 return $record;
@@ -576,5 +584,45 @@ abstract class AbstractApplication extends Application
     {
         $this['cache'] = new \Pmi\Cache\DatastoreAdapter($this->getConfig('ds_clean_up_limit'));
         $this['cache']->setLogger($this['logger']);
+    }
+
+    public function getLogMetaData()
+    {
+        if (($user = $this->getUser()) && is_object($user)) {
+            $user = $user->getUsername();
+        } elseif ($user = $this->getGoogleUser()) {
+            $user = $user->getEmail();
+        } else {
+            $user = null;
+        }
+        $site = $this->getSiteId();
+
+        if ($request = $this['request_stack']->getCurrentRequest()) {
+            // http://symfony.com/doc/3.4/deployment/proxies.html#but-what-if-the-ip-of-my-reverse-proxy-changes-constantly
+            $trustedProxies = ['127.0.0.1', $request->server->get('REMOTE_ADDR')];
+            $originalTrustedProxies = Request::getTrustedProxies();
+            // specififying HEADER_X_FORWARDED_FOR because App Engine 2nd Gen also adds a FORWARDED
+            Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_FOR);
+
+            // getClientIps reverses the order, so we want the last ip which will be the user's origin ip
+            $ips = $request->getClientIps();
+            $ip = array_pop($ips);
+
+            // reset trusted proxies
+            Request::setTrustedProxies($originalTrustedProxies);
+
+            // identify cron user
+            if ($user === null && $request->headers->get('X-Appengine-Cron') === 'true') {
+                $user = 'Appengine-Cron';
+            }
+        } else {
+            $ip = null;
+        }
+
+        return [
+            'user' => $user,
+            'site' => $site,
+            'ip' => $ip
+        ];
     }
 }

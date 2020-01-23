@@ -8,13 +8,16 @@ use Pmi\Entities\Participant;
 use Pmi\Drc\CodeBook;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Pmi\WorkQueue\WorkQueue;
+use Pmi\Order\Order;
+use Pmi\Evaluation\Evaluation;
 
 class WorkQueueController extends AbstractController
 {
     protected static $name = 'workqueue';
     protected static $routes = [
         ['index', '/', ['method' => 'GET|POST']],
-        ['export', '/export.csv']
+        ['export', '/export.csv'],
+        ['participant', '/participant/{id}']
     ];
 
     protected $rdrError = false;
@@ -459,4 +462,41 @@ class WorkQueueController extends AbstractController
     {
         return $value === AdminController::DOWNLOAD_DISABLED;
     }
+
+    public function participantAction($id, Application $app, Request $request)
+    {
+        $refresh = $request->query->get('refresh');
+        $participant = $app['pmi.drc.participants']->getById($id, $refresh);
+        if ($refresh) {
+            return $app->redirectToRoute('workqueue_participant', [
+                'id' => $id
+            ]);
+        }
+        if (!$participant) {
+            $app->abort(404);
+        }
+
+        if (!$app->hasRole('ROLE_AWARDEE_SCRIPPS') || !in_array($participant->awardee, $app->getAwardeeOrganization())) {
+            $app->abort(403);
+        }
+        $evaluation = new Evaluation($app);
+        $evaluations = $evaluation->getEvaluationsWithHistory($id);
+
+        $order = new Order($app);
+        $orders = $order->getParticipantOrdersWithHistory($id);
+
+        $query = "SELECT p.id, p.updated_ts, p.finalized_ts, MAX(pc.created_ts) as last_comment_ts, count(pc.comment) as comment_count FROM problems p LEFT JOIN problem_comments pc on p.id = pc.problem_id WHERE p.participant_id = ? GROUP BY p.id ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC";
+        $problems = $app['db']->fetchAll($query, [$id]);
+
+        return $app['twig']->render('workqueue/participant.html.twig',[
+            'participant' => $participant,
+            'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled(),
+            'orders' => $orders,
+            'evaluations' => $evaluations,
+            'problems' => $problems,
+            'displayPatientStatusBlock' => false,
+            'readOnly' => true
+        ]);
+    }
+
 }

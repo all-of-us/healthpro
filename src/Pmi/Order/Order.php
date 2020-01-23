@@ -665,7 +665,17 @@ class Order
     {
         $order = $this->getRdrObject();
         $rdrId = $this->app['pmi.drc.participants']->createOrder($this->participant->id, $order);
-        if ($rdrId) {
+        if (!$rdrId) {
+            // Check for rdr id conflict error code
+            if ($this->app['pmi.drc.participants']->getLastErrorCode() === 409) {
+                $rdrOrder = $this->app['pmi.drc.participants']->getOrder($this->order['participant_id'], $this->order['mayo_id']);
+                // Check if order exists in RDR
+                if (!empty($rdrOrder) && $rdrOrder->id === $this->order['mayo_id']) {
+                    $rdrId = $this->order['mayo_id'];
+                }
+            }
+        }
+        if (!empty($rdrId)) {
             $this->app['em']->getRepository('orders')->update(
                 $this->order['id'],
                 ['rdr_id' => $rdrId]
