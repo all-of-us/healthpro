@@ -8,6 +8,15 @@
         <div class="col-sm-6 col-sm-offset-3">
             {{ form_start(form, { attr: { class: 'warn-unsaved prevent-resubmit' } }) }}
             {{ form_errors(form) }}
+
+            {{ form_row(form.status) }}
+            {{ form_row(form.url) }}
+            {{ form_row(form.message) }}
+            {{ form_row(form.full_page) }}
+
+            {% set return = path('admin_notice', { notice: notice ? notice.id : null }) %}
+            <p><strong>Your time zone</strong>: {{ app.userTimezoneDisplay }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
+
             {{ form_rest(form) }}
             <button type="submit" class="btn btn-primary">Save</button>
             <a class="btn btn-default" href="{{ path('admin_notices') }}">Cancel</a>
