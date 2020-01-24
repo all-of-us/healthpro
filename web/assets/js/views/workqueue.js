@@ -76,7 +76,7 @@ $(document).ready(function() {
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
       { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
-      { name: 'withdrawal', data: 'withdrawal', class: 'text-center' },
+      { name: 'activityStatus', data: 'activityStatus', class: 'text-center' },
       { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
       { name: 'patientStatusYes', visible: false, data: 'patientStatusYes', orderable: false },
       { name: 'patientStatusNo', visible: false, data: 'patientStatusNo', orderable: false },
@@ -136,7 +136,7 @@ $(document).ready(function() {
         columns: tableColumns,
         pageLength: 25,
         createdRow: function(row, data) {
-            if (data.withdrawal) {
+            if (data.withdrawalStatus === 'NO_USE') {
                 $(row).addClass('tr-withdrawn');
             }
         },

@@ -9,6 +9,7 @@ class WorkQueue
     const HTML_SUCCESS = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
     const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
     const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
+    const HTML_NOTICE = '<i class="fa fa-exclamation-circle text-warning" aria-hidden="true"></i>';
 
     protected $app;
 
@@ -304,11 +305,8 @@ class WorkQueue
             $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsAuthored, true, true);
             $row['dvEhrStatus'] = $this->displayStatus($participant->consentForDvElectronicHealthRecordsSharing, 'SUBMITTED', $participant->consentForDvElectronicHealthRecordsSharingAuthored, true, true);
             $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRAuthored, true);
-            if ($participant->withdrawalStatus == 'NO_USE') {
-                $row['withdrawal'] = self::HTML_DANGER . ' <span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalAuthored, $app->getUserTimezone());
-            } else {
-                $row['withdrawal'] = '';
-            }
+            $row['activityStatus'] = $this->getActivityStatus($participant);
+            $row['withdrawalStatus'] = $participant->withdrawalStatus; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
 
             //Contact
@@ -462,5 +460,21 @@ class WorkQueue
             }
         }
         return implode('; ', $organizations);
+    }
+
+    public function getActivityStatus($participant)
+    {
+        if ($participant->withdrawalStatus === 'NO_USE') {
+            return self::HTML_DANGER . '<span class="text-danger">WithDrawn </span>' . self::dateFromString($participant->withdrawalAuthored, $this->app->getUserTimezone());
+        } else {
+            switch ($participant->suspensionStatus) {
+                case 'NOT_SUSPENDED':
+                    return self::HTML_SUCCESS . ' Active';
+                case 'NO_CONTACT':
+                    return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->withdrawalAuthored, $this->app->getUserTimezone());
+                default:
+                    return '';
+            }
+        }
     }
 }
