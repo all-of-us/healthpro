@@ -471,7 +471,7 @@ class WorkQueue
                 case 'NOT_SUSPENDED':
                     return self::HTML_SUCCESS . ' Active';
                 case 'NO_CONTACT':
-                    return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->withdrawalAuthored, $this->app->getUserTimezone());
+                    return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
                 default:
                     return '';
             }

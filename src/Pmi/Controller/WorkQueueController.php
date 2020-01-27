@@ -344,6 +344,8 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Core Participant Date';
             }
             $headers[] = 'Participant Origination';
+            $headers[] = 'Deactivation Status';
+            $headers[] = 'Deactivation Date';
             fputcsv($output, $headers);
 
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
@@ -425,6 +427,8 @@ class WorkQueueController extends AbstractController
                         $row[] = $participant->enrollmentStatusCoreStoredSampleTime;
                     }
                     $row[] = $participant->participantOrigin;
+                    $row[] = $participant->suspensionStatus === 'NO_CONTACT' ? '1' : '0';
+                    $row[] = $participant->suspensionTime;
                     fputcsv($output, $row);
                 }
                 unset($participants);
