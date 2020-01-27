@@ -2,6 +2,11 @@
 {% block title %}Sites - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li><a href="{{ path('admin_home') }}">Admin</a></li>
+        <li class="active">Site Management</li>
+    </ol>
     <div class="page-header">
         <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> Site Management</h2>
     </div>

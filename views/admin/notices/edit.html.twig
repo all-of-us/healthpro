@@ -1,6 +1,12 @@
 {% extends 'base.html.twig' %}
 {% block title %}Edit Notice - {% endblock %}
 {% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li><a href="{{ path('admin_home') }}">Admin</a></li>
+        <li><a href="{{ path('admin_notices') }}">Page Notices</a></li>
+        <li class="active">{{ notice ? 'Edit' : 'Create' }} Page Notice</li>
+    </ol>
     <div class="page-header">
         <h2><i class="fa fa-info-circle" aria-hidden="true"></i> {{ notice ? 'Edit' : 'Create' }} Page Notice</h2>
     </div>
