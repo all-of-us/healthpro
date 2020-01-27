@@ -11,7 +11,7 @@
         <h2><i class="fa fa-info-circle" aria-hidden="true"></i> {{ notice ? 'Edit' : 'Create' }} Page Notice</h2>
     </div>
     <div class="row">
-        <div class="col-sm-6 col-sm-offset-3">
+        <div class="col-sm-8 col-sm-offset-2">
             {{ form_start(form, { attr: { class: 'warn-unsaved prevent-resubmit' } }) }}
             {{ form_errors(form) }}
 
@@ -19,11 +19,31 @@
             {{ form_row(form.url) }}
             {{ form_row(form.message) }}
             {{ form_row(form.full_page) }}
+            <div class="alert alert-info">
+                <ul>
+                    <li><strong>No</strong>: Notice will be displayed at the top of the page, but otherwise, functionality continues as usual.</li>
+                    <li><strong>Yes</strong>: The page will only render the notice. <span class="text-danger">Use this to disable parts or all of the application.</span></li>
+                </ul>
+            </div>
 
-            {% set return = path('admin_notice', { notice: notice ? notice.id : null }) %}
-            <p><strong>Your time zone</strong>: {{ app.userTimezoneDisplay }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
-
-            {{ form_rest(form) }}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Timing</h3>
+                </div>
+                <div class="panel-body">
+                    {% set return = path('admin_notice', { notice: notice ? notice.id : null }) %}
+                    <p><strong>Your time zone</strong>: {{ app.userTimezoneDisplay }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
+                    {{ form_rest(form) }}
+                    <div class="alert alert-info">
+                        <ul>
+                            <li><strong>No start or end time</strong>: Notice will be displayed unless until it is disabled or deleted.</li>
+                            <li><strong>Start time only</strong>: Notice will display from the start time indefinitely into the future.</li>
+                            <li><strong>End time only</strong>: Notice will display starting now until the end time is reached.</li>
+                            <li><strong>Start and end time</strong>: Notice will display between the start and end times.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             <button type="submit" class="btn btn-primary">Save</button>
             <a class="btn btn-default" href="{{ path('admin_notices') }}">Cancel</a>
             {% if notice %}
