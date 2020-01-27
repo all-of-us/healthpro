@@ -95,11 +95,13 @@ class WorkQueue
     ];
 
     public static $filters = [
-        'withdrawalStatus' => [
-            'label' => 'Withdrawal Status',
+        'activityStatus' => [
+            'label' => 'Activity Status',
             'options' => [
-                'Withdrawn' => 'NO_USE',
-                'Not withdrawn' => 'NOT_WITHDRAWN'
+                'Active' => 'active',
+                'Deactivated' => 'deactivated',
+                'Not Withdrawn' => 'not_withdrawn',
+                'Withdrawn' => 'withdrawn'
             ]
         ],
         'enrollmentStatus' => [

@@ -5,9 +5,9 @@ $(document).ready(function() {
     }
 
     var checkFilters = function () {
-        if ($('#filters select[name=withdrawalStatus]').val() == 'NO_USE') {
-            $('#filters select').not('[name=withdrawalStatus], [name=organization]').val('');
-            $('#filters select').not('[name=withdrawalStatus], [name=organization]').prop('disabled', true);
+        if ($('#filters select[name=activityStatus]').val() == 'withdrawn') {
+            $('#filters select').not('[name=activityStatus], [name=organization]').val('');
+            $('#filters select').not('[name=activityStatus], [name=organization]').prop('disabled', true);
         } else {
             $('#filters select').prop('disabled', false);
         }
