@@ -291,13 +291,13 @@ class Participant
     public function getActivityStatus($participant)
     {
         if ($participant->withdrawalStatus === 'NO_USE') {
-            return 'Withdrawn';
+            return 'withdrawn';
         } else {
             switch ($participant->suspensionStatus) {
                 case 'NOT_SUSPENDED':
-                    return 'Active';
+                    return 'active';
                 case 'NO_CONTACT':
-                    return 'Deactivated';
+                    return 'deactivate';
                 default:
                     return '';
             }

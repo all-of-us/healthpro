@@ -467,11 +467,11 @@ class WorkQueue
     public function getActivityStatus($participant)
     {
         switch ($participant->activityStatus) {
-            case 'Withdrawn':
+            case 'withdrawn':
                 return self::HTML_DANGER . '<span class="text-danger"> Withdrawn </span>' . self::dateFromString($participant->withdrawalAuthored, $this->app->getUserTimezone());
-            case 'Active':
+            case 'active':
                 return self::HTML_SUCCESS . ' Active';
-            case 'Deactivated':
+            case 'deactivate':
                 return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
             default:
                 return '';

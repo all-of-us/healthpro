@@ -49,6 +49,10 @@
         {% include 'partials/participant-consent.html.twig' %}
     {% endif %}
 
+    {% if participant.activityStatus == 'deactivate' %}
+        {% include 'partials/participant-deactive-status-notice.html.twig' %}
+    {% endif %}
+
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
