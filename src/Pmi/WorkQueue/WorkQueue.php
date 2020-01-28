@@ -466,17 +466,15 @@ class WorkQueue
 
     public function getActivityStatus($participant)
     {
-        if ($participant->withdrawalStatus === 'NO_USE') {
-            return self::HTML_DANGER . '<span class="text-danger">WithDrawn </span>' . self::dateFromString($participant->withdrawalAuthored, $this->app->getUserTimezone());
-        } else {
-            switch ($participant->suspensionStatus) {
-                case 'NOT_SUSPENDED':
-                    return self::HTML_SUCCESS . ' Active';
-                case 'NO_CONTACT':
-                    return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
-                default:
-                    return '';
-            }
+        switch ($participant->activityStatus) {
+            case 'Withdrawn':
+                return self::HTML_DANGER . '<span class="text-danger"> Withdrawn </span>' . self::dateFromString($participant->withdrawalAuthored, $this->app->getUserTimezone());
+            case 'Active':
+                return self::HTML_SUCCESS . ' Active';
+            case 'Deactivated':
+                return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
+            default:
+                return '';
         }
     }
 }

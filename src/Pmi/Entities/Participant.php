@@ -20,6 +20,7 @@ class Participant
     public $disableTestAccess;
     public $patientStatus;
     public $isCoreParticipant = false;
+    public $activityStatus;
 
     public function __construct($rdrParticipant = null)
     {
@@ -116,6 +117,9 @@ class Participant
         if (!empty($participant->enrollmentStatus) && $participant->enrollmentStatus === 'FULL_PARTICIPANT') {
             $this->isCoreParticipant = true;
         }
+
+        // Set activity status
+        $this->activityStatus = $this->getActivityStatus($participant);
     }
 
     public function getShortId()
@@ -282,5 +286,21 @@ class Participant
     public function getSiteSuffix($site)
     {
         return str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
+    }
+
+    public function getActivityStatus($participant)
+    {
+        if ($participant->withdrawalStatus === 'NO_USE') {
+            return 'Withdrawn';
+        } else {
+            switch ($participant->suspensionStatus) {
+                case 'NOT_SUSPENDED':
+                    return 'Active';
+                case 'NO_CONTACT':
+                    return 'Deactivated';
+                default:
+                    return '';
+            }
+        }
     }
 }
