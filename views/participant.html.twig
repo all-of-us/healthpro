@@ -49,7 +49,7 @@
         {% include 'partials/participant-consent.html.twig' %}
     {% endif %}
 
-    {% if participant.activityStatus == 'deactivate' %}
+    {% if participant.activityStatus == 'deactivated' %}
         {% include 'partials/participant-deactive-status-notice.html.twig' %}
     {% endif %}
 
