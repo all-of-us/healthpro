@@ -100,8 +100,8 @@ class WorkQueue
             'options' => [
                 'Active' => 'active',
                 'Deactivated' => 'deactivated',
-                'Not Withdrawn' => 'not_withdrawn',
-                'Withdrawn' => 'withdrawn'
+                'Withdrawn' => 'withdrawn',
+                'Not Withdrawn' => 'not_withdrawn'
             ]
         ],
         'enrollmentStatus' => [
