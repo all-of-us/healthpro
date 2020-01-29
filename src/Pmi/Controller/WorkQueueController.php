@@ -436,8 +436,8 @@ class WorkQueueController extends AbstractController
                         $row[] = $participant->enrollmentStatusCoreStoredSampleTime;
                     }
                     $row[] = $participant->participantOrigin;
-                    $row[] = $participant->suspensionStatus === 'NO_CONTACT' ? '1' : '0';
-                    $row[] = $participant->suspensionTime;
+                    $row[] = $participant->isSuspended ? '1' : '0';
+                    $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
                     fputcsv($output, $row);
                 }
                 unset($participants);

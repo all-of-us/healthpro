@@ -120,6 +120,9 @@ class Participant
 
         // Set activity status
         $this->activityStatus = $this->getActivityStatus($participant);
+
+        // Set suspension status
+        $this->isSuspended = $participant->suspensionStatus === 'NO_CONTACT' ? true : false;
     }
 
     public function getShortId()
