@@ -297,7 +297,7 @@ class Participant
                 case 'NOT_SUSPENDED':
                     return 'active';
                 case 'NO_CONTACT':
-                    return 'deactivate';
+                    return 'deactivated';
                 default:
                     return '';
             }
