@@ -58,6 +58,14 @@
 <script>
 $(document).ready(function() {
     $('#form_start_ts, #form_end_ts').pmiDateTimePicker();
+    $('#form_url').dropdownOther({
+        'All': '/*',
+        'Home Page': '/',
+        'Work Queue': '/workqueue/',
+        'Dashboard': '/dashboard/*',
+        'Biobank Order Pages': '/participant/*/order/*',
+        'Physical Measurements': '/participant/*/measurements*'
+    });
     $('.confirm').on('click', function() {
         return confirm('Are you sure you want to delete this notice?');
     });
