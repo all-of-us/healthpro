@@ -353,8 +353,10 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Core Participant Date';
             }
             $headers[] = 'Participant Origination';
-            $headers[] = 'Deactivation Status';
-            $headers[] = 'Deactivation Date';
+            if ($hasFullDataAccess) {
+                $headers[] = 'Deactivation Status';
+                $headers[] = 'Deactivation Date';
+            }
             fputcsv($output, $headers);
 
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
@@ -436,8 +438,10 @@ class WorkQueueController extends AbstractController
                         $row[] = $participant->enrollmentStatusCoreStoredSampleTime;
                     }
                     $row[] = $participant->participantOrigin;
-                    $row[] = $participant->isSuspended ? '1' : '0';
-                    $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
+                    if ($hasFullDataAccess) {
+                        $row[] = $participant->isSuspended ? '1' : '0';
+                        $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
+                    }
                     fputcsv($output, $row);
                 }
                 unset($participants);
