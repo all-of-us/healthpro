@@ -228,7 +228,7 @@ $(document).ready(function()
         select.append(other);
         $.each(choices, function(display, value) {
             var option = $('<option>').val(value).text(display);
-            if (option.val() == self.val()) {
+            if (option.val() === self.val()) {
                 option.attr('selected', true);
                 optionSelected = true;
             }
