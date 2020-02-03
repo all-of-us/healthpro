@@ -148,7 +148,8 @@ class BiobankController extends AbstractController
         return $app['twig']->render('biobank/participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
-            'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled()
+            'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled(),
+            'biobankView' => true
         ]);
     }
 
