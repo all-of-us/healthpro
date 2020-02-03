@@ -9,7 +9,7 @@ class WorkQueue
     const HTML_SUCCESS = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
     const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
     const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
-    const HTML_NOTICE = '<i class="fa fa-exclamation-circle text-warning" aria-hidden="true"></i>';
+    const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
 
     protected $app;
 
