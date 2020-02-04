@@ -1,6 +1,12 @@
 {% extends 'base.html.twig' %}
 {% block title %}Sites - {% endblock %}
 {% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li><a href="{{ path('admin_home') }}">Admin</a></li>
+        <li><a href="{{ path('admin_sites') }}">Site Management</a></li>
+        <li class="active">Sync Sites</li>
+    </ol>
     <div class="page-header">
         <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> Sync Sites</h2>
     </div>

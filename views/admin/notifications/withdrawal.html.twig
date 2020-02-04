@@ -1,6 +1,11 @@
 {% extends 'base.html.twig' %}
 {% block title %}Withdrawal Notifications - {% endblock %}
 {% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li><a href="{{ path('admin_home') }}">Admin</a></li>
+        <li class="active">Withdrawal Notifications</li>
+    </ol>
     <div class="page-header">
         <h2><i class="fa fa-bell" aria-hidden="true"></i> Withdrawal Notifications</h2>
     </div>
