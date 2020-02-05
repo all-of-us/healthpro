@@ -48,12 +48,12 @@ class SiteSyncService
         return str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
     }
 
-    public function dryRun($isProd)
+    public function dryRun()
     {
-        return $this->sync($isProd, true);
+        return $this->sync(true);
     }
 
-    public function sync($isProd, $preview = false)
+    public function sync($preview = false)
     {
         $sitesCount = 0;
         $created = [];
@@ -62,6 +62,8 @@ class SiteSyncService
         $existingSites = $this->getSitesFromDb();
         $deleted = array_keys($existingSites); // add everything to the deleted array, then remove as we find them
         $entries = $this->getAwardeeEntriesFromRdr();
+        $isProd = $this->app->isProd();
+        $isStable = $this->app->isStable();
         foreach ($entries as $entry) {
             $awardee = $entry->resource;
             if (!isset($awardee->organizations) || !is_array($awardee->organizations)) {
@@ -90,6 +92,12 @@ class SiteSyncService
                     $siteData['awardee_id'] = $awardee->id;
                     if ($isProd) {
                         $siteData['mayolink_account'] = isset($site->mayolinkClientNumber) ? $site->mayolinkClientNumber : null;
+                    } elseif ($isStable && empty($existing['mayolink_account'])) {
+                        if (strtolower($awardee->type) === 'dv') {
+                            $siteData['mayolink_account'] = $this->app->getConfig('ml_account_dv_stable');
+                        } else {
+                            $siteData['mayolink_account'] = $this->app->getConfig('ml_account_hpo_stable');
+                        }
                     }
                     $siteData['timezone'] = isset($site->timeZoneId) ? $site->timeZoneId : null;
                     $siteData['type'] = $awardee->type;
