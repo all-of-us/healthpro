@@ -62,8 +62,6 @@ class SiteSyncService
         $existingSites = $this->getSitesFromDb();
         $deleted = array_keys($existingSites); // add everything to the deleted array, then remove as we find them
         $entries = $this->getAwardeeEntriesFromRdr();
-        $isProd = $this->app->isProd();
-        $isStable = $this->app->isStable();
         foreach ($entries as $entry) {
             $awardee = $entry->resource;
             if (!isset($awardee->organizations) || !is_array($awardee->organizations)) {
@@ -90,18 +88,18 @@ class SiteSyncService
                     $siteData['site_id'] = $siteId;
                     $siteData['organization_id'] = $organization->id;
                     $siteData['awardee_id'] = $awardee->id;
-                    if ($isProd) {
+                    if ($this->app->isProd()) {
                         $siteData['mayolink_account'] = isset($site->mayolinkClientNumber) ? $site->mayolinkClientNumber : null;
-                    } elseif ($isStable && empty($existing['mayolink_account'])) {
+                    } elseif ($this->app->isStable() && empty($existing['mayolink_account'])) {
                         if (strtolower($awardee->type) === 'dv') {
-                            $siteData['mayolink_account'] = $this->app->getConfig('ml_account_dv_stable');
+                            $siteData['mayolink_account'] = $this->app->getConfig('ml_account_dv');
                         } else {
-                            $siteData['mayolink_account'] = $this->app->getConfig('ml_account_hpo_stable');
+                            $siteData['mayolink_account'] = $this->app->getConfig('ml_account_hpo');
                         }
                     }
                     $siteData['timezone'] = isset($site->timeZoneId) ? $site->timeZoneId : null;
                     $siteData['type'] = $awardee->type;
-                    if ($isProd) {
+                    if ($this->app->isProd()) {
                         if (isset($site->adminEmails) && is_array($site->adminEmails)) {
                             $siteData['email'] = join(', ', $site->adminEmails);
                         } else {
