@@ -90,11 +90,17 @@ class SiteSyncService
                     $siteData['awardee_id'] = $awardee->id;
                     if ($this->app->isProd()) {
                         $siteData['mayolink_account'] = isset($site->mayolinkClientNumber) ? $site->mayolinkClientNumber : null;
-                    } elseif ($this->app->isStable() && empty($existing['mayolink_account'])) {
+                    } elseif ($this->app->isStable()) {
                         if (strtolower($awardee->type) === 'dv') {
-                            $siteData['mayolink_account'] = $this->app->getConfig('ml_account_dv');
+                            // Set to default dv account number if existing mayo account number is empty or equal to default hpo account number
+                            if (empty($existing['mayolink_account']) || ($existing['mayolink_account'] == $this->app->getConfig('ml_account_hpo'))) {
+                                $siteData['mayolink_account'] = $this->app->getConfig('ml_account_dv');
+                            }
                         } else {
-                            $siteData['mayolink_account'] = $this->app->getConfig('ml_account_hpo');
+                            // Set to default hpo account number if existing mayo account number is empty or equal to default dv account number
+                            if (empty($existing['mayolink_account']) || ($existing['mayolink_account'] == $this->app->getConfig('ml_account_dv'))) {
+                                $siteData['mayolink_account'] = $this->app->getConfig('ml_account_hpo');
+                            }
                         }
                     }
                     $siteData['timezone'] = isset($site->timeZoneId) ? $site->timeZoneId : null;
