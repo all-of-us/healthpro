@@ -108,7 +108,7 @@ function renderMetricPlots() {
               csrf_token: CsrfToken
           })
           .done(function(data) {
-              $('#person-filter-title').html($('#person-filter').val());
+              $('#person-filter-title').html($('#person-filter option:selected').text());
               // Year of Birth
               plotlyDiv = $('#plotly-ehr-year-of-birth').empty();
               plotlyTitle = '<b>Year of Birth</b>';

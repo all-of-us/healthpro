@@ -227,15 +227,16 @@ class DashboardController extends AbstractController
         // Data source must be in list to be accepted
         $dataSources = [];
         foreach ($this->getEhrDataSources($app) as $source) {
-            $dataSources[] = $source->folder;
+            $dataSources[] = $source['folder'];
         }
+
         if (!$dataSource || !in_array($dataSource, $dataSources)) {
             return $app->abort(500, 'Must specify valid source.');
         }
 
         switch ($request->get('mode')) {
             case 'person':
-                $object = $storageService->getObject($bucket, "curation_report/data/{$dataSource}/person.json");
+                $object = $storageService->getObject($bucket, "{$dataSource}/person.json");
                 $person = json_decode($object->downloadAsString());
                 $person_intervals = range($person->BIRTH_YEAR_HISTOGRAM->MIN, $person->BIRTH_YEAR_HISTOGRAM->MAX);
                 $person_output = [];
@@ -290,7 +291,7 @@ class DashboardController extends AbstractController
                 ]);
                 break;
             case 'density':
-                $object = $storageService->getObject($bucket, "curation_report/data/{$dataSource}/datadensity.json");
+                $object = $storageService->getObject($bucket, "{$dataSource}/datadensity.json");
                 $density = json_decode($object->downloadAsString());
 
                 $totalRecords = [];
@@ -354,7 +355,7 @@ class DashboardController extends AbstractController
                 ]);
                 break;
             case 'achillesheel':
-                $object = $storageService->getObject($bucket, "curation_report/data/{$dataSource}/achillesheel.json");
+                $object = $storageService->getObject($bucket, "{$dataSource}/achillesheel.json");
                 $errors = json_decode($object->downloadAsString());
                 $output = [];
                 foreach ($errors->MESSAGES->ATTRIBUTEVALUE as $i => $row) {
@@ -1477,8 +1478,20 @@ class DashboardController extends AbstractController
         preg_match('/https\:\/\/storage\.googleapis\.com\/(.*)\.appspot\.com\/(.*)/i', $rootPath, $matches);
         $bucket = $matches[2];
 
-        $object = $storageService->getObject($bucket, 'curation_report/data/datasources.json');
-        return json_decode($object->downloadAsString())->datasources;
+        $dataSources = [];
+        $objects = $storageService->getObjects($bucket);
+        foreach ($objects as $object) {
+            $objectInfo = $object->info();
+            if (preg_match('/^(\w+)\/datasources.json/i', $objectInfo['name'], $matches)) {
+                $objectContents = json_decode($object->downloadAsString());
+                $dataSources[] = [
+                    'name' => $matches[1],
+                    'folder' => $matches[1] . '/' . $objectContents->datasources[0]->folder,
+                    'cdmVersion' => $objectContents->datasources[0]->cdmVersion,
+                ];
+            }
+        }
+        return $dataSources;
     }
 
 }
