@@ -213,6 +213,52 @@ $(document).ready(function()
     };
 
     /*************************************************************************
+     * Plugin to transform text field into select dropdown with "other" option
+     * Usage:
+     * $('#form_input').dropdownOther({
+     *     'Label 1': 'value_1',
+     *     'Label 2': 'value_2'
+     * });
+     ************************************************************************/
+    $.fn.dropdownOther = function(choices) {
+        var self = this;
+        var select = $('<select class="form-control">');
+        var optionSelected = false;
+        var other = $('<option value="">-- Other --</option>');
+        select.append(other);
+        $.each(choices, function(display, value) {
+            var option = $('<option>').val(value).text(display);
+            if (option.val() === self.val()) {
+                option.attr('selected', true);
+                optionSelected = true;
+            }
+            select.append(option);
+        });
+        if (optionSelected) {
+            self.attr('readonly', true);
+        }
+
+        var col1 = $('<div class="col-sm-6">');
+        var col2 = $('<div class="col-sm-6">');
+        var row = $('<div class="row">');
+        row.append(col1).append(col2);
+        this.before(row);
+        col1.append(select);
+        col2.append(this);
+
+        select.on('change', function() {
+            self.val($(this).val());
+            if ($(this).val()) {
+                self.attr('readonly', true);
+            } else {
+                self.attr('readonly', false);
+                self.focus();
+            }
+        });
+        return this;
+    };
+
+    /*************************************************************************
      * Unsaved changes prompter
      ************************************************************************/
     PMI.hasChanges = false;
