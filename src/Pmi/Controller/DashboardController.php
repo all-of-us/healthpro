@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Drc\RdrMetrics;
+use Pmi\Entities\Cache;
 use Pmi\Service\StorageService;
 
 /**
@@ -17,6 +18,11 @@ class DashboardController extends AbstractController
      * @var int
      */
     const API_VERSION = 2;
+
+    /**
+     * @var int
+     */
+    const EHR_DATA_SORUCES_CACHE_TTL = 60;
 
     /**
      * @var string
@@ -1478,17 +1484,30 @@ class DashboardController extends AbstractController
         preg_match('/https\:\/\/storage\.googleapis\.com\/(.*)\.appspot\.com\/(.*)/i', $rootPath, $matches);
         $bucket = $matches[2];
 
-        $dataSources = [];
-        $objects = $storageService->getObjects($bucket);
-        foreach ($objects as $object) {
-            $objectInfo = $object->info();
-            if (preg_match('/^(\w+)\/datasources.json/i', $objectInfo['name'], $matches)) {
-                $objectContents = json_decode($object->downloadAsString());
-                $dataSources[] = [
-                    'name' => $matches[1],
-                    'folder' => $matches[1] . '/' . $objectContents->datasources[0]->folder,
-                    'cdmVersion' => $objectContents->datasources[0]->cdmVersion,
-                ];
+        if (!$app['cache']) {
+            throw new \Exception('Cache unavailable.', 500);
+        }
+        $cacheItem = $app['cache']->getItem('ehr_data_sources');
+        if ($cacheItem->isHit()) {
+            $dataSources = $cacheItem->get();
+        } else {
+            $dataSources = [];
+            $objects = $storageService->getObjects($bucket);
+            foreach ($objects as $object) {
+                $objectInfo = $object->info();
+                if (preg_match('/^(\w+)\/datasources.json/i', $objectInfo['name'], $matches)) {
+                    $objectContents = json_decode($object->downloadAsString());
+                    $dataSources[] = [
+                        'name' => $matches[1],
+                        'folder' => $matches[1] . '/' . $objectContents->datasources[0]->folder,
+                        'cdmVersion' => $objectContents->datasources[0]->cdmVersion,
+                    ];
+                }
+                if ($dataSources) {
+                    $cacheItem->set($dataSources);
+                    $cacheItem->expiresAfter(self::EHR_DATA_SORUCES_CACHE_TTL);
+                    $app['cache']->save($cacheItem);
+                }
             }
         }
         return $dataSources;

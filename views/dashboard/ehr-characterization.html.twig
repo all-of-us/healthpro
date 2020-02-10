@@ -13,10 +13,7 @@
     </div>
     <div class="col-md-9">
       <div id="plotly-tabs" class="tab-content">
-        <div id="ehr-person" class="tab-pane pad active fade in">
-          <div class="pull-right">
-            {% include 'dashboard/partials/ehr-data-sources-filter.html.twig' with {id: 'person-filter'} %}
-          </div>
+        <div id="ehr-person" class="tab-pane pad active fade in" data-source="{{ ehr_data_sources[0].folder }}" data-label="{{ ehr_data_sources[0].name }}">
           <h3 id="personReport">Person <small id="person-filter-title"></small></h3>
           <hr />
           <div class="row">
@@ -104,11 +101,11 @@ function renderMetricPlots() {
           plotlyLayout;
       $.getJSON('/dashboard/ehr-characterization-data', {
               mode: 'person',
-              source: $('#person-filter').val(),
+              source: $('#ehr-person').data('source'),
               csrf_token: CsrfToken
           })
           .done(function(data) {
-              $('#person-filter-title').html($('#person-filter option:selected').text());
+              $('#person-filter-title').html($('#ehr-person').data('label'));
               // Year of Birth
               plotlyDiv = $('#plotly-ehr-year-of-birth').empty();
               plotlyTitle = '<b>Year of Birth</b>';
@@ -197,7 +194,7 @@ function renderMetricPlots() {
               csrf_token: CsrfToken
           })
           .done(function(data) {
-              $('#datadensity-filter-title').html($('#datadensity-filter').val());
+              $('#datadensity-filter-title').html($('#datadensity-filter option:selected').text());
               // Total Rows
               plotlyDiv = $('#plotly-ehr-total-rows').empty();
               plotlyTitle = '<b>Total Rows</b>';
@@ -262,7 +259,7 @@ function renderMetricPlots() {
    * Errors Table
    */
   function updateAchillesHeelTable() {
-    $('#achillesheel-filter-title').html($('#achillesheel-filter').val());
+    $('#achillesheel-filter-title').html($('#achillesheel-filter option:selected').text());
     // Clean up previous instance if present
     $('#ehr-errors-table').dataTable().fnDestroy();
     $('#ehr-errors-table').dataTable({
