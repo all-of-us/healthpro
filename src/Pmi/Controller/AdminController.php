@@ -57,8 +57,7 @@ class AdminController extends AbstractController
     public function siteSyncAction(Application $app, Request $request)
     {
         $siteSync = new SiteSyncService($app);
-        $isProd = $app->isProd();
-        $preview = $siteSync->dryRun($isProd);
+        $preview = $siteSync->dryRun();
 
         if (!$app->getConfig('sites_use_rdr')) {
             $formView = false;
@@ -70,7 +69,7 @@ class AdminController extends AbstractController
                     $siteSync->syncAwardees();
                     $siteSync->syncOrganizations();
                 } else {
-                    $siteSync->sync($isProd);
+                    $siteSync->sync();
                 }
                 $app->addFlashSuccess('Successfully synced');
                 return $app->redirectToRoute('admin_sites');
