@@ -612,7 +612,7 @@ class OrderController extends AbstractController
             || ($type === $order::ORDER_UNLOCK && !$order->canUnlock())) {
             $app->abort(403);
         }
-        $orders = $order->getParticipantOrdersWithHistory($participantId);
+        $orders = $app['em']->getRepository('order_repository')->getParticipantOrdersWithHistory($participantId);
         $orderModifyForm = $order->getOrderModifyForm($type);
         $orderModifyForm->handleRequest($request);
         if ($orderModifyForm->isSubmitted()) {

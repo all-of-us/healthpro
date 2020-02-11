@@ -88,9 +88,8 @@ class ReviewController extends AbstractController
             $app->addFlashError('You must select a valid site');
             return $app->redirectToRoute('home');
         }
-        $order = new Order($app);
-        $unlockedOrders = $order->getSiteUnlockedOrders();
-        $unfinalizedOrders = $order->getSiteUnfinalizedOrders();
+        $unlockedOrders = $app['em']->getRepository('order_repository')->getSiteUnlockedOrders($app->getSiteId());
+        $unfinalizedOrders = $app['em']->getRepository('order_repository')->getSiteUnfinalizedOrders($app->getSiteId());
         $orders = array_merge($unlockedOrders, $unfinalizedOrders);
         return $app['twig']->render('review/orders.html.twig', [
             'orders' => $orders
@@ -133,8 +132,7 @@ class ReviewController extends AbstractController
             $app->addFlashError('You must select a valid site');
             return $app->redirectToRoute('home');
         }
-        $order = new Order($app);
-        $recentModifyOrders = $order->getSiteRecentModifiedOrders();
+        $recentModifyOrders = $app['em']->getRepository('order_repository')->getSiteRecentModifiedOrders($app->getSiteId());
         return $app['twig']->render('review/orders-recent-modify.html.twig', [
             'orders' => $recentModifyOrders
         ]);
