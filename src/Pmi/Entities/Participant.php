@@ -21,6 +21,7 @@ class Participant
     public $patientStatus;
     public $isCoreParticipant = false;
     public $activityStatus;
+    public $isSuspended = false;
 
     public function __construct($rdrParticipant = null)
     {
@@ -119,10 +120,14 @@ class Participant
         }
 
         // Set activity status
-        $this->activityStatus = $this->getActivityStatus($participant);
+        if (isset($participant->withdrawalStatus)) {
+            $this->activityStatus = $this->getActivityStatus($participant);
+        }
 
         // Set suspension status
-        $this->isSuspended = $participant->suspensionStatus === 'NO_CONTACT' ? true : false;
+        if (isset($participant->suspensionStatus) && $participant->suspensionStatus === 'NO_CONTACT') {
+            $this->isSuspended = true;
+        }
     }
 
     public function getShortId()
@@ -296,7 +301,7 @@ class Participant
         if ($participant->withdrawalStatus === 'NO_USE') {
             return 'withdrawn';
         } else {
-            switch ($participant->suspensionStatus) {
+            switch (isset($participant->suspensionStatus) ? $participant->suspensionStatus : null) {
                 case 'NOT_SUSPENDED':
                     return 'active';
                 case 'NO_CONTACT':
