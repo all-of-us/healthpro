@@ -7,23 +7,9 @@ class EntityManager
 {
     protected $dbal;
 
+    // Define custom repositories
     protected $entities = [
-        'users' => 'doctrine',
-        'orders' => 'doctrine',
-        'evaluations' => 'doctrine',
-        'sites' => 'doctrine',
-        'withdrawal_log' => 'doctrine',
-        'problems' => 'doctrine',
-        'problem_comments' => 'doctrine',
-        'evaluations_queue' => 'doctrine',
-        'organizations' => 'doctrine',
-        'awardees' => 'doctrine',
-        'missing_notifications_log' => 'doctrine',
-        'evaluations_history' => 'doctrine',
-        'orders_history' => 'doctrine',
-        'notices' => 'doctrine',
-        'patient_status' => 'doctrine',
-        'patient_status_history' => 'doctrine'
+        'order_repository' => 'OrderRepository'
     ];
 
     protected $timezone;
@@ -34,18 +20,14 @@ class EntityManager
     }
 
     public function getRepository($entity) {
-        if (!array_key_exists($entity, $this->entities)) {
-            throw new \Exception('Entity not defined');
+        if (!$this->dbal) {
+            throw new \Exception('No DBAL available');
         }
-        switch ($this->entities[$entity]) {
-            case 'doctrine':
-                if (!$this->dbal) {
-                    throw new \Exception('No DBAL available');
-                }
-                return new DoctrineRepository($this->dbal, $entity, $this->getTimezone());
-
-            default:
-                throw new \Exception('Invalid entity type');
+        if (isset($this->entities[$entity])) {
+            $repository = __NAMESPACE__ . '\\' . $this->entities[$entity];
+            return new $repository($this->dbal, $entity, $this->getTimezone());
+        } else {
+            return new DoctrineRepository($this->dbal, $entity, $this->getTimezone());
         }
     }
 
