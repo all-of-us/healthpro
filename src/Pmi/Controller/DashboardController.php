@@ -200,11 +200,18 @@ class DashboardController extends AbstractController
     public function ehrCharacterizationAction(Application $app)
     {
         $ehrDataSources = $this->getEhrDataSources($app);
+        $ehrDataSourcesGrouped = ['Combined' => [], 'Organizations' => []];
+        foreach ($ehrDataSources as $source) {
+            if (preg_match('/^combined(.*)/i', $source['name'])) {
+                $ehrDataSourcesGrouped['Combined'][] = $source;
+            } else {
+                $ehrDataSourcesGrouped['Organizations'][] = $source;
+            }
+        }
         return $app['twig']->render(
             'dashboard/ehr-characterization.html.twig', [
-                'ehr_data_sources' => $ehrDataSources
+                'ehr_data_sources' => $ehrDataSourcesGrouped
             ]
-
         );
     }
 

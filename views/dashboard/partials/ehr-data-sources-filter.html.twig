@@ -1,5 +1,9 @@
 <select name="ehr_data_source" id="{{ id }}">
-    {% for source in ehr_data_sources %}
-    <option value="{{ source.folder }}">{{ source.name }}</option>
+    {% for group_name,group in ehr_data_sources %}
+    <optgroup label="{{ group_name }}">
+      {% for source in group %}
+      <option value="{{ source.folder }}">{{ source.name }}</option>
+      {% endfor %}
+    </optgroup>
     {% endfor %}
 </select>
