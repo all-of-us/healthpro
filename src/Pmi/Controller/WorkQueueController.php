@@ -496,8 +496,8 @@ class WorkQueueController extends AbstractController
         if (!$app->hasRole('ROLE_AWARDEE_SCRIPPS') || !in_array($participant->awardee, $app->getAwardeeOrganization())) {
             $app->abort(403);
         }
-        $evaluation = new Evaluation($app);
-        $evaluations = $evaluation->getEvaluationsWithHistory($id);
+
+        $evaluations = $app['em']->getRepository('evaluation_repository')->getEvaluationsWithHistory($id);
 
         $orders = $app['em']->getRepository('order_repository')->getParticipantOrdersWithHistory($id);
 

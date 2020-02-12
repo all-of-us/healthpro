@@ -406,8 +406,8 @@ class DefaultController extends AbstractController
                 'organization' => $participant->hpoId
             ]);
         }
-        $evaluationService = new Evaluation($app);
-        $evaluations = $evaluationService->getEvaluationsWithHistory($id);
+
+        $evaluations = $app['em']->getRepository('evaluation_repository')->getEvaluationsWithHistory($id);
 
         $orders = $app['em']->getRepository('order_repository')->getParticipantOrdersWithHistory($id);
 

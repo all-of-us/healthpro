@@ -103,8 +103,7 @@ class ReviewController extends AbstractController
             $app->addFlashError('You must select a valid site');
             return $app->redirectToRoute('home');
         }
-        $evaluation = new Evaluation($app);
-        $measurements = $evaluation->getSiteUnfinalizedEvaluations();
+        $measurements = $app['em']->getRepository('evaluation_repository')->getSiteUnfinalizedEvaluations($site);
 
         return $app['twig']->render('review/measurements.html.twig', [
             'measurements' => $measurements
@@ -118,8 +117,7 @@ class ReviewController extends AbstractController
             $app->addFlashError('You must select a valid site');
             return $app->redirectToRoute('home');
         }
-        $evaluation = new Evaluation($app);
-        $recentModifyMeasurements = $evaluation->getSiteRecentModifiedEvaluations();
+        $recentModifyMeasurements = $app['em']->getRepository('evaluation_repository')->getSiteRecentModifiedEvaluations($site);
         return $app['twig']->render('review/measurements-recent-modify.html.twig', [
             'measurements' => $recentModifyMeasurements
         ]);
