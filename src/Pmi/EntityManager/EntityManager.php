@@ -10,7 +10,8 @@ class EntityManager
     // Define custom repositories
     protected $entities = [
         'order_repository' => 'OrderRepository',
-        'evaluation_repository' => 'EvaluationRepository'
+        'evaluation_repository' => 'EvaluationRepository',
+        'problem_repository' => 'ProblemRepository'
     ];
 
     protected $timezone;
