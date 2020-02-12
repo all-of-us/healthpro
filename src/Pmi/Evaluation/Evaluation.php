@@ -33,16 +33,8 @@ class Evaluation
     protected $finalizedUser;
     protected $finalizedSite;
     protected $locked = false;
-    public $evaluation;
 
-    public function __construct($app = null)
-    {
-        $this->app = $app;
-        $this->version = self::CURRENT_VERSION;
-        $this->data = new \StdClass();
-        $this->loadSchema();
-        $this->normalizeData();
-    }
+    public $evaluation;
 
     public static $cancelReasons = [
         'Data entered for wrong participant' => 'PM_CANCEL_WRONG_PARTICIPANT',
@@ -54,6 +46,15 @@ class Evaluation
         'Physical Measurements can be amended instead of cancelled' => 'PM_RESTORE_AMEND',
         'Other' => 'OTHER'
     ];
+
+    public function __construct($app = null)
+    {
+        $this->app = $app;
+        $this->version = self::CURRENT_VERSION;
+        $this->data = new \StdClass();
+        $this->loadSchema();
+        $this->normalizeData();
+    }
 
     public function loadFromArray($array)
     {
@@ -81,7 +82,7 @@ class Evaluation
                 $finalizedSite = $array['finalized_ts'] ? $array['site'] : $this->app->getSiteId();
             } else {
                 $finalizedUserId = $array['finalized_user_id'];
-                $finalizedSite = $array['finalized_site'];          
+                $finalizedSite = $array['finalized_site'];
             }
             $finalizedUser = $this->app['em']->getRepository('users')->fetchOneBy([
                 'id' => $finalizedUserId
@@ -90,8 +91,7 @@ class Evaluation
             $this->createdSite = $array['site'];
             $this->finalizedUser = $finalizedUser['email'];
             $this->finalizedSite = $finalizedSite;
-        }
-        else {
+        } else {
             $this->createdUser = array_key_exists('created_user', $array) ? $array['created_user'] : null;
             $this->createdSite = array_key_exists('created_site', $array) ? $array['created_site'] : null;
             $this->finalizedUser = array_key_exists('finalized_user', $array) ? $array['finalized_user'] : null;
@@ -188,7 +188,7 @@ class Evaluation
                 $attributes['data-parsley-gt'] = 0;
             }
             $form = $formBuilder->getForm();
-            $bmiConstraint = function($value, $context) use ($form) {
+            $bmiConstraint = function ($value, $context) use ($form) {
                 $bmi = round(self::calculateBmi($form->getData()->height, $form->getData()->weight), 1);
                 if ($bmi != false && ($bmi < 5 || $bmi > 125)) {
                     $context->buildViolation('This height/weight combination has yielded an invalid BMI')->addViolation();
@@ -248,7 +248,7 @@ class Evaluation
                     $compareType = $field->compare->type;
                     $compareField = $field->compare->field;
                     $compareMessage = $field->compare->message;
-                    $callback = function($value, $context, $replicate) use ($form, $compareField, $compareType, $compareMessage) {
+                    $callback = function ($value, $context, $replicate) use ($form, $compareField, $compareType, $compareMessage) {
                         $compareTo = $form->getData()->$compareField;
                         if (!isset($compareTo[$replicate])) {
                             return;
@@ -310,8 +310,7 @@ class Evaluation
                 if (is_null($this->data->$key)) {
                     $dataArray = array_fill(0, $field->replicates, null);
                     $this->data->$key = $dataArray;
-                }
-                elseif (!is_null($this->data->$key) && !is_array($this->data->$key)) {
+                } elseif (!is_null($this->data->$key) && !is_array($this->data->$key)) {
                     $dataArray = array_fill(0, $field->replicates, null);
                     $dataArray[0] = $this->data->$key;
                     $this->data->$key = $dataArray;

@@ -1,19 +1,13 @@
 <?php
 namespace Pmi\Order;
 
-use Silex\Application;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
-use Pmi\Util;
 use Pmi\Audit\Log;
 
 class Order
 {
-    protected $app;
-    protected $order;
-    protected $participant;
-    public $version = 2;
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
     const ORDER_ACTIVE = 'active';
@@ -23,18 +17,16 @@ class Order
     const ORDER_EDIT = 'edit';
     const ORDER_REVERT = 'revert';
 
-    // These labels are a fallback - when displayed, they should be using the
-    // sample information below to render a table with more information
+    protected $app;
+    protected $order;
+    protected $participant;
 
     public $samples;
-
     public $samplesInformation;
-
     public $salivaSamples;
-
     public $salivaSamplesInformation;
-
     public $salivaInstructions;
+    public $version = 2;
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL', '1SAL2'];
 
@@ -130,7 +122,7 @@ class Order
         }
         $this->samplesInformation = $schema['samplesInformation'];
         $samples = [];
-        foreach($this->samplesInformation as $sample => $info) {
+        foreach ($this->samplesInformation as $sample => $info) {
             $label = "({$info['number']}) {$info['label']} [{$sample}]";
             $samples[$label] = $sample;
         }
@@ -138,7 +130,7 @@ class Order
 
         $this->salivaSamplesInformation = $schema['salivaSamplesInformation'];
         $salivaSamples = [];
-        foreach($this->salivaSamplesInformation as $salivaSample => $info) {
+        foreach ($this->salivaSamplesInformation as $salivaSample => $info) {
             $salivaSamples[$info['label']] = $salivaSample;
             $this->salivaSamplesInformation[$salivaSample]['sampleId'] = $salivaSample;
         }
@@ -153,7 +145,7 @@ class Order
     {
         foreach ($this->samplesInformation as $sample => $sampleInformation) {
             $sampleId = $sample;
-            if (isset($sampleInformation['icodeSwingingBucket'])){
+            if (isset($sampleInformation['icodeSwingingBucket'])) {
                 // For custom order creation (always display swinging bucket i-test codes)
                 if (empty($this->order)) {
                     $sampleId = $sampleInformation['icodeSwingingBucket'];
@@ -235,7 +227,7 @@ class Order
             'collect' => 'collected',
             'process' => 'processed',
             'finalize' => 'finalized',
-            'printRequisition' => 'finalized'        
+            'printRequisition' => 'finalized'
         ];
         if ($this->order['type'] === 'kit') {
             unset($columns['printLabels']);
@@ -442,7 +434,7 @@ class Order
                 'choices' => $samples,
                 'required' => false,
                 'disabled' => $samplesDisabled,
-                'choice_attr' => function($val) use ($enabledSamples, $set) {
+                'choice_attr' => function ($val) use ($enabledSamples, $set) {
                     $attr = [];
                     if ($set === 'finalized') {
                         $collectedSamples = json_decode($this->order['collected_samples'], true);
@@ -516,7 +508,7 @@ class Order
                         'disabled' => $disabled,
                         'choices' => [
                             '-- Select centrifuge type --' => null,
-                            'Fixed Angle'=> self::FIXED_ANGLE,
+                            'Fixed Angle' => self::FIXED_ANGLE,
                             'Swinging Bucket' => self::SWINGING_BUCKET
                         ],
                         'multiple' => false,
@@ -587,12 +579,12 @@ class Order
         }
         if ($this->app) {
             if (!$this->app->getConfig('ml_mock_order') && $this->order['mayo_id'] != 'pmitest') {
-                $identifiers[] =[
+                $identifiers[] = [
                     'system' => 'https://orders.mayomedicallaboratories.com',
                     'value' => $this->order['mayo_id']
                 ];
             } else {
-                $identifiers[] =[
+                $identifiers[] = [
                     'system' => 'https://orders.mayomedicallaboratories.com',
                     'value' => 'PMITEST-' . $this->order['order_id']
                 ];
@@ -884,11 +876,11 @@ class Order
         return [
             'author' => [
                 'system' => 'https://www.pmi-ops.org/healthpro-username',
-                'value' => $user                  
+                'value' => $user
             ],
             'site' => [
                 'system' => 'https://www.pmi-ops.org/site-id',
-                'value' => $site                    
+                'value' => $site
             ]
         ];
     }
@@ -948,7 +940,7 @@ class Order
                 $errors['sal'] = 'SAL Processing Time is before Collection Time';
             }
         }
-        return $errors;        
+        return $errors;
     }
 
     public function getProcessTabClass()
@@ -1022,7 +1014,7 @@ class Order
     public function getUrineSample()
     {
         foreach ($this->samples as $sample) {
-            if (in_array($sample , Order::$nonBloodSamples)) {
+            if (in_array($sample, Order::$nonBloodSamples)) {
                 return $sample;
             }
         }
@@ -1033,9 +1025,9 @@ class Order
     {
         $length = 10;
         // Avoid leading 0s
-        $id = (string)rand(1,9);
+        $id = (string)rand(1, 9);
         for ($i = 0; $i < $length - 1; $i++) {
-            $id .= (string)rand(0,9);
+            $id .= (string)rand(0, 9);
         }
         return $id;
     }
