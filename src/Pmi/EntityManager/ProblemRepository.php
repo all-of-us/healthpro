@@ -19,7 +19,7 @@ class ProblemRepository extends DoctrineRepository
         return $this->dbal->fetchAll($problemsQuery);
     }
 
-    public function getParticipantProblemsWithCommentsCount($id)
+    public function getParticipantProblemsWithCommentsCount($participantId)
     {
         $problemsQuery = "
             SELECT p.id, 
@@ -34,7 +34,7 @@ class ProblemRepository extends DoctrineRepository
             ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC
         ";
         return $this->dbal->fetchAll($problemsQuery, [
-            'participantId' => $id
+            'participantId' => $participantId
         ]);
     }
 }

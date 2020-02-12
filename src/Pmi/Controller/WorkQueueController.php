@@ -498,11 +498,8 @@ class WorkQueueController extends AbstractController
         }
 
         $evaluations = $app['em']->getRepository('evaluation_repository')->getEvaluationsWithHistory($id);
-
         $orders = $app['em']->getRepository('order_repository')->getParticipantOrdersWithHistory($id);
-
-        $query = "SELECT p.id, p.updated_ts, p.finalized_ts, MAX(pc.created_ts) as last_comment_ts, count(pc.comment) as comment_count FROM problems p LEFT JOIN problem_comments pc on p.id = pc.problem_id WHERE p.participant_id = ? GROUP BY p.id ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC";
-        $problems = $app['db']->fetchAll($query, [$id]);
+        $problems = $app['em']->getRepository('problem_repository')->getParticipantProblemsWithCommentsCount($id);
 
         return $app['twig']->render('workqueue/participant.html.twig',[
             'participant' => $participant,
