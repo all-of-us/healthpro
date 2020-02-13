@@ -224,7 +224,7 @@ class DashboardController extends AbstractController
      */
     public function ehrCharacterizationDataAction(Application $app, Request $request)
     {
-        $rootPath = $app->getConfig('rdr_curation_report_path');
+        $rootPath = $app->getConfig('curation_ehr_report_path');
         preg_match('/https\:\/\/storage\.googleapis\.com\/(.*)\.appspot\.com\/(.*)/i', $rootPath, $matches);
         $bucket = $matches[2];
 
@@ -1487,7 +1487,7 @@ class DashboardController extends AbstractController
             'suppressKeyFileNotice' => true
         ]);
 
-        $rootPath = $app->getConfig('rdr_curation_report_path');
+        $rootPath = $app->getConfig('curation_ehr_report_path');
         preg_match('/https\:\/\/storage\.googleapis\.com\/(.*)\.appspot\.com\/(.*)/i', $rootPath, $matches);
         $bucket = $matches[2];
 

@@ -20,7 +20,9 @@ mysql_host: healthpro-mysql
 #   Note: Store service account key in rdr_key.json
 # Override API endpoint if necessary
 # rdr_endpoint: https://pmi-drc-api-test.appspot.com/
-# rdr_curation_report_path: https://storage.googleapis.com/pmi-drc-api-test.appspot.com/transfer-bucket-name
+
+# Curation Data Sources
+# curation_ehr_report_path: https://storage.googleapis.com/PROJECT_NAME.appspot.com/BUCKET_NAME
 
 #
 # MayoLINK configuration
