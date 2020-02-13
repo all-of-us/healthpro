@@ -5,9 +5,9 @@ $(document).ready(function() {
     }
 
     var checkFilters = function () {
-        if ($('#filters select[name=withdrawalStatus]').val() == 'NO_USE') {
-            $('#filters select').not('[name=withdrawalStatus], [name=organization]').val('');
-            $('#filters select').not('[name=withdrawalStatus], [name=organization]').prop('disabled', true);
+        if ($('#filters select[name=activityStatus]').val() == 'withdrawn') {
+            $('#filters select').not('[name=activityStatus], [name=organization]').val('');
+            $('#filters select').not('[name=activityStatus], [name=organization]').prop('disabled', true);
         } else {
             $('#filters select').prop('disabled', false);
         }
@@ -76,7 +76,7 @@ $(document).ready(function() {
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
       { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
-      { name: 'withdrawal', data: 'withdrawal', class: 'text-center' },
+      { name: 'activityStatus', data: 'activityStatus', class: 'text-center', orderable: false },
       { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
       { name: 'patientStatusYes', visible: false, data: 'patientStatusYes', orderable: false },
       { name: 'patientStatusNo', visible: false, data: 'patientStatusNo', orderable: false },
@@ -136,7 +136,7 @@ $(document).ready(function() {
         columns: tableColumns,
         pageLength: 25,
         createdRow: function(row, data) {
-            if (data.withdrawal) {
+            if (data.withdrawalStatus === 'NO_USE') {
                 $(row).addClass('tr-withdrawn');
             }
         },

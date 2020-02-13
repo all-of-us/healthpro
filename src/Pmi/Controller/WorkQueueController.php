@@ -47,10 +47,10 @@ class WorkQueueController extends AbstractController
             $next = false;
         }
 
-        // Unset other params when withdrawal status is NO_USE
-        if (isset($params['withdrawalStatus']) && $params['withdrawalStatus'] === 'NO_USE') {
+        // Unset other params when activity status is withdrawn
+        if (isset($params['activityStatus']) && $params['activityStatus'] === 'withdrawn') {
             foreach ($params as $key => $value) {
-                if ($key === 'withdrawalStatus' || $key === 'organization') {
+                if ($key === 'activityStatus' || $key === 'organization') {
                     continue;
                 }
                 unset($params[$key]);
@@ -67,8 +67,17 @@ class WorkQueueController extends AbstractController
         }
 
         //Pass filter params
-        if (!empty($params['withdrawalStatus'])) {
-            $rdrParams['withdrawalStatus'] = $params['withdrawalStatus'];
+        if (!empty($params['activityStatus'])) {
+            if ($params['activityStatus'] === 'withdrawn') {
+                $rdrParams['withdrawalStatus'] = 'NO_USE';
+            } else {
+                $rdrParams['withdrawalStatus'] = 'NOT_WITHDRAWN';
+                if ($params['activityStatus'] === 'active') {
+                    $rdrParams['suspensionStatus'] = 'NOT_SUSPENDED';
+                } elseif ($params['activityStatus'] === 'deactivated') {
+                    $rdrParams['suspensionStatus'] = 'NO_CONTACT';
+                }
+            }
         }
         if (!empty($params['enrollmentStatus'])) {
             $rdrParams['enrollmentStatus'] = $params['enrollmentStatus'];
@@ -344,6 +353,10 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Core Participant Date';
             }
             $headers[] = 'Participant Origination';
+            if ($hasFullDataAccess) {
+                $headers[] = 'Deactivation Status';
+                $headers[] = 'Deactivation Date';
+            }
             fputcsv($output, $headers);
 
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
@@ -425,6 +438,10 @@ class WorkQueueController extends AbstractController
                         $row[] = $participant->enrollmentStatusCoreStoredSampleTime;
                     }
                     $row[] = $participant->participantOrigin;
+                    if ($hasFullDataAccess) {
+                        $row[] = $participant->isSuspended ? '1' : '0';
+                        $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
+                    }
                     fputcsv($output, $row);
                 }
                 unset($participants);

@@ -77,8 +77,7 @@ class CronController extends AbstractController
             return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
         }
         $siteSync = new SiteSyncService($app);
-        $isProd = $app->isProd();
-        $siteSync->sync($isProd);
+        $siteSync->sync();
         return (new JsonResponse())->setData(true);
     }
 

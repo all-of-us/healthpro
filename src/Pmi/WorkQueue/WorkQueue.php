@@ -9,6 +9,7 @@ class WorkQueue
     const HTML_SUCCESS = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
     const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
     const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
+    const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
 
     protected $app;
 
@@ -94,11 +95,13 @@ class WorkQueue
     ];
 
     public static $filters = [
-        'withdrawalStatus' => [
-            'label' => 'Withdrawal Status',
+        'activityStatus' => [
+            'label' => 'Activity Status',
             'options' => [
-                'Withdrawn' => 'NO_USE',
-                'Not withdrawn' => 'NOT_WITHDRAWN'
+                'Active' => 'active',
+                'Deactivated' => 'deactivated',
+                'Withdrawn' => 'withdrawn',
+                'Not Withdrawn' => 'not_withdrawn'
             ]
         ],
         'enrollmentStatus' => [
@@ -304,11 +307,8 @@ class WorkQueue
             $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsAuthored, true, true);
             $row['dvEhrStatus'] = $this->displayStatus($participant->consentForDvElectronicHealthRecordsSharing, 'SUBMITTED', $participant->consentForDvElectronicHealthRecordsSharingAuthored, true, true);
             $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRAuthored, true);
-            if ($participant->withdrawalStatus == 'NO_USE') {
-                $row['withdrawal'] = self::HTML_DANGER . ' <span class="text-danger">No Use</span> - ' . self::dateFromString($participant->withdrawalAuthored, $app->getUserTimezone());
-            } else {
-                $row['withdrawal'] = '';
-            }
+            $row['activityStatus'] = $this->getActivityStatus($participant);
+            $row['withdrawalStatus'] = $participant->withdrawalStatus; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
 
             //Contact
@@ -462,5 +462,19 @@ class WorkQueue
             }
         }
         return implode('; ', $organizations);
+    }
+
+    public function getActivityStatus($participant)
+    {
+        switch ($participant->activityStatus) {
+            case 'withdrawn':
+                return self::HTML_DANGER . '<span class="text-danger"> Withdrawn </span>' . self::dateFromString($participant->withdrawalAuthored, $this->app->getUserTimezone());
+            case 'active':
+                return self::HTML_SUCCESS . ' Active';
+            case 'deactivated':
+                return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
+            default:
+                return '';
+        }
     }
 }
