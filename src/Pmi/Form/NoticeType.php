@@ -34,13 +34,14 @@ class NoticeType extends AbstractType
             ])
             ->add('message', Type\TextareaType::class, [
                 'required' => true,
+                'attr' => ['rows' => 4],
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
                 ]
             ])
             ->add('full_page', Type\ChoiceType::class, [
-                'label' => 'Full Page?',
+                'label' => 'Take Page/Application Down?',
                 'required' => true,
                 'choices' => [
                     'No'=> 0,

@@ -1,10 +1,15 @@
 {% extends 'base.html.twig' %}
 {% block title %}Participants - {% endblock %}
 {% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li><a href="{{ path('admin_home') }}">Admin</a></li>
+        <li><a href="{{ path('admin_participants') }}">Participant Summary Lookup</a></li>
+        <li class="active">{{ participant.participantId|default('Participant') }}</li>
+    </ol>
     <div class="page-header">
         <h2><i class="fa fa-user" aria-hidden="true"></i> RDR Participant Summary Details</h2>
     </div>
-    <a href="{{ path('admin_participants') }}" class="pull-right">Return to Participant Summary Lookup</a>
     <table class="table table-bordered table-striped">
         {% for key,value in participant %}
             <tr>

@@ -88,3 +88,7 @@ workqueue_export_page_size: 1000
 
 # Datastore clean up limit
 ds_clean_up_limit:
+
+# Stable default MayoLink account numbers
+ml_account_hpo:
+ml_account_dv:

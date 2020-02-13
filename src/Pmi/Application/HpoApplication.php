@@ -8,6 +8,7 @@ use Pmi\Security\UserProvider;
 use Pmi\Audit\Log;
 use Pmi\Service\NoticeService;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
+use Pmi\Security\User;
 
 class HpoApplication extends AbstractApplication
 {
@@ -256,12 +257,18 @@ class HpoApplication extends AbstractApplication
     {
         $roles = $user->getRoles();
         if ($this['session']->has('site')) {
-            if(($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
+            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
                 unset($roles[$key]);
             }
         }
         if ($this['session']->has('awardee')) {
-            if(($key = array_search('ROLE_USER', $roles)) !== false) {
+            if (($key = array_search('ROLE_USER', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if ($this->getAwardeeId() !== User::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
                 unset($roles[$key]);
             }
         }

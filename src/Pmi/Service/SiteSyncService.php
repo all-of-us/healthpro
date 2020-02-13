@@ -48,12 +48,12 @@ class SiteSyncService
         return str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
     }
 
-    public function dryRun($isProd)
+    public function dryRun()
     {
-        return $this->sync($isProd, true);
+        return $this->sync(true);
     }
 
-    public function sync($isProd, $preview = false)
+    public function sync($preview = false)
     {
         $sitesCount = 0;
         $created = [];
@@ -88,12 +88,24 @@ class SiteSyncService
                     $siteData['site_id'] = $siteId;
                     $siteData['organization_id'] = $organization->id;
                     $siteData['awardee_id'] = $awardee->id;
-                    if ($isProd) {
+                    if ($this->app->isProd()) {
                         $siteData['mayolink_account'] = isset($site->mayolinkClientNumber) ? $site->mayolinkClientNumber : null;
+                    } elseif ($this->app->isStable()) {
+                        if (strtolower($awardee->type) === 'dv') {
+                            // Set to default dv account number if existing mayo account number is empty or equal to default hpo account number
+                            if (empty($existing['mayolink_account']) || ($existing['mayolink_account'] === $this->app->getConfig('ml_account_hpo'))) {
+                                $siteData['mayolink_account'] = $this->app->getConfig('ml_account_dv');
+                            }
+                        } else {
+                            // Set to default hpo account number if existing mayo account number is empty or equal to default dv account number
+                            if (empty($existing['mayolink_account']) || ($existing['mayolink_account'] === $this->app->getConfig('ml_account_dv'))) {
+                                $siteData['mayolink_account'] = $this->app->getConfig('ml_account_hpo');
+                            }
+                        }
                     }
                     $siteData['timezone'] = isset($site->timeZoneId) ? $site->timeZoneId : null;
                     $siteData['type'] = $awardee->type;
-                    if ($isProd) {
+                    if ($this->app->isProd()) {
                         if (isset($site->adminEmails) && is_array($site->adminEmails)) {
                             $siteData['email'] = join(', ', $site->adminEmails);
                         } else {

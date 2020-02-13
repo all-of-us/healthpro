@@ -57,8 +57,7 @@ class AdminController extends AbstractController
     public function siteSyncAction(Application $app, Request $request)
     {
         $siteSync = new SiteSyncService($app);
-        $isProd = $app->isProd();
-        $preview = $siteSync->dryRun($isProd);
+        $preview = $siteSync->dryRun();
 
         if (!$app->getConfig('sites_use_rdr')) {
             $formView = false;
@@ -70,7 +69,7 @@ class AdminController extends AbstractController
                     $siteSync->syncAwardees();
                     $siteSync->syncOrganizations();
                 } else {
-                    $siteSync->sync($isProd);
+                    $siteSync->sync();
                 }
                 $app->addFlashSuccess('Successfully synced');
                 return $app->redirectToRoute('admin_sites');
@@ -393,6 +392,15 @@ class AdminController extends AbstractController
                     if ($rdrId = $app['pmi.drc.participants']->createOrder($order['participant_id'], $orderRdrObject)) {
                         $repository->update($order['id'], ['rdr_id' => $rdrId]);
                         $app->addFlashSuccess("#{$id} successfully sent to RDR");
+                    } elseif ($app['pmi.drc.participants']->getLastErrorCode() === 409) {
+                        $rdrOrder = $app['pmi.drc.participants']->getOrder($order['participant_id'], $order['mayo_id']);
+                        // Check if order exists in RDR
+                        if (!empty($rdrOrder) && $rdrOrder->id === $order['mayo_id']) {
+                            $repository->update($order['id'], ['rdr_id' => $order['mayo_id']]);
+                            $app->addFlashSuccess("#{$id} successfully reconciled");
+                        } else {
+                            $app->addFlashError("#{$id} failed to finalize: " . $app['pmi.drc.participants']->getLastError());
+                        }
                     } else {
                         $app->addFlashError("#{$id} failed sending to RDR: " . $app['pmi.drc.participants']->getLastError());
                     }

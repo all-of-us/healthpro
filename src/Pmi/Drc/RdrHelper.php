@@ -11,6 +11,7 @@ class RdrHelper
     protected $cacheEnabled = true;
     protected $cacheTime = 300;
     protected $lastError;
+    protected $lastErrorCode;
     protected $disableTestAccess = false;
     protected $logger;
     protected $cache;
@@ -96,6 +97,7 @@ class RdrHelper
             $this->logger->info("Response code: {$responseCode}");
             $this->logger->info("Response body: {$contents}");
             $this->lastError = $contents;
+            $this->lastErrorCode = $responseCode;
         } else {
             // No response - request probably timed out
             $this->logger->error($e->getMessage());
@@ -105,6 +107,11 @@ class RdrHelper
     public function getLastError()
     {
         return $this->lastError;
+    }
+
+    public function getLastErrorCode()
+    {
+        return $this->lastErrorCode;
     }
 
     public function getDisableTestAccess()
