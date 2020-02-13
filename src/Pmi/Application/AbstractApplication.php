@@ -277,14 +277,27 @@ abstract class AbstractApplication extends Application
     public function getGoogleServiceClass()
     {
         return $this['isUnitTest'] ? 'Tests\Pmi\GoogleUserService' :
-            'google\appengine\api\users\UserService';
+            'Pmi\Service\MockGoogleUserService';
+    }
+
+    /** For local development. */
+    public function setMockUser($email)
+    {
+        $cls = $this->getGoogleServiceClass();
+        if (class_exists($cls)) {
+            $cls::setMockUser($email);
+        }
     }
 
     public function getGoogleUser()
     {
         if ($this->getConfig('gae_auth')) {
-            $cls = $this->getGoogleServiceClass();
-            return class_exists($cls) ? $cls::getCurrentUser() : null;
+            if ($this['session']->has('mockUser')) {
+                return $this['session']->get('mockUser');
+            } else {
+                $cls = $this->getGoogleServiceClass();
+                return class_exists($cls) ? $cls::getCurrentUser() : null;
+            }
         } else {
             return $this['session']->get('googleUser');
         }
@@ -300,16 +313,6 @@ abstract class AbstractApplication extends Application
         } else {
             // http://stackoverflow.com/a/14831349/1402028
             return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
-        }
-    }
-
-    public function getGoogleLoginUrl($route = 'home')
-    {
-        $dest = $this->generateUrl($route, [], true);
-
-        if ($this->getConfig('gae_auth')) {
-            $cls = $this->getGoogleServiceClass();
-            return class_exists($cls) ? $cls::createLoginURL($dest) : null;
         }
     }
 

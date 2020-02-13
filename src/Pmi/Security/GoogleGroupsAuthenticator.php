@@ -60,6 +60,11 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     /** This runs on every request. */
     public function getCredentials(Request $request)
     {
+        // Set mock user for local development
+        if ($this->app->getConfig('gae_auth') && $request->query->has('user') && !$request->getSession()->has('mockUser')) {
+            $this->app->setMockUser($request->query->get('user'));
+            $this->app['session']->set('mockUser', $this->app->getGoogleUser());
+        }
         // if the user is already authenticated, then don't re-authenticate
         if ($request->getSession()->has('isLogin') && $this->app['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
             $user = $this->app['security.token_storage']->getToken()->getUser();
@@ -143,7 +148,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             $params = ['logoutUrl' => $this->app->getGoogleLogoutUrl()];
         } elseif ($this->app->getConfig('gae_auth')) {
             $template = 'error-gae-auth.html.twig';
-            $params = ['loginUrl' => $this->app->getGoogleLoginUrl()];
+            $params = [];
         } else {
             $template = $this->app['errorTemplate'];
             $params = ['code' => $code];
