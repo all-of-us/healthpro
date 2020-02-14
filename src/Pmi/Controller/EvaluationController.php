@@ -359,7 +359,7 @@ class EvaluationController extends AbstractController
                 $app->addFlashError('Please correct the errors below');
             }
         }
-        $evaluations = $app['em']->getRepository('evaluation_repository')->getEvaluationsWithHistory($participantId);
+        $evaluations = $app['em']->getRepository('evaluations')->getEvaluationsWithHistory($participantId);
         return $app['twig']->render('evaluation-modify.html.twig', [
             'participant' => $participant,
             'evaluation' => $evaluation,

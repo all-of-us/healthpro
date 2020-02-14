@@ -88,8 +88,8 @@ class ReviewController extends AbstractController
             $app->addFlashError('You must select a valid site');
             return $app->redirectToRoute('home');
         }
-        $unlockedOrders = $app['em']->getRepository('order_repository')->getSiteUnlockedOrders($app->getSiteId());
-        $unfinalizedOrders = $app['em']->getRepository('order_repository')->getSiteUnfinalizedOrders($app->getSiteId());
+        $unlockedOrders = $app['em']->getRepository('orders')->getSiteUnlockedOrders($app->getSiteId());
+        $unfinalizedOrders = $app['em']->getRepository('orders')->getSiteUnfinalizedOrders($app->getSiteId());
         $orders = array_merge($unlockedOrders, $unfinalizedOrders);
         return $app['twig']->render('review/orders.html.twig', [
             'orders' => $orders
@@ -103,7 +103,7 @@ class ReviewController extends AbstractController
             $app->addFlashError('You must select a valid site');
             return $app->redirectToRoute('home');
         }
-        $measurements = $app['em']->getRepository('evaluation_repository')->getSiteUnfinalizedEvaluations($site);
+        $measurements = $app['em']->getRepository('evaluations')->getSiteUnfinalizedEvaluations($site);
 
         return $app['twig']->render('review/measurements.html.twig', [
             'measurements' => $measurements
@@ -117,7 +117,7 @@ class ReviewController extends AbstractController
             $app->addFlashError('You must select a valid site');
             return $app->redirectToRoute('home');
         }
-        $recentModifyMeasurements = $app['em']->getRepository('evaluation_repository')->getSiteRecentModifiedEvaluations($site);
+        $recentModifyMeasurements = $app['em']->getRepository('evaluations')->getSiteRecentModifiedEvaluations($site);
         return $app['twig']->render('review/measurements-recent-modify.html.twig', [
             'measurements' => $recentModifyMeasurements
         ]);
@@ -130,7 +130,7 @@ class ReviewController extends AbstractController
             $app->addFlashError('You must select a valid site');
             return $app->redirectToRoute('home');
         }
-        $recentModifyOrders = $app['em']->getRepository('order_repository')->getSiteRecentModifiedOrders($app->getSiteId());
+        $recentModifyOrders = $app['em']->getRepository('orders')->getSiteRecentModifiedOrders($app->getSiteId());
         return $app['twig']->render('review/orders-recent-modify.html.twig', [
             'orders' => $recentModifyOrders
         ]);

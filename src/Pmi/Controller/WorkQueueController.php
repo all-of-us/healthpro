@@ -497,9 +497,9 @@ class WorkQueueController extends AbstractController
             $app->abort(403);
         }
 
-        $evaluations = $app['em']->getRepository('evaluation_repository')->getEvaluationsWithHistory($id);
-        $orders = $app['em']->getRepository('order_repository')->getParticipantOrdersWithHistory($id);
-        $problems = $app['em']->getRepository('problem_repository')->getParticipantProblemsWithCommentsCount($id);
+        $evaluations = $app['em']->getRepository('evaluations')->getEvaluationsWithHistory($id);
+        $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($id);
+        $problems = $app['em']->getRepository('problems')->getParticipantProblemsWithCommentsCount($id);
 
         return $app['twig']->render('workqueue/participant.html.twig',[
             'participant' => $participant,

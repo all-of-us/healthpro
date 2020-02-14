@@ -15,7 +15,7 @@ class ProblemReportController extends ProblemController
 
     public function reportsAction(Application $app, Request $request)
     {
-        $problems = $app['em']->getRepository('problem_repository')->getProblemsWithCommentsCount();
+        $problems = $app['em']->getRepository('problems')->getProblemsWithCommentsCount();
 
         return $app['twig']->render('problem-reports.html.twig', [
             'problems' => $problems,

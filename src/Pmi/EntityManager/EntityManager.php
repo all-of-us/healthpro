@@ -9,9 +9,9 @@ class EntityManager
 
     // Define custom repositories
     protected $entities = [
-        'order_repository' => 'OrderRepository',
-        'evaluation_repository' => 'EvaluationRepository',
-        'problem_repository' => 'ProblemRepository'
+        'orders' => 'Order',
+        'evaluations' => 'Evaluation',
+        'problems' => 'Problem'
     ];
 
     protected $timezone;
@@ -26,7 +26,7 @@ class EntityManager
             throw new \Exception('No DBAL available');
         }
         if (isset($this->entities[$entity])) {
-            $repository = __NAMESPACE__ . '\\' . $this->entities[$entity];
+            $repository = __NAMESPACE__ . '\\' . $this->entities[$entity] . 'Repository';
             return new $repository($this->dbal, $entity, $this->getTimezone());
         } else {
             return new DoctrineRepository($this->dbal, $entity, $this->getTimezone());

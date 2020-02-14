@@ -407,9 +407,9 @@ class DefaultController extends AbstractController
             ]);
         }
 
-        $evaluations = $app['em']->getRepository('evaluation_repository')->getEvaluationsWithHistory($id);
-        $orders = $app['em']->getRepository('order_repository')->getParticipantOrdersWithHistory($id);
-        $problems = $app['em']->getRepository('problem_repository')->getParticipantProblemsWithCommentsCount($id);
+        $evaluations = $app['em']->getRepository('evaluations')->getEvaluationsWithHistory($id);
+        $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($id);
+        $problems = $app['em']->getRepository('problems')->getParticipantProblemsWithCommentsCount($id);
 
         if (empty($participant->cacheTime)) {
             $participant->cacheTime = new \DateTime();
