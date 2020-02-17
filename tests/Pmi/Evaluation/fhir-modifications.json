@@ -7,17 +7,21 @@
                 "author": [
                     {
                         "reference": "Practitioner\/test@example.com",
-                        "extension": {
-                            "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/authoring-step",
-                            "valueCode": "created"
-                        }
+                        "extension": [
+                            {
+                                "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/authoring-step",
+                                "valueCode": "created"
+                            }
+                        ]
                     },
                     {
                         "reference": "Practitioner\/test@example.com",
-                        "extension": {
-                            "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/authoring-step",
-                            "valueCode": "finalized"
-                        }
+                        "extension": [
+                            {
+                                "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/authoring-step",
+                                "valueCode": "finalized"
+                            }
+                        ]
                     }
                 ],
                 "date": "2017-01-01T00:00:00Z",
