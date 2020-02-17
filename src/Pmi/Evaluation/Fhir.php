@@ -166,17 +166,17 @@ class Fhir
                 'author' => [
                     [
                         'reference' => "Practitioner/{$this->createdUser}",
-                        'extension' => [
+                        'extension' => [[
                             'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
                             'valueCode' => "created"
-                        ]
+                        ]]
                     ],
                     [
                         'reference' => "Practitioner/{$this->finalizedUser}",
-                        'extension' => [
+                        'extension' => [[
                             'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
                             'valueCode' => "finalized"
-                        ]
+                        ]]
                     ]
                 ],
                 'date' => $this->date,
