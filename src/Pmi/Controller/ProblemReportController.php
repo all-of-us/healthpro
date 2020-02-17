@@ -15,13 +15,7 @@ class ProblemReportController extends ProblemController
 
     public function reportsAction(Application $app, Request $request)
     {
-        $query = "SELECT p.*,
-                    IFNULL(MAX(pc.created_ts), updated_ts) AS last_update_ts,
-                    count(pc.comment) AS comment_count
-                    FROM problems p LEFT JOIN problem_comments pc ON p.id = pc.problem_id
-                    GROUP BY p.id
-                    ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC";
-        $problems = $app['db']->fetchAll($query);
+        $problems = $app['em']->getRepository('problems')->getProblemsWithCommentsCount();
 
         return $app['twig']->render('problem-reports.html.twig', [
             'problems' => $problems,

@@ -131,8 +131,7 @@ class BiobankController extends AbstractController
             $app->abort(404);
         }
         $participant = $participant[0];
-        $order = new Order($app);
-        $orders = $order->getParticipantOrdersWithHistory($participant->id);
+        $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($participant->id);
 
         foreach ($orders as $key => $order) {
             // Display most recent processed sample time if exists
@@ -208,8 +207,7 @@ class BiobankController extends AbstractController
 
     public function ordersUnfinalizedAction(Application $app)
     {
-        $order = new Order($app);
-        $unfinalizedOrders = $order->getUnfinalizedOrders();
+        $unfinalizedOrders = $app['em']->getRepository('orders')->getUnfinalizedOrders();
         return $app['twig']->render('biobank/orders-unfinalized.html.twig', [
             'orders' => $unfinalizedOrders
         ]);
@@ -217,8 +215,7 @@ class BiobankController extends AbstractController
 
     public function ordersUnlockedAction(Application $app)
     {
-        $order = new Order($app);
-        $unlockedOrders = $order->getUnlockedOrders();
+        $unlockedOrders = $app['em']->getRepository('orders')->getUnlockedOrders();
         return $app['twig']->render('biobank/orders-unlocked.html.twig', [
             'orders' => $unlockedOrders
         ]);
@@ -226,8 +223,7 @@ class BiobankController extends AbstractController
 
     public function ordersRecentModifyAction(Application $app)
     {
-        $order = new Order($app);
-        $recentModifyOrders = $order->getRecentModifiedOrders();
+        $recentModifyOrders = $app['em']->getRepository('orders')->getRecentModifiedOrders();
         return $app['twig']->render('biobank/orders-recent-modify.html.twig', [
             'orders' => $recentModifyOrders
         ]);
