@@ -286,6 +286,7 @@ abstract class AbstractApplication extends Application
         $cls = $this->getGoogleServiceClass();
         if (class_exists($cls)) {
             $cls::setMockUser($email);
+            $this['session']->set('mockUser', $cls::getCurrentUser());
         }
     }
 
@@ -314,6 +315,13 @@ abstract class AbstractApplication extends Application
             // http://stackoverflow.com/a/14831349/1402028
             return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
         }
+    }
+
+    public  function getGoogleLoginUrl($route = 'home')
+    {
+        $dest = $this->generateUrl($route, [], true);
+        $cls = $this->getGoogleServiceClass();
+        return class_exists($cls) ? $cls::createLoginURL($dest) : null;
     }
 
     public function getUser()

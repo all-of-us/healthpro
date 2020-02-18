@@ -3,12 +3,6 @@
 {% block body %}
     <div class="alert alert-danger">
         <span class="glyphicon glyphicon-thumbs-down"></span>
-        <strong>Access denied!</strong> You are not logged into Google, please login.
+        <strong>Access denied!</strong> You are not logged into Google, please <a href="{{ loginUrl }}">login</a>.
     </div>
-
-    <form action="/" method="get">
-        <label>Email:</label>
-        <input type="text" name="user"/>
-        <input type="submit" value="Login"/>
-    </form>
 {% endblock %}

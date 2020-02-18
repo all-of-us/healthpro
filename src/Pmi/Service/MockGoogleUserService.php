@@ -23,4 +23,9 @@ class MockGoogleUserService
     {
         return $destination_url;
     }
+
+    public static function createLoginURL($destination_url)
+    {
+        return $destination_url . 'mock-login';
+    }
 }

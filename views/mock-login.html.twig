@@ -1,0 +1,12 @@
+
+{% block body %}
+    <div class="row">
+        <div class="col-sm-6">
+            <h3>Login</h3>
+            {{ form_start(loginForm, { attr: { class: 'prevent-resubmit' } }) }}
+            {{ form_widget(loginForm) }}
+            <p><button type="submit" class="btn btn-primary">Submit</button></p>
+            {{ form_end(loginForm) }}
+        </div>
+    </div>
+{% endblock %}
