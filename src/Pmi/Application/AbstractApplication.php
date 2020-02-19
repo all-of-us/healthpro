@@ -293,7 +293,12 @@ abstract class AbstractApplication extends Application
     public function getGoogleUser()
     {
         if ($this->isLocal() && $this->getConfig('gae_auth')) {
-            return $this['session']->get('mockUser');
+            if ($this['isUnitTest']) {
+                $cls = $this->getGoogleServiceClass();
+                return class_exists($cls) ? $cls::getCurrentUser() : null;
+            } else {
+                return $this['session']->get('mockUser');
+            }
         } else {
             return $this['session']->get('googleUser');
         }
