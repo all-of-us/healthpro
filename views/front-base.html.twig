@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ asset('dist/css/lib.min.css') }}?v={{ app.assetVer }}">
+    <link rel="stylesheet" href="{{ asset('dist/css/app.min.css') }}?v={{ app.assetVer }}">
+    <title>{% block title %}{% endblock %}HealthPro</title>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{{ path('home') }}">
+                <i class="fa fa-star" aria-hidden="true"></i> HealthPro
+            </a>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    {% block body %}{% endblock %}
+</div>
+<script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
+</body>
+</html>
