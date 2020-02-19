@@ -4,7 +4,6 @@ namespace Pmi\Service;
 
 use Pmi\Security\MockGoogleUser;
 
-/** Simulates GAE's UserService. */
 class MockGoogleUserService
 {
     private static $googleUser;
@@ -26,6 +25,6 @@ class MockGoogleUserService
 
     public static function createLoginURL($destination_url)
     {
-        return $destination_url . 'mock-login';
+        return $destination_url;
     }
 }

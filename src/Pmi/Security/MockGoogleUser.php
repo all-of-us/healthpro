@@ -2,7 +2,6 @@
 
 namespace Pmi\Security;
 
-/** Simulates GAE's User. */
 class MockGoogleUser
 {
     private $id;
@@ -22,5 +21,10 @@ class MockGoogleUser
     public function getEmail()
     {
         return $this->email;
+    }
+
+    public function getUserId()
+    {
+        return $this->id;
     }
 }

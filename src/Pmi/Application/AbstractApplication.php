@@ -292,13 +292,8 @@ abstract class AbstractApplication extends Application
 
     public function getGoogleUser()
     {
-        if ($this->getConfig('gae_auth')) {
-            if ($this['session']->has('mockUser')) {
-                return $this['session']->get('mockUser');
-            } else {
-                $cls = $this->getGoogleServiceClass();
-                return class_exists($cls) ? $cls::getCurrentUser() : null;
-            }
+        if ($this->isLocal() && $this->getConfig('gae_auth')) {
+            return $this['session']->get('mockUser');
         } else {
             return $this['session']->get('googleUser');
         }
@@ -308,7 +303,7 @@ abstract class AbstractApplication extends Application
     {
         $dest = $this->generateUrl($route, [], true);
 
-        if ($this->getConfig('gae_auth')) {
+        if ($this->isLocal() && $this->getConfig('gae_auth')) {
             $cls = $this->getGoogleServiceClass();
             return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
         } else {
