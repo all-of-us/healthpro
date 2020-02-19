@@ -4,7 +4,6 @@ namespace Pmi\Security;
 use Pmi\Application\AbstractApplication;
 use Pmi\Audit\Log;
 use Pmi\HttpClient;
-use Pmi\Util;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -143,7 +142,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             $params = ['logoutUrl' => $this->app->getGoogleLogoutUrl()];
         } elseif ($this->app->isLocal() && $this->app->getConfig('gae_auth')) {
             $template = 'error-gae-auth.html.twig';
-            $params = ['loginUrl' => $this->app->getGoogleLoginUrl('mockLogin')];
+            $params = [];
         } else {
             $template = $this->app['errorTemplate'];
             $params = ['code' => $code];

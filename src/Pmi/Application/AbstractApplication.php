@@ -10,7 +10,6 @@ use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Monolog\StackdriverHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
-use Pmi\Util;
 use Silex\Application;
 use Silex\Provider\CsrfServiceProvider;
 use Silex\Provider\FormServiceProvider;
@@ -20,7 +19,6 @@ use Silex\Provider\Routing\LazyRequestMatcher;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
-use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
@@ -309,19 +307,11 @@ abstract class AbstractApplication extends Application
         $dest = $this->generateUrl($route, [], true);
 
         if ($this->isLocal() && $this->getConfig('gae_auth')) {
-            $cls = $this->getGoogleServiceClass();
-            return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
+            return $this['isUnitTest'] ? null : $dest;
         } else {
             // http://stackoverflow.com/a/14831349/1402028
             return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
         }
-    }
-
-    public  function getGoogleLoginUrl($route = 'home')
-    {
-        $dest = $this->generateUrl($route, [], true);
-        $cls = $this->getGoogleServiceClass();
-        return class_exists($cls) ? $cls::createLoginURL($dest) : null;
     }
 
     public function getUser()

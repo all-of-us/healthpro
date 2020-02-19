@@ -20,14 +20,4 @@ class GoogleUserService
     {
         self::$googleUser = null;
     }
-    
-    public static function createLoginURL($destination_url = null, $federated_identity = null)
-    {
-        return null;
-    }
-    
-    public static function createLogoutURL($destination_url)
-    {
-        return null;
-    }
 }

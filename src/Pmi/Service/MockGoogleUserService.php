@@ -17,14 +17,4 @@ class MockGoogleUserService
     {
         self::$googleUser = new MockGoogleUser($email);
     }
-
-    public static function createLogoutURL($destination_url)
-    {
-        return $destination_url;
-    }
-
-    public static function createLoginURL($destination_url)
-    {
-        return $destination_url;
-    }
 }
