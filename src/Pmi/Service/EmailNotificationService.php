@@ -115,14 +115,11 @@ class EmailNotificationService
                     ]);
                 } else {
                     $message = new Message($this->app);
-                    $participantIds = array_map(function ($participant) {
-                        return $participant['id'];
-                    }, $participants);
                     $message
                         ->setTo($organization['emails'])
                         ->render($this->render, [
                             'organization' => $organization['id'],
-                            'participantIds' => $participantIds
+                            'participants' => $participants
                         ])
                         ->send();
                     $this->app->log($this->log, [
