@@ -294,8 +294,8 @@ class AdminController extends AbstractController
 
     public function deactivateNotificationsAction(Application $app)
     {
-        $withdrawal = new DeactivateService($app);
-        $notifications = $withdrawal->getDeactivateNotifications();
+        $deactivate = new DeactivateService($app);
+        $notifications = $deactivate->getDeactivateNotifications();
         return $app['twig']->render('admin/notifications/deactivate.html.twig', ['notifications' => $notifications]);
     }
 
