@@ -496,14 +496,10 @@ class WorkQueueController extends AbstractController
         if (!$app->hasRole('ROLE_AWARDEE_SCRIPPS') || !in_array($participant->awardee, $app->getAwardeeOrganization())) {
             $app->abort(403);
         }
-        $evaluation = new Evaluation($app);
-        $evaluations = $evaluation->getEvaluationsWithHistory($id);
 
-        $order = new Order($app);
-        $orders = $order->getParticipantOrdersWithHistory($id);
-
-        $query = "SELECT p.id, p.updated_ts, p.finalized_ts, MAX(pc.created_ts) as last_comment_ts, count(pc.comment) as comment_count FROM problems p LEFT JOIN problem_comments pc on p.id = pc.problem_id WHERE p.participant_id = ? GROUP BY p.id ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC";
-        $problems = $app['db']->fetchAll($query, [$id]);
+        $evaluations = $app['em']->getRepository('evaluations')->getEvaluationsWithHistory($id);
+        $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($id);
+        $problems = $app['em']->getRepository('problems')->getParticipantProblemsWithCommentsCount($id);
 
         return $app['twig']->render('workqueue/participant.html.twig',[
             'participant' => $participant,
