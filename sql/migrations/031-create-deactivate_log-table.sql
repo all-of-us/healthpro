@@ -6,7 +6,6 @@ CREATE TABLE `deactivate_log` (
   `hpo_id` varchar(100) DEFAULT NULL,
   `email_notified` varchar(2000) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `participant_id` (`participant_id`),
-  UNIQUE KEY `deactivate_ts` (`deactivate_ts`),
+  UNIQUE KEY (`participant_id`, `deactivate_ts`),
   KEY `hpo_id` (`hpo_id`)
 ) DEFAULT CHARSET=utf8mb4;
