@@ -1,4 +1,4 @@
-FROM php:7.2
+FROM gcr.io/gcp-runtimes/php72:2020-02-19-11-00
 
 # Fix for issue with OpenJDK install
 RUN mkdir -p /usr/share/man/man1
@@ -8,11 +8,9 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
       && apt-get update \
       && apt-get install -y --no-install-recommends \
         libpython2.7-stdlib \
-        default-mysql-client \
         git-all \
         nodejs \
-        openjdk-11-jdk \
-      && docker-php-ext-install pdo_mysql \
+        default-jre \
       && rm -rf /var/lib/apt/lists/*
 
 # Google Cloud Tools
