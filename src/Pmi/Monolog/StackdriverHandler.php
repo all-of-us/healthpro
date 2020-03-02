@@ -5,6 +5,7 @@ use Google\Cloud\Logging\LoggingClient;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use Monolog\Formatter\FormatterInterface;
 
 class StackdriverHandler extends AbstractProcessingHandler
 {
@@ -32,7 +33,7 @@ class StackdriverHandler extends AbstractProcessingHandler
         $this->stackdriverLogger = $stackdriverClient->logger($logName, $logOptions);
     }
 
-    protected function getDefaultFormatter()
+    protected function getDefaultFormatter() : FormatterInterface
     {
         $formatter = new LineFormatter("%message% %context%", null, true);
         $formatter->includeStacktraces();
@@ -72,7 +73,7 @@ class StackdriverHandler extends AbstractProcessingHandler
         return $this->stackdriverLogger->entry((string) $record['formatted'], $entryOptions);
     }
 
-    public function handleBatch(array $records)
+    public function handleBatch(array $records) : void
     {
         $entries = [];
         foreach ($records as $record) {
@@ -86,7 +87,7 @@ class StackdriverHandler extends AbstractProcessingHandler
         $this->stackdriverLogger->writeBatch($entries);
     }
 
-    protected function write(array $record)
+    protected function write(array $record) : void
     {
         $entry = $this->getEntryFromRecord($record);
         $this->stackdriverLogger->write($entry);
