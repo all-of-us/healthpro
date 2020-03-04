@@ -282,7 +282,7 @@ abstract class AbstractApplication extends Application
 
     public function getGoogleUser()
     {
-        if ($this->isLocal() && $this->getConfig('gae_auth')) {
+        if ($this->isLocal() && $this->getConfig('local_mock_auth')) {
             if ($this['isUnitTest']) {
                 return MockUserService::getCurrentUser();
             } else {
@@ -297,7 +297,7 @@ abstract class AbstractApplication extends Application
     {
         $dest = $this->generateUrl($route, [], true);
 
-        if ($this->isLocal() && $this->getConfig('gae_auth')) {
+        if ($this->isLocal() && $this->getConfig('local_mock_auth')) {
             return $this['isUnitTest'] ? null : $dest;
         } else {
             // http://stackoverflow.com/a/14831349/1402028
