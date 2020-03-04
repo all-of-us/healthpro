@@ -317,8 +317,8 @@ abstract class AbstractApplication extends Application
     public function getUser()
     {
         $token = $this['security.token_storage']->getToken();
-        if ($token) {
-            return is_object($token->getUser()) ? $token->getUser() : null;
+        if ($token && is_object($token->getUser())) {
+            return $token->getUser();
         }
         return null;
     }
