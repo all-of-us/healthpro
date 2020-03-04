@@ -26,6 +26,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Twig_SimpleFilter;
 use Twig_SimpleFunction;
+use Pmi\Service\MockUserService;
 
 abstract class AbstractApplication extends Application
 {
@@ -272,28 +273,18 @@ abstract class AbstractApplication extends Application
     /** Sets up authentication and firewall. */
     abstract protected function registerSecurity();
 
-    public function getGoogleServiceClass()
-    {
-        return $this['isUnitTest'] ? 'Tests\Pmi\GoogleUserService' :
-            'Pmi\Service\MockGoogleUserService';
-    }
-
     /** For local development. */
     public function setMockUser($email)
     {
-        $cls = $this->getGoogleServiceClass();
-        if (class_exists($cls)) {
-            $cls::setMockUser($email);
-            $this['session']->set('mockUser', $cls::getCurrentUser());
-        }
+        MockUserService::switchCurrentUser($email);
+        $this['session']->set('mockUser', MockUserService::getCurrentUser());
     }
 
     public function getGoogleUser()
     {
         if ($this->isLocal() && $this->getConfig('gae_auth')) {
             if ($this['isUnitTest']) {
-                $cls = $this->getGoogleServiceClass();
-                return class_exists($cls) ? $cls::getCurrentUser() : null;
+                return MockUserService::getCurrentUser();
             } else {
                 return $this['session']->get('mockUser');
             }

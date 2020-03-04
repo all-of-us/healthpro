@@ -2,7 +2,7 @@
 
 namespace Pmi\Security;
 
-class MockGoogleUser
+class MockUser
 {
     private $id;
     private $email;

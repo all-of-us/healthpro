@@ -1,7 +1,7 @@
 <?php
 use Pmi\Security\UserProvider;
 use Tests\Pmi\AbstractWebTestCase;
-use Tests\Pmi\GoogleUserService;
+use Pmi\Service\MockUserService;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class UserProviderTest extends AbstractWebTestCase
@@ -9,7 +9,7 @@ class UserProviderTest extends AbstractWebTestCase
     public function testLoadUserByUsername()
     {
         $email = 'test@testLoadUserByUsername.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         $provider = new UserProvider($this->app);
         $user = $provider->loadUserByUsername($email);
         $this->assertEquals($email, $user->getEmail());
@@ -22,7 +22,7 @@ class UserProviderTest extends AbstractWebTestCase
     public function testNoGoogleUser()
     {
         $email = 'test@testNoGoogleUser.com';
-        GoogleUserService::clearCurrentUser();
+        MockUserService::clearCurrentUser();
         $provider = new UserProvider($this->app);
         $caught = false; // because we don't have expectException
         try {
