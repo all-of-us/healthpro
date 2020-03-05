@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 use Pmi\Audit\Log;
 use Pmi\Service\WithdrawalService;
+use Pmi\Service\DeactivateService;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Order\Order;
 use Pmi\Service\SiteSyncService;
@@ -36,6 +37,7 @@ class AdminController extends AbstractController
             'method' => 'GET|POST'
         ]],
         ['withdrawalNotifications', '/notifications/withdrawal'],
+        ['deactivateNotifications', '/notifications/deactivate'],
         ['missingMeasurements', '/missing/measurements', ['method' => 'GET|POST']],
         ['missingOrders', '/missing/orders', ['method' => 'GET|POST']],
         ['notices', '/notices'],
@@ -288,6 +290,13 @@ class AdminController extends AbstractController
         $withdrawal = new WithdrawalService($app);
         $notifications = $withdrawal->getWithdrawalNotifications();
         return $app['twig']->render('admin/notifications/withdrawal.html.twig', ['notifications' => $notifications]);
+    }
+
+    public function deactivateNotificationsAction(Application $app)
+    {
+        $deactivate = new DeactivateService($app);
+        $notifications = $deactivate->getDeactivateNotifications();
+        return $app['twig']->render('admin/notifications/deactivate.html.twig', ['notifications' => $notifications]);
     }
 
     public function missingMeasurementsAction(Application $app, Request $request, $_route)

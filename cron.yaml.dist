@@ -7,6 +7,10 @@ cron:
   url: /cron/withdrawal
   schedule: every day 07:00
   timezone: America/Chicago
+- description: "Deactivate notification"
+  url: /cron/deactivate
+  schedule: every day 07:01
+  timezone: America/Chicago
 - description: "Missing measurements/orders notification"
   url: /cron/missing-measurements-orders
   schedule: every day 08:00
