@@ -601,6 +601,7 @@ abstract class AbstractApplication extends Application
             // http://symfony.com/doc/3.4/deployment/proxies.html#but-what-if-the-ip-of-my-reverse-proxy-changes-constantly
             $trustedProxies = ['127.0.0.1', $request->server->get('REMOTE_ADDR')];
             $originalTrustedProxies = Request::getTrustedProxies();
+            $originalTrustedHeaderSet = Request::getTrustedHeaderSet();
             // specififying HEADER_X_FORWARDED_FOR because App Engine 2nd Gen also adds a FORWARDED
             Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_FOR);
 
@@ -609,7 +610,7 @@ abstract class AbstractApplication extends Application
             $ip = array_pop($ips);
 
             // reset trusted proxies
-            Request::setTrustedProxies($originalTrustedProxies);
+            Request::setTrustedProxies($originalTrustedProxies, $originalTrustedHeaderSet);
 
             // identify cron user
             if ($user === null && $request->headers->get('X-Appengine-Cron') === 'true') {
