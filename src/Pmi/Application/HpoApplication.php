@@ -494,19 +494,21 @@ class HpoApplication extends AbstractApplication
     protected function afterCallback(Request $request, Response $response)
     {
         $this->setHeaders($response);
-    }
-    
-    protected function finishCallback(Request $request, Response $response)
-    {
+
         if ($this->isLoggedIn()) {
             // only the first route handled is considered a login
             $this['session']->set('isLogin', false);
-            
+
             // unset after the first route handled following loginReturn
             if (!$this->isUpkeepRoute($request)) {
                 $this['session']->set('isLoginReturn', false);
             }
         }
+    }
+    
+    protected function finishCallback(Request $request, Response $response)
+    {
+        // moved to afterCallBack to fix session start error
     }
 
     public function isValidSite($email)
