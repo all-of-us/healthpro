@@ -282,7 +282,7 @@ abstract class AbstractApplication extends Application
 
     public function getGoogleUser()
     {
-        if ($this->isLocal() && $this->getConfig('local_mock_auth')) {
+        if ($this->canMockLogin()) {
             if ($this['isUnitTest']) {
                 return MockUserService::getCurrentUser();
             } else {

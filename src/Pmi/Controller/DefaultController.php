@@ -575,7 +575,7 @@ class DefaultController extends AbstractController
 
     public function mockLoginAction(Application $app, Request $request)
     {
-        if (!$app->isLocal() && !$app->getConfig('local_mock_auth')){
+        if (!$app->canMockLogin()){
             return $app->abort(403);
         }
         $loginForm = $app['form.factory']->createNamedBuilder('login', FormType::class)

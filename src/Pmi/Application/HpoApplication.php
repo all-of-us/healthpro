@@ -648,4 +648,9 @@ class HpoApplication extends AbstractApplication
             $this['session']->remove('currentSiteDisplayName');
         }
     }
+
+    public function canMockLogin()
+    {
+        return $this->isLocal() && $this->getConfig('local_mock_auth');
+    }
 }

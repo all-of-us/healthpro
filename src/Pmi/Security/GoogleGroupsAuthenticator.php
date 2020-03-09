@@ -140,7 +140,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         } elseif ($exception->getMessage() === self::OAUTH_FAILURE_MESSAGE) {
             $template = 'error-oauth.html.twig';
             $params = ['logoutUrl' => $this->app->getGoogleLogoutUrl()];
-        } elseif ($this->app->isLocal() && $this->app->getConfig('local_mock_auth')) {
+        } elseif ($this->app->canMockLogin()) {
             $template = 'error-gae-auth.html.twig';
             $params = [];
         } else {
@@ -162,7 +162,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         // has the user agreed to the system usage agreement this session?
         $request->getSession()->set('isUsageAgreed', false);
         
-        if ($this->app->getConfig('local_mock_auth')) {
+        if ($this->app->canMockLogin()) {
             // simulate the OAuth workflow for more accurate testing
             $this->app['session']->set('loginDestUrl', $request->getRequestUri());
             return $this->app->redirectToRoute('loginReturn');
@@ -179,7 +179,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        if ($this->app->getConfig('local_mock_auth')) {
+        if ($this->app->canMockLogin()) {
             return $this->onAuthenticationFailure($request, $authException);
         } elseif (!$authException || $authException instanceof AuthenticationCredentialsNotFoundException) {
             $authState = sha1(openssl_random_pseudo_bytes(1024));
