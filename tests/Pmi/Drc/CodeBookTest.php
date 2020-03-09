@@ -1,7 +1,7 @@
 <?php
 use Pmi\Drc\CodeBook;
 
-class CodeBookTest extends \PHPUnit_Framework_TestCase
+class CodeBookTest extends PHPUnit\Framework\TestCase
 {
     public function testCodeBook()
     {

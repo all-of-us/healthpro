@@ -3,7 +3,7 @@ use Pmi\Security\User;
 use Tests\Pmi\GoogleUserService;
 use Tests\Pmi\GoogleGroup;
 
-class UserTest extends \PHPUnit_Framework_TestCase
+class UserTest extends PHPUnit\Framework\TestCase
 {
     public function testEmail()
     {

@@ -1,7 +1,7 @@
 <?php
 use Pmi\Entities\Participant;
 
-class OrderNotesIdentifierTest extends \PHPUnit_Framework_TestCase
+class OrderNotesIdentifierTest extends PHPUnit\Framework\TestCase
 {
     public function testName()
     {
