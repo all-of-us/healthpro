@@ -131,11 +131,11 @@
                 "extension": [
                     {
                         "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/authored-location",
-                        "valueReference": "Location\/hpo-site-test-site1"
+                        "valueString": "Location\/hpo-site-test-site1"
                     },
                     {
                         "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/finalized-location",
-                        "valueReference": "Location\/hpo-site-test-site2"
+                        "valueString": "Location\/hpo-site-test-site2"
                     }
                 ]
             }
