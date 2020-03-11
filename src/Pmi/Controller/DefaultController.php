@@ -175,7 +175,7 @@ class DefaultController extends AbstractController
 
         $idForm->handleRequest($request);
 
-        if ($idForm->isValid()) {
+        if ($idForm->isSubmitted() && $idForm->isValid()) {
             $id = $idForm->get('participantId')->getData();
             $participant = $app['pmi.drc.participants']->getById($id);
             if ($participant) {
@@ -198,7 +198,7 @@ class DefaultController extends AbstractController
 
         $emailForm->handleRequest($request);
 
-        if ($emailForm->isValid()) {
+        if ($emailForm->isSubmitted() && $emailForm->isValid()) {
             $searchParameters = $emailForm->getData();
             try {
                 $searchResults = $app['pmi.drc.participants']->search($searchParameters);
@@ -232,7 +232,7 @@ class DefaultController extends AbstractController
 
         $phoneForm->handleRequest($request);
 
-        if ($phoneForm->isValid()) {
+        if ($phoneForm->isSubmitted() && $phoneForm->isValid()) {
             $searchFields = ['loginPhone', 'phone'];
             $searchResults = [];
             foreach ($searchFields as $field) {
@@ -292,7 +292,7 @@ class DefaultController extends AbstractController
 
         $searchForm->handleRequest($request);
 
-        if ($searchForm->isValid()) {
+        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
             $searchParameters = $searchForm->getData();
             try {
                 $searchResults = $app['pmi.drc.participants']->search($searchParameters);
@@ -327,7 +327,7 @@ class DefaultController extends AbstractController
 
         $idForm->handleRequest($request);
 
-        if ($idForm->isValid()) {
+        if ($idForm->isSubmitted() && $idForm->isValid()) {
             $id = $idForm->get('orderId')->getData();
             
             // New barcodes include a 4-digit sample identifier appended to the 10 digit order id
@@ -377,7 +377,7 @@ class DefaultController extends AbstractController
 
         $agreeForm = $app['form.factory']->createBuilder(FormType::class)->getForm();
         $agreeForm->handleRequest($request);
-        if ($agreeForm->isValid()) {
+        if ($agreeForm->isSubmitted() && $agreeForm->isValid()) {
             $app['session']->set('agreeCrossOrg_'.$id, true);
             $app->log(Log::CROSS_ORG_PARTICIPANT_AGREE, [
                 'participantId' => $id,
@@ -542,7 +542,7 @@ class DefaultController extends AbstractController
             ->getForm();
 
         $settingsForm->handleRequest($request);
-        if ($settingsForm->isValid()) {
+        if ($settingsForm->isSubmitted() && $settingsForm->isValid()) {
             $app['em']->getRepository('users')->update($app->getUserId(), [
                 'timezone' => $settingsForm['timezone']->getData()
             ]);
