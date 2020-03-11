@@ -122,7 +122,7 @@ class OrderController extends AbstractController
         $ordersRepository = $app['em']->getRepository('orders');
         $confirmForm = $formBuilder->getForm();
         $confirmForm->handleRequest($request);
-        if ($confirmForm->isValid()) {
+        if ($confirmForm->isSubmitted() && $confirmForm->isValid()) {
             $orderData = ['type' => null];
             if ($request->request->has('existing')) {
                 if (empty($confirmForm['kitId']->getData())) {
