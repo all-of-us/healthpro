@@ -166,17 +166,17 @@ class Fhir
                 'author' => [
                     [
                         'reference' => "Practitioner/{$this->createdUser}",
-                        'extension' => [
+                        'extension' => [[
                             'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
                             'valueCode' => "created"
-                        ]
+                        ]]
                     ],
                     [
                         'reference' => "Practitioner/{$this->finalizedUser}",
-                        'extension' => [
+                        'extension' => [[
                             'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
                             'valueCode' => "finalized"
-                        ]
+                        ]]
                     ]
                 ],
                 'date' => $this->date,
@@ -200,11 +200,11 @@ class Fhir
                 'extension' => [
                     [
                         'url' => "http://terminology.pmi-ops.org/StructureDefinition/authored-location",
-                        'valueReference' => 'Location/' . \Pmi\Security\User::SITE_PREFIX . $this->createdSite
+                        'valueString' => 'Location/' . \Pmi\Security\User::SITE_PREFIX . $this->createdSite
                     ],
                     [
                         'url' => "http://terminology.pmi-ops.org/StructureDefinition/finalized-location",
-                        'valueReference' => 'Location/' . \Pmi\Security\User::SITE_PREFIX . $this->finalizedSite
+                        'valueString' => 'Location/' . \Pmi\Security\User::SITE_PREFIX . $this->finalizedSite
                     ]
                 ],
             ]
