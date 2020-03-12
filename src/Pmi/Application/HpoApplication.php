@@ -255,25 +255,8 @@ class HpoApplication extends AbstractApplication
 
     public function setNewRoles($user)
     {
-        $roles = $user->getRoles();
-        if ($this['session']->has('site')) {
-            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-        }
-        if ($this['session']->has('awardee')) {
-            if (($key = array_search('ROLE_USER', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if ($this->getAwardeeId() !== User::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-        }
-        if ($roles != $user->getRoles()) {
-            $token = new PostAuthenticationGuardToken($this['security.token_storage']->getToken()->getUser(), 'main', $roles);
+        if ($user->getAllRoles() != $user->getRoles()) {
+            $token = new PostAuthenticationGuardToken($user, 'main', $user->getRoles());
             $this['security.token_storage']->setToken($token);
         }
     }
