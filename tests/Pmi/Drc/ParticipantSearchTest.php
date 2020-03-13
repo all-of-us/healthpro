@@ -1,7 +1,7 @@
 <?php
 use Pmi\Drc\MockParticipantSearch;
 
-class ParticipantSearchTest extends \PHPUnit_Framework_TestCase
+class ParticipantSearchTest extends PHPUnit\Framework\TestCase
 {
     protected function getDrcParticipantClient()
     {

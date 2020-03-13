@@ -2,7 +2,7 @@
 use Pmi\Order\Order;
 use Pmi\Entities\Participant;
 
-class OrderTest extends \PHPUnit_Framework_TestCase
+class OrderTest extends PHPUnit\Framework\TestCase
 {
     protected function createOrder($parameters = [])
     {
