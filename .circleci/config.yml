@@ -1,6 +1,4 @@
-version: 2
-experimental:
-  pipelines: true
+version: 2.1
 jobs:
   build:
     working_directory: ~/vanderbilt/pmi-drc-hpo
