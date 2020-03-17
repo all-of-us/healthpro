@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-sm-4">
             <dl class="dl-horizontal">
-                {% if is_granted('ROLE_SCRIPPS') %}
+                {% if is_granted('ROLE_SCRIPPS') or is_granted('ROLE_AWARDEE') %}
                     <dt>Participant ID</dt>
                     <dd>{{ participant.id }}</dd>
                 {% endif %}
