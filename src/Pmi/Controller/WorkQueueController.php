@@ -508,7 +508,8 @@ class WorkQueueController extends AbstractController
             'evaluations' => $evaluations,
             'problems' => $problems,
             'displayPatientStatusBlock' => false,
-            'readOnly' => true
+            'readOnly' => true,
+            'biobankView' => true
         ]);
     }
 
