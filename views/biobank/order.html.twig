@@ -12,7 +12,13 @@
                     <dd>{{ participant.id }}</dd>
                 {% endif %}
                 <dt>Biobank ID</dt>
-                <dd><a href="{{ path('biobank_participant', { biobankId: participant.biobankId }) }}">{{ participant.biobankId }}</a></dd>
+                <dd>
+                    {% if is_granted('ROLE_SCRIPPS') or is_granted('ROLE_BIOBANK') %}
+                        <a href="{{ path('biobank_participant', { biobankId: participant.biobankId }) }}">{{ participant.biobankId }}</a>
+                    {% else %}
+                        {{ participant.biobankId }}
+                    {% endif %}
+                </dd>
                 <dt>Paired Awardee</dt>
                 <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
                 <dt>Paired Site</dt>
