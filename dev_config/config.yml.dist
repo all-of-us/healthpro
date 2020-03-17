@@ -92,3 +92,6 @@ ds_clean_up_limit:
 # Stable default MayoLink account numbers
 ml_account_hpo:
 ml_account_dv:
+
+# Set mock login
+# local_mock_auth: 1

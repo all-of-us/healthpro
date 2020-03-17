@@ -10,7 +10,6 @@ use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Monolog\StackdriverHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
-use Pmi\Util;
 use Silex\Application;
 use Silex\Provider\CsrfServiceProvider;
 use Silex\Provider\FormServiceProvider;
@@ -20,7 +19,6 @@ use Silex\Provider\Routing\LazyRequestMatcher;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
-use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
@@ -28,6 +26,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Twig_SimpleFilter;
 use Twig_SimpleFunction;
+use Pmi\Service\MockUserService;
 
 abstract class AbstractApplication extends Application
 {
@@ -274,17 +273,21 @@ abstract class AbstractApplication extends Application
     /** Sets up authentication and firewall. */
     abstract protected function registerSecurity();
 
-    public function getGoogleServiceClass()
+    /** For local development. */
+    public function setMockUser($email)
     {
-        return $this['isUnitTest'] ? 'Tests\Pmi\GoogleUserService' :
-            'google\appengine\api\users\UserService';
+        MockUserService::switchCurrentUser($email);
+        $this['session']->set('mockUser', MockUserService::getCurrentUser());
     }
 
     public function getGoogleUser()
     {
-        if ($this->getConfig('gae_auth')) {
-            $cls = $this->getGoogleServiceClass();
-            return class_exists($cls) ? $cls::getCurrentUser() : null;
+        if ($this->canMockLogin()) {
+            if ($this['isUnitTest']) {
+                return MockUserService::getCurrentUser();
+            } else {
+                return $this['session']->get('mockUser');
+            }
         } else {
             return $this['session']->get('googleUser');
         }
@@ -294,29 +297,21 @@ abstract class AbstractApplication extends Application
     {
         $dest = $this->generateUrl($route, [], true);
 
-        if ($this->getConfig('gae_auth')) {
-            $cls = $this->getGoogleServiceClass();
-            return class_exists($cls) ? $cls::createLogoutURL($dest) : null;
+        if ($this->isLocal() && $this->getConfig('local_mock_auth')) {
+            return $this['isUnitTest'] ? null : $dest;
         } else {
             // http://stackoverflow.com/a/14831349/1402028
             return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
         }
     }
 
-    public function getGoogleLoginUrl($route = 'home')
-    {
-        $dest = $this->generateUrl($route, [], true);
-
-        if ($this->getConfig('gae_auth')) {
-            $cls = $this->getGoogleServiceClass();
-            return class_exists($cls) ? $cls::createLoginURL($dest) : null;
-        }
-    }
-
     public function getUser()
     {
         $token = $this['security.token_storage']->getToken();
-        return $token ? $token->getUser() : null;
+        if ($token && is_object($token->getUser())) {
+            return $token->getUser();
+        }
+        return null;
     }
 
     public function getUserId()

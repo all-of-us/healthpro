@@ -1,8 +1,8 @@
 <?php
-namespace Tests\Pmi;
 
-/** Simulates GAE's User. */
-class GoogleUser
+namespace Pmi\Security;
+
+class MockUser
 {
     private $id;
     private $email;
@@ -23,11 +23,8 @@ class GoogleUser
         return $this->email;
     }
 
-    /*
-     * For parity with google\appengine\api\users\User::getUserId
-     */
     public function getUserId()
     {
-        return $this->getId();
+        return $this->id;
     }
 }
