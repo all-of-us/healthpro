@@ -6,7 +6,7 @@
         {% if (readOnly is defined or biobankView is defined or participant.isSuspended) and orders|length == 0 %}
             <small class="text-warning">No Records Found</small>
         {% else %}
-            {% for order in orders %}`
+            {% for order in orders %}
                 {% if type is not defined and loop.index == 6 %}
                     <div id="order-overflow">
                 {% endif %}
