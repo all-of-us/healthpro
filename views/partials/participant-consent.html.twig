@@ -24,6 +24,20 @@
         <br />
     </div>
     <div class="status-block">
+        <strong>gRoR Consent</strong>
+        {% if participant.consentForGenomicsRoR == 'SUBMITTED' %}
+            <i class="fa fa-check text-success" aria-hidden="true"></i>
+            {{ participant.consentForGenomicsRoRAuthored ? participant.consentForGenomicsRoRAuthored|date('n/j/Y', app.userTimezone) }}
+        {% elseif participant.consentForGenomicsRoRAuthored == 'INVALID' %}
+            <i class="fa fa-times text-danger" aria-hidden="true"></i> (invalid)
+            {{ participant.consentForGenomicsRoRAuthored ? participant.consentForGenomicsRoRAuthored|date('n/j/Y', app.userTimezone) }}
+        {% else %}
+            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+            {{ participant.consentForGenomicsRoRAuthored ? participant.consentForGenomicsRoRAuthored|date('n/j/Y', app.userTimezone) : '(not completed)' }}
+        {% endif %}
+        <br />
+    </div>
+    <div class="status-block">
         <strong>DV-only EHR Sharing</strong> <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip"><span class="sr-only">What is DV EHR Sharing</span><i class="fa fa-question-circle text-info"></i></span>
         {% if participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED' %}
             <i class="fa fa-check text-success" aria-hidden="true"></i>
