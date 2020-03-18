@@ -356,6 +356,8 @@ class WorkQueueController extends AbstractController
             if ($hasFullDataAccess) {
                 $headers[] = 'Deactivation Status';
                 $headers[] = 'Deactivation Date';
+                $headers[] = 'gROR Consent Status';
+                $headers[] = 'gRoR Consent Date';
             }
             fputcsv($output, $headers);
 
@@ -441,6 +443,8 @@ class WorkQueueController extends AbstractController
                     if ($hasFullDataAccess) {
                         $row[] = $participant->isSuspended ? '1' : '0';
                         $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsRoR);
+                        $row[] = WorkQueue::dateFromString($participant->consentForGenomicsRoRAuthored, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
                 }
