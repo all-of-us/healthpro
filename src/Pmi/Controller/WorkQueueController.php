@@ -443,8 +443,8 @@ class WorkQueueController extends AbstractController
                     if ($hasFullDataAccess) {
                         $row[] = $participant->isSuspended ? '1' : '0';
                         $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
-                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsRoR);
-                        $row[] = WorkQueue::dateFromString($participant->consentForGenomicsRoRAuthored, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsROR);
+                        $row[] = WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
                 }

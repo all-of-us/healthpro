@@ -305,7 +305,7 @@ class WorkQueue
             $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentAuthored);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsAuthored, true, true);
-            $row['consentForGenomicsRoR'] = $this->displayStatus($participant->consentForGenomicsRoR, 'SUBMITTED', $participant->consentForGenomicsRoRAuthored, true, true);
+            $row['consentForGenomicsROR'] = $this->displayStatus($participant->consentForGenomicsROR, 'SUBMITTED', $participant->consentForGenomicsRORAuthored, true, true);
             $row['dvEhrStatus'] = $this->displayStatus($participant->consentForDvElectronicHealthRecordsSharing, 'SUBMITTED', $participant->consentForDvElectronicHealthRecordsSharingAuthored, true, true);
             $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRAuthored, true);
             $row['activityStatus'] = $this->getActivityStatus($participant);
