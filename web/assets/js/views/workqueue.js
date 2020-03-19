@@ -74,7 +74,7 @@ $(document).ready(function() {
       { name: 'generalConsent', data: 'generalConsent', class: 'text-center' },
       { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
-      { name: 'consentForGenomicsROR', data: 'consentForGenomicsROR', class: 'text-center' },
+      { name: 'gRoRConsent', data: 'gRoRConsent', class: 'text-center' },
       { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
       { name: 'activityStatus', data: 'activityStatus', class: 'text-center', orderable: false },
