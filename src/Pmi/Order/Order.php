@@ -1395,11 +1395,6 @@ class Order
             }
         }
 
-        // Update centrifuge type
-        if (!empty($centrifugeType)) {
-            $updateArray['processed_centrifuge_type'] = $centrifugeType;
-        }
-
         $this->order['id'] = $object->id;
         $this->order['order_id'] = $kitId;
         $this->order['rdr_id'] = $object->id;
@@ -1408,6 +1403,7 @@ class Order
         $this->order['processed_ts'] = $processedTs;
         $this->order['collected_ts'] = $collectedTs;
         $this->order['finalized_ts'] = $finalizedTs;
+        $this->order['processed_centrifuge_type'] = (!empty($centrifugeType)) ? $centrifugeType : null;
         $this->order['collected_samples'] = json_encode(!empty($collectedSamples) ? $collectedSamples : []);
         $this->order['collected_ts'] = !empty($collectedTs) ? $collectedTs : null;
         $this->order['processed_samples'] = json_encode(!empty($processedSamples) ? $processedSamples : []);
