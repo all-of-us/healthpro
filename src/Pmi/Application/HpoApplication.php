@@ -22,38 +22,9 @@ class HpoApplication extends AbstractApplication
     {
         parent::setup($config);
 
-        $rdrOptions = [];
-        if ($this->isLocal()) {
-            putenv('DATASTORE_EMULATOR_HOST=' . self::DATASTORE_EMULATOR_HOST);
-            $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
-            if (file_exists($keyFile)) {
-                $rdrOptions['key_file'] = $keyFile;
-            }
-        }
-        if ($this->getConfig('rdr_endpoint')) {
-            $rdrOptions['endpoint'] = $this->getConfig('rdr_endpoint');
-        }
-        if ($this->getConfig('rdr_auth_json')) {
-            $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
-        }
-        if ($this->getConfig('rdr_disable_cache')) {
-            $rdrOptions['disable_cache'] = true;
-        }
-        if (intval($this->getConfig('cache_time'))) {
-            $rdrOptions['cache_time'] = intval($this->getConfig('cache_time'));
-        }
-        if ($this->getConfig('disable_test_access')) {
-            $rdrOptions['disable_test_access'] = $this->getConfig('disable_test_access');
-        }
-        if ($this->getConfig('genomics_start_time')) {
-            $rdrOptions['genomics_start_time'] = $this->getConfig('genomics_start_time');
-        }
         $this->registerDb();
-        $rdrOptions['siteType'] = $this->getSiteType();
-        $rdrOptions['logger'] = $this['logger'];
-        $rdrOptions['cache'] = $this['cache'];
 
-        $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
+        $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($this->getRdrOptions());
         if ($this->participantSource == 'mock') {
             $this['pmi.drc.participants'] = new \Pmi\Drc\MockParticipantSearch();
         } else {
@@ -660,5 +631,40 @@ class HpoApplication extends AbstractApplication
     public function canMockLogin()
     {
         return $this->isLocal() && $this->getConfig('local_mock_auth');
+    }
+
+    private function getRdrOptions()
+    {
+        $rdrOptions = [];
+        if ($this->isLocal()) {
+            putenv('DATASTORE_EMULATOR_HOST=' . self::DATASTORE_EMULATOR_HOST);
+            $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
+            if (file_exists($keyFile)) {
+                $rdrOptions['key_file'] = $keyFile;
+            }
+        }
+        if ($this->getConfig('rdr_endpoint')) {
+            $rdrOptions['endpoint'] = $this->getConfig('rdr_endpoint');
+        }
+        if ($this->getConfig('rdr_auth_json')) {
+            $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
+        }
+        if ($this->getConfig('rdr_disable_cache')) {
+            $rdrOptions['disable_cache'] = true;
+        }
+        if (intval($this->getConfig('cache_time'))) {
+            $rdrOptions['cache_time'] = intval($this->getConfig('cache_time'));
+        }
+        if ($this->getConfig('disable_test_access')) {
+            $rdrOptions['disable_test_access'] = $this->getConfig('disable_test_access');
+        }
+        if ($this->getConfig('genomics_start_time')) {
+            $rdrOptions['genomics_start_time'] = $this->getConfig('genomics_start_time');
+        }
+        $rdrOptions['siteType'] = $this->getSiteType();
+        $rdrOptions['logger'] = $this['logger'];
+        $rdrOptions['cache'] = $this['cache'];
+
+        return $rdrOptions;
     }
 }
