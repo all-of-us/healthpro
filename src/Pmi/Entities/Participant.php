@@ -23,6 +23,8 @@ class Participant
     public $activityStatus;
     public $isSuspended = false;
 
+    private $genomicsStartTime;
+
     public function __construct($rdrParticipant = null)
     {
         if (is_object($rdrParticipant)) {
@@ -33,6 +35,10 @@ class Participant
             if (isset($rdrParticipant->disableTestAccess)) {
                 $this->disableTestAccess = $rdrParticipant->disableTestAccess;
                 unset($rdrParticipant->disableTestAccess);
+            }
+            if (isset($rdrParticipant->genomicsStartTime)) {
+                $this->genomicsStartTime = $rdrParticipant->genomicsStartTime;
+                unset($rdrParticipant->genomicsStartTime);
             }
             $this->rdrData = $rdrParticipant;
             $this->parseRdrParticipant($rdrParticipant);
@@ -68,6 +74,10 @@ class Participant
         if (!empty($participant->withdrawalStatus) && $participant->withdrawalStatus === 'NO_USE') {
             $this->status = false;
             $this->statusReason = 'withdrawal';
+        }
+        if ($participant->signUpTime > $this->genomicsStartTime && $participant->consentForGenomicsROR === 'UNSET') {
+            $this->status = false;
+            $this->statusReason = 'genomics';
         }
 
         // Map gender identity to gender options for MayoLINK.

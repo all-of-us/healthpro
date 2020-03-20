@@ -13,6 +13,7 @@ class RdrHelper
     protected $lastError;
     protected $lastErrorCode;
     protected $disableTestAccess = false;
+    protected $genomicsStartTime;
     protected $logger;
     protected $cache;
 
@@ -30,6 +31,9 @@ class RdrHelper
             }
             if (!empty($options['disable_test_access'])) {
                 $this->disableTestAccess  = $options['disable_test_access'];
+            }
+            if (!empty($options['genomics_start_time'])) {
+                $this->genomicsStartTime  = $options['genomics_start_time'];
             }
             $this->logger = $options['logger'];
             $this->cache = $options['cache'];
@@ -117,5 +121,10 @@ class RdrHelper
     public function getDisableTestAccess()
     {
         return $this->disableTestAccess;
+    }
+
+    public function getGenomicsStartTime()
+    {
+        return $this->genomicsStartTime;
     }
 }

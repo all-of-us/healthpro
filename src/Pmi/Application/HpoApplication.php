@@ -45,6 +45,9 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('disable_test_access')) {
             $rdrOptions['disable_test_access'] = $this->getConfig('disable_test_access');
         }
+        if ($this->getConfig('genomics_start_time')) {
+            $rdrOptions['genomics_start_time'] = $this->getConfig('genomics_start_time');
+        }
         $rdrOptions['logger'] = $this['logger'];
         $rdrOptions['cache'] = $this['cache'];
 
