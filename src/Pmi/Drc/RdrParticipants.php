@@ -4,6 +4,7 @@ namespace Pmi\Drc;
 use Pmi\Entities\Participant;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Order\Order;
+use Pmi\Drc\BiobankOrder;
 use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -343,6 +344,23 @@ class RdrParticipants
             return false;
         }
         return false;
+    }
+
+    public function getOrdersByParticipant($participantId, $query = [])
+    {
+        try {
+            $response = $this->getClient()->request('GET', "Participant/{$participantId}/BiobankOrder", [
+                'query' => $query
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && is_array($result->data)) {
+                return $result->data;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return [];
+        }
+        return [];
     }
 
     public function getOrder($participantId, $orderId)

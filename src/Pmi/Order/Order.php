@@ -1352,4 +1352,79 @@ class Order
         $reasonDisplayText = array_search($this->order['oh_reason'], self::$cancelReasons);
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
+
+    public function loadFromJsonObject($object)
+    {
+        if (!empty($object->samples)) {
+            foreach ($object->samples as $sample) {
+                $sampleCode = $sample->test;
+                if (!array_key_exists($sample->test, $this->samplesInformation) && array_key_exists($sample->test, self::$mapRdrSamples)) {
+                    $sampleCode = self::$mapRdrSamples[$sample->test]['code'];
+                    $centrifugeType = self::$mapRdrSamples[$sample->test]['centrifuge_type'];
+                }
+                if (!empty($sample->collected)) {
+                    $collectedSamples[] = $sampleCode;
+                    $collectedTs = $sample->collected;
+                }
+                if (!empty($sample->processed)) {
+                    $processedSamples[] = $sampleCode;
+                    $processedTs = new \DateTime($sample->processed);
+                    $processedSamplesTs[$sampleCode] = $processedTs->getTimestamp();
+                }
+                if (!empty($sample->finalized)) {
+                    $finalizedSamples[] = $sampleCode;
+                    $finalizedTs = $sample->finalized;
+                }
+            }
+        }
+
+        // Update notes field
+        $collectedNotes = !empty($object->notes->collected) ? $object->notes->collected : null;
+        $processedNotes = !empty($object->notes->processed) ? $object->notes->processed : null;
+        $finalizedNotes = !empty($object->notes->finalized) ? $object->notes->finalized : null;
+
+        if (!empty($object->identifier)) {
+            foreach ($object->identifier as $identifier) {
+                // Update tracking number
+                if (preg_match('/tracking-number/i', $identifier->system)) {
+                    $trackingNumber = $identifier->value;
+                }
+                if (preg_match('/kit-id/i', $identifier->system)) {
+                    $kitId = $identifier->value;
+                }
+            }
+        }
+
+        // Update centrifuge type
+        if (!empty($centrifugeType)) {
+            $updateArray['processed_centrifuge_type'] = $centrifugeType;
+        }
+
+        $this->order['id'] = $object->id;
+        $this->order['order_id'] = $kitId;
+        $this->order['rdr_id'] = $object->id;
+        $this->order['oh_type'] = 'kit';
+        $this->order['created_ts'] = $object->created;
+        $this->order['processed_ts'] = $processedTs;
+        $this->order['collected_ts'] = $collectedTs;
+        $this->order['finalized_ts'] = $finalizedTs;
+        $this->order['collected_samples'] = json_encode(!empty($collectedSamples) ? $collectedSamples : []);
+        $this->order['collected_ts'] = !empty($collectedTs) ? $collectedTs : null;
+        $this->order['processed_samples'] = json_encode(!empty($processedSamples) ? $processedSamples : []);
+        $this->order['processed_samples_ts'] = json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []);
+        $this->order['finalized_samples'] = json_encode(!empty($finalizedSamples) ? $finalizedSamples : []);
+        $this->order['finalized_ts'] = !empty($finalizedTs) ? $finalizedTs : null;
+        $this->order['collected_notes'] = $collectedNotes;
+        $this->order['processed_notes'] = $processedNotes;
+        $this->order['finalized_notes'] = $finalizedNotes;
+        $this->order['fedex_tracking'] = !empty($trackingNumber) ? $trackingNumber : null;
+        $this->order['collected_user_id'] = false;
+        $this->order['processed_user_id'] = false;
+        $this->order['finalized_user_id'] = false;
+        $this->order['failedToReachRDR'] = false;
+        $this->order['status'] = 'finalized';
+        $this->order['origin'] = $object->origin;
+
+        return $this;
+    }
 }

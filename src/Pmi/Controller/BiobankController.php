@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Form\FormError;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 use Pmi\Order\Order;
+use Pmi\Drc\BiobankOrder;
 use Pmi\Review\Review;
 
 class BiobankController extends AbstractController
@@ -20,6 +21,7 @@ class BiobankController extends AbstractController
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/{biobankId}'],
         ['order', '/{biobankId}/order/{orderId}'],
+        ['quanumOrder', '/{biobankId}/quanum-order/{orderId}'],
         ['ordersToday', '/review/orders/today'],
         ['ordersUnfinalized', '/review/orders/unfinalized'],
         ['ordersUnlocked', '/review/orders/unlocked'],
@@ -131,8 +133,9 @@ class BiobankController extends AbstractController
             $app->abort(404);
         }
         $participant = $participant[0];
-        $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($participant->id);
 
+        // Internal Orders
+        $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($participant->id);
         foreach ($orders as $key => $order) {
             // Display most recent processed sample time if exists
             $processedSamplesTs = json_decode($order['processed_samples_ts'], true);
@@ -142,6 +145,13 @@ class BiobankController extends AbstractController
                 $processedTs->setTimezone(new \DateTimeZone($app->getUserTimezone()));
                 $orders[$key]['processed_ts'] = $processedTs;
             }
+        }
+        // Quanum Orders
+        $quanumOrders = $app['pmi.drc.participants']->getOrdersByParticipant($participant->id, [
+            'origin' => 'careevolution'
+        ]);
+        foreach ($quanumOrders as $quanumOrder) {
+            $orders[] = (new Order())->loadFromJsonObject($quanumOrder)->toArray();
         }
 
         return $app['twig']->render('biobank/participant.html.twig', [
@@ -181,6 +191,30 @@ class BiobankController extends AbstractController
             'order' => $order->toArray(),
             'samplesInfo' => $order->getSamplesInfo(),
             'currentStep' => $currentStep
+        ]);
+    }
+
+    public function quanumOrderAction($biobankId, $orderId, Application $app)
+    {
+        try {
+            $participant = $app['pmi.drc.participants']->search(['biobankId' => $biobankId]);
+        } catch (ParticipantSearchExceptionInterface $e) {
+            $app->abort(404);
+        }
+
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $participant = $participant[0];
+
+        $quanumOrder = $app['pmi.drc.participants']->getOrder($participant->id, $orderId);
+        $order = (new Order($app))->loadFromJsonObject($quanumOrder);
+
+        return $app['twig']->render('biobank/order.html.twig', [
+            'participant' => $participant,
+            'samplesInfo' => $order->getSamplesInfo(),
+            'currentStep' => 'finalize',
+            'order' => $order->toArray()
         ]);
     }
 
