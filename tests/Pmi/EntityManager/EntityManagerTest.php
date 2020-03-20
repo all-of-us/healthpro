@@ -1,7 +1,7 @@
 <?php
 use Pmi\EntityManager\EntityManager;
 
-class EntityManagerTest extends \PHPUnit_Framework_TestCase
+class EntityManagerTest extends PHPUnit\Framework\TestCase
 {
     public function testCreateTableAndInsert()
     {

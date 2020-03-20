@@ -14,3 +14,4 @@ php.ini
 ci/*.secret
 /deploy_*.txt
 /docker-compose.override.yml
+.phpunit.result.cache

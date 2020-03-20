@@ -43,7 +43,7 @@ class EvaluationTest extends AbstractWebTestCase
 
     public function testMissingSchema()
     {
-        $this->setExpectedException(MissingSchemaException::class);
+        $this->expectException(MissingSchemaException::class);
         $evaluation = new Evaluation();
         $evaluation->loadFromArray(['version' => '0.0a', 'participant_id' => 'test']);
         $schema = $evaluation->getSchema();

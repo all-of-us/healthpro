@@ -1,7 +1,7 @@
 <?php
 use Pmi\Entities\Participant;
 
-class ParticipantTest extends \PHPUnit_Framework_TestCase
+class ParticipantTest extends PHPUnit\Framework\TestCase
 {
     public function testMayolinkDob()
     {

@@ -71,7 +71,7 @@ class HpoApplication extends AbstractApplication
         $app = $this;
         // include `/` in common routes because homeAction will redirect based on role
         $commonRegex = '^/(logout|login-return|keepalive|client-timeout|agree)?$';
-        $anonRegex = '^/(timeout$|login$|cron\/|_ah\/)'; // cron and _ah controllers have their own access control
+        $anonRegex = '^/(timeout$|login$|mock-login$|cron\/|_ah\/)'; // cron and _ah controllers have their own access control
         $this->register(new \Silex\Provider\SecurityServiceProvider(), [
             'security.firewalls' => [
                 'anonymous' => [
@@ -647,5 +647,10 @@ class HpoApplication extends AbstractApplication
             $this['session']->remove('siteAwardeeDisplayName');
             $this['session']->remove('currentSiteDisplayName');
         }
+    }
+
+    public function canMockLogin()
+    {
+        return $this->isLocal() && $this->getConfig('local_mock_auth');
     }
 }
