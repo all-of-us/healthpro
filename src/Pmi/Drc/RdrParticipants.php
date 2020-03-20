@@ -19,6 +19,7 @@ class RdrParticipants
     protected $total;
     protected $disableTestAccess;
     protected $genomicsStartTime;
+    protected $siteType;
 
     // Expected RDR response status
     // TODO: Remove these two constants once rdr starts sending new response in prod
@@ -39,6 +40,7 @@ class RdrParticipants
         $this->cacheTime = $rdrHelper->getCacheTime();
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
         $this->genomicsStartTime = $rdrHelper->getGenomicsStartTime();
+        $this->siteType = $rdrHelper->getSiteType();
     }
 
     protected function getClient()
@@ -199,6 +201,7 @@ class RdrParticipants
             $participant = json_decode($response->getBody()->getContents());
             $participant->disableTestAccess = $this->disableTestAccess;
             $participant->genomicsStartTime = $this->genomicsStartTime;
+            $participant->siteType = $this->siteType;
             return $participant;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             return false;

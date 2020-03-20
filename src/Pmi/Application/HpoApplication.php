@@ -48,6 +48,8 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('genomics_start_time')) {
             $rdrOptions['genomics_start_time'] = $this->getConfig('genomics_start_time');
         }
+        $this->registerDb();
+        $rdrOptions['siteType'] = $this->getSiteType();
         $rdrOptions['logger'] = $this['logger'];
         $rdrOptions['cache'] = $this['cache'];
 
@@ -60,8 +62,6 @@ class HpoApplication extends AbstractApplication
 
         $this['pmi.drc.appsclient'] = (!$this->isProd() && ($this['isUnitTest'] || $this->getConfig('gaBypass'))) ?
              \Pmi\Drc\MockAppsClient::createFromApp($this) : \Pmi\Drc\AppsClient::createFromApp($this);
-
-        $this->registerDb();
         return $this;
     }
     
@@ -415,6 +415,11 @@ class HpoApplication extends AbstractApplication
             'type' => 'DV'
         ]);
         return !empty($site);
+    }
+
+    public function getSiteType()
+    {
+        return $this->isDVType() ? 'dv' : 'hpo';
     }
 
     protected function earlyBeforeCallback(Request $request, AbstractApplication $app)

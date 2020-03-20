@@ -24,6 +24,7 @@ class Participant
     public $isSuspended = false;
 
     private $genomicsStartTime;
+    private $siteType;
 
     public function __construct($rdrParticipant = null)
     {
@@ -39,6 +40,10 @@ class Participant
             if (isset($rdrParticipant->genomicsStartTime)) {
                 $this->genomicsStartTime = $rdrParticipant->genomicsStartTime;
                 unset($rdrParticipant->genomicsStartTime);
+            }
+            if (isset($rdrParticipant->siteType)) {
+                $this->siteType = $rdrParticipant->siteType;
+                unset($rdrParticipant->siteType);
             }
             $this->rdrData = $rdrParticipant;
             $this->parseRdrParticipant($rdrParticipant);
@@ -75,9 +80,19 @@ class Participant
             $this->status = false;
             $this->statusReason = 'withdrawal';
         }
-        if ($participant->signUpTime > $this->genomicsStartTime && $participant->consentForGenomicsROR === 'UNSET') {
-            $this->status = false;
-            $this->statusReason = 'genomics';
+        if (isset($participant->signUpTime) && $participant->signUpTime > $this->genomicsStartTime) {
+            if ($participant->consentForGenomicsROR === 'UNSET') {
+                $this->status = false;
+                $this->statusReason = 'genomics';
+            }
+            if ($this->siteType === 'hpo' && $participant->consentForElectronicHealthRecords === 'UNSET') {
+                $this->status = false;
+                $this->statusReason = 'ehr-consent';
+            }
+            if ($this->siteType === 'dv' && $participant->consentForDvElectronicHealthRecordsSharing !== 'SUBMITTED') {
+                $this->status = false;
+                $this->statusReason = 'ehr-consent';
+            }
         }
 
         // Map gender identity to gender options for MayoLINK.
