@@ -8,7 +8,6 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Form\FormError;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
 use Pmi\Order\Order;
-use Pmi\Drc\BiobankOrder;
 use Pmi\Review\Review;
 
 class BiobankController extends AbstractController
@@ -210,7 +209,7 @@ class BiobankController extends AbstractController
         $quanumOrder = $app['pmi.drc.participants']->getOrder($participant->id, $orderId);
         $order = (new Order($app))->loadFromJsonObject($quanumOrder);
 
-        return $app['twig']->render('biobank/order.html.twig', [
+        return $app['twig']->render('biobank/order-quanum.html.twig', [
             'participant' => $participant,
             'samplesInfo' => $order->getSamplesInfo(),
             'currentStep' => 'finalize',

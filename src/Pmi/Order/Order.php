@@ -1385,9 +1385,11 @@ class Order
 
         if (!empty($object->identifier)) {
             foreach ($object->identifier as $identifier) {
-                // Update tracking number
                 if (preg_match('/tracking-number/i', $identifier->system)) {
                     $trackingNumber = $identifier->value;
+                }
+                if (preg_match('/PerfSite/i', $identifier->system)) {
+                    $performingSite = $identifier->value;
                 }
                 if (preg_match('/kit-id/i', $identifier->system)) {
                     $kitId = $identifier->value;
@@ -1414,11 +1416,15 @@ class Order
         $this->order['processed_notes'] = $processedNotes;
         $this->order['finalized_notes'] = $finalizedNotes;
         $this->order['fedex_tracking'] = !empty($trackingNumber) ? $trackingNumber : null;
-        $this->order['collected_user_id'] = false;
-        $this->order['processed_user_id'] = false;
-        $this->order['finalized_user_id'] = false;
+        $this->order['collected_user_id'] = !empty($order->collectedInfo) ? $order->collectedInfo->author->value : false;
+        $this->order['collected_site'] = !empty($performingSite) ? $performingSite : null;
+        $this->order['processed_user_id'] = !empty($order->processedInfo) ? $order->processedInfo->author->value : false;
+        $this->order['processed_site'] = !empty($performingSite) ? $performingSite : null;
+        $this->order['finalized_user_id'] = !empty($order->finalizedInfo) ? $order->finalizedInfo->author->value : false;
+        $this->order['finalized_site'] = !empty($performingSite) ? $performingSite : null;
         $this->order['failedToReachRDR'] = false;
         $this->order['status'] = 'finalized';
+
         $this->order['origin'] = $object->origin;
 
         return $this;
