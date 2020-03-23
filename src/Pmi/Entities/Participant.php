@@ -25,6 +25,7 @@ class Participant
 
     private $genomicsStartTime;
     private $siteType;
+    private $salivaryZipCodes;
 
     public function __construct($rdrParticipant = null)
     {
@@ -44,6 +45,10 @@ class Participant
             if (isset($rdrParticipant->siteType)) {
                 $this->siteType = $rdrParticipant->siteType;
                 unset($rdrParticipant->siteType);
+            }
+            if (isset($rdrParticipant->salivaryZipCodes)) {
+                $this->salivaryZipCodes = $rdrParticipant->salivaryZipCodes;
+                unset($rdrParticipant->salivaryZipCodes);
             }
             $this->rdrData = $rdrParticipant;
             $this->parseRdrParticipant($rdrParticipant);
@@ -85,11 +90,9 @@ class Participant
                 $this->status = false;
                 $this->statusReason = 'genomics';
             }
-            if ($this->siteType === 'hpo' && $participant->consentForElectronicHealthRecords === 'UNSET') {
-                $this->status = false;
-                $this->statusReason = 'ehr-consent';
-            }
-            if ($this->siteType === 'dv' && $participant->consentForDvElectronicHealthRecordsSharing !== 'SUBMITTED') {
+
+            if (($this->siteType === 'hpo' && $participant->consentForElectronicHealthRecords === 'UNSET') ||
+                ($this->siteType === 'dv' && $participant->consentForDvElectronicHealthRecordsSharing !== 'SUBMITTED' && !in_array($participant->zipCode, $this->salivaryZipCodes))) {
                 $this->status = false;
                 $this->statusReason = 'ehr-consent';
             }

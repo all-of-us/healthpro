@@ -664,7 +664,13 @@ class HpoApplication extends AbstractApplication
         $rdrOptions['siteType'] = $this->getSiteType();
         $rdrOptions['logger'] = $this['logger'];
         $rdrOptions['cache'] = $this['cache'];
+        $rdrOptions['salivaryZipCodes'] = $this->getSalivaryZipCodes();
 
         return $rdrOptions;
+    }
+
+    public function getSalivaryZipCodes() {
+        $salivaryZipCodes = $this['em']->getRepository('salivary_inclusion_zip_codes')->fetchBy([], ['zip_code' => 'asc']);
+        return $salivaryZipCodes;
     }
 }

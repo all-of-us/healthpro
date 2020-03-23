@@ -14,6 +14,7 @@ class RdrHelper
     protected $lastErrorCode;
     protected $disableTestAccess = false;
     protected $genomicsStartTime;
+    protected $salivaryZipCodes;
     protected $logger;
     protected $cache;
 
@@ -37,6 +38,9 @@ class RdrHelper
             }
             if (!empty($options['siteType'])) {
                 $this->siteType  = $options['siteType'];
+            }
+            if (!empty($options['salivaryZipCodes'])) {
+                $this->salivaryZipCodes  = $options['salivaryZipCodes'];
             }
             $this->logger = $options['logger'];
             $this->cache = $options['cache'];
@@ -134,5 +138,10 @@ class RdrHelper
     public function getSiteType()
     {
         return $this->siteType;
+    }
+
+    public function getSalivaryZipCodes()
+    {
+        return $this->salivaryZipCodes;
     }
 }

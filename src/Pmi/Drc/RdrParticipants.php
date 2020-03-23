@@ -20,6 +20,7 @@ class RdrParticipants
     protected $disableTestAccess;
     protected $genomicsStartTime;
     protected $siteType;
+    protected $salivaryZipCodes;
 
     // Expected RDR response status
     // TODO: Remove these two constants once rdr starts sending new response in prod
@@ -41,6 +42,7 @@ class RdrParticipants
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
         $this->genomicsStartTime = $rdrHelper->getGenomicsStartTime();
         $this->siteType = $rdrHelper->getSiteType();
+        $this->salivaryZipCodes = $rdrHelper->getSalivaryZipCodes();
     }
 
     protected function getClient()
@@ -202,6 +204,7 @@ class RdrParticipants
             $participant->disableTestAccess = $this->disableTestAccess;
             $participant->genomicsStartTime = $this->genomicsStartTime;
             $participant->siteType = $this->siteType;
+            $participant->salivaryZipCodes = $this->salivaryZipCodes;
             return $participant;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             return false;
