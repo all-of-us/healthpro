@@ -36,12 +36,8 @@ class RdrHelper
             if (!empty($options['genomics_start_time'])) {
                 $this->genomicsStartTime  = $options['genomics_start_time'];
             }
-            if (!empty($options['siteType'])) {
-                $this->siteType  = $options['siteType'];
-            }
-            if (!empty($options['salivaryZipCodes'])) {
-                $this->salivaryZipCodes  = $options['salivaryZipCodes'];
-            }
+            $this->siteType  = $options['siteType'];
+            $this->salivaryZipCodes  = $options['salivaryZipCodes'];
             $this->logger = $options['logger'];
             $this->cache = $options['cache'];
             $this->options = $options;

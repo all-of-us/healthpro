@@ -4,7 +4,6 @@ namespace Pmi\Drc;
 use Pmi\Entities\Participant;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Order\Order;
-use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\Cache\ItemInterface;
 
 class RdrParticipants
@@ -17,10 +16,11 @@ class RdrParticipants
     protected static $resourceEndpoint = 'rdr/v1/';
     protected $nextToken;
     protected $total;
-    protected $disableTestAccess;
-    protected $genomicsStartTime;
-    protected $siteType;
-    protected $salivaryZipCodes;
+
+    private $disableTestAccess;
+    private $genomicsStartTime;
+    private $siteType;
+    private $salivaryZipCodes;
 
     // Expected RDR response status
     // TODO: Remove these two constants once rdr starts sending new response in prod
@@ -201,10 +201,12 @@ class RdrParticipants
         try {
             $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
             $participant = json_decode($response->getBody()->getContents());
-            $participant->disableTestAccess = $this->disableTestAccess;
-            $participant->genomicsStartTime = $this->genomicsStartTime;
-            $participant->siteType = $this->siteType;
-            $participant->salivaryZipCodes = $this->salivaryZipCodes;
+            $participant->options = [
+                'disableTestAccess' => $this->disableTestAccess,
+                'genomicsStartTime' => $this->genomicsStartTime,
+                'siteType' => $this->siteType,
+                'salivaryZipCodes' => $this->salivaryZipCodes
+            ];
             return $participant;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             return false;

@@ -3,7 +3,6 @@ namespace Pmi\Entities;
 
 use Pmi\Util;
 use Pmi\Drc\CodeBook;
-use Pmi\Application\AbstractApplication as Application;
 
 class Participant
 {
@@ -17,12 +16,12 @@ class Participant
     public $evaluationFinalizedSite;
     public $orderCreatedSite;
     public $age;
-    public $disableTestAccess;
     public $patientStatus;
     public $isCoreParticipant = false;
     public $activityStatus;
     public $isSuspended = false;
 
+    private $disableTestAccess;
     private $genomicsStartTime;
     private $siteType;
     private $salivaryZipCodes;
@@ -34,28 +33,19 @@ class Participant
                 $this->cacheTime = $rdrParticipant->cacheTime;
                 unset($rdrParticipant->cacheTime);
             }
-            if (isset($rdrParticipant->disableTestAccess)) {
-                $this->disableTestAccess = $rdrParticipant->disableTestAccess;
-                unset($rdrParticipant->disableTestAccess);
-            }
-            if (isset($rdrParticipant->genomicsStartTime)) {
-                $this->genomicsStartTime = $rdrParticipant->genomicsStartTime;
-                unset($rdrParticipant->genomicsStartTime);
-            }
-            if (isset($rdrParticipant->siteType)) {
-                $this->siteType = $rdrParticipant->siteType;
-                unset($rdrParticipant->siteType);
-            }
-            if (isset($rdrParticipant->salivaryZipCodes)) {
-                $this->salivaryZipCodes = $rdrParticipant->salivaryZipCodes;
-                unset($rdrParticipant->salivaryZipCodes);
+            if (isset($rdrParticipant->options)) {
+                $this->disableTestAccess = $rdrParticipant->options['disableTestAccess'];
+                $this->genomicsStartTime = $rdrParticipant->options['genomicsStartTime'];
+                $this->siteType = $rdrParticipant->options['siteType'];
+                $this->salivaryZipCodes = $rdrParticipant->options['salivaryZipCodes'];
+                unset($rdrParticipant->options);
             }
             $this->rdrData = $rdrParticipant;
             $this->parseRdrParticipant($rdrParticipant);
         }
     }
 
-    public function parseRdrParticipant($participant)
+    private function parseRdrParticipant($participant)
     {
         if (!is_object($participant)) {
             return;
@@ -85,7 +75,7 @@ class Participant
             $this->status = false;
             $this->statusReason = 'withdrawal';
         }
-        if (isset($participant->signUpTime) && $participant->signUpTime > $this->genomicsStartTime) {
+        if (!empty($this->genomicsStartTime) && isset($participant->signUpTime) && $participant->signUpTime > $this->genomicsStartTime) {
             if ($participant->consentForGenomicsROR === 'UNSET') {
                 $this->status = false;
                 $this->statusReason = 'genomics';
@@ -319,12 +309,12 @@ class Participant
         return false;
     }
 
-    public function getSiteSuffix($site)
+    private function getSiteSuffix($site)
     {
         return str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
     }
 
-    public function getActivityStatus($participant)
+    private function getActivityStatus($participant)
     {
         if ($participant->withdrawalStatus === 'NO_USE') {
             return 'withdrawn';
