@@ -345,12 +345,10 @@ class RdrParticipants
         return false;
     }
 
-    public function getOrdersByParticipant($participantId, $query = [])
+    public function getOrdersByParticipant($participantId)
     {
         try {
-            $response = $this->getClient()->request('GET', "Participant/{$participantId}/BiobankOrder", [
-                'query' => $query
-            ]);
+            $response = $this->getClient()->request('GET', "Participant/{$participantId}/BiobankOrder");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && is_array($result->data)) {
                 return $result->data;

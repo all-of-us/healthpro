@@ -146,11 +146,11 @@ class BiobankController extends AbstractController
             }
         }
         // Quanum Orders
-        $quanumOrders = $app['pmi.drc.participants']->getOrdersByParticipant($participant->id, [
-            'origin' => 'careevolution'
-        ]);
+        $quanumOrders = $app['pmi.drc.participants']->getOrdersByParticipant($participant->id);
         foreach ($quanumOrders as $quanumOrder) {
-            $orders[] = (new Order())->loadFromJsonObject($quanumOrder)->toArray();
+            if (in_array($quanumOrder->origin, ['careevolution'])) {
+                $orders[] = (new Order())->loadFromJsonObject($quanumOrder)->toArray();
+            }
         }
 
         return $app['twig']->render('biobank/participant.html.twig', [
