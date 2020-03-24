@@ -131,6 +131,16 @@ class WorkQueue
                 'Invalid' => 'SUBMITTED_INVALID'
             ]
         ],
+        'consentForGenomicsROR' => [
+            'label' => 'gROR Consent Status',
+            'options' => [
+                'Consented' => 'SUBMITTED',
+                'Refused consent' => 'SUBMITTED_NO_CONSENT',
+                'Refused not sure' => 'SUBMITTED_NOT_SURE',
+                'Consent not completed' => 'UNSET',
+                'Invalid' => 'SUBMITTED_INVALID'
+            ]
+        ],
         'ageRange' => [
             'label' => 'Age',
             'options' => [

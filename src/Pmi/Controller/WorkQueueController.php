@@ -8,8 +8,6 @@ use Pmi\Entities\Participant;
 use Pmi\Drc\CodeBook;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Pmi\WorkQueue\WorkQueue;
-use Pmi\Order\Order;
-use Pmi\Evaluation\Evaluation;
 
 class WorkQueueController extends AbstractController
 {
@@ -84,6 +82,9 @@ class WorkQueueController extends AbstractController
         }
         if (!empty($params['consentForElectronicHealthRecords'])) {
             $rdrParams['consentForElectronicHealthRecords'] = $params['consentForElectronicHealthRecords'];
+        }
+        if (!empty($params['consentForGenomicsROR'])) {
+            $rdrParams['consentForGenomicsROR'] = $params['consentForGenomicsROR'];
         }
         if (!empty($params['genderIdentity'])) {
             $rdrParams['genderIdentity'] = $params['genderIdentity'];
