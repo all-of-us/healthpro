@@ -661,21 +661,10 @@ class HpoApplication extends AbstractApplication
         if ($this->getConfig('genomics_start_time')) {
             $rdrOptions['genomics_start_time'] = $this->getConfig('genomics_start_time');
         }
-        $rdrOptions['siteType'] = $this->getSiteType();
         $rdrOptions['logger'] = $this['logger'];
         $rdrOptions['cache'] = $this['cache'];
-        $rdrOptions['salivaryZipCodes'] = $this->getSalivaryZipCodes();
+        $rdrOptions['em'] = $this['em'];
 
         return $rdrOptions;
-    }
-
-    public function getSalivaryZipCodes()
-    {
-        if (!$this['isUnitTest']) {
-            $salivaryZipCodes = $this['em']->getRepository('salivary_inclusion_zip_codes')->fetchBy([], ['zip_code' => 'asc']);
-            return $salivaryZipCodes;
-        }
-
-        return [];
     }
 }
