@@ -643,24 +643,7 @@ class HpoApplication extends AbstractApplication
                 $rdrOptions['key_file'] = $keyFile;
             }
         }
-        if ($this->getConfig('rdr_endpoint')) {
-            $rdrOptions['endpoint'] = $this->getConfig('rdr_endpoint');
-        }
-        if ($this->getConfig('rdr_auth_json')) {
-            $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
-        }
-        if ($this->getConfig('rdr_disable_cache')) {
-            $rdrOptions['disable_cache'] = true;
-        }
-        if (intval($this->getConfig('cache_time'))) {
-            $rdrOptions['cache_time'] = intval($this->getConfig('cache_time'));
-        }
-        if ($this->getConfig('disable_test_access')) {
-            $rdrOptions['disable_test_access'] = $this->getConfig('disable_test_access');
-        }
-        if ($this->getConfig('genomics_start_time')) {
-            $rdrOptions['genomics_start_time'] = $this->getConfig('genomics_start_time');
-        }
+        $rdrOptions['config'] = $this->configuration;
         $rdrOptions['logger'] = $this['logger'];
         $rdrOptions['cache'] = $this['cache'];
         $rdrOptions['em'] = $this['em'];

@@ -6,40 +6,28 @@ use Pmi\HttpClient;
 class RdrHelper
 {
     protected $client;
-    protected $endpoint = 'https://pmi-drc-api-test.appspot.com/';
     protected $options = [];
-    protected $cacheEnabled = true;
-    protected $cacheTime = 300;
-    protected $lastError;
-    protected $lastErrorCode;
-    protected $disableTestAccess = false;
-    protected $genomicsStartTime;
+    protected $config = [];
     protected $logger;
     protected $cache;
     protected $em;
+    protected $lastError;
+    protected $lastErrorCode;
+    protected $endpoint = 'https://pmi-drc-api-test.appspot.com/';
+    protected $cacheEnabled = true;
+    protected $cacheTime = 300;
+    protected $disableTestAccess = false;
+    protected $genomicsStartTime;
 
     public function __construct(array $options)
     {
         if (!empty($options)) {
-            if (!empty($options['endpoint'])) {
-                $this->endpoint = $options['endpoint'];
-            }
-            if (!empty($options['disable_cache']) && $options['disable_cache']) {
-                $this->cacheEnabled = false;
-            }
-            if (!empty($options['cache_time'])) {
-                $this->cacheTime  = $options['cache_time'];
-            }
-            if (!empty($options['disable_test_access'])) {
-                $this->disableTestAccess  = $options['disable_test_access'];
-            }
-            if (!empty($options['genomics_start_time'])) {
-                $this->genomicsStartTime  = $options['genomics_start_time'];
-            }
+            $this->options = $options;
+            $this->config = $options['config'];
             $this->logger = $options['logger'];
             $this->cache = $options['cache'];
             $this->em = $options['em'];
-            $this->options = $options;
+            $this->setConfigs();
         }
     }
 
@@ -47,8 +35,8 @@ class RdrHelper
     {
         $googleClient = new \Google_Client();
 
-        if (!empty($this->options['key_contents'])) {
-            $googleClient->setAuthConfig(json_decode($this->options['key_contents'], true));
+        if (!empty($this->config['rdr_auth_json'])) {
+            $googleClient->setAuthConfig(json_decode($this->config['rdr_auth_json'], true));
         } else {
             if (!empty($this->options['key_file'])) {
                 putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $this->options['key_file']);
@@ -130,14 +118,37 @@ class RdrHelper
         return $this->genomicsStartTime;
     }
 
-    public function getEm()
+    public function setConfigs()
     {
-        return $this->em;
+        if (!empty($this->config['rdr_endpoint'])) {
+            $this->endpoint = $this->config['rdr_endpoint'];
+        }
+        if (!empty($this->config['rdr_disable_cache']) && $this->config['rdr_disable_cache']) {
+            $this->cacheEnabled = $this->config['rdr_disable_cache'];
+        }
+        if (!empty($this->config['cache_time'])) {
+            $this->cacheTime = $this->config['cache_time'];
+        }
+        if (!empty($this->config['disable_test_access'])) {
+            $this->disableTestAccess = $this->config['disable_test_access'];
+        }
+        if (!empty($this->config['genomics_start_time'])) {
+            $this->genomicsStartTime = $this->config['genomics_start_time'];
+        }
     }
 
     public function getSalivaryZipCodes()
     {
         $salivaryZipCodes = $this->em->getRepository('salivary_inclusion_zip_codes')->fetchBy([], ['zip_code' => 'asc']);
         return $salivaryZipCodes;
+    }
+
+    public function getSiteType($awardeeId)
+    {
+        $site = $this->em->getRepository('sites')->fetchOneBy(['awardee_id' => $awardeeId]);
+        if (!empty($site)) {
+            return strtolower($site['type']) === 'dv' ? 'dv' : 'hpo';
+        }
+        return null;
     }
 }

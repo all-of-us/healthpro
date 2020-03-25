@@ -41,7 +41,6 @@ class RdrParticipants
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
         $this->genomicsStartTime = $rdrHelper->getGenomicsStartTime();
         $this->salivaryZipCodes = $rdrHelper->getSalivaryZipCodes();
-        $this->em = $rdrHelper->getEm();
     }
 
     protected function getClient()
@@ -204,7 +203,7 @@ class RdrParticipants
                 'disableTestAccess' => $this->disableTestAccess,
                 'genomicsStartTime' => $this->genomicsStartTime,
                 'salivaryZipCodes' => $this->salivaryZipCodes,
-                'siteType' => isset($participant->awardee) ? $this->getSiteType($participant->awardee) : null
+                'siteType' => isset($participant->awardee) ? $this->rdrHelper->getSiteType($participant->awardee) : null
             ];
             return $participant;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
@@ -515,14 +514,5 @@ class RdrParticipants
             return false;
         }
         return $participant;
-    }
-
-    public function getSiteType($awardeeId)
-    {
-        $site = $this->em->getRepository('sites')->fetchOneBy(['awardee_id' => $awardeeId]);
-        if (!empty($site)) {
-            return strtolower($site['type']) === 'dv' ? 'dv' : 'hpo';
-        }
-        return null;
     }
 }
