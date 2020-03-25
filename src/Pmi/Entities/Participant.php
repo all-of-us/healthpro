@@ -76,11 +76,11 @@ class Participant
             $this->statusReason = 'withdrawal';
         }
         if (!empty($this->genomicsStartTime) && isset($participant->signUpTime) && $participant->signUpTime > $this->genomicsStartTime) {
-            if ($participant->consentForGenomicsROR === 'UNSET') {
+            if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                 $this->status = false;
                 $this->statusReason = 'genomics';
-            } elseif (($this->siteType === 'hpo' && $participant->consentForElectronicHealthRecords === 'UNSET') ||
-                ($this->siteType === 'dv' && $participant->consentForDvElectronicHealthRecordsSharing !== 'SUBMITTED' && !in_array($participant->zipCode, $this->salivaryZipCodes))) {
+            } elseif ((isset($participant->consentForElectronicHealthRecords) && $this->siteType === 'hpo' && $participant->consentForElectronicHealthRecords === 'UNSET') ||
+                (isset($participant->consentForDvElectronicHealthRecordsSharing) && isset($participant->zipCode) && $this->siteType === 'dv' && $participant->consentForDvElectronicHealthRecordsSharing !== 'SUBMITTED' && !in_array($participant->zipCode, $this->salivaryZipCodes))) {
                 $this->status = false;
                 $this->statusReason = 'ehr-consent';
             }
