@@ -101,7 +101,7 @@ class BiobankController extends AbstractController
             if (preg_match('/^\d{14}$/', $id)) {
                 $id = substr($id, 0, 10);
             }
-
+            // Internal Order
             $order = $app['em']->getRepository('orders')->fetchOneBy([
                 'order_id' => $id
             ]);
@@ -110,6 +110,18 @@ class BiobankController extends AbstractController
                     'biobankId' => $order['biobank_id'],
                     'orderId' => $order['id']
                 ]);
+            }
+            // Quanum Orders
+            $quanumOrders = $app['pmi.drc.participants']->getOrderByKitId($id, 'careevolution');
+            if (isset($quanumOrders[0])) {
+                $order = (new Order())->loadFromJsonObject($quanumOrders[0])->toArray();
+                $participant = $app['pmi.drc.participants']->getById($order['participant_id']);
+                if ($participant->biobankId) {
+                    return $app->redirectToRoute('biobank_quanumOrder', [
+                        'biobankId' => $participant->biobankId,
+                        'orderId' => $order['id']
+                    ]);
+                }
             }
             $app->addFlashError('Order ID not found');
         }

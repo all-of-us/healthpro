@@ -360,6 +360,26 @@ class RdrParticipants
         return [];
     }
 
+    public function getOrderByKitId($kitId, $origin = 'careevolution')
+    {
+        try {
+            $response = $this->getClient()->request('GET', "BiobankOrder", [
+                'query' => [
+                    'kitId' => $kitId,
+                    'origin' => $origin
+                ]
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && is_array($result->data)) {
+                return $result->data;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return [];
+        }
+        return [];
+    }
+
     public function getOrder($participantId, $orderId)
     {
         try {

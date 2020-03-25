@@ -1397,7 +1397,11 @@ class Order
             }
         }
 
+        // Extract participantId
+        preg_match('/^Patient\/(P\d+)$/i', $object->subject, $subject_matches);
+
         $this->order['id'] = $object->id;
+        $this->order['participant_id'] = $subject_matches[1] ? $subject_matches[1] : 'Unknown';
         $this->order['order_id'] = $kitId;
         $this->order['rdr_id'] = $object->id;
         $this->order['oh_type'] = 'kit';
