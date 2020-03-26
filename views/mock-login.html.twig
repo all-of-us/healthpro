@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+{% block title %}Mock Login - {% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="page-header">
+                <h2><i class="fa fa-sign-in" aria-hidden="true"></i> Login</h2>
+            </div>
+            {{ form_start(loginForm, { attr: { class: 'prevent-resubmit' } }) }}
+            {{ form_widget(loginForm) }}
+            <p>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </p>
+            {{ form_end(loginForm) }}
+        </div>
+    </div>
+{% endblock %}

@@ -77,7 +77,7 @@ abstract class AbstractWebTestCase extends TestCase
             // don't bypass groups auth because we handle this with fixtures
             'gaBypass' => false,
             'gaDomain' => 'pmi-drc-hpo-unit-tests.biz',
-            'gae_auth' => true,
+            'local_mock_auth' => true,
             'enforce2fa' => true
         ]);
         $app->mount('/', new Controller\DefaultController());

@@ -37,7 +37,8 @@ class DefaultController extends AbstractController
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['settings', '/settings', ['method' => 'GET|POST']],
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
-        ['patientStatus', '/participant/{participantId}/patient/status/{patientStatusId}', ['method' => 'GET']]
+        ['patientStatus', '/participant/{participantId}/patient/status/{patientStatusId}', ['method' => 'GET']],
+        ['mockLogin', '/mock-login', ['method' => 'GET|POST']]
     ];
 
     public function homeAction(Application $app)
@@ -567,5 +568,35 @@ class DefaultController extends AbstractController
         
         $request->getSession()->set('hideTZWarning', true);
         return (new JsonResponse())->setData([]);
+    }
+
+    public function mockLoginAction(Application $app, Request $request)
+    {
+        if (!$app->canMockLogin()){
+            return $app->abort(403);
+        }
+        $loginForm = $app['form.factory']->createNamedBuilder('login', FormType::class)
+            ->add('userName', TextType::class, [
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                    new Constraints\Type('string')
+                ],
+                'attr' => [
+                    'value' => 'test@example.com'
+                ]
+            ])
+            ->getForm();
+
+        $loginForm->handleRequest($request);
+
+        if ($loginForm->isValid()) {
+            // Set mock user for local development
+            $app->setMockUser($loginForm->get('userName')->getData());
+            return $app->redirect('/');
+        }
+
+        return $app['twig']->render('mock-login.html.twig', [
+            'loginForm' => $loginForm->createView()
+        ]);
     }
 }

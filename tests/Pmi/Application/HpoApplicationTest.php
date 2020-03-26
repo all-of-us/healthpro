@@ -3,7 +3,7 @@ use Pmi\Drc\MockAppsClient as AppsClient;
 use Pmi\Security\User;
 use Tests\Pmi\AbstractWebTestCase;
 use Tests\Pmi\GoogleGroup;
-use Tests\Pmi\GoogleUserService;
+use Pmi\Service\MockUserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -27,7 +27,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testLogin()
     {
         $email = 'testLogin@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->assertSame(null, $this->app['session']->get('isLogin'));
         $client = $this->createClient();
@@ -42,7 +42,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testTwoFactorDeny()
     {
         $email = 'testTwoFactorDeny@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [
             new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
             new GoogleGroup(User::TWOFACTOR_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
@@ -57,7 +57,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testDashboardDeny()
     {
         $email = 'testDashboardDeny@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->assertSame(null, $this->app['session']->get('isLogin'));
         $client = $this->createClient();
@@ -71,7 +71,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testDashboardAllow()
     {
         $email = 'testDashboardAllow@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup('admin-dashboard@gapps.com', 'Admin Dashboard', 'lorem ipsum 1')]);
         $this->assertSame(null, $this->app['session']->get('isLogin'));
         $client = $this->createClient();
@@ -85,7 +85,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testTimeout()
     {
         $email = 'testTimeout@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->app['sessionTimeout'] = 2;
         $client = $this->createClient();
@@ -101,7 +101,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testDashboardTimeout()
     {
         $email = 'testDashboardTimeout@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->app['sessionTimeout'] = 2;
         $client = $this->createClient();
@@ -117,7 +117,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testDashboardRedirect()
     {
         $email = 'testDashboardRedirect@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->app['sessionTimeout'] = 2;
         $client = $this->createClient();
@@ -129,7 +129,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testForceSiteSelect()
     {
         $email = 'testForceSiteSelect@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'), new GoogleGroup('hpo-site-2@gapps.com', 'Test Group 2', 'lorem ipsum 2')]);
         $client = $this->createClient();
         $client->followRedirects();
@@ -140,7 +140,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testDashSplash()
     {
         $email = 'testDashSplash@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [
             new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
             new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
@@ -154,7 +154,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testDashSplashAwardee()
     {
         $email = 'testDashSplashAwardee@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [
             new GoogleGroup('awardee-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
             new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
@@ -168,7 +168,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testDashSplashAdmin()
     {
         $email = 'testDashSplashAdmin@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [
             new GoogleGroup(User::ADMIN_GROUP . '@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
             new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
@@ -182,7 +182,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testDashSplashDvAdmin()
     {
         $email = 'testDashSplashDvAdmin@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [
             new GoogleGroup(User::ADMIN_DV . '@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
             new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
@@ -196,7 +196,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testUsageAgreement()
     {
         $email = 'testUsageAgreement@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
         $client->followRedirects();
@@ -212,7 +212,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testSiteAutoselect()
     {
         $email = 'testSiteAutoselect@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         $groupEmail = 'hpo-site-1@gapps.com';
         AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
@@ -225,7 +225,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testAwardeeAutoselect()
     {
         $email = 'testAwardeeAutoselect@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         $groupEmail = 'awardee-1@gapps.com';
         AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
@@ -238,7 +238,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testDvAdminAutoselect()
     {
         $email = 'testDvAdminAutoselect@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         $groupEmail = User::ADMIN_DV . '@gapps.com';
         AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
@@ -251,7 +251,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testAdminAutoselect()
     {
         $email = 'testAdminAutoselect@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         $groupEmail = User::ADMIN_GROUP . '@gapps.com';
         AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
@@ -264,7 +264,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testDashboardAutoselect()
     {
         $email = 'testDashboardAutoselect@example.com';
-        GoogleUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email);
         $groupEmail = User::DASHBOARD_GROUP . '@gapps.com';
         AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
