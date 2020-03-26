@@ -589,7 +589,7 @@ class DefaultController extends AbstractController
 
         $loginForm->handleRequest($request);
 
-        if ($loginForm->isValid()) {
+        if ($loginForm->isSubmitted() && $loginForm->isValid()) {
             // Set mock user for local development
             $app->setMockUser($loginForm->get('userName')->getData());
             return $app->redirect('/');
