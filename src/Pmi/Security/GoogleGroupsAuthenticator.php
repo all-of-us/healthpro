@@ -72,7 +72,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             }
         } elseif ($request->query->get('state') && $request->query->get('state') === $this->app['session']->get('auth_state')) {
             return true;
-        } elseif ($this->app->getConfig('gae_auth') && $this->app->getGoogleUser()) {
+        } elseif ($this->app->getConfig('local_mock_auth') && $this->app->getGoogleUser()) {
             return true;
         } else {
             // firewall rules will fail and $this->start() will be called
