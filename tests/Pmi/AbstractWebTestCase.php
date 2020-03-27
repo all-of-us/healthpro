@@ -63,7 +63,7 @@ abstract class AbstractWebTestCase extends TestCase
             'sessionWarning' => 2 * 60
         ]);
         // session must be registered prior to boot()
-        $app->register(new \Silex\Provider\SessionServiceProvider(), [
+        $app->register(new \Pmi\Session\SessionServiceProvider(), [
             'session.test' => true
         ]);
         $app['session.storage.test'] = function () {
