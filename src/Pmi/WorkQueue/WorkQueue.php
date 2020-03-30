@@ -432,9 +432,9 @@ class WorkQueue
             case 'SUBMITTED':
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (consented yes)';
             case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (refused consent)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (refused consent)';
             case 'SUBMITTED_NO_SURE':
-                return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (not sure)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (not sure)';
             case 'SUBMITTED_INVALID':
                 return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (invalid)';
             default:
