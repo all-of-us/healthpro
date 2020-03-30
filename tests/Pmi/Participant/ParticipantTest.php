@@ -80,7 +80,7 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentForGenomicsROR' => 'UNSET',
-            'signUpTime' => '2020-03-24T12:44:33'
+            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('genomics', $participant->statusReason);
@@ -101,7 +101,7 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentForGenomicsROR' => 'SUBMITTED',
             'consentForElectronicHealthRecords' => 'UNSET',
-            'signUpTime' => '2020-03-24T12:44:33'
+            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('ehr-consent', $participant->statusReason);
