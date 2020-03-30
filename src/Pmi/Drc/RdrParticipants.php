@@ -19,7 +19,6 @@ class RdrParticipants
 
     private $disableTestAccess;
     private $genomicsStartTime;
-    private $salivaryZipCodes;
 
     // Expected RDR response status
     // TODO: Remove these two constants once rdr starts sending new response in prod
@@ -40,7 +39,6 @@ class RdrParticipants
         $this->cacheTime = $rdrHelper->getCacheTime();
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
         $this->genomicsStartTime = $rdrHelper->getGenomicsStartTime();
-        $this->salivaryZipCodes = $rdrHelper->getSalivaryZipCodes();
     }
 
     protected function getClient()
@@ -202,7 +200,6 @@ class RdrParticipants
             $participant->options = [
                 'disableTestAccess' => $this->disableTestAccess,
                 'genomicsStartTime' => $this->genomicsStartTime,
-                'salivaryZipCodes' => $this->salivaryZipCodes,
                 'siteType' => isset($participant->awardee) ? $this->rdrHelper->getSiteType($participant->awardee) : null
             ];
             return $participant;

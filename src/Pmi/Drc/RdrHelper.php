@@ -137,12 +137,6 @@ class RdrHelper
         }
     }
 
-    public function getSalivaryZipCodes()
-    {
-        $salivaryZipCodes = $this->em->getRepository('salivary_inclusion_zip_codes')->fetchBy([], ['zip_code' => 'asc']);
-        return $salivaryZipCodes;
-    }
-
     public function getSiteType($awardeeId)
     {
         $site = $this->em->getRepository('sites')->fetchOneBy(['awardee_id' => $awardeeId]);

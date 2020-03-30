@@ -23,7 +23,6 @@ class Participant
 
     private $disableTestAccess;
     private $genomicsStartTime;
-    private $salivaryZipCodes;
     private $siteType;
 
     public function __construct($rdrParticipant = null)
@@ -36,7 +35,6 @@ class Participant
             if (isset($rdrParticipant->options)) {
                 $this->disableTestAccess = $rdrParticipant->options['disableTestAccess'];
                 $this->genomicsStartTime = $rdrParticipant->options['genomicsStartTime'];
-                $this->salivaryZipCodes = $rdrParticipant->options['salivaryZipCodes'];
                 $this->siteType = $rdrParticipant->options['siteType'];
                 unset($rdrParticipant->options);
             }
@@ -79,8 +77,7 @@ class Participant
             if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                 $this->status = false;
                 $this->statusReason = 'genomics';
-            } elseif ((isset($participant->consentForElectronicHealthRecords) && $this->siteType === 'hpo' && $participant->consentForElectronicHealthRecords === 'UNSET') ||
-                (isset($participant->consentForDvElectronicHealthRecordsSharing) && isset($participant->zipCode) && $this->siteType === 'dv' && $participant->consentForDvElectronicHealthRecordsSharing !== 'SUBMITTED' && !in_array($participant->zipCode, $this->salivaryZipCodes))) {
+            } elseif (isset($this->siteType) && isset($participant->consentForElectronicHealthRecords) && $this->siteType === 'hpo' && $participant->consentForElectronicHealthRecords === 'UNSET') {
                 $this->status = false;
                 $this->statusReason = 'ehr-consent';
             }

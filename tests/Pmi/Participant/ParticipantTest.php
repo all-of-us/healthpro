@@ -23,8 +23,7 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $options = [
             'disableTestAccess' => true,
             'genomicsStartTime' => '2020-03-23T12:44:33',
-            'siteType' => 'hpo',
-            'salivaryZipCodes' => ['11111', '22222', '33333']
+            'siteType' => 'hpo'
         ];
 
         $participant = new Participant((object)[
@@ -73,8 +72,7 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $options = [
             'disableTestAccess' => false,
             'genomicsStartTime' => '2020-03-23T12:44:33',
-            'siteType' => 'hpo',
-            'salivaryZipCodes' => ['11111', '22222', '33333']
+            'siteType' => 'hpo'
         ];
 
         $participant = new Participant((object)[
@@ -93,8 +91,7 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $options = [
             'disableTestAccess' => false,
             'genomicsStartTime' => '2020-03-23T12:44:33',
-            'siteType' => 'hpo',
-            'salivaryZipCodes' => ['11111', '22222', '33333']
+            'siteType' => 'hpo'
         ];
 
         // For HPO
@@ -105,21 +102,6 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
             'consentForGenomicsROR' => 'SUBMITTED',
             'consentForElectronicHealthRecords' => 'UNSET',
             'signUpTime' => '2020-03-24T12:44:33'
-        ]);
-        $this->assertSame(false, $participant->status);
-        $this->assertSame('ehr-consent', $participant->statusReason);
-
-        // For DV
-        $options['siteType'] = 'dv';
-        $participant = new Participant((object)[
-            'options' => $options,
-            'questionnaireOnTheBasics' => 'SUBMITTED',
-            'consentForStudyEnrollment' => 'SUBMITTED',
-            'consentForGenomicsROR' => 'SUBMITTED',
-            'consentForElectronicHealthRecords' => 'SUBMITTED',
-            'consentForDvElectronicHealthRecordsSharing' => 'UNSET',
-            'signUpTime' => '2020-03-24T12:44:33',
-            'zipCode' => '12345'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('ehr-consent', $participant->statusReason);
