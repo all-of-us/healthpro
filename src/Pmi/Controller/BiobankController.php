@@ -112,7 +112,10 @@ class BiobankController extends AbstractController
                 ]);
             }
             // Quanum Orders
-            $quanumOrders = $app['pmi.drc.participants']->getOrderByKitId($id, 'careevolution');
+            $quanumOrders = $app['pmi.drc.participants']->getOrders([
+                'kitId' => $id,
+                'origin' => 'careevolution'
+            ]);
             if (isset($quanumOrders[0])) {
                 $order = (new Order())->loadFromJsonObject($quanumOrders[0])->toArray();
                 $participant = $app['pmi.drc.participants']->getById($order['participant_id']);

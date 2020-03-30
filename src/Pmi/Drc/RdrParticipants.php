@@ -360,14 +360,11 @@ class RdrParticipants
         return [];
     }
 
-    public function getOrderByKitId($kitId, $origin = 'careevolution')
+    public function getOrders($query = [])
     {
         try {
-            $response = $this->getClient()->request('GET', "BiobankOrder", [
-                'query' => [
-                    'kitId' => $kitId,
-                    'origin' => $origin
-                ]
+            $response = $this->getClient()->request('GET', 'BiobankOrder', [
+                'query' => $query
             ]);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && is_array($result->data)) {

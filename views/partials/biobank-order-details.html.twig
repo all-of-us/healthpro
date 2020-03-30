@@ -7,7 +7,7 @@
     {% elseif order.origin is defined and order.origin == 'careevolution' %}
       <div class="alert alert-success well-sm">
           <i class="fa fa-info-circle" aria-hidden="true"></i>
-          <strong>{{ type|capitalize }} by Quest User at {{ attribute(order, type~'_site')|default('Unknown') }}</strong>
+          <strong>{{ type|capitalize }} by Quest User at a Quest Site</strong>
       </div>
     {% endif %}
     {% if type == 'finalized' and order.failedToReachRDR %}

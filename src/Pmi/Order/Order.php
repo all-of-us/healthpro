@@ -1404,12 +1404,14 @@ class Order
         $this->order['participant_id'] = $subject_matches[1] ? $subject_matches[1] : 'Unknown';
         $this->order['order_id'] = $kitId;
         $this->order['rdr_id'] = $object->id;
+        $this->order['type'] = 'kit';
         $this->order['oh_type'] = 'kit';
         $this->order['created_ts'] = $object->created;
         $this->order['processed_ts'] = $processedTs;
         $this->order['collected_ts'] = $collectedTs;
         $this->order['finalized_ts'] = $finalizedTs;
         $this->order['processed_centrifuge_type'] = (!empty($centrifugeType)) ? $centrifugeType : null;
+        $this->order['requested_samples'] = null;
         $this->order['collected_samples'] = json_encode(!empty($collectedSamples) ? $collectedSamples : []);
         $this->order['collected_ts'] = !empty($collectedTs) ? $collectedTs : null;
         $this->order['processed_samples'] = json_encode(!empty($processedSamples) ? $processedSamples : []);
