@@ -643,11 +643,22 @@ class HpoApplication extends AbstractApplication
                 $rdrOptions['key_file'] = $keyFile;
             }
         }
-        $rdrOptions['config'] = $this->configuration;
+        $rdrOptions['config'] = $this->getRdrConfigs();
         $rdrOptions['logger'] = $this['logger'];
         $rdrOptions['cache'] = $this['cache'];
         $rdrOptions['em'] = $this['em'];
 
         return $rdrOptions;
+    }
+
+    private function getRdrConfigs()
+    {
+        return [
+            'rdr_endpoint' => $this->getConfig('rdr_endpoint'),
+            'rdr_disable_cache' => $this->getConfig('rdr_endpoint'),
+            'cache_time' => $this->getConfig('cache_time'),
+            'disable_test_access' => $this->getConfig('disable_test_access'),
+            'genomics_start_time' => $this->getConfig('genomics_start_time')
+        ];
     }
 }
