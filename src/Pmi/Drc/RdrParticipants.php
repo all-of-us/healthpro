@@ -24,7 +24,7 @@ class RdrParticipants
     const EVALUATION_CANCEL_STATUS = 'CANCELLED';
     const EVALUATION_RESTORE_STATUS = 'RESTORED';
 
-    const NEW_EVALUATION_CANCEL_STATUS = 'entered_in_error';
+    const NEW_EVALUATION_CANCEL_STATUS = 'entered-in-error';
     const NEW_EVALUATION_RESTORE_STATUS = 'final';
     const ORDER_CANCEL_STATUS = 'CANCELLED';
     const ORDER_RESTORE_STATUS = 'UNSET';
