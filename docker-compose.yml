@@ -27,4 +27,5 @@ services:
         ports:
             - "8080:8080"
         volumes:
+            - ./dev_config/php.conf.d:/opt/php72/lib/conf.d:delegated
             - .:/app:delegated
