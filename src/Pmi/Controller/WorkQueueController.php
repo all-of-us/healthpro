@@ -357,7 +357,7 @@ class WorkQueueController extends AbstractController
             if ($hasFullDataAccess) {
                 $headers[] = 'Deactivation Status';
                 $headers[] = 'Deactivation Date';
-                $headers[] = 'gROR Consent Status';
+                $headers[] = 'gRoR Consent Status';
                 $headers[] = 'gRoR Consent Date';
             }
             fputcsv($output, $headers);

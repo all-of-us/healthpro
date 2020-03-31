@@ -132,7 +132,7 @@ class WorkQueue
             ]
         ],
         'consentForGenomicsROR' => [
-            'label' => 'gROR Consent Status',
+            'label' => 'gRoR Consent Status',
             'options' => [
                 'Consented' => 'SUBMITTED',
                 'Refused consent' => 'SUBMITTED_NO_CONSENT',
