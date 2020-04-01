@@ -9,7 +9,6 @@ php.ini
 /cache/
 /dev_config/*
 !dev_config/config.yml.dist
-!dev_config/php.conf.d/*
 .idea
 /bin/GeoLite2-Country.mmdb
 ci/*.secret
