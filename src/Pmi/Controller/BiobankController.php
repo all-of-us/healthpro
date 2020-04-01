@@ -20,6 +20,7 @@ class BiobankController extends AbstractController
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/{biobankId}'],
         ['order', '/{biobankId}/order/{orderId}'],
+        ['quanumOrder', '/{biobankId}/quanum-order/{orderId}'],
         ['ordersToday', '/review/orders/today'],
         ['ordersUnfinalized', '/review/orders/unfinalized'],
         ['ordersUnlocked', '/review/orders/unlocked'],
@@ -100,7 +101,7 @@ class BiobankController extends AbstractController
             if (preg_match('/^\d{14}$/', $id)) {
                 $id = substr($id, 0, 10);
             }
-
+            // Internal Order
             $order = $app['em']->getRepository('orders')->fetchOneBy([
                 'order_id' => $id
             ]);
@@ -109,6 +110,21 @@ class BiobankController extends AbstractController
                     'biobankId' => $order['biobank_id'],
                     'orderId' => $order['id']
                 ]);
+            }
+            // Quanum Orders
+            $quanumOrders = $app['pmi.drc.participants']->getOrders([
+                'kitId' => $id,
+                'origin' => 'careevolution'
+            ]);
+            if (isset($quanumOrders[0])) {
+                $order = (new Order())->loadFromJsonObject($quanumOrders[0])->toArray();
+                $participant = $app['pmi.drc.participants']->getById($order['participant_id']);
+                if ($participant->biobankId) {
+                    return $app->redirectToRoute('biobank_quanumOrder', [
+                        'biobankId' => $participant->biobankId,
+                        'orderId' => $order['id']
+                    ]);
+                }
             }
             $app->addFlashError('Order ID not found');
         }
@@ -131,8 +147,9 @@ class BiobankController extends AbstractController
             $app->abort(404);
         }
         $participant = $participant[0];
-        $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($participant->id);
 
+        // Internal Orders
+        $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($participant->id);
         foreach ($orders as $key => $order) {
             // Display most recent processed sample time if exists
             $processedSamplesTs = json_decode($order['processed_samples_ts'], true);
@@ -141,6 +158,13 @@ class BiobankController extends AbstractController
                 $processedTs->setTimestamp(max($processedSamplesTs));
                 $processedTs->setTimezone(new \DateTimeZone($app->getUserTimezone()));
                 $orders[$key]['processed_ts'] = $processedTs;
+            }
+        }
+        // Quanum Orders
+        $quanumOrders = $app['pmi.drc.participants']->getOrdersByParticipant($participant->id);
+        foreach ($quanumOrders as $quanumOrder) {
+            if (in_array($quanumOrder->origin, ['careevolution'])) {
+                $orders[] = (new Order())->loadFromJsonObject($quanumOrder)->toArray();
             }
         }
 
@@ -181,6 +205,30 @@ class BiobankController extends AbstractController
             'order' => $order->toArray(),
             'samplesInfo' => $order->getSamplesInfo(),
             'currentStep' => $currentStep
+        ]);
+    }
+
+    public function quanumOrderAction($biobankId, $orderId, Application $app)
+    {
+        try {
+            $participant = $app['pmi.drc.participants']->search(['biobankId' => $biobankId]);
+        } catch (ParticipantSearchExceptionInterface $e) {
+            $app->abort(404);
+        }
+
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $participant = $participant[0];
+
+        $quanumOrder = $app['pmi.drc.participants']->getOrder($participant->id, $orderId);
+        $order = (new Order($app))->loadFromJsonObject($quanumOrder);
+
+        return $app['twig']->render('biobank/order-quanum.html.twig', [
+            'participant' => $participant,
+            'samplesInfo' => $order->getSamplesInfo(),
+            'currentStep' => 'finalize',
+            'order' => $order->toArray()
         ]);
     }
 
