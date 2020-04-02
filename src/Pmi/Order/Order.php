@@ -1368,8 +1368,8 @@ class Order
                 }
                 if (!empty($sample->processed)) {
                     $processedSamples[] = $sampleCode;
-                    $processedTs = new \DateTime($sample->processed);
-                    $processedSamplesTs[$sampleCode] = $processedTs->getTimestamp();
+                    $processedTs = $sample->processed;
+                    $processedSamplesTs[$sampleCode] = $sample->processed;
                 }
                 if (!empty($sample->finalized)) {
                     $finalizedSamples[] = $sampleCode;
@@ -1396,13 +1396,16 @@ class Order
 
         // Extract participantId
         preg_match('/^Patient\/(P\d+)$/i', $object->subject, $subject_matches);
+        $participant = $this->app['pmi.drc.participants']->getById($subject_matches[1]);
 
         $this->order['id'] = $object->id;
-        $this->order['participant_id'] = $subject_matches[1] ? $subject_matches[1] : 'Unknown';
+        $this->order['participant_id'] = $participant->id;
         $this->order['order_id'] = $kitId;
         $this->order['rdr_id'] = $object->id;
+        $this->order['biobank_id'] = $participant->biobankId;
         $this->order['type'] = 'kit';
         $this->order['oh_type'] = 'kit';
+        $this->order['h_type'] = 'kit';
         $this->order['created_ts'] = $object->created;
         $this->order['processed_ts'] = $processedTs;
         $this->order['collected_ts'] = $collectedTs;
@@ -1414,6 +1417,7 @@ class Order
         $this->order['processed_samples'] = json_encode(!empty($processedSamples) ? $processedSamples : []);
         $this->order['processed_samples_ts'] = json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []);
         $this->order['finalized_samples'] = json_encode(!empty($finalizedSamples) ? $finalizedSamples : []);
+        $this->order['finalizedSamples'] = !empty($finalizedSamples) ? join($finalizedSamples, ', ') : '';
         $this->order['finalized_ts'] = !empty($finalizedTs) ? $finalizedTs : null;
         $this->order['collected_notes'] = $collectedNotes;
         $this->order['processed_notes'] = $processedNotes;
@@ -1421,11 +1425,15 @@ class Order
         $this->order['fedex_tracking'] = !empty($trackingNumber) ? $trackingNumber : null;
         $this->order['collected_user_id'] = !empty($order->collectedInfo) ? $order->collectedInfo->author->value : false;
         $this->order['collected_site'] = null;
+        $this->order['collected_site_name'] = 'A Quest Site';
         $this->order['processed_user_id'] = !empty($order->processedInfo) ? $order->processedInfo->author->value : false;
         $this->order['processed_site'] = null;
+        $this->order['processed_site_name'] = 'A Quest Site';
         $this->order['finalized_user_id'] = !empty($order->finalizedInfo) ? $order->finalizedInfo->author->value : false;
         $this->order['finalized_site'] = null;
+        $this->order['finalized_site_name'] = 'A Quest Site';
         $this->order['failedToReachRDR'] = false;
+        $this->order['orderStatus'] = 'Finalized';
         $this->order['status'] = 'finalized';
 
         $this->order['origin'] = $object->origin;
