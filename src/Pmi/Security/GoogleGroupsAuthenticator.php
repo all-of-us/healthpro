@@ -59,7 +59,9 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     public function supports(Request $request)
     {
         // if the user is already authenticated, then don't re-authenticate
-        if ($request->getSession()->has('isLogin') && $this->app['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($request->getSession()->has('isLogin') &&
+            !empty($this->app['security.token_storage']->getToken()) &&
+            $this->app['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
             $user = $this->app['security.token_storage']->getToken()->getUser();
             $googleUser = $this->app->getGoogleUser();
             // make sure the user the Google user is the same as our user
@@ -79,18 +81,20 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             return false;
         }
     }
-    
+
     /** This runs on every request. */
     public function getCredentials(Request $request)
     {
         // if the user is already authenticated, then don't re-authenticate
-        if ($request->getSession()->has('isLogin') && $this->app['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($request->getSession()->has('isLogin') &&
+            !empty($this->app['security.token_storage']->getToken()) &&
+            $this->app['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
             $user = $this->app['security.token_storage']->getToken()->getUser();
             $googleUser = $this->app->getGoogleUser();
             // make sure the user the Google user is the same as our user
             if ($googleUser && strcasecmp($googleUser->getEmail(), $user->getEmail()) === 0) {
                 // firewall rules will pass and $this->start() will not be called
-                return;
+                return '';
             } else {
                 // force checkCredentials() to fail due to the mismatched users
                 return $this->buildCredentials(null);
@@ -114,7 +118,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             return $this->buildCredentials($this->app->getGoogleUser());
         } else {
             // firewall rules will fail and $this->start() will be called
-            return;
+            return '';
         }
     }
     
