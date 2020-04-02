@@ -268,11 +268,9 @@ class BiobankController extends AbstractController
         $today = $startTime->format('Y-m-d');
 
         $quanumOrders = $app['pmi.drc.participants']->getOrders([
-            'participant_id' => $participant_id,
             'startDate' => $today,
             'endDate' => date('Y-m-d'),
             'origin' => 'careevolution',
-            'kitId' => null,
             'page' => '1',
             'pageSize' => '1000'
         ]);
