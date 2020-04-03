@@ -4,7 +4,6 @@ namespace Pmi\Drc;
 use Pmi\Entities\Participant;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Order\Order;
-use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\Cache\ItemInterface;
 
 class RdrParticipants
@@ -17,7 +16,9 @@ class RdrParticipants
     protected static $resourceEndpoint = 'rdr/v1/';
     protected $nextToken;
     protected $total;
-    protected $disableTestAccess;
+
+    private $disableTestAccess;
+    private $genomicsStartTime;
 
     // Expected RDR response status
 
@@ -34,6 +35,7 @@ class RdrParticipants
         $this->cache = $rdrHelper->getCache();
         $this->cacheTime = $rdrHelper->getCacheTime();
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
+        $this->genomicsStartTime = $rdrHelper->getGenomicsStartTime();
     }
 
     protected function getClient()
@@ -192,7 +194,11 @@ class RdrParticipants
         try {
             $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
             $participant = json_decode($response->getBody()->getContents());
-            $participant->disableTestAccess = $this->disableTestAccess;
+            $participant->options = [
+                'disableTestAccess' => $this->disableTestAccess,
+                'genomicsStartTime' => $this->genomicsStartTime,
+                'siteType' => isset($participant->awardee) ? $this->rdrHelper->getSiteType($participant->awardee) : null
+            ];
             return $participant;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             return false;
