@@ -73,7 +73,7 @@ class Participant
             $this->status = false;
             $this->statusReason = 'withdrawal';
         }
-        if (!empty($this->genomicsStartTime) && isset($participant->consentForStudyEnrollmentAuthored) && $participant->consentForStudyEnrollmentAuthored > $this->genomicsStartTime) {
+        if (!empty($this->genomicsStartTime) && isset($participant->consentForStudyEnrollmentAuthored) && $participant->consentForStudyEnrollmentAuthored >= $this->genomicsStartTime) {
             if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                 $this->status = false;
                 $this->statusReason = 'genomics';
