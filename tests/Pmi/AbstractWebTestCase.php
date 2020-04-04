@@ -6,7 +6,7 @@ use Pmi\Controller;
 use Pmi\Security\GoogleGroupsAuthenticator;
 use Pmi\Security\User;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\Client;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +36,7 @@ abstract class AbstractWebTestCase extends TestCase
      *
      * @param array $server Server parameters
      *
-     * @return Client A Client instance
+     * @return HttpKernelBrowser A HttpKernelBrowser instance
      */
     public function createClient(array $server = [])
     {
@@ -44,7 +44,7 @@ abstract class AbstractWebTestCase extends TestCase
             throw new \LogicException('Component "symfony/browser-kit" is required by WebTestCase.'.PHP_EOL.'Run composer require symfony/browser-kit');
         }
 
-        return new Client($this->app, $server);
+        return new HttpKernelBrowser($this->app, $server);
     }
 
     /**
