@@ -8,8 +8,6 @@ use Pmi\Entities\Participant;
 use Pmi\Drc\CodeBook;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Pmi\WorkQueue\WorkQueue;
-use Pmi\Order\Order;
-use Pmi\Evaluation\Evaluation;
 
 class WorkQueueController extends AbstractController
 {
@@ -84,6 +82,9 @@ class WorkQueueController extends AbstractController
         }
         if (!empty($params['consentForElectronicHealthRecords'])) {
             $rdrParams['consentForElectronicHealthRecords'] = $params['consentForElectronicHealthRecords'];
+        }
+        if (!empty($params['consentForGenomicsROR'])) {
+            $rdrParams['consentForGenomicsROR'] = $params['consentForGenomicsROR'];
         }
         if (!empty($params['genderIdentity'])) {
             $rdrParams['genderIdentity'] = $params['genderIdentity'];
@@ -356,6 +357,8 @@ class WorkQueueController extends AbstractController
             if ($hasFullDataAccess) {
                 $headers[] = 'Deactivation Status';
                 $headers[] = 'Deactivation Date';
+                $headers[] = 'gRoR Consent Status';
+                $headers[] = 'gRoR Consent Date';
             }
             fputcsv($output, $headers);
 
@@ -441,6 +444,8 @@ class WorkQueueController extends AbstractController
                     if ($hasFullDataAccess) {
                         $row[] = $participant->isSuspended ? '1' : '0';
                         $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsROR);
+                        $row[] = WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
                 }
