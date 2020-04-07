@@ -658,7 +658,8 @@ class HpoApplication extends AbstractApplication
             'rdr_disable_cache' => $this->getConfig('rdr_endpoint'),
             'cache_time' => $this->getConfig('cache_time'),
             'disable_test_access' => $this->getConfig('disable_test_access'),
-            'genomics_start_time' => $this->getConfig('genomics_start_time')
+            'genomics_start_time' => $this->getConfig('genomics_start_time'),
+            'rdr_auth_json' => $this->getConfig('rdr_auth_json')
         ];
     }
 }
