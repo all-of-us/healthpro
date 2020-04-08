@@ -1396,13 +1396,13 @@ class Order
 
         // Extract participantId
         preg_match('/^Patient\/(P\d+)$/i', $object->subject, $subject_matches);
-        $participant = $this->app['pmi.drc.participants']->getById($subject_matches[1]);
+        $participantId = $subject_matches[1];
 
         $this->order['id'] = $object->id;
-        $this->order['participant_id'] = $participant->id;
+        $this->order['participant_id'] = $participantId;
         $this->order['order_id'] = $kitId;
         $this->order['rdr_id'] = $object->id;
-        $this->order['biobank_id'] = $participant->biobankId;
+        $this->order['biobank_id'] = $object->biobankId;
         $this->order['type'] = 'kit';
         $this->order['oh_type'] = 'kit';
         $this->order['h_type'] = 'kit';
