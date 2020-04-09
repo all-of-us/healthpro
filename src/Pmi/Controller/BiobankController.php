@@ -263,13 +263,12 @@ class BiobankController extends AbstractController
             $startString = '-' . intval($request->query->get('days')) . ' days';
         }
         $startTime = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
-        // Get MySQL date/time string in UTC
-        $startTime->setTimezone(new \DateTimezone('UTC'));
         $today = $startTime->format('Y-m-d');
+        $endDate = (new \DateTime('today', new \DateTimezone('UTC')))->format('Y-m-d');
 
         $quanumOrders = $app['pmi.drc.participants']->getOrders([
             'startDate' => $today,
-            'endDate' => date('Y-m-d'),
+            'endDate' => $endDate,
             'origin' => 'careevolution',
             'page' => '1',
             'pageSize' => '1000'
