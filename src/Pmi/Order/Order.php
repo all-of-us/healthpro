@@ -1402,7 +1402,7 @@ class Order
         $this->order['participant_id'] = $participantId;
         $this->order['order_id'] = $kitId;
         $this->order['rdr_id'] = $object->id;
-        $this->order['biobank_id'] = $object->biobankId;
+        $this->order['biobank_id'] = (property_exists($object, 'biobankId')) ? $object->biobankId : null;
         $this->order['type'] = 'kit';
         $this->order['oh_type'] = 'kit';
         $this->order['h_type'] = 'kit';
