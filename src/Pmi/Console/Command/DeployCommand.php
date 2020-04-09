@@ -142,6 +142,9 @@ class DeployCommand extends Command {
         $this->out->writeln('');
         $this->runJsSecurityCheck(); // must occur after asset compilation
 
+        // create symlink for symfony
+        $this->createSymfonySymlink();
+
         // unit tests should pass before deploying to testers or production
         if ($this->isStaging() || $this->isStable() || $this->isProd()) {
             $this->runUnitTests();
@@ -358,6 +361,11 @@ class DeployCommand extends Command {
     private function runUnitTests()
     {
         $this->exec("{$this->appDir}/bin/phpunit");
+    }
+
+    private function createSymfonySymlink()
+    {
+        $this->exec("{$this->appDir}/bin/symfonySymlink");
     }
 
     private function displayVulnerabilities($vulnerabilities)

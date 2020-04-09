@@ -35,3 +35,5 @@ ci/*.secret
 ###< symfony/phpunit-bridge ###
 
 /symfony/.gitignore
+
+/web/s
