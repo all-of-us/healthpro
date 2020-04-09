@@ -129,6 +129,16 @@
                                                 {{ participant.consentForElectronicHealthRecordsAuthored ? participant.consentForElectronicHealthRecordsAuthored|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
                                             {% endif %}
                                         </dd>
+                                        <dt>gRoR Consent</dt>
+                                        <dd>
+                                            {% if participant.consentForGenomicsROR == 'SUBMITTED' %}
+                                                {{ participant.consentForGenomicsRORAuthored ? participant.consentForGenomicsRORAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% elseif participant.consentForGenomicsROR == 'INVALID' %}
+                                                (invalid) {{ participant.consentForGenomicsRORAuthored ? participant.consentForGenomicsRORAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+                                            {% else %}
+                                                {{ participant.consentForGenomicsRORAuthored ? participant.consentForGenomicsRORAuthored|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
+                                            {% endif %}
+                                        </dd>
                                         <dt>DV-only EHR Sharing</dt>
                                         <dd>
                                             {% if participant.consentForDvElectronicHealthRecordsSharing == 'SUBMITTED' %}

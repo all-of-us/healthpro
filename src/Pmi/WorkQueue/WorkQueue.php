@@ -131,6 +131,16 @@ class WorkQueue
                 'Invalid' => 'SUBMITTED_INVALID'
             ]
         ],
+        'consentForGenomicsROR' => [
+            'label' => 'gRoR Consent Status',
+            'options' => [
+                'Consented Yes' => 'SUBMITTED',
+                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
+                'Consent Not Completed' => 'UNSET',
+                'Invalid' => 'SUBMITTED_INVALID'
+            ]
+        ],
         'ageRange' => [
             'label' => 'Age',
             'options' => [
@@ -302,11 +312,12 @@ class WorkQueue
             $row['participantOrigin'] = $e($participant->participantOrigin);
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
-            $row['generalConsent'] = $this->displayStatus($participant->consentForStudyEnrollment, 'SUBMITTED', $participant->consentForStudyEnrollmentAuthored);
+            $row['generalConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
-            $row['ehrConsent'] = $this->displayStatus($participant->consentForElectronicHealthRecords, 'SUBMITTED', $participant->consentForElectronicHealthRecordsAuthored, true, true);
-            $row['dvEhrStatus'] = $this->displayStatus($participant->consentForDvElectronicHealthRecordsSharing, 'SUBMITTED', $participant->consentForDvElectronicHealthRecordsSharingAuthored, true, true);
-            $row['caborConsent'] = $this->displayStatus($participant->consentForCABoR, 'SUBMITTED', $participant->consentForCABoRAuthored, true);
+            $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
+            $row['gRoRConsent'] = $this->displayConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
+            $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
+            $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
             $row['activityStatus'] = $this->getActivityStatus($participant);
             $row['withdrawalStatus'] = $participant->withdrawalStatus; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
@@ -332,17 +343,13 @@ class WorkQueue
             $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
             foreach (array_keys(self::$surveys) as $field) {
                 $row["ppi{$field}"] = $this->displayStatus($participant->{'questionnaireOn' . $field}, 'SUBMITTED');
-                if (!empty($participant->{'questionnaireOn' . $field . 'Authored'})) {
-                    $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn' . $field . 'Authored'}, $app->getUserTimezone());
-                } else {
-                    $row["ppi{$field}Time"] = '';
-                }
+                $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn' . $field . 'Authored'}, $app->getUserTimezone());
             }
 
             //In-Person Enrollment
             $row['pairedSite'] = $this->app->getSiteDisplayName($e($participant->siteSuffix));
             $row['pairedOrganization'] = $this->app->getOrganizationDisplayName($e($participant->organization));
-            $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsFinalizedTime, false, false, false);
+            $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsFinalizedTime, false);
             $row['evaluationFinalizedSite'] = $this->app->getSiteDisplayName($e($participant->evaluationFinalizedSite));
             $row['biobankDnaStatus'] = $this->displayStatus($participant->samplesToIsolateDNA, 'RECEIVED');
             if ($participant->numBaselineSamplesArrived >= 7) {
@@ -359,11 +366,7 @@ class WorkQueue
                     }
                 }
                 $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED');
-                if (!empty($participant->{'sampleStatus' . $newSample . 'Time'})) {
-                    $row["sample{$sample}Time"] = self::dateFromString($participant->{'sampleStatus' . $newSample . 'Time'}, $app->getUserTimezone(), false);
-                } else {
-                    $row["sample{$sample}Time"] = '';
-                }
+                $row["sample{$sample}Time"] = self::dateFromString($participant->{'sampleStatus' . $newSample . 'Time'}, $app->getUserTimezone(), false);
             }
             $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
 
@@ -413,24 +416,30 @@ class WorkQueue
         }
     }
 
-    public function displayStatus($value, $successStatus, $time = null, $showNotCompleteText = false, $checkInvalidStatus = false, $displayTime = true)
+    public function displayStatus($value, $successStatus, $time = null, $displayTime = true)
     {
         if ($value === $successStatus) {
-            if (!empty($time)) {
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
-            }
-            return self::HTML_SUCCESS;
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
         } elseif ($value === "{$successStatus}_NOT_SURE") {
-            if (!empty($time)) {
-                return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
-            }
-            return self::HTML_WARNING;
-        } elseif ($checkInvalidStatus && ($value === 'INVALID' || $value === 'SUBMITTED_INVALID')) {
-            return !empty($time) ? self::HTML_DANGER . ' (invalid) ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) : self::HTML_DANGER . ' (invalid)';
-        } elseif ($showNotCompleteText) {
-            return !empty($time) ? self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) : self::HTML_DANGER . ' (not completed)';
+            return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
         }
         return self::HTML_DANGER;
+    }
+
+    public function displayConsentStatus($value, $time, $displayTime = true)
+    {
+        switch ($value) {
+            case 'SUBMITTED':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Consented Yes)';
+            case 'SUBMITTED_NO_CONSENT':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Refused Consent)';
+            case 'SUBMITTED_NO_SURE':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Responded Not Sure)';
+            case 'SUBMITTED_INVALID':
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Invalid)';
+            default:
+                return self::HTML_DANGER . ' (Consent Not Completed)';
+        }
     }
 
     public function generateLink($id, $name)
