@@ -26,3 +26,5 @@ ci/*.secret
 /symfony/var/
 /symfony/vendor/
 ###< symfony/framework-bundle ###
+
+/web/s
