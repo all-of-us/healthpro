@@ -27,6 +27,7 @@ class WorkQueue
         'consentForStudyEnrollmentAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
+        'consentForGenomicsRORAuthored',
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
         'withdrawalAuthored',
