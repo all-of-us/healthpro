@@ -22,6 +22,7 @@ class BiobankController extends AbstractController
         ['order', '/{biobankId}/order/{orderId}'],
         ['quanumOrder', '/{biobankId}/quanum-order/{orderId}'],
         ['ordersToday', '/review/orders/today'],
+        ['quanumOrdersToday', '/review/quanum-orders/today'],
         ['ordersUnfinalized', '/review/orders/unfinalized'],
         ['ordersUnlocked', '/review/orders/unlocked'],
         ['ordersRecentModify', '/review/orders/recent/modify']
@@ -117,7 +118,7 @@ class BiobankController extends AbstractController
                 'origin' => 'careevolution'
             ]);
             if (isset($quanumOrders[0])) {
-                $order = (new Order())->loadFromJsonObject($quanumOrders[0])->toArray();
+                $order = (new Order($app))->loadFromJsonObject($quanumOrders[0])->toArray();
                 $participant = $app['pmi.drc.participants']->getById($order['participant_id']);
                 if ($participant->biobankId) {
                     return $app->redirectToRoute('biobank_quanumOrder', [
@@ -164,7 +165,7 @@ class BiobankController extends AbstractController
         $quanumOrders = $app['pmi.drc.participants']->getOrdersByParticipant($participant->id);
         foreach ($quanumOrders as $quanumOrder) {
             if (in_array($quanumOrder->origin, ['careevolution'])) {
-                $orders[] = (new Order())->loadFromJsonObject($quanumOrder)->toArray();
+                $orders[] = (new Order($app))->loadFromJsonObject($quanumOrder)->toArray();
             }
         }
 
@@ -249,6 +250,37 @@ class BiobankController extends AbstractController
         $orders = $review->getTodayOrders($today);
 
         return $app['twig']->render('biobank/orders-today.html.twig', [
+            'orders' => $orders
+        ]);
+    }
+
+    public function quanumOrdersTodayAction(Application $app, Request $request)
+    {
+        // Get beginning of today (at midnight) in user's timezone
+        $startString = 'today';
+        // Allow overriding start time to test in non-prod environments
+        if (!$app->isProd() && intval($request->query->get('days')) > 0) {
+            $startString = '-' . intval($request->query->get('days')) . ' days';
+        }
+        $startTime = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
+        $today = $startTime->format('Y-m-d');
+        $endDate = (new \DateTime('today', new \DateTimezone('UTC')))->format('Y-m-d');
+
+        $quanumOrders = $app['pmi.drc.participants']->getOrders([
+            'startDate' => $today,
+            'endDate' => $endDate,
+            'origin' => 'careevolution',
+            'page' => '1',
+            'pageSize' => '1000'
+        ]);
+        $orders = [];
+        foreach ($quanumOrders as $quanumOrder) {
+            if (in_array($quanumOrder->origin, ['careevolution'])) {
+                $orders[] = (new Order($app))->loadFromJsonObject($quanumOrder)->toArray();
+            }
+        }
+
+        return $app['twig']->render('biobank/orders-quanum-today.html.twig', [
             'orders' => $orders
         ]);
     }
