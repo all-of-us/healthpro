@@ -151,16 +151,7 @@ class BiobankController extends AbstractController
 
         // Internal Orders
         $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($participant->id);
-        foreach ($orders as $key => $order) {
-            // Display most recent processed sample time if exists
-            $processedSamplesTs = json_decode($order['processed_samples_ts'], true);
-            if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
-                $processedTs = new \DateTime();
-                $processedTs->setTimestamp(max($processedSamplesTs));
-                $processedTs->setTimezone(new \DateTimeZone($app->getUserTimezone()));
-                $orders[$key]['processed_ts'] = $processedTs;
-            }
-        }
+
         // Quanum Orders
         $quanumOrders = $app['pmi.drc.participants']->getOrdersByParticipant($participant->id);
         foreach ($quanumOrders as $quanumOrder) {

@@ -498,7 +498,18 @@ class WorkQueueController extends AbstractController
         }
 
         $evaluations = $app['em']->getRepository('evaluations')->getEvaluationsWithHistory($id);
+
+        // Internal Orders
         $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($id);
+
+        // Quanum Orders
+        $quanumOrders = $app['pmi.drc.participants']->getOrdersByParticipant($participant->id);
+        foreach ($quanumOrders as $quanumOrder) {
+            if (in_array($quanumOrder->origin, ['careevolution'])) {
+                $orders[] = (new Order($app))->loadFromJsonObject($quanumOrder)->toArray();
+            }
+        }
+
         $problems = $app['em']->getRepository('problems')->getParticipantProblemsWithCommentsCount($id);
 
         return $app['twig']->render('workqueue/participant.html.twig',[
