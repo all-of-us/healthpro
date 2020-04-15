@@ -28,7 +28,7 @@
         "symfony/twig-bridge": "^4.4",
         "symfony/validator": "^4.4",
         "symfony/yaml": "^4.4",
-        "twig/twig": "^1.24",
+        "twig/twig": "^2.12",
         "fzaninotto/faker": "^1.6",
         "google/cloud-datastore": "^1.5",
         "google/cloud-logging": "^1.18",
