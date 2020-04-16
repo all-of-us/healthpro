@@ -12,8 +12,15 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
         git-all \
         nodejs \
         openjdk-11-jdk \
+        libzstd-dev \
+        zlib1g-dev \
+        autoconf \
+        g++ \
       && docker-php-ext-install pdo_mysql \
       && rm -rf /var/lib/apt/lists/*
+
+# Install GRPC module for PHP
+RUN pecl install grpc
 
 # Google Cloud Tools
 WORKDIR /opt

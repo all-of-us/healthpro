@@ -59,7 +59,7 @@ class BiobankController extends AbstractController
 
         $idForm->handleRequest($request);
 
-        if ($idForm->isValid()) {
+        if ($idForm->isSubmitted() && $idForm->isValid()) {
             $searchParameters = $idForm->getData();
             try {
                 $searchResults = $app['pmi.drc.participants']->search($searchParameters);
@@ -94,7 +94,7 @@ class BiobankController extends AbstractController
 
         $idForm->handleRequest($request);
 
-        if ($idForm->isValid()) {
+        if ($idForm->isSubmitted() && $idForm->isValid()) {
             $id = $idForm->get('orderId')->getData();
 
             // New barcodes include a 4-digit sample identifier appended to the 10 digit order id

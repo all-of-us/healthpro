@@ -4,7 +4,6 @@ namespace Pmi\Drc;
 use Pmi\Entities\Participant;
 use Pmi\Evaluation\Evaluation;
 use Pmi\Order\Order;
-use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\Cache\ItemInterface;
 
 class RdrParticipants
@@ -17,15 +16,14 @@ class RdrParticipants
     protected static $resourceEndpoint = 'rdr/v1/';
     protected $nextToken;
     protected $total;
-    protected $disableTestAccess;
+
+    private $disableTestAccess;
+    private $genomicsStartTime;
 
     // Expected RDR response status
-    // TODO: Remove these two constants once rdr starts sending new response in prod
-    const EVALUATION_CANCEL_STATUS = 'CANCELLED';
-    const EVALUATION_RESTORE_STATUS = 'RESTORED';
 
-    const NEW_EVALUATION_CANCEL_STATUS = 'entered_in_error';
-    const NEW_EVALUATION_RESTORE_STATUS = 'final';
+    const EVALUATION_CANCEL_STATUS = 'entered-in-error';
+    const EVALUATION_RESTORE_STATUS = 'final';
     const ORDER_CANCEL_STATUS = 'CANCELLED';
     const ORDER_RESTORE_STATUS = 'UNSET';
     const ORDER_EDIT_STATUS = 'AMENDED';
@@ -37,6 +35,7 @@ class RdrParticipants
         $this->cache = $rdrHelper->getCache();
         $this->cacheTime = $rdrHelper->getCacheTime();
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
+        $this->genomicsStartTime = $rdrHelper->getGenomicsStartTime();
     }
 
     protected function getClient()
@@ -195,7 +194,11 @@ class RdrParticipants
         try {
             $response = $this->getClient()->request('GET', "Participant/{$id}/Summary");
             $participant = json_decode($response->getBody()->getContents());
-            $participant->disableTestAccess = $this->disableTestAccess;
+            $participant->options = [
+                'disableTestAccess' => $this->disableTestAccess,
+                'genomicsStartTime' => $this->genomicsStartTime,
+                'siteType' => isset($participant->awardee) ? $this->rdrHelper->getSiteType($participant->awardee) : null
+            ];
             return $participant;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             return false;
@@ -322,19 +325,13 @@ class RdrParticipants
                 'json' => $evaluation
             ]);
             $result = json_decode($response->getBody()->getContents());
-            $rdrStatus = $type === Evaluation::EVALUATION_CANCEL ? self::EVALUATION_CANCEL_STATUS : self::EVALUATION_RESTORE_STATUS;
-            // TODO: Remove this check once rdr starts sending new response in prod
-            // Currently, RDR is returning response in lower case (they will soon switch it upper case) so convert the response into uppercase
-            if (is_object($result) && isset($result->status) && strtoupper($result->status) === $rdrStatus) {
-                return true;
-            }
 
-            // Check new RDR response
-            $newRdrStatus = $type === Evaluation::EVALUATION_CANCEL ? self::NEW_EVALUATION_CANCEL_STATUS : self::NEW_EVALUATION_RESTORE_STATUS;
+            // Check RDR response
+            $rdrStatus = $type === Evaluation::EVALUATION_CANCEL ? self::EVALUATION_CANCEL_STATUS : self::EVALUATION_RESTORE_STATUS;
             if (is_object($result) && is_array($result->entry)) {
                 foreach ($result->entry as $entries) {
                     if (strtolower($entries->resource->resourceType) === 'composition') {
-                        return $entries->resource->status === $newRdrStatus ? true : false;
+                        return $entries->resource->status === $rdrStatus ? true : false;
                     }
                 }
             }

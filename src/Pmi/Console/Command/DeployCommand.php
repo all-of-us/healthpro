@@ -148,7 +148,7 @@ class DeployCommand extends Command {
         }
 
         if ($this->local) {
-            $cmd = "php -S 0.0.0.0:{$this->port} -t web/ web/local-router.php";
+            $cmd = "php -c php.ini -S 0.0.0.0:{$this->port} -t web/ web/local-router.php";
         } else {
             $cmd = "gcloud app deploy --quiet --project={$this->appId} {$this->appDir}/app.yaml {$this->appDir}/cron.yaml";
         }

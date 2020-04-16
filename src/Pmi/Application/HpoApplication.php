@@ -22,33 +22,9 @@ class HpoApplication extends AbstractApplication
     {
         parent::setup($config);
 
-        $rdrOptions = [];
-        if ($this->isLocal()) {
-            putenv('DATASTORE_EMULATOR_HOST=' . self::DATASTORE_EMULATOR_HOST);
-            $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
-            if (file_exists($keyFile)) {
-                $rdrOptions['key_file'] = $keyFile;
-            }
-        }
-        if ($this->getConfig('rdr_endpoint')) {
-            $rdrOptions['endpoint'] = $this->getConfig('rdr_endpoint');
-        }
-        if ($this->getConfig('rdr_auth_json')) {
-            $rdrOptions['key_contents'] = $this->getConfig('rdr_auth_json');
-        }
-        if ($this->getConfig('rdr_disable_cache')) {
-            $rdrOptions['disable_cache'] = true;
-        }
-        if (intval($this->getConfig('cache_time'))) {
-            $rdrOptions['cache_time'] = intval($this->getConfig('cache_time'));
-        }
-        if ($this->getConfig('disable_test_access')) {
-            $rdrOptions['disable_test_access'] = $this->getConfig('disable_test_access');
-        }
-        $rdrOptions['logger'] = $this['logger'];
-        $rdrOptions['cache'] = $this['cache'];
+        $this->registerDb();
 
-        $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($rdrOptions);
+        $this['pmi.drc.rdrhelper'] = new \Pmi\Drc\RdrHelper($this->getRdrOptions());
         if ($this->participantSource == 'mock') {
             $this['pmi.drc.participants'] = new \Pmi\Drc\MockParticipantSearch();
         } else {
@@ -57,8 +33,6 @@ class HpoApplication extends AbstractApplication
 
         $this['pmi.drc.appsclient'] = (!$this->isProd() && ($this['isUnitTest'] || $this->getConfig('gaBypass'))) ?
              \Pmi\Drc\MockAppsClient::createFromApp($this) : \Pmi\Drc\AppsClient::createFromApp($this);
-
-        $this->registerDb();
         return $this;
     }
 
@@ -256,25 +230,8 @@ class HpoApplication extends AbstractApplication
 
     public function setNewRoles($user)
     {
-        $roles = $user->getRoles();
-        if ($this['session']->has('site')) {
-            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-        }
-        if ($this['session']->has('awardee')) {
-            if (($key = array_search('ROLE_USER', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if ($this->getAwardeeId() !== User::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-        }
-        if ($roles != $user->getRoles()) {
-            $token = new PostAuthenticationGuardToken($this['security.token_storage']->getToken()->getUser(), 'main', $roles);
+        if ($user->getAllRoles() != $user->getRoles()) {
+            $token = new PostAuthenticationGuardToken($user, 'main', $user->getRoles());
             $this['security.token_storage']->setToken($token);
         }
     }
@@ -415,6 +372,11 @@ class HpoApplication extends AbstractApplication
         return !empty($site);
     }
 
+    public function getSiteType()
+    {
+        return $this->isDVType() ? 'dv' : 'hpo';
+    }
+
     protected function earlyBeforeCallback(Request $request, AbstractApplication $app)
     {
         if ($request->getBasePath() === '/web') {
@@ -495,10 +457,6 @@ class HpoApplication extends AbstractApplication
     protected function afterCallback(Request $request, Response $response)
     {
         $this->setHeaders($response);
-    }
-
-    protected function finishCallback(Request $request, Response $response)
-    {
         if ($this->isLoggedIn()) {
             // only the first route handled is considered a login
             $this['session']->set('isLogin', false);
@@ -508,6 +466,11 @@ class HpoApplication extends AbstractApplication
                 $this['session']->set('isLoginReturn', false);
             }
         }
+    }
+    
+    protected function finishCallback(Request $request, Response $response)
+    {
+        // moved to afterCallBack to fix session start error
     }
 
     public function isValidSite($email)
@@ -653,5 +616,35 @@ class HpoApplication extends AbstractApplication
     public function canMockLogin()
     {
         return $this->isLocal() && $this->getConfig('local_mock_auth');
+    }
+
+    private function getRdrOptions()
+    {
+        $rdrOptions = [];
+        if ($this->isLocal()) {
+            putenv('DATASTORE_EMULATOR_HOST=' . self::DATASTORE_EMULATOR_HOST);
+            $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
+            if (file_exists($keyFile)) {
+                $rdrOptions['key_file'] = $keyFile;
+            }
+        }
+        $rdrOptions['config'] = $this->getRdrConfigs();
+        $rdrOptions['logger'] = $this['logger'];
+        $rdrOptions['cache'] = $this['cache'];
+        $rdrOptions['em'] = $this['em'];
+
+        return $rdrOptions;
+    }
+
+    private function getRdrConfigs()
+    {
+        return [
+            'rdr_endpoint' => $this->getConfig('rdr_endpoint'),
+            'rdr_disable_cache' => $this->getConfig('rdr_endpoint'),
+            'cache_time' => intval($this->getConfig('cache_time')),
+            'disable_test_access' => $this->getConfig('disable_test_access'),
+            'genomics_start_time' => $this->getConfig('genomics_start_time'),
+            'rdr_auth_json' => $this->getConfig('rdr_auth_json')
+        ];
     }
 }
