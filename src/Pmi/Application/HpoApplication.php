@@ -229,25 +229,8 @@ class HpoApplication extends AbstractApplication
 
     public function setNewRoles($user)
     {
-        $roles = $user->getRoles();
-        if ($this['session']->has('site')) {
-            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-        }
-        if ($this['session']->has('awardee')) {
-            if (($key = array_search('ROLE_USER', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if ($this->getAwardeeId() !== User::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-        }
-        if ($roles != $user->getRoles()) {
-            $token = new PostAuthenticationGuardToken($this['security.token_storage']->getToken()->getUser(), 'main', $roles);
+        if ($user->getAllRoles() != $user->getRoles()) {
+            $token = new PostAuthenticationGuardToken($user, 'main', $user->getRoles());
             $this['security.token_storage']->setToken($token);
         }
     }
@@ -473,19 +456,21 @@ class HpoApplication extends AbstractApplication
     protected function afterCallback(Request $request, Response $response)
     {
         $this->setHeaders($response);
-    }
-    
-    protected function finishCallback(Request $request, Response $response)
-    {
+
         if ($this->isLoggedIn()) {
             // only the first route handled is considered a login
             $this['session']->set('isLogin', false);
-            
+
             // unset after the first route handled following loginReturn
             if (!$this->isUpkeepRoute($request)) {
                 $this['session']->set('isLoginReturn', false);
             }
         }
+    }
+    
+    protected function finishCallback(Request $request, Response $response)
+    {
+        // moved to afterCallBack to fix session start error
     }
 
     public function isValidSite($email)

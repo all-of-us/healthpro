@@ -24,17 +24,19 @@ class User implements UserInterface
     private $adminAccess;
     private $info;
     private $timezone;
+    private $session;
     private $adminDvAccess;
     private $biobankAccess;
     private $scrippsAccess;
     private $scrippsAwardee;
-    
-    public function __construct($googleUser, array $groups, $info = null, $timezone = null)
+
+    public function __construct($googleUser, array $groups, $info = null, $timezone = null, $session = null)
     {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
         $this->info = $info;
-        $this->timezone = $timezone;
+        $this->timezone = null;
+        $this->session = $session;
         $this->sites = $this->computeSites();
         $this->awardees = $this->computeAwardees();
         $this->dashboardAccess = $this->computeDashboardAccess();
@@ -229,8 +231,8 @@ class User implements UserInterface
     {
         return $this->googleUser;
     }
-    
-    public function getRoles()
+
+    public function getAllRoles()
     {
         $roles = [];
         if (count($this->sites) > 0) {
@@ -256,6 +258,28 @@ class User implements UserInterface
         }
         if ($this->scrippsAwardee) {
             $roles[] = 'ROLE_AWARDEE_SCRIPPS';
+        }
+        return $roles;
+    }
+
+    public function getRoles()
+    {
+        $roles = $this->getAllRoles();
+        if ($this->session->has('site')) {
+            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+        }
+        if ($this->session->has('awardee')) {
+            if (($key = array_search('ROLE_USER', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if ($this->session->get('awardee')->id !== self::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
+                unset($roles[$key]);
+            }
         }
         return $roles;
     }
