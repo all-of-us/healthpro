@@ -20,7 +20,9 @@ class BiobankController extends AbstractController
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/{biobankId}'],
         ['order', '/{biobankId}/order/{orderId}'],
+        ['quanumOrder', '/{biobankId}/quanum-order/{orderId}'],
         ['ordersToday', '/review/orders/today'],
+        ['quanumOrdersToday', '/review/quanum-orders/today'],
         ['ordersUnfinalized', '/review/orders/unfinalized'],
         ['ordersUnlocked', '/review/orders/unlocked'],
         ['ordersRecentModify', '/review/orders/recent/modify']
@@ -100,7 +102,7 @@ class BiobankController extends AbstractController
             if (preg_match('/^\d{14}$/', $id)) {
                 $id = substr($id, 0, 10);
             }
-
+            // Internal Order
             $order = $app['em']->getRepository('orders')->fetchOneBy([
                 'order_id' => $id
             ]);
@@ -109,6 +111,21 @@ class BiobankController extends AbstractController
                     'biobankId' => $order['biobank_id'],
                     'orderId' => $order['id']
                 ]);
+            }
+            // Quanum Orders
+            $quanumOrders = $app['pmi.drc.participants']->getOrders([
+                'kitId' => $id,
+                'origin' => 'careevolution'
+            ]);
+            if (isset($quanumOrders[0])) {
+                $order = (new Order($app))->loadFromJsonObject($quanumOrders[0])->toArray();
+                $participant = $app['pmi.drc.participants']->getById($order['participant_id']);
+                if ($participant->biobankId) {
+                    return $app->redirectToRoute('biobank_quanumOrder', [
+                        'biobankId' => $participant->biobankId,
+                        'orderId' => $order['id']
+                    ]);
+                }
             }
             $app->addFlashError('Order ID not found');
         }
@@ -131,16 +148,15 @@ class BiobankController extends AbstractController
             $app->abort(404);
         }
         $participant = $participant[0];
+
+        // Internal Orders
         $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($participant->id);
 
-        foreach ($orders as $key => $order) {
-            // Display most recent processed sample time if exists
-            $processedSamplesTs = json_decode($order['processed_samples_ts'], true);
-            if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
-                $processedTs = new \DateTime();
-                $processedTs->setTimestamp(max($processedSamplesTs));
-                $processedTs->setTimezone(new \DateTimeZone($app->getUserTimezone()));
-                $orders[$key]['processed_ts'] = $processedTs;
+        // Quanum Orders
+        $quanumOrders = $app['pmi.drc.participants']->getOrdersByParticipant($participant->id);
+        foreach ($quanumOrders as $quanumOrder) {
+            if (in_array($quanumOrder->origin, ['careevolution'])) {
+                $orders[] = (new Order($app))->loadFromJsonObject($quanumOrder)->toArray();
             }
         }
 
@@ -184,6 +200,30 @@ class BiobankController extends AbstractController
         ]);
     }
 
+    public function quanumOrderAction($biobankId, $orderId, Application $app)
+    {
+        try {
+            $participant = $app['pmi.drc.participants']->search(['biobankId' => $biobankId]);
+        } catch (ParticipantSearchExceptionInterface $e) {
+            $app->abort(404);
+        }
+
+        if (!$participant) {
+            $app->abort(404);
+        }
+        $participant = $participant[0];
+
+        $quanumOrder = $app['pmi.drc.participants']->getOrder($participant->id, $orderId);
+        $order = (new Order($app))->loadFromJsonObject($quanumOrder);
+
+        return $app['twig']->render('biobank/order-quanum.html.twig', [
+            'participant' => $participant,
+            'samplesInfo' => $order->getSamplesInfo(),
+            'currentStep' => 'finalize',
+            'order' => $order->toArray()
+        ]);
+    }
+
     public function ordersTodayAction(Application $app, Request $request)
     {
         // Get beginning of today (at midnight) in user's timezone
@@ -201,6 +241,37 @@ class BiobankController extends AbstractController
         $orders = $review->getTodayOrders($today);
 
         return $app['twig']->render('biobank/orders-today.html.twig', [
+            'orders' => $orders
+        ]);
+    }
+
+    public function quanumOrdersTodayAction(Application $app, Request $request)
+    {
+        // Get beginning of today (at midnight) in user's timezone
+        $startString = 'today';
+        // Allow overriding start time to test in non-prod environments
+        if (!$app->isProd() && intval($request->query->get('days')) > 0) {
+            $startString = '-' . intval($request->query->get('days')) . ' days';
+        }
+        $startTime = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
+        $today = $startTime->format('Y-m-d');
+        $endDate = (new \DateTime('today', new \DateTimezone('UTC')))->format('Y-m-d');
+
+        $quanumOrders = $app['pmi.drc.participants']->getOrders([
+            'startDate' => $today,
+            'endDate' => $endDate,
+            'origin' => 'careevolution',
+            'page' => '1',
+            'pageSize' => '1000'
+        ]);
+        $orders = [];
+        foreach ($quanumOrders as $quanumOrder) {
+            if (in_array($quanumOrder->origin, ['careevolution'])) {
+                $orders[] = (new Order($app))->loadFromJsonObject($quanumOrder)->toArray();
+            }
+        }
+
+        return $app['twig']->render('biobank/orders-quanum-today.html.twig', [
             'orders' => $orders
         ]);
     }
