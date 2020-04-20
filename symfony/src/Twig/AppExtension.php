@@ -26,7 +26,7 @@ class AppExtension extends AbstractExtension
 
     public function checkPath($name)
     {
-        return !is_null($this->container->get('router')->getRouteCollection()->get('dd'));
+        return !is_null($this->container->get('router')->getRouteCollection()->get($name));
     }
 
     public function asset($asset)
