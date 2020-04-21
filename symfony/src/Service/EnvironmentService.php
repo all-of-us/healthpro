@@ -45,6 +45,8 @@ class EnvironmentService
         }
         $this->values['assetVer'] = $this->values['env'] === self::ENV_LOCAL ?
             date('YmdHis') : $this->values['release'];
+        $this->values['sessionTimeOut'] = $this->isLocal() ? 3600 * 24 : 30 * 60;
+        $this->values['sessionWarning'] = 2 * 60;
     }
 
     /** Determines the environment under which the code is running. */
@@ -98,5 +100,24 @@ class EnvironmentService
         return
             isset($_SERVER['SERVER_SOFTWARE']) &&
             preg_match('/^PHP [0-9\\.]+ Development Server$/', $_SERVER['SERVER_SOFTWARE']);
+    }
+
+    public function getTimeZones()
+    {
+        return self::$timezoneOptions;
+    }
+
+    public function getUserTimezone($useDefault = true)
+    {
+        if ($user = $this->getUser()) {
+            if (($info = $user->getInfo()) && isset($info['timezone'])) {
+                return $info['timezone'];
+            }
+        }
+        if ($useDefault) {
+            return self::DEFAULT_TIMEZONE;
+        } else {
+            return null;
+        }
     }
 }
