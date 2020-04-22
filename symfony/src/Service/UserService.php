@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Pmi\Service\MockUserService;
+use App\Entity\User;
 
 class UserService
 {
@@ -54,11 +55,7 @@ class UserService
         $maxAttempts = 3;
         do {
             try {
-                $conn = $this->em->getConnection();
-                $sql = 'SELECT * FROM users WHERE email = :email';
-                $stmt = $conn->prepare($sql);
-                $stmt->execute(array('email' => $googleUser->getEmail()));
-                $userInfo = $stmt->fetch();
+                $userInfo = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
                 break;
             } catch (\Exception $e) {
                 if ($attempts == 2) {
