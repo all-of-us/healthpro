@@ -2,15 +2,26 @@
 
 namespace App\Security;
 
+use App\Service\UserService;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Pmi\Security\User;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
+    private $userService;
+    private $session;
+
+    public function __construct(UserService $userService, SessionInterface $session)
+    {
+        $this->userService = $userService;
+        $this->session = $session;
+    }
     /**
      * Symfony calls this method if you use features like switch_user
      * or remember_me.
@@ -24,11 +35,17 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
      */
     public function loadUserByUsername($username)
     {
-        // Load a User object from your data source or throw UsernameNotFoundException.
-        // The $username argument may not actually be a username:
-        // it is whatever value is being returned by the getUsername()
-        // method in your User class.
-        throw new \Exception('TODO: fill in loadUserByUsername() inside '.__FILE__);
+        $googleUser = $this->userService->getGoogleUser();
+        if (!$googleUser || strcasecmp($googleUser->getEmail(), $username) !== 0) {
+            throw new AuthenticationException("User $username is not logged in to Google!");
+        }
+        if ($this->session->has('googlegroups')) {
+            $groups = $this->session->get('googlegroups');
+        } else {
+            throw new AuthenticationException('Failed to retrieve group permissions');
+        }
+        $userInfo = $this->userService->getUserInfo($googleUser);
+        return new User($googleUser, $groups, $userInfo, null, $this->session);
     }
 
     /**
@@ -50,7 +67,7 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
         }
 
-        return $user;
+        return $this->loadUserByUsername($user->getUsername());
     }
 
     /**

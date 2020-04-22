@@ -11,6 +11,9 @@ security:
         main:
             anonymous: lazy
             provider: app_user_provider
+            guard:
+                authenticators:
+                    - App\Security\GoogleGroupsAuthenticator
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
