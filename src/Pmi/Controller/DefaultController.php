@@ -394,7 +394,7 @@ class DefaultController extends AbstractController
         }
 
         $isCrossOrg = $participant->hpoId !== $app->getSiteOrganization();
-        $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, ['test-participant', 'basics']));
+        $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, ['test-participant', 'basics', 'genomics']));
         $hasNoParticipantAccess = $isCrossOrg && empty($app['session']->get('agreeCrossOrg_'.$id));
         if ($hasNoParticipantAccess) {
             $app->log(Log::CROSS_ORG_PARTICIPANT_ATTEMPT, [
