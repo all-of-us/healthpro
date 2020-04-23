@@ -348,6 +348,7 @@ class DeployCommand extends Command {
     {
         $config['env_variables']['PMI_ENV'] = $this->determineEnv();
         $config['env_variables']['PMI_RELEASE'] = $this->release;
+        $config['env_variables']['APP_ENV'] = $this->local ? 'dev' : 'prod';
     }
 
     /** Enhance instance class and scaling */
