@@ -1,7 +1,6 @@
 runtime: php72
 
 # default is `public/index.php` or `index.php`
-entrypoint: serve web/index.php
 
 handlers:
 - url: /robots.txt
@@ -24,6 +23,9 @@ handlers:
   script: auto
   secure: always
 - url: /.*
+  script: auto
+  secure: always
+- url: /s/.*
   script: auto
   secure: always
 
