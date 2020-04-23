@@ -64,15 +64,6 @@ class Participant
             $this->status = false;
             $this->statusReason = 'basics';
         }
-        // RDR should not be returning participant data for unconsented participants, but adding this check to be safe
-        if (empty($participant->consentForStudyEnrollment) || $participant->consentForStudyEnrollment !== 'SUBMITTED') {
-            $this->status = false;
-            $this->statusReason = 'consent';
-        }
-        if (!empty($participant->withdrawalStatus) && $participant->withdrawalStatus === 'NO_USE') {
-            $this->status = false;
-            $this->statusReason = 'withdrawal';
-        }
         if (!empty($this->genomicsStartTime) && isset($participant->consentForStudyEnrollmentAuthored) && $participant->consentForStudyEnrollmentAuthored >= $this->genomicsStartTime) {
             if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                 $this->status = false;
@@ -81,6 +72,16 @@ class Participant
                 $this->status = false;
                 $this->statusReason = 'ehr-consent';
             }
+        }
+        // RDR should not be returning participant data for unconsented participants, but adding this check to be safe
+        // Participant details tab is disabled for the below two status reasons
+        if (empty($participant->consentForStudyEnrollment) || $participant->consentForStudyEnrollment !== 'SUBMITTED') {
+            $this->status = false;
+            $this->statusReason = 'consent';
+        }
+        if (!empty($participant->withdrawalStatus) && $participant->withdrawalStatus === 'NO_USE') {
+            $this->status = false;
+            $this->statusReason = 'withdrawal';
         }
 
         // Map gender identity to gender options for MayoLINK.
