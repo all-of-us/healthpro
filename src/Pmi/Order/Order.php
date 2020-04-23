@@ -1369,7 +1369,7 @@ class Order
                 if (!empty($sample->processed)) {
                     $processedSamples[] = $sampleCode;
                     $processedTs = $sample->processed;
-                    $processedSamplesTs[$sampleCode] = $sample->processed;
+                    $processedSamplesTs[$sampleCode] = (new \DateTime($sample->processed))->getTimestamp();
                 }
                 if (!empty($sample->finalized)) {
                     $finalizedSamples[] = $sampleCode;
