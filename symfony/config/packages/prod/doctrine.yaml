@@ -1,4 +1,10 @@
 doctrine:
+    dbal:
+        dbname:               '%mysql_schema%'
+        unix_socket:          '%mysql_socket%'
+        user:                 '%mysql_user%'
+        password:             '%mysql_password%'
+        driver:               pdo_mysql
     orm:
         auto_generate_proxy_classes: false
         metadata_cache_driver:
