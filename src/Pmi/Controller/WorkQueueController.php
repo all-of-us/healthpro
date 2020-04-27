@@ -438,7 +438,7 @@ class WorkQueueController extends AbstractController
                         $row[] = $workQueue->getPatientStatus($participant, 'NO ACCESS', 'export');
                         $row[] = $workQueue->getPatientStatus($participant, 'UNKNOWN', 'export');
                         $row[] = $participant->middleName;
-                        $row[] = $participant->enrollmentStatusCoreStoredSampleTime;
+                        $row[] = WorkQueue::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimeZone());
                     }
                     $row[] = $participant->participantOrigin;
                     if ($hasFullDataAccess) {
