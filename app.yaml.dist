@@ -1,6 +1,7 @@
 runtime: php72
 
 # default is `public/index.php` or `index.php`
+entrypoint: serve web/index.php
 
 handlers:
 - url: /robots.txt
