@@ -47,6 +47,9 @@ class EnvironmentService
             date('YmdHis') : $this->values['release'];
         $this->values['sessionTimeOut'] = $this->isLocal() ? 3600 * 24 : 30 * 60;
         $this->values['sessionWarning'] = 2 * 60;
+        if ($this->isLocal()) {
+            putenv('DATASTORE_EMULATOR_HOST=' . self::DATASTORE_EMULATOR_HOST);
+        }
     }
 
     /** Determines the environment under which the code is running. */
