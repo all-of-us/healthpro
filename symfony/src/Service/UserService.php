@@ -51,20 +51,8 @@ class UserService
                 'google_id' => $googleUser->getUserId(),
             ];
         }
-        $attempts = 0;
-        $maxAttempts = 3;
-        do {
-            try {
-                $userInfo = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
-                break;
-            } catch (\Exception $e) {
-                if ($attempts == 2) {
-                    sleep(1);
-                }
-                $attempts++;
-            }
-        } while ($attempts < $maxAttempts);
-        if (!$userInfo) {
+        $userInfo = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
+        if (empty($userInfo)) {
             throw new AuthenticationException('Failed to retrieve user information');
         }
         return $userInfo;
