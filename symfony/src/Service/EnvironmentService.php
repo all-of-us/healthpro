@@ -55,7 +55,7 @@ class EnvironmentService
     /** Determines the environment under which the code is running. */
     private function determineEnv()
     {
-        $env = getenv('PMI_ENV');
+        $env = getenv('PMI_ENV') ?: $_SERVER['PMI_ENV'];
         if ($env == self::ENV_LOCAL) {
             return self::ENV_LOCAL;
         } elseif ($env == self::ENV_DEV) {
