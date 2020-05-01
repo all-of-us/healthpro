@@ -40,11 +40,12 @@
         "symfony/framework-bundle": "4.4.*",
         "symfony/orm-pack": "^1.0",
         "symfony/security-bundle": "4.4.*",
-        "symfony/twig-pack": "^1.0"
+        "symfony/twig-pack": "^1.0",
+        "symfony/monolog-bundle": "^3.5"
     },
     "config": {
         "platform": {
-            "php": "7.2"
+            "php": "7.2.5"
         }
     },
     "require-dev": {
