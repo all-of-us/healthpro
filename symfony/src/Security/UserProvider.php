@@ -45,7 +45,11 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
             throw new AuthenticationException('Failed to retrieve group permissions');
         }
         $userInfo = $this->userService->getUserInfo($googleUser);
-        return new User($googleUser, $groups, $userInfo, null, $this->session);
+        $sessionInfo = [
+            'site' => $this->session->get('site'),
+            'awardee' => $this->session->get('awardee')
+        ];
+        return new User($googleUser, $groups, $userInfo, null, $sessionInfo);
     }
 
     /**
