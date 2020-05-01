@@ -1,0 +1,30 @@
+<?php
+
+namespace Pmi\Service;
+
+use Pmi\Security\User;
+
+class UserService
+{
+
+    public static function getRoles($roles, $site, $awardee)
+    {
+        if (!empty($site)) {
+            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+        }
+        if (!empty($awardee)) {
+            if (($key = array_search('ROLE_USER', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if (isset($awardee->id) && $awardee->id !== User::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+        }
+        return $roles;
+    }
+}

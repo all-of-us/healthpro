@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Application;
 
+use Pmi\Service\UserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Pmi\Entities\Configuration;
@@ -230,8 +231,9 @@ class HpoApplication extends AbstractApplication
 
     public function setNewRoles($user)
     {
-        if ($user->getAllRoles() != $user->getRoles()) {
-            $token = new PostAuthenticationGuardToken($user, 'main', $user->getRoles());
+        $userRoles = UserService::getRoles($user->getAllRoles(), $this['session']->get('site'), $this['session']->get('awardee'));
+        if ($user->getAllRoles() != $userRoles) {
+            $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
             $this['security.token_storage']->setToken($token);
         }
     }
