@@ -27,6 +27,7 @@ class WorkQueue
         'consentForStudyEnrollmentAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
+        'consentForGenomicsRORAuthored',
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
         'withdrawalAuthored',
@@ -134,10 +135,10 @@ class WorkQueue
         'consentForGenomicsROR' => [
             'label' => 'gRoR Consent Status',
             'options' => [
-                'Consented' => 'SUBMITTED',
-                'Refused consent' => 'SUBMITTED_NO_CONSENT',
-                'Refused not sure' => 'SUBMITTED_NOT_SURE',
-                'Consent not completed' => 'UNSET',
+                'Consented Yes' => 'SUBMITTED',
+                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
+                'Consent Not Completed' => 'UNSET',
                 'Invalid' => 'SUBMITTED_INVALID'
             ]
         ],
@@ -430,15 +431,15 @@ class WorkQueue
     {
         switch ($value) {
             case 'SUBMITTED':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (consented yes)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Consented Yes)';
             case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (refused consent)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Refused Consent)';
             case 'SUBMITTED_NO_SURE':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (not sure)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Responded Not Sure)';
             case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (invalid)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Invalid)';
             default:
-                return self::HTML_DANGER . ' (consent not completed)';
+                return self::HTML_DANGER . ' (Consent Not Completed)';
         }
     }
 

@@ -18,21 +18,21 @@
     {% if value == 'SUBMITTED' %}
         <i class="fa fa-check text-success" aria-hidden="true"></i>
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
-        (consented yes)
+        (Consented Yes)
     {% elseif value == 'SUBMITTED_NO_CONSENT' %}
         <i class="fa fa-check text-danger" aria-hidden="true"></i>
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
-        (refused consent)
+        (Refused Consent)
     {% elseif value == 'SUBMITTED_NO_SURE' %}
         <i class="fa fa-check text-warning" aria-hidden="true"></i>
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
-        (not sure)
+        (Responded Not Sure)
     {% elseif value == 'SUBMITTED_INVALID' %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
-        (invalid)
+        (Invalid)
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
-        (consent not completed) <br/>
+        (Consent Not Completed) <br/>
     {% endif %}
 {% endmacro %}

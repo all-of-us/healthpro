@@ -10,8 +10,8 @@
                 {% if type is not defined and loop.index == 6 %}
                     <div id="order-overflow">
                 {% endif %}
-                {% if readOnly is defined %}
-                    <div class="btn btn-block btn-lg btn-default btn-readonly">
+                {% if order.origin is defined and order.origin == 'careevolution' %}
+                    <a href="{{ path('biobank_quanumOrder', { biobankId: participant.biobankId, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {% elseif biobankView is defined %}
                     <a href="{{ path('biobank_order', { biobankId: participant.biobankId, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {% else %}
@@ -37,11 +37,7 @@
                             <span class="label label-default">Collected</span> {{ order.collected_ts|date('n/j/Y g:ia', app.userTimezone) }}
                         {% endif %}
                     </small>
-                {% if readOnly is defined %}
-                    </div> {# close .btn-readonly div above #}
-                {% else %}
                     </a>
-                {% endif %}
             {% endfor %}
             {% if type is not defined and orders|length > 5 %}
                 </div> {# close .order-overflow div above #}
