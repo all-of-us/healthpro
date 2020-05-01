@@ -25,7 +25,7 @@ class User implements UserInterface
     private $adminAccess;
     private $info;
     private $timezone;
-    private $session;
+    private $sessionInfo;
     private $adminDvAccess;
     private $biobankAccess;
     private $scrippsAccess;
