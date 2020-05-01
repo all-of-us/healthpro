@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% block title %}Surveys{% endblock %}
+{% block body %}
+    <h2>
+        <i class="fa fa-check-square-o" aria-hidden="true"></i>
+        Surveys
+    </h2>
+    {% for survey, responses in surveys %}
+        <h3>{{ surveyNames[survey] }}</h3>
+        {% if responses %}
+            <ul>
+                {% for response in responses %}
+                    <li>{{ response.authored|date('n/j/Y g:ia', app.userTimezone) }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

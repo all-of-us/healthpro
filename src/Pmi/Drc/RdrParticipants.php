@@ -503,4 +503,19 @@ class RdrParticipants
         }
         return $participant;
     }
+
+    public function getQuestionnaireAnswers($participantId, $module)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "Participant/{$participantId}/QuestionnaireAnswers/{$module}");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_array($result) && (empty($result) || isset($result[0]->questionnaire_id))) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return false;
+        }
+        return false;
+    }
 }
