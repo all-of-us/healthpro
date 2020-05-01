@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Security;
 
+use Pmi\Service\UserService;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
@@ -24,19 +25,19 @@ class User implements UserInterface
     private $adminAccess;
     private $info;
     private $timezone;
-    private $session;
+    private $sessionInfo;
     private $adminDvAccess;
     private $biobankAccess;
     private $scrippsAccess;
     private $scrippsAwardee;
 
-    public function __construct($googleUser, array $groups, $info = null, $timezone = null, $session = null)
+    public function __construct($googleUser, array $groups, $info = null, $timezone = null, $sessionInfo = null)
     {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
         $this->info = $info;
         $this->timezone = null;
-        $this->session = $session;
+        $this->sessionInfo = $sessionInfo;
         $this->sites = $this->computeSites();
         $this->awardees = $this->computeAwardees();
         $this->dashboardAccess = $this->computeDashboardAccess();
@@ -264,24 +265,7 @@ class User implements UserInterface
 
     public function getRoles()
     {
-        $roles = $this->getAllRoles();
-        if ($this->session->has('site')) {
-            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-        }
-        if ($this->session->has('awardee')) {
-            if (($key = array_search('ROLE_USER', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if ($this->session->get('awardee')->id !== self::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-        }
-        return $roles;
+        return UserService::getRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee']);
     }
     
     public function getPassword()
