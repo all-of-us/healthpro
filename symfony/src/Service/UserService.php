@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Pmi\Service\MockUserService;
 use App\Entity\User;
+use Symfony\Component\Security\Core\Security;
 
 class UserService
 {
@@ -15,13 +16,20 @@ class UserService
     private $params;
     private $env;
     private $session;
+    private $security;
 
-    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params, EnvironmentService $env, SessionInterface $session)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        ContainerBagInterface $params,
+        EnvironmentService $env,
+        SessionInterface $session,
+        Security $security
+    ) {
         $this->em = $em;
         $this->params = $params;
         $this->env = $env;
         $this->session = $session;
+        $this->security = $security;
     }
 
     public function getGoogleUser()
@@ -56,5 +64,14 @@ class UserService
             throw new AuthenticationException('Failed to retrieve user information');
         }
         return $userInfo;
+    }
+
+    public function getUser()
+    {
+        $token = $this->security->getToken();
+        if ($token && is_object($token->getUser())) {
+            return $token->getUser();
+        }
+        return null;
     }
 }
