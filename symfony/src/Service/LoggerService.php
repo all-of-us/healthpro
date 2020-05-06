@@ -124,7 +124,7 @@ class LoggerService
         $auditLog->save();
     }
 
-    protected function getLogMetaData()
+    public function getLogMetaData()
     {
         if (($user = $this->userService->getUser()) && is_object($user)) {
             $user = $user->getUsername();

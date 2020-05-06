@@ -7,17 +7,22 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 use Monolog\Formatter\FormatterInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class StackdriverHandler extends AbstractProcessingHandler
 {
     private $env;
+    private $requestStack;
+    private $logger;
     private $stackdriverLogger;
 
-    public function __construct(EnvironmentService $env)
+    public function __construct(EnvironmentService $env, RequestStack $requestStack, LoggerService $logger)
     {
         parent::__construct(Logger::INFO, true);
 
         $this->env = $env;
+        $this->requestStack = $requestStack;
+        $this->logger = $logger;
 
         $clientConfig = [];
         if ($this->env->isLocal()) {
@@ -102,6 +107,18 @@ class StackdriverHandler extends AbstractProcessingHandler
 
     protected function write(array $record): void
     {
+        $request = $this->requestStack->getCurrentRequest();
+        $siteMetaData = $this->logger->getLogMetaData();
+        $record['extra']['labels'] = [
+            'requestMethod' => $request->getMethod(),
+            'requestUrl' => $request->getPathInfo(),
+            'user' => $siteMetaData['user'],
+            'site' => $siteMetaData['site'],
+            'ip' => $siteMetaData['ip']
+        ];
+        if ($traceHeader = $request->headers->get('X-Cloud-Trace-Context')) {
+            $record['extra']['trace_header'] = $traceHeader;
+        }
         $entry = $this->getEntryFromRecord($record);
         $this->stackdriverLogger->write($entry);
     }
