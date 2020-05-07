@@ -23,7 +23,7 @@
         <i class="fa fa-check text-danger" aria-hidden="true"></i>
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
         (Refused Consent)
-    {% elseif value == 'SUBMITTED_NO_SURE' %}
+    {% elseif value == 'SUBMITTED_NOT_SURE' %}
         <i class="fa fa-check text-warning" aria-hidden="true"></i>
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
         (Responded Not Sure)
