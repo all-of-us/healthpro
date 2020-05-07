@@ -8,6 +8,7 @@ use Pmi\Entities\Participant;
 use Pmi\Drc\CodeBook;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Pmi\WorkQueue\WorkQueue;
+use Pmi\Order\Order;
 
 class WorkQueueController extends AbstractController
 {
@@ -265,7 +266,7 @@ class WorkQueueController extends AbstractController
         } else {
             $organization = $app->getSiteOrganization();
             $site = $app->getSiteId();
-        }       
+        }
         if (!$organization) {
             return $app['twig']->render('workqueue/no-organization.html.twig');
         }
@@ -325,7 +326,7 @@ class WorkQueueController extends AbstractController
                     'PMI ID',
                     'Biobank ID',
                     'ZIP'
-                ];                
+                ];
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Physical Measurements Completion Date';
@@ -404,7 +405,7 @@ class WorkQueueController extends AbstractController
                             $participant->id,
                             $participant->biobankId,
                             $participant->zipCode,
-                        ];                   
+                        ];
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
                     $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone(), false);
@@ -503,7 +504,18 @@ class WorkQueueController extends AbstractController
         }
 
         $evaluations = $app['em']->getRepository('evaluations')->getEvaluationsWithHistory($id);
+
+        // Internal Orders
         $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($id);
+
+        // Quanum Orders
+        $quanumOrders = $app['pmi.drc.participants']->getOrdersByParticipant($participant->id);
+        foreach ($quanumOrders as $quanumOrder) {
+            if (in_array($quanumOrder->origin, ['careevolution'])) {
+                $orders[] = (new Order($app))->loadFromJsonObject($quanumOrder)->toArray();
+            }
+        }
+
         $problems = $app['em']->getRepository('problems')->getParticipantProblemsWithCommentsCount($id);
 
         return $app['twig']->render('workqueue/participant.html.twig',[
@@ -513,7 +525,8 @@ class WorkQueueController extends AbstractController
             'evaluations' => $evaluations,
             'problems' => $problems,
             'displayPatientStatusBlock' => false,
-            'readOnly' => true
+            'readOnly' => true,
+            'biobankView' => true
         ]);
     }
 

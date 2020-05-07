@@ -34,7 +34,11 @@ class UserProvider implements UserProviderInterface
             }
         }
         $userInfo = $this->getUserInfo($googleUser);
-        return new User($googleUser, $groups, $userInfo);
+        $sessionInfo = [
+            'site' => $this->app['session']->get('site'),
+            'awardee' => $this->app['session']->get('awardee')
+        ];
+        return new User($googleUser, $groups, $userInfo, null, $sessionInfo);
     }
     
     public function refreshUser(UserInterface $user)

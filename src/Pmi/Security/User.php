@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Security;
 
+use Pmi\Service\UserService;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
@@ -24,17 +25,19 @@ class User implements UserInterface
     private $adminAccess;
     private $info;
     private $timezone;
+    private $sessionInfo;
     private $adminDvAccess;
     private $biobankAccess;
     private $scrippsAccess;
     private $scrippsAwardee;
-    
-    public function __construct($googleUser, array $groups, $info = null, $timezone = null)
+
+    public function __construct($googleUser, array $groups, $info = null, $timezone = null, $sessionInfo = null)
     {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
         $this->info = $info;
-        $this->timezone = $timezone;
+        $this->timezone = null;
+        $this->sessionInfo = $sessionInfo;
         $this->sites = $this->computeSites();
         $this->awardees = $this->computeAwardees();
         $this->dashboardAccess = $this->computeDashboardAccess();
@@ -229,8 +232,8 @@ class User implements UserInterface
     {
         return $this->googleUser;
     }
-    
-    public function getRoles()
+
+    public function getAllRoles()
     {
         $roles = [];
         if (count($this->sites) > 0) {
@@ -258,6 +261,11 @@ class User implements UserInterface
             $roles[] = 'ROLE_AWARDEE_SCRIPPS';
         }
         return $roles;
+    }
+
+    public function getRoles()
+    {
+        return UserService::getRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee']);
     }
     
     public function getPassword()
