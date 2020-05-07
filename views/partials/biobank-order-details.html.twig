@@ -4,6 +4,11 @@
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong>{{ type|capitalize }} by {{ app.getUserEmailById(attribute(order, type~'_user_id'))|default('Unknown') }} at {{ app.getSiteDisplayName(attribute(order, type~'_site')) }}</strong>
         </div>
+    {% elseif order.origin is defined and order.origin == 'careevolution' %}
+      <div class="alert alert-success well-sm">
+          <i class="fa fa-info-circle" aria-hidden="true"></i>
+          <strong>{{ type|capitalize }} by Quest User at a Quest Site</strong>
+      </div>
     {% endif %}
     {% if type == 'finalized' and order.failedToReachRDR %}
         <div class="alert alert-danger well-sm">
