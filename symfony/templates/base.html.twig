@@ -15,7 +15,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/home') }}">
+            <a class="navbar-brand" href="/home">
                 <i class="fa fa-star" aria-hidden="true"></i> HealthPro
                 {% if isTraining %}
                     <div class="navbar-brand-subtitle">training</div>
@@ -73,16 +73,14 @@
                         </li>
                     {% endif %}
 
-                    {% if path_exists('help_home') %}
-                        <li class="dropdown">
-                            <a href="/help_home" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-question-circle" aria-hidden="true"></i> <span class="visible-xs-inline">Help</span><span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="/help_videos"><i class="fa fa-film" aria-hidden="true"></i> Training Videos</a></li>
-                                <li><a href="/help_faq"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Technical FAQs</a></li>
-                                <li><a href="/help_sop"><i class="fa fa-file-text-o" aria-hidden="true"></i> All of Us℠ SOPs</a></li>
-                            </ul>
-                        </li>
-                    {% endif %}
+                    <li class="dropdown">
+                        <a href="/help" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-question-circle" aria-hidden="true"></i> <span class="visible-xs-inline">Help</span><span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/help/videos"><i class="fa fa-film" aria-hidden="true"></i> Training Videos</a></li>
+                            <li><a href="/help/faq"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Technical FAQs</a></li>
+                            <li><a href="/help/sop"><i class="fa fa-file-text-o" aria-hidden="true"></i> All of Us℠ SOPs</a></li>
+                        </ul>
+                    </li>
                     <li class="dropdown">
                         <a href="/settings" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i> {{ app.user.email|default('') }} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
@@ -129,7 +127,7 @@
     <div class="modal fade" id="siteModal" tabindex="-1" role="dialog" aria-labelledby="siteModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form method="POST" action="/selectSite">
+                <form method="POST" action="/site/select">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title" id="siteModalLabel">Current site</h4>
