@@ -36,3 +36,12 @@
         (Consent Not Completed) <br/>
     {% endif %}
 {% endmacro %}
+
+{% macro displayConsentPanelStatus(value, time) %}
+    {% set consentValues = ['SUBMITTED', 'SUBMITTED_NO_CONSENT', 'SUBMITTED_NOT_SURE', 'SUBMITTED_INVALID'] %}
+    {% if value in consentValues %}
+        {{ time ? time|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+    {% else %}
+        (not completed)
+    {% endif %}
+{% endmacro %}
