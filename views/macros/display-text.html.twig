@@ -24,7 +24,7 @@
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
         (Refused Consent)
     {% elseif value == 'SUBMITTED_NOT_SURE' %}
-        <i class="fa fa-check text-sucess" aria-hidden="true"></i>
+        <i class="fa fa-check text-success" aria-hidden="true"></i>
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
         (Responded Not Sure)
     {% elseif value == 'SUBMITTED_INVALID' %}
