@@ -406,11 +406,14 @@ class DeployCommand extends Command {
             $this->out->writeln('No packages have known vulnerabilities');
         } else {
             $this->displayVulnerabilities($vulnerabilities);
-            if ($this->noInteraction || !$this->local) {
-                throw new \Exception('Fix security vulnerabilities before deploying');
-            } else {
-                if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
-                    throw new \Exception('Aborting due to security vulnerability');
+            $this->out->writeln('');
+            if (!$this->noInteraction) {
+                if (!$this->local) {
+                    throw new \Exception('Fix security vulnerabilities before deploying');
+                } else {
+                    if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
+                        throw new \Exception('Aborting due to security vulnerability');
+                    }
                 }
             }
         }
