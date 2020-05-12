@@ -5,6 +5,7 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Audit\Log;
+use Pmi\Order\Mayolink\MayolinkOrder;
 
 class Order
 {
@@ -1439,5 +1440,54 @@ class Order
         $this->order['origin'] = $object->origin;
 
         return $this;
+    }
+
+    public function sendOrderToMayo($participantId, $orderId, $app, $type = 'collected')
+    {
+        // Return mock id for mock orders
+        if ($app->getConfig('ml_mock_order')) {
+            return ['status' => 'success', 'mayoId' => $app->getConfig('ml_mock_order')];
+        }
+        $result = ['status' => 'fail'];
+        $this->loadOrder($participantId, $orderId);
+        // Set collected time to user local time
+        $collectedAt = new \DateTime($this->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $app->getSiteId()])) {
+            $mayoClientId = $site['mayolink_account'];
+        }
+        // Check if mayo account number exists
+        if (!empty($mayoClientId)) {
+            $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+            if ($birthDate) {
+                $birthDate = $birthDate->format('Y-m-d');
+            }
+            $options = [
+                'type' => $this->order['type'],
+                'biobank_id' => $participant->biobankId,
+                'first_name' => '*',
+                'gender' => $participant->gender,
+                'birth_date' => $birthDate,
+                'order_id' => $this->order['order_id'],
+                'collected_at' => $collectedAt->format('c'),
+                'mayoClientId' => $mayoClientId,
+                'collected_samples' => $this->order["{$type}_samples"],
+                'centrifugeType' => $this->order['processed_centrifuge_type'],
+                'version' => $this->order['version'],
+                'tests' => $this->samplesInformation,
+                'salivaTests' => $this->salivaSamplesInformation
+            ];
+            $mayoOrder = new MayolinkOrder($app);
+            $mayoId = $mayoOrder->createOrder($options);
+            if (!empty($mayoId)) {
+                $result['status'] = 'success';
+                $result['mayoId'] = $mayoId;
+            } else {
+                $result['errorMessage'] = 'An error occurred while attempting to send this order. Please try again.';
+            }
+        } else {
+            $result['errorMessage'] = 'Mayo account number is not set for this site. Please contact the administrator.';
+        }
+        return $result;
     }
 }

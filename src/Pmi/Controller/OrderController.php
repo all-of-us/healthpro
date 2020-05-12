@@ -434,7 +434,7 @@ class OrderController extends AbstractController
                     if (!empty($finalizeForm['finalized_ts']->getData()) || $order->isOrderUnlocked()) {
                         //Send order to mayo if mayo id is empty
                         if (empty($order->get('mayo_id'))) {
-                            $result = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                            $result = $order->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
                             if ($result['status'] === 'success' && !empty($result['mayoId'])) {
                                 //Save mayo id and finalized time
                                 $newUpdateArray = [
@@ -733,56 +733,6 @@ class OrderController extends AbstractController
             }         
         } else {
             $result['errorMessage'] = 'A MayoLINK account number is not set for this site. Please contact an administrator.';
-        }
-        return $result;
-    }
-
-    public function sendOrderToMayo($participantId, $orderId, $app, $type = 'collected')
-    {
-        // Return mock id for mock orders
-        if ($app->getConfig('ml_mock_order')) {
-            return ['status' => 'success', 'mayoId' => $app->getConfig('ml_mock_order')];
-        }
-        $result = ['status' => 'fail'];
-        $order = $this->loadOrder($participantId, $orderId, $app);
-        // Set collected time to user local time
-        $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
-        $orderData = $order->toArray();
-        $participant = $app['pmi.drc.participants']->getById($participantId);
-        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $app->getSiteId()])) {
-            $mayoClientId = $site['mayolink_account'];
-        }
-        // Check if mayo account number exists
-        if (!empty($mayoClientId)) {
-            $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
-            if ($birthDate) {
-                $birthDate = $birthDate->format('Y-m-d');
-            }
-            $options = [
-                'type' => $orderData['type'],
-                'biobank_id' => $participant->biobankId,
-                'first_name' => '*',
-                'gender' => $participant->gender,
-                'birth_date' => $birthDate,
-                'order_id' => $orderData['order_id'],
-                'collected_at' => $collectedAt->format('c'),
-                'mayoClientId' => $mayoClientId,
-                'collected_samples' => $orderData["{$type}_samples"],
-                'centrifugeType' => $orderData['processed_centrifuge_type'],
-                'version' => $orderData['version'],
-                'tests' => $order->samplesInformation,
-                'salivaTests' => $order->salivaSamplesInformation
-            ];
-            $mayoOrder = new MayolinkOrder($app);
-            $mayoId = $mayoOrder->createOrder($options);
-            if (!empty($mayoId)) {
-                $result['status'] = 'success';
-                $result['mayoId'] = $mayoId;
-            } else {
-                $result['errorMessage'] = 'An error occurred while attempting to send this order. Please try again.';
-            }
-        } else {
-            $result['errorMessage'] = 'Mayo account number is not set for this site. Please contact the administrator.';
         }
         return $result;
     }
