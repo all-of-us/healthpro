@@ -1490,4 +1490,103 @@ class Order
         }
         return $result;
     }
+
+    public function createBiobankOrderFinalizeForm($formFactory)
+    {
+        $disabled = $this->isOrderFormDisabled();
+
+        $formData = $this->getOrderFormData('finalized');
+        $samples = $this->getRequestedSamples();
+
+        $enabledSamples = array_values($this->getRequestedSamples());
+        $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
+        $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
+        $constraints = [
+            new Constraints\LessThanOrEqual([
+                'value' => $constraintDateTime,
+                'message' => 'Timestamp cannot be in the future'
+            ])
+        ];
+        array_push($constraints,
+            new Constraints\GreaterThan([
+                'value' => $this->order['collected_ts'],
+                'message' => 'Finalized Time is before Collection Time'
+            ])
+        );
+        $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
+        if (!empty($processedSamplesTs)) {
+            $processedTs = new \DateTime();
+            $processedTs->setTimestamp(max($processedSamplesTs));
+            $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+            array_push($constraints,
+                new Constraints\GreaterThan([
+                    'value' => $processedTs,
+                    'message' => 'Finalized Time is before Processing Time'
+                ])
+            );
+        }
+        $formBuilder->add("finalized_ts", Type\DateTimeType::class, [
+            'label' => 'Finalized time',
+            'widget' => 'single_text',
+            'format' => 'M/d/yyyy h:mm a',
+            'required' => false,
+            'disabled' => $disabled,
+            'view_timezone' => $this->app->getUserTimezone(),
+            'model_timezone' => 'UTC',
+            'constraints' => $constraints
+        ]);
+        if (!empty($samples)) {
+            $samplesDisabled = $disabled;
+            $formBuilder->add("finalized_samples", Type\ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => true,
+                'label' => 'Which samples are being shipped to the All of Us℠ Biobank?',
+                'choices' => $samples,
+                'required' => false,
+                'disabled' => $samplesDisabled,
+                'choice_attr' => function ($val) use ($enabledSamples) {
+                    $attr = [];
+                    $collectedSamples = json_decode($this->order['collected_samples'], true);
+                    $processedSamples = json_decode($this->order['processed_samples_ts'], true);
+                    if (in_array($val, $collectedSamples)) {
+                        $attr = ['collected' => $this->order['collected_ts']->format('n/j/Y g:ia')];
+                    }
+                    if (!empty($processedSamples[$val])) {
+                        $time = new \DateTime();
+                        $time->setTimestamp($processedSamples[$val]);
+                        $time->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                        $attr['processed'] = $time->format('n/j/Y g:ia');
+                    }
+                    if (in_array($val, self::$samplesRequiringProcessing) && in_array($val, $collectedSamples)) {
+                        $attr['required-processing'] = 'yes';
+                    }
+                    $warnings = $this->getWarnings();
+                    $errors = $this->getErrors();
+                    if (array_key_exists($val, self::$sampleMessageLabels)) {
+                        $type = self::$sampleMessageLabels[$val];
+                        if (!empty($errors[$type])) {
+                            $attr['error'] = $errors[$type];
+                        } elseif (!empty($warnings[$type])) {
+                            $attr['warning'] = $warnings[$type];
+                        }
+                    }
+                    if (in_array($val, $enabledSamples)) {
+                        return $attr;
+                    } else {
+                        $attr['disabled'] = true;
+                        $attr['class'] = 'sample-disabled';
+                        return $attr;
+                    }
+                }
+            ]);
+        }
+        $formBuilder->add("finalized_notes", Type\TextareaType::class, [
+            'label' => 'Additional notes on finalization',
+            'disabled' => $disabled,
+            'required' => false,
+            'constraints' => new Constraints\Type('string')
+        ]);
+        $form = $formBuilder->getForm();
+        return $form;
+    }
 }
