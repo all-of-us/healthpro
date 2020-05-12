@@ -51,6 +51,7 @@ class DeployCommand extends Command {
     private $appDir;
     private $appId;
     private $local;
+    private $noInteraction;
     private $port;
     private $in;
     private $out;
@@ -105,6 +106,7 @@ class DeployCommand extends Command {
         $this->out->setFormatter(new OutputFormatter(true)); // color output
         $this->appId = $input->getOption('appId');
         $this->local = (boolean) $input->getOption('local');
+        $this->noInteraction = (boolean) $input->getOption('no-interaction');
         $this->port = (integer) $input->getOption('port');
         $this->release = $input->getOption('release');
 
@@ -404,11 +406,14 @@ class DeployCommand extends Command {
             $this->out->writeln('No packages have known vulnerabilities');
         } else {
             $this->displayVulnerabilities($vulnerabilities);
-            if (!$this->local) {
-                throw new \Exception('Fix security vulnerabilities before deploying');
-            } else {
-                if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
-                    throw new \Exception('Aborting due to security vulnerability');
+            $this->out->writeln('');
+            if (!$this->noInteraction) {
+                if (!$this->local) {
+                    throw new \Exception('Fix security vulnerabilities before deploying');
+                } else {
+                    if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
+                        throw new \Exception('Aborting due to security vulnerability');
+                    }
                 }
             }
         }
@@ -422,9 +427,11 @@ class DeployCommand extends Command {
             $this->out->writeln('No node modules have known vulnerabilities');
         } else {
             $this->out->writeln('');
-            $helper = $this->getHelper('question');
-            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerabilities?</error> '))) {
-                throw new \Exception('Aborting due to JS security vulnerability');
+            if (!$this->noInteraction) {
+                $helper = $this->getHelper('question');
+                if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerabilities?</error> '))) {
+                    throw new \Exception('Aborting due to JS security vulnerability');
+                }
             }
         }
     }
