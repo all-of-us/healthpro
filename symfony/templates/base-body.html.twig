@@ -2,5 +2,5 @@
 {% include 'messages/alert.html.twig' %}
 {% include 'messages/confirm.html.twig' %}
 {% if hideSystemUsage is not defined and is_granted('IS_AUTHENTICATED_FULLY') and not app.session.get('isUsageAgreed') %}
-    {% include 'templates/system-usage.html.twig' %}
+    {% include 'messages/system-usage.html.twig' %}
 {% endif %}

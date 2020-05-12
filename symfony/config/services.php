@@ -15,6 +15,19 @@ if ($env->isLocal() && file_exists($configFile)) {
             $container->setParameter($key, $val);
         }
     }
+    // look for Docker environment variables override
+    if (getenv('MYSQL_HOST')) {
+        $container->setParameter('mysql_host', getenv('MYSQL_HOST'));
+    }
+    if (getenv('MYSQL_DATABASE')) {
+        $container->setParameter('mysql_schema', getenv('MYSQL_DATABASE'));
+    }
+    if (getenv('MYSQL_USER')) {
+        $container->setParameter('mysql_user', getenv('MYSQL_USER'));
+    }
+    if (getenv('MYSQL_PASSWORD') !== false) {
+        $container->setParameter('mysql_password', getenv('MYSQL_PASSWORD'));
+    }
 }
 
 // circle ci db configurations
