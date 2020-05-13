@@ -1589,4 +1589,15 @@ class Order
         $form = $formBuilder->getForm();
         return $form;
     }
+
+    public function getFinalizedProcessSamples($samples)
+    {
+        $processSamples = [];
+        foreach ($samples as $sample) {
+            if (in_array($sample, self::$samplesRequiringProcessing)) {
+                array_push($processSamples, $sample);
+            }
+        }
+        return $processSamples;
+    }
 }

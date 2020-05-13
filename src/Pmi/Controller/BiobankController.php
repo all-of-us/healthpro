@@ -216,21 +216,42 @@ class BiobankController extends AbstractController
                     $label = Order::$identifierLabel[$type[0]];
                     $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
-                if ($order->get('type') === 'kit' && $finalizeForm->has('fedex_tracking') && !empty($finalizeForm['fedex_tracking']->getData())) {
-                    $duplicateFedexTracking = $app['em']->getRepository('orders')->fetchBySql('fedex_tracking = ? and id != ?', [
-                        $finalizeForm['fedex_tracking']->getData(),
-                        $orderId
-                    ]);
-                    if ($duplicateFedexTracking) {
-                        $finalizeForm['fedex_tracking']['first']->addError(new FormError('This tracking number has already been used for another order.'));
-                    }
-                }
                 if ($finalizeForm->isValid()) {
                     $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
-                    if (!$order->isOrderUnlocked()) {
-                        $updateArray['finalized_user_id'] = $app->getUser()->getId();
-                        $updateArray['finalized_site'] = $app->getSiteId();
+                    $biobankChanges = [];
+                    if (empty($order->get('collected_ts'))) {
+                        $updateArray['collected_ts'] = $updateArray['finalized_ts'];
+                        $updateArray['collected_user_id'] = NULL;
+                        $biobankChanges['collect']['time'] = $updateArray['collected_ts'];
+                        $biobankChanges['collect']['user'] = $updateArray['collected_user_id'];
                     }
+                    if (empty($order->get('processed_ts'))) {
+                        $updateArray['processed_ts'] = $updateArray['finalized_ts'];
+                        $updateArray['processed_user_id'] = NULL;
+                        $biobankChanges['process']['time'] = $updateArray['processed_ts'];
+                        $biobankChanges['process']['user'] = $updateArray['processed_user_id'];
+                    }
+                    $collectedSamples = json_decode($order->get('collected_samples'), true);
+                    $processedSamples = json_decode($order->get('processed_samples'), true);
+                    $finalizedSamples = json_decode($updateArray['finalized_samples'], true);
+                    $collectedSamplesDiff = array_diff($finalizedSamples, $collectedSamples);
+                    $finalizedProcessSamples = $order->getFinalizedProcessSamples($finalizedSamples);
+                    $processedSamplesDiff = array_diff($finalizedProcessSamples, $processedSamples);
+                    if (empty($order->get('collected_samples')) || !empty($collectedSamplesDiff)) {
+                        $updateArray['collected_site'] = $order->get('created_site');
+                        $updateArray['collected_samples'] = json_encode(array_merge($collectedSamples, $collectedSamplesDiff));
+                        $biobankChanges['collect']['site'] = $updateArray['collected_site'];
+                        $biobankChanges['collect']['samples'] = $collectedSamplesDiff;
+                    }
+                    if (empty($order->get('processed_samples')) || !empty($processedSamplesDiff)) {
+                        $updateArray['processed_site'] = $order->get('created_site');
+                        $updateArray['processed_samples'] = json_encode(array_merge($processedSamples, $processedSamplesDiff));
+                        $biobankChanges['process']['site'] = $updateArray['processed_site'];
+                        $biobankChanges['process']['samples'] = $processedSamplesDiff;
+                    }
+                    $updateArray['finalized_site'] = $order->get('site');
+                    $updateArray['biobank'] = 1;
+                    $updateArray['biobank_changes'] = json_encode($biobankChanges);
                     // Unset finalized_ts for all types of orders
                     unset($updateArray['finalized_ts']);
                     // Finalized time will not be saved at this point
