@@ -217,34 +217,37 @@ class BiobankController extends AbstractController
                     $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
                 if ($finalizeForm->isValid()) {
-                    $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
+                    $updateArray = [];
+                    $samples = [];
+                    if ($finalizeForm["finalized_samples"]->getData() && is_array($finalizeForm["finalized_samples"]->getData())) {
+                        $samples = array_values($finalizeForm["finalized_samples"]->getData());
+                    }
+                    $updateArray["finalized_samples"] = json_encode($samples);
+                    $updateArray['finalized_notes'] = $finalizeForm['finalized_notes']->getData();
+                    $finalizedTs = new \DateTime();
                     // Check biobank changes
-                    $order->checkBiobankChanges($updateArray);
+                    $order->checkBiobankChanges($updateArray, $finalizedTs);
                     $updateArray['finalized_site'] = $order->get('site');
-                    // Unset finalized_ts for all types of orders
-                    unset($updateArray['finalized_ts']);
                     // Finalized time will not be saved at this point
                     if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
                         $app->log(Log::ORDER_EDIT, $orderId);
                     }
-                    if (!empty($finalizeForm['finalized_ts']->getData()) || $order->isOrderUnlocked()) {
-                        //Send order to mayo if mayo id is empty
-                        if (empty($order->get('mayo_id'))) {
-                            $result = $order->sendOrderToMayo($participant->id, $orderId, $app, 'finalized');
-                            if ($result['status'] === 'success' && !empty($result['mayoId'])) {
-                                //Save mayo id and finalized time
-                                $newUpdateArray = [
-                                    'finalized_ts' => $finalizeForm['finalized_ts']->getData(),
-                                    'mayo_id' => $result['mayoId']
-                                ];
-                                $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
-                            } else {
-                                $app->addFlashError($result['errorMessage']);
-                            }
+                    //Send order to mayo if mayo id is empty
+                    if (empty($order->get('mayo_id'))) {
+                        $result = $order->sendOrderToMayo($participant->id, $orderId, $app, 'finalized');
+                        if ($result['status'] === 'success' && !empty($result['mayoId'])) {
+                            //Save mayo id and finalized time
+                            $newUpdateArray = [
+                                'finalized_ts' => $finalizedTs,
+                                'mayo_id' => $result['mayoId']
+                            ];
+                            $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
                         } else {
-                            // Save finalized time
-                            $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizeForm['finalized_ts']->getData()]);
+                            $app->addFlashError($result['errorMessage']);
                         }
+                    } else {
+                        // Save finalized time
+                        $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizedTs]);
                     }
                     $sendToRdr = true;
                 } else {

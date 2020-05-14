@@ -1494,48 +1494,9 @@ class Order
     public function createBiobankOrderFinalizeForm($formFactory)
     {
         $disabled = $this->isOrderFormDisabled();
-
         $formData = $this->getOrderFormData('finalized');
         $samples = $this->getRequestedSamples();
-
         $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
-        $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
-        $constraints = [
-            new Constraints\LessThanOrEqual([
-                'value' => $constraintDateTime,
-                'message' => 'Timestamp cannot be in the future'
-            ])
-        ];
-        if (!empty($this->order['collected_ts'])) {
-            array_push($constraints,
-                new Constraints\GreaterThan([
-                    'value' => $this->order['collected_ts'],
-                    'message' => 'Finalized Time is before Collection Time'
-                ])
-            );
-        }
-        $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
-        if (!empty($processedSamplesTs)) {
-            $processedTs = new \DateTime();
-            $processedTs->setTimestamp(max($processedSamplesTs));
-            $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
-            array_push($constraints,
-                new Constraints\GreaterThan([
-                    'value' => $processedTs,
-                    'message' => 'Finalized Time is before Processing Time'
-                ])
-            );
-        }
-        $formBuilder->add("finalized_ts", Type\DateTimeType::class, [
-            'label' => 'Finalized time',
-            'widget' => 'single_text',
-            'format' => 'M/d/yyyy h:mm a',
-            'required' => false,
-            'disabled' => $disabled,
-            'view_timezone' => $this->app->getUserTimezone(),
-            'model_timezone' => 'UTC',
-            'constraints' => $constraints
-        ]);
         if (!empty($samples)) {
             $samplesDisabled = $disabled;
             $formBuilder->add("finalized_samples", Type\ChoiceType::class, [
@@ -1568,7 +1529,7 @@ class Order
         return $processSamples;
     }
 
-    public function checkBiobankChanges(&$updateArray)
+    public function checkBiobankChanges(&$updateArray, $finalizedTs)
     {
         $biobankChanges = [];
         $collectedSamples = !empty($this->get('collected_samples')) ? json_decode($this->get('collected_samples'), true) : [];
@@ -1579,7 +1540,7 @@ class Order
         $finalizedProcessSamples = $this->getFinalizedProcessSamples($finalizedSamples);
         $processedSamplesDiff = array_values(array_diff($finalizedProcessSamples, $processedSamples));
         if (empty($this->get('collected_ts'))) {
-            $updateArray['collected_ts'] = $updateArray['finalized_ts'];
+            $updateArray['collected_ts'] = $finalizedTs;
             $updateArray['collected_user_id'] = null;
             $biobankChanges['collected']['time'] = $updateArray['collected_ts'];
             $biobankChanges['collected']['user'] = $updateArray['collected_user_id'];
@@ -1591,7 +1552,7 @@ class Order
             $biobankChanges['collected']['samples'] = $collectedSamplesDiff;
         }
         if (empty($this->get('processed_samples_ts'))) {
-            $updateArray['processed_ts'] = $updateArray['finalized_ts'];
+            $updateArray['processed_ts'] = $finalizedTs;
             $updateArray['processed_user_id'] = null;
             $biobankChanges['processed']['time'] = $updateArray['processed_ts'];
             $biobankChanges['processed']['user'] = $updateArray['processed_user_id'];
@@ -1600,7 +1561,7 @@ class Order
             $updateArray['processed_site'] = $this->get('site');
             $newProcessedSampleTimes = [];
             foreach ($processedSamplesDiff as $sample) {
-                $newProcessedSampleTimes[$sample] = $updateArray['finalized_ts']->getTimestamp();
+                $newProcessedSampleTimes[$sample] = $finalizedTs->getTimestamp();
             }
             $updateArray['processed_samples'] = json_encode($processedSamplesDiff);
             $updateArray['processed_samples_ts'] = json_encode($newProcessedSampleTimes);
@@ -1613,7 +1574,7 @@ class Order
             $newProcessedSamples = array_merge($processedSamples, $processedSamplesDiff);
             $newProcessedSampleTimes = [];
             foreach ($processedSamplesDiff as $sample) {
-                $newProcessedSampleTimes[$sample] = $updateArray['finalized_ts']->getTimestamp();
+                $newProcessedSampleTimes[$sample] = $finalizedTs->getTimestamp();
             }
             $updateArray['processed_samples'] = json_encode($newProcessedSamples);
             $updateArray['processed_samples_ts'] = json_encode(array_merge($newProcessedSampleTimes, $processedSamplesTs));
