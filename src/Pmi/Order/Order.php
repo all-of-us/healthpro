@@ -1498,7 +1498,6 @@ class Order
         $formData = $this->getOrderFormData('finalized');
         $samples = $this->getRequestedSamples();
 
-        $enabledSamples = array_values($this->getRequestedSamples());
         $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
         $constraints = [
@@ -1507,12 +1506,14 @@ class Order
                 'message' => 'Timestamp cannot be in the future'
             ])
         ];
-        array_push($constraints,
-            new Constraints\GreaterThan([
-                'value' => $this->order['collected_ts'],
-                'message' => 'Finalized Time is before Collection Time'
-            ])
-        );
+        if (!empty($this->order['collected_ts'])) {
+            array_push($constraints,
+                new Constraints\GreaterThan([
+                    'value' => $this->order['collected_ts'],
+                    'message' => 'Finalized Time is before Collection Time'
+                ])
+            );
+        }
         $processedSamplesTs = json_decode($this->order['processed_samples_ts'], true);
         if (!empty($processedSamplesTs)) {
             $processedTs = new \DateTime();
@@ -1543,41 +1544,7 @@ class Order
                 'label' => 'Which samples are being shipped to the All of Us℠ Biobank?',
                 'choices' => $samples,
                 'required' => false,
-                'disabled' => $samplesDisabled,
-                'choice_attr' => function ($val) use ($enabledSamples) {
-                    $attr = [];
-                    $collectedSamples = json_decode($this->order['collected_samples'], true);
-                    $processedSamples = json_decode($this->order['processed_samples_ts'], true);
-                    if (in_array($val, $collectedSamples)) {
-                        $attr = ['collected' => $this->order['collected_ts']->format('n/j/Y g:ia')];
-                    }
-                    if (!empty($processedSamples[$val])) {
-                        $time = new \DateTime();
-                        $time->setTimestamp($processedSamples[$val]);
-                        $time->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
-                        $attr['processed'] = $time->format('n/j/Y g:ia');
-                    }
-                    if (in_array($val, self::$samplesRequiringProcessing) && in_array($val, $collectedSamples)) {
-                        $attr['required-processing'] = 'yes';
-                    }
-                    $warnings = $this->getWarnings();
-                    $errors = $this->getErrors();
-                    if (array_key_exists($val, self::$sampleMessageLabels)) {
-                        $type = self::$sampleMessageLabels[$val];
-                        if (!empty($errors[$type])) {
-                            $attr['error'] = $errors[$type];
-                        } elseif (!empty($warnings[$type])) {
-                            $attr['warning'] = $warnings[$type];
-                        }
-                    }
-                    if (in_array($val, $enabledSamples)) {
-                        return $attr;
-                    } else {
-                        $attr['disabled'] = true;
-                        $attr['class'] = 'sample-disabled';
-                        return $attr;
-                    }
-                }
+                'disabled' => $samplesDisabled
             ]);
         }
         $formBuilder->add("finalized_notes", Type\TextareaType::class, [
@@ -1604,9 +1571,9 @@ class Order
     public function checkBiobankChanges(&$updateArray)
     {
         $biobankChanges = [];
-        $collectedSamples = json_decode($this->get('collected_samples'), true);
-        $processedSamples = json_decode($this->get('processed_samples'), true);
-        $processedSamplesTs = json_decode($this->get('processed_samples_ts'), true);
+        $collectedSamples = !empty($this->get('collected_samples')) ? json_decode($this->get('collected_samples'), true) : [];
+        $processedSamples = !empty($this->get('processed_samples')) ? json_decode($this->get('processed_samples'), true) : [];
+        $processedSamplesTs = !empty($this->get('processed_samples_ts')) ? json_decode($this->get('processed_samples_ts'), true) : [];
         $finalizedSamples = json_decode($updateArray['finalized_samples'], true);
         $collectedSamplesDiff = array_values(array_diff($finalizedSamples, $collectedSamples));
         $finalizedProcessSamples = $this->getFinalizedProcessSamples($finalizedSamples);
