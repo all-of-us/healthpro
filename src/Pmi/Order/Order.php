@@ -1600,4 +1600,41 @@ class Order
         }
         return $processSamples;
     }
+
+    public function checkBiobankChanges(&$updateArray)
+    {
+        $biobankChanges = [];
+        $collectedSamples = json_decode($this->get('collected_samples'), true);
+        $processedSamples = json_decode($this->get('processed_samples'), true);
+        $finalizedSamples = json_decode($updateArray['finalized_samples'], true);
+        $collectedSamplesDiff = array_values(array_diff($finalizedSamples, $collectedSamples));
+        $finalizedProcessSamples = $this->getFinalizedProcessSamples($finalizedSamples);
+        $processedSamplesDiff = array_values(array_diff($finalizedProcessSamples, $processedSamples));
+        if (empty($this->get('collected_ts'))) {
+            $updateArray['collected_ts'] = $updateArray['finalized_ts'];
+            $updateArray['collected_user_id'] = null;
+            $biobankChanges['collect']['time'] = $updateArray['collected_ts'];
+            $biobankChanges['collect']['user'] = $updateArray['collected_user_id'];
+        }
+        if (empty($this->get('processed_ts'))) {
+            $updateArray['processed_ts'] = $updateArray['finalized_ts'];
+            $updateArray['processed_user_id'] = null;
+            $biobankChanges['process']['time'] = $updateArray['processed_ts'];
+            $biobankChanges['process']['user'] = $updateArray['processed_user_id'];
+        }
+        if (empty($this->get('collected_samples')) || !empty($collectedSamplesDiff)) {
+            $updateArray['collected_site'] = $this->get('site');
+            $updateArray['collected_samples'] = json_encode(array_merge($collectedSamples, $collectedSamplesDiff));
+            $biobankChanges['collect']['site'] = $updateArray['collected_site'];
+            $biobankChanges['collect']['samples'] = $collectedSamplesDiff;
+        }
+        if (empty($this->get('processed_samples')) || !empty($processedSamplesDiff)) {
+            $updateArray['processed_site'] = $this->get('site');
+            $updateArray['processed_samples'] = json_encode(array_merge($processedSamples, $processedSamplesDiff));
+            $biobankChanges['process']['site'] = $updateArray['processed_site'];
+            $biobankChanges['process']['samples'] = $processedSamplesDiff;
+        }
+        $updateArray['biobank'] = 1;
+        $updateArray['biobank_changes'] = json_encode($biobankChanges);
+    }
 }

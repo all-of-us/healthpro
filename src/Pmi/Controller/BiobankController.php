@@ -218,40 +218,9 @@ class BiobankController extends AbstractController
                 }
                 if ($finalizeForm->isValid()) {
                     $updateArray = $order->getOrderUpdateFromForm('finalized', $finalizeForm);
-                    $biobankChanges = [];
-                    if (empty($order->get('collected_ts'))) {
-                        $updateArray['collected_ts'] = $updateArray['finalized_ts'];
-                        $updateArray['collected_user_id'] = NULL;
-                        $biobankChanges['collect']['time'] = $updateArray['collected_ts'];
-                        $biobankChanges['collect']['user'] = $updateArray['collected_user_id'];
-                    }
-                    if (empty($order->get('processed_ts'))) {
-                        $updateArray['processed_ts'] = $updateArray['finalized_ts'];
-                        $updateArray['processed_user_id'] = NULL;
-                        $biobankChanges['process']['time'] = $updateArray['processed_ts'];
-                        $biobankChanges['process']['user'] = $updateArray['processed_user_id'];
-                    }
-                    $collectedSamples = json_decode($order->get('collected_samples'), true);
-                    $processedSamples = json_decode($order->get('processed_samples'), true);
-                    $finalizedSamples = json_decode($updateArray['finalized_samples'], true);
-                    $collectedSamplesDiff = array_diff($finalizedSamples, $collectedSamples);
-                    $finalizedProcessSamples = $order->getFinalizedProcessSamples($finalizedSamples);
-                    $processedSamplesDiff = array_diff($finalizedProcessSamples, $processedSamples);
-                    if (empty($order->get('collected_samples')) || !empty($collectedSamplesDiff)) {
-                        $updateArray['collected_site'] = $order->get('created_site');
-                        $updateArray['collected_samples'] = json_encode(array_merge($collectedSamples, $collectedSamplesDiff));
-                        $biobankChanges['collect']['site'] = $updateArray['collected_site'];
-                        $biobankChanges['collect']['samples'] = $collectedSamplesDiff;
-                    }
-                    if (empty($order->get('processed_samples')) || !empty($processedSamplesDiff)) {
-                        $updateArray['processed_site'] = $order->get('created_site');
-                        $updateArray['processed_samples'] = json_encode(array_merge($processedSamples, $processedSamplesDiff));
-                        $biobankChanges['process']['site'] = $updateArray['processed_site'];
-                        $biobankChanges['process']['samples'] = $processedSamplesDiff;
-                    }
+                    // Check biobank changes
+                    $order->checkBiobankChanges($updateArray);
                     $updateArray['finalized_site'] = $order->get('site');
-                    $updateArray['biobank'] = 1;
-                    $updateArray['biobank_changes'] = json_encode($biobankChanges);
                     // Unset finalized_ts for all types of orders
                     unset($updateArray['finalized_ts']);
                     // Finalized time will not be saved at this point
