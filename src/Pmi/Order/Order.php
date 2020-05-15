@@ -1542,7 +1542,7 @@ class Order
         if (empty($this->get('collected_ts'))) {
             $updateArray['collected_ts'] = $finalizedTs;
             $updateArray['collected_user_id'] = null;
-            $biobankChanges['collected']['time'] = $updateArray['collected_ts'];
+            $biobankChanges['collected']['time'] = $updateArray['collected_ts']->getTimestamp();
             $biobankChanges['collected']['user'] = $updateArray['collected_user_id'];
         }
         if (empty($collectedSamples) || !empty($collectedSamplesDiff)) {
