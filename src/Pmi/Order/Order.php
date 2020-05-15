@@ -1529,13 +1529,12 @@ class Order
         return $processSamples;
     }
 
-    public function checkBiobankChanges(&$updateArray, $finalizedTs)
+    public function checkBiobankChanges(&$updateArray, $finalizedTs, $finalizedSamples)
     {
         $biobankChanges = [];
         $collectedSamples = !empty($this->get('collected_samples')) ? json_decode($this->get('collected_samples'), true) : [];
         $processedSamples = !empty($this->get('processed_samples')) ? json_decode($this->get('processed_samples'), true) : [];
         $processedSamplesTs = !empty($this->get('processed_samples_ts')) ? json_decode($this->get('processed_samples_ts'), true) : [];
-        $finalizedSamples = json_decode($updateArray['finalized_samples'], true);
         $collectedSamplesDiff = array_values(array_diff($finalizedSamples, $collectedSamples));
         $finalizedProcessSamples = $this->getFinalizedProcessSamples($finalizedSamples);
         $processedSamplesDiff = array_values(array_diff($finalizedProcessSamples, $processedSamples));
@@ -1582,6 +1581,8 @@ class Order
             $biobankChanges['processed']['samples'] = $processedSamplesDiff;
             $biobankChanges['processed']['samples_ts'] = $newProcessedSampleTimes;
         }
+        $biobankChanges['finalized']['time'] = $finalizedTs->getTimestamp();
+        $biobankChanges['finalized']['samples'] = $finalizedSamples;
         $updateArray['biobank'] = 1;
         $updateArray['biobank_changes'] = json_encode($biobankChanges);
     }

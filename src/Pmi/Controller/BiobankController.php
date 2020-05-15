@@ -226,7 +226,7 @@ class BiobankController extends AbstractController
                     $updateArray['finalized_notes'] = $finalizeForm['finalized_notes']->getData();
                     $finalizedTs = new \DateTime();
                     // Check biobank changes
-                    $order->checkBiobankChanges($updateArray, $finalizedTs);
+                    $order->checkBiobankChanges($updateArray, $finalizedTs, $samples);
                     $updateArray['finalized_site'] = $order->get('site');
                     // Finalized time will not be saved at this point
                     if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
