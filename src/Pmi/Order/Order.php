@@ -1616,6 +1616,21 @@ class Order
         }
         $biobankChanges['processed']['sample_details'] = $sampleDetails;
 
+        if (!empty($biobankChanges['finalized']['time'])) {
+            $collectedTs = new \DateTime();
+            $collectedTs->setTimestamp($biobankChanges['finalized']['time']);
+            $collectedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+            $biobankChanges['finalized']['time'] = $collectedTs;
+        }
+        $samplesInfo = $this->get('type') === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
+
+        $sampleDetails = [];
+        foreach ($biobankChanges['finalized']['samples'] as $sample) {
+            $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
+            $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+        }
+        $biobankChanges['finalized']['sample_details'] = $sampleDetails;
+
         return $biobankChanges;
     }
 }
