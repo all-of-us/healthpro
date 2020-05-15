@@ -28,7 +28,8 @@ class OrderController extends AbstractController
         ['orderJson', '/participant/{participantId}/order/{orderId}/order.json'],
         ['orderExport', '/orders/export.csv'],
         ['orderModify', '/participant/{participantId}/order/{orderId}/modify/{type}', ['method' => 'GET|POST']],
-        ['orderRevert', '/participant/{participantId}/order/{orderId}/revert', ['method' => 'POST']]
+        ['orderRevert', '/participant/{participantId}/order/{orderId}/revert', ['method' => 'POST']],
+        ['biobankSummary', '/participant/{participantId}/order/{orderId}/biobank/summary']
     ];
 
     protected function loadOrder($participantId, $orderId, Application $app)
@@ -735,5 +736,13 @@ class OrderController extends AbstractController
             $result['errorMessage'] = 'A MayoLINK account number is not set for this site. Please contact an administrator.';
         }
         return $result;
+    }
+
+    public function biobankSummaryAction($participantId, $orderId, Application $app)
+    {
+        $order = $this->loadOrder($participantId, $orderId, $app);
+        return $app['twig']->render('biobank/summary.html.twig', [
+            'biobankChanges' => $order->getBiobankChangesDetails()
+        ]);
     }
 }

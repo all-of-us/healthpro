@@ -1585,4 +1585,36 @@ class Order
         $updateArray['biobank'] = 1;
         $updateArray['biobank_changes'] = json_encode($biobankChanges);
     }
+
+    public function getBiobankChangesDetails()
+    {
+        $biobankChanges = !empty($this->get('biobank_changes')) ? json_decode($this->get('biobank_changes'), true) : [];
+        if (!empty($biobankChanges['collected']['time'])) {
+            $collectedTs = new \DateTime();
+            $collectedTs->setTimestamp($biobankChanges['collected']['time']);
+            $collectedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+            $biobankChanges['collected']['time'] = $collectedTs;
+        }
+        $samplesInfo = $this->get('type') === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
+
+        $sampleDetails = [];
+        foreach ($biobankChanges['collected']['samples'] as $sample) {
+            $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
+            $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+        }
+        $biobankChanges['collected']['sample_details'] = $sampleDetails;
+
+        $sampleDetails = [];
+        foreach ($biobankChanges['processed']['samples_ts'] as $sample => $time) {
+            $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
+            $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+            $processedTs = new \DateTime();
+            $processedTs->setTimestamp($time);
+            $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+            $sampleDetails[$sample]['time'] = $processedTs;
+        }
+        $biobankChanges['processed']['sample_details'] = $sampleDetails;
+
+        return $biobankChanges;
+    }
 }
