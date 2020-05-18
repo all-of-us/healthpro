@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Controller;
 
+use Pmi\Service\NotifyBiobankOrderFinalizeService;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -242,6 +243,14 @@ class BiobankController extends AbstractController
                                 'mayo_id' => $result['mayoId']
                             ];
                             $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
+                            $info = [
+                                'participantId' => $participant->id,
+                                'biobankId' => $biobankId,
+                                'orderId' => $order->get('order_id'),
+                                'siteId' => $order->get('site')
+                            ];
+                            $notify = new NotifyBiobankOrderFinalizeService($app, $info);
+                            $notify->sendEmails();
                         } else {
                             $app->addFlashError($result['errorMessage']);
                         }
