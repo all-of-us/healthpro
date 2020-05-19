@@ -1581,8 +1581,12 @@ class Order
             $biobankChanges['processed']['samples'] = $processedSamplesDiff;
             $biobankChanges['processed']['samples_ts'] = $newProcessedSampleTimes;
         }
+        $updateArray['finalized_site'] = $this->get('site');
+        $updateArray['finalized_user_id'] = null;
         $biobankChanges['finalized']['time'] = $finalizedTs->getTimestamp();
         $biobankChanges['finalized']['samples'] = $finalizedSamples;
+        $biobankChanges['finalized']['site'] = $updateArray['finalized_site'];
+        $biobankChanges['finalized']['user'] = $updateArray['finalized_user_id'];
         $updateArray['biobank'] = 1;
         $updateArray['biobank_changes'] = json_encode($biobankChanges);
     }
