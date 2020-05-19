@@ -254,9 +254,9 @@ class WorkQueue
         'Medications' => 'Meds',
         'FamilyHealth' => 'Family',
         'HealthcareAccess' => 'Access',
-        'CopeMay' => 'Cope May',
-        'CopeJune' => 'Cope June',
-        'CopeJuly' => 'Cope July'
+        'CopeMay' => 'COPE May',
+        'CopeJune' => 'COPE June',
+        'CopeJuly' => 'COPE July'
     ];
 
     public static $initialSurveys = [

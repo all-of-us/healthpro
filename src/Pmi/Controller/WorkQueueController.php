@@ -362,12 +362,12 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Deactivation Date';
                 $headers[] = 'gRoR Consent Status';
                 $headers[] = 'gRoR Consent Date';
-                $headers[] = 'Cope May PPI Survey Complete';
-                $headers[] = 'Cope May PPI Survey Completion Date';
-                $headers[] = 'Cope June PPI Survey Complete';
-                $headers[] = 'Cope June PPI Survey Completion Date';
-                $headers[] = 'Cope July PPI Survey Complete';
-                $headers[] = 'Cope July PPI Survey Completion Date';
+                $headers[] = 'COPE May PPI Survey Complete';
+                $headers[] = 'COPE May PPI Survey Completion Date';
+                $headers[] = 'COPE June PPI Survey Complete';
+                $headers[] = 'COPE June PPI Survey Completion Date';
+                $headers[] = 'COPE July PPI Survey Complete';
+                $headers[] = 'COPE July PPI Survey Completion Date';
             }
             fputcsv($output, $headers);
 
