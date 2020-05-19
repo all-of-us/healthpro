@@ -108,8 +108,8 @@ class WorkQueueController extends AbstractController
             $rdrParams['organization'] = $params['organization_id'];
         }
         // Patient status query parameter format Organization:Status
-        if (!empty($params['patientStatus'])) {
-            $rdrParams['patientStatus'] = $app->getSiteOrganizationId() . ':' . $params['patientStatus'];
+        if (!empty($params['patientStatus']) && !empty($params['siteOrganizationId'])) {
+            $rdrParams['patientStatus'] = $params['siteOrganizationId'] . ':' . $params['patientStatus'];
         }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
@@ -227,6 +227,9 @@ class WorkQueueController extends AbstractController
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = array_merge($params, array_filter($request->request->all()));
+            if (!empty($params['patientStatus'])) {
+                $params['siteOrganizationId'] = $app->getSiteOrganizationId();
+            }
             $participants = $this->participantSummarySearch($organization, $params, $app, $type = 'wQTable');
             $ajaxData = [];
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $app['pmi.drc.participants']->getTotal();
@@ -280,6 +283,9 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $params['_count'] = $pageSize;
         $params['_sort:desc'] = 'consentForStudyEnrollmentAuthored';
+        if (!empty($params['patientStatus'])) {
+            $params['siteOrganizationId'] = $app->getSiteOrganizationId();
+        }
 
         $stream = function() use ($app, $params, $organization, $hasFullDataAccess, $limit, $pageSize) {
             $output = fopen('php://output', 'w');
