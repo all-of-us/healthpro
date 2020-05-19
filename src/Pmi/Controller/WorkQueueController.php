@@ -227,7 +227,9 @@ class WorkQueueController extends AbstractController
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = array_merge($params, array_filter($request->request->all()));
-            $params['siteOrganizationId'] = $app->getSiteOrganizationId();
+            if (!empty($params['patientStatus'])) {
+                $params['siteOrganizationId'] = $app->getSiteOrganizationId();
+            }
             $participants = $this->participantSummarySearch($organization, $params, $app, $type = 'wQTable');
             $ajaxData = [];
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $app['pmi.drc.participants']->getTotal();
@@ -281,7 +283,9 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $params['_count'] = $pageSize;
         $params['_sort:desc'] = 'consentForStudyEnrollmentAuthored';
-        $params['siteOrganizationId'] = $app->getSiteOrganizationId();
+        if (!empty($params['patientStatus'])) {
+            $params['siteOrganizationId'] = $app->getSiteOrganizationId();
+        }
 
         $stream = function() use ($app, $params, $organization, $hasFullDataAccess, $limit, $pageSize) {
             $output = fopen('php://output', 'w');
