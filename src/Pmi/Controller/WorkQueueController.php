@@ -324,8 +324,10 @@ class WorkQueueController extends AbstractController
                     'Completed Surveys'
                 ];
                 foreach (WorkQueue::$surveys as $survey => $label) {
-                    $headers[] = $label . ' PPI Survey Complete';
-                    $headers[] = $label . ' PPI Survey Completion Date';
+                    if (in_array($survey, WorkQueue::$initialSurveys)) {
+                        $headers[] = $label . ' PPI Survey Complete';
+                        $headers[] = $label . ' PPI Survey Completion Date';
+                    }
                 }
             } else {
                 $headers = [
@@ -366,6 +368,12 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Deactivation Date';
                 $headers[] = 'gRoR Consent Status';
                 $headers[] = 'gRoR Consent Date';
+                $headers[] = 'COPE May PPI Survey Complete';
+                $headers[] = 'COPE May PPI Survey Completion Date';
+                $headers[] = 'COPE June PPI Survey Complete';
+                $headers[] = 'COPE June PPI Survey Completion Date';
+                $headers[] = 'COPE July PPI Survey Complete';
+                $headers[] = 'COPE July PPI Survey Completion Date';
             }
             fputcsv($output, $headers);
 
@@ -403,8 +411,10 @@ class WorkQueueController extends AbstractController
                             $participant->numCompletedPPIModules
                         ];
                         foreach (WorkQueue::$surveys as $survey => $label) {
-                            $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                            $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
+                            if (in_array($survey, WorkQueue::$initialSurveys)) {
+                                $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
+                                $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
+                            }
                         }
                     } else {
                         $row = [
@@ -453,6 +463,12 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsROR);
                         $row[] = WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeMay"});
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeMayAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJune"});
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJuneAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJuly"});
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJulyAuthored"}, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
                 }
