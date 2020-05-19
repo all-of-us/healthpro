@@ -218,30 +218,25 @@ class BiobankController extends AbstractController
                     $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
                 if ($finalizeForm->isValid()) {
-                    $updateArray = [];
-                    $samples = [];
-                    if ($finalizeForm["finalized_samples"]->getData() && is_array($finalizeForm["finalized_samples"]->getData())) {
-                        $samples = array_values($finalizeForm["finalized_samples"]->getData());
-                    }
-                    $updateArray["finalized_samples"] = json_encode($samples);
-                    $updateArray['finalized_notes'] = $finalizeForm['finalized_notes']->getData();
-                    $finalizedTs = new \DateTime();
-                    // Check biobank changes
-                    $order->checkBiobankChanges($updateArray, $finalizedTs, $samples);
-                    // Finalized time will not be saved at this point
-                    if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
-                        $app->log(Log::ORDER_EDIT, $orderId);
-                    }
                     //Send order to mayo if mayo id is empty
                     if (empty($order->get('mayo_id'))) {
                         $result = $order->sendOrderToMayo($participant->id, $orderId, $app, 'finalized');
                         if ($result['status'] === 'success' && !empty($result['mayoId'])) {
-                            //Save mayo id and finalized time
-                            $newUpdateArray = [
-                                'finalized_ts' => $finalizedTs,
-                                'mayo_id' => $result['mayoId']
-                            ];
-                            $app['em']->getRepository('orders')->update($orderId, $newUpdateArray);
+                            $updateArray = [];
+                            $samples = [];
+                            if ($finalizeForm["finalized_samples"]->getData() && is_array($finalizeForm["finalized_samples"]->getData())) {
+                                $samples = array_values($finalizeForm["finalized_samples"]->getData());
+                            }
+                            $finalizedTs = new \DateTime();
+                            // Check biobank changes
+                            $order->checkBiobankChanges($updateArray, $finalizedTs, $samples, $finalizeForm['finalized_notes']->getData());
+                            // Save mayo id
+                            $updateArray['mayo_id'] = $result['mayoId'];
+
+                            if ($app['em']->getRepository('orders')->update($orderId, $updateArray)) {
+                                $app->log(Log::ORDER_EDIT, $orderId);
+                            }
+                            // Send email to site user
                             $info = [
                                 'participantId' => $participant->id,
                                 'biobankId' => $biobankId,

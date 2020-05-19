@@ -1529,7 +1529,7 @@ class Order
         return $processSamples;
     }
 
-    public function checkBiobankChanges(&$updateArray, $finalizedTs, $finalizedSamples)
+    public function checkBiobankChanges(&$updateArray, $finalizedTs, $finalizedSamples, $finalizedNotes)
     {
         $biobankChanges = [];
         $collectedSamples = !empty($this->get('collected_samples')) ? json_decode($this->get('collected_samples'), true) : [];
@@ -1541,52 +1541,68 @@ class Order
         if (empty($this->get('collected_ts'))) {
             $updateArray['collected_ts'] = $finalizedTs;
             $updateArray['collected_user_id'] = null;
-            $biobankChanges['collected']['time'] = $updateArray['collected_ts']->getTimestamp();
-            $biobankChanges['collected']['user'] = $updateArray['collected_user_id'];
+            $biobankChanges['collected'] = [
+                'time' => $updateArray['collected_ts']->getTimestamp(),
+                'user' => $updateArray['collected_user_id']
+            ];
         }
         if (empty($collectedSamples) || !empty($collectedSamplesDiff)) {
             $updateArray['collected_site'] = $this->get('site');
             $updateArray['collected_samples'] = json_encode(array_merge($collectedSamples, $collectedSamplesDiff));
-            $biobankChanges['collected']['site'] = $updateArray['collected_site'];
-            $biobankChanges['collected']['samples'] = $collectedSamplesDiff;
+            $biobankChanges['collected'] = [
+                'site' => $updateArray['collected_site'],
+                'samples' => $collectedSamplesDiff
+            ];
         }
         if (empty($this->get('processed_samples_ts'))) {
             $updateArray['processed_ts'] = $finalizedTs;
             $updateArray['processed_user_id'] = null;
-            $biobankChanges['processed']['time'] = $updateArray['processed_ts'];
-            $biobankChanges['processed']['user'] = $updateArray['processed_user_id'];
+            $biobankChanges['processed'] = [
+                'time' => $updateArray['processed_ts'],
+                'user' => $updateArray['processed_user_id']
+            ];
         }
         if (empty($processedSamplesTs)) {
-            $updateArray['processed_site'] = $this->get('site');
             $newProcessedSampleTimes = [];
             foreach ($processedSamplesDiff as $sample) {
                 $newProcessedSampleTimes[$sample] = $finalizedTs->getTimestamp();
             }
+            $updateArray['processed_site'] = $this->get('site');
             $updateArray['processed_samples'] = json_encode($processedSamplesDiff);
             $updateArray['processed_samples_ts'] = json_encode($newProcessedSampleTimes);
-            $biobankChanges['processed']['site'] = $updateArray['processed_site'];
-            $biobankChanges['processed']['samples'] = $processedSamplesDiff;
-            $biobankChanges['processed']['samples_ts'] = $newProcessedSampleTimes;
+            $biobankChanges['processed'] = [
+                'site' => $updateArray['processed_site'],
+                'samples' => $processedSamplesDiff,
+                'samples_ts' => $newProcessedSampleTimes
+            ];
         }
         if (!empty($processedSamplesTs) && !empty($processedSamplesDiff)) {
-            $updateArray['processed_site'] = $this->get('site');
             $newProcessedSamples = array_merge($processedSamples, $processedSamplesDiff);
             $newProcessedSampleTimes = [];
             foreach ($processedSamplesDiff as $sample) {
                 $newProcessedSampleTimes[$sample] = $finalizedTs->getTimestamp();
             }
+            $updateArray['processed_site'] = $this->get('site');
             $updateArray['processed_samples'] = json_encode($newProcessedSamples);
             $updateArray['processed_samples_ts'] = json_encode(array_merge($newProcessedSampleTimes, $processedSamplesTs));
-            $biobankChanges['processed']['site'] = $updateArray['processed_site'];
-            $biobankChanges['processed']['samples'] = $processedSamplesDiff;
-            $biobankChanges['processed']['samples_ts'] = $newProcessedSampleTimes;
+            $biobankChanges['processed'] = [
+                'site' => $updateArray['processed_site'],
+                'samples' => $processedSamplesDiff,
+                'samples_ts' => $newProcessedSampleTimes
+            ];
         }
+        $updateArray['finalized_ts'] = $finalizedTs;
         $updateArray['finalized_site'] = $this->get('site');
         $updateArray['finalized_user_id'] = null;
-        $biobankChanges['finalized']['time'] = $finalizedTs->getTimestamp();
-        $biobankChanges['finalized']['samples'] = $finalizedSamples;
-        $biobankChanges['finalized']['site'] = $updateArray['finalized_site'];
-        $biobankChanges['finalized']['user'] = $updateArray['finalized_user_id'];
+        $updateArray['finalized_notes'] = $finalizedNotes;
+        $updateArray['finalized_samples'] = json_encode($finalizedSamples);
+        $biobankChanges['finalized'] = [
+            'time' => $finalizedTs->getTimestamp(),
+            'site' => $updateArray['finalized_site'],
+            'user' => $updateArray['finalized_user_id'],
+            'notes' => $updateArray['finalized_notes'],
+            'samples' => $finalizedSamples
+        ];
         $updateArray['biobank'] = 1;
         $updateArray['biobank_changes'] = json_encode($biobankChanges);
     }
