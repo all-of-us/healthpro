@@ -95,12 +95,25 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         ];
 
         // For HPO
+        // Assert not submitted ehr consent (UNSET)
         $participant = new Participant((object)[
             'options' => $options,
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentForGenomicsROR' => 'SUBMITTED',
             'consentForElectronicHealthRecords' => 'UNSET',
+            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('ehr-consent', $participant->statusReason);
+
+        // Assert not submitted ehr consent (SUBMITTED_NOT_SURE)
+        $participant = new Participant((object)[
+            'options' => $options,
+            'questionnaireOnTheBasics' => 'SUBMITTED',
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'consentForGenomicsROR' => 'SUBMITTED',
+            'consentForElectronicHealthRecords' => 'SUBMITTED_NOT_SURE',
             'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
         ]);
         $this->assertSame(false, $participant->status);
