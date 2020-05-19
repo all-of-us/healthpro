@@ -57,6 +57,12 @@ class WorkQueue
         'questionnaireOnFamilyHealthAuthored',
         'questionnaireOnHealthcareAccess',
         'questionnaireOnHealthcareAccessAuthored',
+        'questionnaireOnCopeMay',
+        'questionnaireOnCopeMayAuthored',
+        'questionnaireOnCopeJune',
+        'questionnaireOnCopeJuneAuthored',
+        'questionnaireOnCopeJuly',
+        'questionnaireOnCopeJulyAuthored',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -247,7 +253,10 @@ class WorkQueue
         'MedicalHistory' => 'Hist',
         'Medications' => 'Meds',
         'FamilyHealth' => 'Family',
-        'HealthcareAccess' => 'Access'
+        'HealthcareAccess' => 'Access',
+        'CopeMay' => 'Cope May',
+        'CopeJune' => 'Cope June',
+        'CopeJuly' => 'Cope July'
     ];
 
     public static $samples = [
