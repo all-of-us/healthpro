@@ -1618,23 +1618,27 @@ class Order
         }
         $samplesInfo = $this->get('type') === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
 
-        $sampleDetails = [];
-        foreach ($biobankChanges['collected']['samples'] as $sample) {
-            $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
-            $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+        if (!empty($biobankChanges['collected']['samples'])) {
+            $sampleDetails = [];
+            foreach ($biobankChanges['collected']['samples'] as $sample) {
+                $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
+                $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+            }
+            $biobankChanges['collected']['sample_details'] = $sampleDetails;
         }
-        $biobankChanges['collected']['sample_details'] = $sampleDetails;
 
-        $sampleDetails = [];
-        foreach ($biobankChanges['processed']['samples_ts'] as $sample => $time) {
-            $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
-            $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
-            $processedTs = new \DateTime();
-            $processedTs->setTimestamp($time);
-            $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
-            $sampleDetails[$sample]['time'] = $processedTs;
+        if (!empty($biobankChanges['processed']['samples_ts'])) {
+            $sampleDetails = [];
+            foreach ($biobankChanges['processed']['samples_ts'] as $sample => $time) {
+                $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
+                $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+                $processedTs = new \DateTime();
+                $processedTs->setTimestamp($time);
+                $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                $sampleDetails[$sample]['time'] = $processedTs;
+            }
+            $biobankChanges['processed']['sample_details'] = $sampleDetails;
         }
-        $biobankChanges['processed']['sample_details'] = $sampleDetails;
 
         if (!empty($biobankChanges['finalized']['time'])) {
             $collectedTs = new \DateTime();
@@ -1644,12 +1648,14 @@ class Order
         }
         $samplesInfo = $this->get('type') === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
 
-        $sampleDetails = [];
-        foreach ($biobankChanges['finalized']['samples'] as $sample) {
-            $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
-            $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+        if (!empty($biobankChanges['finalized']['samples'])) {
+            $sampleDetails = [];
+            foreach ($biobankChanges['finalized']['samples'] as $sample) {
+                $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
+                $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+            }
+            $biobankChanges['finalized']['sample_details'] = $sampleDetails;
         }
-        $biobankChanges['finalized']['sample_details'] = $sampleDetails;
 
         return $biobankChanges;
     }

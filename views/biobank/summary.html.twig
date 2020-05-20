@@ -14,38 +14,44 @@
             </h3>
         </div>
         <div class="panel-body">
-            <h4>Collected {{ biobankChanges.collected.time is defined ? biobankChanges.collected.time|date('n/j/Y g:ia', app.userTimezone) : ''}}</h4>
-            <table class="table">
-                {% for sampleDetail in biobankChanges.collected.sample_details %}
-                    <tr>
-                        <td>{{ sampleDetail.code }}</td>
-                        <td>{{ sampleDetail.color }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
+            {% if biobankChanges.collected.sample_details is defined %}
+                <h4>Collected {{ biobankChanges.collected.time is defined ? biobankChanges.collected.time|date('n/j/Y g:ia', app.userTimezone) : ''}}</h4>
+                <table class="table">
+                    {% for sampleDetail in biobankChanges.collected.sample_details %}
+                        <tr>
+                            <td>{{ sampleDetail.code }}</td>
+                            <td>{{ sampleDetail.color }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
 
-            <h4>Processed</h4>
-            <table class="table">
-                {% for sampleDetail in biobankChanges.processed.sample_details %}
-                    <tr>
-                        <td>{{ sampleDetail.code }}</td>
-                        <td>{{ sampleDetail.color }}</td>
-                        {% if sampleDetail.time is defined %}
-                            <td>{{ sampleDetail.time|date('n/j/Y g:ia', app.userTimezone) }}</td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-            </table>
+            {% if biobankChanges.processed.sample_details is defined %}
+                <h4>Processed</h4>
+                <table class="table">
+                    {% for sampleDetail in biobankChanges.processed.sample_details %}
+                        <tr>
+                            <td>{{ sampleDetail.code }}</td>
+                            <td>{{ sampleDetail.color }}</td>
+                            {% if sampleDetail.time is defined %}
+                                <td>{{ sampleDetail.time|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
 
-            <h4>Finalized {{ biobankChanges.finalized.time|date('n/j/Y g:ia', app.userTimezone) }}</h4>
-            <table class="table">
-                {% for sampleDetail in biobankChanges.finalized.sample_details %}
-                    <tr>
-                        <td>{{ sampleDetail.code }}</td>
-                        <td>{{ sampleDetail.color }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
+            {% if biobankChanges.finalized.sample_details is defined %}
+                <h4>Finalized {{ biobankChanges.finalized.time|date('n/j/Y g:ia', app.userTimezone) }}</h4>
+                <table class="table">
+                    {% for sampleDetail in biobankChanges.finalized.sample_details %}
+                        <tr>
+                            <td>{{ sampleDetail.code }}</td>
+                            <td>{{ sampleDetail.color }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
         </div>
     </div>
 </div>
