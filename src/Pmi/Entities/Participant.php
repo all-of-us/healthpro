@@ -68,7 +68,8 @@ class Participant
             if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                 $this->status = false;
                 $this->statusReason = 'genomics';
-            } elseif (isset($this->siteType) && isset($participant->consentForElectronicHealthRecords) && $this->siteType === 'hpo' && $participant->consentForElectronicHealthRecords !== 'SUBMITTED') {
+            }
+            if (isset($this->siteType) && isset($participant->consentForElectronicHealthRecords) && $this->siteType === 'hpo' && $participant->consentForElectronicHealthRecords !== 'SUBMITTED') {
                 $this->status = false;
                 $this->statusReason = 'ehr-consent';
             }

@@ -118,5 +118,17 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('ehr-consent', $participant->statusReason);
+
+        // Assert UNSET gRoR and Ehr consent
+        $participant = new Participant((object)[
+            'options' => $options,
+            'questionnaireOnTheBasics' => 'SUBMITTED',
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'consentForGenomicsROR' => 'UNSET',
+            'consentForElectronicHealthRecords' => 'UNSET',
+            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('ehr-consent', $participant->statusReason);
     }
 }
