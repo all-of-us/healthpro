@@ -385,8 +385,7 @@ class WorkQueue
                         break;
                     }
                 }
-                $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED');
-                $row["sample{$sample}Time"] = self::dateFromString($participant->{'sampleStatus' . $newSample . 'Time'}, $app->getUserTimezone(), false);
+                $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED', $participant->{'sampleStatus' . $newSample . 'Time'}, false);
             }
             $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
 
