@@ -99,8 +99,12 @@
 {% block pagejs %}
     <script>
         $(document).ready(function() {
+            var currentStep = {{ currentStep|json_encode|raw }};
+            if ($('.finalize-form .alert-danger').length !== 0) {
+                currentStep = 'finalize';
+            }
             // Switch tab to active step
-            $(".nav-tabs a[href='#{{ currentStep }}']").tab('show');
+            $(".nav-tabs a[href='#" + currentStep + "']").tab('show');
 
             $('#checkall').on('change', function() {
                 $('#form_finalized_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));

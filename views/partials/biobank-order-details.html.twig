@@ -5,10 +5,10 @@
             <strong {% if attribute(order, 'biobank') and attribute(order, type~'_user_id') is empty %} class="text-danger" {% endif %}>{{ type|capitalize }} by {{ attribute(order, type~'_user_id') is not empty ? app.getUserEmailById(attribute(order, type~'_user_id'))|default('Unknown') : 'Biobank user' }} at {{ app.getSiteDisplayName(attribute(order, type~'_site')) }}</strong>
         </div>
     {% elseif order.origin is defined and order.origin == 'careevolution' %}
-      <div class="alert alert-success well-sm">
-          <i class="fa fa-info-circle" aria-hidden="true"></i>
-          <strong>{{ type|capitalize }} by Quest User at a Quest Site</strong>
-      </div>
+        <div class="alert alert-success well-sm">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>{{ type|capitalize }} by Quest User at a Quest Site</strong>
+        </div>
     {% endif %}
     {% if type == 'finalized' and order.failedToReachRDR %}
         <div class="alert alert-danger well-sm">
@@ -26,7 +26,7 @@
         {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit finalize-form' } }) }}
         {{ form_errors(finalizeForm) }}
 
-        <div class="form-group{% if not finalizeForm.finalized_samples.vars.valid %} has-error{% endif %}">
+        <div class="form-group">
             {{ form_label(finalizeForm.finalized_samples) }}
             <span class="toggle-help-image" data-caption="Finalized samples help text placeholder.">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
@@ -101,7 +101,7 @@
             </tbody>
         </table>
     </div>
-    <div class="row col-sm-12" >
+    <div class="row col-sm-12">
         <b>Notes</b>
         <br>{{ attribute(order, type~'_notes')|default('--') }}
     </div>
