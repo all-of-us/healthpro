@@ -1601,6 +1601,16 @@ class Order
 
     public function getBiobankChangesDetails()
     {
+        $samplesInfo = $this->get('type') === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
+        if ($this->get('type') === 'saliva') {
+            // Set color to empty string for saliva samples
+            foreach (array_keys($samplesInfo) as $key) {
+                if (empty($samplesInfo[$key]['color'])) {
+                    $samplesInfo[$key]['color'] = '';
+                }
+            }
+        }
+
         $biobankChanges = !empty($this->get('biobank_changes')) ? json_decode($this->get('biobank_changes'), true) : [];
         if (!empty($biobankChanges['collected']['time'])) {
             $collectedTs = new \DateTime();
@@ -1608,7 +1618,6 @@ class Order
             $collectedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
             $biobankChanges['collected']['time'] = $collectedTs;
         }
-        $samplesInfo = $this->get('type') === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
 
         if (!empty($biobankChanges['collected']['samples'])) {
             $sampleDetails = [];
@@ -1638,7 +1647,6 @@ class Order
             $collectedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
             $biobankChanges['finalized']['time'] = $collectedTs;
         }
-        $samplesInfo = $this->get('type') === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
 
         if (!empty($biobankChanges['finalized']['samples'])) {
             $sampleDetails = [];
