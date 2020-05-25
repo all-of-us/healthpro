@@ -274,9 +274,14 @@ class BiobankController extends AbstractController
             }
         }
         $hasErrors = !empty($order->getErrors()) ? true : false;
+        $orderArray = $order->toArray();
+        // Set processed ts to null if processed samples ts are empty
+        if (empty(json_decode($order->get('processed_samples_ts')))) {
+            $orderArray['processed_ts'] = null;
+        }
         return $app['twig']->render('biobank/order.html.twig', [
             'participant' => $participant,
-            'order' => $order->toArray(),
+            'order' => $orderArray,
             'samplesInfoText' => $order->getSamplesInfo(),
             'currentStep' => $currentStep,
             'finalizeForm' => $finalizeForm->createView(),
