@@ -243,8 +243,8 @@ class BiobankController extends AbstractController
                                 'orderId' => $order->get('order_id'),
                                 'siteId' => $order->get('site')
                             ];
-                            $notify = new NotifyBiobankOrderFinalizeService($app, $info);
-                            $notify->sendEmails();
+                            $notify = new NotifyBiobankOrderFinalizeService($app);
+                            $notify->sendEmails($info);
                         } else {
                             $app->addFlashError($result['errorMessage']);
                         }
