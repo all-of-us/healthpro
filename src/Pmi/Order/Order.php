@@ -590,14 +590,14 @@ class Order
                     'value' => 'PMITEST-' . $this->order['order_id']
                 ];
             }
-            $createdUser = $this->getOrderUser($this->order['user_id'], null);
-            $createdSite = $this->getOrderSite($this->order['site'], null);
-            $collectedUser = $this->getOrderUser($this->order['collected_user_id'], 'collected');
-            $collectedSite = $this->getOrderSite($this->order['collected_site'], 'collected');
-            $processedUser = $this->getOrderUser($this->order['processed_user_id'], 'processed');
-            $processedSite = $this->getOrderSite($this->order['processed_site'], 'processed');
-            $finalizedUser = $this->getOrderUser($this->order['finalized_user_id'], 'finalized');
-            $finalizedSite = $this->getOrderSite($this->order['finalized_site'], 'finalized');
+            $createdUser = $this->getOrderUser($this->order['user_id']);
+            $createdSite = $this->getOrderSite($this->order['site']);
+            $collectedUser = $this->getOrderUser($this->order['collected_user_id']);
+            $collectedSite = $this->getOrderSite($this->order['collected_site']);
+            $processedUser = $this->getOrderUser($this->order['processed_user_id']);
+            $processedSite = $this->getOrderSite($this->order['processed_site']);
+            $finalizedUser = $this->getOrderUser($this->order['finalized_user_id']);
+            $finalizedSite = $this->getOrderSite($this->order['finalized_site']);
             $obj->createdInfo = $this->getOrderUserSiteData($createdUser, $createdSite);
             $obj->collectedInfo = $this->getOrderUserSiteData($collectedUser, $collectedSite);
             $obj->processedInfo = $this->getOrderUserSiteData($processedUser, $processedSite);
@@ -629,8 +629,8 @@ class Order
         $statusType = $type === self::ORDER_CANCEL ? 'cancelled' : 'restored';
         $obj->status = $statusType;
         $obj->amendedReason = $reason;
-        $user = $this->getOrderUser($this->app->getUser()->getId(), null);
-        $site = $this->getOrderSite($this->app->getSiteId(), null);
+        $user = $this->getOrderUser($this->app->getUser()->getId());
+        $site = $this->getOrderSite($this->app->getSiteId());
         $obj->{$statusType . 'Info'} = $this->getOrderUserSiteData($user, $site);
         return $obj;
     }
@@ -639,8 +639,8 @@ class Order
     {
         $obj = $this->getRdrObject();
         $obj->amendedReason = $this->order['oh_reason'];
-        $user = $this->getOrderUser($this->order['oh_user_id'], null);
-        $site = $this->getOrderSite($this->order['oh_site'], null);
+        $user = $this->getOrderUser($this->order['oh_user_id']);
+        $site = $this->getOrderSite($this->order['oh_site']);
         $obj->amendedInfo = $this->getOrderUserSiteData($user, $site);
         return $obj;
     }
@@ -853,22 +853,18 @@ class Order
         }
     }
 
-    protected function getOrderUser($userId, $type)
+    protected function getOrderUser($userId)
     {
-        if ($type) {
-            $userId = $this->order["{$type}_user_id"] ? $this->order["{$type}_user_id"] : $this->order['user_id'];
-        }
+        $userId = $userId ?: $this->order['user_id'];
         $user = $this->app['em']->getRepository('users')->fetchOneBy([
             'id' => $userId
         ]);
-        return $user['email'];
+        return $user['email'] ?? '';
     }
 
-    protected function getOrderSite($site, $type)
+    protected function getOrderSite($site)
     {
-        if ($type) {
-            $site = $this->order["{$type}_site"] ? $this->order["{$type}_site"] : $this->order['site'];
-        }
+        $site = $site ?: $this->order['site'];
         return \Pmi\Security\User::SITE_PREFIX . $site;
     }
 
