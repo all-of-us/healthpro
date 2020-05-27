@@ -855,6 +855,9 @@ class Order
 
     protected function getOrderUser($userId)
     {
+        if ($this->order['biobank'] && empty($userId)) {
+            return 'BiobankUser';
+        }
         $userId = $userId ?: $this->order['user_id'];
         $user = $this->app['em']->getRepository('users')->fetchOneBy([
             'id' => $userId
