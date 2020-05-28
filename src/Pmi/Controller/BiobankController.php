@@ -279,6 +279,8 @@ class BiobankController extends AbstractController
         if (empty(json_decode($order->get('processed_samples_ts')))) {
             $orderArray['processed_ts'] = null;
         }
+        // Using collected samples to compare with finalized samples since users can't check processed samples that are not collected
+        $collectedSamples = json_decode($order->get('collected_samples'), true);
         return $app['twig']->render('biobank/order.html.twig', [
             'participant' => $participant,
             'order' => $orderArray,
@@ -287,7 +289,8 @@ class BiobankController extends AbstractController
             'finalizeForm' => $finalizeForm->createView(),
             'samplesInfo' => $order->samplesInformation,
             'version' => $order->version,
-            'hasErrors' => $hasErrors
+            'hasErrors' => $hasErrors,
+            'collectedSamples' => $collectedSamples ?: null
         ]);
     }
 
