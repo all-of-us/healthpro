@@ -1,8 +1,13 @@
 .page-header {
     margin-top: 0;
+    padding-bottom: 5px;
+    border-color: #c8c6e4;
 }
 .page-header h2 {
     margin-top: 0;
+    margin-bottom: 0;
+    color: #363272;
+    font-weight: 700;
 }
 a {
     cursor: pointer;
