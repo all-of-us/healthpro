@@ -73,8 +73,8 @@
         {% else %}
             <div class="{% if order.rdr_id is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
-                <strong {% if attribute(order, 'biobank') and attribute(order, activeStep~'_user_id') is empty %} class="text-danger" {% endif %}>{{ activeStep|capitalize }} by {{ attribute(order, activeStep~'_user_id') is not empty ? app.getUserEmailById(attribute(order, activeStep~'_user_id'))|default('Unknown') : 'Biobank user' }} at {{ app.getSiteDisplayName(attribute(order, activeStep~'_site')) }}</strong>
-                {% if order.biobank and attribute(order, activeStep~'_user_id') is empty %}
+                <strong {% if attribute(order, 'biobank_finalized') and attribute(order, activeStep~'_user_id') is empty %} class="text-danger" {% endif %}>{{ activeStep|capitalize }} by {{ attribute(order, activeStep~'_user_id') is not empty ? app.getUserEmailById(attribute(order, activeStep~'_user_id'))|default('Unknown') : 'Biobank user' }} at {{ app.getSiteDisplayName(attribute(order, activeStep~'_site')) }}</strong>
+                {% if order.biobank_finalized and attribute(order, activeStep~'_user_id') is empty %}
                     <a class="btn btn-success btn-xs pull-right" href="{{ path('biobankSummary', { participantId: participant.id, orderId: order.id }) }}" target="_blank">Summary</a>
                 {% endif %}
             </div>

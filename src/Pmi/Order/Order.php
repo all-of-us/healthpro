@@ -855,7 +855,7 @@ class Order
 
     protected function getOrderUser($userId)
     {
-        if ($this->order['biobank'] && empty($userId)) {
+        if ($this->order['biobank_finalized'] && empty($userId)) {
             return 'BiobankUser';
         }
         $userId = $userId ?: $this->order['user_id'];
@@ -1594,7 +1594,7 @@ class Order
             'notes' => $updateArray['finalized_notes'],
             'samples' => $finalizedSamples
         ];
-        $updateArray['biobank'] = 1;
+        $updateArray['biobank_finalized'] = 1;
         $updateArray['biobank_changes'] = json_encode($biobankChanges);
     }
 
