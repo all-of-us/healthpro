@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Application;
 
+use Pmi\Service\UserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Pmi\Entities\Configuration;
@@ -35,13 +36,13 @@ class HpoApplication extends AbstractApplication
              \Pmi\Drc\MockAppsClient::createFromApp($this) : \Pmi\Drc\AppsClient::createFromApp($this);
         return $this;
     }
-    
+
     protected function registerSecurity()
     {
         $this['app.googlegroups_authenticator'] = function ($app) {
             return new \Pmi\Security\GoogleGroupsAuthenticator($app);
         };
-        
+
         $app = $this;
         // include `/` in common routes because homeAction will redirect based on role
         $commonRegex = '^/(logout|login-return|keepalive|client-timeout|agree)?$';
@@ -67,7 +68,7 @@ class HpoApplication extends AbstractApplication
             'security.access_rules' => [
                 [['path' => $anonRegex], 'IS_AUTHENTICATED_ANONYMOUSLY'],
                 [['path' => '^/_dev($|\/)$'], 'IS_AUTHENTICATED_FULLY'],
-                [['path' => $commonRegex], 'IS_AUTHENTICATED_FULLY'],                
+                [['path' => $commonRegex], 'IS_AUTHENTICATED_FULLY'],
                 [['path' => '^/dashboard($|\/)'], 'ROLE_DASHBOARD'],
                 [['path' => '^/admin($|\/)'], 'ROLE_ADMIN'],
                 [['path' => '^/workqueue($|\/)'], ['ROLE_USER', 'ROLE_AWARDEE']],
@@ -75,6 +76,7 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/site($|\/)'], ['ROLE_USER', 'ROLE_AWARDEE']],
                 [['path' => '^/help($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
                 [['path' => '^/settings($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
+                [['path' => '^/biobank\/\w+\/(order|quanum-order)\/\w+$'], ['ROLE_AWARDEE', 'ROLE_BIOBANK', 'ROLE_SCRIPPS']],
                 [['path' => '^/biobank($|\/)'], ['ROLE_BIOBANK', 'ROLE_SCRIPPS']],
                 [['path' => '^/.*$'], 'ROLE_USER'],
             ]
@@ -85,7 +87,7 @@ class HpoApplication extends AbstractApplication
     {
         // default two-factor setting
         $this->configuration['enforce2fa'] = $this->isProd();
-        
+
         $appDir = realpath(__DIR__ . '/../../../');
         $configFile = $appDir . '/dev_config/config.yml';
         if ($this->isLocal() && file_exists($configFile)) {
@@ -107,7 +109,7 @@ class HpoApplication extends AbstractApplication
                 foreach ($configs as $key => $val) {
                     $this->configuration[$key] = $val;
                 }
-            }            
+            }
         }
 
         // unit tests don't have access to Datastore
@@ -118,12 +120,12 @@ class HpoApplication extends AbstractApplication
                 $this->configuration[$config->key] = $config->value;
             }
         }
-        
+
         foreach ($override as $key => $val) {
             $this->configuration[$key] = $val;
         }
     }
-    
+
     protected function registerDb()
     {
         $socket = $this->getConfig('mysql_socket');
@@ -193,10 +195,10 @@ class HpoApplication extends AbstractApplication
 
         // prevent browsers from sending unencrypted requests
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-        
+
         // "low" security finding: prevent MIME type sniffing
         $response->headers->set('X-Content-Type-Options', 'nosniff');
-        
+
         // "low" security finding: enable XSS Protection
         // http://blog.innerht.ml/the-misunderstood-x-xss-protection/
         $response->headers->set('X-XSS-Protection', '1; mode=block');
@@ -205,7 +207,7 @@ class HpoApplication extends AbstractApplication
         // Recommendation from security team is to add no-store as well.
         $response->headers->addCacheControlDirective('no-cache, no-store');
     }
-    
+
     public function switchSite($email)
     {
         $user = $this->getUser();
@@ -229,29 +231,13 @@ class HpoApplication extends AbstractApplication
 
     public function setNewRoles($user)
     {
-        $roles = $user->getRoles();
-        if ($this['session']->has('site')) {
-            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-        }
-        if ($this['session']->has('awardee')) {
-            if (($key = array_search('ROLE_USER', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if ($this->getAwardeeId() !== User::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-        }
-        if ($roles != $user->getRoles()) {
-            $token = new PostAuthenticationGuardToken($this['security.token_storage']->getToken()->getUser(), 'main', $roles);
+        $userRoles = UserService::getRoles($user->getAllRoles(), $this['session']->get('site'), $this['session']->get('awardee'));
+        if ($user->getAllRoles() != $userRoles) {
+            $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
             $this['security.token_storage']->setToken($token);
         }
     }
-    
+
     /** Returns the user's currently selected HPO site. */
     public function getSite()
     {
@@ -399,11 +385,11 @@ class HpoApplication extends AbstractApplication
             return $this->abort(404);
         }
     }
-    
+
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
         $app->log(Log::REQUEST);
-        
+
         // log the user out if their session is expired
         if ($this->isLoginExpired() && $request->attributes->get('_route') !== 'logout') {
             return $this->redirectToRoute('logout', ['timeout' => true]);
@@ -473,19 +459,20 @@ class HpoApplication extends AbstractApplication
     protected function afterCallback(Request $request, Response $response)
     {
         $this->setHeaders($response);
-    }
-    
-    protected function finishCallback(Request $request, Response $response)
-    {
         if ($this->isLoggedIn()) {
             // only the first route handled is considered a login
             $this['session']->set('isLogin', false);
-            
+
             // unset after the first route handled following loginReturn
             if (!$this->isUpkeepRoute($request)) {
                 $this['session']->set('isLoginReturn', false);
             }
         }
+    }
+    
+    protected function finishCallback(Request $request, Response $response)
+    {
+        // moved to afterCallBack to fix session start error
     }
 
     public function isValidSite($email)

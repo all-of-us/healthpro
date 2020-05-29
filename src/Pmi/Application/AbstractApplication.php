@@ -10,13 +10,13 @@ use Pmi\Audit\Log;
 use Pmi\Datastore\DatastoreSessionHandler;
 use Pmi\Monolog\StackdriverHandler;
 use Pmi\Twig\Provider\TwigServiceProvider;
+use Pmi\Session\SessionServiceProvider;
 use Silex\Application;
 use Silex\Provider\CsrfServiceProvider;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\LocaleServiceProvider;
 use Silex\Provider\MonologServiceProvider;
 use Silex\Provider\Routing\LazyRequestMatcher;
-use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -596,6 +596,7 @@ abstract class AbstractApplication extends Application
             // http://symfony.com/doc/3.4/deployment/proxies.html#but-what-if-the-ip-of-my-reverse-proxy-changes-constantly
             $trustedProxies = ['127.0.0.1', $request->server->get('REMOTE_ADDR')];
             $originalTrustedProxies = Request::getTrustedProxies();
+            $originalTrustedHeaderSet = Request::getTrustedHeaderSet();
             // specififying HEADER_X_FORWARDED_FOR because App Engine 2nd Gen also adds a FORWARDED
             Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_FOR);
 
@@ -604,7 +605,7 @@ abstract class AbstractApplication extends Application
             $ip = array_pop($ips);
 
             // reset trusted proxies
-            Request::setTrustedProxies($originalTrustedProxies);
+            Request::setTrustedProxies($originalTrustedProxies, $originalTrustedHeaderSet);
 
             // identify cron user
             if ($user === null && $request->headers->get('X-Appengine-Cron') === 'true') {

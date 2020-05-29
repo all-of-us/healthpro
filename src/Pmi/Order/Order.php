@@ -1352,4 +1352,92 @@ class Order
         $reasonDisplayText = array_search($this->order['oh_reason'], self::$cancelReasons);
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
+
+    public function loadFromJsonObject($object)
+    {
+        if (!empty($object->samples)) {
+            foreach ($object->samples as $sample) {
+                $sampleCode = $sample->test;
+                if (!array_key_exists($sample->test, $this->samplesInformation) && array_key_exists($sample->test, self::$mapRdrSamples)) {
+                    $sampleCode = self::$mapRdrSamples[$sample->test]['code'];
+                    $centrifugeType = self::$mapRdrSamples[$sample->test]['centrifuge_type'];
+                }
+                if (!empty($sample->collected)) {
+                    $collectedSamples[] = $sampleCode;
+                    $collectedTs = $sample->collected;
+                }
+                if (!empty($sample->processed)) {
+                    $processedSamples[] = $sampleCode;
+                    $processedTs = $sample->processed;
+                    $processedSamplesTs[$sampleCode] = (new \DateTime($sample->processed))->getTimestamp();
+                }
+                if (!empty($sample->finalized)) {
+                    $finalizedSamples[] = $sampleCode;
+                    $finalizedTs = $sample->finalized;
+                }
+            }
+        }
+
+        // Update notes field
+        $collectedNotes = !empty($object->notes->collected) ? $object->notes->collected : null;
+        $processedNotes = !empty($object->notes->processed) ? $object->notes->processed : null;
+        $finalizedNotes = !empty($object->notes->finalized) ? $object->notes->finalized : null;
+
+        if (!empty($object->identifier)) {
+            foreach ($object->identifier as $identifier) {
+                if (preg_match('/tracking-number/i', $identifier->system)) {
+                    $trackingNumber = $identifier->value;
+                }
+                if (preg_match('/kit-id/i', $identifier->system)) {
+                    $kitId = $identifier->value;
+                }
+            }
+        }
+
+        // Extract participantId
+        preg_match('/^Patient\/(P\d+)$/i', $object->subject, $subject_matches);
+        $participantId = $subject_matches[1];
+
+        $this->order['id'] = $object->id;
+        $this->order['participant_id'] = $participantId;
+        $this->order['order_id'] = $kitId;
+        $this->order['rdr_id'] = $object->id;
+        $this->order['biobank_id'] = (property_exists($object, 'biobankId')) ? $object->biobankId : null;
+        $this->order['type'] = 'kit';
+        $this->order['oh_type'] = 'kit';
+        $this->order['h_type'] = 'kit';
+        $this->order['created_ts'] = $object->created;
+        $this->order['processed_ts'] = $processedTs;
+        $this->order['collected_ts'] = $collectedTs;
+        $this->order['finalized_ts'] = $finalizedTs;
+        $this->order['processed_centrifuge_type'] = (!empty($centrifugeType)) ? $centrifugeType : null;
+        $this->order['requested_samples'] = null;
+        $this->order['collected_samples'] = json_encode(!empty($collectedSamples) ? $collectedSamples : []);
+        $this->order['collected_ts'] = !empty($collectedTs) ? $collectedTs : null;
+        $this->order['processed_samples'] = json_encode(!empty($processedSamples) ? $processedSamples : []);
+        $this->order['processed_samples_ts'] = json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []);
+        $this->order['finalized_samples'] = json_encode(!empty($finalizedSamples) ? $finalizedSamples : []);
+        $this->order['finalizedSamples'] = !empty($finalizedSamples) ? join($finalizedSamples, ', ') : '';
+        $this->order['finalized_ts'] = !empty($finalizedTs) ? $finalizedTs : null;
+        $this->order['collected_notes'] = $collectedNotes;
+        $this->order['processed_notes'] = $processedNotes;
+        $this->order['finalized_notes'] = $finalizedNotes;
+        $this->order['fedex_tracking'] = !empty($trackingNumber) ? $trackingNumber : null;
+        $this->order['collected_user_id'] = !empty($order->collectedInfo) ? $order->collectedInfo->author->value : false;
+        $this->order['collected_site'] = null;
+        $this->order['collected_site_name'] = 'A Quest Site';
+        $this->order['processed_user_id'] = !empty($order->processedInfo) ? $order->processedInfo->author->value : false;
+        $this->order['processed_site'] = null;
+        $this->order['processed_site_name'] = 'A Quest Site';
+        $this->order['finalized_user_id'] = !empty($order->finalizedInfo) ? $order->finalizedInfo->author->value : false;
+        $this->order['finalized_site'] = null;
+        $this->order['finalized_site_name'] = 'A Quest Site';
+        $this->order['failedToReachRDR'] = false;
+        $this->order['orderStatus'] = 'Finalized';
+        $this->order['status'] = 'finalized';
+
+        $this->order['origin'] = $object->origin;
+
+        return $this;
+    }
 }

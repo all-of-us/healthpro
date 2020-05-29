@@ -20,11 +20,11 @@
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
         (Consented Yes)
     {% elseif value == 'SUBMITTED_NO_CONSENT' %}
-        <i class="fa fa-check text-danger" aria-hidden="true"></i>
+        <i class="fa fa-times text-danger" aria-hidden="true"></i>
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
         (Refused Consent)
-    {% elseif value == 'SUBMITTED_NO_SURE' %}
-        <i class="fa fa-check text-warning" aria-hidden="true"></i>
+    {% elseif value == 'SUBMITTED_NOT_SURE' %}
+        <i class="fa fa-question text-warning" aria-hidden="true"></i>
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
         (Responded Not Sure)
     {% elseif value == 'SUBMITTED_INVALID' %}
@@ -34,5 +34,37 @@
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
         (Consent Not Completed) <br/>
+    {% endif %}
+{% endmacro %}
+
+{% macro displayGenomicsConsentStatus(value, time) %}
+    {% if value == 'SUBMITTED' %}
+        <i class="fa fa-check text-success" aria-hidden="true"></i>
+        {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
+        (Consented Yes)
+    {% elseif value == 'SUBMITTED_NO_CONSENT' %}
+        <i class="fa fa-check text-success" aria-hidden="true"></i>
+        {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
+        (Refused Consent)
+    {% elseif value == 'SUBMITTED_NOT_SURE' %}
+        <i class="fa fa-check text-success" aria-hidden="true"></i>
+        {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
+        (Responded Not Sure)
+    {% elseif value == 'SUBMITTED_INVALID' %}
+        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+        {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
+        (Invalid)
+    {% else %}
+        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+        (Consent Not Completed) <br/>
+    {% endif %}
+{% endmacro %}
+
+{% macro displayConsentPanelStatus(value, time) %}
+    {% set consentValues = ['SUBMITTED', 'SUBMITTED_NO_CONSENT', 'SUBMITTED_NOT_SURE', 'SUBMITTED_INVALID'] %}
+    {% if value in consentValues %}
+        {{ time ? time|date('n/j/Y g:ia', app.userTimezone) : '--' }}
+    {% else %}
+        (not completed)
     {% endif %}
 {% endmacro %}

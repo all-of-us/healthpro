@@ -8,6 +8,7 @@ use Pmi\Entities\Participant;
 use Pmi\Drc\CodeBook;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Pmi\WorkQueue\WorkQueue;
+use Pmi\Order\Order;
 
 class WorkQueueController extends AbstractController
 {
@@ -107,8 +108,8 @@ class WorkQueueController extends AbstractController
             $rdrParams['organization'] = $params['organization_id'];
         }
         // Patient status query parameter format Organization:Status
-        if (!empty($params['patientStatus'])) {
-            $rdrParams['patientStatus'] = $app->getSiteOrganizationId() . ':' . $params['patientStatus'];
+        if (!empty($params['patientStatus']) && !empty($params['siteOrganizationId'])) {
+            $rdrParams['patientStatus'] = $params['siteOrganizationId'] . ':' . $params['patientStatus'];
         }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
@@ -226,6 +227,9 @@ class WorkQueueController extends AbstractController
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = array_merge($params, array_filter($request->request->all()));
+            if (!empty($params['patientStatus'])) {
+                $params['siteOrganizationId'] = $app->getSiteOrganizationId();
+            }
             $participants = $this->participantSummarySearch($organization, $params, $app, $type = 'wQTable');
             $ajaxData = [];
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $app['pmi.drc.participants']->getTotal();
@@ -265,7 +269,7 @@ class WorkQueueController extends AbstractController
         } else {
             $organization = $app->getSiteOrganization();
             $site = $app->getSiteId();
-        }       
+        }
         if (!$organization) {
             return $app['twig']->render('workqueue/no-organization.html.twig');
         }
@@ -279,6 +283,9 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $params['_count'] = $pageSize;
         $params['_sort:desc'] = 'consentForStudyEnrollmentAuthored';
+        if (!empty($params['patientStatus'])) {
+            $params['siteOrganizationId'] = $app->getSiteOrganizationId();
+        }
 
         $stream = function() use ($app, $params, $organization, $hasFullDataAccess, $limit, $pageSize) {
             $output = fopen('php://output', 'w');
@@ -317,15 +324,17 @@ class WorkQueueController extends AbstractController
                     'Completed Surveys'
                 ];
                 foreach (WorkQueue::$surveys as $survey => $label) {
-                    $headers[] = $label . ' PPI Survey Complete';
-                    $headers[] = $label . ' PPI Survey Completion Date';
+                    if (in_array($survey, WorkQueue::$initialSurveys)) {
+                        $headers[] = $label . ' PPI Survey Complete';
+                        $headers[] = $label . ' PPI Survey Completion Date';
+                    }
                 }
             } else {
                 $headers = [
                     'PMI ID',
                     'Biobank ID',
                     'ZIP'
-                ];                
+                ];
             }
             $headers[] = 'Physical Measurements Status';
             $headers[] = 'Physical Measurements Completion Date';
@@ -359,6 +368,12 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Deactivation Date';
                 $headers[] = 'gRoR Consent Status';
                 $headers[] = 'gRoR Consent Date';
+                $headers[] = 'COPE May PPI Survey Complete';
+                $headers[] = 'COPE May PPI Survey Completion Date';
+                $headers[] = 'COPE June PPI Survey Complete';
+                $headers[] = 'COPE June PPI Survey Completion Date';
+                $headers[] = 'COPE July PPI Survey Complete';
+                $headers[] = 'COPE July PPI Survey Completion Date';
             }
             fputcsv($output, $headers);
 
@@ -396,15 +411,17 @@ class WorkQueueController extends AbstractController
                             $participant->numCompletedPPIModules
                         ];
                         foreach (WorkQueue::$surveys as $survey => $label) {
-                            $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                            $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
+                            if (in_array($survey, WorkQueue::$initialSurveys)) {
+                                $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
+                                $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
+                            }
                         }
                     } else {
                         $row = [
                             $participant->id,
                             $participant->biobankId,
                             $participant->zipCode,
-                        ];                   
+                        ];
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
                     $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone(), false);
@@ -446,6 +463,12 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsROR);
                         $row[] = WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeMay"});
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeMayAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJune"});
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJuneAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJuly"});
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJulyAuthored"}, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
                 }
@@ -503,7 +526,18 @@ class WorkQueueController extends AbstractController
         }
 
         $evaluations = $app['em']->getRepository('evaluations')->getEvaluationsWithHistory($id);
+
+        // Internal Orders
         $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($id);
+
+        // Quanum Orders
+        $quanumOrders = $app['pmi.drc.participants']->getOrdersByParticipant($participant->id);
+        foreach ($quanumOrders as $quanumOrder) {
+            if (in_array($quanumOrder->origin, ['careevolution'])) {
+                $orders[] = (new Order($app))->loadFromJsonObject($quanumOrder)->toArray();
+            }
+        }
+
         $problems = $app['em']->getRepository('problems')->getParticipantProblemsWithCommentsCount($id);
 
         return $app['twig']->render('workqueue/participant.html.twig',[
@@ -513,7 +547,8 @@ class WorkQueueController extends AbstractController
             'evaluations' => $evaluations,
             'problems' => $problems,
             'displayPatientStatusBlock' => false,
-            'readOnly' => true
+            'readOnly' => true,
+            'biobankView' => true
         ]);
     }
 

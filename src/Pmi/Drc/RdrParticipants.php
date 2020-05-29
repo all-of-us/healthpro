@@ -342,6 +342,38 @@ class RdrParticipants
         return false;
     }
 
+    public function getOrdersByParticipant($participantId)
+    {
+        try {
+            $response = $this->getClient()->request('GET', "Participant/{$participantId}/BiobankOrder");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && is_array($result->data)) {
+                return $result->data;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return [];
+        }
+        return [];
+    }
+
+    public function getOrders($query = [])
+    {
+        try {
+            $response = $this->getClient()->request('GET', 'BiobankOrder', [
+                'query' => $query
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && is_array($result->data)) {
+                return $result->data;
+            }
+        } catch (\Exception $e) {
+            $this->rdrHelper->logException($e);
+            return [];
+        }
+        return [];
+    }
+
     public function getOrder($participantId, $orderId)
     {
         try {

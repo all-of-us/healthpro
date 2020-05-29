@@ -517,7 +517,7 @@ class AdminController extends AbstractController
 
         $idForm->handleRequest($request);
 
-        if ($idForm->isValid()) {
+        if ($idForm->isSubmitted() && $idForm->isValid()) {
             $id = $idForm->get('participantId')->getData();
             $participant = $app['pmi.drc.participants']->getById($id);
             if ($participant) {

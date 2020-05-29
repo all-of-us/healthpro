@@ -57,6 +57,12 @@ class WorkQueue
         'questionnaireOnFamilyHealthAuthored',
         'questionnaireOnHealthcareAccess',
         'questionnaireOnHealthcareAccessAuthored',
+        'questionnaireOnCopeMay',
+        'questionnaireOnCopeMayAuthored',
+        'questionnaireOnCopeJune',
+        'questionnaireOnCopeJuneAuthored',
+        'questionnaireOnCopeJuly',
+        'questionnaireOnCopeJulyAuthored',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -247,7 +253,20 @@ class WorkQueue
         'MedicalHistory' => 'Hist',
         'Medications' => 'Meds',
         'FamilyHealth' => 'Family',
-        'HealthcareAccess' => 'Access'
+        'HealthcareAccess' => 'Access',
+        'CopeMay' => 'COPE May',
+        'CopeJune' => 'COPE June',
+        'CopeJuly' => 'COPE July'
+    ];
+
+    public static $initialSurveys = [
+        'TheBasics',
+        'OverallHealth',
+        'Lifestyle',
+        'MedicalHistory',
+        'Medications',
+        'FamilyHealth',
+        'HealthcareAccess'
     ];
 
     public static $samples = [
@@ -316,7 +335,7 @@ class WorkQueue
             $row['generalConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
-            $row['gRoRConsent'] = $this->displayConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
+            $row['gRoRConsent'] = $this->displayGenomicsConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
             $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
             $row['activityStatus'] = $this->getActivityStatus($participant);
@@ -433,8 +452,24 @@ class WorkQueue
             case 'SUBMITTED':
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Consented Yes)';
             case 'SUBMITTED_NO_CONSENT':
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Refused Consent)';
+            case 'SUBMITTED_NOT_SURE':
+                return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Responded Not Sure)';
+            case 'SUBMITTED_INVALID':
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Invalid)';
+            default:
+                return self::HTML_DANGER . ' (Consent Not Completed)';
+        }
+    }
+
+    public function displayGenomicsConsentStatus($value, $time, $displayTime = true)
+    {
+        switch ($value) {
+            case 'SUBMITTED':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Consented Yes)';
+            case 'SUBMITTED_NO_CONSENT':
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Refused Consent)';
-            case 'SUBMITTED_NO_SURE':
+            case 'SUBMITTED_NOT_SURE':
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Responded Not Sure)';
             case 'SUBMITTED_INVALID':
                 return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Invalid)';
