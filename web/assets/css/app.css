@@ -186,6 +186,10 @@ label.label-normal {
     margin: 20px auto;
     max-width: 500px;
 }
+#biobank-summary {
+    margin: 20px auto;
+    max-width: 600px;
+}
 #problem-details {
     margin: 20px auto;
 }

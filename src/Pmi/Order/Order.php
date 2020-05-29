@@ -5,6 +5,7 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Audit\Log;
+use Pmi\Order\Mayolink\MayolinkOrder;
 
 class Order
 {
@@ -589,14 +590,14 @@ class Order
                     'value' => 'PMITEST-' . $this->order['order_id']
                 ];
             }
-            $createdUser = $this->getOrderUser($this->order['user_id'], null);
-            $createdSite = $this->getOrderSite($this->order['site'], null);
-            $collectedUser = $this->getOrderUser($this->order['collected_user_id'], 'collected');
-            $collectedSite = $this->getOrderSite($this->order['collected_site'], 'collected');
-            $processedUser = $this->getOrderUser($this->order['processed_user_id'], 'processed');
-            $processedSite = $this->getOrderSite($this->order['processed_site'], 'processed');
-            $finalizedUser = $this->getOrderUser($this->order['finalized_user_id'], 'finalized');
-            $finalizedSite = $this->getOrderSite($this->order['finalized_site'], 'finalized');
+            $createdUser = $this->getOrderUser($this->order['user_id']);
+            $createdSite = $this->getOrderSite($this->order['site']);
+            $collectedUser = $this->getOrderUser($this->order['collected_user_id']);
+            $collectedSite = $this->getOrderSite($this->order['collected_site']);
+            $processedUser = $this->getOrderUser($this->order['processed_user_id']);
+            $processedSite = $this->getOrderSite($this->order['processed_site']);
+            $finalizedUser = $this->getOrderUser($this->order['finalized_user_id']);
+            $finalizedSite = $this->getOrderSite($this->order['finalized_site']);
             $obj->createdInfo = $this->getOrderUserSiteData($createdUser, $createdSite);
             $obj->collectedInfo = $this->getOrderUserSiteData($collectedUser, $collectedSite);
             $obj->processedInfo = $this->getOrderUserSiteData($processedUser, $processedSite);
@@ -628,8 +629,8 @@ class Order
         $statusType = $type === self::ORDER_CANCEL ? 'cancelled' : 'restored';
         $obj->status = $statusType;
         $obj->amendedReason = $reason;
-        $user = $this->getOrderUser($this->app->getUser()->getId(), null);
-        $site = $this->getOrderSite($this->app->getSiteId(), null);
+        $user = $this->getOrderUser($this->app->getUser()->getId());
+        $site = $this->getOrderSite($this->app->getSiteId());
         $obj->{$statusType . 'Info'} = $this->getOrderUserSiteData($user, $site);
         return $obj;
     }
@@ -638,8 +639,8 @@ class Order
     {
         $obj = $this->getRdrObject();
         $obj->amendedReason = $this->order['oh_reason'];
-        $user = $this->getOrderUser($this->order['oh_user_id'], null);
-        $site = $this->getOrderSite($this->order['oh_site'], null);
+        $user = $this->getOrderUser($this->order['oh_user_id']);
+        $site = $this->getOrderSite($this->order['oh_site']);
         $obj->amendedInfo = $this->getOrderUserSiteData($user, $site);
         return $obj;
     }
@@ -852,22 +853,21 @@ class Order
         }
     }
 
-    protected function getOrderUser($userId, $type)
+    protected function getOrderUser($userId)
     {
-        if ($type) {
-            $userId = $this->order["{$type}_user_id"] ? $this->order["{$type}_user_id"] : $this->order['user_id'];
+        if ($this->order['biobank_finalized'] && empty($userId)) {
+            return 'BiobankUser';
         }
+        $userId = $userId ?: $this->order['user_id'];
         $user = $this->app['em']->getRepository('users')->fetchOneBy([
             'id' => $userId
         ]);
-        return $user['email'];
+        return $user['email'] ?? '';
     }
 
-    protected function getOrderSite($site, $type)
+    protected function getOrderSite($site)
     {
-        if ($type) {
-            $site = $this->order["{$type}_site"] ? $this->order["{$type}_site"] : $this->order['site'];
-        }
+        $site = $site ?: $this->order['site'];
         return \Pmi\Security\User::SITE_PREFIX . $site;
     }
 
@@ -1439,5 +1439,223 @@ class Order
         $this->order['origin'] = $object->origin;
 
         return $this;
+    }
+
+    public function sendOrderToMayo($participantId, $orderId, $app, $type = 'collected')
+    {
+        // Return mock id for mock orders
+        if ($app->getConfig('ml_mock_order')) {
+            return ['status' => 'success', 'mayoId' => $app->getConfig('ml_mock_order')];
+        }
+        $result = ['status' => 'fail'];
+        $this->loadOrder($participantId, $orderId);
+        // Set collected time to user local time
+        $collectedAt = new \DateTime($this->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $app->getSiteId()])) {
+            $mayoClientId = $site['mayolink_account'];
+        }
+        // Check if mayo account number exists
+        if (!empty($mayoClientId)) {
+            $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+            if ($birthDate) {
+                $birthDate = $birthDate->format('Y-m-d');
+            }
+            $options = [
+                'type' => $this->order['type'],
+                'biobank_id' => $participant->biobankId,
+                'first_name' => '*',
+                'gender' => $participant->gender,
+                'birth_date' => $birthDate,
+                'order_id' => $this->order['order_id'],
+                'collected_at' => $collectedAt->format('c'),
+                'mayoClientId' => $mayoClientId,
+                'collected_samples' => $this->order["{$type}_samples"],
+                'centrifugeType' => $this->order['processed_centrifuge_type'],
+                'version' => $this->order['version'],
+                'tests' => $this->samplesInformation,
+                'salivaTests' => $this->salivaSamplesInformation
+            ];
+            $mayoOrder = new MayolinkOrder($app);
+            $mayoId = $mayoOrder->createOrder($options);
+            if (!empty($mayoId)) {
+                $result['status'] = 'success';
+                $result['mayoId'] = $mayoId;
+            } else {
+                $result['errorMessage'] = 'An error occurred while attempting to send this order. Please try again.';
+            }
+        } else {
+            $result['errorMessage'] = 'Mayo account number is not set for this site. Please contact the administrator.';
+        }
+        return $result;
+    }
+
+    public function createBiobankOrderFinalizeForm($formFactory)
+    {
+        $disabled = $this->isOrderFormDisabled();
+        $formData = $this->getOrderFormData('finalized');
+        $samples = $this->getRequestedSamples();
+        $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
+        if (!empty($samples)) {
+            $samplesDisabled = $disabled;
+            $formBuilder->add("finalized_samples", Type\ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => true,
+                'label' => 'Which samples are being shipped to the All of Us℠ Biobank?',
+                'choices' => $samples,
+                'required' => false,
+                'disabled' => $samplesDisabled
+            ]);
+        }
+        $formBuilder->add("finalized_notes", Type\TextareaType::class, [
+            'label' => 'Additional notes on finalization',
+            'disabled' => $disabled,
+            'required' => false,
+            'constraints' => new Constraints\Type('string')
+        ]);
+        $form = $formBuilder->getForm();
+        return $form;
+    }
+
+    public function getFinalizedProcessSamples($samples)
+    {
+        $processSamples = [];
+        foreach ($samples as $sample) {
+            if (in_array($sample, self::$samplesRequiringProcessing)) {
+                array_push($processSamples, $sample);
+            }
+        }
+        return $processSamples;
+    }
+
+    public function checkBiobankChanges(&$updateArray, $finalizedTs, $finalizedSamples, $finalizedNotes)
+    {
+        $biobankChanges = [];
+        $collectedSamples = !empty($this->get('collected_samples')) ? json_decode($this->get('collected_samples'), true) : [];
+        $processedSamples = !empty($this->get('processed_samples')) ? json_decode($this->get('processed_samples'), true) : [];
+        $processedSamplesTs = !empty($this->get('processed_samples_ts')) ? json_decode($this->get('processed_samples_ts'), true) : [];
+        $collectedSamplesDiff = array_values(array_diff($finalizedSamples, $collectedSamples));
+        $finalizedProcessSamples = $this->getFinalizedProcessSamples($finalizedSamples);
+        $processedSamplesDiff = array_values(array_diff($finalizedProcessSamples, $processedSamples));
+        if (empty($this->get('collected_ts'))) {
+            $updateArray['collected_ts'] = $finalizedTs;
+            $updateArray['collected_user_id'] = null;
+            $biobankChanges['collected'] = [
+                'time' => $updateArray['collected_ts']->getTimestamp(),
+                'user' => $updateArray['collected_user_id']
+            ];
+        }
+        if (empty($collectedSamples) || !empty($collectedSamplesDiff)) {
+            $updateArray['collected_site'] = $this->get('site');
+            $updateArray['collected_samples'] = json_encode(array_merge($collectedSamples, $collectedSamplesDiff));
+            $biobankChanges['collected']['site'] = $updateArray['collected_site'];
+            $biobankChanges['collected']['samples'] = $collectedSamplesDiff;
+        }
+        if (empty($processedSamplesTs)) {
+            $updateArray['processed_ts'] = $finalizedTs;
+            $updateArray['processed_user_id'] = null;
+            $biobankChanges['processed'] = [
+                'time' => $updateArray['processed_ts'],
+                'user' => $updateArray['processed_user_id']
+            ];
+            $finalizedProcessSamplesTs = [];
+            foreach ($finalizedProcessSamples as $sample) {
+                $finalizedProcessSamplesTs[$sample] = $finalizedTs->getTimestamp();
+            }
+            $updateArray['processed_site'] = $this->get('site');
+            $updateArray['processed_samples'] = json_encode($finalizedProcessSamples);
+            $updateArray['processed_samples_ts'] = json_encode($finalizedProcessSamplesTs);
+            $biobankChanges['processed']['site'] = $updateArray['processed_site'];
+            $biobankChanges['processed']['samples'] = $finalizedProcessSamples;
+            $biobankChanges['processed']['samples_ts'] = $finalizedProcessSamplesTs;
+        }
+        if (!empty($processedSamplesTs) && !empty($processedSamplesDiff)) {
+            $totalProcessedSamples = array_merge($processedSamples, $processedSamplesDiff);
+            $newProcessedSampleTs = [];
+            foreach ($processedSamplesDiff as $sample) {
+                $newProcessedSampleTs[$sample] = $finalizedTs->getTimestamp();
+            }
+            $updateArray['processed_site'] = $this->get('site');
+            $updateArray['processed_samples'] = json_encode($totalProcessedSamples);
+            $updateArray['processed_samples_ts'] = json_encode(array_merge($newProcessedSampleTs, $processedSamplesTs));
+            $biobankChanges['processed']['site'] = $updateArray['processed_site'];
+            $biobankChanges['processed']['samples'] = $processedSamplesDiff;
+            $biobankChanges['processed']['samples_ts'] = $newProcessedSampleTs;
+        }
+        $updateArray['finalized_ts'] = $finalizedTs;
+        $updateArray['finalized_site'] = $this->get('site');
+        $updateArray['finalized_user_id'] = null;
+        $updateArray['finalized_notes'] = $finalizedNotes;
+        $updateArray['finalized_samples'] = json_encode($finalizedSamples);
+        $biobankChanges['finalized'] = [
+            'time' => $finalizedTs->getTimestamp(),
+            'site' => $updateArray['finalized_site'],
+            'user' => $updateArray['finalized_user_id'],
+            'notes' => $updateArray['finalized_notes'],
+            'samples' => $finalizedSamples
+        ];
+        $updateArray['biobank_finalized'] = 1;
+        $updateArray['biobank_changes'] = json_encode($biobankChanges);
+    }
+
+    public function getBiobankChangesDetails()
+    {
+        $samplesInfo = $this->get('type') === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
+        if ($this->get('type') === 'saliva') {
+            // Set color to empty string for saliva samples
+            foreach (array_keys($samplesInfo) as $key) {
+                if (empty($samplesInfo[$key]['color'])) {
+                    $samplesInfo[$key]['color'] = '';
+                }
+            }
+        }
+
+        $biobankChanges = !empty($this->get('biobank_changes')) ? json_decode($this->get('biobank_changes'), true) : [];
+        if (!empty($biobankChanges['collected']['time'])) {
+            $collectedTs = new \DateTime();
+            $collectedTs->setTimestamp($biobankChanges['collected']['time']);
+            $collectedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+            $biobankChanges['collected']['time'] = $collectedTs;
+        }
+
+        if (!empty($biobankChanges['collected']['samples'])) {
+            $sampleDetails = [];
+            foreach ($biobankChanges['collected']['samples'] as $sample) {
+                $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
+                $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+            }
+            $biobankChanges['collected']['sample_details'] = $sampleDetails;
+        }
+
+        if (!empty($biobankChanges['processed']['samples_ts'])) {
+            $sampleDetails = [];
+            foreach ($biobankChanges['processed']['samples_ts'] as $sample => $time) {
+                $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
+                $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+                $processedTs = new \DateTime();
+                $processedTs->setTimestamp($time);
+                $processedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                $sampleDetails[$sample]['time'] = $processedTs;
+            }
+            $biobankChanges['processed']['sample_details'] = $sampleDetails;
+        }
+
+        if (!empty($biobankChanges['finalized']['time'])) {
+            $collectedTs = new \DateTime();
+            $collectedTs->setTimestamp($biobankChanges['finalized']['time']);
+            $collectedTs->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+            $biobankChanges['finalized']['time'] = $collectedTs;
+        }
+
+        if (!empty($biobankChanges['finalized']['samples'])) {
+            $sampleDetails = [];
+            foreach ($biobankChanges['finalized']['samples'] as $sample) {
+                $sampleDetails[$sample]['code'] = array_search($sample, $this->getRequestedSamples());
+                $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+            }
+            $biobankChanges['finalized']['sample_details'] = $sampleDetails;
+        }
+
+        return $biobankChanges;
     }
 }
