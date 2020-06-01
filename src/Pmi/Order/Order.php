@@ -211,6 +211,11 @@ class Order
         }
     }
 
+    public function set($key, $value)
+    {
+        $this->order[$key] = $value;
+    }
+
     public function toArray()
     {
         return $this->order;
@@ -1441,41 +1446,41 @@ class Order
         return $this;
     }
 
-    public function sendOrderToMayo($app, $info)
+    public function sendOrderToMayo()
     {
         // Return mock id for mock orders
-        if ($app->getConfig('ml_mock_order')) {
-            return ['status' => 'success', 'mayoId' => $app->getConfig('ml_mock_order')];
+        if ($this->app->getConfig('ml_mock_order')) {
+            return ['status' => 'success', 'mayoId' => $this->app->getConfig('ml_mock_order')];
         }
         $result = ['status' => 'fail'];
         // Set collected time to user local time
-        $collectedAt = new \DateTime($info['collectedTs']->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
+        $collectedAt = new \DateTime($this->order['biobank_collected_ts']->format('Y-m-d H:i:s'), new \DateTimeZone($this->app->getUserTimezone()));
         // Get mayo account number
-        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $app->getSiteId()])) {
+        if ($site = $this->app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $this->app->getSiteId()])) {
             $mayoClientId = $site['mayolink_account'];
         }
         // Check if mayo account number exists
         if (!empty($mayoClientId)) {
-            $birthDate = $app->getConfig('ml_real_dob') ? $info['participant']->dob : $info['participant']->getMayolinkDob();
+            $birthDate = $this->app->getConfig('ml_real_dob') ? $this->participant->dob : $this->participant->getMayolinkDob();
             if ($birthDate) {
                 $birthDate = $birthDate->format('Y-m-d');
             }
             $options = [
                 'type' => $this->order['type'],
-                'biobank_id' => $info['participant']->biobankId,
+                'biobank_id' => $this->participant->biobankId,
                 'first_name' => '*',
-                'gender' => $info['participant']->gender,
+                'gender' => $this->participant->gender,
                 'birth_date' => $birthDate,
                 'order_id' => $this->order['order_id'],
                 'collected_at' => $collectedAt->format('c'),
                 'mayoClientId' => $mayoClientId,
-                'collected_samples' => $info['finalizedSamples'],
+                'collected_samples' => $this->order['biobank_finalized_samples'],
                 'centrifugeType' => $this->order['processed_centrifuge_type'],
                 'version' => $this->order['version'],
                 'tests' => $this->samplesInformation,
                 'salivaTests' => $this->salivaSamplesInformation
             ];
-            $mayoOrder = new MayolinkOrder($app);
+            $mayoOrder = new MayolinkOrder($this->app);
             $mayoId = $mayoOrder->createOrder($options);
             if (!empty($mayoId)) {
                 $result['status'] = 'success';

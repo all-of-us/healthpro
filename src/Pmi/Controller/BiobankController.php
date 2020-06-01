@@ -225,12 +225,9 @@ class BiobankController extends AbstractController
                         if ($finalizeForm["finalized_samples"]->getData() && is_array($finalizeForm["finalized_samples"]->getData())) {
                             $samples = array_values($finalizeForm["finalized_samples"]->getData());
                         }
-                        $info = [
-                            'collectedTs' => $order->get('collected_ts') ?: $finalizedTs->setTimezone(new \DateTimeZone($app->getUserTimezone())),
-                            'finalizedSamples' => json_encode($samples),
-                            'participant' => $participant
-                        ];
-                        $result = $order->sendOrderToMayo($app, $info);
+                        $order->set('biobank_collected_ts', $order->get('collected_ts') ?: $finalizedTs->setTimezone(new \DateTimeZone($app->getUserTimezone())));
+                        $order->set('biobank_finalized_samples', json_encode($samples));
+                        $result = $order->sendOrderToMayo();
                         if ($result['status'] === 'success' && !empty($result['mayoId'])) {
                             $updateArray = [];
                             // Check biobank changes
