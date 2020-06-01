@@ -220,7 +220,7 @@ class BiobankController extends AbstractController
                 if ($finalizeForm->isValid()) {
                     //Send order to mayo if mayo id is empty
                     if (empty($order->get('mayo_id'))) {
-                        $finalizedTs = new \DateTime($app->getUserTimezone());
+                        $finalizedTs = new \DateTime();
                         $samples = [];
                         if ($finalizeForm["finalized_samples"]->getData() && is_array($finalizeForm["finalized_samples"]->getData())) {
                             $samples = array_values($finalizeForm["finalized_samples"]->getData());
