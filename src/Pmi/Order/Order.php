@@ -1441,36 +1441,35 @@ class Order
         return $this;
     }
 
-    public function sendOrderToMayo($participantId, $orderId, $app, $type = 'collected')
+    public function sendOrderToMayo($app, $info)
     {
         // Return mock id for mock orders
         if ($app->getConfig('ml_mock_order')) {
             return ['status' => 'success', 'mayoId' => $app->getConfig('ml_mock_order')];
         }
         $result = ['status' => 'fail'];
-        $this->loadOrder($participantId, $orderId);
         // Set collected time to user local time
-        $collectedAt = new \DateTime($this->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
-        $participant = $app['pmi.drc.participants']->getById($participantId);
+        $collectedAt = new \DateTime($info['collectedTs']->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
+        // Get mayo account number
         if ($site = $app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $app->getSiteId()])) {
             $mayoClientId = $site['mayolink_account'];
         }
         // Check if mayo account number exists
         if (!empty($mayoClientId)) {
-            $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+            $birthDate = $app->getConfig('ml_real_dob') ? $info['participant']->dob : $info['participant']->getMayolinkDob();
             if ($birthDate) {
                 $birthDate = $birthDate->format('Y-m-d');
             }
             $options = [
                 'type' => $this->order['type'],
-                'biobank_id' => $participant->biobankId,
+                'biobank_id' => $info['participant']->biobankId,
                 'first_name' => '*',
-                'gender' => $participant->gender,
+                'gender' => $info['participant']->gender,
                 'birth_date' => $birthDate,
                 'order_id' => $this->order['order_id'],
                 'collected_at' => $collectedAt->format('c'),
                 'mayoClientId' => $mayoClientId,
-                'collected_samples' => $this->order["{$type}_samples"],
+                'collected_samples' => $info['finalizedSamples'],
                 'centrifugeType' => $this->order['processed_centrifuge_type'],
                 'version' => $this->order['version'],
                 'tests' => $this->samplesInformation,

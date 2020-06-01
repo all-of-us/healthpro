@@ -220,14 +220,19 @@ class BiobankController extends AbstractController
                 if ($finalizeForm->isValid()) {
                     //Send order to mayo if mayo id is empty
                     if (empty($order->get('mayo_id'))) {
-                        $result = $order->sendOrderToMayo($participant->id, $orderId, $app, 'finalized');
+                        $finalizedTs = new \DateTime($app->getUserTimezone());
+                        $samples = [];
+                        if ($finalizeForm["finalized_samples"]->getData() && is_array($finalizeForm["finalized_samples"]->getData())) {
+                            $samples = array_values($finalizeForm["finalized_samples"]->getData());
+                        }
+                        $info = [
+                            'collectedTs' => $order->get('collected_ts') ?: $finalizedTs->setTimezone(new \DateTimeZone($app->getUserTimezone())),
+                            'finalizedSamples' => json_encode($samples),
+                            'participant' => $participant
+                        ];
+                        $result = $order->sendOrderToMayo($app, $info);
                         if ($result['status'] === 'success' && !empty($result['mayoId'])) {
                             $updateArray = [];
-                            $samples = [];
-                            if ($finalizeForm["finalized_samples"]->getData() && is_array($finalizeForm["finalized_samples"]->getData())) {
-                                $samples = array_values($finalizeForm["finalized_samples"]->getData());
-                            }
-                            $finalizedTs = new \DateTime();
                             // Check biobank changes
                             $order->checkBiobankChanges($updateArray, $finalizedTs, $samples, $finalizeForm['finalized_notes']->getData());
                             // Save mayo id
@@ -248,9 +253,6 @@ class BiobankController extends AbstractController
                         } else {
                             $app->addFlashError($result['errorMessage']);
                         }
-                    } else {
-                        // Save finalized time
-                        $app['em']->getRepository('orders')->update($orderId, ['finalized_ts' => $finalizedTs]);
                     }
                     $sendToRdr = true;
                 } else {
