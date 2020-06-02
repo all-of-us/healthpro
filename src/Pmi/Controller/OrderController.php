@@ -435,7 +435,9 @@ class OrderController extends AbstractController
                     if (!empty($finalizeForm['finalized_ts']->getData()) || $order->isOrderUnlocked()) {
                         //Send order to mayo if mayo id is empty
                         if (empty($order->get('mayo_id'))) {
-                            $result = $order->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                            $order->set('biobank_collected_ts', $order->get('collected_ts'));
+                            $order->set('biobank_finalized_samples', $updateArray['finalized_samples']);
+                            $result = $order->sendOrderToMayo();
                             if ($result['status'] === 'success' && !empty($result['mayoId'])) {
                                 //Save mayo id and finalized time
                                 $newUpdateArray = [
