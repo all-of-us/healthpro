@@ -193,13 +193,12 @@
                                                 <strong>{{ label }}</strong>
                                                 {% if attribute(participant, 'questionnaireOn' ~ field) == 'SUBMITTED' %}
                                                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                                    {% if attribute(participant, 'questionnaireOn' ~ field ~ 'Authored') %}
-                                                        <small>{{ attribute(participant, 'questionnaireOn' ~ field ~ 'Authored')|date('n/j/Y g:ia', app.userTimezone) }}</small>
-                                                    {% endif %}
                                                 {% else %}
                                                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                                                    <small>(not completed)</small>
                                                 {% endif %}
+                                                <small>
+                                                    {{ attribute(participant, 'questionnaireOn' ~ field ~ 'Authored') ? attribute(participant, 'questionnaireOn' ~ field ~ 'Authored')|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
+                                                </small>
                                             </div>
                                         {% endfor %}
                                     </div>

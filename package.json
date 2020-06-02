@@ -29,7 +29,7 @@
         "gulp-sourcemaps": "^2.6.5",
         "gulp-uglify": "^3.0.2",
         "inputmask": "^4.0.6",
-        "jquery": "^3.4.0",
+        "jquery": "^3.5.0",
         "jsbarcode": "^3.11.0",
         "merge-stream": "^1.0.0",
         "parsleyjs": "^2.9.0",
