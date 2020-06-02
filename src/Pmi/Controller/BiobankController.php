@@ -225,6 +225,16 @@ class BiobankController extends AbstractController
                         if ($finalizeForm["finalized_samples"]->getData() && is_array($finalizeForm["finalized_samples"]->getData())) {
                             $samples = array_values($finalizeForm["finalized_samples"]->getData());
                         }
+                        // Check centrifuge type
+                        if ($order->get('type') === 'kit' && empty($order->get('processed_centrifuge_type'))) {
+                            $site = $app['em']->getRepository('sites')->fetchOneBy([
+                                'deleted' => 0,
+                                'google_group' => $app->getSiteId()
+                            ]);
+                            if (!empty($site['centrifuge_type'])) {
+                                $order->set('processed_centrifuge_type', $site['centrifuge_type']);
+                            }
+                        }
                         $order->set('biobank_collected_ts', $order->get('collected_ts') ?: $finalizedTs->setTimezone(new \DateTimeZone($app->getUserTimezone())));
                         $order->set('biobank_finalized_samples', json_encode($samples));
                         $result = $order->sendOrderToMayo();
