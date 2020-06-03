@@ -1662,6 +1662,10 @@ class Order
             $biobankChanges['processed']['sample_details'] = $sampleDetails;
         }
 
+        if (!empty($biobankChanges['processed']['centrifuge_type'])) {
+            $biobankChanges['processed']['centrifuge_type'] = self::$centrifugeType[$biobankChanges['processed']['centrifuge_type']];
+        }
+
         if (!empty($biobankChanges['finalized']['time'])) {
             $collectedTs = new \DateTime();
             $collectedTs->setTimestamp($biobankChanges['finalized']['time']);

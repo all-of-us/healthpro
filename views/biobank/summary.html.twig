@@ -38,6 +38,12 @@
                             {% endif %}
                         </tr>
                     {% endfor %}
+                    {% if biobankChanges.processed.centrifuge_type is defined %}
+                        <tr>
+                            <td>Centrifuge Type</td>
+                            <td colspan="2">{{ biobankChanges.processed.centrifuge_type }}</td>
+                        </tr>
+                    {% endif %}
                 </table>
             {% endif %}
 
