@@ -196,7 +196,7 @@ class BiobankController extends AbstractController
         $currentStep = !in_array($order->getCurrentStep(), $steps) ? 'collect' : $order->getCurrentStep();
         $site = $app['em']->getRepository('sites')->fetchOneBy([
             'deleted' => 0,
-            'google_group' => $app->getSiteId()
+            'google_group' => $order->get('site')
         ]);
         $finalizeForm = $order->createBiobankOrderFinalizeForm($site);
         $finalizeForm->handleRequest($request);
@@ -235,15 +235,6 @@ class BiobankController extends AbstractController
                                 $centrifugeType = $finalizeForm['processed_centrifuge_type']->getData();
                             } elseif (!empty($site['centrifuge_type'])) {
                                 $centrifugeType = $site['centrifuge_type'];
-                            }
-                        }
-                        if ($order->get('type') === 'kit' && empty($order->get('processed_centrifuge_type'))) {
-                            $site = $app['em']->getRepository('sites')->fetchOneBy([
-                                'deleted' => 0,
-                                'google_group' => $app->getSiteId()
-                            ]);
-                            if (!empty($site['centrifuge_type'])) {
-                                $order->set('processed_centrifuge_type', $site['centrifuge_type']);
                             }
                         }
                         $order->set('biobank_collected_ts', $order->get('collected_ts') ?: $finalizedTs->setTimezone(new \DateTimeZone($app->getUserTimezone())));
