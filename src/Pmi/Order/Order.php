@@ -1511,7 +1511,7 @@ class Order
                 'disabled' => $samplesDisabled
             ]);
         }
-        if ($this->order['type'] === 'kit' && empty($site['centrifuge_type']) && $this->requireCentrifugeType()) {
+        if ($this->order['type'] === 'kit' && empty($site['centrifuge_type'])) {
             $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
                 'label' => 'Centrifuge type',
                 'required' => true,
@@ -1683,10 +1683,5 @@ class Order
         }
 
         return $biobankChanges;
-    }
-
-    public function requireCentrifugeType()
-    {
-        return !empty(array_intersect($this->getRequestedSamples(), self::$samplesRequiringProcessing)) ? true : false;
     }
 }
