@@ -437,7 +437,9 @@ class OrderController extends AbstractController
                         if (empty($order->get('mayo_id'))) {
                             $order->set('biobank_collected_ts', $order->get('collected_ts'));
                             $order->set('biobank_finalized_samples', $updateArray['finalized_samples']);
-                            $result = $order->sendOrderToMayo();
+                            $site = $app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $app->getSiteId()]);
+                            $mayoClientId = $site['mayolink_account'] ?: null;
+                            $result = $order->sendOrderToMayo($mayoClientId);
                             if ($result['status'] === 'success' && !empty($result['mayoId'])) {
                                 //Save mayo id and finalized time
                                 $newUpdateArray = [

@@ -242,7 +242,8 @@ class BiobankController extends AbstractController
                         if (!empty($centrifugeType)) {
                             $order->set('processed_centrifuge_type', $centrifugeType);
                         }
-                        $result = $order->sendOrderToMayo();
+                        $mayoClientId = $site['mayolink_account'] ?: null;
+                        $result = $order->sendOrderToMayo($mayoClientId);
                         if ($result['status'] === 'success' && !empty($result['mayoId'])) {
                             $updateArray = [];
                             // Check biobank changes

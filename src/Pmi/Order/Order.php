@@ -1446,7 +1446,7 @@ class Order
         return $this;
     }
 
-    public function sendOrderToMayo()
+    public function sendOrderToMayo($mayoClientId)
     {
         // Return mock id for mock orders
         if ($this->app->getConfig('ml_mock_order')) {
@@ -1455,10 +1455,6 @@ class Order
         $result = ['status' => 'fail'];
         // Set collected time to user local time
         $collectedAt = new \DateTime($this->order['biobank_collected_ts']->format('Y-m-d H:i:s'), new \DateTimeZone($this->app->getUserTimezone()));
-        // Get mayo account number
-        if ($site = $this->app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $this->order['site']])) {
-            $mayoClientId = $site['mayolink_account'];
-        }
         // Check if mayo account number exists
         if (!empty($mayoClientId)) {
             $birthDate = $this->app->getConfig('ml_real_dob') ? $this->participant->dob : $this->participant->getMayolinkDob();
