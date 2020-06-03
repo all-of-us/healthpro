@@ -1494,12 +1494,12 @@ class Order
         return $result;
     }
 
-    public function createBiobankOrderFinalizeForm($formFactory)
+    public function createBiobankOrderFinalizeForm($site)
     {
         $disabled = $this->isOrderFormDisabled();
         $formData = $this->getOrderFormData('finalized');
         $samples = $this->getRequestedSamples();
-        $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
+        $formBuilder = $this->app['form.factory']->createBuilder(FormType::class, $formData);
         if (!empty($samples)) {
             $samplesDisabled = $disabled;
             $formBuilder->add("finalized_samples", Type\ChoiceType::class, [
@@ -1509,6 +1509,21 @@ class Order
                 'choices' => $samples,
                 'required' => false,
                 'disabled' => $samplesDisabled
+            ]);
+        }
+        if ($this->order['type'] === 'kit' && empty($site['centrifuge_type']) && $this->requireCentrifugeType()) {
+            $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
+                'label' => 'Centrifuge type',
+                'required' => true,
+                'choices' => [
+                    '-- Select centrifuge type --' => null,
+                    'Fixed Angle' => self::FIXED_ANGLE,
+                    'Swinging Bucket' => self::SWINGING_BUCKET
+                ],
+                'multiple' => false,
+                'constraints' => new Constraints\NotBlank([
+                    'message' => 'Please select centrifuge type'
+                ])
             ]);
         }
         $formBuilder->add("finalized_notes", Type\TextareaType::class, [
@@ -1532,7 +1547,7 @@ class Order
         return $processSamples;
     }
 
-    public function checkBiobankChanges(&$updateArray, $finalizedTs, $finalizedSamples, $finalizedNotes)
+    public function checkBiobankChanges(&$updateArray, $finalizedTs, $finalizedSamples, $finalizedNotes, $centrifugeType)
     {
         $biobankChanges = [];
         $collectedSamples = !empty($this->get('collected_samples')) ? json_decode($this->get('collected_samples'), true) : [];
@@ -1585,6 +1600,9 @@ class Order
             $biobankChanges['processed']['site'] = $updateArray['processed_site'];
             $biobankChanges['processed']['samples'] = $processedSamplesDiff;
             $biobankChanges['processed']['samples_ts'] = $newProcessedSampleTs;
+        }
+        if (!empty($centrifugeType)) {
+            $updateArray['processed_centrifuge_type'] = $biobankChanges['processed']['centrifuge_type'] = $centrifugeType;
         }
         $updateArray['finalized_ts'] = $finalizedTs;
         $updateArray['finalized_site'] = $this->get('site');
@@ -1661,5 +1679,10 @@ class Order
         }
 
         return $biobankChanges;
+    }
+
+    public function requireCentrifugeType()
+    {
+        return !empty(array_intersect($this->getRequestedSamples(), self::$samplesRequiringProcessing)) ? true : false;
     }
 }
