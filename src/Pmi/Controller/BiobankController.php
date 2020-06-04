@@ -194,7 +194,11 @@ class BiobankController extends AbstractController
         $steps = ['collect', 'process', 'finalize'];
         // Set default step if current step not exists in the available steps
         $currentStep = !in_array($order->getCurrentStep(), $steps) ? 'collect' : $order->getCurrentStep();
-        $finalizeForm = $order->createBiobankOrderFinalizeForm($app['form.factory']);
+        $site = $app['em']->getRepository('sites')->fetchOneBy([
+            'deleted' => 0,
+            'google_group' => $order->get('site')
+        ]);
+        $finalizeForm = $order->createBiobankOrderFinalizeForm($site);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {
             if ($order->isOrderDisabled()) {
@@ -225,13 +229,25 @@ class BiobankController extends AbstractController
                         if ($finalizeForm["finalized_samples"]->getData() && is_array($finalizeForm["finalized_samples"]->getData())) {
                             $samples = array_values($finalizeForm["finalized_samples"]->getData());
                         }
+                        // Check centrifuge type for dv kit orders
+                        if ($order->get('type') === 'kit' && empty($order->get('processed_centrifuge_type'))) {
+                            if ($finalizeForm->has('processed_centrifuge_type')) {
+                                $centrifugeType = $finalizeForm['processed_centrifuge_type']->getData();
+                            } elseif (!empty($site['centrifuge_type'])) {
+                                $centrifugeType = $site['centrifuge_type'];
+                            }
+                        }
                         $order->set('biobank_collected_ts', $order->get('collected_ts') ?: $finalizedTs->setTimezone(new \DateTimeZone($app->getUserTimezone())));
                         $order->set('biobank_finalized_samples', json_encode($samples));
-                        $result = $order->sendOrderToMayo();
+                        if (!empty($centrifugeType)) {
+                            $order->set('processed_centrifuge_type', $centrifugeType);
+                        }
+                        $mayoClientId = $site['mayolink_account'] ?: null;
+                        $result = $order->sendOrderToMayo($mayoClientId);
                         if ($result['status'] === 'success' && !empty($result['mayoId'])) {
                             $updateArray = [];
                             // Check biobank changes
-                            $order->checkBiobankChanges($updateArray, $finalizedTs, $samples, $finalizeForm['finalized_notes']->getData());
+                            $order->checkBiobankChanges($updateArray, $finalizedTs, $samples, $finalizeForm['finalized_notes']->getData(), $centrifugeType);
                             // Save mayo id
                             $updateArray['mayo_id'] = $result['mayoId'];
 

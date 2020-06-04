@@ -1446,7 +1446,7 @@ class Order
         return $this;
     }
 
-    public function sendOrderToMayo()
+    public function sendOrderToMayo($mayoClientId)
     {
         // Return mock id for mock orders
         if ($this->app->getConfig('ml_mock_order')) {
@@ -1455,10 +1455,6 @@ class Order
         $result = ['status' => 'fail'];
         // Set collected time to user local time
         $collectedAt = new \DateTime($this->order['biobank_collected_ts']->format('Y-m-d H:i:s'), new \DateTimeZone($this->app->getUserTimezone()));
-        // Get mayo account number
-        if ($site = $this->app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $this->order['site']])) {
-            $mayoClientId = $site['mayolink_account'];
-        }
         // Check if mayo account number exists
         if (!empty($mayoClientId)) {
             $birthDate = $this->app->getConfig('ml_real_dob') ? $this->participant->dob : $this->participant->getMayolinkDob();
@@ -1494,12 +1490,12 @@ class Order
         return $result;
     }
 
-    public function createBiobankOrderFinalizeForm($formFactory)
+    public function createBiobankOrderFinalizeForm($site)
     {
         $disabled = $this->isOrderFormDisabled();
         $formData = $this->getOrderFormData('finalized');
         $samples = $this->getRequestedSamples();
-        $formBuilder = $formFactory->createBuilder(FormType::class, $formData);
+        $formBuilder = $this->app['form.factory']->createBuilder(FormType::class, $formData);
         if (!empty($samples)) {
             $samplesDisabled = $disabled;
             $formBuilder->add("finalized_samples", Type\ChoiceType::class, [
@@ -1509,6 +1505,21 @@ class Order
                 'choices' => $samples,
                 'required' => false,
                 'disabled' => $samplesDisabled
+            ]);
+        }
+        if ($this->order['type'] === 'kit' && empty($site['centrifuge_type'])) {
+            $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
+                'label' => 'Centrifuge type',
+                'required' => true,
+                'choices' => [
+                    '-- Select centrifuge type --' => null,
+                    'Fixed Angle' => self::FIXED_ANGLE,
+                    'Swinging Bucket' => self::SWINGING_BUCKET
+                ],
+                'multiple' => false,
+                'constraints' => new Constraints\NotBlank([
+                    'message' => 'Please select centrifuge type'
+                ])
             ]);
         }
         $formBuilder->add("finalized_notes", Type\TextareaType::class, [
@@ -1532,7 +1543,7 @@ class Order
         return $processSamples;
     }
 
-    public function checkBiobankChanges(&$updateArray, $finalizedTs, $finalizedSamples, $finalizedNotes)
+    public function checkBiobankChanges(&$updateArray, $finalizedTs, $finalizedSamples, $finalizedNotes, $centrifugeType)
     {
         $biobankChanges = [];
         $collectedSamples = !empty($this->get('collected_samples')) ? json_decode($this->get('collected_samples'), true) : [];
@@ -1585,6 +1596,9 @@ class Order
             $biobankChanges['processed']['site'] = $updateArray['processed_site'];
             $biobankChanges['processed']['samples'] = $processedSamplesDiff;
             $biobankChanges['processed']['samples_ts'] = $newProcessedSampleTs;
+        }
+        if (!empty($centrifugeType)) {
+            $updateArray['processed_centrifuge_type'] = $biobankChanges['processed']['centrifuge_type'] = $centrifugeType;
         }
         $updateArray['finalized_ts'] = $finalizedTs;
         $updateArray['finalized_site'] = $this->get('site');
@@ -1642,6 +1656,10 @@ class Order
                 $sampleDetails[$sample]['time'] = $processedTs;
             }
             $biobankChanges['processed']['sample_details'] = $sampleDetails;
+        }
+
+        if (!empty($biobankChanges['processed']['centrifuge_type'])) {
+            $biobankChanges['processed']['centrifuge_type'] = self::$centrifugeType[$biobankChanges['processed']['centrifuge_type']];
         }
 
         if (!empty($biobankChanges['finalized']['time'])) {
