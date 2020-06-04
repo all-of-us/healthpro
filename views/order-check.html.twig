@@ -91,9 +91,10 @@
         </div>
         <div id="continue" style="display:none;">
             <br />
-            <p><button type="submit" class="btn btn-primary">Continue</button></p>
+            <p><button type="submit" name="order-check" class="btn btn-primary">Continue</button></p>
         </div>
         <input type="hidden" name="show-blood-tubes" value="no" />
         <input type="hidden" name="show-saliva-tubes" value="no" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token('orderCheck') }}"/>
     </form>
 {% endblock %}

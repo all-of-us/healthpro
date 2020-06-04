@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Order\Order;
 use Pmi\Order\Mayolink\MayolinkOrder;
@@ -61,6 +62,9 @@ class OrderController extends AbstractController
 
     public function orderCreateAction($participantId, Application $app, Request $request)
     {
+        if ($request->request->has('order-check') && !$app['csrf.token_manager']->isTokenValid(new CsrfToken('orderCheck', $request->request->get('csrf_token')))) {
+            return $app->abort(403);
+        }
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
