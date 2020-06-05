@@ -62,9 +62,6 @@ class OrderController extends AbstractController
 
     public function orderCreateAction($participantId, Application $app, Request $request)
     {
-        if ($request->request->has('order-check') && !$app['csrf.token_manager']->isTokenValid(new CsrfToken('orderCheck', $request->request->get('csrf_token')))) {
-            return $app->abort(403);
-        }
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
@@ -126,6 +123,9 @@ class OrderController extends AbstractController
         $ordersRepository = $app['em']->getRepository('orders');
         $confirmForm = $formBuilder->getForm();
         $confirmForm->handleRequest($request);
+        if (!$confirmForm->isSubmitted() && !$app['csrf.token_manager']->isTokenValid(new CsrfToken('orderCheck', $request->request->get('csrf_token')))) {
+            return $app->abort(403);
+        }
         if ($confirmForm->isSubmitted() && $confirmForm->isValid()) {
             $orderData = ['type' => null];
             if ($request->request->has('existing')) {
