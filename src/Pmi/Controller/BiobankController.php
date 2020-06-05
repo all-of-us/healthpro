@@ -209,13 +209,6 @@ class BiobankController extends AbstractController
                 if (empty($finalizeForm['finalized_samples']->getData())) {
                     $finalizeForm['finalized_samples']->addError(new FormError('Please select at least one sample'));
                 }
-                $errors = $order->getErrors();
-                // Check sample errors
-                if (!empty($errors)) {
-                    foreach ($errors as $error) {
-                        $finalizeForm['finalized_samples']->addError(new FormError($error));
-                    }
-                }
                 // Check identifiers in notes
                 if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
                     $label = Order::$identifierLabel[$type[0]];
