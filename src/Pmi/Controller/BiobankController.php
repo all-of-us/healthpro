@@ -223,18 +223,19 @@ class BiobankController extends AbstractController
                             $samples = array_values($finalizeForm["finalized_samples"]->getData());
                         }
                         // Check centrifuge type for dv kit orders
+                        $centrifugeType = null;
                         if ($order->get('type') === 'kit' && empty($order->get('processed_centrifuge_type'))) {
                             if ($finalizeForm->has('processed_centrifuge_type')) {
                                 $centrifugeType = $finalizeForm['processed_centrifuge_type']->getData();
                             } elseif (!empty($site['centrifuge_type'])) {
                                 $centrifugeType = $site['centrifuge_type'];
                             }
+                            if (!empty($centrifugeType)) {
+                                $order->set('processed_centrifuge_type', $centrifugeType);
+                            }
                         }
                         $order->set('biobank_collected_ts', $order->get('collected_ts') ?: $finalizedTs->setTimezone(new \DateTimeZone($app->getUserTimezone())));
                         $order->set('biobank_finalized_samples', json_encode($samples));
-                        if (!empty($centrifugeType)) {
-                            $order->set('processed_centrifuge_type', $centrifugeType);
-                        }
                         $mayoClientId = $site['mayolink_account'] ?: null;
                         $result = $order->sendOrderToMayo($mayoClientId);
                         if ($result['status'] === 'success' && !empty($result['mayoId'])) {
