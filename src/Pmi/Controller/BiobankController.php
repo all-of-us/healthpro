@@ -288,7 +288,6 @@ class BiobankController extends AbstractController
                 ]);
             }
         }
-        $hasErrors = !empty($order->getErrors()) ? true : false;
         $orderArray = $order->toArray();
         // Set processed ts to null if processed samples ts are empty
         if (empty(json_decode($order->get('processed_samples_ts')))) {
@@ -304,7 +303,6 @@ class BiobankController extends AbstractController
             'finalizeForm' => $finalizeForm->createView(),
             'samplesInfo' => $order->samplesInformation,
             'version' => $order->version,
-            'hasErrors' => $hasErrors,
             'collectedSamples' => $collectedSamples ?: null
         ]);
     }
