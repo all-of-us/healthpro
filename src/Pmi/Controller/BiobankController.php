@@ -209,13 +209,6 @@ class BiobankController extends AbstractController
                 if (empty($finalizeForm['finalized_samples']->getData())) {
                     $finalizeForm['finalized_samples']->addError(new FormError('Please select at least one sample'));
                 }
-                $errors = $order->getErrors();
-                // Check sample errors
-                if (!empty($errors)) {
-                    foreach ($errors as $error) {
-                        $finalizeForm['finalized_samples']->addError(new FormError($error));
-                    }
-                }
                 // Check identifiers in notes
                 if ($type = $order->checkIdentifiers($finalizeForm['finalized_notes']->getData())) {
                     $label = Order::$identifierLabel[$type[0]];
@@ -230,18 +223,19 @@ class BiobankController extends AbstractController
                             $samples = array_values($finalizeForm["finalized_samples"]->getData());
                         }
                         // Check centrifuge type for dv kit orders
+                        $centrifugeType = null;
                         if ($order->get('type') === 'kit' && empty($order->get('processed_centrifuge_type'))) {
                             if ($finalizeForm->has('processed_centrifuge_type')) {
                                 $centrifugeType = $finalizeForm['processed_centrifuge_type']->getData();
                             } elseif (!empty($site['centrifuge_type'])) {
                                 $centrifugeType = $site['centrifuge_type'];
                             }
+                            if (!empty($centrifugeType)) {
+                                $order->set('processed_centrifuge_type', $centrifugeType);
+                            }
                         }
                         $order->set('biobank_collected_ts', $order->get('collected_ts') ?: $finalizedTs->setTimezone(new \DateTimeZone($app->getUserTimezone())));
                         $order->set('biobank_finalized_samples', json_encode($samples));
-                        if (!empty($centrifugeType)) {
-                            $order->set('processed_centrifuge_type', $centrifugeType);
-                        }
                         $mayoClientId = $site['mayolink_account'] ?: null;
                         $result = $order->sendOrderToMayo($mayoClientId);
                         if ($result['status'] === 'success' && !empty($result['mayoId'])) {
@@ -288,7 +282,6 @@ class BiobankController extends AbstractController
                 ]);
             }
         }
-        $hasErrors = !empty($order->getErrors()) ? true : false;
         $orderArray = $order->toArray();
         // Set processed ts to null if processed samples ts are empty
         if (empty(json_decode($order->get('processed_samples_ts')))) {
@@ -304,7 +297,6 @@ class BiobankController extends AbstractController
             'finalizeForm' => $finalizeForm->createView(),
             'samplesInfo' => $order->samplesInformation,
             'version' => $order->version,
-            'hasErrors' => $hasErrors,
             'collectedSamples' => $collectedSamples ?: null
         ]);
     }

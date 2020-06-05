@@ -1570,7 +1570,7 @@ class Order
             $updateArray['processed_ts'] = $finalizedTs;
             $updateArray['processed_user_id'] = null;
             $biobankChanges['processed'] = [
-                'time' => $updateArray['processed_ts'],
+                'time' => $finalizedTs->getTimestamp(),
                 'user' => $updateArray['processed_user_id']
             ];
             $finalizedProcessSamplesTs = [];
