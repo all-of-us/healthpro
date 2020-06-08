@@ -57,7 +57,7 @@ class WorkQueueController extends AbstractController
         }
         if ($organization === 'salivary_pilot') {
             $rdrParams['hpoId'] = 'UNSET';
-            $rdrParams['sampleStatus1SAL'] = 'RECEIVED';
+            $rdrParams['sampleStatus1SAL2'] = 'RECEIVED';
         } else {
             $rdrParams['hpoId'] = $organization;
         }
