@@ -24,6 +24,7 @@ class WorkQueue
         'language',
         'enrollmentStatus',
         'participantOrigin',
+        'consentCohort',
         'consentForStudyEnrollmentAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
@@ -320,6 +321,7 @@ class WorkQueue
             $row['participantOrigin'] = $e($participant->participantOrigin);
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
+            $row['consentCohort'] = $e($participant->consentCohort);
             $row['generalConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
