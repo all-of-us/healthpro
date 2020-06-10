@@ -374,6 +374,7 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'COPE June PPI Survey Completion Date';
                 $headers[] = 'COPE July PPI Survey Complete';
                 $headers[] = 'COPE July PPI Survey Completion Date';
+                $headers[] = 'Consent Cohort';
             }
             fputcsv($output, $headers);
 
@@ -469,6 +470,7 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJuneAuthored"}, $app->getUserTimezone());
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJuly"});
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJulyAuthored"}, $app->getUserTimezone());
+                        $row[] = $participant->consentCohort;
                     }
                     fputcsv($output, $row);
                 }
