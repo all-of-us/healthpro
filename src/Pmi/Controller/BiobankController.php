@@ -214,6 +214,10 @@ class BiobankController extends AbstractController
                     $label = Order::$identifierLabel[$type[0]];
                     $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
+                // Check if centrifuge type is required or not
+                if ($finalizeForm->has('processed_centrifuge_type') && empty($finalizeForm['processed_centrifuge_type']->getData()) && !empty($finalizeForm['finalized_samples']->getData()) && $order->requireCentrifugeType($finalizeForm['finalized_samples']->getData())) {
+                    $finalizeForm['processed_centrifuge_type']->addError(new FormError('Please select centrifuge type'));
+                }
                 if ($finalizeForm->isValid()) {
                     //Send order to mayo if mayo id is empty
                     if (empty($order->get('mayo_id'))) {

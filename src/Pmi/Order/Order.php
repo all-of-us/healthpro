@@ -1510,16 +1510,13 @@ class Order
         if ($this->order['type'] === 'kit' && empty($site['centrifuge_type'])) {
             $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
                 'label' => 'Centrifuge type',
-                'required' => true,
+                'required' => false,
                 'choices' => [
                     '-- Select centrifuge type --' => null,
                     'Fixed Angle' => self::FIXED_ANGLE,
                     'Swinging Bucket' => self::SWINGING_BUCKET
                 ],
-                'multiple' => false,
-                'constraints' => new Constraints\NotBlank([
-                    'message' => 'Please select centrifuge type'
-                ])
+                'multiple' => false
             ]);
         }
         $formBuilder->add("finalized_notes", Type\TextareaType::class, [
@@ -1679,5 +1676,10 @@ class Order
         }
 
         return $biobankChanges;
+    }
+
+    public function requireCentrifugeType($samples)
+    {
+        return !empty(array_intersect($samples, self::$samplesRequiringCentrifugeType)) ? true : false;
     }
 }
