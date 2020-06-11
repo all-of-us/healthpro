@@ -33,7 +33,7 @@ class WorkQueueController extends AbstractController
             // Pass sort params
             if (!empty($params['order'][0])) {
                 $sortColumnIndex = $params['order'][0]['column'];
-                $sortColumnName = WorkQueue::$wQColumns[$sortColumnIndex];
+                $sortColumnName = WorkQueue::$sortColumns[$sortColumnIndex];
                 $sortDir = $params['order'][0]['dir'];
                 if ($sortDir == 'asc') {
                     $rdrParams['_sort'] = $sortColumnName;

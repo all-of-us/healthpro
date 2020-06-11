@@ -111,9 +111,6 @@ $(document).ready(function() {
       tableColumns.push(
         { name: 'sample'+key, visible: false, data: 'sample'+key, class: 'text-center' }
       );
-      tableColumns.push(
-        { name: 'sample'+key+'Time', visible: false, data: 'sample'+key+'Time' }
-      );
     });
     tableColumns.push(
       { name: 'orderCreatedSite', visible: false, data: 'orderCreatedSite', orderable: false },
@@ -153,7 +150,6 @@ $(document).ready(function() {
                     '.col-group-ppi:not(.col-group-default)',
                     '.col-group-ppi-time',
                     '.col-group-inperson:not(.col-group-default)',
-                    '.col-group-inperson-time',
                     '.col-group-demographics',
                     '.col-group-contact',
                     '.col-group-patient-status'
@@ -170,7 +166,6 @@ $(document).ready(function() {
                     '.col-group-info',
                     '.col-group-ppi-time',
                     '.col-group-inperson',
-                    '.col-group-inperson-time',
                     '.col-group-demographics',
                     '.col-group-contact',
                     '.col-group-patient-status'
@@ -187,7 +182,6 @@ $(document).ready(function() {
                     'dateOfBirth:name',
                     '.col-group-info',
                     '.col-group-inperson',
-                    '.col-group-inperson-time',
                     '.col-group-demographics',
                     '.col-group-contact',
                     '.col-group-patient-status'
@@ -201,24 +195,6 @@ $(document).ready(function() {
                     '.col-group-inperson'
                 ],
                 hide: [
-                    '.col-group-info',
-                    '.col-group-ppi',
-                    '.col-group-ppi-time',
-                    '.col-group-inperson-time',
-                    '.col-group-demographics',
-                    '.col-group-contact',
-                    '.col-group-patient-status'
-                ]
-            },
-            {
-                extend: 'colvisGroup',
-                text: 'In-Person + Sample Dates',
-                show: [
-                    '.col-group-inperson',
-                    '.col-group-inperson-time'
-                ],
-                hide: [
-                    'dateOfBirth:name',
                     '.col-group-info',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
@@ -237,7 +213,6 @@ $(document).ready(function() {
                 hide: [
                     '.col-group-info',
                     '.col-group-inperson',
-                    '.col-group-inperson-time',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-contact',
@@ -256,7 +231,6 @@ $(document).ready(function() {
                     '.col-group-demographics',
                     '.col-group-info:not(.col-group-default)',
                     '.col-group-inperson',
-                    '.col-group-inperson-time',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-contact'
@@ -274,7 +248,6 @@ $(document).ready(function() {
                     '.col-group-demographics',
                     '.col-group-info:not(.col-group-default)',
                     '.col-group-inperson',
-                    '.col-group-inperson-time',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-patient-status'

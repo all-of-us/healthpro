@@ -74,7 +74,7 @@
 
                 <th colspan="{{ 2 * (surveys|length) + 2 }}" class="topheader multiheader-survey">PPI Survey Completion</th>
 
-                <th colspan="{{ 2 * (samples|length) + 7 }}" class="topheader multiheader-inperson">In-Person Enrollment</th>
+                <th colspan="{{ (samples|length) + 7 }}" class="topheader multiheader-inperson">In-Person Enrollment</th>
 
                 <th colspan="5" class="topheader multiheader-demographics">Demographics</th>
             </tr>
@@ -105,7 +105,6 @@
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Bio&shy;specimens</th>
                 {% for field, label in samples %}
                     <th class="secondaryheader col-group-inperson multiheader-inperson">{{ label }}</th>
-                    <th class="secondaryheader col-group-inperson-time multiheader-inperson">{{ label }} Date</th>
                 {% endfor %}
                 <th class="secondaryheader col-group-inperson multiheader-inperson">Bio&shy;specimens Site</th>
 

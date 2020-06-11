@@ -14,7 +14,7 @@ class WorkQueue
     protected $app;
 
     // These are used to map a DataTables column index to an RDR field for sorting
-    public static $wQColumns = [
+    public static $sortColumns = [
         'lastName',
         'firstName',
         'middleName',
@@ -69,29 +69,17 @@ class WorkQueue
         'physicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
         'numBaselineSamplesArrived',
-        'sampleStatus1SST8',
         'sampleStatus1SST8Time',
-        'sampleStatus1PST8',
         'sampleStatus1PST8Time',
-        'sampleStatus1HEP4',
         'sampleStatus1HEP4Time',
-        'sampleStatus1ED02',
         'sampleStatus1ED02Time',
-        'sampleStatus1ED04',
         'sampleStatus1ED04Time',
-        'sampleStatus1ED10',
         'sampleStatus1ED10Time',
-        'sampleStatus2ED10',
         'sampleStatus2ED10Time',
-        'sampleStatus1CFD9',
         'sampleStatus1CFD9Time',
-        'sampleStatus1PXR2',
         'sampleStatus1PXR2Time',
-        'sampleStatus1UR10',
         'sampleStatus1UR10Time',
-        'sampleStatus1UR90',
         'sampleStatus1UR90Time',
-        'sampleStatus1SAL',
         'sampleStatus1SALTime',
         'biospecimenSourceSite',
         'dateOfBirth',
@@ -385,8 +373,7 @@ class WorkQueue
                         break;
                     }
                 }
-                $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED');
-                $row["sample{$sample}Time"] = self::dateFromString($participant->{'sampleStatus' . $newSample . 'Time'}, $app->getUserTimezone(), false);
+                $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED', $participant->{'sampleStatus' . $newSample . 'Time'}, false);
             }
             $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
 
