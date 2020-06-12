@@ -15,7 +15,7 @@
     {% set errorMessage = 'This participant has provided primary consent but has not completed Genomic Return of Results consent in the Participant Portal and is therefore ineligible to be scheduled for or complete physical measurements and biospecimen collection. Please direct the participant to complete the Genomic Return of Results consent in the Participant Portal to enable in-person enrollment or contact the Help Desk, if needed.' %}
 {% elseif participant.statusReason == 'ehr-consent' %}
     {% set errorTitle = 'EHR Consent not complete' %}
-    {% set errorMessage = 'This participant has provided primary consent but has either 1) not completed EHR Consent (if an HPO participant) or 2) responded “no” to DV EHR Attestation and is not in an allowed Saliva-only zip code (if a DV participant) in the Participant Portal and is therefore ineligible to be scheduled for or complete physical measurements and biospecimen collection. Please direct the participant to complete the necessary consent components in the Participant Portal to enable in-person enrollment or contact the Help Desk, if needed.' %}
+    {% set errorMessage = 'This participant has provided primary consent but has not completed EHR Consent in the Participant Portal and is therefore ineligible to be scheduled for or complete physical measurements and biospecimen collection. Please direct the participant to complete the necessary consent components in the Participant Portal to enable in-person enrollment or contact the Help Desk, if needed.' %}
 {% else %}
     {% set errorTitle = 'Consent not complete' %}
     {% set errorMessage = 'This participant has not completed consent for enrollment.' %}
