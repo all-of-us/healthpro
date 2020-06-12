@@ -1423,13 +1423,13 @@ class Order
         $this->order['processed_notes'] = $processedNotes;
         $this->order['finalized_notes'] = $finalizedNotes;
         $this->order['fedex_tracking'] = !empty($trackingNumber) ? $trackingNumber : null;
-        $this->order['collected_user_id'] = !empty($order->collectedInfo) ? $order->collectedInfo->author->value : false;
+        $this->order['collected_user_id'] = !empty($object->collectedInfo) ? $object->collectedInfo->author->value : false;
         $this->order['collected_site'] = null;
         $this->order['collected_site_name'] = 'A Quest Site';
-        $this->order['processed_user_id'] = !empty($order->processedInfo) ? $order->processedInfo->author->value : false;
+        $this->order['processed_user_id'] = !empty($object->processedInfo) ? $object->processedInfo->author->value : false;
         $this->order['processed_site'] = null;
         $this->order['processed_site_name'] = 'A Quest Site';
-        $this->order['finalized_user_id'] = !empty($order->finalizedInfo) ? $order->finalizedInfo->author->value : false;
+        $this->order['finalized_user_id'] = !empty($object->finalizedInfo) ? $object->finalizedInfo->author->value : false;
         $this->order['finalized_site'] = null;
         $this->order['finalized_site_name'] = 'A Quest Site';
         $this->order['failedToReachRDR'] = false;

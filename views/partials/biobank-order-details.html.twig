@@ -4,7 +4,7 @@
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong>{{ type|capitalize }} by {{ app.getUserEmailById(attribute(order, type~'_user_id'))|default('Unknown') }} at {{ app.getSiteDisplayName(attribute(order, type~'_site')) }}</strong>
         </div>
-    {% elseif order.origin is defined and order.origin == 'careevolution' %}
+    {% elseif order.origin is defined and order.origin == 'careevolution' and attribute(order, type~'_user_id') is not empty %}
       <div class="alert alert-success well-sm">
           <i class="fa fa-info-circle" aria-hidden="true"></i>
           <strong>{{ type|capitalize }} by Quest User at a Quest Site</strong>
