@@ -302,8 +302,8 @@ class WorkQueueController extends AbstractController
                     'Date of Birth',
                     'Language',
                     'Participant Status',
-                    'General Consent Status',
-                    'General Consent Date',
+                    'Primary Consent Status',
+                    'Primary Consent Date',
                     'EHR Consent Status',
                     'EHR Consent Date',
                     'CABoR Consent Status',
@@ -349,7 +349,7 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Biospecimens Site';
             $headers[] = 'Withdrawal Reason';
-            $headers[] = 'Language of General Consent';
+            $headers[] = 'Language of Primary Consent';
             $headers[] = 'DV-only EHR Sharing Status';
             $headers[] = 'DV-only EHR Sharing Date';
             if ($hasFullDataAccess) {
