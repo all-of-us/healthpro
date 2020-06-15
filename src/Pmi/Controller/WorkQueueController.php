@@ -55,7 +55,12 @@ class WorkQueueController extends AbstractController
                 unset($params[$key]);
             }
         }
-        $rdrParams['hpoId'] = $organization;
+        if ($organization === 'salivary_pilot') {
+            $rdrParams['hpoId'] = 'UNSET';
+            $rdrParams['sampleStatus1SAL2'] = 'RECEIVED';
+        } else {
+            $rdrParams['hpoId'] = $organization;
+        }
 
         //Pass export params
         if (isset($params['_count'])) {
@@ -175,12 +180,13 @@ class WorkQueueController extends AbstractController
             foreach ($organizations as $org) {
                 $organizationsList['organization']['options'][$app->getAwardeeDisplayName($org)] = $org;
             }
+            $organizationsList['organization']['options']['Salivary Pilot'] = 'salivary_pilot';
             $filters = array_merge($filters, $organizationsList);
 
             // Set to selected organization
             if (isset($params['organization'])) {
                 // Check if the awardee has access to this organization
-                if (!in_array($params['organization'], $app->getAwardeeOrganization())) {
+                if ($params['organization'] !== 'salivary_pilot' && !in_array($params['organization'], $app->getAwardeeOrganization())) {
                     $app->abort(403);
                 }
                 $organization = $params['organization'];
