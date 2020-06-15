@@ -186,6 +186,14 @@ class WorkQueue
                 'PTSC Portal' => 'vibrent',
                 'DV Pilot Portal' => 'careevolution'
             ]
+        ],
+        'consentCohort' => [
+            'label' => 'Consent Cohort',
+            'options' => [
+                'Cohort 1' => 'COHORT_1',
+                'Cohort 2' => 'COHORT_2',
+                'Cohort 3' => 'COHORT_3'
+            ]
         ]
     ];
 
