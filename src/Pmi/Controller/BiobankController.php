@@ -323,7 +323,7 @@ class BiobankController extends AbstractController
 
         return $app['twig']->render('biobank/order-quanum.html.twig', [
             'participant' => $participant,
-            'samplesInfo' => $order->getSamplesInfo(),
+            'samplesInfoText' => $order->getSamplesInfo(),
             'currentStep' => 'finalize',
             'order' => $order->toArray()
         ]);
