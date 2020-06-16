@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Order\Order;
 use Pmi\Order\Mayolink\MayolinkOrder;
@@ -123,6 +124,9 @@ class OrderController extends AbstractController
         $ordersRepository = $app['em']->getRepository('orders');
         $confirmForm = $formBuilder->getForm();
         $confirmForm->handleRequest($request);
+        if (!$confirmForm->isSubmitted() && !$app['csrf.token_manager']->isTokenValid(new CsrfToken('orderCheck', $request->request->get('csrf_token')))) {
+            return $app->abort(403);
+        }
         if ($confirmForm->isSubmitted() && $confirmForm->isValid()) {
             $orderData = ['type' => null];
             if ($request->request->has('existing')) {

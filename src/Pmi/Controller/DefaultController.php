@@ -145,6 +145,9 @@ class DefaultController extends AbstractController
     public function selectSiteAction(Application $app, Request $request)
     {
         if ($request->request->has('site')) {
+            if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('siteSelect', $request->request->get('csrf_token')))) {
+                return $app->abort(403);
+            }
             $siteId = $request->request->get('site');
             if (strpos($siteId, User::AWARDEE_PREFIX) !== 0 && !$app->isValidSite($siteId)) {
                 $app->addFlashError("Sorry, there is a problem with your site's configuration. Please contact your site administrator.");
