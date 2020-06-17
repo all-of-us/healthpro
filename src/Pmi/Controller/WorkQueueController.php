@@ -527,7 +527,7 @@ class WorkQueueController extends AbstractController
             $app->abort(404);
         }
 
-        if (!$app->hasRole('ROLE_AWARDEE_SCRIPPS') || !in_array($participant->awardee, $app->getAwardeeOrganization())) {
+        if (!$app->hasRole('ROLE_AWARDEE_SCRIPPS') || (!empty($participant->awardee) && !in_array($participant->awardee, $app->getAwardeeOrganization()))) {
             $app->abort(403);
         }
 
