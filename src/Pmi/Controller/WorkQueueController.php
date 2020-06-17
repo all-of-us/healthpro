@@ -527,7 +527,12 @@ class WorkQueueController extends AbstractController
             $app->abort(404);
         }
 
-        if (!$app->hasRole('ROLE_AWARDEE_SCRIPPS') || (!empty($participant->awardee) && !in_array($participant->awardee, $app->getAwardeeOrganization()))) {
+        if (!$app->hasRole('ROLE_AWARDEE_SCRIPPS')) {
+            $app->abort(403);
+        }
+
+        // Deny access if participant awardee does not belong to the allowed awardees or not a salivary participant (awardee = UNSET and sampleStatus1SAL2 = RECEIVED)
+        if (!(in_array($participant->awardee, $app->getAwardeeOrganization()) || (empty($participant->awardee) && $participant->sampleStatus1SAL2 === 'RECEIVED'))) {
             $app->abort(403);
         }
 
