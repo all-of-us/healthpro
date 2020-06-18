@@ -35,7 +35,7 @@ class Review
 
     protected function getTodayRows($today, $site)
     {
-        $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, ' .
+        $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, o.biobank_finalized, ' .
             'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
             'oh.type as h_type ' .
             'FROM orders o ' .
@@ -43,7 +43,7 @@ class Review
             'ON o.history_id = oh.id WHERE ' .
             '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ' .
             'AND (o.site = :site OR o.collected_site = :site OR o.processed_site = :site OR o.finalized_site = :site) ';
-        $measurementsQuery = 'SELECT e.participant_id, \'measurement\' as type, e.id, e.parent_id, null, e.rdr_id, e.created_ts, null, null, e.finalized_ts, null, ' .
+        $measurementsQuery = 'SELECT e.participant_id, \'measurement\' as type, e.id, e.parent_id, null, e.rdr_id, e.created_ts, null, null, e.finalized_ts, null, null, ' .
             'greatest(coalesce(e.created_ts, 0), coalesce(e.finalized_ts, 0), coalesce(eh.created_ts, 0)) as latest_ts, ' .
             'eh.type as h_type ' .
             'FROM evaluations e ' .
@@ -161,6 +161,8 @@ class Review
             $status = 'Edited & Finalized';
         } elseif (!empty($row['finalized_ts']) && empty($row['rdr_id'])) {
             $status = 'Processed';
+        } elseif (!empty($row['finalized_ts']) && $row['biobank_finalized']) {
+            $status = 'Biobank Finalized';
         }
         return $status;
     }
