@@ -102,7 +102,7 @@ class WorkQueueController extends AbstractController
             $rdrParams['participantOrigin'] = $params['participantOrigin'];
         }
         if (!empty($params['consentCohort'])) {
-            $rdrParams['consentCohort'] = $params['participantOrigin'];
+            $rdrParams['consentCohort'] = $params['consentCohort'];
         }
         // Add site prefix
         if (!empty($params['site'])) {
