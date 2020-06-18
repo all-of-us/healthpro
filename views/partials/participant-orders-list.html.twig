@@ -30,7 +30,12 @@
                         {% elseif order.oh_type == 'edit' %}
                             <span class="label label-success">Edited &amp; Finalized</span> {{ order.oh_created_ts|date('n/j/Y g:ia', app.userTimezone) }}
                         {% elseif order.finalized_ts and order.rdr_id %}
-                            <span class="label label-success">Finalized</span> {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
+                            {% if order.biobank_finalized %}
+                                <span class="label label-warning">Biobank Finalized</span>
+                            {% else %}
+                                <span class="label label-success">Finalized</span>
+                            {% endif %}
+                            {{ order.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}
                         {% elseif order.processed_ts %}
                             <span class="label label-info">Processed</span> {{ order.processed_ts|date('n/j/Y g:ia', app.userTimezone) }}
                         {% elseif order.collected_ts %}
