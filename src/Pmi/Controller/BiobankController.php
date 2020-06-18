@@ -201,7 +201,7 @@ class BiobankController extends AbstractController
         $finalizeForm = $order->createBiobankOrderFinalizeForm($site);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {
-            if ($order->isOrderDisabled()) {
+            if ($order->isOrderDisabled() || !$app->hasRole('ROLE_BIOBANK')) {
                 $app->abort(403);
             }
             if (!$order->isOrderFormDisabled()) {

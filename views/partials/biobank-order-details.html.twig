@@ -17,7 +17,7 @@
         </div>
     {% endif %}
 </dl>
-{% if type == 'finalized' and attribute(order, 'finalized_ts') is empty and not order.disabled and order.origin is not defined %}
+{% if is_granted('ROLE_BIOBANK') and type == 'finalized' and attribute(order, 'finalized_ts') is empty and not order.disabled and order.origin is not defined %}
     {% import 'order-samples.html.twig' as samples %}
     {% if order.type != 'saliva' %}
         {% form_theme finalizeForm 'form/simple_checkbox.html.twig' %}
