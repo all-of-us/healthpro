@@ -31,6 +31,8 @@ CREATE TABLE `orders` (
   `type` varchar(20) NULL DEFAULT NULL,
   `version` varchar(10) NULL DEFAULT NULL,
   `history_id` int(11) DEFAULT NULL,
+  `biobank_finalized` tinyint(1) NOT NULL DEFAULT 0,
+  `biobank_changes` text DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_id` (`order_id`),
   KEY `participant_id` (`participant_id`),

@@ -49,6 +49,7 @@ class Log
     const PATIENT_STATUS_HISTORY_EDIT = 'PATIENT_STATUS_HISTORY_EDIT';
     const AWARDEE_ADD = 'AWARDEE_ADD';
     const ORGANIZATION_ADD = 'ORGANIZATION_ADD';
+    const BIOBANK_ORDER_FINALIZE_NOTIFY = 'BIOBANK_ORDER_FINALIZE_NOTIFY';
 
     public function __construct($app, $action, $data)
     {
