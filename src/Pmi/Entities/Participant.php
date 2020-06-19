@@ -342,7 +342,7 @@ class Participant
 
     private function getConsentCohortText($participant)
     {
-        if (isset($participant->cohort2PilotFlag) && $participant->cohort2PilotFlag === 'COHORT_2_PILOT') {
+        if ($participant->consentCohort === 'COHORT_2' && isset($participant->cohort2PilotFlag) && $participant->cohort2PilotFlag === 'COHORT_2_PILOT') {
             return self::$consentCohortValues[$participant->cohort2PilotFlag];
         } else {
             return self::$consentCohortValues[$participant->consentCohort] ?? $participant->consentCohort;

@@ -131,4 +131,50 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $this->assertSame(false, $participant->status);
         $this->assertSame('ehr-consent', $participant->statusReason);
     }
+
+    public function testParticipantConsentCohort()
+    {
+        // Assert cohort 1
+        $participant = new Participant((object)[
+            'consentCohort' => 'COHORT_1'
+        ]);
+        $this->assertSame('Cohort 1', $participant->consentCohortText);
+
+        $participant = new Participant((object)[
+            'consentCohort' => 'COHORT_1',
+            'cohort2PilotFlag' => 'COHORT_2_PILOT'
+        ]);
+        $this->assertSame('Cohort 1', $participant->consentCohortText);
+
+        // Assert cohort 2
+        $participant = new Participant((object)[
+            'consentCohort' => 'COHORT_2'
+        ]);
+        $this->assertSame('Cohort 2', $participant->consentCohortText);
+
+        $participant = new Participant((object)[
+            'consentCohort' => 'COHORT_2',
+            'cohort2PilotFlag' => 'UNSET'
+        ]);
+        $this->assertSame('Cohort 2', $participant->consentCohortText);
+
+        // Assert cohort 2 pilot
+        $participant = new Participant((object)[
+            'consentCohort' => 'COHORT_2',
+            'cohort2PilotFlag' => 'COHORT_2_PILOT'
+        ]);
+        $this->assertSame('Cohort 2 Pilot', $participant->consentCohortText);
+
+        // Assert cohort 3
+        $participant = new Participant((object)[
+            'consentCohort' => 'COHORT_3'
+        ]);
+        $this->assertSame('Cohort 3', $participant->consentCohortText);
+
+        $participant = new Participant((object)[
+            'consentCohort' => 'COHORT_3',
+            'cohort2PilotFlag' => 'COHORT_2_PILOT'
+        ]);
+        $this->assertSame('Cohort 3', $participant->consentCohortText);
+    }
 }
