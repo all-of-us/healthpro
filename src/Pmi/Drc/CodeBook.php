@@ -125,10 +125,7 @@ class CodeBook
         'en' => 'English',
         'es' => 'Spanish',
         'vibrent' => 'PTSC Portal',
-        'careevolution' => 'DV Pilot Portal',
-        'COHORT_1' => 'Cohort 1',
-        'COHORT_2' => 'Cohort 2',
-        'COHORT_3' => 'Cohort 3'
+        'careevolution' => 'DV Pilot Portal'
     ];
 
     public static function display($code)

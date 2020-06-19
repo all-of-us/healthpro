@@ -192,6 +192,7 @@ class WorkQueue
             'options' => [
                 'Cohort 1' => 'COHORT_1',
                 'Cohort 2' => 'COHORT_2',
+                'Cohort 2 Pilot' => 'COHORT_2_PILOT',
                 'Cohort 3' => 'COHORT_3'
             ]
         ]
@@ -329,7 +330,7 @@ class WorkQueue
             $row['participantOrigin'] = $e($participant->participantOrigin);
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
-            $row['consentCohort'] = $e($participant->consentCohort);
+            $row['consentCohort'] = $e($participant->consentCohortText);
             $row['generalConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);

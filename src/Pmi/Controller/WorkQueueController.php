@@ -102,7 +102,12 @@ class WorkQueueController extends AbstractController
             $rdrParams['participantOrigin'] = $params['participantOrigin'];
         }
         if (!empty($params['consentCohort'])) {
-            $rdrParams['consentCohort'] = $params['consentCohort'];
+            if ($params['consentCohort'] === 'COHORT_2_PILOT') {
+                $rdrParams['consentCohort'] = 'COHORT_2';
+                $rdrParams['cohort2PilotFlag'] = 'COHORT_2_PILOT';
+            } else {
+                $rdrParams['consentCohort'] = $params['consentCohort'];
+            }
         }
         // Add site prefix
         if (!empty($params['site'])) {
@@ -479,7 +484,7 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJuneAuthored"}, $app->getUserTimezone());
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJuly"});
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJulyAuthored"}, $app->getUserTimezone());
-                        $row[] = $participant->consentCohort;
+                        $row[] = $participant->consentCohortText;
                     }
                     fputcsv($output, $row);
                 }
