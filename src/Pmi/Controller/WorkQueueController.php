@@ -101,6 +101,14 @@ class WorkQueueController extends AbstractController
         if (!empty($params['participantOrigin'])) {
             $rdrParams['participantOrigin'] = $params['participantOrigin'];
         }
+        if (!empty($params['consentCohort'])) {
+            if ($params['consentCohort'] === 'COHORT_2_PILOT') {
+                $rdrParams['consentCohort'] = 'COHORT_2';
+                $rdrParams['cohort2PilotFlag'] = 'COHORT_2_PILOT';
+            } else {
+                $rdrParams['consentCohort'] = $params['consentCohort'];
+            }
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];
@@ -308,8 +316,8 @@ class WorkQueueController extends AbstractController
                     'Date of Birth',
                     'Language',
                     'Participant Status',
-                    'General Consent Status',
-                    'General Consent Date',
+                    'Primary Consent Status',
+                    'Primary Consent Date',
                     'EHR Consent Status',
                     'EHR Consent Date',
                     'CABoR Consent Status',
@@ -355,7 +363,7 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Biospecimens Site';
             $headers[] = 'Withdrawal Reason';
-            $headers[] = 'Language of General Consent';
+            $headers[] = 'Language of Primary Consent';
             $headers[] = 'DV-only EHR Sharing Status';
             $headers[] = 'DV-only EHR Sharing Date';
             if ($hasFullDataAccess) {
@@ -380,6 +388,7 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'COPE June PPI Survey Completion Date';
                 $headers[] = 'COPE July PPI Survey Complete';
                 $headers[] = 'COPE July PPI Survey Completion Date';
+                $headers[] = 'Consent Cohort';
                 $headers[] = 'Program Update';
                 $headers[] = 'Date of Program Update';
             }
@@ -477,6 +486,7 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJuneAuthored"}, $app->getUserTimezone());
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJuly"});
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJulyAuthored"}, $app->getUserTimezone());
+                        $row[] = $participant->consentCohortText;
                         $row[] = $participant->questionnaireOnDnaProgram;
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnDnaProgramAuthored"}, $app->getUserTimezone());
                     }

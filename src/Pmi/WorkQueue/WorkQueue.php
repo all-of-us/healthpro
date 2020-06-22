@@ -24,6 +24,7 @@ class WorkQueue
         'language',
         'enrollmentStatus',
         'participantOrigin',
+        'consentCohort',
         'consentForStudyEnrollmentAuthored',
         'questionnaireOnDnaProgramAuthored',
         'primaryLanguage',
@@ -186,6 +187,15 @@ class WorkQueue
                 'PTSC Portal' => 'vibrent',
                 'DV Pilot Portal' => 'careevolution'
             ]
+        ],
+        'consentCohort' => [
+            'label' => 'Consent Cohort',
+            'options' => [
+                'Cohort 1' => 'COHORT_1',
+                'Cohort 2' => 'COHORT_2',
+                'Cohort 2 Pilot' => 'COHORT_2_PILOT',
+                'Cohort 3' => 'COHORT_3'
+            ]
         ]
     ];
 
@@ -321,7 +331,8 @@ class WorkQueue
             $row['participantOrigin'] = $e($participant->participantOrigin);
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
-            $row['generalConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
+            $row['consentCohort'] = $e($participant->consentCohortText);
+            $row['primaryConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
             $row['questionnaireOnDnaProgram'] = $this->displayProgramUpdate($participant);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);

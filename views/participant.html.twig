@@ -110,9 +110,11 @@
                                 </div>
                                 <div class="panel-body">
                                     <dl class="dl-vertical">
-                                        <dt>Language of General Consent</dt>
+                                        <dt>Consent Cohort</dt>
+                                        <dd>{{ participant.consentCohortText }}</dd>
+                                        <dt>Language of Primary Consent</dt>
                                         <dd>{{ participant.primaryLanguage|default('--') }}</dd>
-                                        <dt>General Consent</dt>
+                                        <dt>Primary Consent</dt>
                                         <dd>{{ macros.displayConsentPanelStatus(participant.consentForStudyEnrollment, participant.consentForStudyEnrollmentAuthored) }}</dd>
                                         <dt>Program Update</dt>
                                         <dd>{{ macros.displayProgramUpdate(participant.consentCohort, participant.questionnaireOnDnaProgram, participant.questionnaireOnDnaProgramAuthored) }}</dd>

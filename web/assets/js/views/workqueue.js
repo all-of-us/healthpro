@@ -71,7 +71,8 @@ $(document).ready(function() {
       { name: 'language', visible: false, data: 'language', orderable: false  },
       { name: 'participantStatus', data: 'participantStatus' },
       { name: 'participantOrigin', data: 'participantOrigin', visible: !!isDvType },
-      { name: 'generalConsent', data: 'generalConsent', class: 'text-center' },
+      { name: 'consentCohort', data: 'consentCohort', class: 'text-center' },
+      { name: 'primaryConsent', data: 'primaryConsent', class: 'text-center' },
       { name: 'questionnaireOnDnaProgram', data: 'questionnaireOnDnaProgram', class: 'text-center' },
       { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
@@ -130,7 +131,7 @@ $(document).ready(function() {
             url: url,
             type: "POST"
         },
-        order: [[9, 'desc']],
+        order: [[10, 'desc']],
         dom: 'lBrtip',
         columns: tableColumns,
         pageLength: 25,
