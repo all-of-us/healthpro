@@ -72,6 +72,7 @@ $(document).ready(function() {
       { name: 'participantStatus', data: 'participantStatus' },
       { name: 'participantOrigin', data: 'participantOrigin', visible: !!isDvType },
       { name: 'generalConsent', data: 'generalConsent', class: 'text-center' },
+      { name: 'questionnaireOnDnaProgram', data: 'questionnaireOnDnaProgram', class: 'text-center' },
       { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
       { name: 'gRoRConsent', data: 'gRoRConsent', class: 'text-center' },

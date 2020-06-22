@@ -25,6 +25,7 @@ class WorkQueue
         'enrollmentStatus',
         'participantOrigin',
         'consentForStudyEnrollmentAuthored',
+        'questionnaireOnDnaProgramAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
         'consentForGenomicsRORAuthored',
@@ -321,6 +322,7 @@ class WorkQueue
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
             $row['generalConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
+            $row['questionnaireOnDnaProgram'] = $this->displayProgramUpdate($participant);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
             $row['gRoRConsent'] = $this->displayGenomicsConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
@@ -507,6 +509,17 @@ class WorkQueue
                 return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
             default:
                 return '';
+        }
+    }
+
+    public function displayProgramUpdate($participant)
+    {
+        if ($participant->consentCohort === 'COHORT_1' || $participant->consentCohort === 'COHORT_3') {
+            return self::HTML_NOTICE . ' (not applicable) ';
+        } elseif ($participant->questionnaireOnDnaProgram === 'SUBMITTED') {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->questionnaireOnDnaProgramAuthored, $this->app->getUserTimezone());
+        } else {
+            return self::HTML_DANGER . '<span class="text-danger"> (review not completed) </span>';
         }
     }
 }
