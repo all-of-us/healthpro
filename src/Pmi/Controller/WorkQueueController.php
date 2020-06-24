@@ -487,7 +487,7 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJuly"});
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJulyAuthored"}, $app->getUserTimezone());
                         $row[] = $participant->consentCohortText;
-                        $row[] = $participant->questionnaireOnDnaProgram;
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnDnaProgram);
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnDnaProgramAuthored"}, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
