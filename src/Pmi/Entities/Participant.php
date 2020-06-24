@@ -82,6 +82,18 @@ class Participant
                 $this->statusReason = 'ehr-consent';
             }
         }
+        if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_2') {
+            if (isset($participant->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && $participant->physicalMeasurementsStatus !== 'COMPLETED' && $participant->samplesToIsolateDNA !== 'RECEIVED') {
+                if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
+                    $this->status = false;
+                    $this->statusReason = 'genomics';
+                }
+                if (isset($participant->questionnaireOnDnaProgram) && $participant->questionnaireOnDnaProgram !== 'SUBMITTED') {
+                    $this->status = false;
+                    $this->statusReason = 'program-update';
+                }
+            }
+        }
         // RDR should not be returning participant data for unconsented participants, but adding this check to be safe
         // Participant details tab is disabled for the below two status reasons
         if (empty($participant->consentForStudyEnrollment) || $participant->consentForStudyEnrollment !== 'SUBMITTED') {

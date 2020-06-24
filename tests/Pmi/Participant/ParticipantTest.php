@@ -75,12 +75,25 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
             'siteType' => 'hpo'
         ];
 
+        // Assert genomics status (Criteria 1)
         $participant = new Participant((object)[
             'options' => $options,
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentForGenomicsROR' => 'UNSET',
             'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('genomics', $participant->statusReason);
+
+        // Assert genomics status (Criteria 2)
+        $participant = new Participant((object)[
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'consentCohort' => 'COHORT_2',
+            'physicalMeasurementsStatus' => 'UNSET',
+            'samplesToIsolateDNA' => 'UNSET',
+            'consentForGenomicsROR' => 'UNSET',
+            'questionnaireOnDnaProgram' => 'SUBMITTED'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('genomics', $participant->statusReason);
@@ -176,5 +189,31 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
             'cohort2PilotFlag' => 'COHORT_2_PILOT'
         ]);
         $this->assertSame('Cohort 3', $participant->consentCohortText);
+    }
+
+    public function testParticipantProgramUpdateStatus()
+    {
+        // Assert program update status
+        $participant = new Participant((object)[
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'consentCohort' => 'COHORT_2',
+            'physicalMeasurementsStatus' => 'UNSET',
+            'samplesToIsolateDNA' => 'UNSET',
+            'questionnaireOnDnaProgram' => 'UNSET'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('program-update', $participant->statusReason);
+
+        // Assert participant status to true
+        $participant = new Participant((object)[
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'questionnaireOnTheBasics' => 'SUBMITTED',
+            'consentCohort' => 'COHORT_2',
+            'physicalMeasurementsStatus' => 'COMPLETED',
+            'samplesToIsolateDNA' => 'RECEIVED',
+            'questionnaireOnDnaProgram' => 'SUBMITTED',
+            'consentForGenomicsROR' => 'SUBMITTED',
+        ]);
+        $this->assertSame(true, $participant->status);
     }
 }

@@ -116,6 +116,8 @@
                                         <dd>{{ participant.primaryLanguage|default('--') }}</dd>
                                         <dt>Primary Consent</dt>
                                         <dd>{{ macros.displayConsentPanelStatus(participant.consentForStudyEnrollment, participant.consentForStudyEnrollmentAuthored) }}</dd>
+                                        <dt>Program Update</dt>
+                                        <dd>{{ macros.displayProgramUpdate(participant.consentCohort, participant.questionnaireOnDnaProgram, participant.questionnaireOnDnaProgramAuthored) }}</dd>
                                         <dt>EHR Consent</dt>
                                         <dd>{{ macros.displayConsentPanelStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored) }}</dd>
                                         <dt>gRoR Consent</dt>
