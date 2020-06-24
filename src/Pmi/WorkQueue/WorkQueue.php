@@ -525,7 +525,7 @@ class WorkQueue
 
     public function displayProgramUpdate($participant)
     {
-        if ($participant->consentCohort === 'COHORT_1' || $participant->consentCohort === 'COHORT_3') {
+        if ($participant->consentCohort !== 'COHORT_2') {
             return self::HTML_NOTICE . ' (not applicable) ';
         } elseif ($participant->questionnaireOnDnaProgram === 'SUBMITTED') {
             return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->questionnaireOnDnaProgramAuthored, $this->app->getUserTimezone());
