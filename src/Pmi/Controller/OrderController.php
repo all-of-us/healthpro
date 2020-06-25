@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Order\Order;
 use Pmi\Order\Mayolink\MayolinkOrder;
@@ -28,7 +29,8 @@ class OrderController extends AbstractController
         ['orderJson', '/participant/{participantId}/order/{orderId}/order.json'],
         ['orderExport', '/orders/export.csv'],
         ['orderModify', '/participant/{participantId}/order/{orderId}/modify/{type}', ['method' => 'GET|POST']],
-        ['orderRevert', '/participant/{participantId}/order/{orderId}/revert', ['method' => 'POST']]
+        ['orderRevert', '/participant/{participantId}/order/{orderId}/revert', ['method' => 'POST']],
+        ['biobankSummary', '/participant/{participantId}/order/{orderId}/biobank/summary']
     ];
 
     protected function loadOrder($participantId, $orderId, Application $app)
@@ -122,6 +124,9 @@ class OrderController extends AbstractController
         $ordersRepository = $app['em']->getRepository('orders');
         $confirmForm = $formBuilder->getForm();
         $confirmForm->handleRequest($request);
+        if (!$confirmForm->isSubmitted() && !$app['csrf.token_manager']->isTokenValid(new CsrfToken('orderCheck', $request->request->get('csrf_token')))) {
+            return $app->abort(403);
+        }
         if ($confirmForm->isSubmitted() && $confirmForm->isValid()) {
             $orderData = ['type' => null];
             if ($request->request->has('existing')) {
@@ -434,7 +439,11 @@ class OrderController extends AbstractController
                     if (!empty($finalizeForm['finalized_ts']->getData()) || $order->isOrderUnlocked()) {
                         //Send order to mayo if mayo id is empty
                         if (empty($order->get('mayo_id'))) {
-                            $result = $this->sendOrderToMayo($participantId, $orderId, $app, 'finalized');
+                            $order->set('biobank_collected_ts', $order->get('collected_ts'));
+                            $order->set('biobank_finalized_samples', $updateArray['finalized_samples']);
+                            $site = $app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $app->getSiteId()]);
+                            $mayoClientId = $site['mayolink_account'] ?: null;
+                            $result = $order->sendOrderToMayo($mayoClientId);
                             if ($result['status'] === 'success' && !empty($result['mayoId'])) {
                                 //Save mayo id and finalized time
                                 $newUpdateArray = [
@@ -737,53 +746,11 @@ class OrderController extends AbstractController
         return $result;
     }
 
-    public function sendOrderToMayo($participantId, $orderId, $app, $type = 'collected')
+    public function biobankSummaryAction($participantId, $orderId, Application $app)
     {
-        // Return mock id for mock orders
-        if ($app->getConfig('ml_mock_order')) {
-            return ['status' => 'success', 'mayoId' => $app->getConfig('ml_mock_order')];
-        }
-        $result = ['status' => 'fail'];
         $order = $this->loadOrder($participantId, $orderId, $app);
-        // Set collected time to user local time
-        $collectedAt = new \DateTime($order->get('collected_ts')->format('Y-m-d H:i:s'), new \DateTimeZone($app->getUserTimezone()));
-        $orderData = $order->toArray();
-        $participant = $app['pmi.drc.participants']->getById($participantId);
-        if ($site = $app['em']->getRepository('sites')->fetchOneBy(['deleted' => 0, 'google_group' => $app->getSiteId()])) {
-            $mayoClientId = $site['mayolink_account'];
-        }
-        // Check if mayo account number exists
-        if (!empty($mayoClientId)) {
-            $birthDate = $app->getConfig('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
-            if ($birthDate) {
-                $birthDate = $birthDate->format('Y-m-d');
-            }
-            $options = [
-                'type' => $orderData['type'],
-                'biobank_id' => $participant->biobankId,
-                'first_name' => '*',
-                'gender' => $participant->gender,
-                'birth_date' => $birthDate,
-                'order_id' => $orderData['order_id'],
-                'collected_at' => $collectedAt->format('c'),
-                'mayoClientId' => $mayoClientId,
-                'collected_samples' => $orderData["{$type}_samples"],
-                'centrifugeType' => $orderData['processed_centrifuge_type'],
-                'version' => $orderData['version'],
-                'tests' => $order->samplesInformation,
-                'salivaTests' => $order->salivaSamplesInformation
-            ];
-            $mayoOrder = new MayolinkOrder($app);
-            $mayoId = $mayoOrder->createOrder($options);
-            if (!empty($mayoId)) {
-                $result['status'] = 'success';
-                $result['mayoId'] = $mayoId;
-            } else {
-                $result['errorMessage'] = 'An error occurred while attempting to send this order. Please try again.';
-            }
-        } else {
-            $result['errorMessage'] = 'Mayo account number is not set for this site. Please contact the administrator.';
-        }
-        return $result;
+        return $app['twig']->render('biobank/summary.html.twig', [
+            'biobankChanges' => $order->getBiobankChangesDetails()
+        ]);
     }
 }

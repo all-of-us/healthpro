@@ -145,6 +145,9 @@ class DefaultController extends AbstractController
     public function selectSiteAction(Application $app, Request $request)
     {
         if ($request->request->has('site')) {
+            if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('siteSelect', $request->request->get('csrf_token')))) {
+                return $app->abort(403);
+            }
             $siteId = $request->request->get('site');
             if (strpos($siteId, User::AWARDEE_PREFIX) !== 0 && !$app->isValidSite($siteId)) {
                 $app->addFlashError("Sorry, there is a problem with your site's configuration. Please contact your site administrator.");
@@ -394,7 +397,7 @@ class DefaultController extends AbstractController
         }
 
         $isCrossOrg = $participant->hpoId !== $app->getSiteOrganization();
-        $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, ['test-participant', 'basics', 'genomics', 'ehr-consent']));
+        $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, ['test-participant', 'basics', 'genomics', 'ehr-consent', 'program-update']));
         $hasNoParticipantAccess = $isCrossOrg && empty($app['session']->get('agreeCrossOrg_'.$id));
         if ($hasNoParticipantAccess) {
             $app->log(Log::CROSS_ORG_PARTICIPANT_ATTEMPT, [

@@ -139,15 +139,16 @@
                                 <span class="text-danger">You do not belong to any HPO sites!</span>
                             {% else %}
                                 <select class="form-control" name="site">
-                                {% for site in app.user.sites %}
-                                    <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : ''}} >{{ app.getSiteDisplayName(site.id, false)|default(site.name) }}</option>
-                                {% endfor %}
-                                {% for awardee in app.user.awardees %}
-                                    <option value="{{ awardee.email }}"{{ (app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>
-                                {% endfor %}
-                            </select>
+                                    {% for site in app.user.sites %}
+                                        <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : '' }} >{{ app.getSiteDisplayName(site.id, false)|default(site.name) }}</option>
+                                    {% endfor %}
+                                    {% for awardee in app.user.awardees %}
+                                        <option value="{{ awardee.email }}"{{ (app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : '' }} >{{ awardee.name }}</option>
+                                    {% endfor %}
+                                </select>
                             {% endif %}
                         </div>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token('siteSelect') }}"/>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                             {% if app.user.sites|length > 0 or app.user.awardees|length > 0 %}

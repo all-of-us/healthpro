@@ -14,7 +14,7 @@ class WorkQueue
     protected $app;
 
     // These are used to map a DataTables column index to an RDR field for sorting
-    public static $wQColumns = [
+    public static $sortColumns = [
         'lastName',
         'firstName',
         'middleName',
@@ -24,7 +24,9 @@ class WorkQueue
         'language',
         'enrollmentStatus',
         'participantOrigin',
+        'consentCohort',
         'consentForStudyEnrollmentAuthored',
+        'questionnaireOnDnaProgramAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
         'consentForGenomicsRORAuthored',
@@ -57,35 +59,29 @@ class WorkQueue
         'questionnaireOnFamilyHealthAuthored',
         'questionnaireOnHealthcareAccess',
         'questionnaireOnHealthcareAccessAuthored',
+        'questionnaireOnCopeMay',
+        'questionnaireOnCopeMayAuthored',
+        'questionnaireOnCopeJune',
+        'questionnaireOnCopeJuneAuthored',
+        'questionnaireOnCopeJuly',
+        'questionnaireOnCopeJulyAuthored',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
         'physicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
         'numBaselineSamplesArrived',
-        'sampleStatus1SST8',
         'sampleStatus1SST8Time',
-        'sampleStatus1PST8',
         'sampleStatus1PST8Time',
-        'sampleStatus1HEP4',
         'sampleStatus1HEP4Time',
-        'sampleStatus1ED02',
         'sampleStatus1ED02Time',
-        'sampleStatus1ED04',
         'sampleStatus1ED04Time',
-        'sampleStatus1ED10',
         'sampleStatus1ED10Time',
-        'sampleStatus2ED10',
         'sampleStatus2ED10Time',
-        'sampleStatus1CFD9',
         'sampleStatus1CFD9Time',
-        'sampleStatus1PXR2',
         'sampleStatus1PXR2Time',
-        'sampleStatus1UR10',
         'sampleStatus1UR10Time',
-        'sampleStatus1UR90',
         'sampleStatus1UR90Time',
-        'sampleStatus1SAL',
         'sampleStatus1SALTime',
         'biospecimenSourceSite',
         'dateOfBirth',
@@ -191,6 +187,15 @@ class WorkQueue
                 'PTSC Portal' => 'vibrent',
                 'DV Pilot Portal' => 'careevolution'
             ]
+        ],
+        'consentCohort' => [
+            'label' => 'Consent Cohort',
+            'options' => [
+                'Cohort 1' => 'COHORT_1',
+                'Cohort 2' => 'COHORT_2',
+                'Cohort 2 Pilot' => 'COHORT_2_PILOT',
+                'Cohort 3' => 'COHORT_3'
+            ]
         ]
     ];
 
@@ -247,7 +252,20 @@ class WorkQueue
         'MedicalHistory' => 'Hist',
         'Medications' => 'Meds',
         'FamilyHealth' => 'Family',
-        'HealthcareAccess' => 'Access'
+        'HealthcareAccess' => 'Access',
+        'CopeMay' => 'COPE May',
+        'CopeJune' => 'COPE June',
+        'CopeJuly' => 'COPE July'
+    ];
+
+    public static $initialSurveys = [
+        'TheBasics',
+        'OverallHealth',
+        'Lifestyle',
+        'MedicalHistory',
+        'Medications',
+        'FamilyHealth',
+        'HealthcareAccess'
     ];
 
     public static $samples = [
@@ -313,10 +331,12 @@ class WorkQueue
             $row['participantOrigin'] = $e($participant->participantOrigin);
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
-            $row['generalConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
+            $row['consentCohort'] = $e($participant->consentCohortText);
+            $row['primaryConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
+            $row['questionnaireOnDnaProgram'] = $this->displayProgramUpdate($participant);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
-            $row['gRoRConsent'] = $this->displayConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
+            $row['gRoRConsent'] = $this->displayGenomicsConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
             $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
             $row['activityStatus'] = $this->getActivityStatus($participant);
@@ -366,8 +386,7 @@ class WorkQueue
                         break;
                     }
                 }
-                $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED');
-                $row["sample{$sample}Time"] = self::dateFromString($participant->{'sampleStatus' . $newSample . 'Time'}, $app->getUserTimezone(), false);
+                $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED', $participant->{'sampleStatus' . $newSample . 'Time'}, false);
             }
             $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
 
@@ -433,6 +452,22 @@ class WorkQueue
             case 'SUBMITTED':
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Consented Yes)';
             case 'SUBMITTED_NO_CONSENT':
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Refused Consent)';
+            case 'SUBMITTED_NOT_SURE':
+                return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Responded Not Sure)';
+            case 'SUBMITTED_INVALID':
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Invalid)';
+            default:
+                return self::HTML_DANGER . ' (Consent Not Completed)';
+        }
+    }
+
+    public function displayGenomicsConsentStatus($value, $time, $displayTime = true)
+    {
+        switch ($value) {
+            case 'SUBMITTED':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Consented Yes)';
+            case 'SUBMITTED_NO_CONSENT':
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Refused Consent)';
             case 'SUBMITTED_NOT_SURE':
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Responded Not Sure)';
@@ -485,6 +520,17 @@ class WorkQueue
                 return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
             default:
                 return '';
+        }
+    }
+
+    public function displayProgramUpdate($participant)
+    {
+        if ($participant->consentCohort !== 'COHORT_2') {
+            return self::HTML_NOTICE . ' (not applicable) ';
+        } elseif ($participant->questionnaireOnDnaProgram === 'SUBMITTED') {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->questionnaireOnDnaProgramAuthored, $this->app->getUserTimezone());
+        } else {
+            return self::HTML_DANGER . '<span class="text-danger"> (review not completed) </span>';
         }
     }
 }

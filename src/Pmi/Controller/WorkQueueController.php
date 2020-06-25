@@ -33,7 +33,7 @@ class WorkQueueController extends AbstractController
             // Pass sort params
             if (!empty($params['order'][0])) {
                 $sortColumnIndex = $params['order'][0]['column'];
-                $sortColumnName = WorkQueue::$wQColumns[$sortColumnIndex];
+                $sortColumnName = WorkQueue::$sortColumns[$sortColumnIndex];
                 $sortDir = $params['order'][0]['dir'];
                 if ($sortDir == 'asc') {
                     $rdrParams['_sort'] = $sortColumnName;
@@ -55,7 +55,12 @@ class WorkQueueController extends AbstractController
                 unset($params[$key]);
             }
         }
-        $rdrParams['hpoId'] = $organization;
+        if ($organization === 'salivary_pilot') {
+            $rdrParams['hpoId'] = 'UNSET';
+            $rdrParams['sampleStatus1SAL2'] = 'RECEIVED';
+        } else {
+            $rdrParams['hpoId'] = $organization;
+        }
 
         //Pass export params
         if (isset($params['_count'])) {
@@ -96,6 +101,14 @@ class WorkQueueController extends AbstractController
         if (!empty($params['participantOrigin'])) {
             $rdrParams['participantOrigin'] = $params['participantOrigin'];
         }
+        if (!empty($params['consentCohort'])) {
+            if ($params['consentCohort'] === 'COHORT_2_PILOT') {
+                $rdrParams['consentCohort'] = 'COHORT_2';
+                $rdrParams['cohort2PilotFlag'] = 'COHORT_2_PILOT';
+            } else {
+                $rdrParams['consentCohort'] = $params['consentCohort'];
+            }
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];
@@ -108,8 +121,8 @@ class WorkQueueController extends AbstractController
             $rdrParams['organization'] = $params['organization_id'];
         }
         // Patient status query parameter format Organization:Status
-        if (!empty($params['patientStatus'])) {
-            $rdrParams['patientStatus'] = $app->getSiteOrganizationId() . ':' . $params['patientStatus'];
+        if (!empty($params['patientStatus']) && !empty($params['siteOrganizationId'])) {
+            $rdrParams['patientStatus'] = $params['siteOrganizationId'] . ':' . $params['patientStatus'];
         }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
@@ -175,12 +188,13 @@ class WorkQueueController extends AbstractController
             foreach ($organizations as $org) {
                 $organizationsList['organization']['options'][$app->getAwardeeDisplayName($org)] = $org;
             }
+            $organizationsList['organization']['options']['Salivary Pilot'] = 'salivary_pilot';
             $filters = array_merge($filters, $organizationsList);
 
             // Set to selected organization
             if (isset($params['organization'])) {
                 // Check if the awardee has access to this organization
-                if (!in_array($params['organization'], $app->getAwardeeOrganization())) {
+                if ($params['organization'] !== 'salivary_pilot' && !in_array($params['organization'], $app->getAwardeeOrganization())) {
                     $app->abort(403);
                 }
                 $organization = $params['organization'];
@@ -227,6 +241,9 @@ class WorkQueueController extends AbstractController
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = array_merge($params, array_filter($request->request->all()));
+            if (!empty($params['patientStatus'])) {
+                $params['siteOrganizationId'] = $app->getSiteOrganizationId();
+            }
             $participants = $this->participantSummarySearch($organization, $params, $app, $type = 'wQTable');
             $ajaxData = [];
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $app['pmi.drc.participants']->getTotal();
@@ -280,6 +297,9 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
         $params['_count'] = $pageSize;
         $params['_sort:desc'] = 'consentForStudyEnrollmentAuthored';
+        if (!empty($params['patientStatus'])) {
+            $params['siteOrganizationId'] = $app->getSiteOrganizationId();
+        }
 
         $stream = function() use ($app, $params, $organization, $hasFullDataAccess, $limit, $pageSize) {
             $output = fopen('php://output', 'w');
@@ -296,8 +316,8 @@ class WorkQueueController extends AbstractController
                     'Date of Birth',
                     'Language',
                     'Participant Status',
-                    'General Consent Status',
-                    'General Consent Date',
+                    'Primary Consent Status',
+                    'Primary Consent Date',
                     'EHR Consent Status',
                     'EHR Consent Date',
                     'CABoR Consent Status',
@@ -318,8 +338,10 @@ class WorkQueueController extends AbstractController
                     'Completed Surveys'
                 ];
                 foreach (WorkQueue::$surveys as $survey => $label) {
-                    $headers[] = $label . ' PPI Survey Complete';
-                    $headers[] = $label . ' PPI Survey Completion Date';
+                    if (in_array($survey, WorkQueue::$initialSurveys)) {
+                        $headers[] = $label . ' PPI Survey Complete';
+                        $headers[] = $label . ' PPI Survey Completion Date';
+                    }
                 }
             } else {
                 $headers = [
@@ -341,7 +363,7 @@ class WorkQueueController extends AbstractController
             }
             $headers[] = 'Biospecimens Site';
             $headers[] = 'Withdrawal Reason';
-            $headers[] = 'Language of General Consent';
+            $headers[] = 'Language of Primary Consent';
             $headers[] = 'DV-only EHR Sharing Status';
             $headers[] = 'DV-only EHR Sharing Date';
             if ($hasFullDataAccess) {
@@ -360,6 +382,15 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Deactivation Date';
                 $headers[] = 'gRoR Consent Status';
                 $headers[] = 'gRoR Consent Date';
+                $headers[] = 'COPE May PPI Survey Complete';
+                $headers[] = 'COPE May PPI Survey Completion Date';
+                $headers[] = 'COPE June PPI Survey Complete';
+                $headers[] = 'COPE June PPI Survey Completion Date';
+                $headers[] = 'COPE July PPI Survey Complete';
+                $headers[] = 'COPE July PPI Survey Completion Date';
+                $headers[] = 'Consent Cohort';
+                $headers[] = 'Program Update';
+                $headers[] = 'Date of Program Update';
             }
             fputcsv($output, $headers);
 
@@ -397,8 +428,10 @@ class WorkQueueController extends AbstractController
                             $participant->numCompletedPPIModules
                         ];
                         foreach (WorkQueue::$surveys as $survey => $label) {
-                            $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                            $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
+                            if (in_array($survey, WorkQueue::$initialSurveys)) {
+                                $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
+                                $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
+                            }
                         }
                     } else {
                         $row = [
@@ -447,6 +480,15 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsROR);
                         $row[] = WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeMay"});
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeMayAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJune"});
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJuneAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJuly"});
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJulyAuthored"}, $app->getUserTimezone());
+                        $row[] = $participant->consentCohortText;
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnDnaProgram);
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnDnaProgramAuthored"}, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
                 }
@@ -499,7 +541,12 @@ class WorkQueueController extends AbstractController
             $app->abort(404);
         }
 
-        if (!$app->hasRole('ROLE_AWARDEE_SCRIPPS') || !in_array($participant->awardee, $app->getAwardeeOrganization())) {
+        if (!$app->hasRole('ROLE_AWARDEE_SCRIPPS')) {
+            $app->abort(403);
+        }
+
+        // Deny access if participant awardee does not belong to the allowed awardees or not a salivary participant (awardee = UNSET and sampleStatus1SAL2 = RECEIVED)
+        if (!(in_array($participant->awardee, $app->getAwardeeOrganization()) || (empty($participant->awardee) && $participant->sampleStatus1SAL2 === 'RECEIVED'))) {
             $app->abort(403);
         }
 

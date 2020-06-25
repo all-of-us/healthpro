@@ -2,7 +2,7 @@
 
 <div id="participant-consent-status">
     <div class="status-block">
-        <strong>General Consent</strong>
+        <strong>Primary Consent</strong>
         {{ macros.displayConsentStatus(participant.consentForStudyEnrollment, participant.consentForStudyEnrollmentAuthored) }}
         <br/>
     </div>
@@ -13,7 +13,7 @@
     </div>
     <div class="status-block">
         <strong>gRoR Consent</strong>
-        {{ macros.displayConsentStatus(participant.consentForGenomicsROR, participant.consentForGenomicsRORAuthored) }}
+        {{ macros.displayGenomicsConsentStatus(participant.consentForGenomicsROR, participant.consentForGenomicsRORAuthored) }}
         <br/>
     </div>
     <div class="status-block">
