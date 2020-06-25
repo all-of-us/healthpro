@@ -20,10 +20,18 @@ class Participant
     public $isCoreParticipant = false;
     public $activityStatus;
     public $isSuspended = false;
+    public $consentCohortText;
 
     private $disableTestAccess;
     private $genomicsStartTime;
     private $siteType;
+
+    private static $consentCohortValues = [
+        'COHORT_1' => 'Cohort 1',
+        'COHORT_2' => 'Cohort 2',
+        'COHORT_2_PILOT' => 'Cohort 2 Pilot',
+        'COHORT_3' => 'Cohort 3'
+    ];
 
     public function __construct($rdrParticipant = null)
     {
@@ -72,6 +80,18 @@ class Participant
             if (isset($this->siteType) && isset($participant->consentForElectronicHealthRecords) && $this->siteType === 'hpo' && $participant->consentForElectronicHealthRecords !== 'SUBMITTED') {
                 $this->status = false;
                 $this->statusReason = 'ehr-consent';
+            }
+        }
+        if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_2') {
+            if (isset($participant->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && $participant->physicalMeasurementsStatus !== 'COMPLETED' && $participant->samplesToIsolateDNA !== 'RECEIVED') {
+                if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
+                    $this->status = false;
+                    $this->statusReason = 'genomics';
+                }
+                if (isset($participant->questionnaireOnDnaProgram) && $participant->questionnaireOnDnaProgram !== 'SUBMITTED') {
+                    $this->status = false;
+                    $this->statusReason = 'program-update';
+                }
             }
         }
         // RDR should not be returning participant data for unconsented participants, but adding this check to be safe
@@ -142,6 +162,11 @@ class Participant
         // Set suspension status
         if (isset($participant->suspensionStatus) && $participant->suspensionStatus === 'NO_CONTACT') {
             $this->isSuspended = true;
+        }
+
+        // Set consent cohort text
+        if (isset($participant->consentCohort)) {
+            $this->consentCohortText = $this->getConsentCohortText($participant);
         }
     }
 
@@ -324,6 +349,15 @@ class Participant
                 default:
                     return '';
             }
+        }
+    }
+
+    private function getConsentCohortText($participant)
+    {
+        if ($participant->consentCohort === 'COHORT_2' && isset($participant->cohort2PilotFlag) && $participant->cohort2PilotFlag === 'COHORT_2_PILOT') {
+            return self::$consentCohortValues[$participant->cohort2PilotFlag];
+        } else {
+            return self::$consentCohortValues[$participant->consentCohort] ?? $participant->consentCohort;
         }
     }
 }

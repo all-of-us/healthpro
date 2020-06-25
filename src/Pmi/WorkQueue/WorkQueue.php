@@ -24,7 +24,9 @@ class WorkQueue
         'language',
         'enrollmentStatus',
         'participantOrigin',
+        'consentCohort',
         'consentForStudyEnrollmentAuthored',
+        'questionnaireOnDnaProgramAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
         'consentForGenomicsRORAuthored',
@@ -185,6 +187,15 @@ class WorkQueue
                 'PTSC Portal' => 'vibrent',
                 'DV Pilot Portal' => 'careevolution'
             ]
+        ],
+        'consentCohort' => [
+            'label' => 'Consent Cohort',
+            'options' => [
+                'Cohort 1' => 'COHORT_1',
+                'Cohort 2' => 'COHORT_2',
+                'Cohort 2 Pilot' => 'COHORT_2_PILOT',
+                'Cohort 3' => 'COHORT_3'
+            ]
         ]
     ];
 
@@ -320,7 +331,9 @@ class WorkQueue
             $row['participantOrigin'] = $e($participant->participantOrigin);
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
-            $row['generalConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
+            $row['consentCohort'] = $e($participant->consentCohortText);
+            $row['primaryConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
+            $row['questionnaireOnDnaProgram'] = $this->displayProgramUpdate($participant);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
             $row['gRoRConsent'] = $this->displayGenomicsConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
@@ -507,6 +520,17 @@ class WorkQueue
                 return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
             default:
                 return '';
+        }
+    }
+
+    public function displayProgramUpdate($participant)
+    {
+        if ($participant->consentCohort !== 'COHORT_2') {
+            return self::HTML_NOTICE . ' (not applicable) ';
+        } elseif ($participant->questionnaireOnDnaProgram === 'SUBMITTED') {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->questionnaireOnDnaProgramAuthored, $this->app->getUserTimezone());
+        } else {
+            return self::HTML_DANGER . '<span class="text-danger"> (review not completed) </span>';
         }
     }
 }
