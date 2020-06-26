@@ -1,10 +1,6 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
-
 use Pmi\Controller;
-use Pmi\Application\HpoApplication;
 
-$app = new HpoApplication();
 $app['templatesDirectory'] = realpath(__DIR__ . '/../views');
 $app['errorTemplate'] = 'error.html.twig';
 
