@@ -36,4 +36,4 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Start emulator and the web server
 WORKDIR /app
-CMD ["/bin/sh", "-c", "/opt/google-cloud-sdk/bin/gcloud beta emulators datastore start & bin/console pmi:deploy --local 2>&1"]
+CMD ["/bin/sh", "-c", "/opt/google-cloud-sdk/bin/gcloud beta emulators datastore start & bin/console pmi:deploy --local --no-interaction 2>&1"]

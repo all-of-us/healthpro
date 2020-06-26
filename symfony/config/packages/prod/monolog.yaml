@@ -1,0 +1,17 @@
+monolog:
+    handlers:
+        main:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+            channels: ["!event"]
+        syslog_handler:
+            type: syslog
+            ident: false
+            facility: !php/const LOG_USER
+            level: info
+            bubble: true
+            logopts: !php/const LOG_PERROR
+        service:
+            type: service
+            id: App\Service\StackdriverHandler

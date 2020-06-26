@@ -26,6 +26,9 @@ handlers:
 - url: /.*
   script: auto
   secure: always
+- url: /s/.*
+  script: auto
+  secure: always
 
 inbound_services:
 - warmup
