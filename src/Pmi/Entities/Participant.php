@@ -100,7 +100,7 @@ class Participant
             $this->status = false;
             $this->statusReason = 'consent';
         }
-        if (!empty($participant->withdrawalStatus) && $participant->withdrawalStatus === 'NO_USE') {
+        if (!empty($participant->withdrawalStatus) && in_array($participant->withdrawalStatus, ['NO_USE', 'EARLY_OUT'], true)) {
             $this->status = false;
             $this->statusReason = 'withdrawal';
         }
@@ -338,7 +338,7 @@ class Participant
 
     private function getActivityStatus($participant)
     {
-        if ($participant->withdrawalStatus === 'NO_USE') {
+        if (in_array($participant->withdrawalStatus, ['NO_USE', 'EARLY_OUT'], true)) {
             return 'withdrawn';
         } else {
             switch (isset($participant->suspensionStatus) ? $participant->suspensionStatus : null) {

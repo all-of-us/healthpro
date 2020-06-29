@@ -493,7 +493,7 @@ class WorkQueue
     public function getPatientStatus($participant, $value, $type = 'wq')
     {
         // Clear patient status for withdrawn participants
-        if ($participant->withdrawalStatus === 'NO_USE') {
+        if (in_array($participant->withdrawalStatus, ['NO_USE', 'EARLY_OUT'], true)) {
             return '';
         }
         $organizations = [];
