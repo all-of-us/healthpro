@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusTemp;
+use App\Repository\PatientStatusImportRepository;
 use App\Service\LoggerService;
 use App\Form\PatientStatusImportFormType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -64,11 +65,24 @@ class DefaultController extends AbstractController
                     $em->persist($patientStatusTemp);
                 }
                 $em->flush();
+                $id = $patientStatusImport->getId();
                 $em->clear();
             }
+            return $this->redirectToRoute('patientStatusConfirmation', ['id' => $id]);
         }
         return $this->render('patientstatus/import.html.twig', [
             'importForm' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/patient/status/confirmation/{id}", name="patientStatusConfirmation", methods={"GET"})
+     */
+    public function patientStatusConfirmation(int $id, PatientStatusImportRepository $patientStatusImportRepository)
+    {
+        $data = $patientStatusImportRepository->find($id);
+        return $this->render('patientstatus/confirmation.html.twig', [
+            'patientStatuses' => $data->getPatientStatusTemps()
         ]);
     }
 }

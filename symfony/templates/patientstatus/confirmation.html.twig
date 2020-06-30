@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2><i class="fa fa-check-circle" aria-hidden="true"></i> Patient Status Confirmation</h2>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Participant Id</th>
+                        <th>Status</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patientStatus in patientStatuses %}
+                        <tr>
+                            <td>{{ patientStatus.participantId }}</td>
+                            <td>{{ patientStatus.status }}</td>
+                            <td>{{ patientStatus.comments }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button type="button" class="btn btn-success">Confirm</button>
+        </div>
+    </div>
+{% endblock %}
