@@ -136,7 +136,7 @@ $(document).ready(function() {
         columns: tableColumns,
         pageLength: 25,
         createdRow: function(row, data) {
-            if (data.withdrawalStatus === 'NO_USE') {
+            if (data.isWithdrawn === true) {
                 $(row).addClass('tr-withdrawn');
             }
         },
