@@ -58,6 +58,11 @@ class PatientStatusImport
      */
     private $patientStatusTemps;
 
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $confirm;
+
     public function __construct()
     {
         $this->patientStatusTemps = new ArrayCollection();
@@ -179,6 +184,18 @@ class PatientStatusImport
                 $patientStatusTemp->setImportId(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getConfirm(): ?int
+    {
+        return $this->confirm;
+    }
+
+    public function setConfirm(int $confirm): self
+    {
+        $this->confirm = $confirm;
 
         return $this;
     }

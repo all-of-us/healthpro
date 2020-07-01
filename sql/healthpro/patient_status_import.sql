@@ -6,6 +6,7 @@ CREATE TABLE `patient_status_import` (
   `user_id` int(11) NOT NULL,
   `site` varchar(50) NOT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `confirm` tinyint(1) NOT NULL DEFAULT 0,
   `import_status` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8mb4;

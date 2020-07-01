@@ -1,0 +1,143 @@
+<?php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\PatientStatusHistoryRepository")
+ */
+class PatientStatusHistory
+{
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $user_id;
+
+    /**
+     * @ORM\Column(type="string", length=50)
+     */
+    private $site;
+
+    /**
+     * @ORM\Column(type="string", length=50)
+     */
+    private $status;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $comments;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created_ts;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $rdr_ts;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\PatientStatus", inversedBy="patientStatusHistories")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $patient_status;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->user_id;
+    }
+
+    public function setUserId(int $user_id): self
+    {
+        $this->user_id = $user_id;
+
+        return $this;
+    }
+
+    public function getSite(): ?string
+    {
+        return $this->site;
+    }
+
+    public function setSite(string $site): self
+    {
+        $this->site = $site;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getComments(): ?string
+    {
+        return $this->comments;
+    }
+
+    public function setComments(?string $comments): self
+    {
+        $this->comments = $comments;
+
+        return $this;
+    }
+
+    public function getCreatedTs(): ?\DateTimeInterface
+    {
+        return $this->created_ts;
+    }
+
+    public function setCreatedTs(\DateTimeInterface $created_ts): self
+    {
+        $this->created_ts = $created_ts;
+
+        return $this;
+    }
+
+    public function getRdrTs(): ?\DateTimeInterface
+    {
+        return $this->rdr_ts;
+    }
+
+    public function setRdrTs(?\DateTimeInterface $rdr_ts): self
+    {
+        $this->rdr_ts = $rdr_ts;
+
+        return $this;
+    }
+
+    public function getPatientStatus(): ?PatientStatus
+    {
+        return $this->patient_status;
+    }
+
+    public function setPatientStatus(?PatientStatus $patient_status): self
+    {
+        $this->patient_status = $patient_status;
+
+        return $this;
+    }
+}

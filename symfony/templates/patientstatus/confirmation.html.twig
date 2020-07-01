@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block body %}
     <div class="page-header">
-        <h2><i class="fa fa-check-circle" aria-hidden="true"></i> Patient Status Confirmation</h2>
+        <h2><i class="fa fa-check-circle" aria-hidden="true"></i> Patient Status Import Confirmation</h2>
     </div>
     <div class="row">
         <div class="col-md-12">
@@ -27,7 +27,10 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <button type="button" class="btn btn-success">Confirm</button>
+            {{ form_start(importConfirmForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(importConfirmForm) }}
+            {{ form_rest(importConfirmForm) }}
+            {{ form_end(importConfirmForm) }}
         </div>
     </div>
 {% endblock %}

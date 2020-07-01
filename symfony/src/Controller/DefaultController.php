@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\PatientStatus;
+use App\Entity\PatientStatusHistory;
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusTemp;
 use App\Entity\User;
-use App\Repository\PatientStatusImportRepository;
 use App\Service\LoggerService;
 use App\Form\PatientStatusImportFormType;
+use App\Form\PatientStatusImportConfirmFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,7 +32,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/patient/status/import", name="patientStatusImports", methods={"GET","POST"})
+     * @Route("/patient/status/import", name="patientStatusImport", methods={"GET","POST"})
      */
     public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em, Security $security)
     {
@@ -53,25 +55,26 @@ class DefaultController extends AbstractController
                 $patientStatusImport = new PatientStatusImport();
                 $patientStatusImport->setFileName($fileName);
                 $patientStatusImport->setImportStatus(0);
+                $patientStatusImport->setConfirm(0);
                 $patientStatusImport->setOrganization($session->get('siteOrganizationId'));
                 $patientStatusImport->setAwardee($session->get('siteAwardeeId'));
                 $patientStatusImport->setUserId($user->getId());
                 $patientStatusImport->setSite($session->get('site')->id);
                 $patientStatusImport->setCreatedTs(new \DateTime());
+                $em->persist($patientStatusImport);
                 foreach ($patientStatuses as $key => $patientStatus) {
                     $patientStatusTemp = new PatientStatusTemp();
                     $patientStatusTemp->setParticipantId($patientStatus['participantId']);
                     $patientStatusTemp->setStatus($patientStatus['status']);
                     $patientStatusTemp->setComments($patientStatus['comments']);
                     $patientStatusTemp->setImport($patientStatusImport);
-                    $em->persist($patientStatusImport);
                     $em->persist($patientStatusTemp);
                 }
                 $em->flush();
                 $id = $patientStatusImport->getId();
                 $em->clear();
             }
-            return $this->redirectToRoute('patientStatusConfirmation', ['id' => $id]);
+            return $this->redirectToRoute('patientStatusImportConfirmation', ['id' => $id]);
         }
         return $this->render('patientstatus/import.html.twig', [
             'importForm' => $form->createView()
@@ -79,13 +82,56 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/patient/status/confirmation/{id}", name="patientStatusConfirmation", methods={"GET"})
+     * @Route("/patient/status/confirmation/{id}", name="patientStatusImportConfirmation", methods={"GET", "POST"})
      */
-    public function patientStatusConfirmation(int $id, PatientStatusImportRepository $patientStatusImportRepository)
+    public function patientStatusImportConfirmation(int $id, Request $request, EntityManagerInterface $em)
     {
-        $data = $patientStatusImportRepository->find($id);
+        $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'confirm' => 0]);
+        $form = $this->createForm(PatientStatusImportConfirmFormType::class);
+        $form->handleRequest($request);
+        $importPatientStatuses = $patientStatusImport->getPatientStatusTemps();
+        if ($form->isSubmitted() && $form->isValid()) {
+            foreach ($importPatientStatuses as $importPatientStatus) {
+                $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
+                    'participant_id' => $importPatientStatus->getParticipantId(),
+                    'organization' => $patientStatusImport->getOrganization()
+                ]);
+                if (!$patientStatus) {
+                    $patientStatus = new PatientStatus();
+                    $patientStatus->setParticipantId($importPatientStatus->getParticipantId());
+                    $patientStatus->setAwardee($patientStatusImport->getAwardee());
+                    $patientStatus->setOrganization($patientStatusImport->getOrganization());
+                    $em->persist($patientStatus);
+                }
+                $patientStatusHistory = new PatientStatusHistory();
+                $patientStatusHistory->setUserId($patientStatusImport->getUserId());
+                $patientStatusHistory->setSite($patientStatusImport->getSite());
+                $patientStatusHistory->setStatus($importPatientStatus->getStatus());
+                $patientStatusHistory->setComments($importPatientStatus->getComments());
+                $patientStatusHistory->setCreatedTs(new \DateTime());
+                $patientStatusHistory->setPatientStatus($patientStatus);
+                $em->persist($patientStatusHistory);
+                $em->flush();
+                $patientStatusHistoryId = $patientStatusHistory->getId();
+
+                // Update history id in patient_status table
+                $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
+                    'participant_id' => $importPatientStatus->getParticipantId(),
+                    'organization' => $patientStatusImport->getOrganization()
+                ]);
+                $patientStatus->setHistoryId($patientStatusHistoryId);
+                $em->persist($patientStatus);
+                $em->flush();
+            }
+            // Update confirm status
+            $patientStatusImport->setConfirm(1);
+            $em->flush();
+            $em->clear();
+            return $this->redirectToRoute('patientStatusImport');
+        }
         return $this->render('patientstatus/confirmation.html.twig', [
-            'patientStatuses' => $data->getPatientStatusTemps()
+            'patientStatuses' => $importPatientStatuses,
+            'importConfirmForm' => $form->createView()
         ]);
     }
 }
