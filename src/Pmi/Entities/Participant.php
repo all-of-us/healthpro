@@ -34,6 +34,11 @@ class Participant
         'COHORT_3' => 'Cohort 3'
     ];
 
+    private static $withdrawalStatusValues = [
+        'NO_USE',
+        'EARLY_OUT'
+    ];
+
     public function __construct($rdrParticipant = null)
     {
         if (is_object($rdrParticipant)) {
@@ -101,7 +106,7 @@ class Participant
             $this->status = false;
             $this->statusReason = 'consent';
         }
-        if (!empty($participant->withdrawalStatus) && in_array($participant->withdrawalStatus, ['NO_USE', 'EARLY_OUT'], true)) {
+        if (!empty($participant->withdrawalStatus) && in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
             $this->status = false;
             $this->statusReason = 'withdrawal';
             $this->isWithdrawn = true;
@@ -340,7 +345,7 @@ class Participant
 
     private function getActivityStatus($participant)
     {
-        if (in_array($participant->withdrawalStatus, ['NO_USE', 'EARLY_OUT'], true)) {
+        if (in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
             return 'withdrawn';
         } else {
             switch (isset($participant->suspensionStatus) ? $participant->suspensionStatus : null) {

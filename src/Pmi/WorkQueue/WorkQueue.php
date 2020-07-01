@@ -340,7 +340,6 @@ class WorkQueue
             $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
             $row['activityStatus'] = $this->getActivityStatus($participant);
-            $row['withdrawalStatus'] = $participant->withdrawalStatus;
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
 
