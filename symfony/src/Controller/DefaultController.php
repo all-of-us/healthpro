@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusTemp;
+use App\Entity\User;
 use App\Repository\PatientStatusImportRepository;
 use App\Service\LoggerService;
 use App\Form\PatientStatusImportFormType;
@@ -12,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * @Route("/s")
@@ -30,7 +32,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/patient/status/import", name="patientStatusImports", methods={"GET","POST"})
      */
-    public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em)
+    public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em, Security $security)
     {
         $form = $this->createForm(PatientStatusImportFormType::class);
         $form->handleRequest($request);
@@ -47,12 +49,13 @@ class DefaultController extends AbstractController
                 $patientStatuses[] = $patientStatus;
             }
             if (!empty($patientStatuses)) {
+                $user = $em->getRepository(User::class)->findOneBy(['email' => $security->getUser()->getUsername()]);
                 $patientStatusImport = new PatientStatusImport();
                 $patientStatusImport->setFileName($fileName);
                 $patientStatusImport->setImportStatus(0);
                 $patientStatusImport->setOrganization($session->get('siteOrganizationId'));
                 $patientStatusImport->setAwardee($session->get('siteAwardeeId'));
-                $patientStatusImport->setUserId(1);
+                $patientStatusImport->setUserId($user->getId());
                 $patientStatusImport->setSite($session->get('site')->id);
                 $patientStatusImport->setCreatedTs(new \DateTime());
                 foreach ($patientStatuses as $key => $patientStatus) {
