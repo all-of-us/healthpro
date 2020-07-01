@@ -6,7 +6,6 @@ use App\Entity\PatientStatus;
 use App\Entity\PatientStatusHistory;
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusTemp;
-use App\Entity\User;
 use App\Service\LoggerService;
 use App\Form\PatientStatusImportFormType;
 use App\Form\PatientStatusImportConfirmFormType;
@@ -15,7 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
 
 /**
  * @Route("/s")
@@ -34,7 +32,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/patient/status/import", name="patientStatusImport", methods={"GET","POST"})
      */
-    public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em, Security $security)
+    public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em)
     {
         $form = $this->createForm(PatientStatusImportFormType::class);
         $form->handleRequest($request);
@@ -51,14 +49,13 @@ class DefaultController extends AbstractController
                 $patientStatuses[] = $patientStatus;
             }
             if (!empty($patientStatuses)) {
-                $user = $em->getRepository(User::class)->findOneBy(['email' => $security->getUser()->getUsername()]);
                 $patientStatusImport = new PatientStatusImport();
                 $patientStatusImport->setFileName($fileName);
                 $patientStatusImport->setImportStatus(0);
                 $patientStatusImport->setConfirm(0);
                 $patientStatusImport->setOrganization($session->get('siteOrganizationId'));
                 $patientStatusImport->setAwardee($session->get('siteAwardeeId'));
-                $patientStatusImport->setUserId($user->getId());
+                $patientStatusImport->setUserId($this->getUser()->getId());
                 $patientStatusImport->setSite($session->get('site')->id);
                 $patientStatusImport->setCreatedTs(new \DateTime());
                 $em->persist($patientStatusImport);
@@ -86,7 +83,10 @@ class DefaultController extends AbstractController
      */
     public function patientStatusImportConfirmation(int $id, Request $request, EntityManagerInterface $em)
     {
-        $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'confirm' => 0]);
+        $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'user_id' => $this->getUser()->getId(), 'confirm' => 0]);
+        if (empty($patientStatusImport)) {
+            throw $this->createNotFoundException('Page Not Found!');
+        }
         $form = $this->createForm(PatientStatusImportConfirmFormType::class);
         $form->handleRequest($request);
         $importPatientStatuses = $patientStatusImport->getPatientStatusTemps();
