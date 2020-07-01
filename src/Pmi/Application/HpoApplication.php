@@ -180,8 +180,9 @@ class HpoApplication extends AbstractApplication
         // prevent clickjacking attacks
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
 
-        // whitelist content that the client is allowed to request
-        $whitelist =  "default-src 'self'"
+        // define content security policy
+        $contentSecurityPolicy = "default-src"
+            . " 'self'" // allow all local content
             . " 'unsafe-eval'" // required for setTimeout and setInterval
             . " 'unsafe-inline'" // for the places we are using inline JS
             . " www.google-analytics.com www.googletagmanager.com" // Google Analytics
@@ -189,9 +190,12 @@ class HpoApplication extends AbstractApplication
             . " www.youtube.com" // for training videos hosted on YouTube
             . " *.kaltura.com" // for training videos hosted on Kaltura
             . " cdn.plot.ly;" // allow plot.ly remote requests
-            . " img-src www.google-analytics.com 'self' data:"; // allow Google Analytcs, self, and data: urls for img src
 
-        $response->headers->set('Content-Security-Policy', $whitelist);
+            . " img-src www.google-analytics.com 'self' data:;" // allow Google Analytcs, self, and data: urls for img src
+
+            . " frame-ancestors 'self'"; // accomplishes the same as the X-Frame-Options header above
+
+        $response->headers->set('Content-Security-Policy', $contentSecurityPolicy);
 
         // prevent browsers from sending unencrypted requests
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
