@@ -15,6 +15,9 @@ class PatientStatusImportFormType extends AbstractType
                 'label' => 'Upload CSV File',
                 'required' => true
             ])
+            ->add('Save', Type\SubmitType::class, [
+                'attr' => ['class' => 'btn btn-primary'],
+            ]);
         ;
     }
 }
