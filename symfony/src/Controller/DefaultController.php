@@ -11,6 +11,7 @@ use App\Form\PatientStatusImportFormType;
 use App\Form\PatientStatusImportConfirmFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,42 +37,55 @@ class DefaultController extends AbstractController
     {
         $form = $this->createForm(PatientStatusImportFormType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $file = $form['patient_status_csv']->getData();
             $fileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '-' . uniqid();
             $fileHandle = fopen($file->getPathname(), 'r');
+            $validStatus = ['YES', 'NO', 'NO_ACCESS', 'UNKNOWN'];
             $patientStatuses = [];
-            while (($row = fgetcsv($fileHandle, 0, ",")) !== false) {
+            $row = 1;
+            while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
                 $patientStatus = [];
-                $patientStatus['participantId'] = $row[0];
-                $patientStatus['status'] = $row[1];
-                $patientStatus['comments'] = $row[2];
-                $patientStatuses[] = $patientStatus;
-            }
-            if (!empty($patientStatuses)) {
-                $patientStatusImport = new PatientStatusImport();
-                $patientStatusImport->setFileName($fileName);
-                $patientStatusImport->setImportStatus(0);
-                $patientStatusImport->setConfirm(0);
-                $patientStatusImport->setOrganization($session->get('siteOrganizationId'));
-                $patientStatusImport->setAwardee($session->get('siteAwardeeId'));
-                $patientStatusImport->setUserId($this->getUser()->getId());
-                $patientStatusImport->setSite($session->get('site')->id);
-                $patientStatusImport->setCreatedTs(new \DateTime());
-                $em->persist($patientStatusImport);
-                foreach ($patientStatuses as $key => $patientStatus) {
-                    $patientStatusTemp = new PatientStatusTemp();
-                    $patientStatusTemp->setParticipantId($patientStatus['participantId']);
-                    $patientStatusTemp->setStatus($patientStatus['status']);
-                    $patientStatusTemp->setComments($patientStatus['comments']);
-                    $patientStatusTemp->setImport($patientStatusImport);
-                    $em->persist($patientStatusTemp);
+                if (!preg_match("/^P\d{9}+$/", $data[0])) {
+                    $form['patient_status_csv']->addError(new FormError("Invalid participant ID {$data[0]} in line {$row}, column 1"));
                 }
-                $em->flush();
-                $id = $patientStatusImport->getId();
-                $em->clear();
+                $patientStatus['participantId'] = $data[0];
+                if (!in_array($data[1], $validStatus)) {
+                    $form['patient_status_csv']->addError(new FormError("Invalid patient status {$data[1]} in line {$row}, column 2"));
+                }
+                $patientStatus['status'] = $data[1];
+                $patientStatus['comments'] = $data[2];
+                $patientStatuses[] = $patientStatus;
+                $row++;
             }
-            return $this->redirectToRoute('patientStatusImportConfirmation', ['id' => $id]);
+            if ($form->isValid()) {
+                if (!empty($patientStatuses)) {
+                    $patientStatusImport = new PatientStatusImport();
+                    $patientStatusImport->setFileName($fileName);
+                    $patientStatusImport->setImportStatus(0);
+                    $patientStatusImport->setConfirm(0);
+                    $patientStatusImport->setOrganization($session->get('siteOrganizationId'));
+                    $patientStatusImport->setAwardee($session->get('siteAwardeeId'));
+                    $patientStatusImport->setUserId($this->getUser()->getId());
+                    $patientStatusImport->setSite($session->get('site')->id);
+                    $patientStatusImport->setCreatedTs(new \DateTime());
+                    $em->persist($patientStatusImport);
+                    foreach ($patientStatuses as $key => $patientStatus) {
+                        $patientStatusTemp = new PatientStatusTemp();
+                        $patientStatusTemp->setParticipantId($patientStatus['participantId']);
+                        $patientStatusTemp->setStatus($patientStatus['status']);
+                        $patientStatusTemp->setComments($patientStatus['comments']);
+                        $patientStatusTemp->setImport($patientStatusImport);
+                        $em->persist($patientStatusTemp);
+                    }
+                    $em->flush();
+                    $id = $patientStatusImport->getId();
+                    $em->clear();
+                }
+                return $this->redirectToRoute('patientStatusImportConfirmation', ['id' => $id]);
+            } else {
+                $form->addError(new FormError('Please correct the errors below'));
+            }
         }
         return $this->render('patientstatus/import.html.twig', [
             'importForm' => $form->createView()
@@ -127,6 +141,10 @@ class DefaultController extends AbstractController
             $patientStatusImport->setConfirm(1);
             $em->flush();
             $em->clear();
+            $this->addFlash(
+                'success',
+                'Successfully Imported!'
+            );
             return $this->redirectToRoute('patientStatusImport');
         }
         return $this->render('patientstatus/confirmation.html.twig', [
