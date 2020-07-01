@@ -20,6 +20,7 @@ class Participant
     public $isCoreParticipant = false;
     public $activityStatus;
     public $isSuspended = false;
+    public $isWithdrawn = false;
     public $consentCohortText;
 
     private $disableTestAccess;
@@ -103,6 +104,7 @@ class Participant
         if (!empty($participant->withdrawalStatus) && in_array($participant->withdrawalStatus, ['NO_USE', 'EARLY_OUT'], true)) {
             $this->status = false;
             $this->statusReason = 'withdrawal';
+            $this->isWithdrawn = true;
         }
 
         // Map gender identity to gender options for MayoLINK.
