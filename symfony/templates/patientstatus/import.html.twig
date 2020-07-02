@@ -4,11 +4,38 @@
         <h2><i class="fa fa-upload" aria-hidden="true"></i> Patient Status Import</h2>
     </div>
     <div class="row">
-        <div class="col-sm-9 col-sm-offset-3">
+        <div class="col-sm-6 col-sm-offset-2">
             {{ form_start(importForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(importForm) }}
             {{ form_rest(importForm) }}
             {{ form_end(importForm) }}
+        </div>
+        <div class="col-sm-4 alert alert-info">
+            <h4>CSV Format</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Participant ID</th>
+                        <th>Status</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>P000000000</td>
+                        <td>YES</td>
+                        <td>Test Comment 1</td>
+                    </tr>
+                    <tr>
+                        <td>P000000001</td>
+                        <td>NO</td>
+                        <td>Test Comment 2</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Participant ID: <b>Must be 10 digits ex: P000000000</b></p>
+            <p>Status: <b>YES, NO, NO_ACCESS, and UNKNOWN</b></p>
+            <p>Comments: <b>Optional</b></p>
         </div>
     </div>
 {% endblock %}
