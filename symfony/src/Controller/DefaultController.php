@@ -45,6 +45,10 @@ class DefaultController extends AbstractController
             $patientStatuses = [];
             $row = 1;
             while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
+                if ($row === 1) {
+                    $row++;
+                    continue;
+                }
                 $patientStatus = [];
                 if (!preg_match("/^P\d{9}+$/", $data[0])) {
                     $form['patient_status_csv']->addError(new FormError("Invalid participant ID {$data[0]} in line {$row}, column 1"));
@@ -81,8 +85,8 @@ class DefaultController extends AbstractController
                     $em->flush();
                     $id = $patientStatusImport->getId();
                     $em->clear();
+                    return $this->redirectToRoute('patientStatusImportConfirmation', ['id' => $id]);
                 }
-                return $this->redirectToRoute('patientStatusImportConfirmation', ['id' => $id]);
             } else {
                 $form->addError(new FormError('Please correct the errors below'));
             }
