@@ -52,6 +52,11 @@ class PatientStatusHistory
      */
     private $patient_status;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\PatientStatusImport", inversedBy="patientStatusHistories")
+     */
+    private $import;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +142,18 @@ class PatientStatusHistory
     public function setPatientStatus(?PatientStatus $patient_status): self
     {
         $this->patient_status = $patient_status;
+
+        return $this;
+    }
+
+    public function getImport(): ?PatientStatusImport
+    {
+        return $this->import;
+    }
+
+    public function setImport(?PatientStatusImport $import): self
+    {
+        $this->import = $import;
 
         return $this;
     }

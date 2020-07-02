@@ -91,8 +91,10 @@ class DefaultController extends AbstractController
                 $form->addError(new FormError('Please correct the errors below'));
             }
         }
+        $patientStatusImports = $em->getRepository(PatientStatusImport::class)->findBy(['user_id' => $this->getUser()->getId(), 'confirm' => 1]);
         return $this->render('patientstatus/import.html.twig', [
-            'importForm' => $form->createView()
+            'importForm' => $form->createView(),
+            'imports' => $patientStatusImports
         ]);
     }
 
@@ -128,6 +130,7 @@ class DefaultController extends AbstractController
                 $patientStatusHistory->setComments($importPatientStatus->getComments());
                 $patientStatusHistory->setCreatedTs(new \DateTime());
                 $patientStatusHistory->setPatientStatus($patientStatus);
+                $patientStatusHistory->setImport($patientStatusImport);
                 $em->persist($patientStatusHistory);
                 $em->flush();
                 $patientStatusHistoryId = $patientStatusHistory->getId();

@@ -63,9 +63,15 @@ class PatientStatusImport
      */
     private $confirm;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusHistory", mappedBy="import")
+     */
+    private $patientStatusHistories;
+
     public function __construct()
     {
         $this->patientStatusTemps = new ArrayCollection();
+        $this->patientStatusHistories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -196,6 +202,37 @@ class PatientStatusImport
     public function setConfirm(int $confirm): self
     {
         $this->confirm = $confirm;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PatientStatusHistory[]
+     */
+    public function getPatientStatusHistories(): Collection
+    {
+        return $this->patientStatusHistories;
+    }
+
+    public function addPatientStatusHistory(PatientStatusHistory $patientStatusHistory): self
+    {
+        if (!$this->patientStatusHistories->contains($patientStatusHistory)) {
+            $this->patientStatusHistories[] = $patientStatusHistory;
+            $patientStatusHistory->setImport($this);
+        }
+
+        return $this;
+    }
+
+    public function removePatientStatusHistory(PatientStatusHistory $patientStatusHistory): self
+    {
+        if ($this->patientStatusHistories->contains($patientStatusHistory)) {
+            $this->patientStatusHistories->removeElement($patientStatusHistory);
+            // set the owning side to null (unless already changed)
+            if ($patientStatusHistory->getImport() === $this) {
+                $patientStatusHistory->setImport(null);
+            }
+        }
 
         return $this;
     }
