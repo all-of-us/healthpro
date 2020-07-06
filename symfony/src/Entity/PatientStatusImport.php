@@ -49,9 +49,9 @@ class PatientStatusImport
     private $created_ts;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="smallint", options={"default":0})
      */
-    private $import_status;
+    private $import_status = 0;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusTemp", mappedBy="import")
@@ -59,9 +59,9 @@ class PatientStatusImport
     private $patientStatusTemps;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="smallint", options={"default":0})
      */
-    private $confirm;
+    private $confirm = 0;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusHistory", mappedBy="import")

@@ -58,9 +58,9 @@ class PatientStatusHistory
     private $import;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="smallint", options={"default":0})
      */
-    private $rdr_status;
+    private $rdr_status = 0;
 
     public function getId(): ?int
     {

@@ -57,8 +57,6 @@ class PatientStatusController extends AbstractController
                 if (!empty($patientStatuses)) {
                     $patientStatusImport = new PatientStatusImport();
                     $patientStatusImport->setFileName($fileName);
-                    $patientStatusImport->setImportStatus(0);
-                    $patientStatusImport->setConfirm(0);
                     $patientStatusImport->setOrganization($session->get('siteOrganizationId'));
                     $patientStatusImport->setAwardee($session->get('siteAwardeeId'));
                     $patientStatusImport->setUserId($this->getUser()->getId());
@@ -120,7 +118,6 @@ class PatientStatusController extends AbstractController
                 $patientStatusHistory->setStatus($importPatientStatus->getStatus());
                 $patientStatusHistory->setComments($importPatientStatus->getComments());
                 $patientStatusHistory->setCreatedTs(new \DateTime());
-                $patientStatusHistory->setRdrStatus(0);
                 $patientStatusHistory->setPatientStatus($patientStatus);
                 $patientStatusHistory->setImport($patientStatusImport);
                 $em->persist($patientStatusHistory);
