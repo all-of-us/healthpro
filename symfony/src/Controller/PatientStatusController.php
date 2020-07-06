@@ -151,4 +151,19 @@ class PatientStatusController extends AbstractController
             'importConfirmForm' => $form->createView()
         ]);
     }
+
+    /**
+     * @Route("/patient/status/import/{id}", name="patientStatusImportDetails", methods={"GET"})
+     */
+    public function patientStatusImportDetails(int $id, Request $request, EntityManagerInterface $em)
+    {
+        $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'user_id' => $this->getUser()->getId(), 'confirm' => 1]);
+        if (empty($patientStatusImport)) {
+            throw $this->createNotFoundException('Page Not Found!');
+        }
+        $patientStatusHistories = $patientStatusImport->getPatientStatusHistories();
+        return $this->render('patientstatus/import-details.html.twig', [
+            'patientStatusHistories' => $patientStatusHistories
+        ]);
+    }
 }

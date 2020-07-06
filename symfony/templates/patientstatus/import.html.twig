@@ -48,6 +48,7 @@
                         <th>Organization</th>
                         <th>Created</th>
                         <th>Status</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,6 +58,7 @@
                             <td>{{ import.organization }}</td>
                             <td>{{ import.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone)  }}</td>
                             <td>{{ import.importStatus == 0 ? 'In Progress' : 'Complete' }}</td>
+                            <td><a href="{{ path('patientStatusImportDetails', { id: import.id }) }}">Details</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
