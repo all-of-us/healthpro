@@ -35,7 +35,7 @@ class PatientStatusService
             FROM patient_status_history psh
             INNER JOIN patient_status ps ON ps.id = psh.patient_status_id
             LEFT JOIN users u ON psh.user_id = u.id
-            WHERE psh.rdr_ts is null
+            WHERE psh.rdr_ts is null and psh.rdr_status = 0
             ORDER BY psh.id ASC
             limit {$limit}
         ";
@@ -44,12 +44,13 @@ class PatientStatusService
         foreach ($patientStatusHistories as $patientStatusHistory) {
             $patientStatusObj->loadDataFromDb($patientStatusHistory);
             if ($patientStatusObj->sendToRdr()) {
-                $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_ts' => new \DateTime()]);
+                $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_ts' => new \DateTime(), 'rdr_status' => 1]);
                 $this->app->log(Log::PATIENT_STATUS_HISTORY_EDIT, [
                     'id' => $patientStatusHistory['id']
                 ]);
             } else {
                 $this->app['logger']->error("#{$patientStatusHistory['id']} failed sending to RDR: " . $this->rdr->getLastError());
+                $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_status' => 2]);
             }
         }
     }

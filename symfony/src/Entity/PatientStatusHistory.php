@@ -57,6 +57,11 @@ class PatientStatusHistory
      */
     private $import;
 
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $rdr_status;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -154,6 +159,18 @@ class PatientStatusHistory
     public function setImport(?PatientStatusImport $import): self
     {
         $this->import = $import;
+
+        return $this;
+    }
+
+    public function getRdrStatus(): ?int
+    {
+        return $this->rdr_status;
+    }
+
+    public function setRdrStatus(int $rdr_status): self
+    {
+        $this->rdr_status = $rdr_status;
 
         return $this;
     }
