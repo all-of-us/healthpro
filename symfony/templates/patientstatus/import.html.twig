@@ -38,31 +38,33 @@
             <p>Comments: <b>Optional</b></p>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <h3>Import Status</h3>
-            <table class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>File Name</th>
-                        <th>Organization</th>
-                        <th>Created</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for import in imports %}
+    {% if imports is not empty %}
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Import Status</h3>
+                <table class="table table-striped table-bordered">
+                    <thead>
                         <tr>
-                            <td>{{ import.fileName }}</td>
-                            <td>{{ import.organization }}</td>
-                            <td>{{ import.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone)  }}</td>
-                            <td>{{ import.importStatus == 0 ? 'In Progress' : 'Complete' }}</td>
-                            <td><a href="{{ path('patientStatusImportDetails', { id: import.id }) }}">Details</a></td>
+                            <th>File Name</th>
+                            <th>Organization</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th></th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for import in imports %}
+                            <tr>
+                                <td>{{ import.fileName }}</td>
+                                <td>{{ import.organization.name }} ({{ import.organization.id }})</td>
+                                <td>{{ import.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone)  }}</td>
+                                <td>{{ import.importStatus == 0 ? 'In Progress' : 'Complete' }}</td>
+                                <td><a href="{{ path('patientStatusImportDetails', { id: import.id }) }}">Details</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}

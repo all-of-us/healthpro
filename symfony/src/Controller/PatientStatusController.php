@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Organizations;
 use App\Entity\PatientStatus;
 use App\Entity\PatientStatusHistory;
 use App\Entity\PatientStatusImport;
@@ -55,9 +56,10 @@ class PatientStatusController extends AbstractController
             }
             if ($form->isValid()) {
                 if (!empty($patientStatuses)) {
+                    $organization = $em->getRepository(Organizations::class)->findOneBy(['id' => $session->get('siteOrganizationId')]);
                     $patientStatusImport = new PatientStatusImport();
                     $patientStatusImport->setFileName($fileName);
-                    $patientStatusImport->setOrganization($session->get('siteOrganizationId'));
+                    $patientStatusImport->setOrganization($organization);
                     $patientStatusImport->setAwardee($session->get('siteAwardeeId'));
                     $patientStatusImport->setUserId($this->getUser()->getId());
                     $patientStatusImport->setSite($session->get('site')->id);
@@ -80,7 +82,7 @@ class PatientStatusController extends AbstractController
                 $form->addError(new FormError('Please correct the errors below'));
             }
         }
-        $patientStatusImports = $em->getRepository(PatientStatusImport::class)->findBy(['user_id' => $this->getUser()->getId(), 'confirm' => 1]);
+        $patientStatusImports = $em->getRepository(PatientStatusImport::class)->findBy(['user_id' => $this->getUser()->getId(), 'confirm' => 1], ['id' => 'DESC']);
         return $this->render('patientstatus/import.html.twig', [
             'importForm' => $form->createView(),
             'imports' => $patientStatusImports
@@ -160,6 +162,7 @@ class PatientStatusController extends AbstractController
         }
         $patientStatusHistories = $patientStatusImport->getPatientStatusHistories();
         return $this->render('patientstatus/import-details.html.twig', [
+            'patientStatusImport' => $patientStatusImport,
             'patientStatusHistories' => $patientStatusHistories
         ]);
     }

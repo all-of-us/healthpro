@@ -31,11 +31,6 @@ class PatientStatusImport
     /**
      * @ORM\Column(type="string", length=50)
      */
-    private $organization;
-
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
     private $awardee;
 
     /**
@@ -68,6 +63,12 @@ class PatientStatusImport
      */
     private $patientStatusHistories;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Organizations")
+     * @ORM\JoinColumn(name="organization", referencedColumnName="id")
+     */
+    private $organization;
+
     public function __construct()
     {
         $this->patientStatusTemps = new ArrayCollection();
@@ -87,18 +88,6 @@ class PatientStatusImport
     public function setFileName(string $file_name): self
     {
         $this->file_name = $file_name;
-
-        return $this;
-    }
-
-    public function getOrganization(): ?string
-    {
-        return $this->organization;
-    }
-
-    public function setOrganization(string $organization): self
-    {
-        $this->organization = $organization;
 
         return $this;
     }
@@ -233,6 +222,18 @@ class PatientStatusImport
                 $patientStatusHistory->setImport(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOrganization(): ?Organizations
+    {
+        return $this->organization;
+    }
+
+    public function setOrganization(?Organizations $organization): self
+    {
+        $this->organization = $organization;
 
         return $this;
     }

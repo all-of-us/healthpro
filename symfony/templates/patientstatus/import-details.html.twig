@@ -22,7 +22,7 @@
                         <td>{{ patientStatusHistory.patientStatus.participantId }}</td>
                         <td>{{ patientStatusHistory.status }}</td>
                         <td>{{ patientStatusHistory.comments }}</td>
-                        <td>{{ patientStatusHistory.patientStatus.organization }}</td>
+                        <td>{{ patientStatusImport.organization.name }} ({{ patientStatusImport.organization.id }})</td>
                         <td>{{ patientStatusHistory.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone)  }}</td>
                         <td>
                             {% if patientStatusHistory.rdrStatus == 1 %}
