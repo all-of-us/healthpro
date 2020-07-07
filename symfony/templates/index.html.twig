@@ -33,6 +33,11 @@
                 </a>
             </div>
         {% endif %}
+        {% if is_granted('ROLE_USER') and app.session.get('site') %}
+            <div class="col-sm-6 col-md-4">
+                <a href="{{ path('patientStatusImport') }}" class="btn btn-lg btn-default btn-block"><i class="fa fa-upload" aria-hidden="true"></i> Patient Status Import</a>
+            </div>
+        {% endif %}
         <div class="col-sm-6 col-md-4">
             <a href="/help" class="btn btn-lg btn-default btn-block"><i class="fa fa-question-circle" aria-hidden="true"></i> Help and Training Resources</a>
         </div>

@@ -30,7 +30,7 @@ class PatientStatusController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             $file = $form['patient_status_csv']->getData();
-            $fileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '-' . uniqid();
+            $fileName = $file->getClientOriginalName();
             $fileHandle = fopen($file->getPathname(), 'r');
             $validStatus = ['YES', 'NO', 'NO_ACCESS', 'UNKNOWN'];
             $patientStatuses = [];
