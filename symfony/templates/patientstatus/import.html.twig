@@ -58,7 +58,15 @@
                                 <td>{{ import.fileName }}</td>
                                 <td>{{ import.organization.name }} ({{ import.organization.id }})</td>
                                 <td>{{ import.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone)  }}</td>
-                                <td>{{ import.importStatus == 0 ? 'In Progress' : 'Complete' }}</td>
+                                <td>
+                                    {% if import.importStatus == 1 %}
+                                        <i class="fa fa-check text-success" aria-hidden="true"></i> Complete
+                                    {% elseif import.importStatus == 2 %}
+                                        <i class="fa fa-check text-success" aria-hidden="true"></i> Complete <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
+                                    {% else %}
+                                        <i class="fa fa-tasks" aria-hidden="true"></i> In Progress
+                                    {% endif %}
+                                </td>
                                 <td><a href="{{ path('patientStatusImportDetails', { id: import.id }) }}">Details</a></td>
                             </tr>
                         {% endfor %}
