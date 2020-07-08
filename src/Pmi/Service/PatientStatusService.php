@@ -71,6 +71,11 @@ class PatientStatusService
             }
         }
         // Update import status
+        $this->updateImportStatus($importIds);
+    }
+
+    private function updateImportStatus($importIds)
+    {
         foreach ($importIds as $importId) {
             $query = "SELECT COUNT(*) AS count FROM patient_status_history WHERE import_id = :importId AND rdr_status = 0";
             $patientStatusHistory = $this->em->fetchAll($query, ['importId' => $importId]);
@@ -87,5 +92,10 @@ class PatientStatusService
                 }
             }
         }
+    }
+
+    public function deletePatientStatusTempData()
+    {
+        $this->em->getRepository('patient_status_temp')->truncate();
     }
 }
