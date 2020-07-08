@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Pmi\Audit\Log;
 
 /**
  * @Route("/s")
@@ -26,7 +27,7 @@ class PatientStatusController extends AbstractController
     /**
      * @Route("/patient/status/import", name="patientStatusImport", methods={"GET","POST"})
      */
-    public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em, CsvFileHandler $csvFileHandler)
+    public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em, LoggerService $loggerService, CsvFileHandler $csvFileHandler)
     {
         $form = $this->createForm(PatientStatusImportFormType::class);
         $form->handleRequest($request);
@@ -34,7 +35,7 @@ class PatientStatusController extends AbstractController
             $file = $form['patient_status_csv']->getData();
             $fileName = $file->getClientOriginalName();
             $patientStatuses = [];
-            $csvFileHandler->extractCsvFileData($file,$form, $patientStatuses);
+            $csvFileHandler->extractCsvFileData($file, $form, $patientStatuses);
             if ($form->isValid()) {
                 if (!empty($patientStatuses)) {
                     $organization = $em->getRepository(Organizations::class)->findOneBy(['id' => $session->get('siteOrganizationId')]);
@@ -56,6 +57,7 @@ class PatientStatusController extends AbstractController
                     }
                     $em->flush();
                     $id = $patientStatusImport->getId();
+                    $loggerService->log(Log::PATIENT_STATUS_IMPORT_ADD, $id);
                     $em->clear();
                     return $this->redirectToRoute('patientStatusImportConfirmation', ['id' => $id]);
                 }
@@ -73,7 +75,7 @@ class PatientStatusController extends AbstractController
     /**
      * @Route("/patient/status/confirmation/{id}", name="patientStatusImportConfirmation", methods={"GET", "POST"})
      */
-    public function patientStatusImportConfirmation(int $id, Request $request, EntityManagerInterface $em)
+    public function patientStatusImportConfirmation(int $id, Request $request, EntityManagerInterface $em, LoggerService $loggerService)
     {
         $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'user_id' => $this->getUser()->getId(), 'confirm' => 0]);
         if (empty($patientStatusImport)) {
@@ -106,6 +108,7 @@ class PatientStatusController extends AbstractController
                 $em->persist($patientStatusHistory);
                 $em->flush();
                 $patientStatusHistoryId = $patientStatusHistory->getId();
+                $loggerService->log(Log::PATIENT_STATUS_HISTORY_ADD, $patientStatusHistoryId);
 
                 // Update history id in patient_status table
                 $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
@@ -115,10 +118,12 @@ class PatientStatusController extends AbstractController
                 $patientStatus->setHistoryId($patientStatusHistoryId);
                 $em->persist($patientStatus);
                 $em->flush();
+                $loggerService->log(Log::PATIENT_STATUS_EDIT, $patientStatus->getId());
             }
             // Update confirm status
             $patientStatusImport->setConfirm(1);
             $em->flush();
+            $loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $patientStatusImport->getId());
             $em->clear();
             $this->addFlash(
                 'success',
