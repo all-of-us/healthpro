@@ -1,4 +1,5 @@
 <?php
+
 namespace Pmi\Service;
 
 use Pmi\Audit\Log;
@@ -28,6 +29,7 @@ class PatientStatusService
                    psh.status,
                    psh.comments,
                    psh.created_ts as authored,
+                   psh.import_id,
                    ps.participant_id,
                    ps.organization,
                    ps.awardee,
@@ -41,16 +43,48 @@ class PatientStatusService
         ";
         $patientStatusHistories = $this->em->fetchAll($query, []);
         $patientStatusObj = new PatientStatus($this->app);
+        $importIds = [];
         foreach ($patientStatusHistories as $patientStatusHistory) {
+            if (!in_array($patientStatusHistory['import_id'], $importIds)) {
+                $importIds[] = $patientStatusHistory['import_id'];
+            }
             $patientStatusObj->loadDataFromDb($patientStatusHistory);
             if ($patientStatusObj->sendToRdr()) {
+                // Set rdr_status = 1 for success
                 $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_ts' => new \DateTime(), 'rdr_status' => 1]);
                 $this->app->log(Log::PATIENT_STATUS_HISTORY_EDIT, [
                     'id' => $patientStatusHistory['id']
                 ]);
             } else {
                 $this->app['logger']->error("#{$patientStatusHistory['id']} failed sending to RDR: " . $this->rdr->getLastError());
-                $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_status' => 2]);
+                // RDR status
+                // 2 = RDR 400 (Invalid participant id)
+                // 3 = RDR 500 (Invalid patient status)
+                // 4 = Other RDR errors
+                $rdrStatus = 4;
+                if ($this->rdr->getLastErrorCode() === 400) {
+                    $rdrStatus = 2;
+                } elseif ($this->rdr->getLastErrorCode() === 500) {
+                    $rdrStatus = 3;
+                }
+                $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_status' => $rdrStatus]);
+            }
+        }
+        // Update import status
+        foreach ($importIds as $importId) {
+            $query = "SELECT COUNT(*) AS count FROM patient_status_history WHERE import_id = :importId AND rdr_status = 0";
+            $patientStatusHistory = $this->em->fetchAll($query, ['importId' => $importId]);
+            if ($patientStatusHistory[0]['count'] == 0) {
+                $query = "SELECT COUNT(*) AS count FROM patient_status_history WHERE import_id = :importId AND rdr_status IN (2, 3, 4)";
+                $patientStatusHistory = $this->em->fetchAll($query, ['importId' => $importId]);
+                // Import Status
+                // 1 = Complete with no errors
+                // 2 = Complete with errors
+                if ($patientStatusHistory[0]['count'] > 0) {
+                    $this->em->getRepository('patient_status_import')->update($importId, ['import_status' => 2]);
+                } else {
+                    $this->em->getRepository('patient_status_import')->update($importId, ['import_status' => 1]);
+                }
             }
         }
     }
