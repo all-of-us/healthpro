@@ -7,6 +7,7 @@ use App\Entity\PatientStatus;
 use App\Entity\PatientStatusHistory;
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusTemp;
+use App\Service\CsvFileHandler;
 use App\Service\LoggerService;
 use App\Form\PatientStatusImportFormType;
 use App\Form\PatientStatusImportConfirmFormType;
@@ -25,35 +26,15 @@ class PatientStatusController extends AbstractController
     /**
      * @Route("/patient/status/import", name="patientStatusImport", methods={"GET","POST"})
      */
-    public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em)
+    public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em, CsvFileHandler $csvFileHandler)
     {
         $form = $this->createForm(PatientStatusImportFormType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             $file = $form['patient_status_csv']->getData();
             $fileName = $file->getClientOriginalName();
-            $fileHandle = fopen($file->getPathname(), 'r');
-            $validStatus = ['YES', 'NO', 'NO_ACCESS', 'UNKNOWN'];
             $patientStatuses = [];
-            $row = 1;
-            while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
-                if ($row === 1) {
-                    $row++;
-                    continue;
-                }
-                $patientStatus = [];
-                if (!preg_match("/^P\d{9}+$/", $data[0])) {
-                    $form['patient_status_csv']->addError(new FormError("Invalid participant ID {$data[0]} in line {$row}, column 1"));
-                }
-                $patientStatus['participantId'] = $data[0];
-                if (!in_array($data[1], $validStatus)) {
-                    $form['patient_status_csv']->addError(new FormError("Invalid patient status {$data[1]} in line {$row}, column 2"));
-                }
-                $patientStatus['status'] = $data[1];
-                $patientStatus['comments'] = $data[2];
-                $patientStatuses[] = $patientStatus;
-                $row++;
-            }
+            $csvFileHandler->extractCsvFileData($file,$form, $patientStatuses);
             if ($form->isValid()) {
                 if (!empty($patientStatuses)) {
                     $organization = $em->getRepository(Organizations::class)->findOneBy(['id' => $session->get('siteOrganizationId')]);
