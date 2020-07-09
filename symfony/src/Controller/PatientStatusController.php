@@ -57,6 +57,7 @@ class PatientStatusController extends AbstractController
                         $em->persist($patientStatusTemp);
                         if (($key % $batchSize) === 0) {
                             $em->flush();
+                            $em->clear(PatientStatusTemp::class);
                         }
                     }
                     $em->flush();
@@ -118,6 +119,8 @@ class PatientStatusController extends AbstractController
                     $em->flush();
                     $loggerService->log(Log::PATIENT_STATUS_HISTORY_ADD, $patientStatusHistory->getId());
                     $loggerService->log(Log::PATIENT_STATUS_EDIT, $patientStatus->getId());
+                    $em->clear(PatientStatusHistory::class);
+                    $em->clear(PatientStatus::class);
                 }
             }
             $em->flush();
