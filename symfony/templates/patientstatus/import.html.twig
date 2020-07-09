@@ -34,8 +34,12 @@
                 </tbody>
             </table>
             <p>Participant ID: <b>Must be 10 digits ex: P000000000</b></p>
-            <p>Status: <b>YES, NO, NO_ACCESS, and UNKNOWN</b></p>
-            <p>Comments: <b>Optional</b></p>
+            <p>Status: <b>Allowed values are YES, NO, NO_ACCESS, and UNKNOWN</b></p>
+            <p><b>YES:</b> Confirmed in EHR system</p>
+            <p><b>NO:</b> Not found in EHR system</p>
+            <p><b>NO_ACCESS:</b> Unable to check EHR system</p>
+            <p><b>UNKNOWN:</b> Inconclusive search results</p>
+            <p>Comments: <b>Free Text (Optional)</b></p>
         </div>
     </div>
     {% if imports is not empty %}
