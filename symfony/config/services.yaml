@@ -27,3 +27,7 @@ services:
     # please note that last definitions always *replace* previous ones
 
     Pmi\Datastore\DatastoreSessionHandler:
+
+    App\EventListener\ResponseListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.response }

@@ -1,6 +1,7 @@
 <?php
 namespace Pmi\Security;
 
+use App\EventListener\ResponseSecurityHeadersTrait;
 use Pmi\Application\AbstractApplication;
 use Pmi\Audit\Log;
 use Pmi\HttpClient;
@@ -19,6 +20,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
  */
 class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 {
+    use ResponseSecurityHeadersTrait;
+
     const OAUTH_FAILURE_MESSAGE = 'OAuth Failure';
 
     private $app;
@@ -179,7 +182,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         // clear session in case Google user and our user are out of sync
         $this->app->logout();
         $response = new Response($this->app['twig']->render($template, $params), $code);
-        $this->app->setHeaders($response);
+        $this->addSecurityHeaders($response);
         return $response;
     }
     

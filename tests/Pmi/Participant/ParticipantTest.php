@@ -34,6 +34,7 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('test-participant', $participant->statusReason);
+        $this->assertSame(false, $participant->isWithdrawn);
     }
 
     public function testParticipantBasicsStatus()
@@ -44,6 +45,7 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('basics', $participant->statusReason);
+        $this->assertSame(false, $participant->isWithdrawn);
     }
 
     public function testParticipantConsentStatus()
@@ -54,9 +56,10 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('consent', $participant->statusReason);
+        $this->assertSame(false, $participant->isWithdrawn);
     }
 
-    public function testParticipantWithdrawalStatus()
+    public function testParticipantWithdrawalStatusNoUse()
     {
         $participant = new Participant((object)[
             'questionnaireOnTheBasics' => 'SUBMITTED',
@@ -65,6 +68,19 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('withdrawal', $participant->statusReason);
+        $this->assertSame(true, $participant->isWithdrawn);
+    }
+
+    public function testParticipantWithdrawalStatusEarlyOut()
+    {
+        $participant = new Participant((object)[
+            'questionnaireOnTheBasics' => 'SUBMITTED',
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'withdrawalStatus' => 'EARLY_OUT'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('withdrawal', $participant->statusReason);
+        $this->assertSame(true, $participant->isWithdrawn);
     }
 
     public function testParticipantGrorStatus()

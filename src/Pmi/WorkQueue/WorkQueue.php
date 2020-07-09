@@ -340,7 +340,7 @@ class WorkQueue
             $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
             $row['activityStatus'] = $this->getActivityStatus($participant);
-            $row['withdrawalStatus'] = $participant->withdrawalStatus; // Used to add withdrawn class in the data tables
+            $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
 
             //Contact
@@ -493,7 +493,7 @@ class WorkQueue
     public function getPatientStatus($participant, $value, $type = 'wq')
     {
         // Clear patient status for withdrawn participants
-        if ($participant->withdrawalStatus === 'NO_USE') {
+        if ($participant->isWithdrawn) {
             return '';
         }
         $organizations = [];
