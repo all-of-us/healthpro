@@ -14,6 +14,7 @@ use App\Form\PatientStatusImportConfirmFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -142,7 +143,7 @@ class PatientStatusController extends AbstractController
     }
 
     /**
-     * @Route("/patient/status/import/{id}", name="patientStatusImportDetails", methods={"GET"})
+     * @Route("/patient/status/import/{id}", name="patientStatusImportDetails", methods={"GET", "POST"})
      */
     public function patientStatusImportDetails(int $id, Request $request, EntityManagerInterface $em)
     {
@@ -150,10 +151,25 @@ class PatientStatusController extends AbstractController
         if (empty($patientStatusImport)) {
             throw $this->createNotFoundException('Page Not Found!');
         }
-        $patientStatusHistories = $patientStatusImport->getPatientStatusHistories();
-        return $this->render('patientstatus/import-details.html.twig', [
-            'patientStatusImport' => $patientStatusImport,
-            'patientStatusHistories' => $patientStatusHistories
-        ]);
+        //For ajax requests
+        if ($request->isXmlHttpRequest()) {
+            $params = $request->request->all();
+            $patientStatusHistories = $patientStatusImport->getPatientStatusHistories()->slice($params['start'], $params['length']);
+            $ajaxData = [];
+            foreach ($patientStatusHistories as $patientStatusHistory) {
+                $data = [];
+                $data['participantId'] = $patientStatusHistory->getPatientStatus()->getParticipantId();
+                $data['patientStatus'] = $patientStatusHistory->getStatus();
+                $data['comments'] = $patientStatusHistory->getComments();
+                $data['organizationName'] = $patientStatusImport->getOrganization()->getName();
+                $data['createdTs'] = $patientStatusHistory->getCreatedTs()->setTimezone(new \DateTimeZone($this->getUser()->getInfo()['timezone']))->format('n/j/Y g:ia');
+                $data['status'] = $patientStatusHistory->getRdrStatus();
+                $ajaxData['data'][] = $data;
+            }
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($patientStatusImport->getPatientStatusHistories());
+            return new JsonResponse($ajaxData, 200);
+        } else {
+            return $this->render('patientstatus/import-details.html.twig');
+        }
     }
 }
