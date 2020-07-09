@@ -47,6 +47,7 @@ class PatientStatusController extends AbstractController
                     $patientStatusImport->setSite($session->get('site')->id);
                     $patientStatusImport->setCreatedTs(new \DateTime());
                     $em->persist($patientStatusImport);
+                    $batchSize = 50;
                     foreach ($patientStatuses as $key => $patientStatus) {
                         $patientStatusTemp = new PatientStatusTemp();
                         $patientStatusTemp->setParticipantId($patientStatus['participantId']);
@@ -54,6 +55,9 @@ class PatientStatusController extends AbstractController
                         $patientStatusTemp->setComments($patientStatus['comments']);
                         $patientStatusTemp->setImport($patientStatusImport);
                         $em->persist($patientStatusTemp);
+                        if (($key % $batchSize) === 0) {
+                            $em->flush();
+                        }
                     }
                     $em->flush();
                     $id = $patientStatusImport->getId();
@@ -85,16 +89,17 @@ class PatientStatusController extends AbstractController
         $form->handleRequest($request);
         $importPatientStatuses = $patientStatusImport->getPatientStatusTemps();
         if ($form->isSubmitted() && $form->isValid()) {
-            foreach ($importPatientStatuses as $importPatientStatus) {
+            $batchSize = 50;
+            foreach ($importPatientStatuses as $key => $importPatientStatus) {
                 $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
                     'participant_id' => $importPatientStatus->getParticipantId(),
-                    'organization' => $patientStatusImport->getOrganization()
+                    'organization' => $patientStatusImport->getOrganization()->getName()
                 ]);
                 if (!$patientStatus) {
                     $patientStatus = new PatientStatus();
                     $patientStatus->setParticipantId($importPatientStatus->getParticipantId());
                     $patientStatus->setAwardee($patientStatusImport->getAwardee());
-                    $patientStatus->setOrganization($patientStatusImport->getOrganization());
+                    $patientStatus->setOrganization($patientStatusImport->getOrganization()->getName());
                     $em->persist($patientStatus);
                 }
                 $patientStatusHistory = new PatientStatusHistory();
@@ -106,20 +111,16 @@ class PatientStatusController extends AbstractController
                 $patientStatusHistory->setPatientStatus($patientStatus);
                 $patientStatusHistory->setImport($patientStatusImport);
                 $em->persist($patientStatusHistory);
-                $em->flush();
-                $patientStatusHistoryId = $patientStatusHistory->getId();
-                $loggerService->log(Log::PATIENT_STATUS_HISTORY_ADD, $patientStatusHistoryId);
 
                 // Update history id in patient_status table
-                $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
-                    'participant_id' => $importPatientStatus->getParticipantId(),
-                    'organization' => $patientStatusImport->getOrganization()
-                ]);
-                $patientStatus->setHistoryId($patientStatusHistoryId);
-                $em->persist($patientStatus);
-                $em->flush();
-                $loggerService->log(Log::PATIENT_STATUS_EDIT, $patientStatus->getId());
+                $patientStatus->setHistory($patientStatusHistory);
+                if (($key % $batchSize) === 0) {
+                    $em->flush();
+                    $loggerService->log(Log::PATIENT_STATUS_HISTORY_ADD, $patientStatusHistory->getId());
+                    $loggerService->log(Log::PATIENT_STATUS_EDIT, $patientStatus->getId());
+                }
             }
+            $em->flush();
             // Update confirm status
             $patientStatusImport->setConfirm(1);
             $em->flush();

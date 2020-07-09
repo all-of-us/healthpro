@@ -34,14 +34,14 @@ class PatientStatus
     private $awardee;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $history_id;
-
-    /**
      * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusHistory", mappedBy="patient_status")
      */
     private $patientStatusHistories;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\PatientStatusHistory", inversedBy="patientStatus", cascade={"persist", "remove"})
+     */
+    private $history;
 
     public function __construct()
     {
@@ -89,18 +89,6 @@ class PatientStatus
         return $this;
     }
 
-    public function getHistoryId(): ?int
-    {
-        return $this->history_id;
-    }
-
-    public function setHistoryId(?int $history_id): self
-    {
-        $this->history_id = $history_id;
-
-        return $this;
-    }
-
     /**
      * @return Collection|PatientStatusHistory[]
      */
@@ -128,6 +116,18 @@ class PatientStatus
                 $patientStatusHistory->setPatientStatus(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getHistory(): ?PatientStatusHistory
+    {
+        return $this->history;
+    }
+
+    public function setHistory(?PatientStatusHistory $history): self
+    {
+        $this->history = $history;
 
         return $this;
     }

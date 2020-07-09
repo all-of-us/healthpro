@@ -62,6 +62,11 @@ class PatientStatusHistory
      */
     private $rdr_status = 0;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\PatientStatus", mappedBy="history", cascade={"persist", "remove"})
+     */
+    private $patientStatus;
+
     public function getId(): ?int
     {
         return $this->id;
