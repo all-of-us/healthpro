@@ -96,6 +96,8 @@ class PatientStatusService
 
     public function deletePatientStatusTempData()
     {
-        $this->em->getRepository('patient_status_temp')->truncate();
+        $date = (new \DateTime('UTC'))->modify('-1 hours');
+        $date = $date->format('Y-m-d H:i:s');
+        $this->db->query("DELETE FROM patient_status_temp where created_ts < '$date'");
     }
 }

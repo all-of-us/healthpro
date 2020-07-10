@@ -37,6 +37,11 @@ class PatientStatusTemp
      */
     private $import;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created_ts;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -86,6 +91,18 @@ class PatientStatusTemp
     public function setImport(?PatientStatusImport $import): self
     {
         $this->import = $import;
+
+        return $this;
+    }
+
+    public function getCreatedTs(): ?\DateTimeInterface
+    {
+        return $this->created_ts;
+    }
+
+    public function setCreatedTs(\DateTimeInterface $created_ts): self
+    {
+        $this->created_ts = $created_ts;
 
         return $this;
     }
