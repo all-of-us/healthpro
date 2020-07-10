@@ -17,6 +17,11 @@ class PatientStatusImportService
         $fileHandle = fopen($file->getPathname(), 'r');
         $validStatus = array_values(PatientStatus::$patientStatus);
         $row = 1;
+        $file = file($file->getPathname(), FILE_SKIP_EMPTY_LINES);
+        if (count($file) > 5001) {
+            $form['patient_status_csv']->addError(new FormError("CSV file rows should not be greater than 5000"));
+            return;
+        }
         while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
             if ($row === 1) {
                 $row++;
