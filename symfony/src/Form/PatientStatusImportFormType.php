@@ -5,6 +5,7 @@ namespace App\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\File;
 
 class PatientStatusImportFormType extends AbstractType
 {
@@ -13,7 +14,10 @@ class PatientStatusImportFormType extends AbstractType
         $builder
             ->add('patient_status_csv', Type\FileType::class, [
                 'label' => 'Upload CSV File',
-                'required' => true
+                'required' => true,
+                'constraints' => new File([
+                    'maxSize' => '1M'
+                ])
             ])
             ->add('Save', Type\SubmitType::class, [
                 'attr' => ['class' => 'btn btn-primary'],

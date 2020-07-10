@@ -15,18 +15,28 @@ class PatientStatusImportService
     public function extractCsvFileData($file, &$form, &$patientStatuses)
     {
         $fileHandle = fopen($file->getPathname(), 'r');
+        $headers = fgetcsv($fileHandle, 0, ",");
+        $validHeaders = ['participantid', 'status', 'comments'];
+        if (count($headers) !== 3) {
+            $form['patient_status_csv']->addError(new FormError("Invalid file format"));
+            return;
+        }
+        foreach ($headers as $header) {
+            // Handle bom
+            $header = str_replace("\xEF\xBB\xBF", '', $header);
+            if (!in_array(str_replace(' ', '', strtolower($header)), $validHeaders)) {
+                $form['patient_status_csv']->addError(new FormError("Invalid column headers"));
+                return;
+            }
+        }
         $validStatus = array_values(PatientStatus::$patientStatus);
         $row = 1;
-        $file = file($file->getPathname(), FILE_SKIP_EMPTY_LINES);
-        if (count($file) > 5001) {
+        $csvFile = file($file->getPathname(), FILE_SKIP_EMPTY_LINES);
+        if (count($csvFile) > 5001) {
             $form['patient_status_csv']->addError(new FormError("CSV file rows should not be greater than 5000"));
             return;
         }
         while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
-            if ($row === 1) {
-                $row++;
-                continue;
-            }
             $patientStatus = [];
             if (!preg_match("/^P\d{9}+$/", $data[0])) {
                 $form['patient_status_csv']->addError(new FormError("Invalid participant ID Format {$data[0]} in line {$row}, column 1"));
