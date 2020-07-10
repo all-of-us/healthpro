@@ -4,7 +4,6 @@ CREATE TABLE `patient_status_temp` (
   `status` varchar(50) NOT NULL,
   `comments` text DEFAULT NULL,
   `import_id` int(11) NOT NULL,
-  `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`import_id`)
   REFERENCES patient_status_import(`id`)

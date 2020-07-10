@@ -39,7 +39,6 @@ class PatientStatusController extends AbstractController
             $patientStatusImportService->extractCsvFileData($file, $form, $patientStatuses);
             if ($form->isValid()) {
                 if (!empty($patientStatuses)) {
-                    $date = new \DateTime();
                     $organization = $em->getRepository(Organizations::class)->findOneBy(['id' => $session->get('siteOrganizationId')]);
                     $patientStatusImport = new PatientStatusImport();
                     $patientStatusImport->setFileName($fileName);
@@ -47,7 +46,7 @@ class PatientStatusController extends AbstractController
                     $patientStatusImport->setAwardee($session->get('siteAwardeeId'));
                     $patientStatusImport->setUserId($this->getUser()->getId());
                     $patientStatusImport->setSite($session->get('site')->id);
-                    $patientStatusImport->setCreatedTs($date);
+                    $patientStatusImport->setCreatedTs(new \DateTime());
                     $em->persist($patientStatusImport);
                     $batchSize = 50;
                     foreach ($patientStatuses as $key => $patientStatus) {
@@ -56,7 +55,6 @@ class PatientStatusController extends AbstractController
                         $patientStatusTemp->setStatus($patientStatus['status']);
                         $patientStatusTemp->setComments($patientStatus['comments']);
                         $patientStatusTemp->setImport($patientStatusImport);
-                        $patientStatusTemp->setCreatedTs($date);
                         $em->persist($patientStatusTemp);
                         if (($key % $batchSize) === 0) {
                             $em->flush();

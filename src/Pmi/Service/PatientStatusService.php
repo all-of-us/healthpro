@@ -98,6 +98,6 @@ class PatientStatusService
     {
         $date = (new \DateTime('UTC'))->modify('-1 hours');
         $date = $date->format('Y-m-d H:i:s');
-        $this->db->query("DELETE FROM patient_status_temp where created_ts < '$date'");
+        $this->db->query("DELETE pst FROM patient_status_temp pst inner join patient_status_import psi on pst.import_id = psi.id where psi.created_ts < '$date'");
     }
 }
