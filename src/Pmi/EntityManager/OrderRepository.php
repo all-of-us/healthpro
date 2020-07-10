@@ -3,6 +3,7 @@
 namespace Pmi\EntityManager;
 
 use Pmi\Order\Order;
+use Pmi\Review\Review;
 
 class OrderRepository extends DoctrineRepository
 {
@@ -32,7 +33,7 @@ class OrderRepository extends DoctrineRepository
                    oh.order_id AS oh_order_id,
                    oh.user_id AS oh_user_id,
                    oh.site AS oh_site,
-                   oh.type AS oh_type,
+                   oh.type AS h_type,
                    oh.created_ts AS oh_created_ts,
                    s.name as created_site_name,
                    sc.name as collected_site_name,
@@ -44,14 +45,22 @@ class OrderRepository extends DoctrineRepository
             LEFT JOIN sites sc ON sc.site_id = o.collected_site
             LEFT JOIN sites sp ON sp.site_id = o.processed_site
             LEFT JOIN sites sf ON sf.site_id = o.finalized_site
-            WHERE o.finalized_ts IS NULL
+            WHERE (o.finalized_ts IS NULL OR o.biobank_finalized = 1)
               AND (oh.type != :type
               OR oh.type IS NULL)
             ORDER BY o.created_ts DESC
         ";
-        return $this->dbal->fetchAll($ordersQuery, [
+        $orders = $this->dbal->fetchAll($ordersQuery, [
             'type' => Order::ORDER_CANCEL
         ]);
+        foreach ($orders as $key => $order) {
+            foreach (Review::$orderStatus as $field => $status) {
+                if ($order[$field]) {
+                    $orders[$key]['orderStatus'] = Review::getOrderStatus($order, $status);
+                }
+            }
+        }
+        return $orders;
     }
 
     public function getSiteUnfinalizedOrders($siteId)
