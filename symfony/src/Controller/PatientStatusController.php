@@ -91,7 +91,7 @@ class PatientStatusController extends AbstractController
         }
         $form = $this->createForm(PatientStatusImportConfirmFormType::class);
         $form->handleRequest($request);
-        $importPatientStatuses = $patientStatusImport->getPatientStatusTemps();
+        $importPatientStatuses = $patientStatusImport->getPatientStatusTemps()->slice(0,100);
         if ($form->isSubmitted() && $form->isValid()) {
             if ($form->get('Confirm')->isClicked()) {
                 $batchSize = 50;
@@ -149,7 +149,8 @@ class PatientStatusController extends AbstractController
         }
         return $this->render('patientstatus/confirmation.html.twig', [
             'patientStatuses' => $importPatientStatuses,
-            'importConfirmForm' => $form->createView()
+            'importConfirmForm' => $form->createView(),
+            'rowsCount' => count($patientStatusImport->getPatientStatusTemps())
         ]);
     }
 
