@@ -91,49 +91,58 @@ class PatientStatusController extends AbstractController
         $form->handleRequest($request);
         $importPatientStatuses = $patientStatusImport->getPatientStatusTemps();
         if ($form->isSubmitted() && $form->isValid()) {
-            $batchSize = 50;
-            foreach ($importPatientStatuses as $key => $importPatientStatus) {
-                $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
-                    'participant_id' => $importPatientStatus->getParticipantId(),
-                    'organization' => $patientStatusImport->getOrganization()->getName()
-                ]);
-                if (!$patientStatus) {
-                    $patientStatus = new PatientStatus();
-                    $patientStatus->setParticipantId($importPatientStatus->getParticipantId());
-                    $patientStatus->setAwardee($patientStatusImport->getAwardee());
-                    $patientStatus->setOrganization($patientStatusImport->getOrganization()->getName());
-                    $em->persist($patientStatus);
-                }
-                $patientStatusHistory = new PatientStatusHistory();
-                $patientStatusHistory->setUserId($patientStatusImport->getUserId());
-                $patientStatusHistory->setSite($patientStatusImport->getSite());
-                $patientStatusHistory->setStatus($importPatientStatus->getStatus());
-                $patientStatusHistory->setComments($importPatientStatus->getComments());
-                $patientStatusHistory->setCreatedTs(new \DateTime());
-                $patientStatusHistory->setPatientStatus($patientStatus);
-                $patientStatusHistory->setImport($patientStatusImport);
-                $em->persist($patientStatusHistory);
+            if ($form->get('Confirm')->isClicked()) {
+                $batchSize = 50;
+                foreach ($importPatientStatuses as $key => $importPatientStatus) {
+                    $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
+                        'participant_id' => $importPatientStatus->getParticipantId(),
+                        'organization' => $patientStatusImport->getOrganization()->getName()
+                    ]);
+                    if (!$patientStatus) {
+                        $patientStatus = new PatientStatus();
+                        $patientStatus->setParticipantId($importPatientStatus->getParticipantId());
+                        $patientStatus->setAwardee($patientStatusImport->getAwardee());
+                        $patientStatus->setOrganization($patientStatusImport->getOrganization()->getName());
+                        $em->persist($patientStatus);
+                    }
+                    $patientStatusHistory = new PatientStatusHistory();
+                    $patientStatusHistory->setUserId($patientStatusImport->getUserId());
+                    $patientStatusHistory->setSite($patientStatusImport->getSite());
+                    $patientStatusHistory->setStatus($importPatientStatus->getStatus());
+                    $patientStatusHistory->setComments($importPatientStatus->getComments());
+                    $patientStatusHistory->setCreatedTs(new \DateTime());
+                    $patientStatusHistory->setPatientStatus($patientStatus);
+                    $patientStatusHistory->setImport($patientStatusImport);
+                    $em->persist($patientStatusHistory);
 
-                // Update history id in patient_status table
-                $patientStatus->setHistory($patientStatusHistory);
-                if (($key % $batchSize) === 0) {
-                    $em->flush();
-                    $loggerService->log(Log::PATIENT_STATUS_HISTORY_ADD, $patientStatusHistory->getId());
-                    $loggerService->log(Log::PATIENT_STATUS_EDIT, $patientStatus->getId());
-                    $em->clear(PatientStatusHistory::class);
-                    $em->clear(PatientStatus::class);
+                    // Update history id in patient_status table
+                    $patientStatus->setHistory($patientStatusHistory);
+                    if (($key % $batchSize) === 0) {
+                        $em->flush();
+                        $loggerService->log(Log::PATIENT_STATUS_HISTORY_ADD, $patientStatusHistory->getId());
+                        $loggerService->log(Log::PATIENT_STATUS_EDIT, $patientStatus->getId());
+                        $em->clear(PatientStatusHistory::class);
+                        $em->clear(PatientStatus::class);
+                    }
                 }
+                $em->flush();
+                // Update confirm status
+                $patientStatusImport->setConfirm(1);
+                $em->flush();
+                $loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $patientStatusImport->getId());
+                $em->clear();
+                $this->addFlash(
+                    'success',
+                    'Successfully Imported!'
+                );
+            } else {
+                $this->addFlash(
+                    'notice',
+                    'Import status canceled!'
+                );
+                $em->remove($patientStatusImport);
+                $em->flush();
             }
-            $em->flush();
-            // Update confirm status
-            $patientStatusImport->setConfirm(1);
-            $em->flush();
-            $loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $patientStatusImport->getId());
-            $em->clear();
-            $this->addFlash(
-                'success',
-                'Successfully Imported!'
-            );
             return $this->redirectToRoute('patientStatusImport');
         }
         return $this->render('patientstatus/confirmation.html.twig', [

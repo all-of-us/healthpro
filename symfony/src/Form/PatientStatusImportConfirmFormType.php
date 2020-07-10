@@ -13,6 +13,9 @@ class PatientStatusImportConfirmFormType extends AbstractType
         $builder
             ->add('Confirm', Type\SubmitType::class, [
                 'attr' => ['class' => 'btn btn-primary'],
+            ])
+            ->add('Cancel', Type\SubmitType::class, [
+                'attr' => ['class' => 'btn btn-danger'],
             ]);
     }
 }

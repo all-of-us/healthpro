@@ -29,6 +29,7 @@
         <div class="col-md-12">
             {{ form_start(importConfirmForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(importConfirmForm) }}
+            {{ form_widget(importConfirmForm.Confirm) }} {{ form_widget(importConfirmForm.Cancel) }}
             {{ form_rest(importConfirmForm) }}
             {{ form_end(importConfirmForm) }}
         </div>

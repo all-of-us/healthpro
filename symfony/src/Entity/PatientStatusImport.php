@@ -49,7 +49,7 @@ class PatientStatusImport
     private $import_status = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusTemp", mappedBy="import")
+     * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusTemp", mappedBy="import", cascade={"persist", "remove"})
      */
     private $patientStatusTemps;
 
