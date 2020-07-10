@@ -16,7 +16,7 @@ class PatientStatusImportFormType extends AbstractType
                 'label' => 'Upload CSV File',
                 'required' => true,
                 'constraints' => new File([
-                    'maxSize' => '1M'
+                    'maxSize' => '5M'
                 ])
             ])
             ->add('Save', Type\SubmitType::class, [
