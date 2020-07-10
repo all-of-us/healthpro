@@ -37,11 +37,15 @@ $(document).ready(function () {
                     } else {
                         var html = '<i class="fa fa-times text-danger" aria-hidden="true"></i> Failed';
                         if (status === 2) {
-                            return html + ' <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Invalid Participant Id"></i>';
+                            return html + ' <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Invalid Participant Id"></i>';
                         }
                     }
                 }
             }
         ]
+    });
+
+    $('table').tooltip({
+        selector: '[data-toggle="tooltip"]'
     });
 });
