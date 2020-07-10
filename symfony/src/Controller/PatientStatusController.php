@@ -7,7 +7,7 @@ use App\Entity\PatientStatus;
 use App\Entity\PatientStatusHistory;
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusTemp;
-use App\Service\CsvFileHandler;
+use App\Service\PatientStatusImportService;
 use App\Service\LoggerService;
 use App\Form\PatientStatusImportFormType;
 use App\Form\PatientStatusImportConfirmFormType;
@@ -28,7 +28,7 @@ class PatientStatusController extends AbstractController
     /**
      * @Route("/patient/status/import", name="patientStatusImport", methods={"GET","POST"})
      */
-    public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em, LoggerService $loggerService, CsvFileHandler $csvFileHandler)
+    public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em, LoggerService $loggerService, PatientStatusImportService $patientStatusImportService)
     {
         $form = $this->createForm(PatientStatusImportFormType::class);
         $form->handleRequest($request);
@@ -36,7 +36,7 @@ class PatientStatusController extends AbstractController
             $file = $form['patient_status_csv']->getData();
             $fileName = $file->getClientOriginalName();
             $patientStatuses = [];
-            $csvFileHandler->extractCsvFileData($file, $form, $patientStatuses);
+            $patientStatusImportService->extractCsvFileData($file, $form, $patientStatuses);
             if ($form->isValid()) {
                 if (!empty($patientStatuses)) {
                     $date = new \DateTime();
@@ -156,7 +156,7 @@ class PatientStatusController extends AbstractController
     /**
      * @Route("/patient/status/import/{id}", name="patientStatusImportDetails", methods={"GET", "POST"})
      */
-    public function patientStatusImportDetails(int $id, Request $request, EntityManagerInterface $em)
+    public function patientStatusImportDetails(int $id, Request $request, EntityManagerInterface $em, PatientStatusImportService $patientStatusImportService)
     {
         $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'user_id' => $this->getUser()->getId(), 'confirm' => 1]);
         if (empty($patientStatusImport)) {
@@ -167,16 +167,7 @@ class PatientStatusController extends AbstractController
             $params = $request->request->all();
             $patientStatusHistories = $patientStatusImport->getPatientStatusHistories()->slice($params['start'], $params['length']);
             $ajaxData = [];
-            foreach ($patientStatusHistories as $patientStatusHistory) {
-                $data = [];
-                $data['participantId'] = $patientStatusHistory->getPatientStatus()->getParticipantId();
-                $data['patientStatus'] = $patientStatusHistory->getStatus();
-                $data['comments'] = $patientStatusHistory->getComments();
-                $data['organizationName'] = $patientStatusImport->getOrganization()->getName();
-                $data['createdTs'] = $patientStatusHistory->getCreatedTs()->setTimezone(new \DateTimeZone($this->getUser()->getInfo()['timezone']))->format('n/j/Y g:ia');
-                $data['status'] = $patientStatusHistory->getRdrStatus();
-                $ajaxData['data'][] = $data;
-            }
+            $ajaxData['data'] = $patientStatusImportService->getAjaxData($patientStatusHistories, $patientStatusImport->getOrganization());
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($patientStatusImport->getPatientStatusHistories());
             return new JsonResponse($ajaxData, 200);
         } else {

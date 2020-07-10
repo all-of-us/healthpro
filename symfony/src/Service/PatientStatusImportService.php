@@ -5,8 +5,12 @@ namespace App\Service;
 use Pmi\PatientStatus\PatientStatus;
 use Symfony\Component\Form\FormError;
 
-class CsvFileHandler
+class PatientStatusImportService
 {
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
 
     public function extractCsvFileData($file, &$form, &$patientStatuses)
     {
@@ -31,5 +35,21 @@ class CsvFileHandler
             $patientStatuses[] = $patientStatus;
             $row++;
         }
+    }
+
+    public function getAjaxData($patientStatusHistories, $organization)
+    {
+        $rows = [];
+        foreach ($patientStatusHistories as $patientStatusHistory) {
+            $row = [];
+            $row['participantId'] = $patientStatusHistory->getPatientStatus()->getParticipantId();
+            $row['patientStatus'] = $patientStatusHistory->getStatus();
+            $row['comments'] = $patientStatusHistory->getComments();
+            $row['organizationName'] = $organization->getName() . " ({$organization->getId()})";
+            $row['createdTs'] = $patientStatusHistory->getCreatedTs()->setTimezone(new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']))->format('n/j/Y g:ia');
+            $row['status'] = $patientStatusHistory->getRdrStatus();
+            array_push($rows, $row);
+        }
+        return $rows;
     }
 }
