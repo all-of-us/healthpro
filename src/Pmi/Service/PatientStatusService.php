@@ -52,7 +52,7 @@ class PatientStatusService
             $patientStatusObj->loadDataFromDb($patientStatusHistory);
             if ($patientStatusObj->sendToRdr()) {
                 // Set rdr_status = 1 for success
-                $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_ts' => new \DateTime(), 'rdr_status' => PatientStatusHistory::STATUS_1]);
+                $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_ts' => new \DateTime(), 'rdr_status' => PatientStatusHistory::STATUS_SUCCESS]);
                 $this->app->log(Log::PATIENT_STATUS_HISTORY_EDIT, [
                     'id' => $patientStatusHistory['id']
                 ]);
@@ -62,11 +62,11 @@ class PatientStatusService
                 // 2 = RDR 400 (Invalid participant id)
                 // 3 = RDR 500 (Invalid patient status)
                 // 4 = Other RDR errors
-                $rdrStatus = PatientStatusHistory::STATUS_4;
+                $rdrStatus = PatientStatusHistory::STATUS_OTHER_RDR_ERRORS;
                 if ($this->rdr->getLastErrorCode() === 400) {
-                    $rdrStatus = PatientStatusHistory::STATUS_2;
+                    $rdrStatus = PatientStatusHistory::STATUS_INVALID_PARTICIPANT_ID;
                 } elseif ($this->rdr->getLastErrorCode() === 500) {
-                    $rdrStatus = PatientStatusHistory::STATUS_3;
+                    $rdrStatus = PatientStatusHistory::STATUS_RDR_INTERNAL_SERVER_ERROR;
                 }
                 $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_status' => $rdrStatus]);
             }

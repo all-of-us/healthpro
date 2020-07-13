@@ -67,18 +67,10 @@ class PatientStatusHistory
      */
     private $patientStatusRecords;
 
-    /**
-     * RDR status
-     * 1 = success
-     * 2 = RDR 400 (Invalid participant id)
-     * 3 = RDR 500 (Invalid patient status and other RDR 500 errors)
-     * 4 = Other RDR errors
-     */
-
-    const STATUS_1 = 1;
-    const STATUS_2 = 2;
-    const STATUS_3 = 3;
-    const STATUS_4 = 4;
+    const STATUS_SUCCESS = 1;
+    const STATUS_INVALID_PARTICIPANT_ID = 2;
+    const STATUS_RDR_INTERNAL_SERVER_ERROR = 3;
+    const STATUS_OTHER_RDR_ERRORS = 4;
 
     public function getId(): ?int
     {
