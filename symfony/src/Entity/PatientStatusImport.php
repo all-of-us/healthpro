@@ -21,12 +21,12 @@ class PatientStatusImport
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $file_name;
+    private $fileName;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $user_id;
+    private $userId;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -41,12 +41,12 @@ class PatientStatusImport
     /**
      * @ORM\Column(type="datetime")
      */
-    private $created_ts;
+    private $createdTs;
 
     /**
      * @ORM\Column(type="smallint", options={"default":0})
      */
-    private $import_status = 0;
+    private $importStatus = 0;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusTemp", mappedBy="import", cascade={"persist", "remove"})
@@ -82,12 +82,12 @@ class PatientStatusImport
 
     public function getFileName(): ?string
     {
-        return $this->file_name;
+        return $this->fileName;
     }
 
-    public function setFileName(string $file_name): self
+    public function setFileName(string $fileName): self
     {
-        $this->file_name = $file_name;
+        $this->fileName = $fileName;
 
         return $this;
     }
@@ -106,12 +106,12 @@ class PatientStatusImport
 
     public function getUserId(): ?int
     {
-        return $this->user_id;
+        return $this->userId;
     }
 
-    public function setUserId(int $user_id): self
+    public function setUserId(int $userId): self
     {
-        $this->user_id = $user_id;
+        $this->userId = $userId;
 
         return $this;
     }
@@ -130,24 +130,24 @@ class PatientStatusImport
 
     public function getCreatedTs(): ?\DateTimeInterface
     {
-        return $this->created_ts;
+        return $this->createdTs;
     }
 
-    public function setCreatedTs(\DateTimeInterface $created_ts): self
+    public function setCreatedTs(\DateTimeInterface $createdTs): self
     {
-        $this->created_ts = $created_ts;
+        $this->createdTs = $createdTs;
 
         return $this;
     }
 
     public function getImportStatus(): ?int
     {
-        return $this->import_status;
+        return $this->importStatus;
     }
 
-    public function setImportStatus(?int $import_status): self
+    public function setImportStatus(?int $importStatus): self
     {
-        $this->import_status = $import_status;
+        $this->importStatus = $importStatus;
 
         return $this;
     }

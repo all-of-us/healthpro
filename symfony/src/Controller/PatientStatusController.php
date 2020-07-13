@@ -73,7 +73,7 @@ class PatientStatusController extends AbstractController
                 $form->addError(new FormError('Please correct the errors below'));
             }
         }
-        $patientStatusImports = $em->getRepository(PatientStatusImport::class)->findBy(['user_id' => $this->getUser()->getId(), 'confirm' => 1], ['id' => 'DESC']);
+        $patientStatusImports = $em->getRepository(PatientStatusImport::class)->findBy(['userId' => $this->getUser()->getId(), 'confirm' => 1], ['id' => 'DESC']);
         return $this->render('patientstatus/import.html.twig', [
             'importForm' => $form->createView(),
             'imports' => $patientStatusImports
@@ -85,7 +85,7 @@ class PatientStatusController extends AbstractController
      */
     public function patientStatusImportConfirmation(int $id, Request $request, EntityManagerInterface $em, LoggerService $loggerService)
     {
-        $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'user_id' => $this->getUser()->getId(), 'confirm' => 0]);
+        $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'userId' => $this->getUser()->getId(), 'confirm' => 0]);
         if (empty($patientStatusImport)) {
             throw $this->createNotFoundException('Page Not Found!');
         }
@@ -97,7 +97,7 @@ class PatientStatusController extends AbstractController
                 $batchSize = 50;
                 foreach ($importPatientStatuses as $key => $importPatientStatus) {
                     $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
-                        'participant_id' => $importPatientStatus->getParticipantId(),
+                        'participantId' => $importPatientStatus->getParticipantId(),
                         'organization' => $patientStatusImport->getOrganization()->getName()
                     ]);
                     if (!$patientStatus) {
@@ -161,7 +161,7 @@ class PatientStatusController extends AbstractController
      */
     public function patientStatusImportDetails(int $id, Request $request, EntityManagerInterface $em, PatientStatusImportService $patientStatusImportService)
     {
-        $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'user_id' => $this->getUser()->getId(), 'confirm' => 1]);
+        $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'userId' => $this->getUser()->getId(), 'confirm' => 1]);
         if (empty($patientStatusImport)) {
             throw $this->createNotFoundException('Page Not Found!');
         }

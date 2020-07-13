@@ -19,7 +19,7 @@ class PatientStatusHistory
     /**
      * @ORM\Column(type="integer")
      */
-    private $user_id;
+    private $userId;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -39,7 +39,7 @@ class PatientStatusHistory
     /**
      * @ORM\Column(type="datetime")
      */
-    private $created_ts;
+    private $createdTs;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -50,7 +50,7 @@ class PatientStatusHistory
      * @ORM\ManyToOne(targetEntity="App\Entity\PatientStatus", inversedBy="patientStatusHistories")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $patient_status;
+    private $patientStatus;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\PatientStatusImport", inversedBy="patientStatusHistories")
@@ -60,12 +60,12 @@ class PatientStatusHistory
     /**
      * @ORM\Column(type="smallint", options={"default":0})
      */
-    private $rdr_status = 0;
+    private $rdrStatus = 0;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\PatientStatus", mappedBy="history", cascade={"persist", "remove"})
      */
-    private $patientStatus;
+    private $patientStatusRecords;
 
     /**
      * RDR status
@@ -87,12 +87,12 @@ class PatientStatusHistory
 
     public function getUserId(): ?int
     {
-        return $this->user_id;
+        return $this->userId;
     }
 
-    public function setUserId(int $user_id): self
+    public function setUserId(int $userId): self
     {
-        $this->user_id = $user_id;
+        $this->userId = $userId;
 
         return $this;
     }
@@ -135,12 +135,12 @@ class PatientStatusHistory
 
     public function getCreatedTs(): ?\DateTimeInterface
     {
-        return $this->created_ts;
+        return $this->createdTs;
     }
 
-    public function setCreatedTs(\DateTimeInterface $created_ts): self
+    public function setCreatedTs(\DateTimeInterface $createdTs): self
     {
-        $this->created_ts = $created_ts;
+        $this->createdTs = $createdTs;
 
         return $this;
     }
@@ -159,12 +159,12 @@ class PatientStatusHistory
 
     public function getPatientStatus(): ?PatientStatus
     {
-        return $this->patient_status;
+        return $this->patientStatus;
     }
 
-    public function setPatientStatus(?PatientStatus $patient_status): self
+    public function setPatientStatus(?PatientStatus $patientStatus): self
     {
-        $this->patient_status = $patient_status;
+        $this->patientStatus = $patientStatus;
 
         return $this;
     }
@@ -183,12 +183,30 @@ class PatientStatusHistory
 
     public function getRdrStatus(): ?int
     {
-        return $this->rdr_status;
+        return $this->rdrStatus;
     }
 
-    public function setRdrStatus(int $rdr_status): self
+    public function setRdrStatus(int $rdrStatus): self
     {
-        $this->rdr_status = $rdr_status;
+        $this->rdrStatus = $rdrStatus;
+
+        return $this;
+    }
+
+    public function getPatientStatusRecords(): ?PatientStatus
+    {
+        return $this->patientStatusRecords;
+    }
+
+    public function setPatientStatusRecords(?PatientStatus $patientStatusRecords): self
+    {
+        $this->patientStatusRecords = $patientStatusRecords;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newHistory = null === $patientStatusRecords ? null : $this;
+        if ($patientStatusRecords->getHistory() !== $newHistory) {
+            $patientStatusRecords->setHistory($newHistory);
+        }
 
         return $this;
     }

@@ -19,7 +19,7 @@ class PatientStatusTemp
     /**
      * @ORM\Column(type="string", length=50)
      */
-    private $participant_id;
+    private $participantId;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -44,12 +44,12 @@ class PatientStatusTemp
 
     public function getParticipantId(): ?string
     {
-        return $this->participant_id;
+        return $this->participantId;
     }
 
-    public function setParticipantId(string $participant_id): self
+    public function setParticipantId(string $participantId): self
     {
-        $this->participant_id = $participant_id;
+        $this->participantId = $participantId;
 
         return $this;
     }

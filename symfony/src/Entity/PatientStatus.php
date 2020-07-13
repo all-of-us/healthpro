@@ -21,7 +21,7 @@ class PatientStatus
     /**
      * @ORM\Column(type="string", length=50)
      */
-    private $participant_id;
+    private $participantId;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -39,7 +39,7 @@ class PatientStatus
     private $patientStatusHistories;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\PatientStatusHistory", inversedBy="patientStatus", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\PatientStatusHistory", inversedBy="patientStatusRecords", cascade={"persist", "remove"})
      */
     private $history;
 
@@ -55,12 +55,12 @@ class PatientStatus
 
     public function getParticipantId(): ?string
     {
-        return $this->participant_id;
+        return $this->participantId;
     }
 
-    public function setParticipantId(string $participant_id): self
+    public function setParticipantId(string $participantId): self
     {
-        $this->participant_id = $participant_id;
+        $this->participantId = $participantId;
 
         return $this;
     }
