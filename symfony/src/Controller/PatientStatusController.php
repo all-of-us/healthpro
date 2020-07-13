@@ -41,20 +41,22 @@ class PatientStatusController extends AbstractController
                 if (!empty($patientStatuses)) {
                     $organization = $em->getRepository(Organizations::class)->findOneBy(['id' => $session->get('siteOrganizationId')]);
                     $patientStatusImport = new PatientStatusImport();
-                    $patientStatusImport->setFileName($fileName);
-                    $patientStatusImport->setOrganization($organization);
-                    $patientStatusImport->setAwardee($session->get('siteAwardeeId'));
-                    $patientStatusImport->setUserId($this->getUser()->getId());
-                    $patientStatusImport->setSite($session->get('site')->id);
-                    $patientStatusImport->setCreatedTs(new \DateTime());
+                    $patientStatusImport
+                        ->setFileName($fileName)
+                        ->setOrganization($organization)
+                        ->setAwardee($session->get('siteAwardeeId'))
+                        ->setUserId($this->getUser()->getId())
+                        ->setSite($session->get('site')->id)
+                        ->setCreatedTs(new \DateTime());
                     $em->persist($patientStatusImport);
                     $batchSize = 50;
                     foreach ($patientStatuses as $key => $patientStatus) {
                         $patientStatusTemp = new PatientStatusTemp();
-                        $patientStatusTemp->setParticipantId($patientStatus['participantId']);
-                        $patientStatusTemp->setStatus($patientStatus['status']);
-                        $patientStatusTemp->setComments($patientStatus['comments']);
-                        $patientStatusTemp->setImport($patientStatusImport);
+                        $patientStatusTemp
+                            ->setParticipantId($patientStatus['participantId'])
+                            ->setStatus($patientStatus['status'])
+                            ->setComments($patientStatus['comments'])
+                            ->setImport($patientStatusImport);
                         $em->persist($patientStatusTemp);
                         if (($key % $batchSize) === 0) {
                             $em->flush();
@@ -89,7 +91,7 @@ class PatientStatusController extends AbstractController
         }
         $form = $this->createForm(PatientStatusImportConfirmFormType::class);
         $form->handleRequest($request);
-        $importPatientStatuses = $patientStatusImport->getPatientStatusTemps()->slice(0,100);
+        $importPatientStatuses = $patientStatusImport->getPatientStatusTemps()->slice(0, 100);
         if ($form->isSubmitted() && $form->isValid()) {
             if ($form->get('Confirm')->isClicked()) {
                 $batchSize = 50;
@@ -100,19 +102,21 @@ class PatientStatusController extends AbstractController
                     ]);
                     if (!$patientStatus) {
                         $patientStatus = new PatientStatus();
-                        $patientStatus->setParticipantId($importPatientStatus->getParticipantId());
-                        $patientStatus->setAwardee($patientStatusImport->getAwardee());
-                        $patientStatus->setOrganization($patientStatusImport->getOrganization()->getName());
+                        $patientStatus
+                            ->setParticipantId($importPatientStatus->getParticipantId())
+                            ->setAwardee($patientStatusImport->getAwardee())
+                            ->setOrganization($patientStatusImport->getOrganization()->getName());
                         $em->persist($patientStatus);
                     }
                     $patientStatusHistory = new PatientStatusHistory();
-                    $patientStatusHistory->setUserId($patientStatusImport->getUserId());
-                    $patientStatusHistory->setSite($patientStatusImport->getSite());
-                    $patientStatusHistory->setStatus($importPatientStatus->getStatus());
-                    $patientStatusHistory->setComments($importPatientStatus->getComments());
-                    $patientStatusHistory->setCreatedTs(new \DateTime());
-                    $patientStatusHistory->setPatientStatus($patientStatus);
-                    $patientStatusHistory->setImport($patientStatusImport);
+                    $patientStatusHistory
+                        ->setUserId($patientStatusImport->getUserId())
+                        ->setSite($patientStatusImport->getSite())
+                        ->setStatus($importPatientStatus->getStatus())
+                        ->setComments($importPatientStatus->getComments())
+                        ->setCreatedTs(new \DateTime())
+                        ->setPatientStatus($patientStatus)
+                        ->setImport($patientStatusImport);
                     $em->persist($patientStatusHistory);
 
                     // Update history id in patient_status table
