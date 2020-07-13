@@ -28,6 +28,10 @@ services:
 
     Pmi\Datastore\DatastoreSessionHandler:
 
+    App\EventListener\RequestListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request }
+
     App\EventListener\ResponseListener:
         tags:
             - { name: kernel.event_listener, event: kernel.response }
