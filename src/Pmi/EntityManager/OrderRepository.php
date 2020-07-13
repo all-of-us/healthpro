@@ -45,13 +45,15 @@ class OrderRepository extends DoctrineRepository
             LEFT JOIN sites sc ON sc.site_id = o.collected_site
             LEFT JOIN sites sp ON sp.site_id = o.processed_site
             LEFT JOIN sites sf ON sf.site_id = o.finalized_site
-            WHERE (o.finalized_ts IS NULL OR o.biobank_finalized = 1)
-              AND (oh.type != :type
+            WHERE (o.finalized_ts IS NULL OR o.biobank_finalized = :biobankFinalized)
+              AND ((oh.type != :type1 AND oh.type != :type2)
               OR oh.type IS NULL)
             ORDER BY o.created_ts DESC
         ";
         $orders = $this->dbal->fetchAll($ordersQuery, [
-            'type' => Order::ORDER_CANCEL
+            'type1' => Order::ORDER_CANCEL,
+            'type2' => Order::ORDER_EDIT,
+            'biobankFinalized' => 1
         ]);
         foreach ($orders as $key => $order) {
             foreach (Review::$orderStatus as $field => $status) {
