@@ -172,7 +172,7 @@ class PatientStatusController extends AbstractController
             $ajaxData = [];
             $ajaxData['data'] = $patientStatusImportService->getAjaxData($patientStatusHistories, $patientStatusImport->getOrganization());
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($patientStatusImport->getPatientStatusHistories());
-            return new JsonResponse($ajaxData, 200);
+            return new JsonResponse($ajaxData);
         } else {
             return $this->render('patientstatus/import-details.html.twig');
         }
