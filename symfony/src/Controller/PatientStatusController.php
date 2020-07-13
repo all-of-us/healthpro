@@ -107,6 +107,7 @@ class PatientStatusController extends AbstractController
                             ->setAwardee($patientStatusImport->getAwardee())
                             ->setOrganization($patientStatusImport->getOrganization()->getName());
                         $em->persist($patientStatus);
+                        $em->flush();
                     }
                     $patientStatusHistory = new PatientStatusHistory();
                     $patientStatusHistory
@@ -142,7 +143,7 @@ class PatientStatusController extends AbstractController
             } else {
                 $this->addFlash(
                     'notice',
-                    'Import status canceled!'
+                    'Import canceled!'
                 );
                 $em->remove($patientStatusImport);
                 $em->flush();
