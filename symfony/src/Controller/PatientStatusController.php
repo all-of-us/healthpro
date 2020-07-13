@@ -124,8 +124,6 @@ class PatientStatusController extends AbstractController
                     $patientStatus->setHistory($patientStatusHistory);
                     if (($key % $batchSize) === 0) {
                         $em->flush();
-                        $loggerService->log(Log::PATIENT_STATUS_HISTORY_ADD, $patientStatusHistory->getId());
-                        $loggerService->log(Log::PATIENT_STATUS_EDIT, $patientStatus->getId());
                         $em->clear(PatientStatusHistory::class);
                         $em->clear(PatientStatus::class);
                     }
