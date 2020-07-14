@@ -14,12 +14,12 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displayConsentStatus(value, time, expireStatus = '', expireDate = '') %}
+{% macro displayConsentStatus(value, time, ehrExpireStatus = '', ehrExpireDate = '') %}
     {% if value == 'SUBMITTED' %}
-        {% if expireStatus == 'EXPIRED' %}
+        {% if ehrExpireStatus == 'EXPIRED' %}
             <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
-            {{ expireDate ? expireDate|date('n/j/Y', app.userTimezone) }} <br/>
-            (Expired)
+            {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
+            (Expired {{ ehrExpireDate ? ehrExpireDate|date('n/j/Y', app.userTimezone) }})
         {% else %}
             <i class="fa fa-check text-success" aria-hidden="true"></i>
             {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
