@@ -29,6 +29,7 @@ class WorkQueue
         'questionnaireOnDnaProgramAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
+        'ehrConsentExpireStatus',
         'consentForGenomicsRORAuthored',
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
@@ -336,6 +337,7 @@ class WorkQueue
             $row['questionnaireOnDnaProgram'] = $this->displayProgramUpdate($participant);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
+            $row['ehrConsentExpireStatus'] = $this->displayEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->ehrConsentExpireAuthored);
             $row['gRoRConsent'] = $this->displayGenomicsConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
             $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
@@ -475,6 +477,18 @@ class WorkQueue
                 return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Invalid)';
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
+        }
+    }
+
+    public function displayEhrConsentExpireStatus($value, $time, $displayTime = true)
+    {
+        switch ($value) {
+            case 'NOT_EXPIRED':
+                return self::HTML_SUCCESS . ' (Active)';
+            case 'EXPIRED':
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Expired)';
+            default:
+                return '';
         }
     }
 
