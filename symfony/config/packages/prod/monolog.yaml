@@ -5,8 +5,6 @@ monolog:
             ident: false
             facility: !php/const LOG_USER
             level: info
-            bubble: true
-            logopts: !php/const LOG_PERROR
         service:
             type: service
             id: App\Service\StackdriverHandler
