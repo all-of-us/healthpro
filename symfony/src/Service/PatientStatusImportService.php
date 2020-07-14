@@ -2,14 +2,18 @@
 
 namespace App\Service;
 
-use Pmi\PatientStatus\PatientStatus;
+use App\Entity\PatientStatusHistory;
+use App\Entity\PatientStatus;
+use Doctrine\ORM\EntityManagerInterface;
+use Pmi\PatientStatus\PatientStatus as PmiPatientStatus;
 use Symfony\Component\Form\FormError;
 
 class PatientStatusImportService
 {
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, EntityManagerInterface $em)
     {
         $this->userService = $userService;
+        $this->em = $em;
     }
 
     public function extractCsvFileData($file, &$form, &$patientStatuses)
@@ -29,7 +33,7 @@ class PatientStatusImportService
                 return;
             }
         }
-        $validStatus = array_values(PatientStatus::$patientStatus);
+        $validStatus = array_values(PmiPatientStatus::$patientStatus);
         $row = 1;
         $csvFile = file($file->getPathname(), FILE_SKIP_EMPTY_LINES);
         if (count($csvFile) > 5001) {
@@ -66,5 +70,27 @@ class PatientStatusImportService
             array_push($rows, $row);
         }
         return $rows;
+    }
+
+    public function insertPatientStatusHistory(&$patientStatusHistory, &$patientStatus, &$patientStatusImport, $i, $status, $comments)
+    {
+        $batchSize = 50;
+        $patientStatusHistory
+            ->setUserId($patientStatusImport->getUserId())
+            ->setSite($patientStatusImport->getSite())
+            ->setStatus($status)
+            ->setComments($comments)
+            ->setCreatedTs(new \DateTime())
+            ->setPatientStatus($patientStatus)
+            ->setImport($patientStatusImport);
+        $this->em->persist($patientStatusHistory);
+
+        // Update history id in patient_status table
+        $patientStatus->setHistory($patientStatusHistory);
+        if (($i % $batchSize) === 0) {
+            $this->em->flush();
+            $this->em->clear(PatientStatusHistory::class);
+            $this->em->clear(PatientStatus::class);
+        }
     }
 }

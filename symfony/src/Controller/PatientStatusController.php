@@ -83,7 +83,7 @@ class PatientStatusController extends AbstractController
     /**
      * @Route("/patient/status/confirmation/{id}", name="patientStatusImportConfirmation", methods={"GET", "POST"})
      */
-    public function patientStatusImportConfirmation(int $id, Request $request, EntityManagerInterface $em, LoggerService $loggerService)
+    public function patientStatusImportConfirmation(int $id, Request $request, EntityManagerInterface $em, LoggerService $loggerService, PatientStatusImportService $patientStatusImportService)
     {
         $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'userId' => $this->getUser()->getId(), 'confirm' => 0]);
         if (empty($patientStatusImport)) {
@@ -95,7 +95,6 @@ class PatientStatusController extends AbstractController
             if ($form->get('Confirm')->isClicked()) {
                 $importPatientStatuses = $patientStatusImport->getPatientStatusTemps();
                 $newImportPatientStatuses = [];
-                $batchSize = 50;
                 $i = 0;
                 foreach ($importPatientStatuses as $importPatientStatus) {
                     $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
@@ -110,26 +109,15 @@ class PatientStatusController extends AbstractController
                         continue;
                     }
                     $patientStatusHistory = new PatientStatusHistory();
-                    $patientStatusHistory
-                        ->setUserId($patientStatusImport->getUserId())
-                        ->setSite($patientStatusImport->getSite())
-                        ->setStatus($importPatientStatus->getStatus())
-                        ->setComments($importPatientStatus->getComments())
-                        ->setCreatedTs(new \DateTime())
-                        ->setPatientStatus($patientStatus)
-                        ->setImport($patientStatusImport);
-                    $em->persist($patientStatusHistory);
-
-                    // Update history id in patient_status table
-                    $patientStatus->setHistory($patientStatusHistory);
-                    if (($i % $batchSize) === 0) {
-                        $em->flush();
-                        $em->clear(PatientStatusHistory::class);
-                        $em->clear(PatientStatus::class);
-                    }
+                    $patientStatusImportService->insertPatientStatusHistory($patientStatusHistory, $patientStatus, $patientStatusImport, $i, $importPatientStatus->getStatus(),
+                        $importPatientStatus->getComments());
                     $i++;
                 }
                 $em->flush();
+                $em->clear(PatientStatusHistory::class);
+                $em->clear(PatientStatus::class);
+
+                // Insert new patient statuses in patient status table
                 foreach ($newImportPatientStatuses as $key => $newImportPatientStatus) {
                     $patientStatus = new PatientStatus();
                     $patientStatus
@@ -139,23 +127,11 @@ class PatientStatusController extends AbstractController
                     $em->persist($patientStatus);
 
                     $patientStatusHistory = new PatientStatusHistory();
-                    $patientStatusHistory
-                        ->setUserId($patientStatusImport->getUserId())
-                        ->setSite($patientStatusImport->getSite())
-                        ->setStatus($newImportPatientStatus['status'])
-                        ->setComments($newImportPatientStatus['comments'])
-                        ->setCreatedTs(new \DateTime())
-                        ->setPatientStatus($patientStatus)
-                        ->setImport($patientStatusImport);
-                    $em->persist($patientStatusHistory);
-                    // Update history id in patient_status table
-                    if (($key % $batchSize) === 0) {
-                        $em->flush();
-                        $em->clear(PatientStatusHistory::class);
-                        $em->clear(PatientStatus::class);
-                    }
+                    $patientStatusImportService->insertPatientStatusHistory($patientStatusHistory, $patientStatus, $patientStatusImport, $key, $newImportPatientStatus['status'],
+                        $newImportPatientStatus['comments']);
                 }
                 $em->flush();
+
                 // Update confirm status
                 $patientStatusImport->setConfirm(1);
                 $em->flush();
