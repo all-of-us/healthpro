@@ -94,20 +94,20 @@ class PatientStatusController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             if ($form->get('Confirm')->isClicked()) {
                 $importPatientStatuses = $patientStatusImport->getPatientStatusTemps();
+                $newImportPatientStatuses = [];
                 $batchSize = 50;
-                foreach ($importPatientStatuses as $key => $importPatientStatus) {
+                $i = 0;
+                foreach ($importPatientStatuses as $importPatientStatus) {
                     $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
                         'participantId' => $importPatientStatus->getParticipantId(),
                         'organization' => $patientStatusImport->getOrganization()->getName()
                     ]);
                     if (!$patientStatus) {
-                        $patientStatus = new PatientStatus();
-                        $patientStatus
-                            ->setParticipantId($importPatientStatus->getParticipantId())
-                            ->setAwardee($patientStatusImport->getAwardee())
-                            ->setOrganization($patientStatusImport->getOrganization()->getName());
-                        $em->persist($patientStatus);
-                        $em->flush();
+                        $newImportPatientStatus['participantId'] = $importPatientStatus->getParticipantId();
+                        $newImportPatientStatus['status'] = $importPatientStatus->getStatus();
+                        $newImportPatientStatus['comments'] = $importPatientStatus->getComments();
+                        $newImportPatientStatuses[] = $newImportPatientStatus;
+                        continue;
                     }
                     $patientStatusHistory = new PatientStatusHistory();
                     $patientStatusHistory
@@ -122,6 +122,33 @@ class PatientStatusController extends AbstractController
 
                     // Update history id in patient_status table
                     $patientStatus->setHistory($patientStatusHistory);
+                    if (($i % $batchSize) === 0) {
+                        $em->flush();
+                        $em->clear(PatientStatusHistory::class);
+                        $em->clear(PatientStatus::class);
+                    }
+                    $i++;
+                }
+                $em->flush();
+                foreach ($newImportPatientStatuses as $key => $newImportPatientStatus) {
+                    $patientStatus = new PatientStatus();
+                    $patientStatus
+                        ->setParticipantId($newImportPatientStatus['participantId'])
+                        ->setAwardee($patientStatusImport->getAwardee())
+                        ->setOrganization($patientStatusImport->getOrganization()->getName());
+                    $em->persist($patientStatus);
+
+                    $patientStatusHistory = new PatientStatusHistory();
+                    $patientStatusHistory
+                        ->setUserId($patientStatusImport->getUserId())
+                        ->setSite($patientStatusImport->getSite())
+                        ->setStatus($newImportPatientStatus['status'])
+                        ->setComments($newImportPatientStatus['comments'])
+                        ->setCreatedTs(new \DateTime())
+                        ->setPatientStatus($patientStatus)
+                        ->setImport($patientStatusImport);
+                    $em->persist($patientStatusHistory);
+                    // Update history id in patient_status table
                     if (($key % $batchSize) === 0) {
                         $em->flush();
                         $em->clear(PatientStatusHistory::class);
