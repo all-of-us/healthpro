@@ -91,9 +91,9 @@ class PatientStatusController extends AbstractController
         }
         $form = $this->createForm(PatientStatusImportConfirmFormType::class);
         $form->handleRequest($request);
-        $importPatientStatuses = $patientStatusImport->getPatientStatusTemps()->slice(0, 100);
         if ($form->isSubmitted() && $form->isValid()) {
             if ($form->get('Confirm')->isClicked()) {
+                $importPatientStatuses = $patientStatusImport->getPatientStatusTemps();
                 $batchSize = 50;
                 foreach ($importPatientStatuses as $key => $importPatientStatus) {
                     $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
@@ -147,6 +147,8 @@ class PatientStatusController extends AbstractController
                 $em->flush();
             }
             return $this->redirectToRoute('patientStatusImport');
+        } else {
+            $importPatientStatuses = $patientStatusImport->getPatientStatusTemps()->slice(0, 100);
         }
         return $this->render('patientstatus/confirmation.html.twig', [
             'patientStatuses' => $importPatientStatuses,
