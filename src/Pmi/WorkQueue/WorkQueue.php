@@ -197,6 +197,13 @@ class WorkQueue
                 'Cohort 2 Pilot' => 'COHORT_2_PILOT',
                 'Cohort 3' => 'COHORT_3'
             ]
+        ],
+        'ehrConsentExpireStatus' => [
+            'label' => 'EHR Expiration Status',
+            'options' => [
+                'Active' => 'NOT_EXPIRED',
+                'Expired' => 'EXPIRED'
+            ]
         ]
     ];
 

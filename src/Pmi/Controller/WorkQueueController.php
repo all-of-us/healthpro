@@ -109,6 +109,9 @@ class WorkQueueController extends AbstractController
                 $rdrParams['consentCohort'] = $params['consentCohort'];
             }
         }
+        if (!empty($params['ehrConsentExpireStatus'])) {
+            $rdrParams['ehrConsentExpireStatus'] = $params['ehrConsentExpireStatus'];
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];
