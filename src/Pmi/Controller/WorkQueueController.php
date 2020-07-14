@@ -110,7 +110,12 @@ class WorkQueueController extends AbstractController
             }
         }
         if (!empty($params['ehrConsentExpireStatus'])) {
-            $rdrParams['ehrConsentExpireStatus'] = $params['ehrConsentExpireStatus'];
+            if ($params['ehrConsentExpireStatus'] === 'ACTIVE') {
+                $rdrParams['consentForElectronicHealthRecords'] = 'SUBMITTED';
+                $rdrParams['ehrConsentExpireStatus'] = 'UNSET';
+            } else {
+                $rdrParams['ehrConsentExpireStatus'] = $params['ehrConsentExpireStatus'];
+            }
         }
         // Add site prefix
         if (!empty($params['site'])) {
@@ -494,7 +499,7 @@ class WorkQueueController extends AbstractController
                         $row[] = $participant->consentCohortText;
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnDnaProgram);
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnDnaProgramAuthored"}, $app->getUserTimezone());
-                        $row[] = $participant->ehrConsentExpireStatus === 'EXPIRED' ? 1 : 0;
+                        $row[] = WorkQueue::csvEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords);
                         $row[] = WorkQueue::dateFromString($participant->{"ehrConsentExpireAuthored"}, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
