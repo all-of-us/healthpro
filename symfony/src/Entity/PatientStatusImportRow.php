@@ -5,9 +5,10 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\PatientStatusTempRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\PatientStatusImportRowRepository")
+ * @ORM\Table(name="patient_status_import_rows")
  */
-class PatientStatusTemp
+class PatientStatusImportRow
 {
     /**
      * @ORM\Id()
@@ -32,7 +33,7 @@ class PatientStatusTemp
     private $comments;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\PatientStatusImport", inversedBy="patientStatusTemps")
+     * @ORM\ManyToOne(targetEntity="App\Entity\PatientStatusImport", inversedBy="PatientStatusImportRows")
      * @ORM\JoinColumn(nullable=false)
      */
     private $import;

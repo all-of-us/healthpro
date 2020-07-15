@@ -49,9 +49,9 @@ class PatientStatusImport
     private $importStatus = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusTemp", mappedBy="import", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="PatientStatusImportRow", mappedBy="import", cascade={"persist", "remove"})
      */
-    private $patientStatusTemps;
+    private $PatientStatusImportRows;
 
     /**
      * @ORM\Column(type="smallint", options={"default":0})
@@ -74,7 +74,7 @@ class PatientStatusImport
 
     public function __construct()
     {
-        $this->patientStatusTemps = new ArrayCollection();
+        $this->PatientStatusImportRows = new ArrayCollection();
         $this->patientStatusHistories = new ArrayCollection();
     }
 
@@ -156,30 +156,30 @@ class PatientStatusImport
     }
 
     /**
-     * @return Collection|PatientStatusTemp[]
+     * @return Collection|PatientStatusImportRow[]
      */
-    public function getPatientStatusTemps(): Collection
+    public function getPatientStatusImportRows(): Collection
     {
-        return $this->patientStatusTemps;
+        return $this->PatientStatusImportRows;
     }
 
-    public function addPatientStatusTemp(PatientStatusTemp $patientStatusTemp): self
+    public function addPatientStatusImportRow(PatientStatusImportRow $PatientStatusImportRow): self
     {
-        if (!$this->patientStatusTemps->contains($patientStatusTemp)) {
-            $this->patientStatusTemps[] = $patientStatusTemp;
-            $patientStatusTemp->setImportId($this);
+        if (!$this->PatientStatusImportRows->contains($PatientStatusImportRow)) {
+            $this->PatientStatusImportRows[] = $PatientStatusImportRow;
+            $PatientStatusImportRow->setImportId($this);
         }
 
         return $this;
     }
 
-    public function removePatientStatusTemp(PatientStatusTemp $patientStatusTemp): self
+    public function removePatientStatusImportRow(PatientStatusImportRow $PatientStatusImportRow): self
     {
-        if ($this->patientStatusTemps->contains($patientStatusTemp)) {
-            $this->patientStatusTemps->removeElement($patientStatusTemp);
+        if ($this->PatientStatusImportRows->contains($PatientStatusImportRow)) {
+            $this->PatientStatusImportRows->removeElement($PatientStatusImportRow);
             // set the owning side to null (unless already changed)
-            if ($patientStatusTemp->getImportId() === $this) {
-                $patientStatusTemp->setImportId(null);
+            if ($PatientStatusImportRow->getImportId() === $this) {
+                $PatientStatusImportRow->setImportId(null);
             }
         }
 

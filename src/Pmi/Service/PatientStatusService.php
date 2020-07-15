@@ -25,7 +25,7 @@ class PatientStatusService
     {
         $limit = $this->app->getConfig('patient_status_queue_limit');
         $query = "
-            SELECT pst.*,
+            SELECT psir.*,
                    psi.site,
                    psi.created_ts as authored,
                    psi.organization,
@@ -33,12 +33,12 @@ class PatientStatusService
                    ps.id as patient_status_id,
                    u.id as user_id,
                    u.email as user_email
-            FROM patient_status_temp pst
-            INNER JOIN patient_status_import psi ON psi.id = pst.import_id AND psi.confirm = 1
-            LEFT JOIN patient_status ps ON ps.participant_id = pst.participant_id AND psi.organization = ps.organization
+            FROM patient_status_import_rows psir
+            INNER JOIN patient_status_import psi ON psi.id = psir.import_id AND psi.confirm = 1
+            LEFT JOIN patient_status ps ON ps.participant_id = psir.participant_id AND psi.organization = ps.organization
             LEFT JOIN users u ON psi.user_id = u.id
-            WHERE pst.rdr_status = 0
-            ORDER BY pst.id ASC
+            WHERE psir.rdr_status = 0
+            ORDER BY psir.id ASC
             limit {$limit}
         ";
         $patientStatuses = $this->em->fetchAll($query, []);
@@ -51,7 +51,7 @@ class PatientStatusService
             $patientStatusObj->loadDataFromImport($patientStatus);
             if ($patientStatusObj->sendToRdr()) {
                 if ($patientStatusObj->saveData()) {
-                    $this->em->getRepository('patient_status_temp')->update($patientStatus['id'], ['rdr_status' => PatientStatusHistory::STATUS_SUCCESS]);
+                    $this->em->getRepository('patient_status_import_rows')->update($patientStatus['id'], ['rdr_status' => PatientStatusHistory::STATUS_SUCCESS]);
                 }
             } else {
                 $this->app['logger']->error("#{$patientStatus['id']} failed sending to RDR: " . $this->rdr->getLastError());
@@ -61,7 +61,7 @@ class PatientStatusService
                 } elseif ($this->rdr->getLastErrorCode() === 500) {
                     $rdrStatus = PatientStatusHistory::STATUS_RDR_INTERNAL_SERVER_ERROR;
                 }
-                $this->em->getRepository('patient_status_temp')->update($patientStatus['id'], ['rdr_status' => $rdrStatus]);
+                $this->em->getRepository('patient_status_import_rows')->update($patientStatus['id'], ['rdr_status' => $rdrStatus]);
             }
         }
         // Update import status
@@ -71,10 +71,10 @@ class PatientStatusService
     private function updateImportStatus($importIds)
     {
         foreach ($importIds as $importId) {
-            $query = "SELECT COUNT(*) AS count FROM patient_status_temp WHERE import_id = :importId AND rdr_status = 0";
+            $query = "SELECT COUNT(*) AS count FROM patient_status_import_rows WHERE import_id = :importId AND rdr_status = 0";
             $patientStatusHistory = $this->em->fetchAll($query, ['importId' => $importId]);
             if ($patientStatusHistory[0]['count'] == 0) {
-                $query = "SELECT COUNT(*) AS count FROM patient_status_temp WHERE import_id = :importId AND rdr_status IN (2, 3, 4)";
+                $query = "SELECT COUNT(*) AS count FROM patient_status_import_rows WHERE import_id = :importId AND rdr_status IN (2, 3, 4)";
                 $patientStatusHistory = $this->em->fetchAll($query, ['importId' => $importId]);
                 if ($patientStatusHistory[0]['count'] > 0) {
                     $this->em->getRepository('patient_status_import')->update($importId, ['import_status' => PatientStatusImport::COMPLETE_WITH_ERRORS]);
@@ -90,6 +90,6 @@ class PatientStatusService
     {
         $date = (new \DateTime('UTC'))->modify('-1 hours');
         $date = $date->format('Y-m-d H:i:s');
-        $this->db->query("DELETE pst FROM patient_status_temp pst inner join patient_status_import psi on pst.import_id = psi.id where psi.created_ts < '$date'");
+        $this->db->query("DELETE pst FROM patient_status_import_rows pst inner join patient_status_import psi on pst.import_id = psi.id where psi.created_ts < '$date'");
     }
 }

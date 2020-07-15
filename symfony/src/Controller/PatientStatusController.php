@@ -6,7 +6,7 @@ use App\Entity\Organizations;
 use App\Entity\PatientStatus;
 use App\Entity\PatientStatusHistory;
 use App\Entity\PatientStatusImport;
-use App\Entity\PatientStatusTemp;
+use App\Entity\PatientStatusImportRow;
 use App\Service\PatientStatusImportService;
 use App\Service\LoggerService;
 use App\Form\PatientStatusImportFormType;
@@ -51,16 +51,16 @@ class PatientStatusController extends AbstractController
                     $em->persist($patientStatusImport);
                     $batchSize = 50;
                     foreach ($patientStatuses as $key => $patientStatus) {
-                        $patientStatusTemp = new PatientStatusTemp();
-                        $patientStatusTemp
+                        $PatientStatusImportRow = new PatientStatusImportRow();
+                        $PatientStatusImportRow
                             ->setParticipantId($patientStatus['participantId'])
                             ->setStatus($patientStatus['status'])
                             ->setComments($patientStatus['comments'])
                             ->setImport($patientStatusImport);
-                        $em->persist($patientStatusTemp);
+                        $em->persist($PatientStatusImportRow);
                         if (($key % $batchSize) === 0) {
                             $em->flush();
-                            $em->clear(PatientStatusTemp::class);
+                            $em->clear(PatientStatusImportRow::class);
                         }
                     }
                     $em->flush();
@@ -112,12 +112,12 @@ class PatientStatusController extends AbstractController
             }
             return $this->redirectToRoute('patientStatusImport');
         } else {
-            $importPatientStatuses = $patientStatusImport->getPatientStatusTemps()->slice(0, 100);
+            $importPatientStatuses = $patientStatusImport->getPatientStatusImportRows()->slice(0, 100);
         }
         return $this->render('patientstatus/confirmation.html.twig', [
             'patientStatuses' => $importPatientStatuses,
             'importConfirmForm' => $form->createView(),
-            'rowsCount' => count($patientStatusImport->getPatientStatusTemps())
+            'rowsCount' => count($patientStatusImport->getPatientStatusImportRows())
         ]);
     }
 
@@ -133,7 +133,7 @@ class PatientStatusController extends AbstractController
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = $request->request->all();
-            $patientStatuses = $patientStatusImport->getPatientStatusTemps()->slice($params['start'], $params['length']);
+            $patientStatuses = $patientStatusImport->getPatientStatusImportRows()->slice($params['start'], $params['length']);
             $ajaxData = [];
             $ajaxData['data'] = $patientStatusImportService->getAjaxData($patientStatusImport, $patientStatuses);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($patientStatusImport->getPatientStatusHistories());
