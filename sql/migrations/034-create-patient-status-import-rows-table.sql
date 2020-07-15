@@ -4,7 +4,7 @@ CREATE TABLE `patient_status_import_rows` (
   `status` varchar(50) NOT NULL,
   `comments` text DEFAULT NULL,
   `import_id` int(11) NOT NULL,
-  `import_status` tinyint(1) NOT NULL DEFAULT 0,
+  `rdr_status` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`import_id`)
   REFERENCES patient_status_import(`id`)

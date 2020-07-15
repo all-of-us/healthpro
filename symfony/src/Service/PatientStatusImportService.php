@@ -72,26 +72,4 @@ class PatientStatusImportService
         }
         return $rows;
     }
-
-    public function insertPatientStatusHistory(&$patientStatusHistory, &$patientStatus, &$patientStatusImport, $i, $status, $comments)
-    {
-        $batchSize = 50;
-        $patientStatusHistory
-            ->setUserId($patientStatusImport->getUserId())
-            ->setSite($patientStatusImport->getSite())
-            ->setStatus($status)
-            ->setComments($comments)
-            ->setCreatedTs(new \DateTime())
-            ->setPatientStatus($patientStatus)
-            ->setImport($patientStatusImport);
-        $this->em->persist($patientStatusHistory);
-
-        // Update history id in patient_status table
-        $patientStatus->setHistory($patientStatusHistory);
-        if (($i % $batchSize) === 0) {
-            $this->em->flush();
-            $this->em->clear(PatientStatusHistory::class);
-            $this->em->clear(PatientStatus::class);
-        }
-    }
 }
