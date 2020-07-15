@@ -86,10 +86,10 @@ class PatientStatusService
         }
     }
 
-    public function deletePatientStatusTempData()
+    public function deleteImportUnconfirmedData()
     {
         $date = (new \DateTime('UTC'))->modify('-1 hours');
         $date = $date->format('Y-m-d H:i:s');
-        $this->db->query("DELETE pst FROM patient_status_import_rows pst inner join patient_status_import psi on pst.import_id = psi.id where psi.created_ts < '$date'");
+        $this->db->query("DELETE psir FROM patient_status_import_rows psir inner join patient_status_import psi on psir.import_id = psi.id where psi.created_ts < '{$date}' and psi.confirm = 0");
     }
 }
