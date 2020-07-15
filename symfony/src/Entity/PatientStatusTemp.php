@@ -37,6 +37,11 @@ class PatientStatusTemp
      */
     private $import;
 
+    /**
+     * @ORM\Column(type="smallint", options={"default":0})
+     */
+    private $rdrStatus = 0;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -86,6 +91,18 @@ class PatientStatusTemp
     public function setImport(?PatientStatusImport $import): self
     {
         $this->import = $import;
+
+        return $this;
+    }
+
+    public function getRdrStatus(): ?int
+    {
+        return $this->rdrStatus;
+    }
+
+    public function setRdrStatus(?int $rdrStatus): self
+    {
+        $this->rdrStatus = $rdrStatus;
 
         return $this;
     }

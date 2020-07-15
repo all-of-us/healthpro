@@ -83,7 +83,7 @@ class PatientStatusController extends AbstractController
     /**
      * @Route("/patient/status/confirmation/{id}", name="patientStatusImportConfirmation", methods={"GET", "POST"})
      */
-    public function patientStatusImportConfirmation(int $id, Request $request, EntityManagerInterface $em, LoggerService $loggerService, PatientStatusImportService $patientStatusImportService)
+    public function patientStatusImportConfirmation(int $id, Request $request, EntityManagerInterface $em, LoggerService $loggerService)
     {
         $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'userId' => $this->getUser()->getId(), 'confirm' => 0]);
         if (empty($patientStatusImport)) {
@@ -93,45 +93,6 @@ class PatientStatusController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             if ($form->get('Confirm')->isClicked()) {
-                $importPatientStatuses = $patientStatusImport->getPatientStatusTemps();
-                $newImportPatientStatuses = [];
-                $i = 0;
-                foreach ($importPatientStatuses as $importPatientStatus) {
-                    $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
-                        'participantId' => $importPatientStatus->getParticipantId(),
-                        'organization' => $patientStatusImport->getOrganization()->getName()
-                    ]);
-                    if (!$patientStatus) {
-                        $newImportPatientStatus['participantId'] = $importPatientStatus->getParticipantId();
-                        $newImportPatientStatus['status'] = $importPatientStatus->getStatus();
-                        $newImportPatientStatus['comments'] = $importPatientStatus->getComments();
-                        $newImportPatientStatuses[] = $newImportPatientStatus;
-                        continue;
-                    }
-                    $patientStatusHistory = new PatientStatusHistory();
-                    $patientStatusImportService->insertPatientStatusHistory($patientStatusHistory, $patientStatus, $patientStatusImport, $i, $importPatientStatus->getStatus(),
-                        $importPatientStatus->getComments());
-                    $i++;
-                }
-                $em->flush();
-                $em->clear(PatientStatusHistory::class);
-                $em->clear(PatientStatus::class);
-
-                // Insert new patient statuses in patient status table
-                foreach ($newImportPatientStatuses as $key => $newImportPatientStatus) {
-                    $patientStatus = new PatientStatus();
-                    $patientStatus
-                        ->setParticipantId($newImportPatientStatus['participantId'])
-                        ->setAwardee($patientStatusImport->getAwardee())
-                        ->setOrganization($patientStatusImport->getOrganization()->getName());
-                    $em->persist($patientStatus);
-
-                    $patientStatusHistory = new PatientStatusHistory();
-                    $patientStatusImportService->insertPatientStatusHistory($patientStatusHistory, $patientStatus, $patientStatusImport, $key, $newImportPatientStatus['status'],
-                        $newImportPatientStatus['comments']);
-                }
-                $em->flush();
-
                 // Update confirm status
                 $patientStatusImport->setConfirm(1);
                 $em->flush();
@@ -172,9 +133,9 @@ class PatientStatusController extends AbstractController
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = $request->request->all();
-            $patientStatusHistories = $patientStatusImport->getPatientStatusHistories()->slice($params['start'], $params['length']);
+            $patientStatuses = $patientStatusImport->getPatientStatusTemps()->slice($params['start'], $params['length']);
             $ajaxData = [];
-            $ajaxData['data'] = $patientStatusImportService->getAjaxData($patientStatusHistories, $patientStatusImport->getOrganization());
+            $ajaxData['data'] = $patientStatusImportService->getAjaxData($patientStatusImport, $patientStatuses);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($patientStatusImport->getPatientStatusHistories());
             return new JsonResponse($ajaxData);
         } else {

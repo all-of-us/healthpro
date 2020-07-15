@@ -3,6 +3,7 @@
 namespace Pmi\Service;
 
 use App\Entity\PatientStatusHistory;
+use App\Entity\PatientStatusImport;
 use Pmi\Audit\Log;
 use Pmi\PatientStatus\PatientStatus;
 
@@ -24,51 +25,43 @@ class PatientStatusService
     {
         $limit = $this->app->getConfig('patient_status_queue_limit');
         $query = "
-            SELECT psh.id,
-                   psh.patient_status_id,
-                   psh.site,
-                   psh.status,
-                   psh.comments,
-                   psh.created_ts as authored,
-                   psh.import_id,
-                   ps.participant_id,
-                   ps.organization,
-                   ps.awardee,
+            SELECT pst.*,
+                   psi.site,
+                   psi.created_ts as authored,
+                   psi.organization,
+                   psi.awardee,
+                   ps.id as patient_status_id,
+                   u.id as user_id,
                    u.email as user_email
-            FROM patient_status_history psh
-            INNER JOIN patient_status ps ON ps.id = psh.patient_status_id
-            LEFT JOIN users u ON psh.user_id = u.id
-            WHERE psh.rdr_ts is null and psh.rdr_status = 0
-            ORDER BY psh.id ASC
+            FROM patient_status_temp pst
+            INNER JOIN patient_status_import psi ON psi.id = pst.import_id AND psi.confirm = 1
+            LEFT JOIN patient_status ps ON ps.participant_id = pst.participant_id AND psi.organization = ps.organization
+            LEFT JOIN users u ON psi.user_id = u.id
+            WHERE pst.rdr_status = 0
+            ORDER BY pst.id ASC
             limit {$limit}
         ";
-        $patientStatusHistories = $this->em->fetchAll($query, []);
+        $patientStatuses = $this->em->fetchAll($query, []);
         $patientStatusObj = new PatientStatus($this->app);
         $importIds = [];
-        foreach ($patientStatusHistories as $patientStatusHistory) {
-            if (!in_array($patientStatusHistory['import_id'], $importIds)) {
-                $importIds[] = $patientStatusHistory['import_id'];
+        foreach ($patientStatuses as $patientStatus) {
+            if (!in_array($patientStatus['import_id'], $importIds)) {
+                $importIds[] = $patientStatus['import_id'];
             }
-            $patientStatusObj->loadDataFromDb($patientStatusHistory);
+            $patientStatusObj->loadDataFromImport($patientStatus);
             if ($patientStatusObj->sendToRdr()) {
-                // Set rdr_status = 1 for success
-                $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_ts' => new \DateTime(), 'rdr_status' => PatientStatusHistory::STATUS_SUCCESS]);
-                $this->app->log(Log::PATIENT_STATUS_HISTORY_EDIT, [
-                    'id' => $patientStatusHistory['id']
-                ]);
+                if ($patientStatusObj->saveData()) {
+                    $this->em->getRepository('patient_status_temp')->update($patientStatus['id'], ['rdr_status' => PatientStatusHistory::STATUS_SUCCESS]);
+                }
             } else {
-                $this->app['logger']->error("#{$patientStatusHistory['id']} failed sending to RDR: " . $this->rdr->getLastError());
-                // RDR status
-                // 2 = RDR 400 (Invalid participant id)
-                // 3 = RDR 500 (Invalid patient status)
-                // 4 = Other RDR errors
+                $this->app['logger']->error("#{$patientStatus['id']} failed sending to RDR: " . $this->rdr->getLastError());
                 $rdrStatus = PatientStatusHistory::STATUS_OTHER_RDR_ERRORS;
                 if ($this->rdr->getLastErrorCode() === 400) {
                     $rdrStatus = PatientStatusHistory::STATUS_INVALID_PARTICIPANT_ID;
                 } elseif ($this->rdr->getLastErrorCode() === 500) {
                     $rdrStatus = PatientStatusHistory::STATUS_RDR_INTERNAL_SERVER_ERROR;
                 }
-                $this->em->getRepository('patient_status_history')->update($patientStatusHistory['id'], ['rdr_status' => $rdrStatus]);
+                $this->em->getRepository('patient_status_temp')->update($patientStatus['id'], ['rdr_status' => $rdrStatus]);
             }
         }
         // Update import status
@@ -78,19 +71,17 @@ class PatientStatusService
     private function updateImportStatus($importIds)
     {
         foreach ($importIds as $importId) {
-            $query = "SELECT COUNT(*) AS count FROM patient_status_history WHERE import_id = :importId AND rdr_status = 0";
+            $query = "SELECT COUNT(*) AS count FROM patient_status_temp WHERE import_id = :importId AND rdr_status = 0";
             $patientStatusHistory = $this->em->fetchAll($query, ['importId' => $importId]);
             if ($patientStatusHistory[0]['count'] == 0) {
-                $query = "SELECT COUNT(*) AS count FROM patient_status_history WHERE import_id = :importId AND rdr_status IN (2, 3, 4)";
+                $query = "SELECT COUNT(*) AS count FROM patient_status_temp WHERE import_id = :importId AND rdr_status IN (2, 3, 4)";
                 $patientStatusHistory = $this->em->fetchAll($query, ['importId' => $importId]);
-                // Import Status
-                // 1 = Complete with no errors
-                // 2 = Complete with errors
                 if ($patientStatusHistory[0]['count'] > 0) {
-                    $this->em->getRepository('patient_status_import')->update($importId, ['import_status' => 2]);
+                    $this->em->getRepository('patient_status_import')->update($importId, ['import_status' => PatientStatusImport::COMPLETE_WITH_ERRORS]);
                 } else {
-                    $this->em->getRepository('patient_status_import')->update($importId, ['import_status' => 1]);
+                    $this->em->getRepository('patient_status_import')->update($importId, ['import_status' => PatientStatusImport::COMPLETE]);
                 }
+                $this->app->log(Log::PATIENT_STATUS_IMPORT_EDIT, $importId);
             }
         }
     }

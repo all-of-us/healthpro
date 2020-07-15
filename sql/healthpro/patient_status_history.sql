@@ -8,6 +8,7 @@ CREATE TABLE `patient_status_history` (
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `rdr_ts` timestamp NULL DEFAULT NULL,
   `import_id` int(11) DEFAULT NULL,
+  `import_status` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`patient_status_id`)
   REFERENCES patient_status(`id`),

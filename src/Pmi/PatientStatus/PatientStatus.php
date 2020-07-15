@@ -88,6 +88,10 @@ class PatientStatus
                 ]);
                 $patientStatusHistoryData['patient_status_id'] = $id;
             }
+            // Set import id if exists
+            if (!empty($this->importId)) {
+                $patientStatusHistoryData['import_id'] = $this->importId;
+            }
             //Create patient status history
             $id = $patientStatusHistoryRepository->insert($patientStatusHistoryData);
             $this->app->log(Log::PATIENT_STATUS_HISTORY_ADD, [
@@ -261,8 +265,8 @@ class PatientStatus
         return $this->app['pmi.drc.participants']->createPatientStatus($this->participantId, $this->organizationId, $postData);
     }
 
-    // Used to send previously created patient statuses to rdr
-    public function loadDataFromDb($patientStatusHistory)
+    // Used to send imported patient statuses to rdr
+    public function loadDataFromImport($patientStatusHistory)
     {
         $this->participantId = $patientStatusHistory['participant_id'];
         $this->organizationId = $patientStatusHistory['organization'];
@@ -272,5 +276,9 @@ class PatientStatus
         $this->comments = $patientStatusHistory['comments'];
         $this->status = $patientStatusHistory['status'];
         $this->createdTs = new \DateTime($patientStatusHistory['authored']);
+        $this->siteId = $patientStatusHistory['site'];
+        $this->userId = $patientStatusHistory['user_id'];
+        $this->patientStatusId = $patientStatusHistory['patient_status_id'];
+        $this->importId = $patientStatusHistory['import_id'];
     }
 }

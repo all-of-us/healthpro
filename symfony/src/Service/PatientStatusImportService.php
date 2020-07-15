@@ -56,17 +56,18 @@ class PatientStatusImportService
         }
     }
 
-    public function getAjaxData($patientStatusHistories, $organization)
+    public function getAjaxData($patientStatusImport, $patientStatuses)
     {
         $rows = [];
-        foreach ($patientStatusHistories as $patientStatusHistory) {
+        foreach ($patientStatuses as $patientStatus) {
             $row = [];
-            $row['participantId'] = $patientStatusHistory->getPatientStatus()->getParticipantId();
-            $row['patientStatus'] = $patientStatusHistory->getStatus();
-            $row['comments'] = $patientStatusHistory->getComments();
-            $row['organizationName'] = $organization->getName() . " ({$organization->getId()})";
-            $row['createdTs'] = $patientStatusHistory->getCreatedTs()->setTimezone(new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']))->format('n/j/Y g:ia');
-            $row['status'] = $patientStatusHistory->getRdrStatus();
+            $row['participantId'] = $patientStatus->getParticipantId();
+            $row['patientStatus'] = $patientStatus->getStatus();
+            $row['comments'] = $patientStatus->getComments();
+            $row['organizationName'] = $patientStatusImport->getOrganization()->getName() . " ({$patientStatusImport->getOrganization()->getId()})";
+            $createdTs = $patientStatusImport->getCreatedTs();
+            $row['createdTs'] = $createdTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']))->format('n/j/Y g:ia');
+            $row['status'] = $patientStatus->getRdrStatus();
             array_push($rows, $row);
         }
         return $rows;
