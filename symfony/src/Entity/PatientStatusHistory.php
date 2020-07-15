@@ -58,11 +58,6 @@ class PatientStatusHistory
     private $import;
 
     /**
-     * @ORM\Column(type="smallint", options={"default":0})
-     */
-    private $rdrStatus = 0;
-
-    /**
      * @ORM\OneToOne(targetEntity="App\Entity\PatientStatus", mappedBy="history", cascade={"persist", "remove"})
      */
     private $patientStatusRecords;
@@ -169,18 +164,6 @@ class PatientStatusHistory
     public function setImport(?PatientStatusImport $import): self
     {
         $this->import = $import;
-
-        return $this;
-    }
-
-    public function getRdrStatus(): ?int
-    {
-        return $this->rdrStatus;
-    }
-
-    public function setRdrStatus(int $rdrStatus): self
-    {
-        $this->rdrStatus = $rdrStatus;
 
         return $this;
     }
