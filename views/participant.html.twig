@@ -123,7 +123,7 @@
                                             {{ macros.displayConsentPanelStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored) }}
                                             {% if participant.ehrConsentExpireStatus == 'EXPIRED' %}
                                                 (Expired on {{ participant.ehrConsentExpireAuthored ? participant.ehrConsentExpireAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }})
-                                            {% elseif participant.ehrConsentExpireStatus == 'NOT_EXPIRED' %}
+                                            {% elseif participant.consentForElectronicHealthRecords == 'SUBMITTED' and participant.ehrConsentExpireStatus is empty %}
                                                 (Active)
                                             {% endif %}
                                         </dd>
