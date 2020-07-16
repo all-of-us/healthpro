@@ -3,8 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Organizations;
-use App\Entity\PatientStatus;
-use App\Entity\PatientStatusHistory;
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusImportRow;
 use App\Service\PatientStatusImportService;
@@ -98,15 +96,9 @@ class PatientStatusController extends AbstractController
                 $em->flush();
                 $loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $patientStatusImport->getId());
                 $em->clear();
-                $this->addFlash(
-                    'success',
-                    'Successfully Imported!'
-                );
+                $this->addFlash('success', 'Successfully Imported!');
             } else {
-                $this->addFlash(
-                    'notice',
-                    'Import canceled!'
-                );
+                $this->addFlash('notice', 'Import canceled!');
                 $em->remove($patientStatusImport);
                 $em->flush();
             }
@@ -133,9 +125,9 @@ class PatientStatusController extends AbstractController
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = $request->request->all();
-            $patientStatuses = $patientStatusImport->getPatientStatusImportRows()->slice($params['start'], $params['length']);
+            $patientStatusImportRows = $patientStatusImport->getPatientStatusImportRows()->slice($params['start'], $params['length']);
             $ajaxData = [];
-            $ajaxData['data'] = $patientStatusImportService->getAjaxData($patientStatusImport, $patientStatuses);
+            $ajaxData['data'] = $patientStatusImportService->getAjaxData($patientStatusImport, $patientStatusImportRows);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($patientStatusImport->getPatientStatusImportRows());
             return new JsonResponse($ajaxData);
         } else {

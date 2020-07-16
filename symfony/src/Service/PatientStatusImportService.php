@@ -2,18 +2,18 @@
 
 namespace App\Service;
 
-use App\Entity\PatientStatusHistory;
-use App\Entity\PatientStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\PatientStatus\PatientStatus as PmiPatientStatus;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 
 class PatientStatusImportService
 {
-    public function __construct(UserService $userService, EntityManagerInterface $em)
+    public function __construct(UserService $userService, EntityManagerInterface $em, ParameterBagInterface $params)
     {
         $this->userService = $userService;
         $this->em = $em;
+        $this->params = $params;
     }
 
     public function extractCsvFileData($file, &$form, &$patientStatuses)
@@ -21,10 +21,12 @@ class PatientStatusImportService
         $fileHandle = fopen($file->getPathname(), 'r');
         $headers = fgetcsv($fileHandle, 0, ",");
         $validHeaders = ['participantid', 'status', 'comments'];
+        // Guess file format using headers
         if (count($headers) !== 3) {
             $form['patient_status_csv']->addError(new FormError("Invalid file format"));
             return;
         }
+        // Check column headers
         foreach ($headers as $header) {
             // Handle bom
             $header = str_replace("\xEF\xBB\xBF", '', $header);
@@ -34,10 +36,11 @@ class PatientStatusImportService
             }
         }
         $validStatus = array_values(PmiPatientStatus::$patientStatus);
+        $rowsLimit = $this->params->has('csv_rows_limit') ? intval($this->params->get('csv_rows_limit')) : 5000;
         $row = 1;
         $csvFile = file($file->getPathname(), FILE_SKIP_EMPTY_LINES);
-        if (count($csvFile) > 5001) {
-            $form['patient_status_csv']->addError(new FormError("CSV file rows should not be greater than 5000"));
+        if (count($csvFile) > $rowsLimit + 1) {
+            $form['patient_status_csv']->addError(new FormError("CSV file rows should not be greater than {$rowsLimit}"));
             return;
         }
         while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
@@ -56,18 +59,18 @@ class PatientStatusImportService
         }
     }
 
-    public function getAjaxData($patientStatusImport, $patientStatuses)
+    public function getAjaxData($patientStatusImport, $patientStatusImportRows)
     {
         $rows = [];
-        foreach ($patientStatuses as $patientStatus) {
+        foreach ($patientStatusImportRows as $patientStatusImportRow) {
             $row = [];
-            $row['participantId'] = $patientStatus->getParticipantId();
-            $row['patientStatus'] = $patientStatus->getStatus();
-            $row['comments'] = $patientStatus->getComments();
+            $row['participantId'] = $patientStatusImportRow->getParticipantId();
+            $row['patientStatus'] = $patientStatusImportRow->getStatus();
+            $row['comments'] = $patientStatusImportRow->getComments();
             $row['organizationName'] = $patientStatusImport->getOrganization()->getName() . " ({$patientStatusImport->getOrganization()->getId()})";
             $createdTs = $patientStatusImport->getCreatedTs();
             $row['createdTs'] = $createdTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']))->format('n/j/Y g:ia');
-            $row['status'] = $patientStatus->getRdrStatus();
+            $row['status'] = $patientStatusImportRow->getRdrStatus();
             array_push($rows, $row);
         }
         return $rows;
