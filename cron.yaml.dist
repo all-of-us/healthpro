@@ -35,7 +35,7 @@ cron:
   url: /cron/send-patient-status-rdr
   schedule: every 5 mins
   timezone: America/Chicago
-- description: "Delete patient status imports temp table data"
-  url: /cron/delete-patient-status-imports-temp-data
+- description: "Delete patient status imports unconfirmed data"
+  url: /cron/delete-unconfirmed-patient-status-import-data
   schedule: every day 02:00
   timezone: America/Chicago

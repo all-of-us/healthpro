@@ -90,7 +90,7 @@ class PatientStatusService
         }
     }
 
-    public function deleteImportUnconfirmedData()
+    public function deleteUnconfirmedImportData()
     {
         $date = (new \DateTime('UTC'))->modify('-1 hours');
         $date = $date->format('Y-m-d H:i:s');
