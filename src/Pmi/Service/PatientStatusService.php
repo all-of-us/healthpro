@@ -34,14 +34,14 @@ class PatientStatusService
                    u.id as user_id,
                    u.email as user_email
             FROM patient_status_import_rows psir
-            INNER JOIN patient_status_import psi ON psi.id = psir.import_id AND psi.confirm = 1
+            INNER JOIN patient_status_import psi ON psi.id = psir.import_id AND psi.confirm = :confirm
             LEFT JOIN patient_status ps ON ps.participant_id = psir.participant_id AND psi.organization = ps.organization
             LEFT JOIN users u ON psi.user_id = u.id
-            WHERE psir.rdr_status = 0
+            WHERE psir.rdr_status = :rdrStatus
             ORDER BY psir.id ASC
             limit {$limit}
         ";
-        $patientStatuses = $this->em->fetchAll($query, []);
+        $patientStatuses = $this->em->fetchAll($query, ['confirm' => 1, 'rdrStatus' => 0]);
         $patientStatusObj = new PatientStatus($this->app);
         $importIds = [];
         foreach ($patientStatuses as $patientStatus) {
@@ -71,12 +71,16 @@ class PatientStatusService
     private function updateImportStatus($importIds)
     {
         foreach ($importIds as $importId) {
-            $query = "SELECT COUNT(*) AS count FROM patient_status_import_rows WHERE import_id = :importId AND rdr_status = 0";
-            $patientStatusHistory = $this->em->fetchAll($query, ['importId' => $importId]);
-            if ($patientStatusHistory[0]['count'] == 0) {
-                $query = "SELECT COUNT(*) AS count FROM patient_status_import_rows WHERE import_id = :importId AND rdr_status IN (2, 3, 4)";
-                $patientStatusHistory = $this->em->fetchAll($query, ['importId' => $importId]);
-                if ($patientStatusHistory[0]['count'] > 0) {
+            $patientStatusImportRows = $this->em->getRepository('patient_status_import_rows')->fetchBySql('import_id = :importId and rdr_status = :rdrStatus', [
+                'importId' => $importId,
+                'rdrStatus' => 0
+            ]);
+            if (count($patientStatusImportRows) === 0) {
+                $patientStatusImportRows = $this->em->getRepository('patient_status_import_rows')->fetchBySql('import_id = :importId and rdr_status = (:rdrStatus)', [
+                    'importId' => $importId,
+                    'rdrStatus' => '2, 3, 4'
+                ]);
+                if (count($patientStatusImportRows) > 0) {
                     $this->em->getRepository('patient_status_import')->update($importId, ['import_status' => PatientStatusImport::COMPLETE_WITH_ERRORS]);
                 } else {
                     $this->em->getRepository('patient_status_import')->update($importId, ['import_status' => PatientStatusImport::COMPLETE]);
