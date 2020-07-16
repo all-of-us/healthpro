@@ -14,11 +14,17 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displayConsentStatus(value, time) %}
+{% macro displayConsentStatus(value, time, ehrExpireStatus = '', ehrExpireDate = '') %}
     {% if value == 'SUBMITTED' %}
-        <i class="fa fa-check text-success" aria-hidden="true"></i>
-        {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
-        (Consented Yes)
+        {% if ehrExpireStatus == 'EXPIRED' %}
+            <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
+            {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
+            (Expired {{ ehrExpireDate ? ehrExpireDate|date('n/j/Y', app.userTimezone) }})
+        {% else %}
+            <i class="fa fa-check text-success" aria-hidden="true"></i>
+            {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>
+            (Consented Yes)
+        {% endif %}
     {% elseif value == 'SUBMITTED_NO_CONSENT' %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
         {{ time ? time|date('n/j/Y', app.userTimezone) }} <br/>

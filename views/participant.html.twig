@@ -119,7 +119,14 @@
                                         <dt>Program Update</dt>
                                         <dd>{{ macros.displayProgramUpdate(participant.consentCohort, participant.questionnaireOnDnaProgram, participant.questionnaireOnDnaProgramAuthored) }}</dd>
                                         <dt>EHR Consent</dt>
-                                        <dd>{{ macros.displayConsentPanelStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored) }}</dd>
+                                        <dd>
+                                            {{ macros.displayConsentPanelStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored) }}
+                                            {% if participant.ehrConsentExpireStatus == 'EXPIRED' %}
+                                                (Expired on {{ participant.ehrConsentExpireAuthored ? participant.ehrConsentExpireAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }})
+                                            {% elseif participant.consentForElectronicHealthRecords == 'SUBMITTED' and participant.ehrConsentExpireStatus is empty %}
+                                                (Active)
+                                            {% endif %}
+                                        </dd>
                                         <dt>gRoR Consent</dt>
                                         <dd>{{ macros.displayConsentPanelStatus(participant.consentForGenomicsROR, participant.consentForGenomicsRORAuthored) }}</dd>
                                         <dt>DV-only EHR Sharing</dt>

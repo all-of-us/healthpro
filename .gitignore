@@ -15,3 +15,8 @@ ci/*.secret
 /deploy_*.txt
 /docker-compose.override.yml
 .phpunit.result.cache
+
+
+/web/s
+
+

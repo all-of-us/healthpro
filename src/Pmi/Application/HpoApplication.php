@@ -1,18 +1,21 @@
 <?php
 namespace Pmi\Application;
 
+use App\EventListener\ResponseSecurityHeadersTrait;
+use Pmi\Audit\Log;
+use Pmi\Entities\Configuration;
+use Pmi\Security\User;
+use Pmi\Security\UserProvider;
+use Pmi\Service\NoticeService;
 use Pmi\Service\UserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Pmi\Entities\Configuration;
-use Pmi\Security\UserProvider;
-use Pmi\Audit\Log;
-use Pmi\Service\NoticeService;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
-use Pmi\Security\User;
 
 class HpoApplication extends AbstractApplication
 {
+    use ResponseSecurityHeadersTrait;
+
     protected $configuration = [];
     protected $participantSource = 'rdr';
     protected $siteNameMapper = [];
@@ -173,39 +176,6 @@ class HpoApplication extends AbstractApplication
 
         $this['em'] = new \Pmi\EntityManager\EntityManager();
         $this['em']->setDbal($this['db']);
-    }
-
-    public function setHeaders(Response $response)
-    {
-        // prevent clickjacking attacks
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-
-        // whitelist content that the client is allowed to request
-        $whitelist =  "default-src 'self'"
-            . " 'unsafe-eval'" // required for setTimeout and setInterval
-            . " 'unsafe-inline'" // for the places we are using inline JS
-            . " www.google-analytics.com www.googletagmanager.com" // Google Analytics
-            . " storage.googleapis.com" // for SOP PDFs stored in a Google Storage bucket
-            . " www.youtube.com" // for training videos hosted on YouTube
-            . " *.kaltura.com" // for training videos hosted on Kaltura
-            . " cdn.plot.ly;" // allow plot.ly remote requests
-            . " img-src www.google-analytics.com 'self' data:"; // allow Google Analytcs, self, and data: urls for img src
-
-        $response->headers->set('Content-Security-Policy', $whitelist);
-
-        // prevent browsers from sending unencrypted requests
-        $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-
-        // "low" security finding: prevent MIME type sniffing
-        $response->headers->set('X-Content-Type-Options', 'nosniff');
-
-        // "low" security finding: enable XSS Protection
-        // http://blog.innerht.ml/the-misunderstood-x-xss-protection/
-        $response->headers->set('X-XSS-Protection', '1; mode=block');
-
-        // Default cache control header in ResponseHeaderBag::computeCacheControlValue returns "no-cache, private"
-        // Recommendation from security team is to add no-store as well.
-        $response->headers->addCacheControlDirective('no-cache, no-store');
     }
 
     public function switchSite($email)
@@ -458,7 +428,7 @@ class HpoApplication extends AbstractApplication
 
     protected function afterCallback(Request $request, Response $response)
     {
-        $this->setHeaders($response);
+        $this->addSecurityHeaders($response);
         if ($this->isLoggedIn()) {
             // only the first route handled is considered a login
             $this['session']->set('isLogin', false);

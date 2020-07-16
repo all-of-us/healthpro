@@ -11,7 +11,7 @@ class Review
         $this->db = $db;
     }
 
-    protected static $orderStatus = [
+    public static $orderStatus = [
         'created_ts' => 'Created',
         'collected_ts' => 'Collected',
         'processed_ts' => 'Processed',
@@ -76,7 +76,7 @@ class Review
                         // Get order status
                         foreach (self::$orderStatus as $field => $status) {
                             if ($row[$field]) {
-                                $participants[$participantId]['orderStatus'] = $this->getOrderStatus($row, $status);
+                                $participants[$participantId]['orderStatus'] = self::getOrderStatus($row, $status);
                             }
                         }
                         // Get number of finalized samples
@@ -137,7 +137,7 @@ class Review
             // Get order status
             foreach (self::$orderStatus as $field => $status) {
                 if ($row[$field]) {
-                    $row['orderStatus'] = $this->getOrderStatus($row, $status);
+                    $row['orderStatus'] = self::getOrderStatus($row, $status);
                 }
             }
             // Get number of finalized samples
@@ -150,7 +150,7 @@ class Review
         return $orders;
     }
 
-    public function getOrderStatus($row, $status)
+    public static function getOrderStatus($row, $status)
     {
         $type = $row['h_type'];
         if ($type === Order::ORDER_CANCEL) {

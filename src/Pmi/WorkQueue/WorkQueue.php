@@ -29,6 +29,7 @@ class WorkQueue
         'questionnaireOnDnaProgramAuthored',
         'primaryLanguage',
         'consentForElectronicHealthRecordsAuthored',
+        'ehrConsentExpireStatus',
         'consentForGenomicsRORAuthored',
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
@@ -196,6 +197,13 @@ class WorkQueue
                 'Cohort 2 Pilot' => 'COHORT_2_PILOT',
                 'Cohort 3' => 'COHORT_3'
             ]
+        ],
+        'ehrConsentExpireStatus' => [
+            'label' => 'EHR Expiration Status',
+            'options' => [
+                'Active' => 'ACTIVE',
+                'Expired' => 'EXPIRED'
+            ]
         ]
     ];
 
@@ -336,11 +344,12 @@ class WorkQueue
             $row['questionnaireOnDnaProgram'] = $this->displayProgramUpdate($participant);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
+            $row['ehrConsentExpireStatus'] = $this->displayEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords, $participant->ehrConsentExpireAuthored);
             $row['gRoRConsent'] = $this->displayGenomicsConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
             $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
             $row['activityStatus'] = $this->getActivityStatus($participant);
-            $row['withdrawalStatus'] = $participant->withdrawalStatus; // Used to add withdrawn class in the data tables
+            $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
 
             //Contact
@@ -436,6 +445,16 @@ class WorkQueue
         }
     }
 
+    public static function csvEhrConsentExpireStatus($ehrConsentExpireStatus, $consentForElectronicHealthRecords)
+    {
+        if ($ehrConsentExpireStatus === 'EXPIRED') {
+            return 1;
+        } elseif ($consentForElectronicHealthRecords === 'SUBMITTED' && empty($ehrConsentExpireStatus)) {
+            return 0;
+        }
+        return '';
+    }
+
     public function displayStatus($value, $successStatus, $time = null, $displayTime = true)
     {
         if ($value === $successStatus) {
@@ -478,6 +497,16 @@ class WorkQueue
         }
     }
 
+    public function displayEhrConsentExpireStatus($ehrConsentExpireStatus, $consentForElectronicHealthRecords, $time, $displayTime = true)
+    {
+        if ($ehrConsentExpireStatus === 'EXPIRED') {
+            return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' Expired';
+        } elseif ($consentForElectronicHealthRecords === 'SUBMITTED' && empty($ehrConsentExpireStatus)) {
+            return self::HTML_SUCCESS . ' Active';
+        }
+        return '';
+    }
+
     public function generateLink($id, $name)
     {
         if($this->app->hasRole('ROLE_USER')) {
@@ -493,7 +522,7 @@ class WorkQueue
     public function getPatientStatus($participant, $value, $type = 'wq')
     {
         // Clear patient status for withdrawn participants
-        if ($participant->withdrawalStatus === 'NO_USE') {
+        if ($participant->isWithdrawn) {
             return '';
         }
         $organizations = [];

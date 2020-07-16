@@ -18,6 +18,7 @@
             {% endif %}
             <th>Order ID</th>
             <th>Biobank ID</th>
+            <th>Status</th>
             <th class="col-created">Created</th>
             <th>Created Site</th>
             <th>Collected</th>
@@ -39,6 +40,9 @@
                 </td>
                 <td>
                     <a href="{{ path('biobank_participant', { biobankId: order.biobank_id }) }}">{{ order.biobank_id }}</a>
+                </td>
+                <td>
+                    <nobr>{{ order.orderStatus }}</nobr>
                 </td>
                 <td data-order="{{ order.created_ts }}">
                     {{ macros.displayDate(order, 'created_ts') }}

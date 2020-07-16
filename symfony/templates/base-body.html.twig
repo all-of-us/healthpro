@@ -1,0 +1,6 @@
+{# common elements in the BODY tag #}
+{% include 'messages/alert.html.twig' %}
+{% include 'messages/confirm.html.twig' %}
+{% if hideSystemUsage is not defined and is_granted('IS_AUTHENTICATED_FULLY') and not app.session.get('isUsageAgreed') %}
+    {% include 'messages/system-usage.html.twig' %}
+{% endif %}

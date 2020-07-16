@@ -76,6 +76,7 @@ $(document).ready(function() {
       { name: 'questionnaireOnDnaProgram', data: 'questionnaireOnDnaProgram', class: 'text-center' },
       { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
+      { name: 'ehrConsentExpireStatus', data: 'ehrConsentExpireStatus', class: 'text-center' },
       { name: 'gRoRConsent', data: 'gRoRConsent', class: 'text-center' },
       { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
@@ -136,7 +137,7 @@ $(document).ready(function() {
         columns: tableColumns,
         pageLength: 25,
         createdRow: function(row, data) {
-            if (data.withdrawalStatus === 'NO_USE') {
+            if (data.isWithdrawn === true) {
                 $(row).addClass('tr-withdrawn');
             }
         },
