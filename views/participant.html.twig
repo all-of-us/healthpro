@@ -115,12 +115,12 @@
                                         <dt>Language of Primary Consent</dt>
                                         <dd>{{ participant.primaryLanguage|default('--') }}</dd>
                                         <dt>Primary Consent</dt>
-                                        <dd>{{ macros.displayConsentPanelStatus(participant.consentForStudyEnrollment, participant.consentForStudyEnrollmentAuthored) }}</dd>
+                                        <dd>{{ macros.displayFirstConsentPanelStatus(participant.consentForStudyEnrollment, participant.consentForStudyEnrollmentAuthored, participant.consentForStudyEnrollmentFirstYesAuthored) }}</dd>
                                         <dt>Program Update</dt>
                                         <dd>{{ macros.displayProgramUpdate(participant.consentCohort, participant.questionnaireOnDnaProgram, participant.questionnaireOnDnaProgramAuthored) }}</dd>
                                         <dt>EHR Consent</dt>
                                         <dd>
-                                            {{ macros.displayConsentPanelStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored) }}
+                                            {{ macros.displayFirstConsentPanelStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored, participant.consentForElectronicHealthRecordsFirstYesAuthored) }}
                                             {% if participant.ehrConsentExpireStatus == 'EXPIRED' %}
                                                 (Expired on {{ participant.ehrConsentExpireAuthored ? participant.ehrConsentExpireAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }})
                                             {% elseif participant.consentForElectronicHealthRecords == 'SUBMITTED' and participant.ehrConsentExpireStatus is empty %}

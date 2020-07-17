@@ -86,3 +86,24 @@
         (review not completed)
     {% endif %}
 {% endmacro %}
+
+{% macro displayFirstConsentPanelStatus(value, time, firstTime) %}
+    {% set consentValues = ['SUBMITTED', 'SUBMITTED_NO_CONSENT', 'SUBMITTED_NOT_SURE', 'SUBMITTED_INVALID'] %}
+    {% if value in consentValues %}
+        {% if value == 'SUBMITTED' %}
+            {% set html = '<i class="fa fa-check text-success" aria-hidden="true"></i>' %}
+        {% else %}
+            {% set html = '<i class="fa fa-times text-danger" aria-hidden="true"></i>' %}
+        {% endif %}
+        {% if firstTime %}
+            {{ html|raw }} {{ firstTime|date('n/j/Y g:ia', app.userTimezone) }} (first agreed to participate) <br>
+        {% endif %}
+        {% if time %}
+            {{ html|raw }} {{ firstTime|date('n/j/Y g:ia', app.userTimezone) }} (current status)
+        {% else %}
+            --
+        {% endif %}
+    {% else %}
+        (not completed)
+    {% endif %}
+{% endmacro %}
