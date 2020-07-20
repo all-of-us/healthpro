@@ -3,7 +3,9 @@
 namespace App\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Twig\Environment as TwigEnvironment;
 use App\Entity\Notice;
@@ -17,11 +19,12 @@ class RequestListener
 
     private $request;
 
-    public function __construct(LoggerService $logger, EntityManagerInterface $em, TwigEnvironment $twig)
+    public function __construct(LoggerService $logger, EntityManagerInterface $em, TwigEnvironment $twig, SessionInterface $session)
     {
         $this->logger = $logger;
         $this->em = $em;
         $this->twig = $twig;
+        $this->session = $session;
     }
 
     public function onKernelRequest(RequestEvent $event)
@@ -33,6 +36,11 @@ class RequestListener
         $this->request = $event->getRequest();
 
         $this->logRequest();
+
+        if ($siteSelectResponse = $this->checkSiteSelect()) {
+            $event->setResponse($siteSelectResponse);
+        }
+
         if ($fullPageNoticeResponse = $this->checkPageNotices()) {
             $event->setResponse($fullPageNoticeResponse);
         }
@@ -61,5 +69,12 @@ class RequestListener
         }
 
         $this->twig->addGlobal('global_notices', $activeNotices);
+    }
+
+    private function checkSiteSelect()
+    {
+        if (!$this->session->has('site')) {
+            return new RedirectResponse('/');
+        }
     }
 }
