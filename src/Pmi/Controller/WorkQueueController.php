@@ -109,6 +109,14 @@ class WorkQueueController extends AbstractController
                 $rdrParams['consentCohort'] = $params['consentCohort'];
             }
         }
+        if (!empty($params['ehrConsentExpireStatus'])) {
+            if ($params['ehrConsentExpireStatus'] === 'ACTIVE') {
+                $rdrParams['consentForElectronicHealthRecords'] = 'SUBMITTED';
+                $rdrParams['ehrConsentExpireStatus'] = 'UNSET';
+            } else {
+                $rdrParams['ehrConsentExpireStatus'] = $params['ehrConsentExpireStatus'];
+            }
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];
@@ -391,6 +399,10 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Consent Cohort';
                 $headers[] = 'Program Update';
                 $headers[] = 'Date of Program Update';
+                $headers[] = 'EHR Expiration Status';
+                $headers[] = 'EHR Expiration Date';
+                $headers[] = 'Date of First Primary Consent';
+                $headers[] = 'Date of First EHR Consent';
             }
             fputcsv($output, $headers);
 
@@ -489,6 +501,10 @@ class WorkQueueController extends AbstractController
                         $row[] = $participant->consentCohortText;
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnDnaProgram);
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnDnaProgramAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords);
+                        $row[] = WorkQueue::dateFromString($participant->{"ehrConsentExpireAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->{"consentForStudyEnrollmentFirstYesAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->{"consentForElectronicHealthRecordsFirstYesAuthored"}, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
                 }

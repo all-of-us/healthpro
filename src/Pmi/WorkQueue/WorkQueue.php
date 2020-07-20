@@ -25,10 +25,13 @@ class WorkQueue
         'enrollmentStatus',
         'participantOrigin',
         'consentCohort',
+        'consentForStudyEnrollmentFirstYesAuthored',
         'consentForStudyEnrollmentAuthored',
         'questionnaireOnDnaProgramAuthored',
         'primaryLanguage',
+        'consentForElectronicHealthRecordsFirstYesAuthored',
         'consentForElectronicHealthRecordsAuthored',
+        'ehrConsentExpireStatus',
         'consentForGenomicsRORAuthored',
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
@@ -196,6 +199,13 @@ class WorkQueue
                 'Cohort 2 Pilot' => 'COHORT_2_PILOT',
                 'Cohort 3' => 'COHORT_3'
             ]
+        ],
+        'ehrConsentExpireStatus' => [
+            'label' => 'EHR Expiration Status',
+            'options' => [
+                'Active' => 'ACTIVE',
+                'Expired' => 'EXPIRED'
+            ]
         ]
     ];
 
@@ -333,9 +343,12 @@ class WorkQueue
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
             $row['consentCohort'] = $e($participant->consentCohortText);
             $row['primaryConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
+            $row['firstPrimaryConsent'] = $this->displayFirstConsentStatusTime($participant->consentForStudyEnrollmentFirstYesAuthored);
             $row['questionnaireOnDnaProgram'] = $this->displayProgramUpdate($participant);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
+            $row['firstEhrConsent'] = $this->displayFirstConsentStatusTime($participant->consentForElectronicHealthRecordsFirstYesAuthored, 'ehr');
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
+            $row['ehrConsentExpireStatus'] = $this->displayEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords, $participant->ehrConsentExpireAuthored);
             $row['gRoRConsent'] = $this->displayGenomicsConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
             $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
@@ -436,6 +449,16 @@ class WorkQueue
         }
     }
 
+    public static function csvEhrConsentExpireStatus($ehrConsentExpireStatus, $consentForElectronicHealthRecords)
+    {
+        if ($ehrConsentExpireStatus === 'EXPIRED') {
+            return 1;
+        } elseif ($consentForElectronicHealthRecords === 'SUBMITTED' && empty($ehrConsentExpireStatus)) {
+            return 0;
+        }
+        return '';
+    }
+
     public function displayStatus($value, $successStatus, $time = null, $displayTime = true)
     {
         if ($value === $successStatus) {
@@ -462,6 +485,16 @@ class WorkQueue
         }
     }
 
+    public function displayFirstConsentStatusTime($time, $type = 'primary', $displayTime = true)
+    {
+        if (!empty($time)) {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
+        } elseif ($type === 'ehr') {
+            return self::HTML_DANGER . ' (never consented yes)';
+        }
+        return '';
+    }
+
     public function displayGenomicsConsentStatus($value, $time, $displayTime = true)
     {
         switch ($value) {
@@ -476,6 +509,16 @@ class WorkQueue
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
+    }
+
+    public function displayEhrConsentExpireStatus($ehrConsentExpireStatus, $consentForElectronicHealthRecords, $time, $displayTime = true)
+    {
+        if ($ehrConsentExpireStatus === 'EXPIRED') {
+            return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Expired)';
+        } elseif ($consentForElectronicHealthRecords === 'SUBMITTED' && empty($ehrConsentExpireStatus)) {
+            return self::HTML_SUCCESS . ' Active';
+        }
+        return '';
     }
 
     public function generateLink($id, $name)
