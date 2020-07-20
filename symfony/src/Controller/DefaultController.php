@@ -15,9 +15,8 @@ class DefaultController extends AbstractController
     /**
      * @Route("/", name="home")
      */
-    public function index(LoggerService $loggerService)
+    public function index()
     {
-        $loggerService->log(Log::REQUEST, 'HealthPro Symfony Home Page');
         return $this->render('index.html.twig');
     }
 }
