@@ -146,6 +146,7 @@
                             </select>
                         {% endif %}
                     </div>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token('siteSelect') }}"/>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         {% if app.user.sites|length > 0 or app.user.awardees|length > 0 %}
