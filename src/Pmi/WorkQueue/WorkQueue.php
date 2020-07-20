@@ -25,9 +25,11 @@ class WorkQueue
         'enrollmentStatus',
         'participantOrigin',
         'consentCohort',
+        'consentForStudyEnrollmentFirstYesAuthored',
         'consentForStudyEnrollmentAuthored',
         'questionnaireOnDnaProgramAuthored',
         'primaryLanguage',
+        'consentForElectronicHealthRecordsFirstYesAuthored',
         'consentForElectronicHealthRecordsAuthored',
         'ehrConsentExpireStatus',
         'consentForGenomicsRORAuthored',
@@ -341,8 +343,10 @@ class WorkQueue
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
             $row['consentCohort'] = $e($participant->consentCohortText);
             $row['primaryConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
+            $row['firstPrimaryConsent'] = $this->displayFirstConsentStatusTime($participant->consentForStudyEnrollmentFirstYesAuthored);
             $row['questionnaireOnDnaProgram'] = $this->displayProgramUpdate($participant);
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
+            $row['firstEhrConsent'] = $this->displayFirstConsentStatusTime($participant->consentForElectronicHealthRecordsFirstYesAuthored, 'ehr');
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
             $row['ehrConsentExpireStatus'] = $this->displayEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords, $participant->ehrConsentExpireAuthored);
             $row['gRoRConsent'] = $this->displayGenomicsConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
@@ -479,6 +483,16 @@ class WorkQueue
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
+    }
+
+    public function displayFirstConsentStatusTime($time, $type = 'primary', $displayTime = true)
+    {
+        if (!empty($time)) {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
+        } elseif ($type === 'ehr') {
+            return self::HTML_DANGER . ' (never consented yes)';
+        }
+        return '';
     }
 
     public function displayGenomicsConsentStatus($value, $time, $displayTime = true)
