@@ -514,7 +514,7 @@ class WorkQueue
     public function displayEhrConsentExpireStatus($ehrConsentExpireStatus, $consentForElectronicHealthRecords, $time, $displayTime = true)
     {
         if ($ehrConsentExpireStatus === 'EXPIRED') {
-            return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' Expired';
+            return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Expired)';
         } elseif ($consentForElectronicHealthRecords === 'SUBMITTED' && empty($ehrConsentExpireStatus)) {
             return self::HTML_SUCCESS . ' Active';
         }
