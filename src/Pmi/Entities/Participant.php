@@ -25,6 +25,7 @@ class Participant
 
     private $disableTestAccess;
     private $genomicsStartTime;
+    private $cohortOneLaunchTime;
     private $siteType;
 
     private static $consentCohortValues = [
@@ -49,6 +50,7 @@ class Participant
             if (isset($rdrParticipant->options)) {
                 $this->disableTestAccess = $rdrParticipant->options['disableTestAccess'];
                 $this->genomicsStartTime = $rdrParticipant->options['genomicsStartTime'];
+                $this->cohortOneLaunchTime = $rdrParticipant->options['cohortOneLaunchTime'];
                 $this->siteType = $rdrParticipant->options['siteType'];
                 unset($rdrParticipant->options);
             }
@@ -97,6 +99,19 @@ class Participant
                 if (isset($participant->questionnaireOnDnaProgram) && $participant->questionnaireOnDnaProgram !== 'SUBMITTED') {
                     $this->status = false;
                     $this->statusReason = 'program-update';
+                }
+            }
+        }
+
+        if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_1') {
+            if (isset($participant->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->physicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
+                if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
+                    $this->status = false;
+                    $this->statusReason = 'genomics';
+                }
+                if (isset($participant->consentForStudyEnrollmentAuthored) && $participant->consentForStudyEnrollmentAuthored <= $this->cohortOneLaunchTime) {
+                    $this->status = false;
+                    $this->statusReason = 'primary-consent-update';
                 }
             }
         }

@@ -19,6 +19,9 @@
 {% elseif participant.statusReason == 'program-update' %}
     {% set errorTitle = 'Program Update Not Reviewed' %}
     {% set errorMessage = 'This participant has previously provided general consent but has not completed their review of the updated primary consent in the Participant Portal and is therefore ineligible to be scheduled for or complete physical measurements and biospecimen collection. Please direct the participant to review the updated primary consent (complete the Program Update) in the Participant Portal to enable in-person enrollment or contact the Help Desk, if needed.' %}
+{% elseif participant.statusReason == 'primary-consent-update' %}
+    {% set errorTitle = 'Updated Primary Consent not complete' %}
+    {% set errorMessage = 'This participant has previously provided general consent but has not signed the updated primary consent form in the Participant Portal and is therefore ineligible to be scheduled for or complete physical measurements and biospecimen collection. Please direct the participant to complete the updated primary consent in the Participant Portal to enable in-person enrollment or contact the Help Desk, if needed.' %}
 {% else %}
     {% set errorTitle = 'Consent not complete' %}
     {% set errorMessage = 'This participant has not completed consent for enrollment.' %}

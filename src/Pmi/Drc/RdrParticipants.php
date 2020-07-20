@@ -36,6 +36,7 @@ class RdrParticipants
         $this->cacheTime = $rdrHelper->getCacheTime();
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
         $this->genomicsStartTime = $rdrHelper->getGenomicsStartTime();
+        $this->cohortOneLaunchTime = $rdrHelper->getCohortOneLaunchTime();
     }
 
     protected function getClient()

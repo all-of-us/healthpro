@@ -18,6 +18,7 @@ class RdrHelper
     protected $cacheTime = 300;
     protected $disableTestAccess = false;
     protected $genomicsStartTime;
+    protected $cohortOneLaunchTime;
 
     public function __construct(array $options)
     {
@@ -118,6 +119,11 @@ class RdrHelper
         return $this->genomicsStartTime;
     }
 
+    public function getCohortOneLaunchTime()
+    {
+        return $this->cohortOneLaunchTime;
+    }
+
     public function setConfigs()
     {
         if (!empty($this->config['rdr_endpoint'])) {
@@ -134,6 +140,9 @@ class RdrHelper
         }
         if (!empty($this->config['genomics_start_time'])) {
             $this->genomicsStartTime = $this->config['genomics_start_time'];
+        }
+        if (!empty($this->config['cohort_one_launch_time'])) {
+            $this->cohortOneLaunchTime = $this->config['cohort_one_launch_time'];
         }
     }
 
