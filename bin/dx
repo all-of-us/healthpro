@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# Wrapper for docker exec to run a command inside of the web container
+#
+# Example:
+# bin/dx bin/phpunit
+# bin/dx bin/symfony cache:clear
+#
+
+docker exec -it healthpro-web "$@"
