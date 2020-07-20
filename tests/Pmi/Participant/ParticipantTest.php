@@ -23,7 +23,8 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $options = [
             'disableTestAccess' => true,
             'genomicsStartTime' => '2020-03-23T12:44:33',
-            'siteType' => 'hpo'
+            'siteType' => 'hpo',
+            'cohortOneLaunchTime' => ''
         ];
 
         $participant = new Participant((object)[
@@ -88,7 +89,8 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $options = [
             'disableTestAccess' => false,
             'genomicsStartTime' => '2020-03-23T12:44:33',
-            'siteType' => 'hpo'
+            'siteType' => 'hpo',
+            'cohortOneLaunchTime' => ''
         ];
 
         // Assert genomics status (Criteria 1)
@@ -102,7 +104,7 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $this->assertSame(false, $participant->status);
         $this->assertSame('genomics', $participant->statusReason);
 
-        // Assert genomics status (Criteria 2)
+        // Assert genomics status for cohort 2 (Criteria 2)
         $participant = new Participant((object)[
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_2',
@@ -113,6 +115,17 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('genomics', $participant->statusReason);
+
+        // Assert genomics status for cohort 1 (Criteria 3)
+        $participant = new Participant((object)[
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'consentCohort' => 'COHORT_1',
+            'physicalMeasurementsStatus' => 'UNSET',
+            'samplesToIsolateDNA' => 'RECEIVED',
+            'consentForGenomicsROR' => 'UNSET'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('genomics', $participant->statusReason);
     }
 
     public function testParticipantEhrStatus()
@@ -120,7 +133,8 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $options = [
             'disableTestAccess' => false,
             'genomicsStartTime' => '2020-03-23T12:44:33',
-            'siteType' => 'hpo'
+            'siteType' => 'hpo',
+            'cohortOneLaunchTime' => ''
         ];
 
         // For HPO
@@ -230,6 +244,42 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
             'questionnaireOnDnaProgram' => 'SUBMITTED',
             'consentForGenomicsROR' => 'SUBMITTED',
         ]);
+        $this->assertSame(true, $participant->status);
+    }
+
+    public function testParticipantPrimaryConsentUpdateStatus()
+    {
+        $options = [
+            'disableTestAccess' => false,
+            'genomicsStartTime' => '',
+            'siteType' => 'hpo',
+            'cohortOneLaunchTime' => '2020-03-24T12:44:33'
+        ];
+        // Assert program update status
+        $participant = new Participant((object)[
+            'options' => $options,
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'consentCohort' => 'COHORT_1',
+            'physicalMeasurementsStatus' => 'UNSET',
+            'samplesToIsolateDNA' => 'UNSET',
+            'consentForGenomicsROR' => 'SUBMITTED',
+            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:43:33'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('primary-consent-update', $participant->statusReason);
+
+        // Assert participant status to true
+        $participant = new Participant((object)[
+            'options' => $options,
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'questionnaireOnTheBasics' => 'SUBMITTED',
+            'consentCohort' => 'COHORT_1',
+            'physicalMeasurementsStatus' => 'UNSET',
+            'samplesToIsolateDNA' => 'RECEIVED',
+            'consentForGenomicsROR' => 'SUBMITTED',
+            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:45:33'
+        ]);
+        //$this->assertSame(true, $participant->status);
         $this->assertSame(true, $participant->status);
     }
 }

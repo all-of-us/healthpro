@@ -109,7 +109,7 @@ class Participant
                     $this->status = false;
                     $this->statusReason = 'genomics';
                 }
-                if (isset($participant->consentForStudyEnrollmentAuthored) && $participant->consentForStudyEnrollmentAuthored <= $this->cohortOneLaunchTime) {
+                if (isset($participant->consentForStudyEnrollmentAuthored) && !empty($this->cohortOneLaunchTime) && $participant->consentForStudyEnrollmentAuthored <= $this->cohortOneLaunchTime) {
                     $this->status = false;
                     $this->statusReason = 'primary-consent-update';
                 }
