@@ -7,7 +7,10 @@ CREATE TABLE `patient_status_history` (
   `comments` text DEFAULT NULL,
   `created_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `rdr_ts` timestamp NULL DEFAULT NULL,
+  `import_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`patient_status_id`)
-  REFERENCES patient_status(`id`)
+  REFERENCES patient_status(`id`),
+  FOREIGN KEY (`import_id`)
+  REFERENCES patient_status_import(`id`)
 ) DEFAULT CHARSET=utf8mb4;

@@ -27,7 +27,8 @@ class CronController extends AbstractController
         ['missingMeasurementsOrders', '/missing-measurements-orders'],
         ['sendPatientStatusToRdr', '/send-patient-status-rdr'],
         ['deleteCacheKeys', '/delete-cache-keys'],
-        ['deleteSessionKeys', '/delete-session-keys']
+        ['deleteSessionKeys', '/delete-session-keys'],
+        ['deleteUnconfimedPatientStatusImportData', '/delete-unconfirmed-patient-status-import-data']
     ];
 
     private function isAllowed(Application $app, Request $request)
@@ -149,6 +150,17 @@ class CronController extends AbstractController
         $sessionService = new SessionService($app);
         $sessionService->deleteKeys();
 
+        return new JsonResponse(['success' => true]);
+    }
+
+    public function deleteUnconfimedPatientStatusImportDataAction(Application $app, Request $request)
+    {
+        if (!$this->isAllowed($app, $request)) {
+            return $this->getAccessDeniedResponse();
+        }
+
+        $patientStatusService = new PatientStatusService($app);
+        $patientStatusService->deleteUnconfirmedImportData();
         return new JsonResponse(['success' => true]);
     }
 }

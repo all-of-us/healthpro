@@ -437,6 +437,17 @@ class HpoApplication extends AbstractApplication
             if (!$this->isUpkeepRoute($request)) {
                 $this['session']->set('isLoginReturn', false);
             }
+
+            // Set user site display names
+            if (!$this['session']->has('userSiteDisplayNames')) {
+                if (!empty($this->getUser()->getSites())) {
+                    $userSiteDisplayNames = [];
+                    foreach ($this->getUser()->getSites() as $userSite) {
+                        $userSiteDisplayNames[$userSite->id] = $this->getSiteDisplayName($userSite->id, false);
+                    }
+                    $this['session']->set('userSiteDisplayNames', $userSiteDisplayNames);
+                }
+            }
         }
     }
     

@@ -15,7 +15,7 @@
                     <label>Choose Site</label>
                     <select class="form-control" name="site">
                         {% for site in app.user.sites %}
-                            <option value="{{ site.email }}"{{ (siteEmail == site.email) ? ' selected' : ''}} >{{ app.getSiteDisplayName(site.id, false)|default(site.name) }}</option>
+                            <option value="{{ site.email }}"{{ (siteEmail == site.email) ? ' selected' : ''}} >{{ attribute(app.session.get('userSiteDisplayNames'), site.id)|default(site.name) }}</option>
                         {% endfor %}
                         {% for awardee in app.user.awardees %}
                             <option value="{{ awardee.email }}"{{ (siteEmail is not defined and app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>

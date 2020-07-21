@@ -31,3 +31,11 @@ cron:
   url: /cron/delete-session-keys
   schedule: every 1 hours
   timezone: America/Chicago
+- description: "Send patient status to RDR"
+  url: /cron/send-patient-status-rdr
+  schedule: every 5 mins
+  timezone: America/Chicago
+- description: "Delete patient status imports unconfirmed data"
+  url: /cron/delete-unconfirmed-patient-status-import-data
+  schedule: every day 02:00
+  timezone: America/Chicago
