@@ -23,7 +23,7 @@ class PatientStatusService
 
     public function sendPatientStatusToRdr()
     {
-        $limit = $this->app->getConfig('patient_status_queue_limit');
+        $limit = intval($this->app->getConfig('patient_status_queue_limit'));
         $query = "
             SELECT psir.*,
                    psi.site,
@@ -39,8 +39,10 @@ class PatientStatusService
             LEFT JOIN users u ON psi.user_id = u.id
             WHERE psir.rdr_status = :rdrStatus
             ORDER BY psir.id ASC
-            limit {$limit}
         ";
+        if ($limit > 0) {
+            $query .= ' LIMIT ' . $limit;
+        }
         $patientStatuses = $this->em->fetchAll($query, ['confirm' => 1, 'rdrStatus' => 0]);
         $patientStatusObj = new PatientStatus($this->app);
         $importIds = [];
