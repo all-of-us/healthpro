@@ -30,12 +30,12 @@ class PatientStatusImportService
         }
         $validStatus = array_values(PmiPatientStatus::$patientStatus);
         $rowsLimit = $this->params->has('csv_rows_limit') ? intval($this->params->get('csv_rows_limit')) : self::DEFAULT_CSV_ROWS_LIMIT;
-        $row = 1;
         $csvFile = file($file->getPathname(), FILE_SKIP_EMPTY_LINES);
         if (count($csvFile) > $rowsLimit + 1) {
             $form['patient_status_csv']->addError(new FormError("CSV file rows should not be greater than {$rowsLimit}"));
             return;
         }
+        $row = 2;
         while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
             $patientStatus = [];
             if (!preg_match("/^P\d{9}+$/", $data[0])) {
