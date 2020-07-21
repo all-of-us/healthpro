@@ -20,20 +20,10 @@ class PatientStatusImportService
     {
         $fileHandle = fopen($file->getPathname(), 'r');
         $headers = fgetcsv($fileHandle, 0, ",");
-        $validHeaders = ['participantid', 'status', 'comments'];
         // Guess file format using headers
-        if (count($headers) !== 3) {
+        if (count($headers) < 2) {
             $form['patient_status_csv']->addError(new FormError("Invalid file format"));
             return;
-        }
-        // Check column headers
-        foreach ($headers as $header) {
-            // Handle bom
-            $header = str_replace("\xEF\xBB\xBF", '', $header);
-            if (!in_array(str_replace(' ', '', strtolower($header)), $validHeaders)) {
-                $form['patient_status_csv']->addError(new FormError("Invalid column headers"));
-                return;
-            }
         }
         $validStatus = array_values(PmiPatientStatus::$patientStatus);
         $rowsLimit = $this->params->has('csv_rows_limit') ? intval($this->params->get('csv_rows_limit')) : 5000;
@@ -53,7 +43,7 @@ class PatientStatusImportService
                 $form['patient_status_csv']->addError(new FormError("Invalid patient status {$data[1]} in line {$row}, column 2"));
             }
             $patientStatus['status'] = $data[1];
-            $patientStatus['comments'] = $data[2];
+            $patientStatus['comments'] = !empty($data[2]) ? $data[2] : '';
             $patientStatuses[] = $patientStatus;
             $row++;
         }
