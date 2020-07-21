@@ -34,7 +34,7 @@ class PatientStatus
     private $awardee;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusHistory", mappedBy="patient_status")
+     * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusHistory", mappedBy="patientStatus")
      */
     private $patientStatusHistories;
 
