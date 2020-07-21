@@ -19,7 +19,7 @@ class PatientStatusImportFormType extends AbstractType
                     'maxSize' => '5M'
                 ])
             ])
-            ->add('Save', Type\SubmitType::class, [
+            ->add('Upload', Type\SubmitType::class, [
                 'attr' => ['class' => 'btn btn-primary'],
             ]);
         ;
