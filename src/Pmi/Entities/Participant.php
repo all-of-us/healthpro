@@ -91,7 +91,7 @@ class Participant
             }
         }
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_2') {
-            if (isset($participant->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && $participant->physicalMeasurementsStatus !== 'COMPLETED' && $participant->samplesToIsolateDNA !== 'RECEIVED') {
+            if (isset($participant->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->physicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
                 if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
                     $this->statusReason = 'genomics';
