@@ -365,7 +365,6 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
             'consentForGenomicsROR' => 'SUBMITTED',
             'consentForStudyEnrollmentAuthored' => '2020-03-24T12:45:33'
         ]);
-        //$this->assertSame(true, $participant->status);
         $this->assertSame(true, $participant->status);
     }
 }
