@@ -9,6 +9,9 @@ use Symfony\Component\Form\FormError;
 
 class PatientStatusImportService
 {
+
+    const DEFAULT_CSV_ROWS_LIMIT = 5000;
+
     public function __construct(UserService $userService, EntityManagerInterface $em, ParameterBagInterface $params)
     {
         $this->userService = $userService;
@@ -26,7 +29,7 @@ class PatientStatusImportService
             return;
         }
         $validStatus = array_values(PmiPatientStatus::$patientStatus);
-        $rowsLimit = $this->params->has('csv_rows_limit') ? intval($this->params->get('csv_rows_limit')) : 5000;
+        $rowsLimit = $this->params->has('csv_rows_limit') ? intval($this->params->get('csv_rows_limit')) : self::DEFAULT_CSV_ROWS_LIMIT;
         $row = 1;
         $csvFile = file($file->getPathname(), FILE_SKIP_EMPTY_LINES);
         if (count($csvFile) > $rowsLimit + 1) {
