@@ -120,7 +120,7 @@
                                         <dd>{{ macros.displayProgramUpdate(participant.consentCohort, participant.questionnaireOnDnaProgram, participant.questionnaireOnDnaProgramAuthored) }}</dd>
                                         <dt>EHR Consent</dt>
                                         <dd>
-                                            {{ macros.displayFirstConsentPanelStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored, participant.consentForElectronicHealthRecordsFirstYesAuthored) }}
+                                            {{ macros.displayFirstConsentPanelStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored, participant.consentForElectronicHealthRecordsFirstYesAuthored, 'ehr') }}
                                             {% if participant.ehrConsentExpireStatus == 'EXPIRED' %}
                                                 (Expired on {{ participant.ehrConsentExpireAuthored ? participant.ehrConsentExpireAuthored|date('n/j/Y g:ia', app.userTimezone) : '--' }})
                                             {% elseif participant.consentForElectronicHealthRecords == 'SUBMITTED' and participant.ehrConsentExpireStatus is empty %}
