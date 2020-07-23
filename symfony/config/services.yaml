@@ -35,3 +35,15 @@ services:
     App\EventListener\ResponseListener:
         tags:
             - { name: kernel.event_listener, event: kernel.response }
+
+    # Override router_listener service defined in vendor/symfony/framework-bundle/Resources/config/routing.xml
+    # to suppress logger (definition below is identical except for passing in null for the logger)
+    router_listener:
+        class: Symfony\Component\HttpKernel\EventListener\RouterListener
+        arguments:
+            - '@router'
+            - '@request_stack'
+            - '@?router.request_context'
+            - null
+            - '%kernel.project_dir%'
+            - '%kernel.debug%'

@@ -56,6 +56,9 @@ class EnvironmentService
     private function determineEnv()
     {
         $env = getenv('PMI_ENV') ?: $_SERVER['PMI_ENV'];
+        if (empty($env)) {
+            $env = 'local';
+        }
         if ($env == self::ENV_LOCAL) {
             return self::ENV_LOCAL;
         } elseif ($env == self::ENV_DEV) {

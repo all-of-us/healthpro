@@ -19,6 +19,7 @@ class RdrParticipants
 
     private $disableTestAccess;
     private $genomicsStartTime;
+    private $cohortOneLaunchTime;
 
     // Expected RDR response status
 
@@ -36,6 +37,7 @@ class RdrParticipants
         $this->cacheTime = $rdrHelper->getCacheTime();
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
         $this->genomicsStartTime = $rdrHelper->getGenomicsStartTime();
+        $this->cohortOneLaunchTime = $rdrHelper->getCohortOneLaunchTime();
     }
 
     protected function getClient()
@@ -197,7 +199,8 @@ class RdrParticipants
             $participant->options = [
                 'disableTestAccess' => $this->disableTestAccess,
                 'genomicsStartTime' => $this->genomicsStartTime,
-                'siteType' => isset($participant->awardee) ? $this->rdrHelper->getSiteType($participant->awardee) : null
+                'siteType' => isset($participant->awardee) ? $this->rdrHelper->getSiteType($participant->awardee) : null,
+                'cohortOneLaunchTime' => $this->cohortOneLaunchTime
             ];
             return $participant;
         } catch (\GuzzleHttp\Exception\ClientException $e) {

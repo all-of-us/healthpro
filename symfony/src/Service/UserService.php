@@ -59,10 +59,17 @@ class UserService
                 'google_id' => $googleUser->getUserId(),
             ];
         }
-        $userInfo = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
-        if (empty($userInfo)) {
+        $user = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
+        if (empty($user)) {
             throw new AuthenticationException('Failed to retrieve user information');
         }
+        // Return user info in array format
+        $userInfo = [
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            'google_id' => $user->getGoogleId(),
+            'timezone' => $user->getTimezone(),
+        ];
         return $userInfo;
     }
 
