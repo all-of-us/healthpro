@@ -1,3 +1,50 @@
 index:
     path: /
     controller: App\Controller\DefaultController::index
+
+# Legacy Silex Routes
+
+settings:
+    path: /settings
+
+logout:
+    path: /logout
+
+help_home:
+    path: /help
+
+help_videos:
+    path: /help/videos
+
+help_faq:
+    path: /help/faq
+
+help_sop:
+    path: /help/sop
+
+selectSite:
+    path: /site/select
+
+participants:
+    path: /participants
+
+orders:
+    path: /orders
+
+review_today:
+    path: /review
+
+workqueue_index:
+    path: /workqueue
+
+problem_reports:
+    path: /problem/reports
+
+admin_home:
+    path: /admin
+
+dashboard_home:
+    path: /dashboard
+
+biobank_home:
+    path: /biobank

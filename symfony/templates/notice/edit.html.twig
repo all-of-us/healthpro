@@ -32,7 +32,7 @@
                 </div>
                 <div class="panel-body">
                     {% set return = path('admin_notice', { notice: notice ? notice.id : null }) %}
-                    <p><strong>Your time zone</strong>: {{ app.userTimezoneDisplay }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
+                    <p><strong>Your time zone</strong>: {{ app.user.info.timezone|default('Not set!') }} <a href="{{ path('settings', { return: settings_return_url }) }}" class="small">change</a></p>
                     {{ form_rest(form) }}
                     <div class="alert alert-info">
                         <ul>
@@ -59,8 +59,8 @@
 {% block pagejs %}
 <script>
 $(document).ready(function() {
-    $('#form_start_ts, #form_end_ts').pmiDateTimePicker();
-    $('#form_url').dropdownOther({
+    $('#notice_start_ts, #notice_end_ts').pmiDateTimePicker();
+    $('#notice_url').dropdownOther({
         'All': '/*',
         'Home Page': '/',
         'Work Queue': '/workqueue/',

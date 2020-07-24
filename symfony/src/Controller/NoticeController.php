@@ -1,0 +1,84 @@
+<?php
+
+namespace App\Controller;
+
+use App\Form\NoticeType;
+use App\Repository\NoticeRepository;
+use App\Service\LoggerService;
+use Doctrine\ORM\EntityManagerInterface;
+use Pmi\Audit\Log;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+
+/**
+ * @Route("/s/admin/notices")
+ */
+class NoticeController extends AbstractController
+{
+    /**
+     * @Route("/", name="admin_notices")
+     */
+    public function index(NoticeRepository $noticeRepository)
+    {
+        $notices = $noticeRepository->findBy([], ['id' => 'asc']);
+        return $this->render('notice/index.html.twig', [
+            'notices' => $notices,
+        ]);
+    }
+
+    /**
+     * @Route("/notice/{id}", name="admin_notice")
+     */
+    public function edit(NoticeRepository $noticeRepository, EntityManagerInterface $em, LoggerService $loggerService, Request $request, $id=null)
+    {
+        if ($id) {
+            $notice = $noticeRepository->find($id);
+            if (!$notice) {
+                $this->createNotFoundException('Page notice not found.');
+            }
+        } else {
+            $notice = null;
+        }
+
+        $form = $this->createForm(NoticeType::class, $notice, ['timezone' => $this->getUser()->getTimezone()]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                if ($notice === null) {
+                    $notice = $form->getData();
+                    $em->persist($notice);
+                    $em->flush();
+                    $loggerService->log(Log::NOTICE_ADD, $notice->getId());
+                    $this->addFlash('success', 'Notice added');
+                } elseif ($request->request->has('delete')) {
+                    $em->remove($notice);
+                    $em->flush();
+                    $loggerService->log(Log::NOTICE_DELETE, $notice->getId());
+                    $this->addFlash('success', 'Notice removed');
+                } else {
+                    $em->persist($notice);
+                    $em->flush();
+                    $loggerService->log(Log::NOTICE_EDIT, $notice->getId());
+                    $this->addFlash('success', 'Notice updated');
+                }
+                return $this->redirect($this->generateUrl('admin_notices'));
+            } else {
+                // Add a form-level error if there are none
+                if (count($form->getErrors()) == 0) {
+                    $form->addError(new FormError('Please correct the errors below'));
+                }
+            }
+        }
+
+        return $this->render('notice/edit.html.twig', [
+            'notice' => $notice,
+            'settings_return_url' => ($id === null)
+                ? $this->generateUrl('admin_notices')
+                : $this->generateUrl('admin_notice', ['id' => $id]),
+            'form' => $form->createView()
+        ]);
+    }
+}
