@@ -482,6 +482,8 @@ class DefaultController extends AbstractController
             $awardeePatientStatusData = null;
             $canViewPatientStatus = false;
         }
+        $evaluationService = new Evaluation($app);
+        $evaluationUrl = $evaluationService->requireBloodDonorCheck() ? 'evaluationBloodDonorCheck' : 'evaluation';
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
@@ -501,7 +503,8 @@ class DefaultController extends AbstractController
             'awardeePatientStatusData' => $awardeePatientStatusData,
             'isDVType' => $app->isDVType(),
             'canViewPatientStatus' => $canViewPatientStatus,
-            'displayPatientStatusBlock' => !$app->isDVType()
+            'displayPatientStatusBlock' => !$app->isDVType(),
+            'evaluationUrl' => $evaluationUrl
         ]);
     }
 

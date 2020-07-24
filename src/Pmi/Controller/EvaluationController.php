@@ -18,7 +18,8 @@ class EvaluationController extends AbstractController
         ['evaluationFhir', '/participant/{participantId}/measurements/{evalId}/fhir.json'],
         ['evaluationRdr', '/participant/{participantId}/measurements/{evalId}/rdr.json'],
         ['evaluationModify', '/participant/{participantId}/measurements/{evalId}/modify/{type}', ['method' => 'GET|POST']],
-        ['evaluationRevert', '/participant/{participantId}/evaluation/{evalId}/revert', ['method' => 'POST']]
+        ['evaluationRevert', '/participant/{participantId}/evaluation/{evalId}/revert', ['method' => 'POST']],
+        ['evaluationBloodDonorCheck', '/participant/{participantId}/measurements/blood/donor/check', ['method' => 'GET|POST']],
     ];
 
     /* For debugging generated FHIR bundle - only allowed in dev */
@@ -122,6 +123,39 @@ class EvaluationController extends AbstractController
             'participant' => $participant,
             'evaluation' => $evaluation,
             'summary' => $evaluationService->getSummary()
+        ]);
+    }
+
+    public function evaluationBloodDonorCheckAction($participantId, Application $app, Request $request)
+    {
+        $evaluationService = new Evaluation($app);
+        if (!$evaluationService->requireBloodDonorCheck()) {
+            $app->abort(403);
+        }
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->status || $app->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($evalId))) {
+            $app->abort(403);
+        }
+        $bloodDonorCheckForm = $evaluationService->getBloodDonorCheckForm($app['form.factory']);
+        $bloodDonorCheckForm->handleRequest($request);
+        if ($bloodDonorCheckForm->isSubmitted() && $bloodDonorCheckForm->isValid()) {
+            if ($bloodDonorCheckForm['bloodDonor']->getData() === 'yes') {
+                return $app->redirectToRoute('evaluation', [
+                    'participantId' => $participant->id,
+                    'type' => 'donor'
+                ]);
+            } else {
+                return $app->redirectToRoute('evaluation', [
+                    'participantId' => $participant->id
+                ]);
+            }
+        }
+        return $app['twig']->render('evaluation-blood-donor-check.html.twig', [
+            'participant' => $participant,
+            'bloodDonorCheckForm' => $bloodDonorCheckForm->createView()
         ]);
     }
 

@@ -152,6 +152,29 @@ class Evaluation
         return $conversions;
     }
 
+    public function getBloodDonorCheckForm(FormFactory $formFactory)
+    {
+        $formBuilder = $formFactory->createBuilder(FormType::class);
+        $formBuilder
+            ->add('bloodDonor', ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => false,
+                'required' => true,
+                'label' => 'Is the participant on site for a blood donation or apheresis?',
+                'choices' => [
+                    'Yes' => 'yes',
+                    'No' => 'no',
+                ],
+                'constraints' => new Constraints\NotBlank([
+                    'message' => 'Please select an option'
+                ])
+            ])
+            ->add('Continue', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-primary'],
+            ]);
+        return $formBuilder->getForm();
+    }
+
     public function getForm(FormFactory $formFactory)
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
@@ -694,5 +717,10 @@ class Evaluation
         // Check only cancel reasons
         $reasonDisplayText = array_search($this->evaluation['eh_reason'], self::$cancelReasons);
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
+    }
+
+    public function requireBloodDonorCheck()
+    {
+        return $this->app->getSiteAwardeeId() === 'SDBB';
     }
 }
