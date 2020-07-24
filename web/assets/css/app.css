@@ -98,6 +98,11 @@ label.label-normal {
 .navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a, .navbar-inverse .navbar-text {
     color: #ddd; /* increase contrast */
 }
+@media(max-width:767px) {
+    .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {
+        color: #ddd; /* increase contrast */
+    }
+}
 .navbar-allofus, .navbar-allofus .navbar-toggle {
     background-color: #262262;
 }
