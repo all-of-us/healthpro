@@ -36,7 +36,7 @@ class NoticeController extends AbstractController
         if ($id) {
             $notice = $noticeRepository->find($id);
             if (!$notice) {
-                $this->createNotFoundException('Page notice not found.');
+                throw $this->createNotFoundException('Page notice not found.');
             }
         } else {
             $notice = null;
