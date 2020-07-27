@@ -133,6 +133,21 @@ label.label-normal {
     }
 }
 
+/* Home page */
+.home-menu .btn-block i.fa {
+    display: block;
+    font-size: 150%;
+    color: #363272;
+    margin-top: 5px;
+    margin-bottom: 3px;
+}
+.home-menu .btn-block {
+    background-color: #f9f9f9;
+}
+.home-menu .btn-block:hover, .home-menu .btn-block:active, .home-menu .btn-block:focus {
+    background-color: #e6e6e6;
+}
+
 /* Physical evaluation */
 #physicalEvaluation .toggle-help-image {
     cursor: pointer;

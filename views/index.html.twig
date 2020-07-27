@@ -3,7 +3,7 @@
     <div class="page-header">
         <h2>Welcome!</h2>
     </div>
-    <div class="row">
+    <div class="row home-menu">
         {% if is_granted('ROLE_USER') and app.session.get('site') %}
             <div class="col-sm-6 col-md-4{% if not path_exists('help_home') %} col-md-offset-2{% endif %}">
                 <a href="{{ path('participants') }}" class="btn btn-lg btn-default btn-block"><i class="fa fa-user" aria-hidden="true"></i> Participant Lookup</a>
