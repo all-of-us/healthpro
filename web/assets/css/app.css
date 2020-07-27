@@ -147,6 +147,12 @@ label.label-normal {
 .home-menu .btn-block:hover, .home-menu .btn-block:active, .home-menu .btn-block:focus {
     background-color: #e6e6e6;
 }
+.home-menu .description {
+    white-space: normal;
+    font-size: 70%;
+    color: #777777;
+    margin-top: 5px;
+}
 
 /* Physical evaluation */
 #physicalEvaluation .toggle-help-image {
