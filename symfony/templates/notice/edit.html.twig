@@ -32,7 +32,7 @@
                 </div>
                 <div class="panel-body">
                     {% set return = path('admin_notice', { notice: notice ? notice.id : null }) %}
-                    <p><strong>Your time zone</strong>: {{ app.user.info.timezone|default('Not set!') }} <a href="{{ path('settings', { return: settings_return_url }) }}" class="small">change</a></p>
+                    <p><strong>Your time zone</strong>: {{ timezone_display(app.user.info.timezone)|default('Not set!') }} <a href="{{ path('settings', { return: settings_return_url }) }}" class="small">change</a></p>
                     {{ form_rest(form) }}
                     <div class="alert alert-info">
                         <ul>
