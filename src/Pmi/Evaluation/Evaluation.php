@@ -17,11 +17,13 @@ use Pmi\Audit\Log;
 class Evaluation
 {
     const CURRENT_VERSION = '0.3.3';
+    const SDBB_CURRENT_VERSION = '0.3.3-SDBB';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_ACTIVE = 'active';
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
+    const SDBB = 'SDBB';
 
     protected $app;
     protected $version;
@@ -47,10 +49,10 @@ class Evaluation
         'Other' => 'OTHER'
     ];
 
-    public function __construct($app = null)
+    public function __construct($app = null, $type = null)
     {
         $this->app = $app;
-        $this->version = self::CURRENT_VERSION;
+        $this->version = $type === self::SDBB ? self::SDBB_CURRENT_VERSION : self::CURRENT_VERSION;
         $this->data = new \StdClass();
         $this->loadSchema();
         $this->normalizeData();
@@ -721,6 +723,6 @@ class Evaluation
 
     public function requireBloodDonorCheck()
     {
-        return $this->app->getSiteAwardeeId() === 'SDBB';
+        return $this->app->getSiteAwardeeId() === self::SDBB;
     }
 }

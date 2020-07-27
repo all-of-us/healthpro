@@ -145,7 +145,7 @@ class EvaluationController extends AbstractController
             if ($bloodDonorCheckForm['bloodDonor']->getData() === 'yes') {
                 return $app->redirectToRoute('evaluation', [
                     'participantId' => $participant->id,
-                    'type' => 'donor'
+                    'type' => $evaluationService::SDBB
                 ]);
             } else {
                 return $app->redirectToRoute('evaluation', [
@@ -168,7 +168,8 @@ class EvaluationController extends AbstractController
         if (!$participant->status || $app->isTestSite()|| ($participant->activityStatus === 'deactivated' && empty($evalId))) {
             $app->abort(403);
         }
-        $evaluationService = new Evaluation($app);
+        $type = $request->query->get('type');
+        $evaluationService = new Evaluation($app, $type);
         if ($evalId) {
             $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);
             if (!$evaluation) {
