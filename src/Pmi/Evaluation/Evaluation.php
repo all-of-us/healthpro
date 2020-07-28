@@ -181,6 +181,9 @@ class Evaluation
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
         foreach ($this->schema->fields as $field) {
+            if (isset($field->formField) && !$field->formField) {
+                continue;
+            }
             if (isset($field->type)) {
                 $type = $field->type;
             } else {

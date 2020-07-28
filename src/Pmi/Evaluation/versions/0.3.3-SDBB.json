@@ -186,6 +186,7 @@
     {
       "name": "pregnant",
       "label": "Is participant pregnant?",
+      "formField": false,
       "options": {
         "No": false,
         "Yes": true
@@ -203,6 +204,7 @@
     {
       "name": "wheelchair",
       "label": "Is participant a wheelchair user?",
+      "formField": false,
       "options": {
         "No": false,
         "Yes": true
@@ -398,6 +400,7 @@
     {
       "name": "hip-circumference",
       "label": "Hip Circumference",
+      "formField": false,
       "unit": "cm",
       "alternateunits": true,
       "decimals": 1,
@@ -418,6 +421,7 @@
     {
       "name": "hip-circumference-protocol-modification",
       "label": "Modification to Hip Circumference Protocol",
+      "formField": false,
       "replicates": 3,
       "options": {
         "None": "",
@@ -448,12 +452,14 @@
     {
       "name": "hip-circumference-protocol-modification-notes",
       "label": "Reason",
+      "formField": false,
       "replicates": 3,
       "type": "text"
     },
     {
       "name": "waist-circumference",
       "label": "Waist Circumference",
+      "formField": false,
       "unit": "cm",
       "alternateunits": true,
       "decimals": 1,
@@ -474,6 +480,7 @@
     {
       "name": "waist-circumference-location",
       "label": "Waist Circumference Location",
+      "formField": false,
       "options": {
         "Smallest part (Natural indent) of the trunk": "smallest-part-of-trunk",
         "Umbilicus": "umbilicus"
@@ -485,6 +492,7 @@
     {
       "name": "waist-circumference-protocol-modification",
       "label": "Modification to Waist Circumference Protocol",
+      "formField": false,
       "replicates": 3,
       "options": {
         "None": "",
@@ -523,6 +531,7 @@
     {
       "name": "waist-circumference-protocol-modification-notes",
       "label": "Reason",
+      "formField": false,
       "replicates": 3,
       "type": "text"
     },

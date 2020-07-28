@@ -57,13 +57,6 @@
 </div>
 
 <div class="panel panel-default">
-    <div class="panel-body">
-        {{ metrics.form_row(evaluationForm, schema.fields['pregnant']) }}
-        {{ metrics.form_row(evaluationForm, schema.fields['wheelchair']) }}
-    </div>
-</div>
-
-<div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
             Height and Weight
@@ -113,85 +106,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<div class="panel panel-default" id="panel-hip-waist">
-    <div class="panel-heading">
-        <div class="pull-right" id="hip-waist-skip"></div>
-        <h3 class="panel-title">
-            Waist and Hip Circumference
-            <span class="toggle-help-image" data-id="waistHipModal">
-                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-            </span>
-        </h3>
-    </div>
-    <div class="panel-body">
-        <h4>Waist</h4>
-        <div class="well">
-            <div class="row">
-                <div class="col-sm-4">
-                    {{ metrics.form_row(evaluationForm, schema.fields['waist-circumference-location']) }}
-                </div>
-            </div>
-        </div>
-        <div class="row replicate row-equal-height">
-            {% for i in 0..2 %}
-                <div class="col-sm-4">
-                    <div class="panel panel-default panel-waist-circumference-{{ i + 1 }}">
-                        <div class="panel-body">
-                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
-                            <div class="modification-block">
-                                <div class="modification-affected">
-                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference'], i) }}
-                                    {% if i == 2 %}
-                                        <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
-                                    {% endif %}
-                                </div>
-                                <div class="modification-toggle text-right">
-                                    <a class="small">Add protocol modification</a>
-                                </div>
-                                <div class="modification-select" style="display:none">
-                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference-protocol-modification'], i) }}
-                                    <div class="modification-notes" style="display:none">
-                                        {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference-protocol-modification-notes'], i) }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-        <hr />
-        <h4>Hip</h4>
-        <div class="row replicate row-equal-height">
-            {% for i in 0..2 %}
-                <div class="col-sm-4">
-                    <div class="panel panel-default panel-hip-circumference-{{ i + 1 }}">
-                        <div class="panel-body">
-                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
-                            <div class="modification-block">
-                                <div class="modification-affected">
-                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference'], i) }}
-                                    {% if i == 2 %}
-                                        <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
-                                    {% endif %}
-                                </div>
-                                <div class="modification-toggle text-right">
-                                    <a class="small">Add protocol modification</a>
-                                </div>
-                                <div class="modification-select" style="display:none">
-                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference-protocol-modification'], i) }}
-                                    <div class="modification-notes" style="display:none">
-                                        {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference-protocol-modification-notes'], i) }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
         </div>
     </div>
 </div>
