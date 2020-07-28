@@ -14,7 +14,7 @@
       "name": "blood-pressure-systolic",
       "label": "Systolic",
       "unit": "mmHg",
-      "replicates": 3,
+      "replicates": 2,
       "max": 300,
       "warnings": [
         {
@@ -56,7 +56,7 @@
       "name": "blood-pressure-diastolic",
       "label": "Diastolic",
       "unit": "mmHg",
-      "replicates": 3,
+      "replicates": 2,
       "max": 300,
       "compare": {
         "type": "less-than",
@@ -103,7 +103,7 @@
       "name": "heart-rate",
       "label": "Heart Rate",
       "unit": "bpm",
-      "replicates": 3,
+      "replicates": 2,
       "max": 300,
       "warnings": [
         {
@@ -135,7 +135,7 @@
       "name": "irregular-heart-rate",
       "label": "Irregular Heart Rate",
       "type": "checkbox",
-      "replicates": 3,
+      "replicates": 2,
       "help": {
         "caption": "Help text placeholder."
       }
@@ -143,7 +143,7 @@
     {
       "name": "blood-pressure-protocol-modification",
       "label": "Modification to Protocol",
-      "replicates": 3,
+      "replicates": 2,
       "options": {
         "None": "",
         "Refusal": "refusal",
@@ -169,18 +169,18 @@
       "name": "manual-blood-pressure",
       "label": "Blood pressure measured manually",
       "type": "checkbox",
-      "replicates": 3
+      "replicates": 2
     },
     {
       "name": "manual-heart-rate",
       "label": "Heart rate measured manually",
       "type": "checkbox",
-      "replicates": 3
+      "replicates": 2
     },
     {
       "name": "blood-pressure-protocol-modification-notes",
       "label": "Reason",
-      "replicates": 3,
+      "replicates": 2,
       "type": "text"
     },
     {

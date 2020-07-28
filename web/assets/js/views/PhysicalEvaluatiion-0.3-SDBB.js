@@ -13,6 +13,7 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         "keyup input": "inputKeyup",
         "keyup #form_height, #form_weight": "calculateBmi",
         "change #form_height, #form_weight": "calculateBmi",
+        "change .blood-pressure input": "toggleSecondBloodPressure",
         "change #form_blood-pressure-arm-circumference": "calculateCuff",
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
         "change .field-irregular-heart-rate input": "calculateIrregularHeartRate",
@@ -228,6 +229,16 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
             this.$('#form_weight-protocol-modification-notes').val('');
         }
     },
+    toggleSecondReading: function () {
+        var firstSystolic = parseFloat(this.$('#form_blood-pressure-systolic_0').val());
+        var firstDiastolic = parseFloat(this.$('#form_blood-pressure-diastolic_0').val());
+        var firstHeartRate = parseFloat(this.$('#form_heart-rate_0').val());
+        if (firstSystolic < 90 || firstSystolic > 180 || firstDiastolic < 50 || firstDiastolic > 100 || firstHeartRate < 50 || firstHeartRate > 100) {
+            this.$('#blood-pressure_1').show();
+        } else {
+            this.$('#blood-pressure_1').hide();
+        }
+    },
     toggleThirdReading: function(field) {
         var first = parseFloat(this.$('#form_' + field + '_0').val());
         var second = parseFloat(this.$('#form_' + field + '_1').val());
@@ -239,6 +250,9 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
                 $(this).valChange('');
             });
         }
+    },
+    toggleSecondBloodPressure: function() {
+        this.toggleSecondReading();
     },
     toggleThirdHipCircumference: function() {
         this.toggleThirdReading('hip-circumference');
@@ -661,6 +675,7 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         this.handlePregnantOrWheelchair();
         this.handleHeightProtocol();
         this.handleWeightProtocol();
+        this.toggleSecondBloodPressure();
         this.toggleThirdHipCircumference();
         this.toggleThirdWaistCircumference();
         if (this.finalized) {
