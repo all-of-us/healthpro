@@ -1,11 +1,13 @@
 {% extends 'base.html.twig' %}
 {% block title %}Order - {% endblock %}
 {% block body %}
-    <h2>
-        <i class="fa fa-medkit" aria-hidden="true"></i>
-        New Biobank order
-        <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
-    </h2>
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-medkit" aria-hidden="true"></i>
+            New Biobank order
+            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+        </h2>
+    </div>
 
     {% include 'partials/participant-dl.html.twig' %}
 
