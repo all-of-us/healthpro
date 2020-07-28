@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Notice;
 use App\Form\NoticeType;
 use App\Repository\NoticeRepository;
 use App\Service\LoggerService;
@@ -39,7 +40,8 @@ class NoticeController extends AbstractController
                 throw $this->createNotFoundException('Page notice not found.');
             }
         } else {
-            $notice = null;
+            $notice = new Notice();
+            $notice->setStatus(true);
         }
 
         $form = $this->createForm(NoticeType::class, $notice, ['timezone' => $this->getUser()->getTimezone()]);
