@@ -7,8 +7,6 @@
 PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
     events: {
         "click .toggle-help-image": "displayHelpModal",
-        "change .replicate input": "updateMean",
-        "keyup .replicate input": "updateMean",
         "change input, select": "inputChange",
         "keyup input": "inputKeyup",
         "keyup #form_height, #form_weight": "calculateBmi",
@@ -50,59 +48,10 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         $('#helpModal .modal-body').html(html);
         $('#helpModal').modal();
     },
-    updateMean: function(e) {
-        var field = $(e.currentTarget).closest('.field').data('field');
-        this.calculateMean(field);
-    },
     triggerEqualize: function() {
         window.setTimeout(function() {
             $(window).trigger('pmi.equalize');
         }, 50);
-    },
-    calculateMean: function(field) {
-        var fieldSelector = '.field-' + field;
-        var secondThirdFields = [
-            'blood-pressure-systolic',
-            'blood-pressure-diastolic',
-            'heart-rate'
-        ];
-        var twoClosestFields = [
-            'hip-circumference',
-            'waist-circumference'
-        ];
-        if ($.inArray(field, secondThirdFields) !== -1) {
-            fieldSelector = '.field-' + field + '[data-replicate=2], .field-' + field + '[data-replicate=3]';
-        }
-        var values = [];
-        this.$(fieldSelector).find('input').each(function() {
-            if (parseFloat($(this).val())) {
-                values.push(parseFloat($(this).val()));
-            }
-        });
-        if (values.length > 0) {
-            if (values.length == 3 && $.inArray(field, twoClosestFields) !== -1) {
-                values.sort(function(a, b) { return a - b; });
-                if (values[1] - values[0] < values[2] - values[1]) {
-                    values.pop();
-                } else if (values[2] - values[1] < values[1] - values[0]) {
-                    values.shift();
-                }
-            }
-            var sum = _.reduce(values, function(a, b) { return a + b; }, 0);
-            var mean = (sum / values.length).toFixed(1);
-            this.$('#mean-' + field).html('<strong>' + mean + '</strong>');
-            if (this.conversions[field]) {
-                var converted = this.convert(this.conversions[field], mean);
-                this.$('#convert-' + field).html('('+converted+')');
-            }
-            if ($.inArray(field, twoClosestFields) !== -1) {
-                var label = values.length == 3 ? '(average of three measures)' : '(average of two closest measures)';
-                this.$('#convert-' + field).next().html(label);
-            }
-        } else {
-            this.$('#mean-' + field).text('--');
-            this.$('#convert-' + field).text();
-        }
     },
     calculateBmi: function() {
         var height = parseFloat(this.$('#form_height').val());
@@ -658,7 +607,6 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         this.$('.replicate .field').each(function() {
             var field = $(this).data('field');
             if (!processedReplicates[field]) {
-                self.calculateMean(field);
                 self.displayConsecutiveWarning(field);
                 processedReplicates[field] = true;
             }

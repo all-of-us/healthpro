@@ -53,32 +53,6 @@
                 </div>
             {% endfor %}
         </div>
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h3 class="panel-title">Average</h3>
-            </div>
-            <div class="panel-body">
-                <p class="lead">
-                    Blood pressure:
-                    <span id="mean-blood-pressure-systolic"></span>
-                    /
-                    <span id="mean-blood-pressure-diastolic"></span>
-                    {{ schema.fields['blood-pressure-systolic'].unit }}
-                    <small class="text-muted">(average of 2nd and 3rd measures)</small>
-                    <br />
-
-                    Heart rate:
-                    <span id="mean-heart-rate"></span>
-                    {{ schema.fields['heart-rate'].unit }}
-                    <small class="text-muted">(average of 2nd and 3rd measures)</small>
-
-                <div id="blood-pressure-systolic-warning"></div>
-                <div id="blood-pressure-diastolic-warning"></div>
-                <div id="heart-rate-warning"></div>
-                <div id="irregular-heart-rate-warning"></div>
-                </p>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -218,28 +192,6 @@
                     </div>
                 </div>
             {% endfor %}
-        </div>
-        <hr />
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h3 class="panel-title">Average</h3>
-            </div>
-            <div class="panel-body">
-                <p class="lead">
-                    Waist Circumference:
-                    <span id="mean-waist-circumference"></span>
-                    {{ schema.fields['waist-circumference'].unit }}
-                    <span id="convert-waist-circumference"></span>
-                    <small class="text-muted">(average of two closest measures)</small>
-                    <br />
-
-                    Hip Circumference:
-                    <span id="mean-hip-circumference"></span>
-                    {{ schema.fields['hip-circumference'].unit }}
-                    <span id="convert-hip-circumference"></span>
-                    <small class="text-muted">(average of two closest measures)</small>
-                </p>
-            </div>
         </div>
     </div>
 </div>
