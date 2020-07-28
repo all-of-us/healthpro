@@ -20,8 +20,8 @@
                 <td><a href="{{ path('admin_notice', { id: notice.id }) }}">{{ notice.url }}</a></td>
                 <td>{{ notice.message|length > 100 ? notice.message|slice(0, 100) ~ '...' : notice.message  }}</td>
                 <td>{{ notice.fullPage ? 'Yes' : 'No' }}</td>
-                <td>{{ notice.startTs ? notice.startTs|date('n/j/Y g:ia', app.userTimezone) }}</td>
-                <td>{{ notice.endTs ? notice.endTs|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                <td>{{ notice.startTs ? notice.startTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
+                <td>{{ notice.endTs ? notice.endTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
                 <td>
                     {% if notice.status %}
                         <span class="label label-success">Enabled</span>
