@@ -735,11 +735,19 @@ class Evaluation
         return strpos($this->version, self::SDBB) !== false;
     }
 
-    public function addSdbbProtocolModification()
+    public function addSdbbProtocolModificationForWaistandHip()
     {
-        $fields = ['waist-circumference-protocol-modification', 'hip-circumference-protocol-modification'];
-        foreach ($fields as $field) {
+        foreach (['waist-circumference-protocol-modification', 'hip-circumference-protocol-modification'] as $field) {
             $this->data->{$field} = array_fill(0, 2, self::SDBB_PROTOCOL_MODIFICATION);
+        }
+    }
+
+    public function addSdbbProtocolModificationForBloodPressure()
+    {
+        foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
+            if (empty($this->data->$field[1])) {
+                $this->data->{'blood-pressure-protocol-modification'}[1] = self::SDBB_PROTOCOL_MODIFICATION;
+            }
         }
     }
 }

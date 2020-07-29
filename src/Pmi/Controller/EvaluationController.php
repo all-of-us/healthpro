@@ -195,7 +195,10 @@ class EvaluationController extends AbstractController
             if (!$evaluationService->isEvaluationFailedToReachRDR()) {
                 if ($evaluationForm->isValid()) {
                     if ($evaluationService->isSdbbForm()) {
-                        $evaluationService->addSdbbProtocolModification();
+                        $evaluationService->addSdbbProtocolModificationForWaistandHip();
+                        if ($request->request->has('finalize') && (!$evaluation || empty($evaluation['rdr_id']))) {
+                            $evaluationService->addSdbbProtocolModificationForBloodPressure();
+                        }
                     }
                     $evaluationService->setData($evaluationForm->getData());
                     $dbArray = $evaluationService->toArray();
