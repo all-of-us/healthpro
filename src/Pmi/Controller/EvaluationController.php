@@ -194,6 +194,9 @@ class EvaluationController extends AbstractController
             // Check if finalized_ts is set and rdr_id is empty
             if (!$evaluationService->isEvaluationFailedToReachRDR()) {
                 if ($evaluationForm->isValid()) {
+                    if ($evaluationService->isSdbbForm()) {
+                        $evaluationService->addSdbbProtocolModification();
+                    }
                     $evaluationService->setData($evaluationForm->getData());
                     $dbArray = $evaluationService->toArray();
                     $now = new \DateTime();

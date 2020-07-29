@@ -24,6 +24,7 @@ class Evaluation
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
     const SDBB = 'SDBB';
+    const SDBB_PROTOCOL_MODIFICATION = 'SDBB-DV-blood-donor';
 
     protected $app;
     protected $version;
@@ -443,7 +444,7 @@ class Evaluation
             'hip-circumference',
             'waist-circumference'
         ];
-        if (in_array($field, $secondThirdFields)) {
+        if (!$this->isSdbbForm() && in_array($field, $secondThirdFields)) {
             $values = [$this->data->{$field}[1], $this->data->{$field}[2]];
         } else {
             $values = $this->data->{$field};
@@ -727,5 +728,18 @@ class Evaluation
     public function requireBloodDonorCheck()
     {
         return $this->app->getSiteAwardeeId() === self::SDBB;
+    }
+
+    public function isSdbbForm()
+    {
+        return strpos($this->version, self::SDBB) !== false;
+    }
+
+    public function addSdbbProtocolModification()
+    {
+        $fields = ['waist-circumference-protocol-modification', 'hip-circumference-protocol-modification'];
+        foreach ($fields as $field) {
+            $this->data->{$field} = array_fill(0, 2, self::SDBB_PROTOCOL_MODIFICATION);
+        }
     }
 }

@@ -326,6 +326,7 @@
     {
       "name": "weight-prepregnancy",
       "label": "Approx. Pre-pregnancy Weight",
+      "formField": false,
       "unit": "kg",
       "decimals": 1,
       "max": 1000,
@@ -422,7 +423,7 @@
       "name": "hip-circumference-protocol-modification",
       "label": "Modification to Hip Circumference Protocol",
       "formField": false,
-      "replicates": 3,
+      "replicates": 2,
       "options": {
         "None": "",
         "Hip circumference is more than measuring device range": "hip-circumference-out-of-range",
@@ -463,7 +464,7 @@
       "unit": "cm",
       "alternateunits": true,
       "decimals": 1,
-      "replicates": 3,
+      "replicates": 2,
       "max": 300,
       "warnings": [
         {
@@ -493,7 +494,7 @@
       "name": "waist-circumference-protocol-modification",
       "label": "Modification to Waist Circumference Protocol",
       "formField": false,
-      "replicates": 3,
+      "replicates": 2,
       "options": {
         "None": "",
         "Waist circumference is more than measuring device range": "waist-circumference-out-of-range",
@@ -532,7 +533,7 @@
       "name": "waist-circumference-protocol-modification-notes",
       "label": "Reason",
       "formField": false,
-      "replicates": 3,
+      "replicates": 2,
       "type": "text"
     },
     {
