@@ -125,8 +125,10 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         var firstHeartRate = parseFloat(this.$('#form_heart-rate_0').val());
         if (firstSystolic < 90 || firstSystolic > 180 || firstDiastolic < 50 || firstDiastolic > 100 || firstHeartRate < 50 || firstHeartRate > 100) {
             this.$('#blood-pressure_1').show();
+            this.$('.blood-pressure-second-reading-warning').show();
         } else {
             this.$('#blood-pressure_1').hide();
+            this.$('.blood-pressure-second-reading-warning').hide();
         }
     },
     toggleThirdReading: function(field) {
