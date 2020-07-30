@@ -24,7 +24,7 @@ class Evaluation
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
     const SDBB = 'SDBB';
-    const SDBB_PROTOCOL_MODIFICATION = 'SDBB-DV-blood-donor';
+    const SDBB_PROTOCOL_MODIFICATION = 'SDBB-DV-modified-protocol';
 
     protected $app;
     protected $version;
@@ -744,10 +744,14 @@ class Evaluation
 
     public function addSdbbProtocolModificationForBloodPressure()
     {
+        $addModification = true;
         foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
-            if (empty($this->data->$field[1])) {
-                $this->data->{'blood-pressure-protocol-modification'}[1] = self::SDBB_PROTOCOL_MODIFICATION;
+            if (!empty($this->data->$field[1])) {
+                $addModification = false;
             }
+        }
+        if ($addModification) {
+            $this->data->{'blood-pressure-protocol-modification'}[1] = self::SDBB_PROTOCOL_MODIFICATION;
         }
     }
 }
