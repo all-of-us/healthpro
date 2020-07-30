@@ -38,7 +38,6 @@ var ASSETS = {
         ASSETS_DIR + '/css/app.css'
     ],
     'fonts': [
-        NODE_DIR + '/bootstrap/dist/fonts/*',
         NODE_DIR + '/font-awesome/fonts/*'
     ]
 };

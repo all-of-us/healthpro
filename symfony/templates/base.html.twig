@@ -6,7 +6,7 @@
     <title>{% block title %}{% endblock %}HealthPro</title>
 </head>
 <body>
-<nav class="navbar navbar-default{% if isTraining %} navbar-inverse navbar-warning-below{% endif %}">
+<nav class="navbar navbar-default navbar-inverse{% if isTraining %} navbar-warning-below{% else %} navbar-allofus{% endif %}">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pmi-navbar-collapse">
@@ -39,7 +39,7 @@
                     <li><a href="{{ path('problem_reports') }}">Problem Reports</a></li>
                 {% endif %}
                 {% if is_granted('ROLE_USER') and app.session.get('site') and isDvType and reportKitUrl %}
-                    <li><a data-href="{{ app.reportKitUrl }}" class="external-link">Report Kit Problem</a></li>
+                    <li><a data-href="{{ reportKitUrl }}" class="external-link">Report Kit Problem</a></li>
                 {% endif %}
                 {% if is_granted('ROLE_ADMIN') %}
                     <li><a href="{{ path('admin_home') }}">Admin</a></li>

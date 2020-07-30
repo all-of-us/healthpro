@@ -13,7 +13,7 @@ use Pmi\Audit\Log;
 class DefaultController extends AbstractController
 {
     /**
-     * @Route("/", name="home")
+     * @Route("/", name="symfony_home")
      */
     public function index()
     {

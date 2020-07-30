@@ -139,27 +139,43 @@ $(document).ready(function()
     }
 
     /*************************************************************************
-     * Plugin for making panels in bootstrap columns equal heights
+     * Plugin for making panels (or other single-element inside a column)
+     * in Bootstrap rows equal heights
+     *
+     * For example:
+     * <div class="row row-equal-height">
+     *     <div class="col-sm-6"><div class="panel">...</div></div>
+     *     <div class="col-sm-6"><div class="panel">...</div></div>
+     * </div>
+     *
+     * or
+     *
+     * <div class="row row-equal-height">
+     *     <div class="col-sm-6"><a class="btn btn-block">...</a></div>
+     *     <div class="col-sm-6"><a class="btn btn-block">...</a></div>
+     * </div>
      ************************************************************************/
-    $.fn.equalizePanelHeight = function() {
+    $.fn.equalizeColumnHeight = function() {
         var equalize = function(element) {
-            // reset heights
             element.each(function() {
-                $(this).find('.panel').height('auto');
-            });
-            // set heights
-            element.each(function() {
+                // We want the first child of each column in the row
+                var columnChildren = $(this).children().children();
+
+                // reset heights
+                columnChildren.height('auto');
+
+                // set heights
                 var height = 0;
                 if ($('#is-xs').is(':visible')) {
                     height = 'auto';
                 } else {
-                    $(this).find('.panel').each(function() {
+                    columnChildren.each(function() {
                         if ($(this).is(':visible') && $(this).height() > height) {
                             height = $(this).height();
                         }
                     });
                 }
-                $(this).find('.panel').each(function() {
+                columnChildren.each(function() {
                     $(this).height(height);
                 });
             });
@@ -173,7 +189,7 @@ $(document).ready(function()
             equalize(self);
         });
     };
-    $('.row-equal-height').equalizePanelHeight();
+    $('.row-equal-height').equalizeColumnHeight();
 
     /*************************************************************************
      * Plugin to initialize datetimepicker and register change event listener
