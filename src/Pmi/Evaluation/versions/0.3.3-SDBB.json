@@ -196,7 +196,7 @@
       "warnings": [
         {
           "val": true,
-          "message": "Pregnant women should be measured for both height and weight. Do not measure the hip and waist of pregnant participants."
+          "message": "Pregnant women should be measured for both height and weight."
         }
       ]
     },
@@ -213,7 +213,7 @@
       "warnings": [
         {
           "val": true,
-          "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields. Do not measure the hip and waist of wheelchair user participants."
+          "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields."
         }
       ]
     },
