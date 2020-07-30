@@ -2,8 +2,12 @@
 
 namespace App\Twig;
 
+use App\Entity\Awardee;
+use App\Entity\Organization;
 use App\Service\TimezoneService;
+use Pmi\Drc\CodeBook;
 use Psr\Container\ContainerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -11,9 +15,12 @@ class AppExtension extends AbstractExtension
 {
     private $container;
 
-    public function __construct(ContainerInterface $container)
+    private $doctrine;
+
+    public function __construct(ContainerInterface $container, ManagerRegistry $doctrine)
     {
         $this->container = $container;
+        $this->doctrine = $doctrine;
     }
 
     public function getFunctions()
@@ -22,7 +29,10 @@ class AppExtension extends AbstractExtension
             new TwigFunction('path_exists', [$this, 'checkPath']),
             new TwigFunction('asset', [$this, 'asset']),
             new TwigFunction('slugify', [$this, 'slugify']),
-            new TwigFunction('timezone_display', [$this, 'timezoneDisplay'])
+            new TwigFunction('timezone_display', [$this, 'timezoneDisplay']),
+            new TwigFunction('codebook_display', [$this, 'getCodeBookDisplay']),
+            new TwigFunction('organization_display', [$this, 'getAwardeeDisplay']),
+            new TwigFunction('awardee_display', [$this, 'getAwardeeDisplay'])
         ];
     }
 
@@ -56,5 +66,30 @@ class AppExtension extends AbstractExtension
     {
         $tsService = new TimezoneService();
         return $tsService->getTimezoneDisplay($timezone);
+    }
+
+    public function getCodeBookDisplay(string $code): string
+    {
+        return CodeBook::display($code);
+    }
+
+    public function getAwardeeDisplay(string $awardee): string
+    {
+        $repository = $this->doctrine->getRepository(Awardee::class);
+        $record = $repository->find($awardee);
+        if ($record) {
+            return $record->getName();
+        }
+        return $awardee;
+    }
+
+    public function getOrganizationDisplay(string $organization): string
+    {
+        $repository = $this->doctrine->getRepository(Organization::class);
+        $record = $repository->find($organization);
+        if ($record) {
+            return $record->getName();
+        }
+        return $organization;
     }
 }

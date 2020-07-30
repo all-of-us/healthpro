@@ -34,6 +34,18 @@ orders:
 review_today:
     path: /review
 
+review_orders:
+    path: /review/orders
+
+review_measurements:
+    path: /review/measurements
+
+review_ordersRecentModify:
+    path: /review/orders/recent/modify
+
+review_measurementsRecentModify:
+    path: /review/measurements/recent/modify
+
 workqueue_index:
     path: /workqueue
 
@@ -60,3 +72,6 @@ agreeUsage:
 
 hideTZWarning:
     path: /hide-tz-warning
+
+participant:
+    path: /participant/{id}

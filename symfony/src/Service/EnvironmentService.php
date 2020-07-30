@@ -50,6 +50,7 @@ class EnvironmentService
         if ($this->isLocal()) {
             putenv('DATASTORE_EMULATOR_HOST=' . self::DATASTORE_EMULATOR_HOST);
         }
+        $this->loadConfiguration();
     }
 
     /** Determines the environment under which the code is running. */
@@ -124,6 +125,49 @@ class EnvironmentService
             return self::DEFAULT_TIMEZONE;
         } else {
             return null;
+        }
+    }
+
+    protected function loadConfiguration($override = [])
+    {
+        // default two-factor setting
+        $this->configuration['enforce2fa'] = $this->isProd();
+
+        $appDir = realpath(__DIR__ . '/../../../');
+        $configFile = $appDir . '/dev_config/config.yml';
+        if ($this->isLocal() && file_exists($configFile)) {
+            $yaml = new \Symfony\Component\Yaml\Parser();
+            $configs = $yaml->parse(file_get_contents($configFile));
+            if (is_array($configs) || count($configs) > 0) {
+                foreach ($configs as $key => $val) {
+                    $this->configuration[$key] = $val;
+                }
+            }
+        }
+
+        // circle ci db configurations
+        $circleConfigFile = $appDir . '/ci/config.yml';
+        if (getenv('CI') && $this->values['isUnitTest'] && file_exists($circleConfigFile)) {
+            $yaml = new \Symfony\Component\Yaml\Parser();
+            $configs = $yaml->parse(file_get_contents($circleConfigFile));
+            if (is_array($configs) || count($configs) > 0) {
+                foreach ($configs as $key => $val) {
+                    $this->configuration[$key] = $val;
+                }
+            }
+        }
+
+        // unit tests don't have access to Datastore
+        // local environment uses yaml file
+        if (!$this->values['isUnitTest'] && !$this->isPhpDevServer() && !$this->isLocal()) {
+            $configs = Configuration::fetchBy();
+            foreach ($configs as $config) {
+                $this->configuration[$config->key] = $config->value;
+            }
+        }
+
+        foreach ($override as $key => $val) {
+            $this->configuration[$key] = $val;
         }
     }
 }
