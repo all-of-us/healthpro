@@ -4,6 +4,9 @@ index:
 
 # Legacy Silex Routes
 
+home:
+    path: /
+
 settings:
     path: /settings
 
