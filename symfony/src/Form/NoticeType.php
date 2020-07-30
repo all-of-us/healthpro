@@ -1,6 +1,7 @@
 <?php
-namespace Pmi\Form;
+namespace App\Form;
 
+use App\Entity\Notice;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -96,6 +97,7 @@ class NoticeType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
+            'data_class' => Notice::class,
             'timezone' => 'UTC',
         ]);
     }
