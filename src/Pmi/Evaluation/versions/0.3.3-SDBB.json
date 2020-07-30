@@ -260,6 +260,7 @@
         "Unable to stand in a straight position": "unable-to-stand-straight",
         "Refusal": "refusal",
         "Urgent/emergent event": "emergency",
+        "SDBB DV Blood Donor": "SDBB-DV-blood-donor",
         "Other": "other"
       },
       "help": {
@@ -357,6 +358,7 @@
         "Pregnancy": "pregnancy",
         "Refusal": "refusal",
         "Urgent/emergent event": "emergency",
+        "SDBB DV Blood Donor": "SDBB-DV-blood-donor",
         "Other": "other"
       },
       "help": {
