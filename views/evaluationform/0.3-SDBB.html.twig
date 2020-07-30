@@ -65,6 +65,13 @@
 </div>
 
 <div class="panel panel-default">
+    <div class="panel-body">
+        {{ metrics.form_row(evaluationForm, schema.fields['pregnant']) }}
+        {{ metrics.form_row(evaluationForm, schema.fields['wheelchair']) }}
+    </div>
+</div>
+
+<div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
             Height and Weight
@@ -90,6 +97,7 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         {{ metrics.form_row(evaluationForm, schema.fields['weight']) }}
+                        {{ metrics.form_row(evaluationForm, schema.fields['weight-prepregnancy']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-protocol-modification']) }}
                         <div class="modification-notes" style="display:none">
                             {{ metrics.form_row(evaluationForm, schema.fields['weight-protocol-modification-notes']) }}

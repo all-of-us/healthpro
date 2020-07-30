@@ -186,7 +186,6 @@
     {
       "name": "pregnant",
       "label": "Is participant pregnant?",
-      "formField": false,
       "options": {
         "No": false,
         "Yes": true
@@ -204,7 +203,6 @@
     {
       "name": "wheelchair",
       "label": "Is participant a wheelchair user?",
-      "formField": false,
       "options": {
         "No": false,
         "Yes": true
@@ -327,7 +325,6 @@
     {
       "name": "weight-prepregnancy",
       "label": "Approx. Pre-pregnancy Weight",
-      "formField": false,
       "unit": "kg",
       "decimals": 1,
       "max": 1000,
