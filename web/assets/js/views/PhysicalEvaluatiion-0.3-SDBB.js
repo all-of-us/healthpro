@@ -162,6 +162,7 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
             this.$('#blood-pressure_1').show();
             this.$('.blood-pressure-second-reading-warning').show();
         } else {
+            this.clearSecondReading();
             this.$('#blood-pressure_1').hide();
             this.$('.blood-pressure-second-reading-warning').hide();
         }
@@ -180,6 +181,12 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
     },
     toggleSecondBloodPressure: function() {
         this.toggleSecondReading();
+    },
+    clearSecondReading: function() {
+        var input = this.$('#blood-pressure_1');
+        input.find('input:text, select').val('');
+        input.find('input[type=checkbox]').prop('checked', false);
+        input.find('.metric-warnings').remove();
     },
     calculateIrregularHeartRate: function() {
         var allIrregular = true;
