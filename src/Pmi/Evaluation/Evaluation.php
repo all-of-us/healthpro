@@ -735,6 +735,12 @@ class Evaluation
         return strpos($this->version, self::SDBB) !== false;
     }
 
+    public function addSbddProtocolModificationForRemovedFields()
+    {
+        $this->addSdbbProtocolModificationForWaistandHip();
+        $this->addSdbbProtocolModificationForBloodPressure(2);
+    }
+
     public function addSdbbProtocolModificationForWaistandHip()
     {
         foreach (['waist-circumference-protocol-modification', 'hip-circumference-protocol-modification'] as $field) {
@@ -742,16 +748,33 @@ class Evaluation
         }
     }
 
-    public function addSdbbProtocolModificationForBloodPressure()
+    public function addSdbbProtocolModificationForBloodPressure($reading)
     {
-        $addModification = true;
+        // Do not set default reading #2 values if reading #1 is out of range
+        if ($reading === 1 && empty($this->data->{'blood-pressure-protocol-modification'}[0]) && $this->isSdbbBloodPressureOutOfRange(0)) {
+            return false;
+        }
+        // Default reading #2 values are only set when finalized
         foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
-            if (!empty($this->data->$field[1])) {
-                $addModification = false;
-            }
+            $this->data->{$field}[$reading] = null;
         }
-        if ($addModification) {
-            $this->data->{'blood-pressure-protocol-modification'}[1] = self::SDBB_PROTOCOL_MODIFICATION;
+        foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
+            $this->data->{$field}[$reading] = false;
         }
+        $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::SDBB_PROTOCOL_MODIFICATION;
+    }
+
+    public function isSdbbBloodPressureOutOfRange($reading)
+    {
+        if ($this->data->{'blood-pressure-systolic'}[$reading] < 90 ||
+            $this->data->{'blood-pressure-systolic'}[$reading] > 180 ||
+            $this->data->{'blood-pressure-diastolic'}[$reading] < 50 ||
+            $this->data->{'blood-pressure-diastolic'}[$reading] > 100 ||
+            $this->data->{'heart-rate'}[$reading] < 50 ||
+            $this->data->{'heart-rate'}[$reading] > 100
+        ) {
+            return true;
+        }
+        return false;
     }
 }
