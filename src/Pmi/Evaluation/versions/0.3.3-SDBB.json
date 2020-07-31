@@ -16,6 +16,8 @@
       "unit": "mmHg",
       "replicates": 3,
       "max": 300,
+      "secondMax": 180,
+      "secondMin": 90,
       "warnings": [
         {
           "max": 200,
@@ -58,6 +60,8 @@
       "unit": "mmHg",
       "replicates": 3,
       "max": 300,
+      "secondMax": 100,
+      "secondMin": 50,
       "compare": {
         "type": "less-than",
         "field": "blood-pressure-systolic",
@@ -105,6 +109,8 @@
       "unit": "bpm",
       "replicates": 3,
       "max": 300,
+      "secondMax": 100,
+      "secondMin": 50,
       "warnings": [
         {
           "max": 100,

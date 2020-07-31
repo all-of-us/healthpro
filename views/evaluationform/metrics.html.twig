@@ -32,7 +32,12 @@
         {{ form_label(form[name][i]) }}
         {% if definition.unit is defined %}
             <div class="input-group">
-                {{ form_widget(form[name][i]) }}
+                {#Set max and min limits for SDBB 2nd blood pressure reading#}
+                {% if definition.secondMax is defined and i == 1 %}
+                    {{ form_widget(form[name][i], {'attr': {'data-parsley-max': definition.secondMax, 'data-parsley-min': definition.secondMin}}) }}
+                {% else %}
+                    {{ form_widget(form[name][i]) }}
+                {% endif %}
                 <div class="input-group-addon">{{ definition.unit }}</div>
             </div>
         {% else %}
