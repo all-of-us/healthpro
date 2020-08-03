@@ -444,10 +444,15 @@ class Evaluation
             'hip-circumference',
             'waist-circumference'
         ];
-        if (!$this->isSdbbForm() && in_array($field, $secondThirdFields)) {
-            $values = [$this->data->{$field}[1], $this->data->{$field}[2]];
+        $data = $this->data->{$field};
+        // For SDBB form return 1st or 2nd reading for blood pressure and heart rate
+        if ($this->isSdbbForm() && in_array($field, $secondThirdFields)) {
+            return $data[1] ?: $data[0];
+        }
+        if (in_array($field, $secondThirdFields)) {
+            $values = [$data[1], $data[2]];
         } else {
-            $values = $this->data->{$field};
+            $values = $data;
         }
         $values = array_filter($values);
         if (count($values) > 0) {
