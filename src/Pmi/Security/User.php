@@ -38,7 +38,7 @@ class User implements UserInterface
         $this->googleUser = $googleUser;
         $this->groups = $groups;
         $this->info = $info;
-        $this->timezone = (!is_null($timezone)) ? $timezone : $info['timezone'];
+        $this->timezone = is_null($timezone) && isset($info['timezone']) ? $info['timezone'] : $timezone;
         $this->sessionInfo = $sessionInfo;
         $this->sites = $this->computeSites();
         $this->awardees = $this->computeAwardees();
