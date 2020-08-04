@@ -273,6 +273,9 @@ class Evaluation
                     'required' => false,
                     'label' => isset($options['label']) ? $options['label'] : null
                 ];
+                if ($this->isSdbbForm() && in_array($field->name, ['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'])) {
+                    $collectionOptions['constraints'] = $this->addSdbbSecondBloodPressureConstraints($form, $field);
+                }
                 if (isset($field->compare)) {
                     $compareType = $field->compare->type;
                     $compareField = $field->compare->field;
@@ -781,5 +784,27 @@ class Evaluation
             return true;
         }
         return false;
+    }
+
+    private function addSdbbSecondBloodPressureConstraints($form, $field)
+    {
+        $secondMaxVal = $field->secondMax;
+        $secondMinVal = $field->secondMin;
+        $callback = function ($value, $context, $replicate) use ($form, $secondMaxVal, $secondMinVal) {
+            if ($replicate !== 1 || empty($value)) {
+                return;
+            }
+            if ($value > $secondMaxVal) {
+                $context->buildViolation("This value should be less than {$secondMaxVal}")->addViolation();
+            } elseif ($value < $secondMinVal) {
+                $context->buildViolation("This value should be greater than {$secondMinVal}")->addViolation();
+            }
+        };
+        $collectionConstraintFields = [];
+        for ($i = 0; $i < $field->replicates; $i++) {
+            $collectionConstraintFields[] = new Constraints\Callback(['callback' => $callback, 'payload' => $i]);
+        }
+        $compareConstraint = new Constraints\Collection($collectionConstraintFields);
+        return [$compareConstraint];
     }
 }
