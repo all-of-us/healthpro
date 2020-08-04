@@ -274,29 +274,10 @@ class Evaluation
                     'label' => isset($options['label']) ? $options['label'] : null
                 ];
                 if ($this->isSdbbForm() && in_array($field->name, ['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'])) {
-                    $collectionOptions['constraints'] = $this->addSdbbSecondBloodPressureConstraints($form, $field);
+                    $collectionOptions['constraints'] = $this->addSdbbSecondBloodPressureConstraint($form, $field);
                 }
                 if (isset($field->compare)) {
-                    $compareType = $field->compare->type;
-                    $compareField = $field->compare->field;
-                    $compareMessage = $field->compare->message;
-                    $callback = function ($value, $context, $replicate) use ($form, $compareField, $compareType, $compareMessage) {
-                        $compareTo = $form->getData()->$compareField;
-                        if (!isset($compareTo[$replicate])) {
-                            return;
-                        }
-                        if ($compareType == 'greater-than' && $value <= $compareTo[$replicate]) {
-                            $context->buildViolation($compareMessage)->addViolation();
-                        } elseif ($compareType == 'less-than' && $value >= $compareTo[$replicate]) {
-                            $context->buildViolation($compareMessage)->addViolation();
-                        }
-                    };
-                    $collectionConstraintFields = [];
-                    for ($i = 0; $i < $field->replicates; $i++) {
-                        $collectionConstraintFields[] = new Constraints\Callback(['callback' => $callback, 'payload' => $i]);
-                    }
-                    $compareConstraint = new Constraints\Collection($collectionConstraintFields);
-                    $collectionOptions['constraints'] = [$compareConstraint];
+                    $collectionOptions['constraints'] = $this->addDiastolicBloodPressureConstraint($form, $field);
                 }
                 $formBuilder->add($field->name, CollectionType::class, $collectionOptions);
             } else {
@@ -786,7 +767,7 @@ class Evaluation
         return false;
     }
 
-    private function addSdbbSecondBloodPressureConstraints($form, $field)
+    private function addSdbbSecondBloodPressureConstraint($form, $field)
     {
         $secondMaxVal = $field->secondMax;
         $secondMinVal = $field->secondMin;
@@ -798,6 +779,30 @@ class Evaluation
                 $context->buildViolation("This value should be less than {$secondMaxVal}")->addViolation();
             } elseif ($value < $secondMinVal) {
                 $context->buildViolation("This value should be greater than {$secondMinVal}")->addViolation();
+            }
+        };
+        $collectionConstraintFields = [];
+        for ($i = 0; $i < $field->replicates; $i++) {
+            $collectionConstraintFields[] = new Constraints\Callback(['callback' => $callback, 'payload' => $i]);
+        }
+        $compareConstraint = new Constraints\Collection($collectionConstraintFields);
+        return [$compareConstraint];
+    }
+
+    private function addDiastolicBloodPressureConstraint($form, $field)
+    {
+        $compareType = $field->compare->type;
+        $compareField = $field->compare->field;
+        $compareMessage = $field->compare->message;
+        $callback = function ($value, $context, $replicate) use ($form, $compareField, $compareType, $compareMessage) {
+            $compareTo = $form->getData()->$compareField;
+            if (!isset($compareTo[$replicate])) {
+                return;
+            }
+            if ($compareType == 'greater-than' && $value <= $compareTo[$replicate]) {
+                $context->buildViolation($compareMessage)->addViolation();
+            } elseif ($compareType == 'less-than' && $value >= $compareTo[$replicate]) {
+                $context->buildViolation($compareMessage)->addViolation();
             }
         };
         $collectionConstraintFields = [];
