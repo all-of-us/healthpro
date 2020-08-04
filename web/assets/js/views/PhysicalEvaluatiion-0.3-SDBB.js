@@ -182,11 +182,14 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
     toggleSecondBloodPressure: function() {
         this.toggleSecondReading();
     },
-    clearSecondReading: function() {
+    clearSecondReading: function () {
         var input = this.$('#blood-pressure_1');
         input.find('input:text, select').val('');
         input.find('input[type=checkbox]').prop('checked', false);
         input.find('.metric-warnings').remove();
+        input.find('input:text').each(function () {
+            $(this).parsley().validate();
+        })
     },
     calculateIrregularHeartRate: function() {
         var allIrregular = true;
