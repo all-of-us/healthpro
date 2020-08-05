@@ -50,6 +50,12 @@ class Evaluation
         'Other' => 'OTHER'
     ];
 
+    public static $bloodPressureFields = [
+        'blood-pressure-systolic',
+        'blood-pressure-diastolic',
+        'heart-rate'
+    ];
+
     public function __construct($app = null, $type = null)
     {
         $this->app = $app;
@@ -366,7 +372,9 @@ class Evaluation
 
         foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
             foreach ($this->data->$field as $k => $value) {
-                if (!$this->data->{'blood-pressure-protocol-modification'}[$k] && !$value) {
+                // For SDBB form display error if 2nd reading is empty and 1st reading doesn't have any protocol modification
+                $displayError = $this->isSdbbForm() && $k === 1 && empty($this->data->{'blood-pressure-protocol-modification'}[0]);
+                if ((!$this->data->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
                     $errors[] = [$field, $k];
                 }
             }

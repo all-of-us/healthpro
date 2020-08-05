@@ -236,11 +236,15 @@ class EvaluationController extends AbstractController
                             }
                         } else {
                             foreach ($errors as $field) {
+                                $errorMessage = 'Please complete or add protocol modification.';
                                 if (is_array($field)) {
                                     list($field, $replicate) = $field;
-                                    $evaluationForm->get($field)->get($replicate)->addError(new FormError('Please complete or add protocol modification.'));
+                                    if ($evaluationService->isSdbbForm() && in_array($field, $evaluationService::$bloodPressureFields) && $replicate === 1) {
+                                        $errorMessage = 'Please complete';
+                                    }
+                                    $evaluationForm->get($field)->get($replicate)->addError(new FormError($errorMessage));
                                 } else {
-                                    $evaluationForm->get($field)->addError(new FormError('Please complete or add protocol modification.'));
+                                    $evaluationForm->get($field)->addError(new FormError($errorMessage));
                                 }
                             }
                             $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
