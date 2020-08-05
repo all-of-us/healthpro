@@ -34,5 +34,8 @@
         "merge-stream": "^1.0.0",
         "parsleyjs": "^2.9.0",
         "underscore": "^1.9.1"
+    },
+    "devDependencies": {
+        "@symfony/webpack-encore": "^0.30.2"
     }
 }
