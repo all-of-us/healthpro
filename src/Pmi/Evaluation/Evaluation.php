@@ -757,14 +757,16 @@ class Evaluation
         $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::SDBB_PROTOCOL_MODIFICATION;
     }
 
-    public function isSdbbBloodPressureOutOfRange($reading)
+    public function isSdbbBloodPressureOutOfRange($key)
     {
-        if ($this->data->{'blood-pressure-systolic'}[$reading] < 90 ||
-            $this->data->{'blood-pressure-systolic'}[$reading] > 180 ||
-            $this->data->{'blood-pressure-diastolic'}[$reading] < 50 ||
-            $this->data->{'blood-pressure-diastolic'}[$reading] > 100 ||
-            $this->data->{'heart-rate'}[$reading] < 50 ||
-            $this->data->{'heart-rate'}[$reading] > 100
+        $limits = $this->getSecondBloodPressureLimits();
+        list($systolic, $diastolic, $heartRate) = self::$bloodPressureFields;
+        if ($this->data->{$systolic}[$key] < $limits[$systolic]['secondMin'] ||
+            $this->data->{$systolic}[$key] > $limits[$systolic]['secondMax'] ||
+            $this->data->{$diastolic}[$key] < $limits[$diastolic]['secondMin'] ||
+            $this->data->{$diastolic}[$key] > $limits[$diastolic]['secondMax'] ||
+            $this->data->{$heartRate}[$key] < $limits[$heartRate]['secondMin'] ||
+            $this->data->{$heartRate}[$key] > $limits[$heartRate]['secondMax']
         ) {
             return true;
         }
@@ -815,5 +817,17 @@ class Evaluation
         }
         $compareConstraint = new Constraints\Collection($collectionConstraintFields);
         return [$compareConstraint];
+    }
+
+    private function getSecondBloodPressureLimits()
+    {
+        $limits = [];
+        foreach ($this->schema->fields as $field) {
+            if (in_array($field->name, self::$bloodPressureFields)) {
+                $limits[$field->name]['secondMax'] = $field->secondMax;
+                $limits[$field->name]['secondMin'] = $field->secondMin;
+            }
+        }
+        return $limits;
     }
 }
