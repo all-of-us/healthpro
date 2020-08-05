@@ -8,7 +8,6 @@ trait ResponseSecurityHeadersTrait
 {
     public function addSecurityHeaders(Response $response)
     {
-        $response->headers->set('header-source', 'ResponseSecurityHeadersTrait');
         // prevent clickjacking attacks
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
 
