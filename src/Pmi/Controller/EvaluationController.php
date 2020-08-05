@@ -341,7 +341,7 @@ class EvaluationController extends AbstractController
             'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
-            'latestVersion' => $evaluationService::CURRENT_VERSION,
+            'latestVersion' => $evaluationService->isSdbbForm() ? $evaluationService::SDBB_CURRENT_VERSION : $evaluationService::CURRENT_VERSION,
             'showAutoModification' => $showAutoModification,
             'revertForm' => $evaluationService->getEvaluationRevertForm()->createView()
         ]);
