@@ -279,7 +279,7 @@ class Evaluation
                     'required' => false,
                     'label' => isset($options['label']) ? $options['label'] : null
                 ];
-                if ($this->isSdbbForm() && in_array($field->name, ['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'])) {
+                if ($this->isSdbbForm() && in_array($field->name, self::$bloodPressureFields)) {
                     $collectionOptions['constraints'] = $this->addSdbbSecondBloodPressureConstraint($form, $field);
                 }
                 if (isset($field->compare)) {
@@ -370,7 +370,7 @@ class Evaluation
             return $errors;
         }
 
-        foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
+        foreach (self::$bloodPressureFields as $field) {
             foreach ($this->data->$field as $k => $value) {
                 // For SDBB form display error if 2nd reading is empty and 1st reading doesn't have any protocol modification
                 $displayError = $this->isSdbbForm() && $k === 1 && empty($this->data->{'blood-pressure-protocol-modification'}[0]);
@@ -427,11 +427,7 @@ class Evaluation
 
     protected function calculateMean($field)
     {
-        $secondThirdFields = [
-            'blood-pressure-systolic',
-            'blood-pressure-diastolic',
-            'heart-rate'
-        ];
+        $secondThirdFields = self::$bloodPressureFields;
         $twoClosestFields = [
             'hip-circumference',
             'waist-circumference'
@@ -752,7 +748,7 @@ class Evaluation
             return false;
         }
         // Default reading #2 values are only set when finalized
-        foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
+        foreach (self::$bloodPressureFields as $field) {
             $this->data->{$field}[$reading] = null;
         }
         foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
