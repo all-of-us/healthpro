@@ -17,6 +17,8 @@ class User implements UserInterface
     const SCRIPPS_GROUP = 'scripps-non-pii';
     const AWARDEE_SCRIPPS = 'stsi';
 
+    const DEFAULT_TIMEZONE = 'America/New_York';
+
     private $googleUser;
     private $groups;
     private $sites;
@@ -36,7 +38,7 @@ class User implements UserInterface
         $this->googleUser = $googleUser;
         $this->groups = $groups;
         $this->info = $info;
-        $this->timezone = null;
+        $this->timezone = is_null($timezone) && isset($info['timezone']) ? $info['timezone'] : $timezone;
         $this->sessionInfo = $sessionInfo;
         $this->sites = $this->computeSites();
         $this->awardees = $this->computeAwardees();
@@ -46,12 +48,12 @@ class User implements UserInterface
         $this->biobankAccess = $this->computeBiobankAccess();
         $this->scrippsAccess = $this->computeScrippsAccess();
     }
-    
+
     public function getGroups()
     {
         return $this->groups;
     }
-    
+
     public function getInfo()
     {
         return $this->info;
@@ -153,7 +155,7 @@ class User implements UserInterface
     }
 
 
-    
+
     public function hasTwoFactorAuth()
     {
         // Google doesn't expose the user's current 2FA setting via API so
@@ -179,7 +181,7 @@ class User implements UserInterface
     {
         return $this->awardees;
     }
-    
+
     public function getSite($email)
     {
         $site = null;
@@ -203,7 +205,7 @@ class User implements UserInterface
         }
         return $awardee;
     }
-    
+
     public function belongsToSite($email)
     {
         $belongs = false;
@@ -227,7 +229,7 @@ class User implements UserInterface
         }
         return $belongs;
     }
-    
+
     public function getGoogleUser()
     {
         return $this->googleUser;
@@ -267,27 +269,27 @@ class User implements UserInterface
     {
         return UserService::getRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee']);
     }
-    
+
     public function getPassword()
     {
         return null;
     }
-    
+
     public function getSalt()
     {
         return null;
     }
-    
+
     public function getUsername()
     {
         return $this->googleUser->getEmail();
     }
-    
+
     public function getEmail()
     {
         return $this->googleUser->getEmail();
     }
-    
+
     public function eraseCredentials()
     {
         // we don't actually store any credentials
@@ -295,6 +297,9 @@ class User implements UserInterface
 
     public function getTimezone()
     {
+        if (!$this->timezone) {
+            return self::DEFAULT_TIMEZONE;
+        }
         return $this->timezone;
     }
 

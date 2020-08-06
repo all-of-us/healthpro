@@ -2,7 +2,7 @@
 {% block title %}Error - {% endblock %}
 {% block body %}
     <div class="alert alert-danger" id="twoFactorAlert">
-        <span class="glyphicon glyphicon-phone"></span>
+        <i class="fa fa-mobile"></i>
         <strong>Two-factor authentication is not enabled!</strong> Your Google account, <strong>{{ email }}</strong>, must have two-factor authentication enabled in order to access HealthPro. You may <a href="{{ logoutUrl }}">log out of your current Google account</a> and select a different one.
     </div>
 {% endblock %}

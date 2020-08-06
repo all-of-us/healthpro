@@ -27,7 +27,8 @@ var ASSETS = {
     ],
     'css': [
         NODE_DIR + '/bootstrap/dist/css/bootstrap.min.css',
-        NODE_DIR + '/font-awesome/css/font-awesome.min.css',
+        NODE_DIR + '/@fortawesome/fontawesome-free/css/all.css',
+        NODE_DIR + '/@fortawesome/fontawesome-free/css/v4-shims.css',
         NODE_DIR + '/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
         NODE_DIR + '/datatables.net-bs/css/dataTables.bootstrap.css',
         NODE_DIR + '/datatables.net-responsive-bs/css/responsive.bootstrap.css',
@@ -38,8 +39,7 @@ var ASSETS = {
         ASSETS_DIR + '/css/app.css'
     ],
     'fonts': [
-        NODE_DIR + '/bootstrap/dist/fonts/*',
-        NODE_DIR + '/font-awesome/fonts/*'
+        NODE_DIR + '/@fortawesome/fontawesome-free/webfonts/*'
     ]
 };
 
@@ -93,7 +93,7 @@ gulp.task('compile-css', function() {
 });
 
 gulp.task('compile-fonts', function() {
-    var destDir = ASSETS_DIR + '/dist/fonts';
+    var destDir = ASSETS_DIR + '/dist/webfonts';
     return gulp.src(ASSETS.fonts)
         .pipe(gulp.dest(destDir));
 });

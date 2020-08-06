@@ -6,7 +6,7 @@
     <title>{% block title %}{% endblock %}HealthPro</title>
 </head>
 <body>
-    <nav class="navbar navbar-default{% if isTraining %} navbar-inverse navbar-warning-below{% endif %}">
+    <nav class="navbar navbar-default navbar-inverse{% if isTraining %} navbar-warning-below{% else %} navbar-allofus{% endif %}">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pmi-navbar-collapse">
