@@ -814,7 +814,7 @@ class Fhir
             $this->getBpComponent('systolic', $replicate),
             $this->getBpComponent('diastolic', $replicate)
         ];
-        $components = array_filter($components); // remove components that return null
+        $components = array_values(array_filter($components)); // remove components that return null and rearrange index keys
         $entry = [
             'fullUrl' => $this->metricUrns['blood-pressure-' . $replicate],
             'resource' => [
