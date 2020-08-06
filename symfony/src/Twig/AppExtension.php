@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use App\Service\TimezoneService;
 use Psr\Container\ContainerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -20,7 +21,8 @@ class AppExtension extends AbstractExtension
         return [
             new TwigFunction('path_exists', [$this, 'checkPath']),
             new TwigFunction('asset', [$this, 'asset']),
-            new TwigFunction('slugify', [$this, 'slugify'])
+            new TwigFunction('slugify', [$this, 'slugify']),
+            new TwigFunction('timezone_display', [$this, 'timezoneDisplay'])
         ];
     }
 
@@ -48,5 +50,11 @@ class AppExtension extends AbstractExtension
         $output = trim(strtolower($text));
         $output = preg_replace('/[^a-z0-9]/', '-', $output);
         return $output;
+    }
+
+    public function timezoneDisplay(?string $timezone): string
+    {
+        $tsService = new TimezoneService();
+        return $tsService->getTimezoneDisplay($timezone);
     }
 }

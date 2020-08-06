@@ -8,9 +8,15 @@
          processIsolation="false"
          stopOnFailure="false"
     >
+    <php>
+      <ini name="error_reporting" value="E_ALL" />
+    </php>
     <testsuites>
-        <testsuite name="unit">
+        <testsuite name="Silex Unit Tests">
             <directory>tests/Pmi</directory>
+        </testsuite>
+        <testsuite name="Symfony Test Suite">
+            <directory>symfony/tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

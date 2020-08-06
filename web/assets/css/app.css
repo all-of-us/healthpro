@@ -1,8 +1,13 @@
 .page-header {
     margin-top: 0;
+    padding-bottom: 5px;
+    border-color: #c8c6e4;
 }
 .page-header h2 {
     margin-top: 0;
+    margin-bottom: 0;
+    color: #363272;
+    font-weight: 700;
 }
 a {
     cursor: pointer;
@@ -93,6 +98,11 @@ label.label-normal {
 .navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a, .navbar-inverse .navbar-text {
     color: #ddd; /* increase contrast */
 }
+@media(max-width:767px) {
+    .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {
+        color: #ddd; /* increase contrast */
+    }
+}
 .navbar-allofus, .navbar-allofus .navbar-toggle {
     background-color: #262262;
 }
@@ -121,6 +131,27 @@ label.label-normal {
     .hidden-ie {
         display: none;
     }
+}
+
+/* Home page */
+.home-menu .btn-block i.fa {
+    display: block;
+    font-size: 150%;
+    color: #363272;
+    margin-top: 5px;
+    margin-bottom: 3px;
+}
+.home-menu .btn-block {
+    background-color: #f9f9f9;
+}
+.home-menu .btn-block:hover, .home-menu .btn-block:active, .home-menu .btn-block:focus {
+    background-color: #e6e6e6;
+}
+.home-menu .description {
+    white-space: normal;
+    font-size: 70%;
+    color: #777777;
+    margin-top: 5px;
 }
 
 /* Physical evaluation */
