@@ -245,7 +245,7 @@ class Evaluation
                     'label' => isset($options['label']) ? $options['label'] : null
                 ];
                 if (isset($field->compare)) {
-                    $collectionOptions['constraints'] = $this->addDiastolicBloodPressureConstraint($form, $field);
+                    $collectionOptions['constraints'] = $this->addCompareConstraint($form, $field);
                 }
                 $formBuilder->add($field->name, CollectionType::class, $collectionOptions);
             } else {
@@ -677,7 +677,7 @@ class Evaluation
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 
-    private function addDiastolicBloodPressureConstraint($form, $field)
+    private function addCompareConstraint($form, $field)
     {
         $compareType = $field->compare->type;
         $compareField = $field->compare->field;
