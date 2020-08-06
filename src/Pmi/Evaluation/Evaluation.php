@@ -831,4 +831,9 @@ class Evaluation
         }
         return $limits;
     }
+
+    public function getFormFieldErrorMessage($field = null, $replicate = null)
+    {
+        return !empty($field) && $this->isSdbbForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1 ? 'Please complete.' : 'Please complete or add protocol modification.';
+    }
 }
