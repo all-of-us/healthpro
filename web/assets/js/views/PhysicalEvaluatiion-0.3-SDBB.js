@@ -190,6 +190,7 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         input.find('input:text').each(function () {
             $(this).parsley().validate();
         })
+        input.find('.help-block').remove();
     },
     calculateIrregularHeartRate: function() {
         var allIrregular = true;
