@@ -25,6 +25,7 @@ Encore
     .addEntry('order-check', './web/assets/js/views/OrderSafetyChecks.js')
     .addEntry('order-create', './web/assets/js/views/CreateOrder.js')
     .addEntry('order-sub', './web/assets/js/views/OrderSubPage.js')
+    .addEntry('patient-status-import', './web/assets/js/views/PatientStatusImport.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()

@@ -18,7 +18,12 @@ require('bootstrap-toggle/js/bootstrap-toggle.js');
 // ./js/parsley-comparison.js
 require('./bootstrap-session-timeout.js');
 const jstz = require('./jstz.min.js');
+
+// Moved most of the views to separate entries. Leaving Modals here since it is needed on every page.
 require('./views/Modals.js');
+// ModifyReasons is used on both order and PM modification forms. Could be included separately on both, but leaving as a global for now.
+require('./views/ModifyReasons.js');
+
 // ./js/views/* - move to separate files
 
 require('bootstrap/dist/css/bootstrap.css');
