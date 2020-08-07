@@ -99,7 +99,7 @@
             {{ html|raw }} {{ firstTime|date('n/j/Y g:ia', app.userTimezone) }} {{ type == 'primary' ? '(first agreed to participate)' : '(first agreed to share EHR)' }} <br>
         {% endif %}
         {% if time %}
-            {{ html|raw }} {{ firstTime|date('n/j/Y g:ia', app.userTimezone) }} (current status)
+            {{ html|raw }} {{ time|date('n/j/Y g:ia', app.userTimezone) }} (current status)
         {% else %}
             --
         {% endif %}
