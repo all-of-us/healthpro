@@ -55,7 +55,10 @@
         "symfony/profiler-pack": "^1.0"
     },
     "extra": {
-        "root-dir": "symfony"
+        "root-dir": "symfony",
+        "symfony": {
+            "require": "4.4.*"
+        }
     },
     "scripts": {
         "auto-scripts": {
