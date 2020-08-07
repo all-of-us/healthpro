@@ -26,6 +26,9 @@ Encore
     .addEntry('order-create', './web/assets/js/views/CreateOrder.js')
     .addEntry('order-sub', './web/assets/js/views/OrderSubPage.js')
     .addEntry('patient-status-import', './web/assets/js/views/PatientStatusImport.js')
+    .addEntry('physical-measurements-0.1', './web/assets/js/views/PhysicalEvaluation-0.1.js')
+    .addEntry('physical-measurements-0.2', './web/assets/js/views/PhysicalEvaluation-0.2.js')
+    .addEntry('physical-measurements-0.3', './web/assets/js/views/PhysicalEvaluation-0.3.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()

@@ -146,6 +146,7 @@
 {% endblock %}
 
 {% block pagejs %}
+{{ webpack_entry('physical-measurements-' ~ (schema.template|default('-0.1')) , 'js') }}
 <script>
 $(document).ready(function() {
     var evalView = new PMI.views['PhysicalEvaluation{% if schema.template is defined %}-{{ schema.template }}{% else %}-0.1{% endif %}']({
