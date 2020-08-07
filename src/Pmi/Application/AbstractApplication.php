@@ -449,6 +449,11 @@ abstract class AbstractApplication extends Application
                 return;
             }
             $entries = $entrypoints->entrypoints->{$entry}->{$type};
+
+            // for view-specific js, ignore entries already included in app.js
+            if ($type === 'js' && $entry !== 'app' && isset($entrypoints->entrypoints->app->js)) {
+                $entries = array_diff($entries, $entrypoints->entrypoints->app->js);
+            }
             $html = '';
             foreach ($entries as $entry) {
                 switch ($type) {

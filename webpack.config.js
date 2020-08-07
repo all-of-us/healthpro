@@ -21,6 +21,7 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('app', './web/assets/js/app.webpack.js')
+    .addEntry('workqueue', './web/assets/js/views/workqueue.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
