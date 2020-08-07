@@ -5,6 +5,7 @@ const _ = require('underscore');
 require('backbone/backbone.js');
 require('eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js');
 require('parsleyjs/dist/parsley.js');
+require('./parsley-comparison.js'); // customized parsley validator
 require('datatables.net/js/jquery.dataTables.js');
 require('datatables.net-bs/js/dataTables.bootstrap.js');
 require('datatables.net-responsive/js/dataTables.responsive.js');
@@ -15,7 +16,6 @@ require('datatables.net-buttons-bs/js/buttons.bootstrap.js');
 require('jsbarcode/dist/barcodes/JsBarcode.code128.min.js');
 require('inputmask/dist/jquery.inputmask.bundle.js');
 require('bootstrap-toggle/js/bootstrap-toggle.js');
-// ./js/parsley-comparison.js
 require('./bootstrap-session-timeout.js');
 const jstz = require('./jstz.min.js');
 
