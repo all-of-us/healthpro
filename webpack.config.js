@@ -22,6 +22,9 @@ Encore
      */
     .addEntry('app', './web/assets/js/app.webpack.js')
     .addEntry('workqueue', './web/assets/js/views/workqueue.js')
+    .addEntry('order-check', './web/assets/js/views/OrderSafetyChecks.js')
+    .addEntry('order-create', './web/assets/js/views/CreateOrder.js')
+    .addEntry('order-sub', './web/assets/js/views/OrderSubPage.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()

@@ -87,6 +87,7 @@
 {% endblock %}
 
 {% block pagejs %}
+{{ webpack_entry('order-sub', 'js') }}
 <script>
 $(document).ready(function () {
     var name = 'input[name="form[finalized_samples][]"]';
