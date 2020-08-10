@@ -58,6 +58,14 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $this->assertSame(false, $participant->status);
         $this->assertSame('consent', $participant->statusReason);
         $this->assertSame(false, $participant->isWithdrawn);
+
+        $participant = new Participant((object)[
+            'questionnaireOnTheBasics' => 'SUBMITTED',
+            'consentForStudyEnrollment' => 'UNSET',
+            'withdrawalStatus' => 'NO_USE'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('consent', $participant->statusReason);
     }
 
     public function testParticipantWithdrawalStatusNoUse()
