@@ -17,6 +17,11 @@ handlers:
   secure: always
   http_headers:
     X-Content-Type-Options: nosniff
+- url: /build
+  static_dir: web/build
+  secure: always
+  http_headers:
+    X-Content-Type-Options: nosniff
 - url: /cron/.*
   script: auto
   secure: always
