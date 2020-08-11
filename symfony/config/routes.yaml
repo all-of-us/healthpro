@@ -7,9 +7,6 @@ index:
 home:
     path: /
 
-settings:
-    path: /settings
-
 logout:
     path: /logout
 

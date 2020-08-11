@@ -78,7 +78,6 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/problem($|\/)'], ['ROLE_DV_ADMIN']],
                 [['path' => '^/site($|\/)'], ['ROLE_USER', 'ROLE_AWARDEE']],
                 [['path' => '^/help($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
-                [['path' => '^/settings($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
                 [['path' => '^/biobank\/\w+\/(order|quanum-order)\/\w+$'], ['ROLE_AWARDEE', 'ROLE_BIOBANK', 'ROLE_SCRIPPS']],
                 [['path' => '^/biobank($|\/)'], ['ROLE_BIOBANK', 'ROLE_SCRIPPS']],
                 [['path' => '^/.*$'], 'ROLE_USER'],
@@ -349,6 +348,25 @@ class HpoApplication extends AbstractApplication
         return $this->isDVType() ? 'dv' : 'hpo';
     }
 
+    public function addMigratedSymfonyRoutes()
+    {
+        $routes = [
+            'admin_notices' => [
+                'silex' => '/admin/notices',
+                'symfony' => '/s/admin/notices'
+            ],
+            'settings' => [
+                'silex' => '/settings',
+                'symfony' => '/s/settings'
+            ]
+        ];
+        foreach ($routes as $routeName => $mapping) {
+            $this->get($mapping['silex'], function() use ($mapping) {
+                return $this->redirect($mapping['symfony']);
+            })->bind($routeName);
+        }
+    }
+
     protected function earlyBeforeCallback(Request $request, AbstractApplication $app)
     {
         if ($request->getBasePath() === '/web') {
@@ -450,7 +468,7 @@ class HpoApplication extends AbstractApplication
             }
         }
     }
-    
+
     protected function finishCallback(Request $request, Response $response)
     {
         // moved to afterCallBack to fix session start error

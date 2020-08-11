@@ -16,6 +16,9 @@ if ($app->isLocal()) {
     $app['sessionHandler'] = 'datastore';
 }
 
+// Prepends routes that have been migrated to Symfony
+$app->addMigratedSymfonyRoutes();
+
 $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
