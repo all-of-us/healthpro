@@ -1,5 +1,4 @@
 const $ = require('jquery');
-// moment/moment.js - needed on dashboards. probably will split that out into a separate file
 require('bootstrap');
 const _ = require('underscore');
 require('backbone/backbone.js');
@@ -24,8 +23,6 @@ require('./views/Modals.js');
 // ModifyReasons is used on both order and PM modification forms. Could be included separately on both, but leaving as a global for now.
 require('./views/ModifyReasons.js');
 
-// ./js/views/* - move to separate files
-
 require('bootstrap/dist/css/bootstrap.css');
 require('@fortawesome/fontawesome-free/css/all.css');
 require('@fortawesome/fontawesome-free/css/v4-shims.css');
@@ -36,7 +33,7 @@ require('datatables.net-buttons-bs/css/buttons.bootstrap.css');
 require('bootstrap-toggle/css/bootstrap-toggle.css');
 require('../css/app.css');
 
-// merge these files and remove globals when migration from gulp is complete
+// merge these files and possibly remove some globals when migration from gulp is complete
 window.$ = $;
 window._ = _;
 window.jstz = jstz;

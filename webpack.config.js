@@ -29,6 +29,7 @@ Encore
     .addEntry('physical-measurements-0.1', './web/assets/js/views/PhysicalEvaluation-0.1.js')
     .addEntry('physical-measurements-0.2', './web/assets/js/views/PhysicalEvaluation-0.2.js')
     .addEntry('physical-measurements-0.3', './web/assets/js/views/PhysicalEvaluation-0.3.js')
+    .addEntry('dashboard', './web/assets/js/dashboard.webpack.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
