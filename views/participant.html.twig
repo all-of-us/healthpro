@@ -77,8 +77,11 @@
         <br />
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="inperson">
-                {% if participant.canEditPMB and not app.isTestSite %}
+                {% if participantStatus and not app.isTestSite %}
                     <div class="row">
+                        {% if participant.canEditPMB %}
+                            {% include 'partials/participant-notice.html.twig' %}
+                        {% endif %}
                         <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
                             {% include 'partials/participant-evaluation-list.html.twig' %}
                         </div>
