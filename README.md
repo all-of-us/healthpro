@@ -50,9 +50,3 @@ Configure your local development parameters by copying the `dev_config/config.ym
 
 #### MySQL database configuration
 Create a new MySQL for this application.  Configure the MySQL connection in `config.yml`.  Then, import the SQL scripts in `/sql` into the new database.
-
-## Browser sync (optional)
-
-Use the following command to enable Browsersync which will reload your browswer as compiled assets are updated.
-
-`./bin/gulp browser-sync --option localhost:8080`
