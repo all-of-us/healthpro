@@ -309,7 +309,7 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status || $app->isTestSite()) {
+        if (!($participant->status || $participant->canEditPMB) || $app->isTestSite()) {
             $app->abort(403);
         }
         $evaluationService = new Evaluation($app);
