@@ -22,6 +22,7 @@ class Participant
     public $isSuspended = false;
     public $isWithdrawn = false;
     public $consentCohortText;
+    public $canEditPMB = false;
 
     private $disableTestAccess;
     private $genomicsStartTime;
@@ -94,10 +95,12 @@ class Participant
             if (isset($participant->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->physicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
                 if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
+                    $this->canEditPMB = true;
                     $this->statusReason = 'genomics';
                 }
                 if (isset($participant->questionnaireOnDnaProgram) && $participant->questionnaireOnDnaProgram !== 'SUBMITTED') {
                     $this->status = false;
+                    $this->canEditPMB = true;
                     $this->statusReason = 'program-update';
                 }
             }
@@ -107,10 +110,12 @@ class Participant
             if (isset($participant->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->physicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
                 if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
+                    $this->canEditPMB = true;
                     $this->statusReason = 'genomics';
                 }
                 if (isset($participant->consentForStudyEnrollmentAuthored) && !empty($this->cohortOneLaunchTime) && $participant->consentForStudyEnrollmentAuthored <= $this->cohortOneLaunchTime) {
                     $this->status = false;
+                    $this->canEditPMB = true;
                     $this->statusReason = 'primary-consent-update';
                 }
             }

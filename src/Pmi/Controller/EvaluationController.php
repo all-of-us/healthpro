@@ -131,7 +131,8 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status || $app->isTestSite()|| ($participant->activityStatus === 'deactivated' && empty($evalId))) {
+        $participantStatus = empty($evalId) ? $participant->status : $participant->canEditPMB;
+        if (!$participantStatus || $app->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($evalId))) {
             $app->abort(403);
         }
         $evaluationService = new Evaluation($app);
