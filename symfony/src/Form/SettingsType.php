@@ -12,19 +12,12 @@ use Symfony\Component\Form\CallbackTransformer;
 
 class SettingsType extends AbstractType
 {
-    protected $timezoneService;
-
-    public function __construct(TimezoneService $timezoneService)
-    {
-        $this->timezoneService = $timezoneService;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('timezone', Type\ChoiceType::class, [
                 'label' => 'Time zone',
-                'choices' => array_flip($this->timezoneService::$timezoneOptions),
+                'choices' => array_flip(TimezoneService::$timezoneOptions),
                 'placeholder' => '-- Select your time zone --',
                 'constraints' => new Constraints\NotBlank()
             ])

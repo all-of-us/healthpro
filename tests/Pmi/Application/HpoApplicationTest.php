@@ -201,12 +201,12 @@ class HpoApplicationTest extends AbstractWebTestCase
         $client = $this->createClient();
         $client->followRedirects();
         $crawler = $client->request('GET', '/');
-        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
+        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on initial page load.');
         $crawler = $client->reload();
-        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
+        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on reload.');
         $client->request('POST', '/agree', ['csrf_token' => $this->app['csrf.token_manager']->getToken('agreeUsage')]);
         $crawler = $client->request('GET', '/');
-        $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')));
+        $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')), 'Do not see usage modal after confirmation.');
     }
 
     public function testSiteAutoselect()
