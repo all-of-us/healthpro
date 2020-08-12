@@ -20,7 +20,7 @@ Encore
      * Each entry will result in one JavaScript file (e.g. app.js)
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
-    .addEntry('app', './web/assets/js/app.webpack.js')
+    .addEntry('app', './web/assets/js/app.js')
     .addEntry('workqueue', './web/assets/js/views/workqueue.js')
     .addEntry('order-check', './web/assets/js/views/OrderSafetyChecks.js')
     .addEntry('order-create', './web/assets/js/views/CreateOrder.js')
