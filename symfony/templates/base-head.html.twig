@@ -20,12 +20,12 @@
         "keepAliveCsrf": {{ csrf_token('keepAlive')|json_encode|raw }},
         "hideTZWarningCsrf": {{ csrf_token('hideTZWarning')|json_encode|raw }},
         "path": {
-            "clientTimeout": '/client-timeout',
-            "logout": '/logout',
-            "keepAlive": '/keepalive',
-            "agreeUsage": '/agree',
-            "settings": '/settings',
-            "hideTZWarning": '/hide-tz-warning'
+            "clientTimeout": {{ path('clientTimeout')|json_encode|raw }},
+            "logout": {{ path('logout')|json_encode|raw }},
+            "keepAlive": {{ path('keepAlive')|json_encode|raw }},
+            "agreeUsage": {{ path('agreeUsage')|json_encode|raw }},
+            "settings": {{ path('settings')|json_encode|raw }},
+            "hideTZWarning": {{ path('hideTZWarning')|json_encode|raw }}
         },
         "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
         "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }},
