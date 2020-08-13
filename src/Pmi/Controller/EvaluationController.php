@@ -131,11 +131,10 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        $participantStatus = empty($evalId) ? $participant->status : $participant->canEditPMB;
-        if (!$participantStatus || $app->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($evalId))) {
+        $evaluationService = new Evaluation($app);
+        if (!$evaluationService->getParticipantStatus($evalId, $participant) || $app->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($evalId))) {
             $app->abort(403);
         }
-        $evaluationService = new Evaluation($app);
         if ($evalId) {
             $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);
             if (!$evaluation) {
@@ -309,10 +308,10 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!($participant->status || $participant->canEditPMB) || $app->isTestSite()) {
+        $evaluationService = new Evaluation($app);
+        if (!$evaluationService->getParticipantStatus($evalId, $participant) || $app->isTestSite()) {
             $app->abort(403);
         }
-        $evaluationService = new Evaluation($app);
         $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);
         if (!$evaluation) {
             $app->abort(404);
@@ -379,10 +378,10 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status || $app->isTestSite()) {
+        $evaluationService = new Evaluation($app);
+        if (!$evaluationService->getParticipantStatus($evalId, $participant) || $app->isTestSite()) {
             $app->abort(403);
         }
-        $evaluationService = new Evaluation($app);
         $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);
         if (!$evaluation) {
             $app->abort(404);

@@ -40,8 +40,7 @@ class OrderController extends AbstractController
         if (!$order->isValid()) {
             $app->abort(404);
         }
-        $participantStatus = empty($orderId) ? $order->getParticipant()->status : $order->getParticipant()->canEditPMB;
-        if (!$participantStatus || $app->isTestSite()) {
+        if (!$order->getParticipantStatus() || $app->isTestSite()) {
             $app->abort(403);
         }
 
