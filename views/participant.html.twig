@@ -80,7 +80,9 @@
                 {% if participantStatus and not app.isTestSite %}
                     <div class="row">
                         {% if participant.canEditPMB %}
-                            {% include 'partials/participant-notice.html.twig' %}
+                            <div class="col-sm-12">
+                                {% include 'partials/participant-notice.html.twig' %}
+                            </div>
                         {% endif %}
                         <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
                             {% include 'partials/participant-evaluation-list.html.twig' %}
