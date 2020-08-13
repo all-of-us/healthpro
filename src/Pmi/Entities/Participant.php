@@ -115,16 +115,16 @@ class Participant
                 }
             }
         }
+        if (!empty($participant->withdrawalStatus) && in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
+            $this->status = false;
+            $this->statusReason = 'withdrawal';
+            $this->isWithdrawn = true;
+        }
         // RDR should not be returning participant data for unconsented participants, but adding this check to be safe
         // Participant details tab is disabled for the below two status reasons
         if (empty($participant->consentForStudyEnrollment) || $participant->consentForStudyEnrollment !== 'SUBMITTED') {
             $this->status = false;
             $this->statusReason = 'consent';
-        }
-        if (!empty($participant->withdrawalStatus) && in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
-            $this->status = false;
-            $this->statusReason = 'withdrawal';
-            $this->isWithdrawn = true;
         }
 
         // Map gender identity to gender options for MayoLINK.
