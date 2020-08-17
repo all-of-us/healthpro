@@ -70,35 +70,27 @@ class Review
             }
             switch ($row['type']) {
                 case 'order':
-                    if (is_null($participants[$participantId]['order'])) {
-                        $participants[$participantId]['order'] = $row;
-                        $participants[$participantId]['orderCount'] = 1;
-                        // Get order status
-                        foreach (self::$orderStatus as $field => $status) {
-                            if ($row[$field]) {
-                                $participants[$participantId]['orderStatus'] = self::getOrderStatus($row, $status);
-                            }
+                    $participants[$participantId]['orders'][] = $row;
+                    $participants[$participantId]['orderCount']++;
+                    // Get order status
+                    foreach (self::$orderStatus as $field => $status) {
+                        if ($row[$field]) {
+                            $participants[$participantId]['orderStatus'] = self::getOrderStatus($row, $status);
                         }
-                        // Get number of finalized samples
-                        if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
-                            $participants[$participantId]['finalizedSamples'] = count($samples);
-                        }
-                    } else {
-                        $participants[$participantId]['orderCount']++;
+                    }
+                    // Get number of finalized samples
+                    if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
+                        $participants[$participantId]['finalizedSamples'] = count($samples);
                     }
                     break;
                 case 'measurement':
-                    if (is_null($participants[$participantId]['physicalMeasurement'])) {
-                        $participants[$participantId]['physicalMeasurement'] = $row;
-                        $participants[$participantId]['physicalMeasurementCount'] = 1;
-                        // Get physical measurements status
-                        foreach (self::$measurementsStatus as $field => $status) {
-                            if ($row[$field]) {
-                                $participants[$participantId]['physicalMeasurementStatus'] = $this->getEvaluationStatus($row, $status);
-                            }
+                    $participants[$participantId]['physicalMeasurements'][] = $row;
+                    $participants[$participantId]['physicalMeasurementCount']++;
+                    // Get physical measurements status
+                    foreach (self::$measurementsStatus as $field => $status) {
+                        if ($row[$field]) {
+                            $participants[$participantId]['physicalMeasurementStatus'] = $this->getEvaluationStatus($row, $status);
                         }
-                    } else {
-                        $participants[$participantId]['physicalMeasurementCount']++;
                     }
                     break;
             }
