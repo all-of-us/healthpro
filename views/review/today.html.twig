@@ -3,16 +3,18 @@
 {% block bodycontainer %}container-fluid{% endblock %}
 {% set missingName = '' %}
 
-{% macro displayDate(participant, entity, dateType) %}
-    {% if participant[entity] and participant[entity][dateType] %}
-        {% if 'now'|date('Y-m-d', app.userTimezone) == participant[entity][dateType]|date('Y-m-d', app.userTimezone) %}
-            {# previously displayed only time if date is today. leaving this here in case we want to display something different in the future #}
-            {{ participant[entity][dateType]|date('n/j/Y g:ia', app.userTimezone) }}
+{% macro displayDate(type, dateTime) %}
+    {% if type %}
+        {% if type[dateTime] %}
+            {% if 'now'|date('Y-m-d', app.userTimezone) == type[dateTime]|date('Y-m-d', app.userTimezone) %}
+                {# previously displayed only time if date is today. leaving this here in case we want to display something different in the future #}
+                {{ type[dateTime]|date('n/j/Y g:ia', app.userTimezone) }}
+            {% else %}
+                {{ type[dateTime]|date('n/j/Y g:ia', app.userTimezone) }}
+            {% endif %}
         {% else %}
-            {{ participant[entity][dateType]|date('n/j/Y g:ia', app.userTimezone) }}
+            <i class="fa fa-times text-danger" aria-hidden="true"></i>
         {% endif %}
-    {% else %}
-        <i class="fa fa-times text-danger" aria-hidden="true"></i>
     {% endif %}
 {% endmacro %}
 
@@ -53,27 +55,34 @@
         </thead>
         <tbody>
             {% for id, participant in participants %}
-                <tr>
-                    <td><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>
-                    {% if participant.participant is defined %}
-                        <td>
-                            {% if participant.participant %}
-                                <a href="{{ path('participant', { id: id }) }}">{{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}</a>
-                            {% else %}
-                                {{ missingName }}
-                            {% endif %}
-                        </td>
-                    {% else %}
-                        <td data-participant-id="{{ id }}" data-href="{{ path('participant', { id: id }) }}" class="load-name">
-                            <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                            <span class="sr-only">Loading...</span>
-                        </td>
+                {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount) %}
+                {% set rowSpan = 'rowspan =' ~ maxCount %}
+
+                {% for i in 0..maxCount - 1 %}
+                    <tr>
+                    {% if i == 0 %}
+                        <td {{ rowSpan }}><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>
+                        {% if participant.participant is defined %}
+                            <td {{ rowSpan }}>
+                                {% if participant.participant %}
+                                    <a href="{{ path('participant', { id: id }) }}">{{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}</a>
+                                {% else %}
+                                    {{ missingName }}
+                                {% endif %}
+                            </td>
+                        {% else %}
+                            <td data-participant-id="{{ id }}" data-href="{{ path('participant', { id: id }) }}" class="load-name">
+                                <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                                <span class="sr-only">Loading...</span>
+                            </td>
+                        {% endif %}
                     {% endif %}
+                    {% set physicalMeasurement = participant.physicalMeasurements[i] is defined ? participant.physicalMeasurements[i] : '' %}
                     <td class="td-left-border">
-                        {% if participant.physicalMeasurement %}
+                        {% if physicalMeasurement %}
                             <nobr>
-                                <a href="{{ path('evaluation', { participantId: id, evalId: participant.physicalMeasurement.id }) }}">{{ participant.physicalMeasurementStatus }}</a>
-                                {% if participant.physicalMeasurementCount > 1 %}
+                                <a href="{{ path('evaluation', { participantId: id, evalId: physicalMeasurement.id }) }}">{{ physicalMeasurement.status }}</a>
+                                {% if participant.physicalMeasurementsCount > 1 %}
                                     <i class="fa fa-info-circle" aria-hidden="true" title="More than one physical measurements for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of physical measurements." data-toggle="tooltip"></i>
                                     <span class="sr-only">More than one physical measurements for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of physical measurements.</span>
                                 {% endif %}
@@ -81,20 +90,23 @@
                         {% endif %}
                     </td>
                     <td>
-                        {{ today.displayDate(participant, 'physicalMeasurement', 'created_ts') }}
+                        {{ today.displayDate(physicalMeasurement, 'created_ts') }}
                     </td>
                     <td>
-                        {% if participant.physicalMeasurement and participant.physicalMeasurement.h_type != 'unlock' and not (participant.physicalMeasurement.finalized_ts and participant.physicalMeasurement.rdr_id is empty) %}
-                            {{ today.displayDate(participant, 'physicalMeasurement', 'finalized_ts') }}
-                        {% else %}
-                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        {% if physicalMeasurement %}
+                            {% if physicalMeasurement.h_type != 'unlock' and not (physicalMeasurement.finalized_ts and physicalMeasurement.rdr_id is empty) %}
+                                {{ today.displayDate(physicalMeasurement, 'finalized_ts') }}
+                            {% else %}
+                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                            {% endif %}
                         {% endif %}
                     </td>
+                    {% set order = participant.orders[i] is defined ? participant.orders[i] : '' %}
                     <td class="td-left-border">
-                        {% if participant.order %}
+                        {% if order %}
                             <nobr>
-                                <a href="{{ path('order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.orderStatus }}</a>
-                                {% if participant.orderCount > 1 %}
+                                <a href="{{ path('order', { participantId: id, orderId: order.id }) }}">{{ order.status }}</a>
+                                {% if participant.ordersCount > 1 %}
                                     <i class="fa fa-info-circle" aria-hidden="true" title="More than one biobank order for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of biospecimen interactions." data-toggle="tooltip"></i>
                                     <span class="sr-only">More than one biobank order for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of biospecimen interactions.</span>
                                 {% endif %}
@@ -102,35 +114,40 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if participant.order %}
-                            <a href="{{ path('order', { participantId: id, orderId: participant.order.id }) }}">{{ participant.order.order_id }}</a>
+                        {% if order %}
+                            <a href="{{ path('order', { participantId: id, orderId: order.id }) }}">{{ order.order_id }}</a>
                         {% endif %}
                     </td>
                     <td>
-                        {{ today.displayDate(participant, 'order', 'created_ts') }}
+                        {{ today.displayDate(order, 'created_ts') }}
                     </td>
                     <td>
-                        {{ today.displayDate(participant, 'order', 'collected_ts') }}
+                        {{ today.displayDate(order, 'collected_ts') }}
                     </td>
                     <td>
-                        {{ today.displayDate(participant, 'order', 'processed_ts') }}
+                        {{ today.displayDate(order, 'processed_ts') }}
                     </td>
                     <td>
-                        {% set showOrderFinalizedTs = participant.order and participant.order.h_type != 'unlock' and not (participant.order.finalized_ts and participant.order.rdr_id is empty) %}
-                        {% if showOrderFinalizedTs %}
-                            {{ today.displayDate(participant, 'order', 'finalized_ts') }}
-                        {% else %}
-                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        {% if order %}
+                            {% set showOrderFinalizedTs = order.h_type != 'unlock' and not (order.finalized_ts and order.rdr_id is empty) %}
+                            {% if showOrderFinalizedTs %}
+                                {{ today.displayDate(order, 'finalized_ts') }}
+                            {% else %}
+                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                            {% endif %}
                         {% endif %}
                     </td>
                     <td>
-                        {% if showOrderFinalizedTs and participant.finalizedSamples is defined %}
-                            {{ participant.finalizedSamples }}
-                        {% else %}
-                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        {% if order %}
+                            {% if showOrderFinalizedTs and order.finalizedSamplesCount is defined %}
+                                {{ order.finalizedSamplesCount }}
+                            {% else %}
+                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>
+                {% endfor %}
             {% endfor %}
         </tbody>
     </table>
