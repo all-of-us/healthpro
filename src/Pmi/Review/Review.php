@@ -24,13 +24,10 @@ class Review
     ];
 
     protected static $emptyParticipant = [
-        'order' => null,
-        'orderCount' => 0,
-        'orderStatus' => '',
-        'finalizedSamples' => null,
-        'physicalMeasurement' => null,
-        'physicalMeasurementCount' => 0,
-        'physicalMeasurementStatus' => ''
+        'orders' => null,
+        'ordersCount' => 0,
+        'physicalMeasurements' => null,
+        'physicalMeasurementsCount' => 0,
     ];
 
     protected function getTodayRows($today, $site)
@@ -70,28 +67,28 @@ class Review
             }
             switch ($row['type']) {
                 case 'order':
-                    $participants[$participantId]['orders'][] = $row;
-                    $participants[$participantId]['orderCount']++;
                     // Get order status
                     foreach (self::$orderStatus as $field => $status) {
                         if ($row[$field]) {
-                            $participants[$participantId]['orderStatus'] = self::getOrderStatus($row, $status);
+                            $row['status'] = self::getOrderStatus($row, $status);
                         }
                     }
                     // Get number of finalized samples
                     if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
-                        $participants[$participantId]['finalizedSamples'] = count($samples);
+                        $row['finalizedSamplesCount'] = count($samples);
                     }
+                    $participants[$participantId]['orders'][] = $row;
+                    $participants[$participantId]['ordersCount']++;
                     break;
                 case 'measurement':
-                    $participants[$participantId]['physicalMeasurements'][] = $row;
-                    $participants[$participantId]['physicalMeasurementCount']++;
                     // Get physical measurements status
                     foreach (self::$measurementsStatus as $field => $status) {
                         if ($row[$field]) {
-                            $participants[$participantId]['physicalMeasurementStatus'] = $this->getEvaluationStatus($row, $status);
+                            $row['status'] = $this->getEvaluationStatus($row, $status);
                         }
                     }
+                    $participants[$participantId]['physicalMeasurements'][] = $row;
+                    $participants[$participantId]['physicalMeasurementsCount']++;
                     break;
             }
         }
