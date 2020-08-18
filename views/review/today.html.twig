@@ -82,10 +82,6 @@
                         {% if physicalMeasurement %}
                             <nobr>
                                 <a href="{{ path('evaluation', { participantId: id, evalId: physicalMeasurement.id }) }}">{{ physicalMeasurement.status }}</a>
-                                {% if participant.physicalMeasurementsCount > 1 %}
-                                    <i class="fa fa-info-circle" aria-hidden="true" title="More than one physical measurements for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of physical measurements." data-toggle="tooltip"></i>
-                                    <span class="sr-only">More than one physical measurements for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of physical measurements.</span>
-                                {% endif %}
                             </nobr>
                         {% endif %}
                     </td>
@@ -106,10 +102,6 @@
                         {% if order %}
                             <nobr>
                                 <a href="{{ path('order', { participantId: id, orderId: order.id }) }}">{{ order.status }}</a>
-                                {% if participant.ordersCount > 1 %}
-                                    <i class="fa fa-info-circle" aria-hidden="true" title="More than one biobank order for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of biospecimen interactions." data-toggle="tooltip"></i>
-                                    <span class="sr-only">More than one biobank order for this participant was edited today. Click on the Participant ID to view the Participant Summary page for full history of biospecimen interactions.</span>
-                                {% endif %}
                             </nobr>
                         {% endif %}
                     </td>
