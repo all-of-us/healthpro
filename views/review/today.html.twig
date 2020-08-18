@@ -61,9 +61,9 @@
                 {% for i in 0..maxCount - 1 %}
                     <tr>
                     {% if i == 0 %}
-                        <td {{ rowSpan }}><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>
+                        <td {{ rowSpan }} class="align-middle"><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>
                         {% if participant.participant is defined %}
-                            <td {{ rowSpan }}>
+                            <td {{ rowSpan }} class="align-middle">
                                 {% if participant.participant %}
                                     <a href="{{ path('participant', { id: id }) }}">{{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}</a>
                                 {% else %}
@@ -71,7 +71,7 @@
                                 {% endif %}
                             </td>
                         {% else %}
-                            <td data-participant-id="{{ id }}" data-href="{{ path('participant', { id: id }) }}" class="load-name">
+                            <td {{ rowSpan }} data-participant-id="{{ id }}" data-href="{{ path('participant', { id: id }) }}" class="load-name align-middle">
                                 <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
                                 <span class="sr-only">Loading...</span>
                             </td>
