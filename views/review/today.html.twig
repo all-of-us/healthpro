@@ -18,6 +18,12 @@
     {% endif %}
 {% endmacro %}
 
+{% macro displayLink(type, field, participantId) %}
+    {% if type %}
+        <a href="{{ path(type['type'], { participantId: participantId, orderId: type['id'] }) }}">{{ type[field] }}</a>
+    {% endif %}
+{% endmacro %}
+
 {% import _self as today %}
 
 {% block body %}
@@ -34,32 +40,34 @@
     <br />
     <table class="table table-striped table-bordered table-small" id="table-today">
         <thead>
-            <tr>
-                <th rowspan="2">Participant ID</th>
-                <th rowspan="2">Name</th>
-                <th colspan="3" class="text-center td-left-border" style="background-color: #f9f9f9">Physical Measurement</th>
-                <th colspan="7" class="text-center td-left-border" style="background-color: #f9f9f9">Biobank Order</th>
-            </tr>
-            <tr>
-                <th class="td-left-border">Status</th>
-                <th>Created</th>
-                <th>Finalized</th>
-                <th class="td-left-border">Status</th>
-                <th>Order ID</th>
-                <th>Created</th>
-                <th>Collected</th>
-                <th>Processed</th>
-                <th>Finalized</th>
-                <th>Finalized Samples</th>
-            </tr>
+        <tr>
+            <th rowspan="2">Participant ID</th>
+            <th rowspan="2">Name</th>
+            <th colspan="3" class="text-center td-left-border" style="background-color: #f9f9f9">Physical Measurement</th>
+            <th colspan="9" class="text-center td-left-border" style="background-color: #f9f9f9">Biobank Order</th>
+        </tr>
+        <tr>
+            <th class="td-left-border">Status</th>
+            <th>Created</th>
+            <th>Finalized</th>
+            <th class="td-left-border">Status</th>
+            <th>Biobank ID</th>
+            <th>Order ID</th>
+            <th>Created By</th>
+            <th>Created</th>
+            <th>Collected</th>
+            <th>Processed</th>
+            <th>Finalized</th>
+            <th>Finalized Samples</th>
+        </tr>
         </thead>
         <tbody>
-            {% for id, participant in participants %}
-                {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount) %}
-                {% set rowSpan = 'rowspan =' ~ maxCount %}
+        {% for id, participant in participants %}
+            {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount) %}
+            {% set rowSpan = 'rowspan =' ~ maxCount %}
 
-                {% for i in 0..maxCount - 1 %}
-                    <tr>
+            {% for i in 0..maxCount - 1 %}
+                <tr>
                     {% if i == 0 %}
                         <td {{ rowSpan }} class="align-middle"><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>
                         {% if participant.participant is defined %}
@@ -79,11 +87,7 @@
                     {% endif %}
                     {% set physicalMeasurement = participant.physicalMeasurements[i] is defined ? participant.physicalMeasurements[i] : '' %}
                     <td class="td-left-border">
-                        {% if physicalMeasurement %}
-                            <nobr>
-                                <a href="{{ path('evaluation', { participantId: id, evalId: physicalMeasurement.id }) }}">{{ physicalMeasurement.status }}</a>
-                            </nobr>
-                        {% endif %}
+                        {{ today.displayLink(physicalMeasurement, 'status', id) }}
                     </td>
                     <td>
                         {{ today.displayDate(physicalMeasurement, 'created_ts') }}
@@ -99,15 +103,17 @@
                     </td>
                     {% set order = participant.orders[i] is defined ? participant.orders[i] : '' %}
                     <td class="td-left-border">
-                        {% if order %}
-                            <nobr>
-                                <a href="{{ path('order', { participantId: id, orderId: order.id }) }}">{{ order.status }}</a>
-                            </nobr>
-                        {% endif %}
+                        {{ today.displayLink(order, 'status', id) }}
+                    </td>
+                    <td>
+                        {{ today.displayLink(order, 'biobank_id', id) }}
+                    </td>
+                    <td>
+                        {{ today.displayLink(order, 'order_id', id) }}
                     </td>
                     <td>
                         {% if order %}
-                            <a href="{{ path('order', { participantId: id, orderId: order.id }) }}">{{ order.order_id }}</a>
+                            {{ order.created_by }}
                         {% endif %}
                     </td>
                     <td>
@@ -139,8 +145,8 @@
                         {% endif %}
                     </td>
                 </tr>
-                {% endfor %}
             {% endfor %}
+        {% endfor %}
         </tbody>
     </table>
 {% endblock %} 
