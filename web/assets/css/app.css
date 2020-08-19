@@ -385,3 +385,15 @@ table.table-samples td {
 .align-middle {
     vertical-align: middle !important;
 }
+
+.badge-info {
+    background-color: #5bc0de;
+}
+
+.badge-warning {
+    background-color: #f0ad4e;
+}
+
+.badge-success {
+    background-color: #5cb85c;
+}

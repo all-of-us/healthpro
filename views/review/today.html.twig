@@ -40,7 +40,7 @@
         <li role="presentation"><a href="{{ path('review_measurementsRecentModify') }}">Recently Modified Physical Measurements</a></li>
     </ul>
     <br />
-    <table class="table table-striped table-bordered table-small" id="table-today">
+    <table class="table table-bordered table-small" id="table-today">
         <thead>
         <tr>
             <th rowspan="2">Participant ID</th>
@@ -51,15 +51,15 @@
         <tr>
             <th class="td-left-border">Status</th>
             <th>Created <span class="badge" id="evaluation_created_ts"></span></th>
-            <th>Finalized <span class="badge" id="evaluation_finalized_ts"></span></th>
+            <th>Finalized <span class="badge badge-success" id="evaluation_finalized_ts"></span></th>
             <th class="td-left-border">Status</th>
             <th>Biobank ID</th>
             <th>Order ID</th>
             <th>Created By</th>
             <th>Created <span class="badge" id="order_created_ts"></span></th>
-            <th>Collected <span class="badge" id="order_collected_ts"></span></th>
-            <th>Processed <span class="badge" id="order_processed_ts"></span></th>
-            <th>Finalized <span class="badge" id="order_finalized_ts"></span></th>
+            <th>Collected <span class="badge badge-warning" id="order_collected_ts"></span></th>
+            <th>Processed <span class="badge badge-info" id="order_processed_ts"></span></th>
+            <th>Finalized <span class="badge badge-success" id="order_finalized_ts"></span></th>
             <th>Finalized Samples</th>
         </tr>
         </thead>
