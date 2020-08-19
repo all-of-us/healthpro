@@ -381,3 +381,9 @@ table.table-samples td {
     pointer-events: none;
     cursor: default;
 }
+
+.logo-allofus {
+    width: 50px;
+    margin-top: -15px;
+    display: inline !important;
+}

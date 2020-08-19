@@ -16,7 +16,10 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="{{ path('home') }}">
-                <i class="fa fa-star" aria-hidden="true"></i> HealthPro
+                <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" class="logo-allofus">
+            </a>
+            <a class="navbar-brand" href="{{ path('home') }}">
+                HealthPro
                 {% if isTraining %}
                     <div class="navbar-brand-subtitle">training</div>
                 {% endif %}
