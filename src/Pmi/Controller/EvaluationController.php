@@ -102,7 +102,7 @@ class EvaluationController extends AbstractController
             $app->abort(404);
         }
         $evaluationService = new Evaluation($app);
-        if (!$evaluationService->getParticipantStatus($evalId, $participant) || $app->isTestSite()) {
+        if (!$evaluationService->canEdit($evalId, $participant) || $app->isTestSite()) {
             $app->abort(403);
         }
         
@@ -132,7 +132,7 @@ class EvaluationController extends AbstractController
             $app->abort(404);
         }
         $evaluationService = new Evaluation($app);
-        if (!$evaluationService->getParticipantStatus($evalId, $participant) || $app->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($evalId))) {
+        if (!$evaluationService->canEdit($evalId, $participant) || $app->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($evalId))) {
             $app->abort(403);
         }
         if ($evalId) {
@@ -309,7 +309,7 @@ class EvaluationController extends AbstractController
             $app->abort(404);
         }
         $evaluationService = new Evaluation($app);
-        if (!$evaluationService->getParticipantStatus($evalId, $participant) || $app->isTestSite()) {
+        if (!$evaluationService->canEdit($evalId, $participant) || $app->isTestSite()) {
             $app->abort(403);
         }
         $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);
@@ -379,7 +379,7 @@ class EvaluationController extends AbstractController
             $app->abort(404);
         }
         $evaluationService = new Evaluation($app);
-        if (!$evaluationService->getParticipantStatus($evalId, $participant) || $app->isTestSite()) {
+        if (!$evaluationService->canEdit($evalId, $participant) || $app->isTestSite()) {
             $app->abort(403);
         }
         $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);

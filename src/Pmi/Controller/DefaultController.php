@@ -502,7 +502,7 @@ class DefaultController extends AbstractController
             'isDVType' => $app->isDVType(),
             'canViewPatientStatus' => $canViewPatientStatus,
             'displayPatientStatusBlock' => !$app->isDVType(),
-            'participantStatus' => $participant->status || $participant->canEditPMB
+            'canEdit' => $participant->status || $participant->editExistingOnly
         ]);
     }
 

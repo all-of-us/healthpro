@@ -77,9 +77,9 @@
         <br />
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="inperson">
-                {% if participantStatus and not app.isTestSite %}
+                {% if canEdit and not app.isTestSite %}
                     <div class="row">
-                        {% if participant.canEditPMB %}
+                        {% if participant.editExistingOnly %}
                             <div class="col-sm-12">
                                 {% include 'partials/participant-notice.html.twig' %}
                             </div>

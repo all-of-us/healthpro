@@ -701,9 +701,9 @@ class Evaluation
         return [$compareConstraint];
     }
 
-    public function getParticipantStatus($evalId, $participant)
+    public function canEdit($evalId, $participant)
     {
         // Allow cohort 1 and 2 participants to edit existing PMs even if status is false
-        return !$participant->status && !empty($evalId) ? $participant->canEditPMB : $participant->status;
+        return !$participant->status && !empty($evalId) ? $participant->editExistingOnly : $participant->status;
     }
 }

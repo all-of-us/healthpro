@@ -3,7 +3,7 @@
         <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h3>
     </div>
     <div class="panel-body">
-        {% if (readOnly is defined or participant.activityStatus == 'deactivated' or participant.canEditPMB) and evaluations|length == 0 %}
+        {% if (readOnly is defined or participant.activityStatus == 'deactivated' or participant.editExistingOnly) and evaluations|length == 0 %}
             <small class="text-warning">No Records Found</small>
         {% else %}
             {% for evaluation in evaluations %}
