@@ -117,6 +117,9 @@ class WorkQueueController extends AbstractController
                 $rdrParams['ehrConsentExpireStatus'] = $params['ehrConsentExpireStatus'];
             }
         }
+        if (!empty($params['retentionEligibleStatus'])) {
+            $rdrParams['retentionEligibleStatus'] = $params['retentionEligibleStatus'];
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];

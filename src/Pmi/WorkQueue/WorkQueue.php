@@ -207,6 +207,13 @@ class WorkQueue
                 'Active' => 'ACTIVE',
                 'Expired' => 'EXPIRED'
             ]
+        ],
+        'retentionEligibleStatus' => [
+            'label' => 'Retention Eligible',
+            'options' => [
+                'Yes' => 'ELIGIBLE',
+                'No' => 'NOT_ELIGIBLE'
+            ]
         ]
     ];
 
