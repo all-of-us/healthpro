@@ -403,6 +403,8 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'EHR Expiration Date';
                 $headers[] = 'Date of First Primary Consent';
                 $headers[] = 'Date of First EHR Consent';
+                $headers[] = 'Retention Eligible';
+                $headers[] = 'Retention Eligible Date';
             }
             fputcsv($output, $headers);
 
@@ -505,6 +507,8 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::dateFromString($participant->{"ehrConsentExpireAuthored"}, $app->getUserTimezone());
                         $row[] = WorkQueue::dateFromString($participant->{"consentForStudyEnrollmentFirstYesAuthored"}, $app->getUserTimezone());
                         $row[] = WorkQueue::dateFromString($participant->{"consentForElectronicHealthRecordsFirstYesAuthored"}, $app->getUserTimezone());
+                        $row[] = $participant->retentionEligibleStatus === 'ELIGIBLE' ? 1 : 0;
+                        $row[] = WorkQueue::dateFromString($participant->retentionEligibleTime, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
                 }
