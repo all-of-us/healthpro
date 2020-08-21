@@ -13,9 +13,9 @@ class MockUserService
         return self::$googleUser;
     }
 
-    public static function switchCurrentUser($email)
+    public static function switchCurrentUser($email, $timezone = null)
     {
-        self::$googleUser = new MockUser($email);
+        self::$googleUser = new MockUser($email, $timezone);
     }
 
     public static function clearCurrentUser()

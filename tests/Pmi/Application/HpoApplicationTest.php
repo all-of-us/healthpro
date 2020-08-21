@@ -196,7 +196,7 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testUsageAgreement()
     {
         $email = 'testUsageAgreement@example.com';
-        MockUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email, 'America\Chicago');
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
         $client->followRedirects();

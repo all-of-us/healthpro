@@ -81,10 +81,8 @@ abstract class AbstractWebTestCase extends TestCase
             'enforce2fa' => true
         ]);
 
-        // Prepends routes that have been migrated to Symfony
-        $app->addMigratedSymfonyRoutes();
-
         $app->mount('/', new Controller\DefaultController());
+        $app->mount('/', new Controller\SymfonyMigrationController());
         $app->mount('/dashboard', new Controller\DashboardController());
         $app->mount('/help', new Controller\HelpController());
         $app->mount('/admin', new Controller\AdminController());

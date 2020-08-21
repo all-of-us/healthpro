@@ -348,25 +348,6 @@ class HpoApplication extends AbstractApplication
         return $this->isDVType() ? 'dv' : 'hpo';
     }
 
-    public function addMigratedSymfonyRoutes()
-    {
-        $routes = [
-            'admin_notices' => [
-                'silex' => '/admin/notices',
-                'symfony' => '/s/admin/notices'
-            ],
-            'settings' => [
-                'silex' => '/settings',
-                'symfony' => '/s/settings'
-            ]
-        ];
-        foreach ($routes as $routeName => $mapping) {
-            $this->get($mapping['silex'], function() use ($mapping) {
-                return $this->redirect($mapping['symfony']);
-            })->bind($routeName);
-        }
-    }
-
     protected function earlyBeforeCallback(Request $request, AbstractApplication $app)
     {
         if ($request->getBasePath() === '/web') {
