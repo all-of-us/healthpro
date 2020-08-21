@@ -2,6 +2,7 @@
 namespace Pmi\Controller;
 
 use Silex\Application;
+use Symfony\Component\HttpFoundation\Request;
 
 class SymfonyMigrationController extends AbstractController
 {
@@ -10,10 +11,13 @@ class SymfonyMigrationController extends AbstractController
     ];
 
     /**
-     * @deprecated 2020-08-22
+     * @deprecated 2020-08-21
      */
-    public function settingsAction(Application $app)
+    public function settingsAction(Application $app, Request $request)
     {
+        if ($request->query->get('return')) {
+            return $app->redirect('/s/settings?return=' . $request->query->get('return'));
+        }
         return $app->redirect('/s/settings');
     }
 }
