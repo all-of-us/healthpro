@@ -91,6 +91,12 @@ label.label-normal {
     margin-top: -7px;
     text-align: right;
 }
+.navbar-brand-logo {
+    padding: 5px 15px
+}
+.navbar-brand-logo img {
+    height: 40px;
+}
 .navbar-inverse {
     border: 0;
     border-radius: 0;
@@ -380,9 +386,4 @@ table.table-samples td {
 .btn-readonly {
     pointer-events: none;
     cursor: default;
-}
-
-.logo-allofus {
-    width: 50px;
-    margin-top: -15px;
 }
