@@ -174,8 +174,7 @@
 
     <div id="is-xs" class="visible-xs"></div>
     {% include 'base-body.html.twig' %}
-
-    <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
+    {{ webpack_entry('app', 'js') }}
     {% block pagejs %}{% endblock %}
 </body>
 </html>

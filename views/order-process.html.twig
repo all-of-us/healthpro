@@ -63,6 +63,7 @@
 {% endblock %}
 
 {% block pagejs %}
+{{ webpack_entry('order-sub', 'js') }}
 <script>
 $(document).ready(function () {
 {% if order.type == 'saliva' %}

@@ -2,6 +2,8 @@
 use Pmi\Controller;
 
 $app['templatesDirectory'] = realpath(__DIR__ . '/../views');
+$app['webpackBuildDirectory'] = realpath(__DIR__ . '/../web/build');
+
 $app['errorTemplate'] = 'error.html.twig';
 
 $app['sessionTimeout'] = 30 * 60; // Session timeout after 30 minutes
