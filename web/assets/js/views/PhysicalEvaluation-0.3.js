@@ -1,3 +1,5 @@
+const _ = require('underscore');
+
 /**
  * Physical evaluation form view
  */
