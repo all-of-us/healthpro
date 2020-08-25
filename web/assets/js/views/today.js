@@ -1,11 +1,11 @@
-$(document).ready(function() {
+$(document).ready(function () {
     const todayTable = $('#table-today');
     const nameLookupUrl = todayTable.data('name-lookup-url');
     const missingName = todayTable.data('missing-name');
 
-    $('.load-name').each(function() {
+    $('.load-name').each(function () {
         const td = $(this);
-        $.getJSON(nameLookupUrl + td.data('participant-id'), function(data) {
+        $.getJSON(nameLookupUrl + td.data('participant-id'), function (data) {
             td.empty();
             if (data && data.lastName && data.firstName) {
                 const a = $('<a>')
@@ -16,9 +16,9 @@ $(document).ready(function() {
                 td.text(missingName);
             }
         })
-    .fail(function() {
-            td.html('<em>Error loading name</em>');
-        });
+            .fail(function () {
+                td.html('<em>Error loading name</em>');
+            });
     });
 
     const dateTypes = ['evaluation_created_ts', 'evaluation_finalized_ts', 'order_created_ts', 'order_collected_ts', 'order_processed_ts', 'order_finalized_ts'];
