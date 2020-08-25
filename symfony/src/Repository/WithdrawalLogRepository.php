@@ -23,14 +23,12 @@ class WithdrawalLogRepository extends ServiceEntityRepository
      * @return WithdrawalLog[] Returns an array of WithdrawalLog objects
      */
 
-    public function getWithdrawalLogs()
+    public function getWithdrawalNotifications()
     {
         return $this->createQueryBuilder('w')
             ->select('count(w.id) as count, w.insertTs, w.hpoId, w.emailNotified as email')
-            ->groupBy('w.hpoId')
-            ->addGroupBy('w.insertTs')
-            ->addGroupBy('w.emailNotified')
-            ->orderBy('w.insertTs', 'ASC')
+            ->groupBy('w.hpoId, w.insertTs, w.emailNotified')
+            ->orderBy('w.insertTs', 'DESC')
             ->getQuery()
             ->getResult()
         ;

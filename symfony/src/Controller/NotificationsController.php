@@ -17,11 +17,11 @@ class NotificationsController extends AbstractController
      */
     public function index(WithdrawalLogRepository $withdrawalLogRepository, DeactivateLogRepository $deactivateLogRepository)
     {
-        $withdrawalLogs = $withdrawalLogRepository->getWithdrawalLogs();
-        $deactivateLogs = $deactivateLogRepository->getDeactivateLogs();
+        $withdrawalNotifications = $withdrawalLogRepository->getWithdrawalNotifications();
+        $deactivateNotifications = $deactivateLogRepository->getDeactivateNotifications();
         return $this->render('admin/notifications.html.twig', [
-            'withdrawalLogs' => $withdrawalLogs,
-            'deactivateLogs' => $deactivateLogs
+            'withdrawalNotifications' => $withdrawalNotifications,
+            'deactivateNotifications' => $deactivateNotifications
         ]);
     }
 }
