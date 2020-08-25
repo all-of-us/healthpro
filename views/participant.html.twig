@@ -61,12 +61,17 @@
             </li>
             {% if canViewDetails %}
                 <li role="presentation">
-                    <a href="#details" aria-controls="tab" role="tab" data-toggle="tab">Participant Details</a>
+                    <a href="#overview" aria-controls="tab" role="tab" data-toggle="tab">Participant Overview</a>
+                </li>
+                <li role="presentation">
+                    <a href="#activities" aria-controls="tab" role="tab" data-toggle="tab">Participant Activities</a>
                 </li>
             {% else %}
-                <li role="presentation" class="disabled">
-                    <a href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-toggle="tooltip" data-placement="bottom">Participant Details</a>
-                </li>
+                {% for tab in ['Participant Overview', 'Participant Activities'] %}
+                    <li role="presentation" class="disabled">
+                        <a href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-toggle="tooltip" data-placement="bottom">{{ tab }}</a>
+                    </li>
+                {% endfor %}
             {% endif %}
             {% if not isDVType %}
                 <li role="presentation">
@@ -77,8 +82,13 @@
         <br />
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="inperson">
-                {% if participant.status and not app.isTestSite %}
+                {% if canEdit and not app.isTestSite %}
                     <div class="row">
+                        {% if participant.editExistingOnly %}
+                            <div class="col-sm-12">
+                                {% include 'partials/participant-notice.html.twig' %}
+                            </div>
+                        {% endif %}
                         <div class="col-sm-6 {{ app.isDVType ? 'col-lg-4' : 'col-lg-6' }}">
                             {% include 'partials/participant-evaluation-list.html.twig' %}
                         </div>
@@ -101,7 +111,7 @@
                 {% endif %}
             </div>
             {% if canViewDetails %}
-                <div role="tabpanel" class="tab-pane" id="details">
+                <div role="tabpanel" class="tab-pane" id="overview">
                     <div class="row">
                         <div class="col-md-4">
                             <div class="panel panel-default">
@@ -139,28 +149,6 @@
 
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">Contact</h3>
-                                </div>
-                                <div class="panel-body">
-                                    <dl class="dl-vertical">
-                                        <dt>Language</dt>
-                                        <dd>{{ participant.language|default('--') }}</dd>
-                                        <dt>Contact Method</dt>
-                                        <dd>{{ participant.recontactMethod|default('--') }}</dd>
-                                        <dt>Address</dt>
-                                        <dd>{{ participant.getAddress(true)|default('--')|nl2br }}</dd>
-                                        <dt>Email <span title="This is either the registration email or the email provided after consent if the participant registered with a phone number" data-toggle="tooltip"><span class="sr-only">What is Email?</span><i class="fa fa-question-circle text-info"></i></span></dt>
-                                        <dd>{{ participant.email|default('--') }}</dd>
-                                        <dt>Login Phone <span title="This is the verified SMS number used during registration" data-toggle="tooltip"><span class="sr-only">What is Login Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
-                                        <dd>{{ participant.loginPhoneNumber|default('--') }}</dd>
-                                        <dt>Contact Phone <span title="This is the phone number provided after consent" data-toggle="tooltip"><span class="sr-only">What is Contact Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
-                                        <dd>{{ participant.phoneNumber|default('--') }}</dd>
-                                    </dl>
-                                </div>
-                            </div>
-
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
                                     <h3 class="panel-title">Demographics</h3>
                                 </div>
                                 <div class="panel-body">
@@ -183,6 +171,27 @@
                         <div class="col-md-4">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
+                                    <h3 class="panel-title">Contact</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <dl class="dl-vertical">
+                                        <dt>Language</dt>
+                                        <dd>{{ participant.language|default('--') }}</dd>
+                                        <dt>Contact Method</dt>
+                                        <dd>{{ participant.recontactMethod|default('--') }}</dd>
+                                        <dt>Address</dt>
+                                        <dd>{{ participant.getAddress(true)|default('--')|nl2br }}</dd>
+                                        <dt>Email <span title="This is either the registration email or the email provided after consent if the participant registered with a phone number" data-toggle="tooltip"><span class="sr-only">What is Email?</span><i class="fa fa-question-circle text-info"></i></span></dt>
+                                        <dd>{{ participant.email|default('--') }}</dd>
+                                        <dt>Login Phone <span title="This is the verified SMS number used during registration" data-toggle="tooltip"><span class="sr-only">What is Login Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
+                                        <dd>{{ participant.loginPhoneNumber|default('--') }}</dd>
+                                        <dt>Contact Phone <span title="This is the phone number provided after consent" data-toggle="tooltip"><span class="sr-only">What is Contact Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
+                                        <dd>{{ participant.phoneNumber|default('--') }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
                                     <h3 class="panel-title">PPI Survey Completion</h3>
                                 </div>
                                 <div class="panel-body">
@@ -198,21 +207,6 @@
                                         <dt>Number Complete</dt>
                                         <dd>{{ participant.numCompletedPPIModules }}</dd>
                                     </dl>
-                                    <div class="text-center">
-                                        {% for field, label in surveys %}
-                                            <div class="participant-detail-status">
-                                                <strong>{{ label }}</strong>
-                                                {% if attribute(participant, 'questionnaireOn' ~ field) == 'SUBMITTED' %}
-                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                                {% else %}
-                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                                                {% endif %}
-                                                <small>
-                                                    {{ attribute(participant, 'questionnaireOn' ~ field ~ 'Authored') ? attribute(participant, 'questionnaireOn' ~ field ~ 'Authored')|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
-                                                </small>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -271,6 +265,92 @@
                                         {% endif %}
                                     </div>
                                     <hr />
+                                    <div class="text-center">
+                                        <div class="participant-detail-status">
+                                            <strong>Physical Measurements</strong>
+                                            {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% if participant.physicalMeasurementsFinalizedTime %}
+                                                    <small>{{ participant.physicalMeasurementsFinalizedTime|date('m/d/Y', app.userTimezone) }}</small>
+                                                {% endif %}
+                                            {% else %}
+                                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                <small>(not completed)</small>
+                                            {% endif %}
+                                        </div>
+                                        <br />
+                                        {% if participant.evaluationFinalizedSite %}
+                                            Location: <samp>{{ app.getSiteDisplayName(participant.evaluationFinalizedSite) }}</samp>
+                                        {% endif %}
+                                    </div>
+                                    <hr />
+                                    <dl class="dl-horizontal dl-horizontal-lg">
+                                        <dt>Biospecimens Received</dt>
+                                        <dd>
+                                            {% if participant.numBaselineSamplesArrived >= 7 %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                            {% endif %}
+                                            {{ participant.numBaselineSamplesArrived }}
+                                        </dd>
+                                        <dt>Samples for DNA Received?</dt>
+                                        <dd>
+                                            {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                            {% else %}
+                                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                            {% endif %}
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="activities">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">PPI Survey Completion</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <dl class="dl-horizontal">
+                                        <dt>Required Complete?</dt>
+                                        <dd>
+                                            {% if participant.numCompletedBaselinePPIModules == 3 %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                            {% else %}
+                                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                            {% endif %}
+                                        </dd>
+                                        <dt>Number Complete</dt>
+                                        <dd>{{ participant.numCompletedPPIModules }}</dd>
+                                    </dl>
+                                    <div class="text-center">
+                                        {% for field, label in surveys %}
+                                            <div class="participant-detail-status">
+                                                <strong>{{ label }}</strong>
+                                                {% if attribute(participant, 'questionnaireOn' ~ field) == 'SUBMITTED' %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                {% endif %}
+                                                <small>
+                                                    {{ attribute(participant, 'questionnaireOn' ~ field ~ 'Authored') ? attribute(participant, 'questionnaireOn' ~ field ~ 'Authored')|date('n/j/Y g:ia', app.userTimezone) : '(not completed)' }}
+                                                </small>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Physical Measurements and Biospecimens</h3>
+                                </div>
+                                <div class="panel-body">
                                     <div class="text-center">
                                         <div class="participant-detail-status">
                                             <strong>Physical Measurements</strong>

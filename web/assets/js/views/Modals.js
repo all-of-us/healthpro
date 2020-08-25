@@ -1,3 +1,5 @@
+const _ = require('underscore');
+
 /**
  * Extendable Backbone views that use Bootstrap modals for confirmations and
  * alerts, along with convenience functions pmiConfirm() and pmiAlert().

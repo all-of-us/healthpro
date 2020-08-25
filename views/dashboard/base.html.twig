@@ -3,11 +3,10 @@
 <head>
     {% include 'base-head.html.twig' %}
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ app.assetVer }}">
-    <link rel="stylesheet" href="{{ asset('css/jquery-ui.min.css') }}?v=1.12.0" />
-    <script src="{{ asset('dist/js/all.min.js') }}?v={{ app.assetVer }}"></script>
+    {{ webpack_entry('dashboard', 'css') }}
+    {{ webpack_entry('app', 'js') }}
+    {{ webpack_entry('dashboard', 'js') }}
     <script src="{{ asset('js/dashboard.js') }}?v={{ app.assetVer }}"></script>
-    <script src="{{ asset('js/jquery-ui.min.js') }}?v=1.12.0"></script>
     <script src="{{ asset('js/plotly.min.js') }}?v=1.17.3"></script>
     <script src="{{ asset('js/spin.min.js') }}?v=2.3.2"></script>
 </head>

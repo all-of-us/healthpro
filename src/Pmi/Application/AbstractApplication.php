@@ -394,6 +394,20 @@ abstract class AbstractApplication extends Application
         ]) || strpos($route, 'cron_') === 0);
     }
 
+    protected function getBasePath()
+    {
+        $basePath = $this['request_stack']->getCurrentRequest()->getBasepath();
+        if ($basePath === '/web') {
+            // The combination of GAE's routing handlers and the Symfony Request object
+            // base path logic results in an incorrect basepath for requests that start
+            // with /web because the prefix is the same as the web root's directory name.
+            // To account for this, we clear the basePath if it is "/web"
+            $basePath = '';
+        }
+
+        return $basePath;
+    }
+
     protected function enableTwig()
     {
         $options = [
@@ -416,17 +430,45 @@ abstract class AbstractApplication extends Application
 
         // Register custom Twig asset function
         $this['twig']->addFunction(new Twig_SimpleFunction('asset', function($asset) {
-            $basePath = $this['request_stack']->getCurrentRequest()->getBasepath();
-            if ($basePath === '/web') {
-                // The combination of GAE's routing handlers and the Symfony Request object
-                // base path logic results in an incorrect basepath for requests that start
-                // with /web because the prefix is the same as the web root's directory name.
-                // To account for this, we clear the basePath if it is "/web"
-                $basePath = '';
-            }
-            $basePath .= '/assets/';
-            return $basePath . ltrim($asset, '/');
+            $path = $this->getBasePath();
+            $path .= '/assets/';
+            return $path . ltrim($asset, '/');
         }));
+
+        // Register custom webpack entrypoint function
+        $this['twig']->addFunction(new Twig_SimpleFunction('webpack_entry', function($entry, $type) {
+            $dir = $this['webpackBuildDirectory'];
+            $entrypointsFile = $dir . '/entrypoints.json';
+            if (!file_exists($entrypointsFile)) {
+                $this['logger']->error('Missing entrypoints.json file');
+                return;
+            }
+            $entrypoints = json_decode(file_get_contents($entrypointsFile));
+            if (!isset($entrypoints->entrypoints) || !isset($entrypoints->entrypoints->{$entry}) || !isset($entrypoints->entrypoints->{$entry}->{$type})) {
+                $this['logger']->error("Entry for {$entry}.{$type} not found");
+                return;
+            }
+            $entries = $entrypoints->entrypoints->{$entry}->{$type};
+
+            // for view-specific js, ignore entries already included in app.js
+            if ($type === 'js' && $entry !== 'app' && isset($entrypoints->entrypoints->app->js)) {
+                $entries = array_diff($entries, $entrypoints->entrypoints->app->js);
+            }
+            $html = '';
+            foreach ($entries as $entry) {
+                switch ($type) {
+                    case 'css':
+                        $html .= "<link rel=\"stylesheet\" href=\"{$entry}\">\n";
+                        break;
+                    case 'js':
+                        $html .= "<script src=\"{$entry}\"></script>\n";
+                        break;
+                    default:
+                        $this['logger']->error("Unsupported webpack entry type: {$entry}.{$type}");
+                }
+            }
+            return $html;
+        }, ['is_safe' => ['html']]));
 
         // Register custom Twig path_exists function
         $this['twig']->addFunction(new Twig_SimpleFunction('path_exists', function ($name) {

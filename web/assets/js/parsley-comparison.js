@@ -3,7 +3,7 @@
  * Modified to remove the import line and add messages
  */
 
-var parseRequirement = function (requirement) {
+window.parseRequirement = function (requirement) {
   if (isNaN(+requirement))
     return parseFloat(jQuery(requirement).val());
   else

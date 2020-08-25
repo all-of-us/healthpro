@@ -26,13 +26,13 @@ Install PHP dependencies via Composer:
 
 `composer install`
 
-Install asset and Gulp dependencies via NPM:
+Install front end assets and build tooling via NPM:
 
 `npm install`
 
-Initialize assets and recompile on the fly as assets change:
+Compile assets using [Webpack Encore](https://symfony.com/doc/4.4/frontend.html) and recompile on the fly as assets change:
 
-`./bin/gulp`
+`npx encore dev --watch`
 
 Run local Datastore emulator
 
@@ -50,9 +50,3 @@ Configure your local development parameters by copying the `dev_config/config.ym
 
 #### MySQL database configuration
 Create a new MySQL for this application.  Configure the MySQL connection in `config.yml`.  Then, import the SQL scripts in `/sql` into the new database.
-
-## Browser sync (optional)
-
-Use the following command to enable Browsersync which will reload your browswer as compiled assets are updated.
-
-`./bin/gulp browser-sync --option localhost:8080`

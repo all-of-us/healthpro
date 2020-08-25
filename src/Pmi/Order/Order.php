@@ -1682,4 +1682,10 @@ class Order
     {
         return !empty(array_intersect($samples, self::$samplesRequiringCentrifugeType)) ? true : false;
     }
+
+    public function canEdit()
+    {
+        // Allow cohort 1 and 2 participants to edit existing orders even if status is false
+        return !$this->getParticipant()->status && !empty($this->order['id']) ? $this->getParticipant()->editExistingOnly : $this->getParticipant()->status;
+    }
 }
