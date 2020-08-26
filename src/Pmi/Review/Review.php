@@ -3,6 +3,9 @@ namespace Pmi\Review;
 
 use Pmi\Order\Order;
 use Pmi\Evaluation\Evaluation;
+use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Validator\Constraints;
 
 class Review
 {
@@ -30,7 +33,7 @@ class Review
         'physicalMeasurementsCount' => 0,
     ];
 
-    protected function getTodayRows($today, $site)
+    protected function getTodayRows($startTime, $endTime, $site)
     {
         $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.biobank_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, o.biobank_finalized, ' .
             'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
@@ -41,7 +44,8 @@ class Review
             'ON o.history_id = oh.id ' .
             'LEFT JOIN users u ' .
             'ON o.user_id = u.id WHERE ' .
-            '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ' .
+            '(o.created_ts >= :startTime OR o.collected_ts >= :startTime OR o.processed_ts >= :startTime OR o.finalized_ts >= :startTime OR oh.created_ts >= :startTime) ' .
+            'AND (o.created_ts <= :endTime OR o.collected_ts <= :endTime OR o.processed_ts <= :endTime OR o.finalized_ts <= :endTime OR oh.created_ts <= :endTime) ' .
             'AND (o.site = :site OR o.collected_site = :site OR o.processed_site = :site OR o.finalized_site = :site) ';
         $measurementsQuery = 'SELECT e.participant_id, \'evaluation\' as type, e.id, e.parent_id, null, e.rdr_id, null, e.created_ts, null, null, e.finalized_ts, null, null, ' .
             'greatest(coalesce(e.created_ts, 0), coalesce(e.finalized_ts, 0), coalesce(eh.created_ts, 0)) as latest_ts, ' .
@@ -51,20 +55,22 @@ class Review
             'LEFT JOIN evaluations_history eh ' .
             'ON e.history_id = eh.id WHERE ' .
             'e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL) ' .
-            'AND (e.created_ts >= :today OR e.finalized_ts >= :today OR eh.created_ts >= :today) ' .
+            'AND (e.created_ts >= :startTime OR e.finalized_ts >= :startTime OR eh.created_ts >= :startTime) ' .
+            'AND (e.created_ts <= :endTime OR e.finalized_ts <= :endTime OR eh.created_ts <= :endTime) ' .
             'AND (e.site = :site OR e.finalized_site = :site)';
         $query = "($ordersQuery) UNION ($measurementsQuery) ORDER BY latest_ts DESC";
 
         return $this->db->fetchAll($query, [
-            'today' => $today,
+            'startTime' => $startTime,
+            'endTime' => $endTime,
             'site' => $site
         ]);
     }
 
-    public function getTodayParticipants($today, $site = null)
+    public function getTodayParticipants($startTime, $endTime, $site = null)
     {
         $participants = [];
-        foreach ($this->getTodayRows($today, $site) as $row) {
+        foreach ($this->getTodayRows($startTime, $endTime, $site) as $row) {
             $participantId = $row['participant_id'];
             if (!array_key_exists($participantId, $participants)) {
                 $participants[$participantId] = self::$emptyParticipant;
@@ -98,6 +104,47 @@ class Review
         }
 
         return $participants;
+    }
+
+    public function getTodayFilterForm($formFactory, $timeZone)
+    {
+        $formBuilder = $formFactory->createBuilder(FormType::class);
+        $constraintDateTime = new \DateTime('+5 minutes');
+        $formBuilder
+            ->add('start_ts', Type\DateTimeType::class, [
+                'required' => true,
+                'label' => 'Start Date',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy h:mm a',
+                'view_timezone' => $timeZone,
+                'model_timezone' => 'UTC',
+                'constraints' => [
+                    new Constraints\DateTime(),
+                    new Constraints\LessThanOrEqual([
+                        'value' => $constraintDateTime,
+                        'message' => 'Timestamp cannot be in the future'
+                    ])
+                ]
+            ])
+            ->add('end_ts', Type\DateTimeType::class, [
+                'required' => false,
+                'label' => 'End Date',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy h:mm a',
+                'view_timezone' => $timeZone,
+                'model_timezone' => 'UTC',
+                'constraints' => [
+                    new Constraints\DateTime(),
+                    new Constraints\LessThanOrEqual([
+                        'value' => $constraintDateTime,
+                        'message' => 'Timestamp cannot be in the future'
+                    ])
+                ]
+            ])
+            ->add('Submit', Type\SubmitType::class, [
+                'attr' => ['class' => 'btn btn-primary'],
+            ]);
+        return $formBuilder->getForm();
     }
 
     protected function getTodayOrderRows($today)

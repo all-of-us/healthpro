@@ -3,6 +3,7 @@ namespace Pmi\Controller;
 
 use Pmi\Evaluation\Evaluation;
 use Silex\Application;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -14,7 +15,7 @@ class ReviewController extends AbstractController
     protected static $name = 'review';
 
     protected static $routes = [
-        ['today', '/'],
+        ['today', '/', ['method' => 'GET|POST']],
         ['orders', '/orders'],
         ['measurements', '/measurements'],
         ['participantNameLookup', '/participant/lookup'],
@@ -30,19 +31,35 @@ class ReviewController extends AbstractController
             return $app->redirectToRoute('home');
         }
 
+        $review = new Review($app['db']);
+
         // Get beginning of today (at midnight) in user's timezone
         $startString = 'today';
-        // Allow overriding start time to test in non-prod environments
-        if (!$app->isProd() && intval($request->query->get('days')) > 0) {
-            $startString = '-' . intval($request->query->get('days')) . ' days';
-        }
         $startTime = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
+
+        // Get beginning of today (at midnight) in user's timezone
+        $endString = 'yesterday 1 sec ago';
+        $endTime = new \DateTime($endString, new \DateTimeZone($app->getUserTimezone()));
+
+        $todayFilterForm = $review->getTodayFilterForm($app['form.factory'], $app->getUserTimezone());
+        $todayFilterForm->handleRequest($request);
+        if ($todayFilterForm->isSubmitted()) {
+            if ($todayFilterForm->isValid()) {
+                $startTime = $todayFilterForm->get('start_ts')->getData();
+                $endTime = $todayFilterForm->get('end_ts')->getData() ?? $endTime;
+            } else {
+                $todayFilterForm->addError(new FormError('Please correct the errors below'));
+            }
+        }
+
         // Get MySQL date/time string in UTC
         $startTime->setTimezone(new \DateTimezone('UTC'));
-        $today = $startTime->format('Y-m-d H:i:s');
+        $startTime = $startTime->format('Y-m-d H:i:s');
 
-        $review = new Review($app['db']);
-        $participants = $review->getTodayParticipants($today, $site);
+        $endTime->setTimezone(new \DateTimezone('UTC'));
+        $endTime = $endTime->format('Y-m-d H:i:s');
+
+        $participants = $review->getTodayParticipants($startTime, $endTime, $site);
         
         // Preload first 5 names
         $count = 0;
@@ -54,7 +71,8 @@ class ReviewController extends AbstractController
         }
 
         return $app['twig']->render('review/today.html.twig', [
-            'participants' => $participants
+            'participants' => $participants,
+            'todayFilterForm' => $todayFilterForm->createView(),
         ]);
     }
 
