@@ -37,7 +37,7 @@ class ReviewController extends AbstractController
         $startString = 'today';
         $startTime = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
 
-        // Get beginning of today (at midnight) in user's timezone
+        // Get end of today (at midnight) in user's timezone
         $endString = 'yesterday 1 sec ago';
         $endTime = new \DateTime($endString, new \DateTimeZone($app->getUserTimezone()));
 

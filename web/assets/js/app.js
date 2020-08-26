@@ -355,8 +355,9 @@ $(document).ready(function()
             PMI.markSaved();
         });
     };
+
     // Automatically enable unsaved prompt on forms with warn-unsaved class
-    PMI.enableUnsavedPrompt('form.warn-unsaved');
+    if ($('form').hasClass('warn-unsaved')) PMI.enableUnsavedPrompt('form.warn-unsaved');
 
 
     /*************************************************************************
