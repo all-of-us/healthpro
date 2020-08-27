@@ -138,6 +138,10 @@ class Review
                     new Constraints\LessThanOrEqual([
                         'value' => $constraintDateTime,
                         'message' => 'Timestamp cannot be in the future'
+                    ]),
+                    new Constraints\GreaterThan([
+                        'propertyPath' => 'parent.all[start_ts].data',
+                        'message' => 'End date should be greater than start date'
                     ])
                 ]
             ])
