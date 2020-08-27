@@ -22,7 +22,7 @@ class DeactivateLogRepository extends ServiceEntityRepository
     /**
      * @return DeactivateLog[] Returns an array of DeactivateLog objects
      */
-    public function getDeactivateNotifications()
+    public function getDeactivatedNotifications()
     {
         return $this->createQueryBuilder('d')
             ->select('count(d.id) as count, d.insertTs, d.hpoId, d.emailNotified as email')
