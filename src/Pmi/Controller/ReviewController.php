@@ -49,6 +49,10 @@ class ReviewController extends AbstractController
                 $endTime = $todayFilterForm->get('end_ts')->getData() ?? $endTime;
             } else {
                 $todayFilterForm->addError(new FormError('Please correct the errors below'));
+                return $app['twig']->render('review/today.html.twig', [
+                    'participants' => [],
+                    'todayFilterForm' => $todayFilterForm->createView(),
+                ]);
             }
         }
 

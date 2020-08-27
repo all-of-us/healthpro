@@ -45,7 +45,11 @@
         {{ form_errors(todayFilterForm) }}
         <div class="today-filter">
             {{ form_rest(todayFilterForm) }}
+            <div class="form-group">
+                <button type="button" class="btn btn-default" onclick="window.location.reload()">Reset</button>
+            </div>
         </div>
+
         {{ form_end(todayFilterForm) }}
     </div>
     <table class="table table-bordered table-small" id="table-today" data-name-lookup-url="{{ path('review_participantNameLookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
