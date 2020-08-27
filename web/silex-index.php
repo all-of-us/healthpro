@@ -2,6 +2,8 @@
 use Pmi\Controller;
 
 $app['templatesDirectory'] = realpath(__DIR__ . '/../views');
+$app['webpackBuildDirectory'] = realpath(__DIR__ . '/../web/build');
+
 $app['errorTemplate'] = 'error.html.twig';
 
 $app['sessionTimeout'] = 30 * 60; // Session timeout after 30 minutes
@@ -22,6 +24,7 @@ $app
     ->mount('/', new Controller\OrderController())
     ->mount('/', new Controller\EvaluationController())
     ->mount('/', new Controller\ProblemController())
+    ->mount('/', new Controller\SymfonyMigrationController())
     ->mount('/_dev', new Controller\DevController())
     ->mount('/cron', new Controller\CronController())
     ->mount('/dashboard', new Controller\DashboardController())

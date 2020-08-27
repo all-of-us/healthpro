@@ -62,6 +62,7 @@
 {% endblock %}
 
 {% block pagejs %}
+{{ webpack_entry('order-sub', 'js') }}
 <script>
 $(document).ready(function() {
     $('#checkall').on('change', function() {
