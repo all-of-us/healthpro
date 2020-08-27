@@ -46,7 +46,9 @@ class ReviewController extends AbstractController
         if ($todayFilterForm->isSubmitted()) {
             if ($todayFilterForm->isValid()) {
                 $startTime = $todayFilterForm->get('start_ts')->getData();
-                $endTime = $todayFilterForm->get('end_ts')->getData() ?? $endTime;
+                if ($endTime = $todayFilterForm->get('end_ts')->getData()) {
+                    $endTime->setTime(23, 59, 59);
+                }
             } else {
                 $todayFilterForm->addError(new FormError('Please correct the errors below'));
                 return $app['twig']->render('review/today.html.twig', [

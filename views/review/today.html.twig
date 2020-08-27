@@ -41,7 +41,7 @@
     </ul>
     <br />
     <div class="well">
-        {{ form_start(todayFilterForm, { attr: { class: 'form-inline' } }) }}
+        {{ form_start(todayFilterForm, { attr: { class: 'form-inline', autoComplete: 'off' } }) }}
         {{ form_errors(todayFilterForm) }}
         <div class="today-filter">
             {{ form_rest(todayFilterForm) }}

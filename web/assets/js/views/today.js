@@ -28,5 +28,5 @@ $(document).ready(function () {
         $('#' + dateType).html($('[data-date-type=' + dateType + ']').length);
     }
 
-    $('#form_start_ts, #form_end_ts').pmiDateTimePicker();
+    $('#form_start_ts, #form_end_ts').pmiDateTimePicker('MM/DD/YYYY');
 });

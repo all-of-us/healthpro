@@ -109,37 +109,26 @@ class Review
     public function getTodayFilterForm($formFactory, $timeZone)
     {
         $formBuilder = $formFactory->createBuilder(FormType::class);
-        $constraintDateTime = new \DateTime('+5 minutes');
         $formBuilder
             ->add('start_ts', Type\DateTimeType::class, [
                 'required' => true,
                 'label' => 'Start Date',
                 'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
-                'view_timezone' => $timeZone,
-                'model_timezone' => 'UTC',
+                'format' => 'M/d/yyyy',
+                'model_timezone' => $timeZone,
                 'constraints' => [
-                    new Constraints\DateTime(),
-                    new Constraints\LessThanOrEqual([
-                        'value' => $constraintDateTime,
-                        'message' => 'Timestamp cannot be in the future'
-                    ])
+                    new Constraints\DateTime()
                 ]
             ])
             ->add('end_ts', Type\DateTimeType::class, [
                 'required' => false,
                 'label' => 'End Date',
                 'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
-                'view_timezone' => $timeZone,
-                'model_timezone' => 'UTC',
+                'format' => 'M/d/yyyy',
+                'model_timezone' => $timeZone,
                 'constraints' => [
                     new Constraints\DateTime(),
-                    new Constraints\LessThanOrEqual([
-                        'value' => $constraintDateTime,
-                        'message' => 'Timestamp cannot be in the future'
-                    ]),
-                    new Constraints\GreaterThan([
+                    new Constraints\GreaterThanOrEqual([
                         'propertyPath' => 'parent.all[start_ts].data',
                         'message' => 'End date should be greater than start date'
                     ])
