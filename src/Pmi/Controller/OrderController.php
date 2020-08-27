@@ -40,7 +40,7 @@ class OrderController extends AbstractController
         if (!$order->isValid()) {
             $app->abort(404);
         }
-        if (!$order->getParticipant()->status || $app->isTestSite()) {
+        if (!$order->canEdit() || $app->isTestSite()) {
             $app->abort(403);
         }
 

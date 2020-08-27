@@ -5,6 +5,7 @@ php.ini
 /node_modules/
 /bower_components/
 /web/assets/dist
+/web/build
 /web/favicon.ico
 /cache/
 /dev_config/*

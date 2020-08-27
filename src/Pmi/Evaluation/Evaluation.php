@@ -700,4 +700,10 @@ class Evaluation
         $compareConstraint = new Constraints\Collection($collectionConstraintFields);
         return [$compareConstraint];
     }
+
+    public function canEdit($evalId, $participant)
+    {
+        // Allow cohort 1 and 2 participants to edit existing PMs even if status is false
+        return !$participant->status && !empty($evalId) ? $participant->editExistingOnly : $participant->status;
+    }
 }

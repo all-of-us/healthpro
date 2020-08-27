@@ -57,6 +57,7 @@ abstract class AbstractWebTestCase extends TestCase
         putenv('PMI_ENV=' . HpoApplication::ENV_LOCAL);
         $app = new HpoApplication([
             'templatesDirectory' => __DIR__ . '/../../views',
+            'webpackBuildDirectory' => __DIR__ . '/../../web/build',
             'errorTemplate' => 'error.html.twig',
             'isUnitTest' => true,
             'sessionTimeout' => 7 * 60,

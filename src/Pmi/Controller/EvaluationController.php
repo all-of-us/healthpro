@@ -101,7 +101,8 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status || $app->isTestSite()) {
+        $evaluationService = new Evaluation($app);
+        if (!$evaluationService->canEdit($evalId, $participant) || $app->isTestSite()) {
             $app->abort(403);
         }
         
@@ -116,7 +117,6 @@ class EvaluationController extends AbstractController
         if (!$evaluation['finalized_ts']) {
             $app->abort(403);
         }
-        $evaluationService = new Evaluation($app);
         $evaluationService->loadFromArray($evaluation);
         return $app['twig']->render('evaluation-summary.html.twig', [
             'participant' => $participant,
@@ -131,10 +131,10 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status || $app->isTestSite()|| ($participant->activityStatus === 'deactivated' && empty($evalId))) {
+        $evaluationService = new Evaluation($app);
+        if (!$evaluationService->canEdit($evalId, $participant) || $app->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($evalId))) {
             $app->abort(403);
         }
-        $evaluationService = new Evaluation($app);
         if ($evalId) {
             $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);
             if (!$evaluation) {
@@ -308,10 +308,10 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status || $app->isTestSite()) {
+        $evaluationService = new Evaluation($app);
+        if (!$evaluationService->canEdit($evalId, $participant) || $app->isTestSite()) {
             $app->abort(403);
         }
-        $evaluationService = new Evaluation($app);
         $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);
         if (!$evaluation) {
             $app->abort(404);
@@ -378,10 +378,10 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status || $app->isTestSite()) {
+        $evaluationService = new Evaluation($app);
+        if (!$evaluationService->canEdit($evalId, $participant) || $app->isTestSite()) {
             $app->abort(403);
         }
-        $evaluationService = new Evaluation($app);
         $evaluation = $evaluationService->getEvaluationWithHistory($evalId, $participantId);
         if (!$evaluation) {
             $app->abort(404);

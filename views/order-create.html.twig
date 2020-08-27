@@ -137,6 +137,7 @@
     </div>
 {% endblock %}
 {% block pagejs %}
+{{ webpack_entry('order-create', 'js') }}
 <script>
 $(document).ready(function() {
     {% if not showBloodTubes %}
