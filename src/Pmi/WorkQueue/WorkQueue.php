@@ -36,6 +36,7 @@ class WorkQueue
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
         'withdrawalAuthored',
+        'retentionEligibleTime',
         'withdrawalReason',
         'patientStatus',
         'patientStatus',
@@ -206,6 +207,13 @@ class WorkQueue
                 'Active' => 'ACTIVE',
                 'Expired' => 'EXPIRED'
             ]
+        ],
+        'retentionEligibleStatus' => [
+            'label' => 'Retention Eligible',
+            'options' => [
+                'Yes' => 'ELIGIBLE',
+                'No' => 'NOT_ELIGIBLE'
+            ]
         ]
     ];
 
@@ -353,6 +361,7 @@ class WorkQueue
             $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
             $row['activityStatus'] = $this->getActivityStatus($participant);
+            $row['retentionEligibleStatus'] = $this->getRetentionEligibleStatus($participant->retentionEligibleStatus, $participant->retentionEligibleTime);
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
 
@@ -575,5 +584,15 @@ class WorkQueue
         } else {
             return self::HTML_DANGER . '<span class="text-danger"> (review not completed) </span>';
         }
+    }
+
+    public function getRetentionEligibleStatus($value, $time)
+    {
+        if ($value === 'ELIGIBLE') {
+            return 'Yes <br/>' . self::dateFromString($time, $this->app->getUserTimezone());
+        } elseif ($value === 'NOT_ELIGIBLE') {
+            return 'No';
+        }
+        return '';
     }
 }
