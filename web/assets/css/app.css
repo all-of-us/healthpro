@@ -403,3 +403,11 @@ table.table-samples td {
 .badge-success {
     background-color: #5cb85c;
 }
+
+.today-filter {
+    display: flex;
+}
+
+.today-filter > div {
+    padding: 0 10px 0 10px;
+}

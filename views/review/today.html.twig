@@ -43,7 +43,9 @@
     <div class="well">
         {{ form_start(todayFilterForm, { attr: { class: 'form-inline' } }) }}
         {{ form_errors(todayFilterForm) }}
-        {{ form_rest(todayFilterForm) }}
+        <div class="today-filter">
+            {{ form_rest(todayFilterForm) }}
+        </div>
         {{ form_end(todayFilterForm) }}
     </div>
     <table class="table table-bordered table-small" id="table-today" data-name-lookup-url="{{ path('review_participantNameLookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
