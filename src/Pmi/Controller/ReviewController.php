@@ -41,7 +41,7 @@ class ReviewController extends AbstractController
         $endString = 'yesterday 1 sec ago';
         $endTime = new \DateTime($endString, new \DateTimeZone($app->getUserTimezone()));
 
-        $todayFilterForm = $review->getTodayFilterForm($app['form.factory']);
+        $todayFilterForm = $review->getTodayFilterForm($app['form.factory'], $app->getUserTimezone());
         $todayFilterForm->handleRequest($request);
         if ($todayFilterForm->isSubmitted()) {
             if ($todayFilterForm->isValid()) {

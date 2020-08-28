@@ -106,9 +106,10 @@ class Review
         return $participants;
     }
 
-    public function getTodayFilterForm($formFactory)
+    public function getTodayFilterForm($formFactory, $timeZone)
     {
         $formBuilder = $formFactory->createBuilder(FormType::class);
+        $constraintDate = new \DateTime('today', new \DateTimeZone($timeZone));
         $formBuilder
             ->add('start_ts', Type\DateTimeType::class, [
                 'required' => true,
@@ -117,7 +118,11 @@ class Review
                 'format' => 'M/d/yyyy',
                 'model_timezone' => 'UTC',
                 'constraints' => [
-                    new Constraints\DateTime()
+                    new Constraints\DateTime(),
+                    new Constraints\LessThanOrEqual([
+                        'value' => $constraintDate,
+                        'message' => 'Date cannot be in the future'
+                    ])
                 ]
             ])
             ->add('end_ts', Type\DateTimeType::class, [
@@ -131,6 +136,10 @@ class Review
                     new Constraints\GreaterThanOrEqual([
                         'propertyPath' => 'parent.all[start_ts].data',
                         'message' => 'End date should be greater than start date'
+                    ]),
+                    new Constraints\LessThanOrEqual([
+                        'value' => $constraintDate,
+                        'message' => 'Date cannot be in the future'
                     ])
                 ]
             ])
