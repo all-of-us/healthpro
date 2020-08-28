@@ -46,8 +46,8 @@ class ReviewController extends AbstractController
         if ($todayFilterForm->isSubmitted()) {
             if ($todayFilterForm->isValid()) {
                 $startTime = $todayFilterForm->get('start_ts')->getData();
-                if ($endTime = $todayFilterForm->get('end_ts')->getData()) {
-                    $endTime->setTime(23, 59, 59);
+                if ($todayFilterForm->get('end_ts')->getData()) {
+                    $endTime = $todayFilterForm->get('end_ts')->getData()->setTime(23, 59, 59);
                 }
             } else {
                 $todayFilterForm->addError(new FormError('Please correct the errors below'));
