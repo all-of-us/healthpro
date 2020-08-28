@@ -106,7 +106,7 @@ class Review
         return $participants;
     }
 
-    public function getTodayFilterForm($formFactory, $timeZone)
+    public function getTodayFilterForm($formFactory)
     {
         $formBuilder = $formFactory->createBuilder(FormType::class);
         $formBuilder
@@ -115,7 +115,7 @@ class Review
                 'label' => 'Start Date',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy',
-                'model_timezone' => $timeZone,
+                'model_timezone' => 'UTC',
                 'constraints' => [
                     new Constraints\DateTime()
                 ]
@@ -125,7 +125,7 @@ class Review
                 'label' => 'End Date',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy',
-                'model_timezone' => $timeZone,
+                'model_timezone' => 'UTC',
                 'constraints' => [
                     new Constraints\DateTime(),
                     new Constraints\GreaterThanOrEqual([

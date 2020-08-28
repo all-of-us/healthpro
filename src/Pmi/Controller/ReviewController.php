@@ -41,13 +41,14 @@ class ReviewController extends AbstractController
         $endString = 'yesterday 1 sec ago';
         $endTime = new \DateTime($endString, new \DateTimeZone($app->getUserTimezone()));
 
-        $todayFilterForm = $review->getTodayFilterForm($app['form.factory'], $app->getUserTimezone());
+        $todayFilterForm = $review->getTodayFilterForm($app['form.factory']);
         $todayFilterForm->handleRequest($request);
         if ($todayFilterForm->isSubmitted()) {
             if ($todayFilterForm->isValid()) {
-                $startTime = $todayFilterForm->get('start_ts')->getData();
+                $startTime = new \DateTime($todayFilterForm->get('start_ts')->getData()->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
                 if ($todayFilterForm->get('end_ts')->getData()) {
-                    $endTime = $todayFilterForm->get('end_ts')->getData()->setTime(23, 59, 59);
+                    $endTime = new \DateTime($todayFilterForm->get('end_ts')->getData()->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
+                    $endTime->setTime(23, 59, 59);
                 }
             } else {
                 $todayFilterForm->addError(new FormError('Please correct the errors below'));
