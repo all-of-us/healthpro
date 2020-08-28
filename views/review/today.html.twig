@@ -46,7 +46,7 @@
         <div class="today-filter">
             {{ form_rest(todayFilterForm) }}
             <div class="form-group">
-                <button type="button" class="btn btn-default" onclick="window.location.reload()">Reset</button>
+                <a href="{{ path('review_today') }}" class="btn btn-default">Reset</a>
             </div>
         </div>
 
