@@ -40,10 +40,10 @@
         <li role="presentation"><a href="{{ path('review_measurementsRecentModify') }}">Recently Modified Physical Measurements</a></li>
     </ul>
     <br />
-    <div class="well">
+    <div class="well today-filter-well" data-title="Filter">
         {{ form_start(todayFilterForm, { attr: { class: 'form-inline', autoComplete: 'off' } }) }}
         {{ form_errors(todayFilterForm) }}
-        <div class="today-filter">
+        <div class="today-filter" align="center">
             {{ form_rest(todayFilterForm) }}
             <div class="form-group">
                 <a href="{{ path('review_today') }}" class="btn btn-default">Reset</a>

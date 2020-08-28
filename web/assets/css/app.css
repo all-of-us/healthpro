@@ -404,10 +404,25 @@ table.table-samples td {
     background-color: #5cb85c;
 }
 
-.today-filter {
-    display: flex;
+.today-filter-well {
+    position: relative;
+}
+
+.today-filter-well:before {
+    content: attr(data-title);
+    position: absolute;
+    background: #363272;
+    color: #ffffff;
+    padding: 0 20px;
+    left: 0;
+    top: 0;
+}
+
+.today-filter-well .alert-danger {
+    margin-top: 5px;
 }
 
 .today-filter > div {
     padding: 0 10px 0 10px;
+    height: 45px;
 }
