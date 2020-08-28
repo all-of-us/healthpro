@@ -111,7 +111,7 @@ class Review
         $formBuilder = $formFactory->createBuilder(FormType::class);
         $constraintDate = new \DateTime('today', new \DateTimeZone($timeZone));
         $formBuilder
-            ->add('start_ts', Type\DateTimeType::class, [
+            ->add('start_date', Type\DateTimeType::class, [
                 'required' => true,
                 'label' => 'Start Date',
                 'widget' => 'single_text',
@@ -125,7 +125,7 @@ class Review
                     ])
                 ]
             ])
-            ->add('end_ts', Type\DateTimeType::class, [
+            ->add('end_date', Type\DateTimeType::class, [
                 'required' => false,
                 'label' => 'End Date',
                 'widget' => 'single_text',
@@ -134,7 +134,7 @@ class Review
                 'constraints' => [
                     new Constraints\DateTime(),
                     new Constraints\GreaterThanOrEqual([
-                        'propertyPath' => 'parent.all[start_ts].data',
+                        'propertyPath' => 'parent.all[start_date].data',
                         'message' => 'End date should be greater than start date'
                     ]),
                     new Constraints\LessThanOrEqual([

@@ -35,20 +35,20 @@ class ReviewController extends AbstractController
 
         // Get beginning of today (at midnight) in user's timezone
         $startString = 'today';
-        $startTime = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
+        $startDate = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
 
         // Get end of today (at midnight) in user's timezone
         $endString = 'yesterday 1 sec ago';
-        $endTime = new \DateTime($endString, new \DateTimeZone($app->getUserTimezone()));
+        $endDate = new \DateTime($endString, new \DateTimeZone($app->getUserTimezone()));
 
         $todayFilterForm = $review->getTodayFilterForm($app['form.factory'], $app->getUserTimezone());
         $todayFilterForm->handleRequest($request);
         if ($todayFilterForm->isSubmitted()) {
             if ($todayFilterForm->isValid()) {
-                $startTime = new \DateTime($todayFilterForm->get('start_ts')->getData()->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
-                if ($todayFilterForm->get('end_ts')->getData()) {
-                    $endTime = new \DateTime($todayFilterForm->get('end_ts')->getData()->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
-                    $endTime->setTime(23, 59, 59);
+                $startDate = new \DateTime($todayFilterForm->get('start_date')->getData()->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
+                if ($todayFilterForm->get('end_date')->getData()) {
+                    $endDate = new \DateTime($todayFilterForm->get('end_date')->getData()->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
+                    $endDate->setTime(23, 59, 59);
                 }
             } else {
                 $todayFilterForm->addError(new FormError('Please correct the errors below'));
@@ -60,13 +60,13 @@ class ReviewController extends AbstractController
         }
 
         // Get MySQL date/time string in UTC
-        $startTime->setTimezone(new \DateTimezone('UTC'));
-        $startTime = $startTime->format('Y-m-d H:i:s');
+        $startDate->setTimezone(new \DateTimezone('UTC'));
+        $startDate = $startDate->format('Y-m-d H:i:s');
 
-        $endTime->setTimezone(new \DateTimezone('UTC'));
-        $endTime = $endTime->format('Y-m-d H:i:s');
+        $endDate->setTimezone(new \DateTimezone('UTC'));
+        $endDate = $endDate->format('Y-m-d H:i:s');
 
-        $participants = $review->getTodayParticipants($startTime, $endTime, $site);
+        $participants = $review->getTodayParticipants($startDate, $endDate, $site);
         
         // Preload first 5 names
         $count = 0;
