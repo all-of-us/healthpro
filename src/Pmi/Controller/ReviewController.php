@@ -12,6 +12,8 @@ use Pmi\Review\Review;
 
 class ReviewController extends AbstractController
 {
+    const DATE_RANGE_LIMIT = 7;
+
     protected static $name = 'review';
 
     protected static $routes = [
@@ -34,12 +36,10 @@ class ReviewController extends AbstractController
         $review = new Review($app['db']);
 
         // Get beginning of today (at midnight) in user's timezone
-        $startString = 'today';
-        $startDate = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
+        $today = $startDate = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
 
         // Get end of today (at midnight) in user's timezone
-        $endString = 'yesterday 1 sec ago';
-        $endDate = new \DateTime($endString, new \DateTimeZone($app->getUserTimezone()));
+        $endDate = new \DateTime('yesterday 1 sec ago', new \DateTimeZone($app->getUserTimezone()));
 
         $todayFilterForm = $review->getTodayFilterForm($app['form.factory'], $app->getUserTimezone());
         $todayFilterForm->handleRequest($request);
@@ -49,8 +49,16 @@ class ReviewController extends AbstractController
                 if ($todayFilterForm->get('end_date')->getData()) {
                     $endDate = new \DateTime($todayFilterForm->get('end_date')->getData()->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
                     $endDate->setTime(23, 59, 59);
+                    if ($startDate->diff($endDate)->days > self::DATE_RANGE_LIMIT) {
+                        $todayFilterForm['start_date']->addError(new FormError('Start date and End date range should not be greater than 7 days'));
+                    }
+                } else {
+                    if ($today->diff($startDate)->days > self::DATE_RANGE_LIMIT) {
+                        $endDate = $startDate->modify('+7 days')->setTime(23, 59, 59);
+                    }
                 }
-            } else {
+            }
+            if (!$todayFilterForm->isValid()) {
                 $todayFilterForm->addError(new FormError('Please correct the errors below'));
                 return $app['twig']->render('review/today.html.twig', [
                     'participants' => [],
