@@ -41,7 +41,7 @@ class ReviewController extends AbstractController
         // Get end of today (at midnight) in user's timezone
         $endDate = new \DateTime('yesterday 1 sec ago', new \DateTimeZone($app->getUserTimezone()));
 
-        $displayMessage = "Today's participants results";
+        $displayMessage = "Today's participants";
         $todayFilterForm = $review->getTodayFilterForm($app['form.factory'], $app->getUserTimezone());
         $todayFilterForm->handleRequest($request);
         if ($todayFilterForm->isSubmitted()) {

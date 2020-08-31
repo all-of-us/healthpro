@@ -78,6 +78,11 @@
         </tr>
         </thead>
         <tbody>
+        {% if participants is empty %}
+            <tr>
+                <td colspan="14" align="center">No records found</td>
+            </tr>
+        {% endif %}
         {% for id, participant in participants %}
             {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount) %}
             {% set rowSpan = 'rowspan =' ~ maxCount %}
