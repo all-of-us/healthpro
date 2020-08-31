@@ -49,8 +49,10 @@
                 <a href="{{ path('review_today') }}" class="btn btn-default">Reset</a>
             </div>
         </div>
-
         {{ form_end(todayFilterForm) }}
+    </div>
+    <div class="text-center text-warning">
+        <strong>{{ displayMessage }}</strong>
     </div>
     <table class="table table-bordered table-small" id="table-today" data-name-lookup-url="{{ path('review_participantNameLookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
         <thead>
