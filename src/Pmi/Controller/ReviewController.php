@@ -36,7 +36,7 @@ class ReviewController extends AbstractController
         $review = new Review($app['db']);
 
         // Get beginning of today (at midnight) in user's timezone
-        $today = $startDate = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
+        $startDate = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
 
         // Get end of today (at midnight) in user's timezone
         $endDate = new \DateTime('yesterday 1 sec ago', new \DateTimeZone($app->getUserTimezone()));
@@ -49,13 +49,13 @@ class ReviewController extends AbstractController
                 if ($todayFilterForm->get('end_date')->getData()) {
                     $endDate = new \DateTime($todayFilterForm->get('end_date')->getData()->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
                     $endDate->setTime(23, 59, 59);
+                    // Check date range
                     if ($startDate->diff($endDate)->days > self::DATE_RANGE_LIMIT) {
                         $todayFilterForm['start_date']->addError(new FormError('Start date and End date range should not be greater than 7 days'));
                     }
                 } else {
-                    if ($today->diff($startDate)->days > self::DATE_RANGE_LIMIT) {
-                        $endDate = $startDate->modify('+7 days')->setTime(23, 59, 59);
-                    }
+                    $endDate = clone $startDate;
+                    $endDate->setTime(23, 59, 59);
                 }
             }
             if (!$todayFilterForm->isValid()) {
