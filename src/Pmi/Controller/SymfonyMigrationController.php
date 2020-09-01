@@ -16,8 +16,8 @@ class SymfonyMigrationController extends AbstractController
     public function settingsAction(Application $app, Request $request)
     {
         if ($request->query->get('return')) {
-            return $app->redirect('/s/settings?return=' . $request->query->get('return'));
+            return $app->redirect('/s/settings/?return=' . $request->query->get('return'));
         }
-        return $app->redirect('/s/settings');
+        return $app->redirect('/s/settings/');
     }
 }
