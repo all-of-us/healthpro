@@ -38,27 +38,25 @@ class ReviewController extends AbstractController
         // Get beginning of today (at midnight) in user's timezone
         $startDate = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
 
-        // Get end of today (at midnight) in user's timezone
-        $endDate = new \DateTime('yesterday 1 sec ago', new \DateTimeZone($app->getUserTimezone()));
+        // Get beginning of tomorrow (at midnight) in user's timezone (will be comparing < $endDate)
+        $endDate = new \DateTime('tomorrow', new \DateTimeZone($app->getUserTimezone()));
 
         $displayMessage = "Today's participants";
         $todayFilterForm = $review->getTodayFilterForm($app['form.factory'], $app->getUserTimezone());
         $todayFilterForm->handleRequest($request);
         if ($todayFilterForm->isSubmitted()) {
             if ($todayFilterForm->isValid()) {
-                $startDate = new \DateTime($todayFilterForm->get('start_date')->getData()->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
-                $displayMessage = "Displaying results for {$startDate->format('m/d/Y')} date";
+                $startDate = $todayFilterForm->get('start_date')->getData();
+                $displayMessage = "Displaying results for {$startDate->format('m/d/Y')}";
                 if ($todayFilterForm->get('end_date')->getData()) {
-                    $endDate = new \DateTime($todayFilterForm->get('end_date')->getData()->format('Y-m-d'), new \DateTimeZone($app->getUserTimezone()));
-                    $endDate->setTime(23, 59, 59);
+                    $endDate = $todayFilterForm->get('end_date')->getData();
                     // Check date range
-                    if ($startDate->diff($endDate)->days > self::DATE_RANGE_LIMIT) {
-                        $todayFilterForm['start_date']->addError(new FormError('Start date and End date range should not be greater than 7 days'));
+                    if ($startDate->diff($endDate)->days >= self::DATE_RANGE_LIMIT) {
+                        $todayFilterForm['start_date']->addError(new FormError('Date range cannot be more than 7 days'));
                     }
-                    $displayMessage = "Displaying results from  {$startDate->format('m/d/Y')} to {$endDate->format('m/d/Y')} dates";
+                    $displayMessage = "Displaying results from {$startDate->format('m/d/Y')} through {$endDate->format('m/d/Y')}";
                 } else {
                     $endDate = clone $startDate;
-                    $endDate->setTime(23, 59, 59);
                 }
             }
             if (!$todayFilterForm->isValid()) {
@@ -70,6 +68,9 @@ class ReviewController extends AbstractController
                 ]);
             }
         }
+
+        // Use midnight of the following day to get the entire day, inclusive
+        $endDate->modify('+1 day');
 
         // Get MySQL date/time string in UTC
         $startDate->setTimezone(new \DateTimezone('UTC'));

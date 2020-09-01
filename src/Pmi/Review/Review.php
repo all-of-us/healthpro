@@ -45,7 +45,7 @@ class Review
             'LEFT JOIN users u ' .
             'ON o.user_id = u.id WHERE ' .
             '(o.created_ts >= :startTime OR o.collected_ts >= :startTime OR o.processed_ts >= :startTime OR o.finalized_ts >= :startTime OR oh.created_ts >= :startTime) ' .
-            'AND (o.created_ts <= :endTime OR o.collected_ts <= :endTime OR o.processed_ts <= :endTime OR o.finalized_ts <= :endTime OR oh.created_ts <= :endTime) ' .
+            'AND (o.created_ts < :endTime OR o.collected_ts < :endTime OR o.processed_ts < :endTime OR o.finalized_ts < :endTime OR oh.created_ts < :endTime) ' .
             'AND (o.site = :site OR o.collected_site = :site OR o.processed_site = :site OR o.finalized_site = :site) ';
         $measurementsQuery = 'SELECT e.participant_id, \'evaluation\' as type, e.id, e.parent_id, null, e.rdr_id, null, e.created_ts, null, null, e.finalized_ts, null, null, ' .
             'greatest(coalesce(e.created_ts, 0), coalesce(e.finalized_ts, 0), coalesce(eh.created_ts, 0)) as latest_ts, ' .
@@ -56,7 +56,7 @@ class Review
             'ON e.history_id = eh.id WHERE ' .
             'e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL) ' .
             'AND (e.created_ts >= :startTime OR e.finalized_ts >= :startTime OR eh.created_ts >= :startTime) ' .
-            'AND (e.created_ts <= :endTime OR e.finalized_ts <= :endTime OR eh.created_ts <= :endTime) ' .
+            'AND (e.created_ts < :endTime OR e.finalized_ts < :endTime OR eh.created_ts < :endTime) ' .
             'AND (e.site = :site OR e.finalized_site = :site)';
         $query = "($ordersQuery) UNION ($measurementsQuery) ORDER BY latest_ts DESC";
 
@@ -116,7 +116,8 @@ class Review
                 'label' => 'Start Date',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy',
-                'model_timezone' => 'UTC',
+                'model_timezone' => $timeZone,
+                'view_timezone' => $timeZone,
                 'constraints' => [
                     new Constraints\DateTime(),
                     new Constraints\LessThanOrEqual([
@@ -130,7 +131,8 @@ class Review
                 'label' => 'End Date',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy',
-                'model_timezone' => 'UTC',
+                'model_timezone' => $timeZone,
+                'view_timezone' => $timeZone,
                 'constraints' => [
                     new Constraints\DateTime(),
                     new Constraints\GreaterThanOrEqual([
