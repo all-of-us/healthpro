@@ -88,14 +88,15 @@ label.label-normal {
 /* Nav bar customization */
 .navbar-brand-subtitle {
     font-size: 11px;
-    margin-top: -7px;
+    margin-top: -17px;
     text-align: right;
 }
-.navbar-brand-logo {
-    padding: 5px 15px
-}
-.navbar-brand-logo img {
+.navbar-brand img {
+    margin-top: -10px;
+    margin-right: 5px;
     height: 40px;
+    vertical-align: top;
+    display: inline-block;
 }
 .navbar-inverse {
     border: 0;
