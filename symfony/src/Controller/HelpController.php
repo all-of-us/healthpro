@@ -84,7 +84,7 @@ class HelpController extends AbstractController
     {
         $document = $helpService->getDocumentInfo($id);
         if (!$document) {
-            throw $this->createAccessDeniedException('Access Denied!');
+            throw $this->createNotFoundException('Page Not Found!');
         }
         return $this->render('help/sop-pdf.html.twig', [
             'sop' => $id,
@@ -102,7 +102,7 @@ class HelpController extends AbstractController
     {
         $document = $helpService->getDocumentInfo($id);
         if (!$document) {
-            throw $this->createAccessDeniedException('Access Denied!');
+            throw $this->createNotFoundException('Page Not Found!');
         }
         $url = $helpService->getStoragePath() . '/' . rawurlencode($document['filename']);
         try {
@@ -131,7 +131,7 @@ class HelpController extends AbstractController
     {
         $document = $helpService->getDocumentInfo($id);
         if (!$document) {
-            throw $this->createAccessDeniedException('Access Denied!');
+            throw $this->createNotFoundException('Page Not Found!');
         }
         $url = $helpService->getStoragePath() . '/' . rawurlencode($document['filename']);
         return $this->redirect($url);
