@@ -10,12 +10,6 @@ home:
 logout:
     path: /logout
 
-help_faq:
-    path: /help/faq
-
-help_sop:
-    path: /help/sop
-
 selectSite:
     path: /site/select
 

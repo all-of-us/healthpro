@@ -6,7 +6,9 @@ use App\Service\HelpService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Pmi\HttpClient;
 
 /**
  * @Route("/s/help")
@@ -51,5 +53,87 @@ class HelpController extends AbstractController
         }
 
         return $this->render('help/videos.html.twig', $parameters);
+    }
+
+    /**
+     * @Route("/faq", name="help_faq")
+     */
+
+    public function faqAction()
+    {
+        return $this->render('help/faq.html.twig');
+    }
+
+    /**
+     * @Route("/sop", name="help_sop")
+     */
+
+    public function sopAction(HelpService $helpService)
+    {
+        return $this->render('help/sop.html.twig', [
+            'documentGroups' => $helpService::$documentGroups,
+            'path' => $helpService->getStoragePath()
+        ]);
+    }
+
+    /**
+     * @Route("/sop/{id}", name="help_sopView")
+     */
+
+    public function sopViewAction($id, HelpService $helpService)
+    {
+        $document = $helpService->getDocumentInfo($id);
+        if (!$document) {
+            throw $this->createAccessDeniedException('Access Denied!');
+        }
+        return $this->render('help/sop-pdf.html.twig', [
+            'sop' => $id,
+            'title' => trim(str_replace($id, '', $document['title'])),
+            'document' => $document,
+            'path' => $helpService->getStoragePath()
+        ]);
+    }
+
+    /**
+     * @Route("/sop/file/{id}", name="help_sopFile")
+     */
+
+    public function sopFileAction($id, HelpService $helpService)
+    {
+        $document = $helpService->getDocumentInfo($id);
+        if (!$document) {
+            throw $this->createAccessDeniedException('Access Denied!');
+        }
+        $url = $helpService->getStoragePath() . '/' . rawurlencode($document['filename']);
+        try {
+            $client = new HttpClient();
+            $response = $client->get($url, ['stream' => true]);
+            $responseBody = $response->getBody();
+            $response = new StreamedResponse(function() use ($responseBody) {
+                while (!$responseBody->eof()) {
+                   echo $responseBody->read(1024); // phpcs:ignore WordPress.XSS.EscapeOutput
+                }
+            });
+            $response->headers->set('Content-Type', 'application/pdf');
+            return $response;
+        } catch (\Exception $e) {
+            error_log('Failed to retrieve Confluence file ' . $url . ' (' . $id . ')');
+            echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>';
+            exit;
+        }
+    }
+
+    /**
+     * @Route("/sop/redirect/{id}", name="help_sopRedirect")
+     */
+
+    public function sopRedirectAction($id, HelpService $helpService)
+    {
+        $document = $helpService->getDocumentInfo($id);
+        if (!$document) {
+            throw $this->createAccessDeniedException('Access Denied!');
+        }
+        $url = $helpService->getStoragePath() . '/' . rawurlencode($document['filename']);
+        return $this->redirect($url);
     }
 }

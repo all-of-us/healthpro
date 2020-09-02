@@ -165,7 +165,7 @@ class HelpService
 
     public function getStoragePath()
     {
-        return $this->params->get('help_storage_path') ?: 'https://docsallofus.atlassian.net/wiki/download/attachments/44357';
+        return $this->params->has('help_storage_path') ? $this->params->get('help_storage_path') : 'https://docsallofus.atlassian.net/wiki/download/attachments/44357';
     }
 
     public function getDocumentInfo($id)
