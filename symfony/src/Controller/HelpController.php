@@ -109,13 +109,13 @@ class HelpController extends AbstractController
             $client = new HttpClient();
             $response = $client->get($url, ['stream' => true]);
             $responseBody = $response->getBody();
-            $response = new StreamedResponse(function() use ($responseBody) {
+            $streamedResponse = new StreamedResponse(function() use ($responseBody) {
                 while (!$responseBody->eof()) {
                    echo $responseBody->read(1024); // phpcs:ignore WordPress.XSS.EscapeOutput
                 }
             });
-            $response->headers->set('Content-Type', 'application/pdf');
-            return $response;
+            $streamedResponse->headers->set('Content-Type', 'application/pdf');
+            return $streamedResponse;
         } catch (\Exception $e) {
             error_log('Failed to retrieve Confluence file ' . $url . ' (' . $id . ')');
             echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>';
