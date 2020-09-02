@@ -87,7 +87,7 @@ class DeceasedReportsController extends AbstractController
             try {
                 $fhirData = $deceasedReportsService->buildDeceasedReportFhir($report, $this->getUser());
                 $response = $deceasedReportsService->createDeceasedReport($participantId, $fhirData);
-                $report = $deceasedReport->loadFromFhirObservation($response);
+                $report = $report->loadFromFhirObservation($response);
                 $this->addFlash('success', 'Deceased Report created!');
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
