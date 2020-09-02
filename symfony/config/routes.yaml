@@ -10,9 +10,6 @@ home:
 logout:
     path: /logout
 
-help_home:
-    path: /help
-
 help_videos:
     path: /help/videos
 
