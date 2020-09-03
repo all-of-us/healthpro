@@ -103,3 +103,13 @@
         (not completed)
     {% endif %}
 {% endmacro %}
+
+{% macro displayRetentionEligibleStatus(value, time) %}
+    {% if value == 'ELIGIBLE' %}
+        Yes {{ time ? '(' ~ time|date('m/d/Y', app.userTimezone) ~ ')' }}
+    {% elseif value == 'NOT_ELIGIBLE' %}
+        No
+    {% else %}
+        (--)
+    {% endif %}
+{% endmacro %}

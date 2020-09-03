@@ -57,6 +57,7 @@ class UserService
                 'id' => 1,
                 'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getUserId(),
+                'timezone' => $googleUser->getTimzezone()
             ];
         }
         $user = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);

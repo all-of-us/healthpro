@@ -81,7 +81,9 @@ abstract class AbstractWebTestCase extends TestCase
             'local_mock_auth' => true,
             'enforce2fa' => true
         ]);
+
         $app->mount('/', new Controller\DefaultController());
+        $app->mount('/', new Controller\SymfonyMigrationController());
         $app->mount('/dashboard', new Controller\DashboardController());
         $app->mount('/help', new Controller\HelpController());
         $app->mount('/admin', new Controller\AdminController());

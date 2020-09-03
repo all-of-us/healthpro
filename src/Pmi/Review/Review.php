@@ -3,6 +3,9 @@ namespace Pmi\Review;
 
 use Pmi\Order\Order;
 use Pmi\Evaluation\Evaluation;
+use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Validator\Constraints;
 
 class Review
 {
@@ -24,87 +27,132 @@ class Review
     ];
 
     protected static $emptyParticipant = [
-        'order' => null,
-        'orderCount' => 0,
-        'orderStatus' => '',
-        'finalizedSamples' => null,
-        'physicalMeasurement' => null,
-        'physicalMeasurementCount' => 0,
-        'physicalMeasurementStatus' => ''
+        'orders' => null,
+        'ordersCount' => 0,
+        'physicalMeasurements' => null,
+        'physicalMeasurementsCount' => 0,
     ];
 
-    protected function getTodayRows($today, $site)
+    protected function getTodayRows($startTime, $endTime, $site)
     {
-        $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, o.biobank_finalized, ' .
+        $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.biobank_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, o.biobank_finalized, ' .
             'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
-            'oh.type as h_type ' .
+            'oh.type as h_type, ' .
+            'u.email as created_by ' .
             'FROM orders o ' .
             'LEFT JOIN orders_history oh ' .
-            'ON o.history_id = oh.id WHERE ' .
-            '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ' .
-            'AND (o.site = :site OR o.collected_site = :site OR o.processed_site = :site OR o.finalized_site = :site) ';
-        $measurementsQuery = 'SELECT e.participant_id, \'measurement\' as type, e.id, e.parent_id, null, e.rdr_id, e.created_ts, null, null, e.finalized_ts, null, null, ' .
+            'ON o.history_id = oh.id ' .
+            'LEFT JOIN users u ' .
+            'ON o.user_id = u.id WHERE ' .
+            '(o.site = :site OR o.collected_site = :site OR o.processed_site = :site OR o.finalized_site = :site) ' .
+            'AND ((o.created_ts >= :startTime AND o.created_ts < :endTime) ' .
+            'OR (o.collected_ts >= :startTime AND o.collected_ts < :endTime) ' .
+            'OR (o.processed_ts >= :startTime AND o.processed_ts < :endTime) ' .
+            'OR (o.finalized_ts >= :startTime AND o.finalized_ts < :endTime) ' .
+            'OR (oh.created_ts >= :startTime AND oh.created_ts < :endTime)) ';
+        $measurementsQuery = 'SELECT e.participant_id, \'evaluation\' as type, e.id, e.parent_id, null, e.rdr_id, null, e.created_ts, null, null, e.finalized_ts, null, null, ' .
             'greatest(coalesce(e.created_ts, 0), coalesce(e.finalized_ts, 0), coalesce(eh.created_ts, 0)) as latest_ts, ' .
-            'eh.type as h_type ' .
+            'eh.type as h_type, ' .
+            'null ' .
             'FROM evaluations e ' .
             'LEFT JOIN evaluations_history eh ' .
             'ON e.history_id = eh.id WHERE ' .
             'e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL) ' .
-            'AND (e.created_ts >= :today OR e.finalized_ts >= :today OR eh.created_ts >= :today) ' .
-            'AND (e.site = :site OR e.finalized_site = :site)';
+            'AND (e.site = :site OR e.finalized_site = :site) ' .
+            'AND ((e.created_ts >= :startTime AND e.created_ts < :endTime) ' .
+            'OR (e.finalized_ts >= :startTime AND e.finalized_ts < :endTime) ' .
+            'OR (eh.created_ts >= :startTime AND eh.created_ts < :endTime)) ';
         $query = "($ordersQuery) UNION ($measurementsQuery) ORDER BY latest_ts DESC";
 
         return $this->db->fetchAll($query, [
-            'today' => $today,
+            'startTime' => $startTime,
+            'endTime' => $endTime,
             'site' => $site
         ]);
     }
 
-    public function getTodayParticipants($today, $site = null)
+    public function getTodayParticipants($startTime, $endTime, $site = null)
     {
         $participants = [];
-        foreach ($this->getTodayRows($today, $site) as $row) {
+        foreach ($this->getTodayRows($startTime, $endTime, $site) as $row) {
             $participantId = $row['participant_id'];
             if (!array_key_exists($participantId, $participants)) {
                 $participants[$participantId] = self::$emptyParticipant;
             }
             switch ($row['type']) {
                 case 'order':
-                    if (is_null($participants[$participantId]['order'])) {
-                        $participants[$participantId]['order'] = $row;
-                        $participants[$participantId]['orderCount'] = 1;
-                        // Get order status
-                        foreach (self::$orderStatus as $field => $status) {
-                            if ($row[$field]) {
-                                $participants[$participantId]['orderStatus'] = self::getOrderStatus($row, $status);
-                            }
+                    // Get order status
+                    foreach (self::$orderStatus as $field => $status) {
+                        if ($row[$field]) {
+                            $row['status'] = self::getOrderStatus($row, $status);
                         }
-                        // Get number of finalized samples
-                        if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
-                            $participants[$participantId]['finalizedSamples'] = count($samples);
-                        }
-                    } else {
-                        $participants[$participantId]['orderCount']++;
                     }
+                    // Get number of finalized samples
+                    if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
+                        $row['finalizedSamplesCount'] = count($samples);
+                    }
+                    $participants[$participantId]['orders'][] = $row;
+                    $participants[$participantId]['ordersCount']++;
                     break;
-                case 'measurement':
-                    if (is_null($participants[$participantId]['physicalMeasurement'])) {
-                        $participants[$participantId]['physicalMeasurement'] = $row;
-                        $participants[$participantId]['physicalMeasurementCount'] = 1;
-                        // Get physical measurements status
-                        foreach (self::$measurementsStatus as $field => $status) {
-                            if ($row[$field]) {
-                                $participants[$participantId]['physicalMeasurementStatus'] = $this->getEvaluationStatus($row, $status);
-                            }
+                case 'evaluation':
+                    // Get physical measurements status
+                    foreach (self::$measurementsStatus as $field => $status) {
+                        if ($row[$field]) {
+                            $row['status'] = $this->getEvaluationStatus($row, $status);
                         }
-                    } else {
-                        $participants[$participantId]['physicalMeasurementCount']++;
                     }
+                    $participants[$participantId]['physicalMeasurements'][] = $row;
+                    $participants[$participantId]['physicalMeasurementsCount']++;
                     break;
             }
         }
 
         return $participants;
+    }
+
+    public function getTodayFilterForm($formFactory, $timeZone)
+    {
+        $formBuilder = $formFactory->createBuilder(FormType::class);
+        $constraintDate = new \DateTime('today', new \DateTimeZone($timeZone));
+        $formBuilder
+            ->add('start_date', Type\DateTimeType::class, [
+                'required' => true,
+                'label' => 'Start Date',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy',
+                'model_timezone' => $timeZone,
+                'view_timezone' => $timeZone,
+                'constraints' => [
+                    new Constraints\DateTime(),
+                    new Constraints\LessThanOrEqual([
+                        'value' => $constraintDate,
+                        'message' => 'Date cannot be in the future'
+                    ])
+                ]
+            ])
+            ->add('end_date', Type\DateTimeType::class, [
+                'required' => false,
+                'label' => 'End Date',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy',
+                'model_timezone' => $timeZone,
+                'view_timezone' => $timeZone,
+                'constraints' => [
+                    new Constraints\DateTime(),
+                    new Constraints\GreaterThanOrEqual([
+                        'propertyPath' => 'parent.all[start_date].data',
+                        'message' => 'End date should be greater than start date'
+                    ]),
+                    new Constraints\LessThanOrEqual([
+                        'value' => $constraintDate,
+                        'message' => 'Date cannot be in the future'
+                    ])
+                ]
+            ])
+            ->add('Submit', Type\SubmitType::class, [
+                'attr' => ['class' => 'btn btn-primary'],
+            ]);
+        return $formBuilder->getForm();
     }
 
     protected function getTodayOrderRows($today)

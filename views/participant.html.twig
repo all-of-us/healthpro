@@ -343,6 +343,20 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Retention and EHR Metrics</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <dl class="dl-horizontal">
+                                        <dt>Retention Eligible</dt>
+                                        <dd>
+                                            {{ macros.displayRetentionEligibleStatus(participant.retentionEligibleStatus, participant.retentionEligibleTime) }}
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="col-md-6">

@@ -36,8 +36,6 @@ class AdminController extends AbstractController
         ['siteSync', '/sites/sync', [
             'method' => 'GET|POST'
         ]],
-        ['withdrawalNotifications', '/notifications/withdrawal'],
-        ['deactivateNotifications', '/notifications/deactivate'],
         ['missingMeasurements', '/missing/measurements', ['method' => 'GET|POST']],
         ['missingOrders', '/missing/orders', ['method' => 'GET|POST']],
         ['patientStatusRdrJson', '/patientstatus/{participantId}/organization/{organizationId}/rdr.json', ['method' => 'GET']],
@@ -278,20 +276,6 @@ class AdminController extends AbstractController
                 ]
             ]);
         return $builder->getForm();
-    }
-
-    public function withdrawalNotificationsAction(Application $app)
-    {
-        $withdrawal = new WithdrawalService($app);
-        $notifications = $withdrawal->getWithdrawalNotifications();
-        return $app['twig']->render('admin/notifications/withdrawal.html.twig', ['notifications' => $notifications]);
-    }
-
-    public function deactivateNotificationsAction(Application $app)
-    {
-        $deactivate = new DeactivateService($app);
-        $notifications = $deactivate->getDeactivateNotifications();
-        return $app['twig']->render('admin/notifications/deactivate.html.twig', ['notifications' => $notifications]);
     }
 
     public function missingMeasurementsAction(Application $app, Request $request, $_route)

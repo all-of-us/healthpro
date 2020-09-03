@@ -10,12 +10,12 @@ use Pmi\Util;
 class UserProvider implements UserProviderInterface
 {
     protected $app;
-    
+
     public function __construct($app)
     {
         $this->app = $app;
     }
-    
+
     public function loadUserByUsername($username)
     {
         $googleUser = $this->app->getGoogleUser();
@@ -40,7 +40,7 @@ class UserProvider implements UserProviderInterface
         ];
         return new User($googleUser, $groups, $userInfo, null, $sessionInfo);
     }
-    
+
     public function refreshUser(UserInterface $user)
     {
         if (!$user instanceof User) {
@@ -49,7 +49,7 @@ class UserProvider implements UserProviderInterface
 
         return $this->loadUserByUsername($user->getUsername());
     }
-    
+
     public function supportsClass($class)
     {
         return $class === 'Pmi\Security\User';
@@ -62,6 +62,7 @@ class UserProvider implements UserProviderInterface
                 'id' => 1,
                 'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getUserId(),
+                'timezone' => $googleUser->getTimezone()
             ];
         }
         $attempts = 0;

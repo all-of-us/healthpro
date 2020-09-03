@@ -28,9 +28,4 @@ class DeactivateService extends EmailNotificationService
         }
         return $searchParams;
     }
-
-    public function getDeactivateNotifications()
-    {
-        return $this->db->fetchAll('SELECT count(*) as count, insert_ts, hpo_id, email_notified as email FROM deactivate_log GROUP BY hpo_id, insert_ts, email_notified ORDER BY insert_ts DESC LIMIT 100');
-    }
 }

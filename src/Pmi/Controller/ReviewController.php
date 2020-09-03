@@ -3,6 +3,7 @@ namespace Pmi\Controller;
 
 use Pmi\Evaluation\Evaluation;
 use Silex\Application;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -11,10 +12,12 @@ use Pmi\Review\Review;
 
 class ReviewController extends AbstractController
 {
+    const DATE_RANGE_LIMIT = 7;
+
     protected static $name = 'review';
 
     protected static $routes = [
-        ['today', '/'],
+        ['today', '/', ['method' => 'GET|POST']],
         ['orders', '/orders'],
         ['measurements', '/measurements'],
         ['participantNameLookup', '/participant/lookup'],
@@ -30,19 +33,53 @@ class ReviewController extends AbstractController
             return $app->redirectToRoute('home');
         }
 
-        // Get beginning of today (at midnight) in user's timezone
-        $startString = 'today';
-        // Allow overriding start time to test in non-prod environments
-        if (!$app->isProd() && intval($request->query->get('days')) > 0) {
-            $startString = '-' . intval($request->query->get('days')) . ' days';
-        }
-        $startTime = new \DateTime($startString, new \DateTimeZone($app->getUserTimezone()));
-        // Get MySQL date/time string in UTC
-        $startTime->setTimezone(new \DateTimezone('UTC'));
-        $today = $startTime->format('Y-m-d H:i:s');
-
         $review = new Review($app['db']);
-        $participants = $review->getTodayParticipants($today, $site);
+
+        // Get beginning of today (at midnight) in user's timezone
+        $startDate = new \DateTime('today', new \DateTimeZone($app->getUserTimezone()));
+
+        // Get beginning of tomorrow (at midnight) in user's timezone (will be comparing < $endDate)
+        $endDate = new \DateTime('tomorrow', new \DateTimeZone($app->getUserTimezone()));
+
+        $displayMessage = "Today's participants";
+        $todayFilterForm = $review->getTodayFilterForm($app['form.factory'], $app->getUserTimezone());
+        $todayFilterForm->handleRequest($request);
+        if ($todayFilterForm->isSubmitted()) {
+            if ($todayFilterForm->isValid()) {
+                $startDate = $todayFilterForm->get('start_date')->getData();
+                $displayMessage = "Displaying results for {$startDate->format('m/d/Y')}";
+                if ($todayFilterForm->get('end_date')->getData()) {
+                    $endDate = $todayFilterForm->get('end_date')->getData();
+                    // Check date range
+                    if ($startDate->diff($endDate)->days >= self::DATE_RANGE_LIMIT) {
+                        $todayFilterForm['start_date']->addError(new FormError('Date range cannot be more than 7 days'));
+                    }
+                    $displayMessage = "Displaying results from {$startDate->format('m/d/Y')} through {$endDate->format('m/d/Y')}";
+                } else {
+                    $endDate = clone $startDate;
+                }
+            }
+            if (!$todayFilterForm->isValid()) {
+                $todayFilterForm->addError(new FormError('Please correct the errors below'));
+                return $app['twig']->render('review/today.html.twig', [
+                    'participants' => [],
+                    'todayFilterForm' => $todayFilterForm->createView(),
+                    'displayMessage' => ''
+                ]);
+            }
+        }
+
+        // Use midnight of the following day to get the entire day, inclusive
+        $endDate->modify('+1 day');
+
+        // Get MySQL date/time string in UTC
+        $startDate->setTimezone(new \DateTimezone('UTC'));
+        $startDate = $startDate->format('Y-m-d H:i:s');
+
+        $endDate->setTimezone(new \DateTimezone('UTC'));
+        $endDate = $endDate->format('Y-m-d H:i:s');
+
+        $participants = $review->getTodayParticipants($startDate, $endDate, $site);
         
         // Preload first 5 names
         $count = 0;
@@ -54,7 +91,9 @@ class ReviewController extends AbstractController
         }
 
         return $app['twig']->render('review/today.html.twig', [
-            'participants' => $participants
+            'participants' => $participants,
+            'todayFilterForm' => $todayFilterForm->createView(),
+            'displayMessage' => $displayMessage
         ]);
     }
 

@@ -30,8 +30,8 @@ $(document).ready(function() {
         $('.page-header').after(html);
     }
     $('.tz-change-btn').on('click', function(){
-        $('#form_timezone').val(PMI.browserTimeZone);
-        $('form[name=form]').submit();
+        $('#settings_timezone').val(PMI.browserTimeZone);
+        $('form[name=settings]').submit();
     });
 });
 </script>

@@ -387,3 +387,42 @@ table.table-samples td {
     pointer-events: none;
     cursor: default;
 }
+
+.align-middle {
+    vertical-align: middle !important;
+}
+
+.badge-info {
+    background-color: #5bc0de;
+}
+
+.badge-warning {
+    background-color: #f0ad4e;
+}
+
+.badge-success {
+    background-color: #5cb85c;
+}
+
+.today-filter-well {
+    position: relative;
+}
+
+.today-filter-well:before {
+    content: attr(data-title);
+    position: absolute;
+    background: #363272;
+    color: #ffffff;
+    padding: 0 20px;
+    left: 0;
+    top: 0;
+}
+
+.today-filter-well .alert-danger {
+    margin-top: 5px;
+}
+
+.today-filter > div {
+    padding: 0 10px 0 10px;
+    height: 45px;
+}
