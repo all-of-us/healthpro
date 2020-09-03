@@ -26,7 +26,7 @@
           {% for report in reports %}
           <tr>
             <td><a href="{{ path('deceased_report_review', {participantId: report.participantId, reportId: report.id}) }}">{{ report.participantId }}</a></td>
-            <td>{{ report.dateOfDeath|date('n/j/Y')|default('N/A') }}</td>
+            <td>{{ report.dateOfDeath ? report.dateOfDeath|date('n/j/Y') : '' }}</td>
             <td>{{ report.reportMechanismDisplay }}{% if report.reportMechanism == 'Other' %} - {{ report.reportMechanismOtherDescription }}{% endif %}</td>
             <td><a href="{{ path('deceased_report_review', {participantId: report.participantId, reportId: report.id}) }}"><span class="label label-default">{{ report.reportStatusDisplay }}</span></a></td>
             <td>{{ report.submittedBy|default('Unknown') }}</td>

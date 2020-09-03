@@ -279,7 +279,9 @@ class DeceasedReport
     {
         $this->setId($report->identifier[0]->value);
         $this->setParticipantId($report->subject->reference);
-        $this->setDateOfDeath($report->effectiveDateTime ? new \DateTime($report->effectiveDateTime) : null);
+        if ($report->effectiveDateTime) {
+            $this->setDateOfDeath(new \DateTime($report->effectiveDateTime));
+        }
         $this->setReportMechanism($report->encounter->reference);
         if (isset($report->encounter->display)) {
             $this->setReportMechanismOtherDescription($report->encounter->display);

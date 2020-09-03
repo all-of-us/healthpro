@@ -66,7 +66,6 @@ class DeceasedReportsService
             'encounter' => [
                 'reference' => $deceasedReport->getReportMechanism()
             ],
-            'effectiveDateTime' => $deceasedReport->getDateOfDeath()->format('Y-m-d'),
             'performer' => [
                 [
                     'type' => 'https://www.pmi-ops.org/healthpro-username',
@@ -75,6 +74,10 @@ class DeceasedReportsService
             ],
             'issued' => date('c')
         ];
+        if ($deceasedReport->getDateOfDeath()) {
+            $report['effectiveDateTime'] = $deceasedReport->getDateOfDeath()->format('Y-m-d');
+        }
+
         if (!in_array($deceasedReport->getReportMechanism(), ['EHR', 'OTHER'])) {
             $report['extension'] = [
                 [

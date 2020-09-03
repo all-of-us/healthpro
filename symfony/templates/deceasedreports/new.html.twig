@@ -11,7 +11,7 @@
     <div class="alert alert-info"><i class="fas fas-info-circle"></i> There is already one or more Deceased Report for this Participant.</div>
     <dl class="dl-horizontal">
       <dt>Status</dt>
-      <dd>{{ report.reportStatusDisplay }}</dd>
+      <dd><span class="label label-default">{{ report.reportStatusDisplay }}</span></dd>
       <dt>Submitted</dt>
       <dd>{{ report.submittedOn|date('n/j/Y g:ia', app.user.timezone) }} ({{ report.submittedBy }})</dd>
       {% if report.reviewedBy %}
@@ -23,14 +23,6 @@
     {% endif %}
 
     {{ form_start(form) }}
-    <div class="row">
-      <div class="col-sm-6">
-        {{ form_row(form.dateOfDeath) }}
-      </div>
-      <div class="col-sm-6">
-        {{ form_row(form.causeOfDeath) }}
-      </div>
-    </div>
     <div class="row">
       <div class="col-sm-4">
         {{ form_row(form.reportMechanism) }}
@@ -45,6 +37,14 @@
         <div class="other_details">
           {{ form_row(form.reportMechanismOtherDescription) }}
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        {{ form_row(form.dateOfDeath) }}
+      </div>
+      <div class="col-sm-6">
+        {{ form_row(form.causeOfDeath) }}
       </div>
     </div>
     <br />

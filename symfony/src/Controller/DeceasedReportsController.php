@@ -52,6 +52,7 @@ class DeceasedReportsController extends AbstractController
             try {
                 $fhirData = $deceasedReportsService->buildDeceasedReportReviewFhir($data, $this->getUser());
                 $deceasedReportsService->updateDeceasedReport($participantId, $reportId, $fhirData);
+                $report->setReportStatus('preliminary');
                 $this->addFlash('success', 'Report updated!');
                 return $this->redirectToRoute('deceased_reports_index');
             } catch (\Exception $e) {
@@ -84,6 +85,7 @@ class DeceasedReportsController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $report = $form->getData();
+            $form = $this->createForm(DeceasedReportType::class, $report, ['disabled' => true]);
             try {
                 $fhirData = $deceasedReportsService->buildDeceasedReportFhir($report, $this->getUser());
                 $response = $deceasedReportsService->createDeceasedReport($participantId, $fhirData);

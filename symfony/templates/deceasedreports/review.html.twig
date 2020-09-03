@@ -16,7 +16,7 @@
       <dd><span class="label label-default">{{ report.reportStatusDisplay }}</span></dd>
 
       <dt>Date of Death</dt>
-      <dd>{{ report.dateOfDeath|date('n/j/Y')|default('Not provided.') }}</dd>
+      <dd>{{ report.dateOfDeath ? report.dateOfDeath|date('n/j/Y') : '' }}</dd>
 
       <dt>Cause of Death</dt>
       <dd>{{ report.causeOfDeath }}</dd>
@@ -28,16 +28,16 @@
       <dd>{{ report.reportMechanismOtherDescription }}</dd>
 
       <dt>Next of Kin</dt>
-      <dd>{{ report.nextOfKinName|default('N/A') }}</dd>
+      <dd>{{ report.nextOfKinName }}</dd>
 
       <dt>Relationship</dt>
-      <dd>{{ report.nextOfKinRelationshipDisplay|default('N/A') }}</dd>
+      <dd>{{ report.nextOfKinRelationshipDisplay }}</dd>
 
       <dt>Telephone Number</dt>
-      <dd>{{ report.nextOfKinTelephoneNumber|default('N/A') }}</dd>
+      <dd>{{ report.nextOfKinTelephoneNumber }}</dd>
 
       <dt>Email</dt>
-      <dd>{{ report.nextOfKinEmail|default('N/A') }}</dd>
+      <dd>{{ report.nextOfKinEmail }}</dd>
 
       <hr />
       <dt>Submitted</dt>
