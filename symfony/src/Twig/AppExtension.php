@@ -21,6 +21,7 @@ class AppExtension extends AbstractExtension
     {
         $this->container = $container;
         $this->doctrine = $doctrine;
+        $this->cache = [];
     }
 
     public function getFunctions()
@@ -75,9 +76,14 @@ class AppExtension extends AbstractExtension
 
     public function getAwardeeDisplay(string $awardee): string
     {
+        $cacheKey = 'awardees.' . $awardee;
+        if (isset($this->cache[$cacheKey]) && $this->cache[$cacheKey]) {
+            return $this->cache[$cacheKey];
+        }
         $repository = $this->doctrine->getRepository(Awardee::class);
         $record = $repository->find($awardee);
         if ($record) {
+            $this->cache[$cacheKey] = $record->getName();
             return $record->getName();
         }
         return $awardee;
@@ -85,9 +91,14 @@ class AppExtension extends AbstractExtension
 
     public function getOrganizationDisplay(string $organization): string
     {
+        $cacheKey = 'organizations.' . $organization;
+        if (isset($this->cache[$cacheKey]) && $this->cache[$cacheKey]) {
+            return $this->cache[$cacheKey];
+        }
         $repository = $this->doctrine->getRepository(Organization::class);
         $record = $repository->find($organization);
         if ($record) {
+            $this->cache[$cacheKey] = $record->getName();
             return $record->getName();
         }
         return $organization;
