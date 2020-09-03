@@ -19,7 +19,7 @@
 
     {% if playlist.type == 'youtube' %}
         <br/>
-        <div class="row">
+        <div class="row" id="you-tube-videos" data-type="{{ type }}" data-help-videos-path="{{ helpVideosPath }}">
             <div class="col-sm-8 col-sm-push-4">
                 <div class="panel panel-default" id="video-panel">
                     <div class="panel-heading">
@@ -75,29 +75,6 @@
 
 {% block pagejs %}
     {% if videoPlaylists[active].type == 'youtube' %}
-        <script>
-            $(document).ready(function () {
-                var type = {{ type|json_encode|raw }};
-                var youTubePath = "https://www.youtube.com/embed";
-                var helpVideosPath = {{ helpVideosPath|json_encode|raw }};
-                var loadVideo = function (src) {
-                    $('#video-title').html(src.html());
-                    if (type === 'file') {
-                        $('#video-file source').attr('src', helpVideosPath + '/' + src.data('file-src'));
-                        $("#video-file")[0].load();
-                    } else {
-                        $('iframe#video-embed').attr('src', youTubePath + '/' + src.data('embed-src') + '?modestbranding=1&rel=0');
-                    }
-                    $('a.load-video').removeClass('active');
-                    src.addClass('active');
-                };
-                $('a.load-video').on('click', function () {
-                    loadVideo($(this));
-                    $('html').scrollTop($('#video-panel').offset().top);
-                    return false;
-                });
-                loadVideo($('a.load-video:first'));
-            });
-        </script>
+        {{ encore_entry_script_tags('video') }}
     {% endif %}
 {% endblock %}
