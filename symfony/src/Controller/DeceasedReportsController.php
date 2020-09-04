@@ -76,9 +76,10 @@ class DeceasedReportsController extends AbstractController
         $reports = $deceasedReportsService->getDeceasedReportsByParticipant($participantId);
         $report = new DeceasedReport();
         foreach ($reports as $record) {
-            if ($record) {
-                $report = (new DeceasedReport())->loadFromFhirObservation($record);
+            if ($record->status == 'cancelled') {
+                continue;
             }
+            $report = (new DeceasedReport())->loadFromFhirObservation($record);
         }
         $form = $this->createForm(DeceasedReportType::class, $report, ['disabled' => (bool) $report->getId()]);
         $form->handleRequest($request);

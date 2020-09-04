@@ -134,7 +134,7 @@ class DeceasedReportsService
                 ]
             ];
             if ($deceasedReport->getDenialReason() == 'OTHER') {
-                $report['extension']['valueReference']['display'] = $deceasedReport->getDenialReasonOtherDescription();
+                $report['extension'][0]['valueReference']['display'] = $deceasedReport->getDenialReasonOtherDescription();
             }
         }
         return $report;
