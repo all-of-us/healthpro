@@ -16,7 +16,7 @@ class DeceasedReport
 
     const STATUSES = [
         'preliminary' => 'Pending Approval',
-        'canceled' => 'Rejected',
+        'cancelled' => 'Denied',
         'final' => 'Approved'
     ];
 
@@ -300,10 +300,13 @@ class DeceasedReport
             }
 
         }
-        $this->setNextOfKinName(isset($report->extension[0]) ? $report->extension[0]->valueHumanName->text : '');
-        $this->setNextOfKinRelationship(isset($report->extension[0]) ? $report->extension[0]->valueHumanName->extension[0]->valueCode : '');
-        $this->setNextOfKinTelephoneNumber(isset($report->extension[0]) ? $report->extension[0]->valueHumanName->extension[1]->valueString : '');
-        $this->setNextOfKinEmail(isset($report->extension[0]) ? $report->extension[0]->valueHumanName->extension[2]->valueString : '');
+
+        if (isset($report->extension[0]->valueHumanName)) {
+            $this->setNextOfKinName($report->extension[0]->valueHumanName->text);
+            $this->setNextOfKinRelationship($report->extension[0]->valueHumanName->extension[0]->valueCode);
+            $this->setNextOfKinTelephoneNumber($report->extension[0]->valueHumanName->extension[1]->valueString);
+            $this->setNextOfKinEmail($report->extension[0]->valueHumanName->extension[2]->valueString);
+        }
         return $this;
     }
 }

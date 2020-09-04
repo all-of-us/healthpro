@@ -126,8 +126,8 @@ class DeceasedReportsService
                 ]
             ]
         ];
-        if ($deceasedReport->getReportStatus() == 'canceled') {
-            $report['extension'] = [
+        if ($deceasedReport->getReportStatus() == 'cancelled') {
+            $report['extension'][] = [
                 'url' => 'https://www.pmi-ops.org/observation-denial-reason',
                 'valueReference' => [
                     'reference' => $deceasedReport->getDenialReason()

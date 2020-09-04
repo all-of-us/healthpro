@@ -5,9 +5,7 @@ use App\Entity\DeceasedReport;
 use App\Form\DeceasedReportReviewType;
 use App\Form\DeceasedReportType;
 use App\Service\DeceasedReportsService;
-use App\Service\LoggerService;
 use App\Service\ParticipantSummaryService;
-use Pmi\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -56,7 +54,8 @@ class DeceasedReportsController extends AbstractController
                 $this->addFlash('success', 'Report updated!');
                 return $this->redirectToRoute('deceased_reports_index');
             } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
+                error_log($e->getMessage());
+                throw new \Exception('Invalid API response.', $e->getCode());
             }
         }
         return $this->render('deceasedreports/review.html.twig', [

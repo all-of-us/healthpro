@@ -25,7 +25,7 @@ class DeceasedReportReviewType extends AbstractType
                 'label' => 'Do you approve marking this participant as deceased?',
                 'choices' => [
                     'Yes' => 'final',
-                    'No' => 'canceled',
+                    'No' => 'cancelled',
                 ],
                 'expanded' => true
             ])
@@ -74,7 +74,7 @@ class DeceasedReportReviewType extends AbstractType
             'validation_groups' => function (FormInterface $form) {
                 $groups = ['Default'];
                 $data = $form->getData();
-                if ($data->getReportStatus() == 'canceled') {
+                if ($data->getReportStatus() == 'cancelled') {
                     $groups[] = 'cancel_group';
                 }
                 if ($data->getDenialReason() == 'OTHER') {
