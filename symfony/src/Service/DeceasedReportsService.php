@@ -78,6 +78,10 @@ class DeceasedReportsService
             $report['effectiveDateTime'] = $deceasedReport->getDateOfDeath()->format('Y-m-d');
         }
 
+        if ($deceasedReport->getCauseOfDeath()) {
+            $report['valueString'] = $deceasedReport->getCauseOfDeath();
+        }
+
         if (!in_array($deceasedReport->getReportMechanism(), ['EHR', 'OTHER'])) {
             $report['extension'] = [
                 [

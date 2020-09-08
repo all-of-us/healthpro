@@ -279,11 +279,14 @@ class DeceasedReport
     {
         $this->setId($report->identifier[0]->value);
         $this->setParticipantId($report->subject->reference);
-        if ($report->effectiveDateTime) {
+        if (property_exists($report, 'effectiveDateTime') && $report->effectiveDateTime) {
             $this->setDateOfDeath(new \DateTime($report->effectiveDateTime));
         }
+        if (property_exists($report, 'valueString') && $report->valueString) {
+            $this->setCauseOfDeath($report->valueString);
+        }
         $this->setReportMechanism($report->encounter->reference);
-        if (isset($report->encounter->display)) {
+        if (property_exists($report->encounter, 'display')) {
             $this->setReportMechanismOtherDescription($report->encounter->display);
         }
         $this->setReportStatus($report->status);
@@ -301,7 +304,7 @@ class DeceasedReport
 
         }
 
-        if (isset($report->extension[0]->valueHumanName)) {
+        if (property_exists($report->extension[0], 'valueHumanName') && $report->extension[0]->valueHumanName) {
             $this->setNextOfKinName($report->extension[0]->valueHumanName->text);
             $this->setNextOfKinRelationship($report->extension[0]->valueHumanName->extension[0]->valueCode);
             $this->setNextOfKinTelephoneNumber($report->extension[0]->valueHumanName->extension[1]->valueString);
