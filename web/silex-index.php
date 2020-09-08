@@ -29,7 +29,6 @@ $app
     ->mount('/cron', new Controller\CronController())
     ->mount('/dashboard', new Controller\DashboardController())
     ->mount('/admin', new Controller\AdminController())
-    ->mount('/help', new Controller\HelpController())
     ->mount('/workqueue', new Controller\WorkQueueController())
     ->mount('/problem', new Controller\ProblemReportController())
     ->mount('/review', new Controller\ReviewController())

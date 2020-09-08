@@ -584,6 +584,7 @@ class HpoApplication extends AbstractApplication
             $this['session']->set('siteAwardeeId', $site['awardee_id']);
             $this['session']->set('siteAwardeeDisplayName', $this->getAwardeeDisplayName($site['awardee_id']));
             $this['session']->set('currentSiteDisplayName', $this->getAwardeeDisplayName($site['name']));
+            $this['session']->set('siteType', $this->getSiteType());
         } else {
             $this['session']->remove('siteOrganization');
             $this['session']->remove('siteOrganizationId');
@@ -592,6 +593,7 @@ class HpoApplication extends AbstractApplication
             $this['session']->remove('siteAwardeeId');
             $this['session']->remove('siteAwardeeDisplayName');
             $this['session']->remove('currentSiteDisplayName');
+            $this['session']->remove('siteType');
         }
     }
 
