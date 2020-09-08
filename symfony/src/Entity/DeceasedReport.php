@@ -304,7 +304,7 @@ class DeceasedReport
 
         }
 
-        if (property_exists($report->extension[0], 'valueHumanName') && $report->extension[0]->valueHumanName) {
+        if (property_exists($report, 'extension') && property_exists($report->extension[0], 'valueHumanName') && $report->extension[0]->valueHumanName) {
             $this->setNextOfKinName($report->extension[0]->valueHumanName->text);
             $this->setNextOfKinRelationship($report->extension[0]->valueHumanName->extension[0]->valueCode);
             $this->setNextOfKinTelephoneNumber($report->extension[0]->valueHumanName->extension[1]->valueString);
