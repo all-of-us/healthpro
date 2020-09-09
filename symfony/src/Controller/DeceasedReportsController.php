@@ -105,7 +105,7 @@ class DeceasedReportsController extends AbstractController
 
     /* Private Methods */
 
-    public function formatReportTableRows($reports = [])
+    private function formatReportTableRows($reports = [])
     {
         $rows = [];
         if (!is_array($reports) || count($reports) == 0) {
@@ -116,18 +116,4 @@ class DeceasedReportsController extends AbstractController
         }
         return $rows;
     }
-
-    public function filterReports($reports, $filter = [])
-    {
-        $rows = [];
-        foreach ($reports as $report) {
-            if (!empty($filter) && !in_array($report->status, $filter)) {
-                continue;
-            }
-            $rows[] = $report;
-        }
-
-        return $rows;
-    }
-
 }
