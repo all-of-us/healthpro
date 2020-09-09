@@ -163,6 +163,12 @@ class HelpService
         ]
     ];
 
+    public static $confluenceResources = [
+        'ops_data_api' => 'https://joinallofus.atlassian.net/wiki/spaces/DRC/pages/410517681/Ops+Data+API',
+        'data_dictionaries' => 'https://joinallofus.atlassian.net/wiki/spaces/DRC/pages/4113771/Work+Queue+Data+Dictionaries',
+        'release_notes' => 'https://joinallofus.atlassian.net/wiki/spaces/DRC/pages/2883800/HealthPro+Release+Notes'
+    ];
+
     public function getStoragePath()
     {
         return $this->params->has('help_storage_path') ? $this->params->get('help_storage_path') : 'https://docsallofus.atlassian.net/wiki/download/attachments/44357';
