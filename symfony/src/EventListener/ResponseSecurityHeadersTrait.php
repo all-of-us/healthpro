@@ -19,6 +19,7 @@ trait ResponseSecurityHeadersTrait
             . " www.google-analytics.com www.googletagmanager.com" // Google Analytics
             . " storage.googleapis.com" // for SOP PDFs stored in a Google Storage bucket
             . " www.youtube.com" // for training videos hosted on YouTube
+            . " docs.google.com" // for technical faq docs stored in Google Drive
             . " *.kaltura.com" // for training videos hosted on Kaltura
             . " cdn.plot.ly;" // allow plot.ly remote requests
 
