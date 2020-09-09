@@ -60,6 +60,8 @@
 {% block pagejs %}
 <script>
 $(document).ready(function () {
+  $('#deceased_report_dateOfDeath').pmiDateTimePicker({format: 'MM/DD/YYYY', maxDate: Date(), useCurrent: false});
+
   var reportMechanism = $('input[name="deceased_report[reportMechanism]"]')
   var reportMechanismChecked = $('input[name="deceased_report[reportMechanism]"]:checked')
   var nextOfKinName = $('input[name="deceased_report[nextOfKinName]"]')

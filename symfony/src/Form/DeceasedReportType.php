@@ -23,7 +23,15 @@ class DeceasedReportType extends AbstractType
                 'widget' => 'single_text',
                 'label' => 'Date of Death (if available)',
                 'required' => false,
-                'help' => 'Do NOT prompt report for this information and only enter if provided.'
+                'html5' => false,
+                'help' => 'Do NOT prompt report for this information and only enter if provided.',
+                'constraints' => [
+                    new Constraints\DateTime(),
+                    new Constraints\LessThanOrEqual([
+                        'value' => new \DateTime('today'),
+                        'message' => 'Date cannot be in the future'
+                    ])
+                ]
             ])
             ->add('causeOfDeath', TextType::class, [
                 'label' => 'Cause of Death (if available)',
