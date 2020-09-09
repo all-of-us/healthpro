@@ -67,14 +67,14 @@ class DeceasedReportType extends AbstractType
                 'required' => false
             ])
             ->add('nextOfKinTelephoneNumber', TextType::class, [
-                'label' => 'Next of kin\'s phone number',
+                'label' => 'Next of kin\'s phone number (optional)',
                 'attr' => [
                     'placeholder' => '(555) 555-5555'
                 ],
                 'required' => false
             ])
             ->add('nextOfKinEmail', TextType::class, [
-                'label' => 'Next of kin\'s e-mail address',
+                'label' => 'Next of kin\'s e-mail address (optional)',
                 'attr' => [
                     'placeholder' => 'user@example.com'
                 ],
