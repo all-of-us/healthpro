@@ -11,6 +11,7 @@ use Pmi\Service\UserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
+use App\Service\HelpService;
 
 class HpoApplication extends AbstractApplication
 {
@@ -423,6 +424,7 @@ class HpoApplication extends AbstractApplication
             }
         }
         $app['twig']->addGlobal('global_notices', $notices);
+        $app['twig']->addGlobal('confluenceResources', HelpService::$confluenceResources);
     }
 
     protected function afterCallback(Request $request, Response $response)
