@@ -8,9 +8,9 @@
       <dt>Biobank ID</dt>
       <dd>{{ participant.biobankId }}</dd>
       <dt>DOB</dt>
-      <dd>{{ participant.dateOfBirth|date('n/j/Y') }}</dd>
+      <dd>{{ participant.dateOfBirth is defined ? participant.dateOfBirth|date('n/j/Y') : '--' }}</dd>
       <dt>Gender Identity</dt>
-      <dd>{{ codebook_display(participant.genderIdentity) }}</dd>
+      <dd>{{ codebook_display(participant.genderIdentity)|default('--') }}</dd>
       <dt>Paired Awardee</dt>
       <dd>{{ awardee_display(participant.awardee) }}</dd>
     </dl>
