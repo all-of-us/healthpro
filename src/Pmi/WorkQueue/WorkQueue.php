@@ -589,9 +589,9 @@ class WorkQueue
     public function getRetentionEligibleStatus($value, $time)
     {
         if ($value === 'ELIGIBLE') {
-            return 'Yes <br/>' . self::dateFromString($time, $this->app->getUserTimezone());
+            return self::HTML_SUCCESS . ' (Yes) <br/>' . self::dateFromString($time, $this->app->getUserTimezone());
         } elseif ($value === 'NOT_ELIGIBLE') {
-            return 'No';
+            return self::HTML_DANGER . ' (No)';
         }
         return '';
     }

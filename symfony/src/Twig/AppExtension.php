@@ -6,22 +6,24 @@ use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Service\TimezoneService;
 use Pmi\Drc\CodeBook;
-use Psr\Container\ContainerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
 {
-    private $container;
-
     private $doctrine;
+    private $requestStack;
+    private $router;
+    private $cache = [];
 
-    public function __construct(ContainerInterface $container, ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, RouterInterface $router, RequestStack $requestStack)
     {
-        $this->container = $container;
         $this->doctrine = $doctrine;
-        $this->cache = [];
+        $this->requestStack = $requestStack;
+        $this->router = $router;
     }
 
     public function getFunctions()
@@ -39,12 +41,12 @@ class AppExtension extends AbstractExtension
 
     public function checkPath($name)
     {
-        return !is_null($this->container->get('router')->getRouteCollection()->get($name));
+        return !is_null($this->router->getRouteCollection()->get($name));
     }
 
     public function asset($asset)
     {
-        $basePath = $this->container->get('request_stack')->getCurrentRequest()->getBasepath();
+        $basePath = $this->requestStack->getCurrentRequest()->getBasePath();
         if (in_array($basePath, ['/web', '/s'])) {
             // The combination of GAE's routing handlers and the Symfony Request object
             // base path logic results in an incorrect basepath for requests that start

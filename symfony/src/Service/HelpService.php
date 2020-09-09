@@ -1,24 +1,18 @@
 <?php
-namespace Pmi\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use Pmi\HttpClient;
-use Silex\Application;
+namespace App\Service;
 
-class HelpController extends AbstractController
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
+class HelpService
 {
-    protected static $name = 'help';
-    protected static $routes = [
-        ['home', '/'],
-        ['videos', '/videos'],
-        ['videosPlaylist', '/videos/{id}'],
-        ['faq', '/faq'],
-        ['sop', '/sop'],
-        ['sopView', '/sop/{id}'],
-        ['sopFile', '/sop/file/{id}'],
-        ['sopRedirect', '/sop/redirect/{id}']
-    ];
-    private static $documentGroups = [
+
+    public function __construct(ParameterBagInterface $params)
+    {
+        $this->params = $params;
+    }
+
+    public static $documentGroups = [
         [
             'title' => 'Physical Measurements for DVs and HPOs',
             'documents' => [
@@ -124,7 +118,7 @@ class HelpController extends AbstractController
         ]
     ];
 
-    private static $videoPlaylists = [
+    public static $videoPlaylists = [
         'biobank-hpo' => [
             'tab_title' => 'HPO Biobank',
             'title' => 'Biobank Video Tutorials for Healthcare Provider Organizations (HPO)',
@@ -144,7 +138,7 @@ class HelpController extends AbstractController
         'other' => [
             'tab_title' => 'Other',
             'type' => 'youtube',
-            'groups' =>  [
+            'groups' => [
                 [
                     'title' => 'Physical Measurements (HPO/DV)',
                     'videos' => [
@@ -169,12 +163,12 @@ class HelpController extends AbstractController
         ]
     ];
 
-    private function getStoragePath(Application $app)
+    public function getStoragePath()
     {
-        return $app->getConfig('help_storage_path') ?: 'https://docsallofus.atlassian.net/wiki/download/attachments/44357';
+        return $this->params->has('help_storage_path') ? $this->params->get('help_storage_path') : 'https://docsallofus.atlassian.net/wiki/download/attachments/44357';
     }
 
-    private function getDocumentInfo($id)
+    public function getDocumentInfo($id)
     {
         foreach (self::$documentGroups as $documentGroup) {
             if (array_key_exists($id, $documentGroup['documents'])) {
@@ -182,102 +176,5 @@ class HelpController extends AbstractController
             }
         }
         return false;
-    }
-
-    public function homeAction(Application $app)
-    {
-        return $app['twig']->render('help/index.html.twig');
-    }
-
-    public function videosAction(Application $app)
-    {
-        if ($app->isDVType()) {
-            $id = 'biobank-dv';
-        } else {
-            $id = 'biobank-hpo';
-        }
-
-        return $app->redirectToRoute('help_videosPlaylist', ['id' => $id]);
-    }
-
-    public function videosPlaylistAction($id, Application $app, Request $request)
-    {
-        if (!array_key_exists($id, self::$videoPlaylists)) {
-            $app->abort(404);
-        }
-
-        $parameters = [
-            'videoPlaylists' => self::$videoPlaylists,
-            'active' => $id
-        ];
-        if ($id === 'other') {
-            $parameters['type'] = $request->query->get('type', 'yt');
-            $parameters['helpVideosPath'] = rtrim($app->getConfig('help_videos_path'), '/');
-        }
-
-        return $app['twig']->render('help/videos.html.twig', $parameters);
-    }
-
-    public function faqAction(Application $app)
-    {
-        return $app['twig']->render('help/faq.html.twig');
-    }
-
-    public function sopAction(Application $app)
-    {
-        return $app['twig']->render('help/sop.html.twig', [
-            'documentGroups' => self::$documentGroups,
-            'path' => $this->getStoragePath($app)
-        ]);
-    }
-
-    public function sopViewAction(Application $app, $id)
-    {
-        $document = $this->getDocumentInfo($id);
-        if (!$document) {
-            $app->abort(404);
-        }
-        return $app['twig']->render('help/sop-pdf.html.twig', [
-            'sop' => $id,
-            'title' => trim(str_replace($id, '', $document['title'])),
-            'document' => $document,
-            'path' => $this->getStoragePath($app)
-        ]);
-    }
-
-    public function sopFileAction(Application $app, $id)
-    {
-        $document = $this->getDocumentInfo($id);
-        if (!$document) {
-            $app->abort(404);
-        }
-        $url = $this->getStoragePath($app) . '/' . rawurlencode($document['filename']);
-        try {
-            $client = new HttpClient();
-            $response = $client->get($url, ['stream' => true]);
-            $responseBody = $response->getBody();
-            $stream = function () use ($responseBody) {
-                while (!$responseBody->eof()) {
-                    echo $responseBody->read(1024); // phpcs:ignore WordPress.XSS.EscapeOutput
-                }
-            };
-            return $app->stream($stream, 200, [
-                'Content-Type' => 'application/pdf'
-            ]);
-        } catch (\Exception $e) {
-            error_log('Failed to retrieve Confluence file ' . $url . ' (' . $id . ')');
-            echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>';
-            exit;
-        }
-    }
-
-    public function sopRedirectAction(Application $app, $id)
-    {
-        $document = $this->getDocumentInfo($id);
-        if (!$document) {
-            $app->abort(404);
-        }
-        $url = $this->getStoragePath($app) . '/' . rawurlencode($document['filename']);
-        return $app->redirect($url);
     }
 }
