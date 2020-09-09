@@ -301,14 +301,29 @@ class DeceasedReport
                     $this->setReviewedOn(new \DateTime($performer->extension[0]->valueDateTime));
                     break;
             }
-
         }
 
-        if (property_exists($report, 'extension') && property_exists($report->extension[0], 'valueHumanName') && $report->extension[0]->valueHumanName) {
+        if (property_exists($report, 'extension')
+            && property_exists($report, 'extension')
+            && count($report->extension) > 0
+            && property_exists($report->extension[0], 'valueHumanName')
+            && $report->extension[0]->valueHumanName
+        ) {
             $this->setNextOfKinName($report->extension[0]->valueHumanName->text);
             $this->setNextOfKinRelationship($report->extension[0]->valueHumanName->extension[0]->valueCode);
-            $this->setNextOfKinTelephoneNumber($report->extension[0]->valueHumanName->extension[1]->valueString);
-            $this->setNextOfKinEmail($report->extension[0]->valueHumanName->extension[2]->valueString);
+            foreach ($report->extension[0]->valueHumanName->extension as $ext) {
+                switch ($ext->url) {
+                    case 'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype':
+                        $this->setNextOfKinRelationship($ext->valueCode);
+                        break;
+                    case 'https://www.pmi-ops.org/phone-number':
+                        $this->setNextOfKinTelephoneNumber($ext->valueString);
+                        break;
+                    case 'https://www.pmi-ops.org/email-address':
+                        $this->setNextOfKinEmail($ext->valueString);
+                        break;
+                }
+            }
         }
         return $this;
     }
