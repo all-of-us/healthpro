@@ -60,6 +60,20 @@
 {% block pagejs %}
 <script>
 $(document).ready(function () {
+  // Form error display/UX
+  $('form[name="deceased_report"]').parsley({
+      errorClass: "has-error",
+      classHandler: function(el) {
+          return el.$element.closest(".form-group");
+      },
+      errorsContainer: function(el) {
+          return el.$element.closest(".form-group");
+      },
+      errorsWrapper: '<div class="deceased-report-errors help-block"></div>',
+      errorTemplate: '<div></div>',
+      trigger: "keyup change"
+  });
+  
   $('#deceased_report_dateOfDeath').pmiDateTimePicker({format: 'MM/DD/YYYY', maxDate: Date(), useCurrent: false});
 
   var reportMechanism = $('input[name="deceased_report[reportMechanism]"]')

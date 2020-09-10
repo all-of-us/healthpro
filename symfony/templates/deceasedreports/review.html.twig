@@ -69,6 +69,20 @@
 {% block pagejs %}
 <script>
 $(document).ready(function () {
+  // Form error display/UX
+  $('form[name="deceased_report_review"]').parsley({
+      errorClass: "has-error",
+      classHandler: function(el) {
+          return el.$element.closest(".form-group");
+      },
+      errorsContainer: function(el) {
+          return el.$element.closest(".form-group");
+      },
+      errorsWrapper: '<div class="deceased-report-review-errors help-block"></div>',
+      errorTemplate: '<div></div>',
+      trigger: "keyup change"
+  });
+
   var reportStatus = $('input[name="deceased_report_review[reportStatus]"]')
   var reportStatusChecked = $('input[name="deceased_report_review[reportStatus]"]:checked')
   var denialReason = $('select[name="deceased_report_review[denialReason]"]')
