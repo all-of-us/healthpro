@@ -21,7 +21,10 @@ class DeceasedReportsController extends AbstractController
      */
     public function participantObservationIndex(Request $request, SessionInterface $session, DeceasedReportsService $deceasedReportsService) {
         $statusFilter = $request->query->get('status', 'preliminary');
-        $organizationId = ($request->query->get('all', false) === false) ? $session->get('siteOrganizationId', null) : null;
+        $organizationId = $session->get('siteOrganizationId');
+        if (!$organizationId) {
+            throw $this->createAccessDeniedException('Must be associated with a valid Organization.');
+        }
         $reports = $deceasedReportsService->getDeceasedReports($organizationId, $statusFilter);
         $reports = $this->formatReportTableRows($reports);
         return $this->render('deceasedreports/index.html.twig', [
