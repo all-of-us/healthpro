@@ -128,8 +128,7 @@ class WorkQueue
             'options' => [
                 'Consented' => 'SUBMITTED',
                 'Refused consent' => 'SUBMITTED_NO_CONSENT',
-                'Consent not completed' => 'UNSET',
-                'Invalid' => 'SUBMITTED_INVALID'
+                'Consent not completed' => 'UNSET'
             ]
         ],
         'consentForGenomicsROR' => [
@@ -138,8 +137,7 @@ class WorkQueue
                 'Consented Yes' => 'SUBMITTED',
                 'Refused Consent' => 'SUBMITTED_NO_CONSENT',
                 'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
-                'Consent Not Completed' => 'UNSET',
-                'Invalid' => 'SUBMITTED_INVALID'
+                'Consent Not Completed' => 'UNSET'
             ]
         ],
         'ageRange' => [
