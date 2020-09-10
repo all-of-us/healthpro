@@ -40,7 +40,7 @@ class DeceasedReportsController extends AbstractController
         }
         $fhirData = $deceasedReportsService->getDeceasedReportById($participantId, $reportId);
         $report = (new DeceasedReport())->loadFromFhirObservation($fhirData);
-        if ($report->getSubmittedBy() == $this->getUser()->getEmail() && $report->getReportStatus() == 'preliminary') {
+        if ($report->getSubmittedBy() === $this->getUser()->getEmail() && $report->getReportStatus() === 'preliminary') {
             $this->addFlash('notice', 'You submitted this report. Another user must review it.');
         }
         $form = $this->createForm(DeceasedReportReviewType::class, $report, ['reviewer_email' => $this->getUser()->getEmail()]);
@@ -55,7 +55,8 @@ class DeceasedReportsController extends AbstractController
                 return $this->redirectToRoute('deceased_reports_index');
             } catch (\Exception $e) {
                 error_log($e->getMessage());
-                throw new \Exception('Invalid API response.', $e->getCode());
+                $report->setReportStatus('preliminary');
+                $this->addFlash('error', sprintf('Invalid API response [%s]', $e->getCode()));
             }
         }
         return $this->render('deceasedreports/review.html.twig', [
@@ -76,7 +77,7 @@ class DeceasedReportsController extends AbstractController
         $reports = $deceasedReportsService->getDeceasedReportsByParticipant($participantId);
         $report = new DeceasedReport();
         foreach ($reports as $record) {
-            if ($record->status == 'cancelled') {
+            if ($record->status === 'cancelled') {
                 continue;
             }
             $report = (new DeceasedReport())->loadFromFhirObservation($record);
@@ -85,14 +86,15 @@ class DeceasedReportsController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $report = $form->getData();
-            $form = $this->createForm(DeceasedReportType::class, $report, ['disabled' => true]);
             try {
                 $fhirData = $deceasedReportsService->buildDeceasedReportFhir($report, $this->getUser());
                 $response = $deceasedReportsService->createDeceasedReport($participantId, $fhirData);
                 $report = $report->loadFromFhirObservation($response);
                 $this->addFlash('success', 'Deceased Report created!');
             } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
+                error_log($e->getMessage());
+                $report->setReportStatus('preliminary');
+                $this->addFlash('error', sprintf('Invalid API response [%s]', $e->getCode()));
             }
         }
 
@@ -108,7 +110,7 @@ class DeceasedReportsController extends AbstractController
     private function formatReportTableRows($reports = [])
     {
         $rows = [];
-        if (!is_array($reports) || count($reports) == 0) {
+        if (!is_array($reports) || count($reports) === 0) {
             return [];
         }
         foreach ($reports as $report) {

@@ -74,10 +74,10 @@ class DeceasedReportReviewType extends AbstractType
             'validation_groups' => function (FormInterface $form) {
                 $groups = ['Default'];
                 $data = $form->getData();
-                if ($data->getReportStatus() == 'cancelled') {
+                if ($data->getReportStatus() === 'cancelled') {
                     $groups[] = 'cancel_group';
                 }
-                if ($data->getDenialReason() == 'OTHER') {
+                if ($data->getDenialReason() === 'OTHER') {
                     $groups[] = 'cancel_group_other';
                 }
                 return $groups;

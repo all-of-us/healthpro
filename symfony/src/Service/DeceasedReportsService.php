@@ -40,7 +40,7 @@ class DeceasedReportsService
         $response = $this->api->get(sprintf('rdr/v1/Participant/%s/DeceasedReport', $participantId));
         $reports = json_decode($response->getBody());
         foreach ($reports as $report) {
-            if ($report->identifier[0]->value == $reportId) {
+            if ($report->identifier[0]->value === $reportId) {
                 return $report;
             }
         }
@@ -106,7 +106,7 @@ class DeceasedReportsService
                 ]
             ];
         }
-        if ($deceasedReport->getReportMechanism() == 'OTHER') {
+        if ($deceasedReport->getReportMechanism() === 'OTHER') {
             $report['encounter']['display'] = $deceasedReport->getReportMechanismOtherDescription();
         }
         return $report;
@@ -130,14 +130,14 @@ class DeceasedReportsService
                 ]
             ]
         ];
-        if ($deceasedReport->getReportStatus() == 'cancelled') {
+        if ($deceasedReport->getReportStatus() === 'cancelled') {
             $report['extension'][] = [
                 'url' => 'https://www.pmi-ops.org/observation-denial-reason',
                 'valueReference' => [
                     'reference' => $deceasedReport->getDenialReason()
                 ]
             ];
-            if ($deceasedReport->getDenialReason() == 'OTHER') {
+            if ($deceasedReport->getDenialReason() === 'OTHER') {
                 $report['extension'][0]['valueReference']['display'] = $deceasedReport->getDenialReasonOtherDescription();
             }
         }
