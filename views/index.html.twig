@@ -63,6 +63,15 @@
                 </a>
             </div>
         {% endif %}
+        {% if is_granted('ROLE_USER') and app.session.get('site') %}
+            <div class="col-sm-6 col-md-4">
+                <a href="{{ path('deceased_reports_index') }}" class="btn btn-lg btn-default btn-block">
+                    <i class="fa fa-hourglass-o" aria-hidden="true"></i>
+                    Deceased Participants
+                    <div class="description">Review participants reported as deceased.</div>
+                </a>
+            </div>
+        {% endif %}
         <div class="col-sm-6 col-md-4">
             <a href="/s/help/" class="btn btn-lg btn-default btn-block">
                 <i class="fa fa-question-circle" aria-hidden="true"></i>
