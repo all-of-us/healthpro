@@ -47,7 +47,7 @@ class UserService
 
     public function canMockLogin()
     {
-        return $this->env->isLocal() && $this->params->get('local_mock_auth');
+        return $this->env->isLocal() && $this->params->has('local_mock_auth') && $this->params->get('local_mock_auth');
     }
 
     public function getUserInfo($googleUser)

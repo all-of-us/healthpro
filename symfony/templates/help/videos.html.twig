@@ -16,10 +16,10 @@
     </ul>
 
     {% set playlist = videoPlaylists[active] %}
-    
+
     {% if playlist.type == 'youtube' %}
-        <br />
-        <div class="row">
+        <br/>
+        <div class="row" id="you-tube-videos" data-type="{{ type }}" data-help-videos-path="{{ helpVideosPath }}">
             <div class="col-sm-8 col-sm-push-4">
                 <div class="panel panel-default" id="video-panel">
                     <div class="panel-heading">
@@ -54,7 +54,9 @@
                             {% if video.youtube_id %}
                                 <a href="#" class="list-group-item load-video" data-embed-src="{{ video.youtube_id }}" data-file-src="{{ video.filename }}">{{ video.title }}</a>
                             {% else %}
-                                <div class="list-group-item disabled">{{ video.title }} <em><small>(Coming Soon!)</small></em></div>
+                                <div class="list-group-item disabled">{{ video.title }} <em>
+                                        <small>(Coming Soon!)</small>
+                                    </em></div>
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -72,30 +74,7 @@
 {% endblock %}
 
 {% block pagejs %}
-{% if videoPlaylists[active].type == 'youtube' %}
-<script>
-$(document).ready(function() {
-    var type = {{ type|json_encode|raw }};
-    var youTubePath = "https://www.youtube.com/embed";
-    var helpVideosPath = {{ helpVideosPath|json_encode|raw }};
-    var loadVideo = function (src) {
-        $('#video-title').html(src.html());
-        if (type === 'file') {
-            $('#video-file source').attr('src', helpVideosPath + '/' + src.data('file-src'));
-            $("#video-file")[0].load();
-        } else {
-            $('iframe#video-embed').attr('src', youTubePath + '/' + src.data('embed-src') + '?modestbranding=1&rel=0');
-        }
-        $('a.load-video').removeClass('active');
-        src.addClass('active');
-    };
-    $('a.load-video').on('click', function () {
-        loadVideo($(this));
-        $('html').scrollTop($('#video-panel').offset().top);
-        return false;
-    });
-    loadVideo($('a.load-video:first'));
-});
-</script>
-{% endif %}
+    {% if videoPlaylists[active].type == 'youtube' %}
+        {{ encore_entry_script_tags('video') }}
+    {% endif %}
 {% endblock %}

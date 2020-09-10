@@ -106,9 +106,10 @@
 
 {% macro displayRetentionEligibleStatus(value, time) %}
     {% if value == 'ELIGIBLE' %}
-        Yes {{ time ? '(' ~ time|date('m/d/Y', app.userTimezone) ~ ')' }}
+        <i class="fa fa-check text-success" aria-hidden="true"></i> (Yes)
+        {{ time ? '(' ~ time|date('m/d/Y', app.userTimezone) ~ ')' }}
     {% elseif value == 'NOT_ELIGIBLE' %}
-        No
+        <i class="fa fa-times text-danger" aria-hidden="true"></i> (No)
     {% else %}
         (--)
     {% endif %}
