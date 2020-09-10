@@ -24,6 +24,7 @@ class DeceasedReportType extends AbstractType
                 'label' => 'Date of Death (if available)',
                 'required' => false,
                 'html5' => false,
+                'format' => 'MM/dd/yyyy',
                 'help' => 'Do NOT prompt report for this information and only enter if provided.',
                 'constraints' => [
                     new Constraints\DateTime(),
