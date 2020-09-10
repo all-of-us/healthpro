@@ -94,6 +94,7 @@ class DeceasedReportsController extends AbstractController
                 $response = $deceasedReportsService->createDeceasedReport($participantId, $fhirData);
                 $report = $report->loadFromFhirObservation($response);
                 $this->addFlash('success', 'Deceased Report created!');
+                return $this->redirectToRoute('participant', ['id' => $participantId]);
             } catch (\Exception $e) {
                 error_log($e->getMessage());
                 $report->setReportStatus('preliminary');
