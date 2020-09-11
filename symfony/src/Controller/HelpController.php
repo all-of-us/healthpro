@@ -59,9 +59,9 @@ class HelpController extends AbstractController
      * @Route("/faq", name="help_faq")
      */
 
-    public function faqAction()
+    public function faqAction(HelpService $helpService)
     {
-        return $this->render('help/faq.html.twig');
+        return $this->render('help/faq.html.twig', ['faqs' => $helpService::$faqs]);
     }
 
     /**

@@ -9,8 +9,8 @@
     <div class="page-header">
         <h2><i class="fa fa-question-circle-o" aria-hidden="true"></i> Technical FAQs</h2>
     </div>
-    <div class="text-right"><a class="pull-right" href="{{ asset('HealthPro Frequently Asked Questions.pdf') }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a></div>
-    <iframe class="pdf" name="pdf" src="{{ asset('HealthPro Frequently Asked Questions.pdf') }}#view=FitH"></iframe>
+    <div class="text-right"><a class="pull-right" href="{{ faqs.link }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a></div>
+    <iframe class="pdf" name="pdf" src="{{ faqs.web_link }}?embedded=true"></iframe>
     {% include 'help/footer.html.twig' %}
 {% endblock %}
 
