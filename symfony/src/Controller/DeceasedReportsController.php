@@ -6,10 +6,12 @@ use App\Form\DeceasedReportReviewType;
 use App\Form\DeceasedReportType;
 use App\Service\DeceasedReportsService;
 use App\Service\ParticipantSummaryService;
+use Pmi\Cache\DatastoreAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @Route("/s/deceased-reports")
@@ -106,6 +108,30 @@ class DeceasedReportsController extends AbstractController
             'participant' => $participant,
             'report' => $report,
             'form' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/stats", name="deceased_report_stats")
+     */
+    public function getStats(SessionInterface $session, DeceasedReportsService $deceasedReportsService)
+    {
+        $organizationId = $session->get('siteOrganizationId');
+        $cache = new DatastoreAdapter(100);
+        $pendingReportCountCache = $cache->getItem('deceased_reports.pending.count');
+        if ($cacheHit = $pendingReportCountCache->isHit()) {
+            $pendingReportCount = (int) $pendingReportCountCache->get();
+        } else {
+            $pendingReportCountCache->expiresAfter(60);
+            $reports = $deceasedReportsService->getDeceasedReports($organizationId, 'preliminary');
+            $pendingReportCount = count($reports);
+            $pendingReportCountCache->set($pendingReportCount);
+            $cache->save($pendingReportCountCache);
+        }
+
+        return $this->json([
+            'pending' => $pendingReportCount,
+            'cacheHit' => $cacheHit
         ]);
     }
 

@@ -426,3 +426,17 @@ table.table-samples td {
     padding: 0 10px 0 10px;
     height: 45px;
 }
+
+.welcome-page-badge {
+  display: inline-block;
+  font-weight: bold;
+  position: absolute;
+  color: white;
+  background-color: red;
+  border-radius: 50%;
+  top: -0.5rem;
+  right: 0.5rem;
+  padding: 0.5rem;
+  border: solid 2pt white;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+}
