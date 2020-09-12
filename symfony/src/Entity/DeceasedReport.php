@@ -28,7 +28,7 @@ class DeceasedReport
         'O' => 'Other'
     ];
 
-    const DENIAl_REASONS = [
+    const DENIAL_REASONS = [
         'INCORRECT_PARTICIPANT' => 'Incorrect Participant',
         'MARKED_IN_ERROR' => 'Marked in Error',
         'INSUFFICENT_INFORMATION' => 'Insufficient Information',
@@ -284,8 +284,8 @@ class DeceasedReport
 
     public function getDenialReasonDisplay(): ?string
     {
-        if (isset(self::DENIAl_REASONS[$this->denialReason])) {
-            return self::DENIAl_REASONS[$this->denialReason];
+        if (isset(self::DENIAL_REASONS[$this->denialReason])) {
+            return self::DENIAL_REASONS[$this->denialReason];
         }
         return $this->denialReason;
     }
