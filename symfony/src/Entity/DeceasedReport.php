@@ -28,6 +28,13 @@ class DeceasedReport
         'O' => 'Other'
     ];
 
+    const DENIAL_REASONS = [
+        'INCORRECT_PARTICIPANT' => 'Incorrect Participant',
+        'MARKED_IN_ERROR' => 'Marked in Error',
+        'INSUFFICENT_INFORMATION' => 'Insufficient Information',
+        'OTHER' => 'Other'
+    ];
+
     private $id;
 
     private $participantId;
@@ -251,7 +258,7 @@ class DeceasedReport
 
     /* Model Methods */
 
-    public function getReportmechanismDisplay()
+    public function getReportmechanismDisplay(): ?string
     {
         if (isset(self::MECHANISMS[$this->reportMechanism])) {
             return self::MECHANISMS[$this->reportMechanism];
@@ -259,7 +266,7 @@ class DeceasedReport
         return $this->reportMechanism;
     }
 
-    public function getReportStatusDisplay()
+    public function getReportStatusDisplay(): ?string
     {
         if (isset(self::STATUSES[$this->reportStatus])) {
             return self::STATUSES[$this->reportStatus];
@@ -267,12 +274,20 @@ class DeceasedReport
         return $this->reportStatus;
     }
 
-    public function getNextOfKinRelationshipDisplay()
+    public function getNextOfKinRelationshipDisplay(): ?string
     {
         if (isset(self::NK_RELATIONSHIPS[$this->nextOfKinRelationship])) {
             return self::NK_RELATIONSHIPS[$this->nextOfKinRelationship];
         }
         return $this->nextOfKinRelationship;
+    }
+
+    public function getDenialReasonDisplay(): ?string
+    {
+        if (isset(self::DENIAL_REASONS[$this->denialReason])) {
+            return self::DENIAL_REASONS[$this->denialReason];
+        }
+        return $this->denialReason;
     }
 
     public function loadFromFhirObservation($report)
@@ -300,6 +315,23 @@ class DeceasedReport
                     $this->setReviewedBy($performer->reference);
                     $this->setReviewedOn(new \DateTime($performer->extension[0]->valueDateTime));
                     break;
+            }
+        }
+
+        if (property_exists($report, 'extension')
+            && count($report->extension) > 0
+        ) {
+            foreach ($report->extension as $reportExtension) {
+                switch($reportExtension->url) {
+                    case 'https://www.pmi-ops.org/observation-denial-reason':
+                        $this->setDenialReason($reportExtension->valueReference->reference);
+                        if (property_exists($reportExtension->valueReference, 'display')
+                            && $reportExtension->valueReference->display
+                        ) {
+                            $this->setDenialReasonOtherDescription($reportExtension->valueReference->display);
+                        }
+                        break;
+                }
             }
         }
 

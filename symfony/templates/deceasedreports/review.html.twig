@@ -15,6 +15,12 @@
       <dt>Status</dt>
       <dd><span class="label label-default">{{ report.reportStatusDisplay }}</span></dd>
 
+      {% if report.denialReason %}
+      <dt>Denial Reason</dt>
+      <dd>{{ report.denialReasonDisplay }} {% if report.denialReason == 'OTHER' %}- {{ report.denialReasonOtherDescription }}{% endif %}</dd>
+      {% endif %}
+
+      <hr />
       <dt>Date of Death</dt>
       <dd>{{ report.dateOfDeath ? report.dateOfDeath|date('n/j/Y') : '' }}</dd>
 
@@ -22,10 +28,7 @@
       <dd>{{ report.causeOfDeath }}</dd>
 
       <dt>Report Mechanism</dt>
-      <dd>{{ report.reportMechanismDisplay }}</dd>
-
-      <dt>Detail (If Other)</dt>
-      <dd>{{ report.reportMechanismOtherDescription }}</dd>
+      <dd>{{ report.reportMechanismDisplay }} {% if report.reportMechanism == 'OTHER' %}- {{ report.reportMechanismOtherDescription }}{% endif %}</dd>
 
       <dt>Next of Kin</dt>
       <dd>{{ report.nextOfKinName }}</dd>
