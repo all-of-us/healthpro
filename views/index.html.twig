@@ -64,7 +64,7 @@
             </div>
         {% endif %}
         {% if is_granted('ROLE_USER') and app.session.get('site') %}
-            <div class="col-sm-6 col-md-4">
+            <div class="col-sm-6 col-md-4" id="deceased_report_block">
                 <a href="{{ path('deceased_reports_index') }}" class="btn btn-lg btn-default btn-block">
                     <i class="fa fa-hourglass-o" aria-hidden="true"></i>
                     Deceased Participants
@@ -80,4 +80,21 @@
             </a>
         </div>
     </div>
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function () {
+  // Add badge for count of Deceased Participant Reports for review
+  var deceasedReportCount = 0;
+  $.ajax({
+    url: '/s/deceased-reports/stats'
+  }).done(function (data) {
+    deceasedReportCount = data.pending
+    if (deceasedReportCount > 0) {
+      $('#deceased_report_block > a').prepend($('<div class="welcome-page-badge">' + deceasedReportCount +'</div>'));
+    }
+  })
+})
+</script>
 {% endblock %}

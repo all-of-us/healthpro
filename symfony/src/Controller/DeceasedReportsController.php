@@ -6,16 +6,21 @@ use App\Form\DeceasedReportReviewType;
 use App\Form\DeceasedReportType;
 use App\Service\DeceasedReportsService;
 use App\Service\ParticipantSummaryService;
+use Pmi\Cache\DatastoreAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @Route("/s/deceased-reports")
  */
 class DeceasedReportsController extends AbstractController
 {
+    const ORG_PENDING_CACHE_TTL = 500;
+    const ORG_PENDING_CACHE_KEY = 'deceased_reports.org-%s.pending.count';
+
     /**
      * @Route("/", name="deceased_reports_index")
      */
@@ -36,7 +41,8 @@ class DeceasedReportsController extends AbstractController
     /**
      * @Route("/{participantId}/{reportId}", name="deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"})
      */
-    public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId, $reportId) {
+    public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId, $reportId) {
+        $organizationId = $session->get('siteOrganizationId');
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -54,6 +60,7 @@ class DeceasedReportsController extends AbstractController
                 $fhirData = $deceasedReportsService->buildDeceasedReportReviewFhir($data, $this->getUser());
                 $deceasedReportsService->updateDeceasedReport($participantId, $reportId, $fhirData);
                 $report->setReportStatus('preliminary');
+                $this->resetPendingCountCache($organizationId);
                 $this->addFlash('success', 'Report updated!');
                 return $this->redirectToRoute('deceased_reports_index');
             } catch (\Exception $e) {
@@ -72,7 +79,8 @@ class DeceasedReportsController extends AbstractController
     /**
      * @Route("/{participantId}/new", name="deceased_report_new", requirements={"participantId"="P\d+"})
      */
-    public function deceasedReportNew(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId) {
+    public function deceasedReportNew(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId) {
+        $organizationId = $session->get('siteOrganizationId');
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -93,6 +101,7 @@ class DeceasedReportsController extends AbstractController
                 $fhirData = $deceasedReportsService->buildDeceasedReportFhir($report, $this->getUser());
                 $response = $deceasedReportsService->createDeceasedReport($participantId, $fhirData);
                 $report = $report->loadFromFhirObservation($response);
+                $this->resetPendingCountCache($organizationId);
                 $this->addFlash('success', 'Deceased Report created!');
                 return $this->redirectToRoute('participant', ['id' => $participantId]);
             } catch (\Exception $e) {
@@ -109,9 +118,40 @@ class DeceasedReportsController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/stats", name="deceased_report_stats")
+     */
+    public function getStats(SessionInterface $session, DeceasedReportsService $deceasedReportsService)
+    {
+        $organizationId = $session->get('siteOrganizationId');
+        $cache = new DatastoreAdapter(100);
+        $pendingReportCountCache = $cache->getItem(sprintf(self::ORG_PENDING_CACHE_KEY, $organizationId));
+        if ($cacheHit = $pendingReportCountCache->isHit()) {
+            $pendingReportCount = (int) $pendingReportCountCache->get();
+        } else {
+            $pendingReportCountCache->expiresAfter(self::ORG_PENDING_CACHE_TTL);
+            $reports = $deceasedReportsService->getDeceasedReports($organizationId, 'preliminary');
+            $pendingReportCount = count($reports);
+            $pendingReportCountCache->set($pendingReportCount);
+            $cache->save($pendingReportCountCache);
+        }
+
+        return $this->json([
+            'pending' => $pendingReportCount,
+            'cacheHit' => $cacheHit
+        ]);
+    }
+
     /* Private Methods */
 
-    private function formatReportTableRows($reports = [])
+    private function resetPendingCountCache($organizationId): bool
+    {
+        $cache = new DatastoreAdapter(100);
+        $cache->deleteItem(sprintf(self::ORG_PENDING_CACHE_KEY, $organizationId));
+        return true;
+    }
+
+    private function formatReportTableRows($reports = []): array
     {
         $rows = [];
         if (!is_array($reports) || count($reports) === 0) {
