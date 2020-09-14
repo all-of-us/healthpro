@@ -434,6 +434,7 @@ table.table-samples td {
   color: white;
   background-color: red;
   border-radius: 50%;
+  font-size: 1.5rem;
   top: -0.5rem;
   right: 0.5rem;
   padding: 0.5rem;

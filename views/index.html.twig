@@ -92,7 +92,7 @@ $(document).ready(function () {
   }).done(function (data) {
     deceasedReportCount = data.pending
     if (deceasedReportCount > 0) {
-      $('#deceased_report_block').prepend($('<div class="welcome-page-badge">' + deceasedReportCount +'</div>'));
+      $('#deceased_report_block > a').prepend($('<div class="welcome-page-badge">' + deceasedReportCount +'</div>'));
     }
   })
 })
