@@ -64,7 +64,7 @@ class PatientStatusImport
     private $patientStatusHistories;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Organizations")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Organization")
      * @ORM\JoinColumn(name="organization", referencedColumnName="id")
      */
     private $organization;

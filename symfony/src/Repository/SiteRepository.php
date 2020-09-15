@@ -19,32 +19,35 @@ class SiteRepository extends ServiceEntityRepository
         parent::__construct($registry, Site::class);
     }
 
-    // /**
-    //  * @return Site[] Returns an array of Site objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return Site[] Returns an array of Site objects
+     */
+
+    public function getOrganizations()
     {
         return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
-            ->setMaxResults(10)
+            ->select('s.organization, GROUP_CONCAT(s.email) AS emails')
+            ->where('s.organization IS NOT NULL')
+            ->andWhere('s.status = 1')
+            ->groupBy('s.organization')
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Site
+    /**
+     * @return Site[] Returns an array of Site objects
+     */
+
+    public function getOrganizationsLastTypes($type)
     {
         return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
+            ->select('s.hpoId, max('.$type.'Ts) AS ts')
+            ->where('s.organization IS NOT NULL')
+            ->andWhere('s.status = 1')
+            ->groupBy('s.organization')
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getResult()
+            ;
     }
-    */
 }

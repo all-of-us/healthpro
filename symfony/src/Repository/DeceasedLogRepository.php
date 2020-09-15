@@ -19,32 +19,17 @@ class DeceasedLogRepository extends ServiceEntityRepository
         parent::__construct($registry, DeceasedLog::class);
     }
 
-    // /**
-    //  * @return DeceasedLog[] Returns an array of DeceasedLog objects
-    //  */
-    /*
-    public function findByExampleField($value)
+     /**
+      * @return DeceasedLog[] Returns an array of DeceasedLog objects
+      */
+
+    public function getLatestOrganizations()
     {
         return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('d.id', 'ASC')
-            ->setMaxResults(10)
+            ->select('d.hpoId, max(d.deceasedTs) as ts')
+            ->groupBy('d.hpoId')
             ->getQuery()
             ->getResult()
         ;
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?DeceasedLog
-    {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
