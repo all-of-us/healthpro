@@ -1,4 +1,10 @@
-{% if app.isTestSite %}
+{% if participant.statusReason == 'deceased-pending' %}
+    {% set errorTitle = 'Deceased Participant' %}
+    {% set errorMessage = 'This participant has a pending Deceased Participant report. You may not create a biobank order or collect physical measurements for this participant.' %}
+{% elseif participant.statusReason == 'deceased-approved' %}
+    {% set errorTitle = 'Deceased Participant' %}
+    {% set errorMessage = 'This participant has an approved Deceased Participant report. You may not create a biobank order or collect physical measurements for this participant.' %}
+{% elseif app.isTestSite %}
     {% set errorTitle = 'Test user' %}
     {% set errorMessage = 'Data collection and entry for test users are prohibited in this environment.' %}
 {% elseif participant.statusReason == 'test-participant' %}

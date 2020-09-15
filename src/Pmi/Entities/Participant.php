@@ -132,6 +132,18 @@ class Participant
             $this->statusReason = 'consent';
         }
 
+        // Deceased Participant
+        if (isset($participant->deceasedStatus)) {
+            if ($participant->deceasedStatus === 'PENDING') {
+                $this->status = false;
+                $this->statusReason = 'deceased-pending';
+            }
+            if ($participant->deceasedStatus === 'APPROVED') {
+                $this->status = false;
+                $this->statusReason = 'deceased-approved';
+            }
+        }
+
         // Map gender identity to gender options for MayoLINK.
         switch (isset($participant->genderIdentity) ? $participant->genderIdentity : null) {
             case 'GenderIdentity_Woman':
