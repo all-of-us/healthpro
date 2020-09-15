@@ -2,7 +2,7 @@ CREATE TABLE `deceased_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `participant_id` varchar(50) NOT NULL,
   `insert_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `withdrawal_ts` timestamp NULL DEFAULT NULL,
+  `deceased_ts` timestamp NULL DEFAULT NULL,
   `hpo_id` varchar(100) DEFAULT NULL,
   `email_notified` varchar(2000) DEFAULT NULL,
   `deceased_status` varchar(100) DEFAULT NULL,

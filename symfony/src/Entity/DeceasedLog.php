@@ -29,7 +29,7 @@ class DeceasedLog
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $deceased_ts;
+    private $deceasedTs;
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
@@ -77,12 +77,12 @@ class DeceasedLog
 
     public function getDeceasedTs(): ?\DateTimeInterface
     {
-        return $this->deceased_ts;
+        return $this->deceasedTs;
     }
 
-    public function setDeceasedTs(?\DateTimeInterface $deceased_ts): self
+    public function setDeceasedTs(?\DateTimeInterface $deceasedTs): self
     {
-        $this->deceased_ts = $deceased_ts;
+        $this->deceased_ts = $deceasedTs;
 
         return $this;
     }
