@@ -1,4 +1,7 @@
 {
+    "beberlei/doctrineextensions": {
+        "version": "v1.2.7"
+    },
     "composer/ca-bundle": {
         "version": "1.2.7"
     },
