@@ -1,0 +1,17 @@
+Subject: PARTICIPANT DECEASED STATUS APPROVED
+
+Hello,
+
+One or more participants paired with your organization ({{ organization }}) who had been previously indicated as deceased has had their deceased status approved in HealthPro. Please be advised that the participant’s contact information will be removed from the HealthPro Participant Work Queue and Participant Summary pages after 48 hours. The list of affected participant IDs are as follows:
+
+{% for participant in participants %}
+    {{ participant.id }}
+{% endfor %}
+
+Additionally, please follow your site specific SOPs for deceased participants, alert all relevant staff, and update your local systems accordingly.
+
+For questions, please contact 844-842-2854.
+
+Thank you.
+
+Precision Medicine Initiative, PMI, All of Us, the All of Us logo, and The Future of Health Begins With You are service marks of the U.S. Department of Health and Human Services.”
