@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Repository\SiteRepository;
 use App\Repository\DeceasedLogRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Pmi\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
@@ -12,6 +13,7 @@ use Twig\Environment;
 class DeceasedNotificationService extends EmailNotificationService
 {
     protected $em;
+    protected $managerRegistry;
     protected $participantSummaryService;
     protected $loggerService;
     protected $env;
@@ -29,6 +31,7 @@ class DeceasedNotificationService extends EmailNotificationService
 
     public function __construct(
         EntityManagerInterface $em,
+        ManagerRegistry $managerRegistry,
         ParticipantSummaryService $participantSummaryService,
         LoggerService $loggerService,
         EnvironmentService $env,
@@ -38,6 +41,7 @@ class DeceasedNotificationService extends EmailNotificationService
         DeceasedLogRepository $deceasedLogRepository
     ) {
         $this->em = $em;
+        $this->managerRegistry = $managerRegistry;
         $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;
         $this->env = $env;

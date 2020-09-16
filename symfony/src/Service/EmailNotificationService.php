@@ -8,6 +8,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 class EmailNotificationService
 {
     protected $em;
+    protected $managerRegistry;
     protected $participantSummaryService;
     protected $loggerService;
     protected $env;
@@ -94,9 +95,11 @@ class EmailNotificationService
                 }
                 $this->em->persist($log);
                 $this->em->flush();
-            } catch (\Exception $e) {
+            } catch (UniqueConstraintViolationException $e) {
                 // remove from if already notified
                 unset($participants[$k]);
+                // Entity managers gets closed on UniqueConstraintViolationException so reset it
+                $this->managerRegistry->resetManager();
             }
         }
     }
