@@ -21,11 +21,11 @@ class DeceasedReportType extends AbstractType
         $builder
             ->add('dateOfDeath', DateType::class, [
                 'widget' => 'single_text',
-                'label' => 'Date of Death (if available)',
+                'label' => 'Date of Death (if offered)',
                 'required' => false,
                 'html5' => false,
                 'format' => 'MM/dd/yyyy',
-                'help' => 'Do NOT prompt report for this information and only enter if provided.',
+                'help' => 'Do NOT prompt report for this information and only enter if offered.',
                 'constraints' => [
                     new Constraints\DateTime(),
                     new Constraints\LessThanOrEqual([
@@ -35,9 +35,9 @@ class DeceasedReportType extends AbstractType
                 ]
             ])
             ->add('causeOfDeath', TextType::class, [
-                'label' => 'Cause of Death (if available)',
+                'label' => 'Cause of Death (if offered)',
                 'required' => false,
-                'help' => 'Please do not enter PII or the participant’s PMID when describing the cause of death. Do NOT prompt reporter for this information and only enter if provided.'
+                'help' => 'Please do not enter PII or the participant’s PMID when describing the cause of death. Do NOT prompt reporter for this information and only enter if offered.'
             ])
             ->add('reportMechanism', ChoiceType::class, [
                 'label' => 'Notification Mechanism',
@@ -72,6 +72,7 @@ class DeceasedReportType extends AbstractType
                 'attr' => [
                     'placeholder' => '(555) 555-5555'
                 ],
+                'help' => 'Only collect if next of kin would like to receive confirmation of deceased reporting.',
                 'required' => false
             ])
             ->add('nextOfKinEmail', TextType::class, [
@@ -79,6 +80,7 @@ class DeceasedReportType extends AbstractType
                 'attr' => [
                     'placeholder' => 'user@example.com'
                 ],
+                'help' => 'Only collect if next of kin would like to receive confirmation of deceased reporting.',
                 'required' => false
             ])
             ->add('reportMechanismOtherDescription', TextareaType::class, [
