@@ -7,6 +7,5 @@ CREATE TABLE `deceased_log` (
   `email_notified` varchar(2000) DEFAULT NULL,
   `deceased_status` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `participant_id` (`participant_id`),
-  KEY `hpo_id` (`hpo_id`)
+  UNIQUE KEY `deceased_log_unique` (`participant_id`, `hpo_id`, `deceased_status`)
 ) DEFAULT CHARSET=utf8mb4;

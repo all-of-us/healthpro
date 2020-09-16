@@ -23,10 +23,12 @@ class DeceasedLogRepository extends ServiceEntityRepository
       * @return DeceasedLog[] Returns an array of DeceasedLog objects
       */
 
-    public function getLatestOrganizations()
+    public function getLatestOrganizations($status)
     {
         return $this->createQueryBuilder('d')
             ->select('d.hpoId, max(d.deceasedTs) as ts')
+            ->where("d.deceasedStatus = :status")
+            ->setParameter('status', $status)
             ->groupBy('d.hpoId')
             ->getQuery()
             ->getResult()

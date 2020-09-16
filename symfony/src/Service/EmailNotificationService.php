@@ -22,6 +22,7 @@ class EmailNotificationService
     protected $log;
     protected $statusText;
     protected $status;
+    protected $deceasedStatus;
 
     public function getOrganizations()
     {
@@ -48,7 +49,7 @@ class EmailNotificationService
 
     protected function getLatestOrganizationsFromLogs()
     {
-        $rows = $this->logRepository->getLatestOrganizations();
+        $rows = $this->logRepository->getLatestOrganizations($this->deceasedStatus);
         $lastTypes = [];
         foreach ($rows as $row) {
             $lastTypes[$row['hpoId']] = $row['ts'];
