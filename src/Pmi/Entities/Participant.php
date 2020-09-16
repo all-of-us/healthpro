@@ -120,17 +120,6 @@ class Participant
                 }
             }
         }
-        if (!empty($participant->withdrawalStatus) && in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
-            $this->status = false;
-            $this->statusReason = 'withdrawal';
-            $this->isWithdrawn = true;
-        }
-        // RDR should not be returning participant data for unconsented participants, but adding this check to be safe
-        // Participant details tab is disabled for the below two status reasons
-        if (empty($participant->consentForStudyEnrollment) || $participant->consentForStudyEnrollment !== 'SUBMITTED') {
-            $this->status = false;
-            $this->statusReason = 'consent';
-        }
 
         // Deceased Participant
         if (isset($participant->deceasedStatus)) {
@@ -142,6 +131,18 @@ class Participant
                 $this->status = false;
                 $this->statusReason = 'deceased-approved';
             }
+        }
+
+        if (!empty($participant->withdrawalStatus) && in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
+            $this->status = false;
+            $this->statusReason = 'withdrawal';
+            $this->isWithdrawn = true;
+        }
+        // RDR should not be returning participant data for unconsented participants, but adding this check to be safe
+        // Participant details tab is disabled for the below two status reasons
+        if (empty($participant->consentForStudyEnrollment) || $participant->consentForStudyEnrollment !== 'SUBMITTED') {
+            $this->status = false;
+            $this->statusReason = 'consent';
         }
 
         // Map gender identity to gender options for MayoLINK.
