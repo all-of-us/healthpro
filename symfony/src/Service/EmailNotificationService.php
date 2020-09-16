@@ -49,7 +49,7 @@ class EmailNotificationService
         $rows = $this->logRepository->getLatestOrganizations();
         $lastTypes = [];
         foreach ($rows as $row) {
-            $lastTypes[$row['hpo_id']] = $row['ts'];
+            $lastTypes[$row['hpoId']] = $row['ts'];
         }
         return $lastTypes;
     }
@@ -63,7 +63,8 @@ class EmailNotificationService
             foreach ($summaries as $summary) {
                 $participants[] = [
                     'id' => $summary->resource->participantId,
-                    'time' => $summary->resource->{$this->time}
+                    'time' => $summary->resource->{$this->time},
+                    'status' => $summary->resource->deceasedStatus
                 ];
             }
         } catch (\Exception $e) {
@@ -85,7 +86,7 @@ class EmailNotificationService
                 $log->setEmailNotified(implode(', ', $organization['emails']));
                 $this->em->persist($log);
                 $this->em->flush();
-            } catch (UniqueConstraintViolationException $e) {
+            } catch (\Exception $e) {
                 // remove from if already notified
                 unset($participants[$k]);
             }

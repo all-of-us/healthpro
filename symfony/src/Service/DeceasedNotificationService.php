@@ -20,10 +20,11 @@ class DeceasedNotificationService extends EmailNotificationService
     protected $siteRepository;
     protected $logRepository;
     protected $type = 'deceased';
-    protected $render = 'deceased';
-    protected $time = 'deceasedTime';
+    protected $render;
+    protected $time = 'deceasedAuthored';
     protected $log = Log::DECEASED_NOTIFY;
-    protected $statusText = 'deceased';
+    protected $statusText;
+    protected $deceasedStatus;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -45,10 +46,17 @@ class DeceasedNotificationService extends EmailNotificationService
         $this->logRepository = $deceasedLogRepository;
     }
 
+    public function setDeceasedStatusType($deceasedStatus)
+    {
+        $this->deceasedStatus = $deceasedStatus;
+        $this->render = $this->statusText = "deceased-{$deceasedStatus}";
+
+    }
+
     protected function getSearchParams($id, $lastDeceased)
     {
         $searchParams = [
-            'deceasedStatus' => 'PENDING',
+            'deceasedStatus' => strtoupper($this->deceasedStatus),
             'hpoId' => $id,
             '_sort:desc' => 'deceasedAuthored'
         ];

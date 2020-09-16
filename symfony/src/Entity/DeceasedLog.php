@@ -82,7 +82,7 @@ class DeceasedLog
 
     public function setDeceasedTs(?\DateTimeInterface $deceasedTs): self
     {
-        $this->deceased_ts = $deceasedTs;
+        $this->deceasedTs = $deceasedTs;
 
         return $this;
     }

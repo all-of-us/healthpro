@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * @ORM\Table(name="sites")
  * @ORM\Entity(repositoryClass="App\Repository\SiteRepository")
  */
 class Site

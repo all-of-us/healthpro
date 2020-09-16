@@ -34,20 +34,4 @@ class SiteRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-
-    /**
-     * @return Site[] Returns an array of Site objects
-     */
-
-    public function getOrganizationsLastTypes($type)
-    {
-        return $this->createQueryBuilder('s')
-            ->select('s.hpoId, max('.$type.'Ts) AS ts')
-            ->where('s.organization IS NOT NULL')
-            ->andWhere('s.status = 1')
-            ->groupBy('s.organization')
-            ->getQuery()
-            ->getResult()
-            ;
-    }
 }
