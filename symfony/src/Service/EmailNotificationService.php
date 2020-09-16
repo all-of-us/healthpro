@@ -20,12 +20,13 @@ class EmailNotificationService
     protected $time;
     protected $log;
     protected $statusText;
+    protected $status;
 
     public function getOrganizations()
     {
         $rows = $this->siteRepository->getOrganizations();
         $organizations = [];
-        $lastTypes = $this->getOrganizationsLastTypes();
+        $lastTypes = $this->getLatestOrganizationsFromLogs();
         foreach ($rows as $row) {
             $emails = [];
             $list = explode(',', trim($row['emails']));
@@ -44,7 +45,7 @@ class EmailNotificationService
         return $organizations;
     }
 
-    protected function getOrganizationsLastTypes()
+    protected function getLatestOrganizationsFromLogs()
     {
         $rows = $this->logRepository->getLatestOrganizations();
         $lastTypes = [];
@@ -61,11 +62,15 @@ class EmailNotificationService
         try {
             $summaries = $this->participantSummaryService->listParticipantSummaries($searchParams);
             foreach ($summaries as $summary) {
-                $participants[] = [
+                $results = [
                     'id' => $summary->resource->participantId,
-                    'time' => $summary->resource->{$this->time},
-                    'status' => $summary->resource->deceasedStatus
+                    'time' => $summary->resource->{$this->time}
                 ];
+                if (!empty($this->status)) {
+                    $results['status'] = $summary->resource->{$this->status};
+                }
+                $participants[] = $results;
+
             }
         } catch (\Exception $e) {
             // RDR error already logged
@@ -84,7 +89,9 @@ class EmailNotificationService
                 $log->setDeceasedTs(new \DateTime($participant['time']));
                 $log->setHpoId($organization['id']);
                 $log->setEmailNotified(implode(', ', $organization['emails']));
-                $log->setDeceasedStatus($participant['status']);
+                if (!empty($participant['status'])) {
+                    $log->setDeceasedStatus($participant['status']);
+                }
                 $this->em->persist($log);
                 $this->em->flush();
             } catch (\Exception $e) {

@@ -24,6 +24,7 @@ class DeceasedNotificationService extends EmailNotificationService
     protected $time = 'deceasedAuthored';
     protected $log = Log::DECEASED_NOTIFY;
     protected $statusText;
+    protected $status = 'deceasedStatus';
     protected $deceasedStatus;
 
     public function __construct(
