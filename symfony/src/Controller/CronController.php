@@ -12,11 +12,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class CronController extends AbstractController
 {
     /**
-     * @Route("/deceased", name="cron_deceased")
+     * @Route("/deceased/{deceasedStatus}", name="cron_deceased")
      */
-    public function index(DeceasedNotificationService $deceasedNotificationService)
+    public function index(DeceasedNotificationService $deceasedNotificationService, $deceasedStatus)
     {
-        $deceasedNotificationService->setDeceasedStatusType('approved');
+        $deceasedNotificationService->setDeceasedStatusType($deceasedStatus);
         $deceasedNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }

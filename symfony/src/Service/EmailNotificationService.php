@@ -84,6 +84,7 @@ class EmailNotificationService
                 $log->setDeceasedTs(new \DateTime($participant['time']));
                 $log->setHpoId($organization['id']);
                 $log->setEmailNotified(implode(', ', $organization['emails']));
+                $log->setDeceasedStatus($participant['status']);
                 $this->em->persist($log);
                 $this->em->flush();
             } catch (\Exception $e) {
