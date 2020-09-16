@@ -21,6 +21,7 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
     public function testDeceasedParticipantPendingAccessStatus()
     {
         $participant = new Participant((object)[
+            'consentForStudyEnrollment' => 'SUBMITTED',
             'deceasedStatus' => 'PENDING'
         ]);
         $this->assertSame(false, $participant->status);
@@ -31,6 +32,7 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
     public function testDeceasedParticipantApprovedAccessStatus()
     {
         $participant = new Participant((object)[
+            'consentForStudyEnrollment' => 'SUBMITTED',
             'deceasedStatus' => 'APPROVED'
         ]);
         $this->assertSame(false, $participant->status);
