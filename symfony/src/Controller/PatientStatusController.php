@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Organizations;
+use App\Entity\Organization;
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusImportRow;
 use App\Service\PatientStatusImportService;
@@ -37,7 +37,7 @@ class PatientStatusController extends AbstractController
             $patientStatusImportService->extractCsvFileData($file, $form, $patientStatuses);
             if ($form->isValid()) {
                 if (!empty($patientStatuses)) {
-                    $organization = $em->getRepository(Organizations::class)->findOneBy(['id' => $session->get('siteOrganizationId')]);
+                    $organization = $em->getRepository(Organization::class)->findOneBy(['id' => $session->get('siteOrganizationId')]);
                     $patientStatusImport = new PatientStatusImport();
                     $patientStatusImport
                         ->setFileName($fileName)
