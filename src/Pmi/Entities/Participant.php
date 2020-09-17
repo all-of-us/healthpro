@@ -41,6 +41,11 @@ class Participant
         'EARLY_OUT'
     ];
 
+    private static $deceasedStatusValues = [
+        'PENDING',
+        'APPROVED'
+    ];
+
     public function __construct($rdrParticipant = null)
     {
         if (is_object($rdrParticipant)) {
@@ -367,6 +372,8 @@ class Participant
     {
         if (in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
             return 'withdrawn';
+        } elseif (in_array($participant->deceasedStatus, self::$deceasedStatusValues, true)) {
+            return 'deceased';
         } else {
             switch (isset($participant->suspensionStatus) ? $participant->suspensionStatus : null) {
                 case 'NOT_SUSPENDED':
