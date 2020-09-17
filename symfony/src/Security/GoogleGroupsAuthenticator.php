@@ -28,7 +28,9 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function supports(Request $request)
     {
-        if ($request->getSession()->has('isLogin') && $request->getSession()->has('_security_main')) {
+        if (($request->getSession()->has('isLogin') && $request->getSession()->has('_security_main')) ||
+            (preg_match('/^\/s\/cron\/.*/', $request->getPathInfo()) && ($request->headers->get('X-Appengine-Cron') === 'true' || $this->env->isLocal()))
+        ) {
             return false;
         }
         return true;
