@@ -24,7 +24,7 @@ class DeceasedNotificationService extends EmailNotificationService
     protected $type = 'deceased';
     protected $render;
     protected $time = 'deceasedAuthored';
-    protected $log = Log::DECEASED_NOTIFY;
+    protected $log;
     protected $statusText;
     protected $status = 'deceasedStatus';
     protected $deceasedStatus;
@@ -55,7 +55,7 @@ class DeceasedNotificationService extends EmailNotificationService
     {
         $this->deceasedStatus = $deceasedStatus;
         $this->render = $this->statusText = "deceased-{$deceasedStatus}";
-
+        $this->log = $deceasedStatus === 'pending' ? Log::DECEASED_PENDING_NOTIFY : Log::DECEASED_APPROVED_NOTIFY;
     }
 
     protected function getSearchParams($id, $lastDeceased)
