@@ -11,22 +11,9 @@ use Twig\Environment;
 
 class DeceasedNotificationService extends EmailNotificationService
 {
-    protected $em;
-    protected $managerRegistry;
-    protected $participantSummaryService;
-    protected $loggerService;
-    protected $env;
-    protected $params;
-    protected $twig;
-    protected $siteRepository;
-    protected $logRepository;
     protected $type = 'deceased';
-    protected $render;
     protected $time = 'deceasedAuthored';
-    protected $log;
-    protected $statusText;
     protected $status = 'deceasedStatus';
-    protected $deceasedStatus;
 
     public function __construct(
         ManagerRegistry $managerRegistry,
