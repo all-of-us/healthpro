@@ -119,6 +119,23 @@ class DeceasedReportsController extends AbstractController
     }
 
     /**
+     * @Route("/{participantId}/history", name="deceased_report_history", requirements={"participantId"="P\d+"})
+     */
+    public function deceasedReporthHistory(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId) {
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $reports = $deceasedReportsService->getDeceasedReportsByParticipant($participantId);
+        $reports = $this->formatReportTableRows($reports);
+
+        return $this->render('deceasedreports/history.html.twig', [
+            'participant' => $participant,
+            'reports' => $reports
+        ]);
+    }
+
+    /**
      * @Route("/stats", name="deceased_report_stats")
      */
     public function getStats(SessionInterface $session, DeceasedReportsService $deceasedReportsService)

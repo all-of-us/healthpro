@@ -120,6 +120,19 @@ class Participant
                 }
             }
         }
+
+        // Deceased Participant
+        if (isset($participant->deceasedStatus)) {
+            if ($participant->deceasedStatus === 'PENDING') {
+                $this->status = false;
+                $this->statusReason = 'deceased-pending';
+            }
+            if ($participant->deceasedStatus === 'APPROVED') {
+                $this->status = false;
+                $this->statusReason = 'deceased-approved';
+            }
+        }
+
         if (!empty($participant->withdrawalStatus) && in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
             $this->status = false;
             $this->statusReason = 'withdrawal';

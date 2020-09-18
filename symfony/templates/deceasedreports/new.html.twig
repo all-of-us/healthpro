@@ -8,7 +8,14 @@
     {% include 'deceasedreports/_review-details.html.twig' %}
 
     {% if report.id %}
-    <div class="alert alert-info"><i class="fas fas-info-circle"></i> There is already one or more Deceased Report for this Participant.</div>
+    <div class="alert alert-info">
+      <div class="pull-right">
+        <a class="btn btn-sm btn-primary" href="{{ path('deceased_report_history', {participantId: participant.participantId}) }}">View Report(s)</a>
+      </div>
+      <div style="line-height:2em;">
+        <i class="fas fa-info-circle"></i> There is already one or more Deceased Report for this Participant.
+      </div>
+    </div>
     <dl class="dl-horizontal">
       <dt>Status</dt>
       <dd><span class="label label-default">{{ report.reportStatusDisplay }}</span></dd>
