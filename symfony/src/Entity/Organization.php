@@ -11,10 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Organization
 {
     /**
-     * @var binary
-     *
-     * @ORM\Column(name="id", type="binary", nullable=false)
-     * @ORM\Id
+     * @ORM\Id()
+     * @ORM\Column(type="string", length=80)
      */
     private $id;
 

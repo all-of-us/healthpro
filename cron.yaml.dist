@@ -39,3 +39,11 @@ cron:
   url: /cron/delete-unconfirmed-patient-status-import-data
   schedule: every day 02:00
   timezone: America/Chicago
+- description: "Deceased status pending"
+  url: /s/cron/deceased/pending
+  schedule: every day 07:05
+  timezone: America/Chicago
+- description: "Deceased status approved"
+  url: /s/cron/deceased/approved
+  schedule: every day 07:10
+  timezone: America/Chicago

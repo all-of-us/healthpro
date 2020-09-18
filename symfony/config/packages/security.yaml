@@ -24,6 +24,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+     - { path: ^/s/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
      - { path: ^/s/admin/.*, roles: ROLE_ADMIN }
      - { path: ^/s/settings($|\/), roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN] }
      - { path: ^/.*$, roles: ROLE_USER }

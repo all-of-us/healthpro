@@ -1,4 +1,7 @@
 {
+    "beberlei/doctrineextensions": {
+        "version": "v1.2.7"
+    },
     "composer/ca-bundle": {
         "version": "1.2.7"
     },
@@ -471,6 +474,9 @@
     },
     "symfony/property-access": {
         "version": "v4.4.7"
+    },
+    "symfony/proxy-manager-bridge": {
+        "version": "v4.4.13"
     },
     "symfony/routing": {
         "version": "4.2",
