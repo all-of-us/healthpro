@@ -39,9 +39,9 @@ class EmailNotificationService
                 }
             }
             $organizations[] = [
-                'id' => $row['organization'],
+                'id' => $row['organizationId'],
                 'emails' => $emails,
-                'last' => isset($lastTypes[$row['organization']]) ? new \DateTime($lastTypes[$row['organization']]) : false
+                'last' => isset($lastTypes[$row['organizationId']]) ? new \DateTime($lastTypes[$row['organizationId']]) : false
             ];
         }
         return $organizations;
@@ -52,7 +52,7 @@ class EmailNotificationService
         $rows = $this->logRepository->getLatestOrganizations($this->deceasedStatus);
         $lastTypes = [];
         foreach ($rows as $row) {
-            $lastTypes[$row['hpoId']] = $row['ts'];
+            $lastTypes[$row['organizationId']] = $row['ts'];
         }
         return $lastTypes;
     }
@@ -89,7 +89,7 @@ class EmailNotificationService
                 $log->setParticipantId($participant['id']);
                 $log->setInsertTs($insert);
                 $log->setDeceasedTs(new \DateTime($participant['time']));
-                $log->setHpoId($organization['id']);
+                $log->setOrganizationId($organization['id']);
                 $log->setEmailNotified(implode(', ', $organization['emails']));
                 if (!empty($participant['status'])) {
                     $log->setDeceasedStatus($participant['status']);

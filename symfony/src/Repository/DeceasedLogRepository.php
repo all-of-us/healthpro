@@ -26,10 +26,10 @@ class DeceasedLogRepository extends ServiceEntityRepository
     public function getLatestOrganizations($status)
     {
         return $this->createQueryBuilder('d')
-            ->select('d.hpoId, max(d.deceasedTs) as ts')
+            ->select('d.organizationId, max(d.deceasedTs) as ts')
             ->where("d.deceasedStatus = :status")
             ->setParameter('status', $status)
-            ->groupBy('d.hpoId')
+            ->groupBy('d.organizationId')
             ->getQuery()
             ->getResult()
         ;

@@ -34,7 +34,7 @@ class DeceasedLog
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
      */
-    private $hpoId;
+    private $organizationId;
 
     /**
      * @ORM\Column(type="string", length=2000, nullable=true)
@@ -87,14 +87,14 @@ class DeceasedLog
         return $this;
     }
 
-    public function getHpoId(): ?string
+    public function getOrganizationId(): ?string
     {
-        return $this->hpoId;
+        return $this->organizationId;
     }
 
-    public function setHpoId(?string $hpoId): self
+    public function setOrganizationId(?string $organizationId): self
     {
-        $this->hpoId = $hpoId;
+        $this->organizationId = $organizationId;
 
         return $this;
     }

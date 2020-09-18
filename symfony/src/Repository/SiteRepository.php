@@ -26,10 +26,10 @@ class SiteRepository extends ServiceEntityRepository
     public function getOrganizations()
     {
         return $this->createQueryBuilder('s')
-            ->select('s.organization, GROUP_CONCAT(s.email) AS emails')
-            ->where('s.organization IS NOT NULL')
+            ->select('s.organizationId, GROUP_CONCAT(s.email) AS emails')
+            ->where('s.organizationId IS NOT NULL')
             ->andWhere('s.status = 1')
-            ->groupBy('s.organization')
+            ->groupBy('s.organizationId')
             ->getQuery()
             ->getResult()
         ;

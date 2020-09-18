@@ -58,7 +58,7 @@ class DeceasedNotificationService extends EmailNotificationService
     {
         $searchParams = [
             'deceasedStatus' => strtoupper($this->deceasedStatus),
-            'hpoId' => $id,
+            'organization' => $id,
             '_sort:desc' => 'deceasedAuthored'
         ];
         if ($lastDeceased) {
