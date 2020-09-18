@@ -2,9 +2,8 @@
 
 namespace App\Service;
 
-use App\Repository\SiteRepository;
-use App\Repository\DeceasedLogRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\DeceasedLog;
+use App\Entity\Site;
 use Doctrine\Persistence\ManagerRegistry;
 use Pmi\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -30,25 +29,22 @@ class DeceasedNotificationService extends EmailNotificationService
     protected $deceasedStatus;
 
     public function __construct(
-        EntityManagerInterface $em,
         ManagerRegistry $managerRegistry,
         ParticipantSummaryService $participantSummaryService,
         LoggerService $loggerService,
         EnvironmentService $env,
         ParameterBagInterface $params,
-        Environment $twig,
-        SiteRepository $siteRepository,
-        DeceasedLogRepository $deceasedLogRepository
+        Environment $twig
     ) {
-        $this->em = $em;
+        $this->em = $managerRegistry->getManager();
         $this->managerRegistry = $managerRegistry;
         $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;
         $this->env = $env;
         $this->params = $params;
         $this->twig = $twig;
-        $this->siteRepository = $siteRepository;
-        $this->logRepository = $deceasedLogRepository;
+        $this->siteRepository = $this->em->getRepository(Site::class);
+        $this->logRepository = $this->em->getRepository(DeceasedLog::class);
     }
 
     public function setDeceasedStatusType($deceasedStatus)
