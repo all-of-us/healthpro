@@ -164,7 +164,6 @@ class HelpService
     ];
 
     public static $faqs = [
-        'link' => 'https://docs.google.com/document/d/1kqZvykQ2OPGdP6lYehyo9P56HJsCA7-_FEAXWbUffus/edit',
         'web_link' => 'https://docs.google.com/document/d/e/2PACX-1vTA0q5gjIvLjX23Dj-XaXBgMxRVFeyQEhzvo5JcfAa61fbvXO9wflZnttN-EXhzyrE1SW5ht97frxwA/pub'
     ];
 
