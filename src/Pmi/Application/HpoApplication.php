@@ -11,6 +11,7 @@ use Pmi\Service\UserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
+use App\Service\HelpService;
 
 class HpoApplication extends AbstractApplication
 {
@@ -357,6 +358,8 @@ class HpoApplication extends AbstractApplication
 
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
+        $app['twig']->addGlobal('confluenceResources', HelpService::$confluenceResources);
+
         $app->log(Log::REQUEST);
 
         // log the user out if their session is expired
