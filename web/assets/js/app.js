@@ -234,9 +234,9 @@ $(document).ready(function()
     /*************************************************************************
      * Plugin to initialize datetimepicker and register change event listener
      ************************************************************************/
-    $.fn.pmiDateTimePicker = function(dateFormat = null) {
+    $.fn.pmiDateTimePicker = function(options = {}) {
         // datetimepicker documentation: https://eonasdan.github.io/bootstrap-datetimepicker/
-        var pickerOptions = {
+        var pickerOptions = Object.assign({
             toolbarPlacement: 'top',
             sideBySide: true,
             showTodayButton: true,
@@ -249,8 +249,7 @@ $(document).ready(function()
                 right: null,
                 'delete': null
             }
-        };
-        if (dateFormat) pickerOptions['format'] = dateFormat;
+        }, options);
         this.datetimepicker(pickerOptions);
         this.on('dp.change', function() {
             PMI.markUnsaved();

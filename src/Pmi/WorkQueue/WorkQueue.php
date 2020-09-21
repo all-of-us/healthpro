@@ -102,7 +102,9 @@ class WorkQueue
                 'Active' => 'active',
                 'Deactivated' => 'deactivated',
                 'Withdrawn' => 'withdrawn',
-                'Not Withdrawn' => 'not_withdrawn'
+                'Not Withdrawn' => 'not_withdrawn',
+                'Deceased' => 'deceased',
+                'Deceased (Pending)' => 'deceased_pending'
             ]
         ],
         'enrollmentStatus' => [
@@ -568,6 +570,12 @@ class WorkQueue
                 return self::HTML_SUCCESS . ' Active';
             case 'deactivated':
                 return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
+            case 'deceased':
+                if ($participant->dateOfDeath) {
+                    $dateOfDeath = self::dateFromString($participant->dateOfDeath, $this->app->getUserTimezone(), false);
+                    return sprintf(self::HTML_DANGER . ' %s - %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (pending approval)' : 'Deceased', $dateOfDeath);
+                }
+                return sprintf(self::HTML_DANGER . ' %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (pending approval)' : 'Deceased');
             default:
                 return '';
         }
