@@ -358,6 +358,8 @@ class HpoApplication extends AbstractApplication
 
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
+        $app['twig']->addGlobal('confluenceResources', HelpService::$confluenceResources);
+
         $app->log(Log::REQUEST);
 
         // log the user out if their session is expired
@@ -424,7 +426,6 @@ class HpoApplication extends AbstractApplication
             }
         }
         $app['twig']->addGlobal('global_notices', $notices);
-        $app['twig']->addGlobal('confluenceResources', HelpService::$confluenceResources);
     }
 
     protected function afterCallback(Request $request, Response $response)
