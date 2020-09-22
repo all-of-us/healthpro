@@ -532,7 +532,7 @@ class WorkQueueController extends AbstractController
                             defeault:
                                 $row[] = 0;
                         }
-                        $row[] = $participant->dateOfDeath ? WorkQueue::dateFromString($participant->dateOfDeath, $app->getUserTimezone(), false) : '';
+                        $row[] = $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '';
                         $row[] = $participant->deceasedStatus == 'APPROVED' ? WorkQueue::dateFromString($participant->deceasedAuthored, $app->getUserTimezone(), false) : '';
                     }
                     fputcsv($output, $row);

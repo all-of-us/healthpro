@@ -572,7 +572,7 @@ class WorkQueue
                 return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
             case 'deceased':
                 if ($participant->dateOfDeath) {
-                    $dateOfDeath = self::dateFromString($participant->dateOfDeath, $this->app->getUserTimezone(), false);
+                    $dateOfDeath = date('n/j/Y', strtotime($participant->dateOfDeath));
                     return sprintf(self::HTML_DANGER . ' %s - %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (pending approval)' : 'Deceased', $dateOfDeath);
                 }
                 return sprintf(self::HTML_DANGER . ' %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (pending approval)' : 'Deceased');

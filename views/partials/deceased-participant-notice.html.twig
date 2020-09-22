@@ -7,7 +7,7 @@
       {% if participant.deceasedStatus == 'APPROVED' %}
       <strong>Deceased Participant:</strong> This participant was approved as deceased. Data can continue to be sent for this participant, but no new data should be collected.
       <ul>
-        <li><strong>Date of death:</strong> {{ participant.dateOfDeath ? participant.dateOfDeath|date('n/j/Y', app.userTimezone) : 'Date not available.' }}</li>
+        <li><strong>Date of death:</strong> {{ participant.dateOfDeath ? participant.dateOfDeath|date('n/j/Y') : 'Date not available.' }}</li>
         <li><strong>Approved on:</strong> {{ participant.deceasedAuthored|date('n/j/Y g:ia', app.userTimezone) }}</li>
       </ul>
       {% endif %}
