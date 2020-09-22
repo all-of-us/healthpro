@@ -529,7 +529,7 @@ class WorkQueueController extends AbstractController
                             case 'APPROVED':
                                 $row[] = 2;
                                 break;
-                            defeault:
+                            default:
                                 $row[] = 0;
                         }
                         $row[] = $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '';
