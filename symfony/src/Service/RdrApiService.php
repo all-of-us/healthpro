@@ -2,11 +2,10 @@
 
 namespace App\Service;
 
-use App\Service;
-use Pmi\Entities\Configuration as DatastoreConfiguration;
 use Google_Client as GoogleClient;
 use Google_Service_Oauth2 as GoogleServiceOauth2;
 use Pmi\HttpClient;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class RdrApiService
@@ -16,9 +15,8 @@ class RdrApiService
     protected $config = [];
     protected $cache;
 
-    public function __construct(EnvironmentService $environment, KernelInterface $appKernel, GoogleClient $googleClient)
+    public function __construct(EnvironmentService $environment, KernelInterface $appKernel, GoogleClient $googleClient, ParameterBagInterface $params)
     {
-        $datastore = new DatastoreConfiguration();
         $this->googleClient = $googleClient;
         $basePath = $appKernel->getProjectDir();
         // Note that when installed in ./symfony, the development credentials are a level down
@@ -26,8 +24,8 @@ class RdrApiService
             $this->config['key_file'] = $basePath . '/../dev_config/rdr_key.json';
         }
         // Load endpoint from configuration
-        if ($datastore->fetchOneById('rdr_endpoint')) {
-            $this->endpoint = $datastore->fetchOneById('rdr_endpoint');
+        if ($params->has('rdr_endpoint')) {
+            $this->endpoint = $params->get('rdr_endpoint');
         }
     }
 
