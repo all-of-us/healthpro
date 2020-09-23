@@ -15,9 +15,9 @@
       <dt>Status</dt>
       <dd><span class="label label-default">{{ report.reportStatusDisplay }}</span></dd>
 
-      {% if report.denialReason %}
+      {% if report.reportStatus == 'cancelled' %}
       <dt>Denial Reason</dt>
-      <dd>{{ report.denialReasonDisplay }} {% if report.denialReason == 'OTHER' %}- {{ report.denialReasonOtherDescription }}{% endif %}</dd>
+      <dd>{{ report.denialReasonDisplay|default('Not Provided') }} {% if report.denialReason == 'OTHER' %}- {{ report.denialReasonOtherDescription }}{% endif %}</dd>
 
       {% else %}
 
