@@ -15,10 +15,11 @@
       <dt>Status</dt>
       <dd><span class="label label-default">{{ report.reportStatusDisplay }}</span></dd>
 
-      {% if report.denialReason %}
+      {% if report.reportStatus == 'cancelled' %}
       <dt>Denial Reason</dt>
-      <dd>{{ report.denialReasonDisplay }} {% if report.denialReason == 'OTHER' %}- {{ report.denialReasonOtherDescription }}{% endif %}</dd>
-      {% endif %}
+      <dd>{{ report.denialReasonDisplay|default('Not Provided') }} {% if report.denialReason == 'OTHER' %}- {{ report.denialReasonOtherDescription }}{% endif %}</dd>
+
+      {% else %}
 
       <hr />
       <dt>Date of Death</dt>
@@ -41,6 +42,8 @@
 
       <dt>Email</dt>
       <dd>{{ report.nextOfKinEmail }}</dd>
+
+      {% endif %}
 
       <hr />
       <dt>Submitted</dt>
