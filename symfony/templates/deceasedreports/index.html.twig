@@ -7,8 +7,8 @@
     <br />
     <div class="container">
       <ul class="nav nav-tabs">
-        <li role="presentation" class="{% if statusFilter == 'preliminary' %}active{% endif %}"><a href="{{ path('deceased_reports_index', {status: 'preliminary'}) }}">Pending Approval</a></li>
-        <li role="presentation" class="{% if statusFilter == 'final' %}active{% endif %}"><a href="{{ path('deceased_reports_index', {status: 'final'}) }}">Approved</a></li>
+        <li role="presentation" class="{% if statusFilter == 'preliminary' %}active{% endif %}"><a href="{{ path('deceased_reports_index', {status: 'preliminary'}) }}">Pending Acceptance</a></li>
+        <li role="presentation" class="{% if statusFilter == 'final' %}active{% endif %}"><a href="{{ path('deceased_reports_index', {status: 'final'}) }}">Accepted</a></li>
         <li role="presentation" class="{% if statusFilter == 'cancelled' %}active{% endif %}"><a href="{{ path('deceased_reports_index', {status: 'cancelled'}) }}">Denied</a></li>
       </ul>
       <br />
