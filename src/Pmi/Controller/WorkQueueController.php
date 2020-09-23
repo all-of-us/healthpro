@@ -74,7 +74,6 @@ class WorkQueueController extends AbstractController
         if (!empty($params['activityStatus'])) {
             if ($params['activityStatus'] === 'withdrawn') {
                 $rdrParams['withdrawalStatus'] = 'NO_USE';
-                $rdrParams['deceasedStatus'] = 'UNSET';
             } else {
                 $rdrParams['withdrawalStatus'] = 'NOT_WITHDRAWN';
                 if ($params['activityStatus'] === 'active') {
