@@ -85,6 +85,14 @@ class DeceasedReportsController extends AbstractController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
+        if ($participant->withdrawalStatus !== 'NOT_WITHDRAWN') {
+            $this->addFlash('error', 'Cannot create Deceased Report on withdrawn participant.');
+            return $this->redirectToRoute('participant', ['id' => $participantId]);
+        }
+        if ($participant->suspensionStatus !== 'NOT_SUSPENDED') {
+            $this->addFlash('error', 'Cannot create Deceased Report on deactivated participant.');
+            return $this->redirectToRoute('participant', ['id' => $participantId]);
+        }
         $reports = $deceasedReportsService->getDeceasedReportsByParticipant($participantId);
         $report = new DeceasedReport();
         foreach ($reports as $record) {
