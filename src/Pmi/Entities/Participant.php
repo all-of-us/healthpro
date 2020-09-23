@@ -131,10 +131,12 @@ class Participant
             if ($participant->deceasedStatus === 'PENDING') {
                 $this->status = false;
                 $this->statusReason = 'deceased-pending';
+                $this->editExistingOnly = true;
             }
             if ($participant->deceasedStatus === 'APPROVED') {
                 $this->status = false;
                 $this->statusReason = 'deceased-approved';
+                $this->editExistingOnly = true;
             }
         }
 
