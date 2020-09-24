@@ -78,8 +78,14 @@ class WorkQueueController extends AbstractController
                 $rdrParams['withdrawalStatus'] = 'NOT_WITHDRAWN';
                 if ($params['activityStatus'] === 'active') {
                     $rdrParams['suspensionStatus'] = 'NOT_SUSPENDED';
+                    $rdrParams['deceasedStatus'] = 'UNSET';
                 } elseif ($params['activityStatus'] === 'deactivated') {
                     $rdrParams['suspensionStatus'] = 'NO_CONTACT';
+                    $rdrParams['deceasedStatus'] = 'UNSET';
+                } elseif ($params['activityStatus'] === 'deceased') {
+                    $rdrParams['deceasedStatus'] = 'APPROVED';
+                } elseif ($params['activityStatus'] === 'deceased_pending') {
+                    $rdrParams['deceasedStatus'] = 'PENDING';
                 }
             }
         }
@@ -408,6 +414,9 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Date of First EHR Consent';
                 $headers[] = 'Retention Eligible';
                 $headers[] = 'Retention Eligible Date';
+                $headers[] = 'Deceased';
+                $headers[] = 'Date of Death';
+                $headers[] = 'Date of Death Approval';
             }
             fputcsv($output, $headers);
 
@@ -512,6 +521,18 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::dateFromString($participant->{"consentForElectronicHealthRecordsFirstYesAuthored"}, $app->getUserTimezone());
                         $row[] = $participant->retentionEligibleStatus === 'ELIGIBLE' ? 1 : 0;
                         $row[] = WorkQueue::dateFromString($participant->retentionEligibleTime, $app->getUserTimezone());
+                        switch ($participant->deceasedStatus) {
+                            case 'PENDING':
+                                $row[] = 1;
+                                break;
+                            case 'APPROVED':
+                                $row[] = 2;
+                                break;
+                            default:
+                                $row[] = 0;
+                        }
+                        $row[] = $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '';
+                        $row[] = $participant->deceasedStatus == 'APPROVED' ? WorkQueue::dateFromString($participant->deceasedAuthored, $app->getUserTimezone(), false) : '';
                     }
                     fputcsv($output, $row);
                 }

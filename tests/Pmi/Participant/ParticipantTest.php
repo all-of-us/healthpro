@@ -18,6 +18,28 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $this->assertSame('1933-03-03', $participant->getMayolinkDob()->format('Y-m-d'));
     }
 
+    public function testDeceasedParticipantPendingAccessStatus()
+    {
+        $participant = new Participant((object)[
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'deceasedStatus' => 'PENDING'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('deceased-pending', $participant->statusReason);
+        $this->assertSame(false, $participant->isWithdrawn);
+    }
+
+    public function testDeceasedParticipantApprovedAccessStatus()
+    {
+        $participant = new Participant((object)[
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'deceasedStatus' => 'APPROVED'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('deceased-approved', $participant->statusReason);
+        $this->assertSame(false, $participant->isWithdrawn);
+    }
+
     public function testParticipantDisableTestAccessStatus()
     {
         $options = [

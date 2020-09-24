@@ -5,18 +5,23 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\OrganizationsRepository")
+ * @ORM\Table(name="awardees")
+ * @ORM\Entity(repositoryClass="App\Repository\AwardeeRepository")
  */
-class Organizations
+class Awardee
 {
     /**
-     * @ORM\Id()
-     * @ORM\Column(type="string", length=80)
+     * @var binary
+     *
+     * @ORM\Column(name="id", type="binary", nullable=false)
+     * @ORM\Id
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
     private $name;
 
@@ -33,7 +38,6 @@ class Organizations
     public function setName(string $name): self
     {
         $this->name = $name;
-
         return $this;
     }
 }

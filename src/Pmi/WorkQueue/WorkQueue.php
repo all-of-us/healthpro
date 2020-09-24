@@ -102,7 +102,9 @@ class WorkQueue
                 'Active' => 'active',
                 'Deactivated' => 'deactivated',
                 'Withdrawn' => 'withdrawn',
-                'Not Withdrawn' => 'not_withdrawn'
+                'Not Withdrawn' => 'not_withdrawn',
+                'Deceased' => 'deceased',
+                'Deceased (Pending)' => 'deceased_pending'
             ]
         ],
         'enrollmentStatus' => [
@@ -128,8 +130,7 @@ class WorkQueue
             'options' => [
                 'Consented' => 'SUBMITTED',
                 'Refused consent' => 'SUBMITTED_NO_CONSENT',
-                'Consent not completed' => 'UNSET',
-                'Invalid' => 'SUBMITTED_INVALID'
+                'Consent not completed' => 'UNSET'
             ]
         ],
         'consentForGenomicsROR' => [
@@ -138,8 +139,7 @@ class WorkQueue
                 'Consented Yes' => 'SUBMITTED',
                 'Refused Consent' => 'SUBMITTED_NO_CONSENT',
                 'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
-                'Consent Not Completed' => 'UNSET',
-                'Invalid' => 'SUBMITTED_INVALID'
+                'Consent Not Completed' => 'UNSET'
             ]
         ],
         'ageRange' => [
@@ -570,6 +570,12 @@ class WorkQueue
                 return self::HTML_SUCCESS . ' Active';
             case 'deactivated':
                 return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
+            case 'deceased':
+                if ($participant->dateOfDeath) {
+                    $dateOfDeath = date('n/j/Y', strtotime($participant->dateOfDeath));
+                    return sprintf(self::HTML_DANGER . ' %s - %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (pending approval)' : 'Deceased', $dateOfDeath);
+                }
+                return sprintf(self::HTML_DANGER . ' %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (pending approval)' : 'Deceased');
             default:
                 return '';
         }

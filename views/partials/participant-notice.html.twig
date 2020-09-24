@@ -10,6 +10,12 @@
 {% elseif participant.statusReason == 'withdrawal' %}
     {% set errorTitle = 'Withdrawn participant' %}
     {% set errorMessage = 'This participant has withdrawn from the All of Us Research Program. No new data can be collected or sent for this participant. Staff must also follow all site-specific SOPs to ensure all All of Us Research Program data are removed from all local systems for this participant.' %}
+{% elseif participant.statusReason == 'deceased-pending' %}
+    {% set errorTitle = 'Deceased Participant' %}
+    {% set errorMessage = 'This participant has a pending Deceased Participant report. You may not create a biobank order or collect physical measurements for this participant.' %}
+{% elseif participant.statusReason == 'deceased-approved' %}
+    {% set errorTitle = 'Deceased Participant' %}
+    {% set errorMessage = 'This participant has been reported and approved as deceased. You may not create a biobank order or collect physical measurements for this participant.' %}
 {% elseif participant.statusReason == 'genomics' %}
     {% set errorTitle = 'Genomic Return of Results Consent not complete' %}
     {% set errorMessage = 'This participant has provided primary consent but has not completed Genomic Return of Results consent in the Participant Portal and is therefore ineligible to be scheduled for or complete physical measurements and biospecimen collection. Please direct the participant to complete the Genomic Return of Results consent in the Participant Portal to enable in-person enrollment or contact the Help Desk, if needed.' %}
