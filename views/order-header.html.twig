@@ -15,6 +15,9 @@
     {% set params = { participantId: participant.id, orderId: order.id } %}
     {% set route = app.request_stack.currentRequest.attributes.get('_route') %}
     {% set return = path(route, params) %}
+    {% if order and order.finalized_ts and order.rdr_id %}
+        <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
+    {% endif %}
     {% if order.canUnlock %}
         <a href="{{ path('orderModify', { participantId: participant.id, orderId: order.id, type: 'unlock', return: return }) }}" class="btn btn-sm btn-primary">Unlock for Editing</a>
     {% endif %}
