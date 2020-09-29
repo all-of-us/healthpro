@@ -30,7 +30,7 @@
             {% for site in sites %}
                 <tr>
                     <td>{{ site.id }}</td>
-                    <td>{{ site.name }}</td>
+                    <td><a href="{{ path('admin_site', { id: site.id }) }}">{{ site.name }}</a></td>
                     <td>{{ site.status ? 'Active' : 'Inactive' }}</td>
                     <td>{{ site.googleGroup }}</td>
                     <td>{{ site.organization }}</td>
