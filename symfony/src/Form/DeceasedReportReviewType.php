@@ -22,7 +22,7 @@ class DeceasedReportReviewType extends AbstractType
     {
         $builder
             ->add('reportStatus', ChoiceType::class, [
-                'label' => 'Do you approve marking this participant as deceased?',
+                'label' => 'Do you accept marking this participant as deceased?',
                 'choices' => [
                     'Yes' => 'final',
                     'No' => 'cancelled',
