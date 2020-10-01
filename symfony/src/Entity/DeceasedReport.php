@@ -15,9 +15,9 @@ class DeceasedReport
     ];
 
     const STATUSES = [
-        'preliminary' => 'Pending Approval',
+        'preliminary' => 'Pending Acceptance',
         'cancelled' => 'Denied',
-        'final' => 'Approved'
+        'final' => 'Accepted'
     ];
 
     const NK_RELATIONSHIPS = [

@@ -250,9 +250,8 @@ class WorkQueueController extends AbstractController
                     $organizationsList['organization_id']['options'][$app->getOrganizationDisplayName($site['organization_id'])] = $site['organization_id'];
                 }
             }
-            if (!empty($organizationsList['organization_id']['options'])) {
-                $filters = array_merge($filters, $organizationsList);
-            }
+            $organizationsList['organization_id']['options']['Unpaired'] = 'UNSET';
+            $filters = array_merge($filters, $organizationsList);
         }
 
         //For ajax requests
