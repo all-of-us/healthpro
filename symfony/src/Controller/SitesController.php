@@ -7,10 +7,12 @@ use App\Form\SiteType;
 use App\Repository\SiteRepository;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
+use App\Service\SiteSyncService;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,11 +25,12 @@ class SitesController extends AbstractController
     /**
      * @Route("/", name="admin_sites")
      */
-    public function index(SiteRepository $siteRepository)
+    public function index(SiteRepository $siteRepository, ParameterBagInterface $params)
     {
         $sites = $siteRepository->findBy(['deleted' => 0], ['name' => 'asc']);
         return $this->render('admin/sites/index.html.twig', [
-            'sites' => $sites
+            'sites' => $sites,
+            'sync' => $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false
         ]);
     }
 
@@ -95,6 +98,38 @@ class SitesController extends AbstractController
         return $this->render('admin/sites/edit.html.twig', [
             'site' => $site,
             'siteForm' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/sync", name="admin_siteSync")
+     */
+    public function siteSyncAction(SiteSyncService $siteSyncService, ParameterBagInterface $params, Request $request)
+    {
+        $preview = $siteSyncService->dryRun();
+
+        if (!$params->has('sites_use_rdr')) {
+            $formView = false;
+        } else {
+            $form = $this->createBuilder(FormType::class)->getForm();
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                if ($request->request->has('awardeeOrgSync')) {
+                    $siteSyncService->syncAwardees();
+                    $siteSyncService->syncOrganizations();
+                } else {
+                    $siteSyncService->sync();
+                }
+                $this->addFlashSuccess('Successfully synced');
+                return $this->redirectToRoute('admin_sites');
+            }
+            $formView = $form->createView();
+        }
+        $canSync = !empty($preview['deleted']) || !empty($preview['modified']) || !empty($preview['created']);
+        return $this->render('admin/sites/sync.html.twig', [
+            'preview' => $preview,
+            'form' => $formView,
+            'canSync' => $canSync
         ]);
     }
 }

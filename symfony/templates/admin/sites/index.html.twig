@@ -7,6 +7,12 @@
         <li><a href="{{ path('admin_home') }}">Admin</a></li>
         <li class="active">Site Management</li>
     </ol>
+    <div class="pull-right">
+        {% if not sync %}
+            <a href="{{ path('admin_site') }}" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i> Add Site</a>
+        {% endif %}
+        <a href="{{ path('admin_siteSync') }}" class="btn btn-default"><i class="fa fa-exchange" aria-hidden="true"></i> Preview Site Sync</a>
+    </div>
     <div class="page-header">
         <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> Site Management</h2>
     </div>

@@ -128,7 +128,7 @@ class Site
 
     public function setSiteId(?string $siteId): self
     {
-        $this->site_id = $siteId;
+        $this->siteId = $siteId;
 
         return $this;
     }
@@ -164,7 +164,7 @@ class Site
 
     public function setGoogleGroup(string $googleGroup): self
     {
-        $this->google_group = $googleGroup;
+        $this->googleGroup = $googleGroup;
 
         return $this;
     }
