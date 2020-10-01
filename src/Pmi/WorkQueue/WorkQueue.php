@@ -573,9 +573,9 @@ class WorkQueue
             case 'deceased':
                 if ($participant->dateOfDeath) {
                     $dateOfDeath = date('n/j/Y', strtotime($participant->dateOfDeath));
-                    return sprintf(self::HTML_DANGER . ' %s - %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (pending acceptance)' : 'Deceased', $dateOfDeath);
+                    return sprintf(self::HTML_DANGER . ' %s %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased', $dateOfDeath);
                 }
-                return sprintf(self::HTML_DANGER . ' %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (pending acceptance)' : 'Deceased');
+                return sprintf(self::HTML_DANGER . ' %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased');
             default:
                 return '';
         }
