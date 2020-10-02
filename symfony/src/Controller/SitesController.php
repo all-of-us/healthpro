@@ -111,7 +111,7 @@ class SitesController extends AbstractController
         if (!$params->has('sites_use_rdr')) {
             $formView = false;
         } else {
-            $form = $this->createBuilder(FormType::class)->getForm();
+            $form = $this->createForm(FormType::class);
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 if ($request->request->has('awardeeOrgSync')) {

@@ -90,7 +90,7 @@ class Site
     /**
      * @ORM\Column(type="smallint")
      */
-    private $deleted;
+    private $deleted = 0;
 
     public function getId(): ?int
     {
@@ -275,5 +275,10 @@ class Site
         $this->deleted = $deleted;
 
         return $this;
+    }
+
+    public function toArray()
+    {
+        return get_object_vars($this);
     }
 }

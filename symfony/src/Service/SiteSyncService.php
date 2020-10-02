@@ -127,8 +127,8 @@ class SiteSyncService
                     if ($existing) {
                         if ($existing != $siteData) {
                             $modified[] = [
-                                'old' => $existing,
-                                'new' => $siteData
+                                'old' => $existing->toArray(),
+                                'new' => $siteData->toArray()
                             ];
                             if (!$preview) {
                                 $this->em->persist($siteData);
@@ -142,7 +142,7 @@ class SiteSyncService
                         }
                         unset($deleted[array_search($siteId, $deleted)]);
                     } else {
-                        $created[] = $siteData;
+                        $created[] = $siteData->toArray();
                         if (!$preview) {
                             $this->em->persist($siteData);
                             $this->em->flush();
