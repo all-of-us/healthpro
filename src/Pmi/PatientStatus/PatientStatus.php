@@ -280,12 +280,12 @@ class PatientStatus
         $this->userId = $patientStatusHistory['user_id'];
         $patientStatusId = $patientStatusHistory['patient_status_id'];
         if (empty($patientStatusId)) {
-            $patientStatus = $this->app['em']->getRepository('patient_status')->fetchOneBy([
+            $patientStatus = $this->app['em']->getRepository('patient_status')->fetchBy([
                 'participant_id' => $patientStatusHistory['participant_id'],
                 'organization' => $patientStatusHistory['organization']
-            ]);
+            ], ['history_id' => 'desc'], 1);
             if (!empty($patientStatus)) {
-                $patientStatusId = $patientStatus['id'];
+                $patientStatusId = $patientStatus[0]['id'];
             }
         }
         $this->patientStatusId = $patientStatusId;
