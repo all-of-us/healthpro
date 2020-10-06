@@ -1,1 +1,1 @@
-ALTER TABLE `patient_status` ADD INDEX participant_organization (`participant_id`, `organization`);
+ALTER TABLE `patient_status` ADD UNIQUE KEY `participant_organization_unique` (`participant_id`, `organization`);

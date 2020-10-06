@@ -6,5 +6,5 @@ CREATE TABLE `patient_status` (
   `history_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `history_id` (`history_id`),
-  KEY `participant_organization` (`participant_id`, `organization`)
+  UNIQUE KEY `participant_organization_unique` (`participant_id`, `organization`)
 ) DEFAULT CHARSET=utf8mb4;
