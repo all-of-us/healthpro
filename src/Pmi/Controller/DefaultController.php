@@ -447,15 +447,15 @@ class DefaultController extends AbstractController
             $patientStatusForm = $patientStatus->getForm($isCommentRequired);
             $patientStatusForm->handleRequest($request);
             if ($patientStatusForm->isSubmitted()) {
-                $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
+                $patientStatusData = $app['em']->getRepository('patient_status')->fetchBy([
                     'participant_id' => $id,
                     'organization' => $app->getSiteOrganizationId()
-                ]);
+                ], ['history_id' => 'desc'], 1);
                 if (!empty($patientStatusData) && empty($patientStatusForm['comments']->getData())) {
                     $patientStatusForm['comments']->addError(new FormError('Please enter comment'));
                 }
                 if ($patientStatusForm->isValid()) {
-                    $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
+                    $patientStatusId = !empty($patientStatusData) ? $patientStatusData[0]['id'] : null;
                     $patientStatus->loadData($id, $patientStatusId, $patientStatusForm->getData());
                     if ($patientStatus->sendToRdr() && $patientStatus->saveData()) {
                         $app->addFlashSuccess('Patient status saved');
