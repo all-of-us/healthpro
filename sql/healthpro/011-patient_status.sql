@@ -5,5 +5,6 @@ CREATE TABLE `patient_status` (
   `awardee` varchar(50) NOT NULL,
   `history_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `history_id` (`history_id`)
+  KEY `history_id` (`history_id`),
+  UNIQUE KEY `participant_organization_unique` (`participant_id`, `organization`)
 ) DEFAULT CHARSET=utf8mb4;
