@@ -44,7 +44,6 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
     {
         $options = [
             'disableTestAccess' => true,
-            'genomicsStartTime' => '2020-03-23T12:44:33',
             'siteType' => 'hpo',
             'cohortOneLaunchTime' => ''
         ];
@@ -118,7 +117,6 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
     {
         $options = [
             'disableTestAccess' => false,
-            'genomicsStartTime' => '2020-03-23T12:44:33',
             'siteType' => 'hpo',
             'cohortOneLaunchTime' => ''
         ];
@@ -126,10 +124,10 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         // Assert genomics status (Criteria 1)
         $participant = new Participant((object)[
             'options' => $options,
+            'consentCohort' => 'COHORT_3',
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
-            'consentForGenomicsROR' => 'UNSET',
-            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
+            'consentForGenomicsROR' => 'UNSET'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('genomics', $participant->statusReason);
@@ -204,7 +202,6 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
     {
         $options = [
             'disableTestAccess' => false,
-            'genomicsStartTime' => '2020-03-23T12:44:33',
             'siteType' => 'hpo',
             'cohortOneLaunchTime' => ''
         ];
@@ -213,11 +210,11 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         // Assert not submitted ehr consent (UNSET)
         $participant = new Participant((object)[
             'options' => $options,
+            'consentCohort' => 'COHORT_3',
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentForGenomicsROR' => 'SUBMITTED',
-            'consentForElectronicHealthRecords' => 'UNSET',
-            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
+            'consentForElectronicHealthRecords' => 'UNSET'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('ehr-consent', $participant->statusReason);
@@ -225,11 +222,11 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         // Assert not submitted ehr consent (SUBMITTED_NOT_SURE)
         $participant = new Participant((object)[
             'options' => $options,
+            'consentCohort' => 'COHORT_3',
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentForGenomicsROR' => 'SUBMITTED',
-            'consentForElectronicHealthRecords' => 'SUBMITTED_NOT_SURE',
-            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
+            'consentForElectronicHealthRecords' => 'SUBMITTED_NOT_SURE'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('ehr-consent', $participant->statusReason);
@@ -237,11 +234,11 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         // Assert UNSET gRoR and Ehr consent
         $participant = new Participant((object)[
             'options' => $options,
+            'consentCohort' => 'COHORT_3',
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentForGenomicsROR' => 'UNSET',
-            'consentForElectronicHealthRecords' => 'UNSET',
-            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
+            'consentForElectronicHealthRecords' => 'UNSET'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('ehr-consent', $participant->statusReason);
@@ -343,7 +340,6 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
     {
         $options = [
             'disableTestAccess' => false,
-            'genomicsStartTime' => '',
             'siteType' => 'hpo',
             'cohortOneLaunchTime' => '2020-03-24T12:44:33'
         ];
