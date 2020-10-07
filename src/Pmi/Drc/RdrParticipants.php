@@ -18,7 +18,6 @@ class RdrParticipants
     protected $total;
 
     private $disableTestAccess;
-    private $genomicsStartTime;
     private $cohortOneLaunchTime;
 
     // Expected RDR response status
@@ -36,7 +35,6 @@ class RdrParticipants
         $this->cache = $rdrHelper->getCache();
         $this->cacheTime = $rdrHelper->getCacheTime();
         $this->disableTestAccess = $rdrHelper->getDisableTestAccess();
-        $this->genomicsStartTime = $rdrHelper->getGenomicsStartTime();
         $this->cohortOneLaunchTime = $rdrHelper->getCohortOneLaunchTime();
     }
 
@@ -198,7 +196,6 @@ class RdrParticipants
             $participant = json_decode($response->getBody()->getContents());
             $participant->options = [
                 'disableTestAccess' => $this->disableTestAccess,
-                'genomicsStartTime' => $this->genomicsStartTime,
                 'siteType' => isset($participant->awardee) ? $this->rdrHelper->getSiteType($participant->awardee) : null,
                 'cohortOneLaunchTime' => $this->cohortOneLaunchTime
             ];
