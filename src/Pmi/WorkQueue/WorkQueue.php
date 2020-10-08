@@ -37,6 +37,7 @@ class WorkQueue
         'consentForCABoRAuthored',
         'withdrawalAuthored',
         'retentionEligibleTime',
+        'retentionType',
         'withdrawalReason',
         'patientStatus',
         'patientStatus',
@@ -365,6 +366,7 @@ class WorkQueue
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
             $row['activityStatus'] = $this->getActivityStatus($participant);
             $row['retentionEligibleStatus'] = $this->getRetentionEligibleStatus($participant->retentionEligibleStatus, $participant->retentionEligibleTime);
+            $row['retentionType'] = $this->getRetentionType($participant->retentionType);
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
 
@@ -603,5 +605,15 @@ class WorkQueue
             return self::HTML_DANGER . ' (No)';
         }
         return '';
+    }
+
+    public function getRetentionType($value)
+    {
+        if ($value === 'ACTIVE') {
+            return self::HTML_SUCCESS . ' (Actively Retained)';
+        } elseif ($value === 'PASSIVE') {
+            return self::HTML_SUCCESS . ' (Passively Retained)';
+        }
+        return self::HTML_DANGER . ' (Not Retained)';
     }
 }
