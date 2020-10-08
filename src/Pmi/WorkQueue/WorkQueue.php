@@ -473,6 +473,16 @@ class WorkQueue
         return '';
     }
 
+    public static function csvRetentionType($value)
+    {
+        if ($value === 'ACTIVE') {
+            return 2;
+        } elseif ($value === 'PASSIVE') {
+            return 1;
+        }
+        return 0;
+    }
+
     public function displayStatus($value, $successStatus, $time = null, $displayTime = true)
     {
         if ($value === $successStatus) {
