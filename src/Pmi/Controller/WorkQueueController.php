@@ -316,8 +316,9 @@ class WorkQueueController extends AbstractController
         if (!empty($params['patientStatus'])) {
             $params['siteOrganizationId'] = $app->getSiteOrganizationId();
         }
+        $userTimeZone = $app->getUserTimezone();
 
-        $stream = function() use ($app, $params, $organization, $hasFullDataAccess, $limit, $pageSize) {
+        $stream = function() use ($app, $params, $organization, $hasFullDataAccess, $limit, $pageSize, $userTimeZone) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -434,13 +435,13 @@ class WorkQueueController extends AbstractController
                             $participant->language,
                             $participant->enrollmentStatus,
                             WorkQueue::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-                            WorkQueue::dateFromString($participant->consentForStudyEnrollmentAuthored, $app->getUserTimezone()),
+                            WorkQueue::dateFromString($participant->consentForStudyEnrollmentAuthored, $userTimeZone),
                             WorkQueue::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-                            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsAuthored, $app->getUserTimezone()),
+                            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsAuthored, $userTimeZone),
                             WorkQueue::csvStatusFromSubmitted($participant->consentForCABoR),
-                            WorkQueue::dateFromString($participant->consentForCABoRAuthored, $app->getUserTimezone()),
+                            WorkQueue::dateFromString($participant->consentForCABoRAuthored, $userTimeZone),
                             $participant->isWithdrawn ? '1' : '0',
-                            WorkQueue::dateFromString($participant->withdrawalAuthored, $app->getUserTimezone()),
+                            WorkQueue::dateFromString($participant->withdrawalAuthored, $userTimeZone),
                             $participant->streetAddress,
                             $participant->city,
                             $participant->state,
@@ -457,7 +458,7 @@ class WorkQueueController extends AbstractController
                         foreach (WorkQueue::$surveys as $survey => $label) {
                             if (in_array($survey, WorkQueue::$initialSurveys)) {
                                 $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                                $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
+                                $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $userTimeZone);
                             }
                         }
                     } else {
@@ -468,7 +469,7 @@ class WorkQueueController extends AbstractController
                         ];
                     }
                     $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone(), false);
+                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $userTimeZone, false);
                     $row[] = $participant->siteSuffix;
                     $row[] = $participant->organization;
                     $row[] = $participant->evaluationFinalizedSite;
@@ -483,13 +484,13 @@ class WorkQueueController extends AbstractController
                             }
                         }
                         $row[] = $participant->{"sampleStatus{$newSample}"} == 'RECEIVED' ? '1' : '0';
-                        $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $app->getUserTimezone(), false);
+                        $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $userTimeZone, false);
                     }
                     $row[] = $participant->orderCreatedSite;
                     $row[] = $participant->withdrawalReason;
                     $row[] = $participant->primaryLanguage;
                     $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForDvElectronicHealthRecordsSharing);
-                    $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingAuthored, $app->getUserTimezone());
+                    $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingAuthored, $userTimeZone);
                     if ($hasFullDataAccess) {
                         $row[] = $participant->loginPhoneNumber;
                         $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
@@ -499,29 +500,29 @@ class WorkQueueController extends AbstractController
                         $row[] = $workQueue->getPatientStatus($participant, 'NO ACCESS', 'export');
                         $row[] = $workQueue->getPatientStatus($participant, 'UNKNOWN', 'export');
                         $row[] = $participant->middleName;
-                        $row[] = WorkQueue::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimeZone());
+                        $row[] = WorkQueue::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $userTimeZone);
                     }
                     $row[] = $participant->participantOrigin;
                     if ($hasFullDataAccess) {
                         $row[] = $participant->isSuspended ? '1' : '0';
-                        $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->suspensionTime, $userTimeZone);
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsROR);
-                        $row[] = WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $userTimeZone);
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeMay"});
-                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeMayAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeMayAuthored"}, $userTimeZone);
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJune"});
-                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJuneAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJuneAuthored"}, $userTimeZone);
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJuly"});
-                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJulyAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJulyAuthored"}, $userTimeZone);
                         $row[] = $participant->consentCohortText;
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnDnaProgram);
-                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnDnaProgramAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnDnaProgramAuthored"}, $userTimeZone);
                         $row[] = WorkQueue::csvEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords);
-                        $row[] = WorkQueue::dateFromString($participant->{"ehrConsentExpireAuthored"}, $app->getUserTimezone());
-                        $row[] = WorkQueue::dateFromString($participant->{"consentForStudyEnrollmentFirstYesAuthored"}, $app->getUserTimezone());
-                        $row[] = WorkQueue::dateFromString($participant->{"consentForElectronicHealthRecordsFirstYesAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->{"ehrConsentExpireAuthored"}, $userTimeZone);
+                        $row[] = WorkQueue::dateFromString($participant->{"consentForStudyEnrollmentFirstYesAuthored"}, $userTimeZone);
+                        $row[] = WorkQueue::dateFromString($participant->{"consentForElectronicHealthRecordsFirstYesAuthored"}, $userTimeZone);
                         $row[] = $participant->retentionEligibleStatus === 'ELIGIBLE' ? 1 : 0;
-                        $row[] = WorkQueue::dateFromString($participant->retentionEligibleTime, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->retentionEligibleTime, $userTimeZone);
                         switch ($participant->deceasedStatus) {
                             case 'PENDING':
                                 $row[] = 1;
@@ -533,9 +534,9 @@ class WorkQueueController extends AbstractController
                                 $row[] = 0;
                         }
                         $row[] = $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '';
-                        $row[] = $participant->deceasedStatus == 'APPROVED' ? WorkQueue::dateFromString($participant->deceasedAuthored, $app->getUserTimezone(), false) : '';
+                        $row[] = $participant->deceasedStatus == 'APPROVED' ? WorkQueue::dateFromString($participant->deceasedAuthored, $userTimeZone, false) : '';
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeOct"});
-                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeOctAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeOctAuthored"}, $userTimeZone);
                     }
                     fputcsv($output, $row);
                 }
