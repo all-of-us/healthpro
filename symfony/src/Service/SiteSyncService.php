@@ -185,7 +185,7 @@ class SiteSyncService
             if ($awardee->id === 'UNSET') {
                 continue;
             }
-            $awardeesMap[$awardee->id] = $awardee->displayName;
+            $awardeesMap[trim($awardee->id)] = $awardee->displayName;
         }
         if (empty($awardeesMap)) {
             throw new \Exception('No awardees found');
@@ -219,7 +219,7 @@ class SiteSyncService
                 if (empty($organization->id) || empty($organization->displayName)) {
                     continue;
                 }
-                $organizationsMap[$organization->id] = $organization->displayName;
+                $organizationsMap[trim($organization->id)] = $organization->displayName;
             }
         }
         if (empty($organizationsMap)) {
