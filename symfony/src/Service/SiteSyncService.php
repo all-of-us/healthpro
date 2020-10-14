@@ -133,7 +133,7 @@ class SiteSyncService
                             if (!$preview) {
                                 $this->em->persist($siteData);
                                 $this->em->flush();
-                                $this->loggerService(Log::SITE_EDIT, [
+                                $this->loggerService->log(Log::SITE_EDIT, [
                                     'id' => $primaryId,
                                     'old' => $existing,
                                     'new' => $siteData
@@ -146,7 +146,7 @@ class SiteSyncService
                         if (!$preview) {
                             $this->em->persist($siteData);
                             $this->em->flush();
-                            $this->loggerService(Log::SITE_ADD, $siteData->getId());
+                            $this->loggerService->log(Log::SITE_ADD, $siteData->getId());
                         }
                     }
                 }
@@ -162,7 +162,7 @@ class SiteSyncService
                 $site->setDeleted(1);
                 $this->em->persist($siteData);
                 $this->em->flush();
-                $this->loggerService(Log::SITE_DELETE, $existingSites[$siteId]['id']);
+                $this->loggerService->log(Log::SITE_DELETE, $existingSites[$siteId]['id']);
             }
         }
 
@@ -202,7 +202,7 @@ class SiteSyncService
                 $awardee->setId = $id;
                 $awardee->setName = $name;
                 $em->persist($awardee);
-                $this->loggerService(Log::AWARDEE_ADD, $id);
+                $this->loggerService->log(Log::AWARDEE_ADD, $id);
             }
         });
     }
@@ -237,7 +237,7 @@ class SiteSyncService
                 $organization->setId = $id;
                 $organization->setName = $name;
                 $em->persist($organization);
-                $this->loggerService(Log::ORGANIZATION_ADD, $id);
+                $this->loggerService->log(Log::ORGANIZATION_ADD, $id);
             }
         });
     }

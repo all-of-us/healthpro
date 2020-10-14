@@ -120,7 +120,7 @@ class SitesController extends AbstractController
                 } else {
                     $siteSyncService->sync();
                 }
-                $this->addFlashSuccess('Successfully synced');
+                $this->addFlash('success', 'Successfully synced');
                 return $this->redirectToRoute('admin_sites');
             }
             $formView = $form->createView();
