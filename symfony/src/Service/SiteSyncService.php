@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 use App\Entity\Awardee;
@@ -17,8 +18,13 @@ class SiteSyncService
     private $orgEndpoint = 'rdr/v1/Awardee?_inactive=true';
     private $entries;
 
-    public function __construct(RdrApiService $rdrApiService, EntityManagerInterface $em, EnvironmentService $env, LoggerService $loggerService, ParameterBagInterface $params)
-    {
+    public function __construct(
+        RdrApiService $rdrApiService,
+        EntityManagerInterface $em,
+        EnvironmentService $env,
+        LoggerService $loggerService,
+        ParameterBagInterface $params
+    ) {
         $this->rdrApiService = $rdrApiService;
         $this->em = $em;
         $this->env = $env;
@@ -190,12 +196,11 @@ class SiteSyncService
         if (empty($awardeesMap)) {
             throw new \Exception('No awardees found');
         }
-        $this->em->transactional(function() use ($awardeesMap) {
-            $cmd = $this->em->getClassMetadata(Awardee::class);
-            $connection = $this->em->getConnection();
-            $dbPlatform = $connection->getDatabasePlatform();
-            $q = $dbPlatform->getTruncateTableSql($cmd->getTableName());
-            $connection->executeUpdate($q);
+        $cmd = $this->em->getClassMetadata(Awardee::class);
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $connection->query('DELETE FROM ' . $cmd->getTableName());
             foreach ($awardeesMap as $id => $name) {
                 $awardee = new Awardee;
                 $awardee->setId($id);
@@ -203,7 +208,12 @@ class SiteSyncService
                 $this->em->persist($awardee);
                 $this->loggerService->log(Log::AWARDEE_ADD, $id);
             }
-        });
+            $this->em->flush();
+            $connection->commit();
+        } catch (\Exception $e) {
+            $connection->rollback();
+            throw $e;
+        }
     }
 
     public function syncOrganizations()
@@ -225,12 +235,11 @@ class SiteSyncService
         if (empty($organizationsMap)) {
             throw new \Exception('No organizations found');
         }
-        $this->em->transactional(function() use ($organizationsMap) {
-            $cmd = $this->em->getClassMetadata(Organization::class);
-            $connection = $this->em->getConnection();
-            $dbPlatform = $connection->getDatabasePlatform();
-            $q = $dbPlatform->getTruncateTableSql($cmd->getTableName());
-            $connection->executeUpdate($q);
+        $cmd = $this->em->getClassMetadata(Organization::class);
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $connection->query('DELETE FROM ' . $cmd->getTableName());
             foreach ($organizationsMap as $id => $name) {
                 $organization = new Organization;
                 $organization->setId($id);
@@ -238,6 +247,11 @@ class SiteSyncService
                 $this->em->persist($organization);
                 $this->loggerService->log(Log::ORGANIZATION_ADD, $id);
             }
-        });
+            $this->em->flush();
+            $connection->commit();
+        } catch (\Exception $e) {
+            $connection->rollback();
+            throw $e;
+        }
     }
 }
