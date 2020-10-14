@@ -190,18 +190,17 @@ class SiteSyncService
         if (empty($awardeesMap)) {
             throw new \Exception('No awardees found');
         }
-
-        $this->em->transactional(function($em) use ($awardeesMap) {
+        $this->em->transactional(function() use ($awardeesMap) {
             $cmd = $this->em->getClassMetadata(Awardee::class);
-            $connection = $em->getConnection();
+            $connection = $this->em->getConnection();
             $dbPlatform = $connection->getDatabasePlatform();
             $q = $dbPlatform->getTruncateTableSql($cmd->getTableName());
             $connection->executeUpdate($q);
             foreach ($awardeesMap as $id => $name) {
                 $awardee = new Awardee;
-                $awardee->setId = $id;
-                $awardee->setName = $name;
-                $em->persist($awardee);
+                $awardee->setId($id);
+                $awardee->setName($name);
+                $this->em->persist($awardee);
                 $this->loggerService->log(Log::AWARDEE_ADD, $id);
             }
         });
@@ -226,17 +225,17 @@ class SiteSyncService
         if (empty($organizationsMap)) {
             throw new \Exception('No organizations found');
         }
-        $this->em->transactional(function($em) use ($organizationsMap) {
+        $this->em->transactional(function() use ($organizationsMap) {
             $cmd = $this->em->getClassMetadata(Organization::class);
-            $connection = $em->getConnection();
+            $connection = $this->em->getConnection();
             $dbPlatform = $connection->getDatabasePlatform();
             $q = $dbPlatform->getTruncateTableSql($cmd->getTableName());
             $connection->executeUpdate($q);
             foreach ($organizationsMap as $id => $name) {
                 $organization = new Organization;
-                $organization->setId = $id;
-                $organization->setName = $name;
-                $em->persist($organization);
+                $organization->setId($id);
+                $organization->setName($name);
+                $this->em->persist($organization);
                 $this->loggerService->log(Log::ORGANIZATION_ADD, $id);
             }
         });
