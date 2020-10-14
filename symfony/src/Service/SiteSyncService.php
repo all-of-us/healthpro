@@ -168,7 +168,7 @@ class SiteSyncService
                 $site->setDeleted(1);
                 $this->em->persist($siteData);
                 $this->em->flush();
-                $this->loggerService->log(Log::SITE_DELETE, $existingSites[$siteId]['id']);
+                $this->loggerService->log(Log::SITE_DELETE, $existingSites[$siteId]->getId());
             }
         }
 

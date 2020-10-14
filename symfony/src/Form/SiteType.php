@@ -28,7 +28,7 @@ class SiteType extends AbstractType
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
                 ],
-                'disabled' => $options['disabled'],
+                'disabled' => $options['isDisabled'],
             ])
             ->add('status', Type\ChoiceType::class, [
                 'label' => 'Status',
@@ -37,7 +37,7 @@ class SiteType extends AbstractType
                     'Active'=> 1,
                     'Inactive' => 0
                 ],
-                'disabled' => $options['disabled']
+                'disabled' => $options['isDisabled']
             ])
             ->add('google_group', Type\TextType::class, [
                 'label' => 'Google Group',
@@ -46,31 +46,31 @@ class SiteType extends AbstractType
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
                 ],
-                'disabled' => $options['disabled'],
+                'disabled' => $options['isDisabled'],
             ])
             ->add('organization', Type\TextType::class, [
                 'label' => 'Awardee (formerly HPO ID)',
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['disabled'],
+                'disabled' => $options['isDisabled'],
             ])
             ->add('organization_id', Type\TextType::class, [
                 'label' => 'Organization',
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['disabled'],
+                'disabled' => $options['isDisabled'],
             ])
             ->add('mayolink_account', Type\TextType::class, [
                 'label' => 'MayoLINK Account',
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['disabled'] && $options['isProd'],
+                'disabled' => $options['isDisabled'] && $options['isProd'],
             ])
             ->add('type', Type\TextType::class, [
                 'label' => 'Type (e.g. HPO, DV)',
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['disabled'],
+                'disabled' => $options['isDisabled'],
             ])
             ->add('email', Type\TextType::class, [
                 'label' => 'Email address(es)',
@@ -97,7 +97,7 @@ class SiteType extends AbstractType
                         }
                     })
                 ],
-                'disabled' => $options['disabled'] && $options['isProd'],
+                'disabled' => $options['isDisabled'] && $options['isProd'],
             ])
             ->add('awardee', Type\TextType::class, [
                 'label' => 'Program (e.g. STSI)',
@@ -134,7 +134,7 @@ class SiteType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Site::class,
-            'disabled' => false,
+            'isDisabled' => false,
             'isProd' => false
         ]);
     }

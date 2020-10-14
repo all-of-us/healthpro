@@ -61,7 +61,7 @@ class SitesController extends AbstractController
             $site = null;
         }
         $disabled = $syncEnabled ? true : false;
-        $form = $this->createForm(SiteType::class, $site, ['disabled' => $disabled, 'isProd' => $env->isProd()]);
+        $form = $this->createForm(SiteType::class, $site, ['isDisabled' => $disabled, 'isProd' => $env->isProd()]);
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             if ($form->isValid() && !$syncEnabled) {
