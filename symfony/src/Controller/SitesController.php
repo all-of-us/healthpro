@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Site;
 use App\Form\SiteType;
 use App\Repository\SiteRepository;
 use App\Service\EnvironmentService;
