@@ -108,12 +108,12 @@ class SiteSyncService
                     } elseif ($this->env->isStable()) {
                         if (strtolower($awardee->type) === 'dv') {
                             // Set to default dv account number if existing mayo account number is empty or equal to default hpo account number
-                            if (empty($existing['mayolink_account']) || ($existing['mayolink_account'] === $this->params->get('ml_account_hpo'))) {
+                            if (empty($existing) || (empty($existing->getMayolinkAccount()) || ($existing->getMayolinkAccount() === $this->params->get('ml_account_hpo')))) {
                                 $siteData->setMayolinkAccount($this->params->get('ml_account_dv'));
                             }
                         } else {
                             // Set to default hpo account number if existing mayo account number is empty or equal to default dv account number
-                            if (empty($existing['mayolink_account']) || ($existing['mayolink_account'] === $this->params->get('ml_account_dv'))) {
+                            if (empty($existing) || (empty($existing->getMayolinkAccount()) || ($existing->getMayolinkAccount() === $this->params->get('ml_account_dv')))) {
                                 $siteData->setMayolinkAccount($this->params->get('ml_account_hpo'));
                             }
                         }
