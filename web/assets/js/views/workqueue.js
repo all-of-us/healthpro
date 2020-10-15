@@ -84,6 +84,7 @@ $(document).ready(function() {
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
       { name: 'activityStatus', data: 'activityStatus', class: 'text-center', orderable: false },
       { name: 'retentionEligibleStatus', data: 'retentionEligibleStatus', class: 'text-center' },
+      { name: 'retentionType', data: 'retentionType', class: 'text-center', orderable: false },
       { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
       { name: 'patientStatusYes', visible: false, data: 'patientStatusYes', orderable: false },
       { name: 'patientStatusNo', visible: false, data: 'patientStatusNo', orderable: false },
