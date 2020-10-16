@@ -464,7 +464,7 @@ class HpoApplication extends AbstractApplication
         if (!$user || !$user->belongsToSite($email)) {
             return false;
         }
-        if ($this->isProd()) {
+        if ($this->isStable() || $this->isProd()) {
             $siteGroup = $user->getSite($email);
             $site = $this['em']->getRepository('sites')->fetchOneBy([
                 'deleted' => 0,
