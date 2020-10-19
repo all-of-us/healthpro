@@ -196,11 +196,11 @@ class SiteSyncService
         if (empty($awardeesMap)) {
             throw new \Exception('No awardees found');
         }
-        $cmd = $this->em->getClassMetadata(Awardee::class);
+        $awardeeRepository = $this->em->getRepository(Awardee::class);
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
         try {
-            $connection->query('DELETE FROM ' . $cmd->getTableName());
+            $awardeeRepository->deleteAwardees();
             foreach ($awardeesMap as $id => $name) {
                 $awardee = new Awardee;
                 $awardee->setId($id);
@@ -235,11 +235,11 @@ class SiteSyncService
         if (empty($organizationsMap)) {
             throw new \Exception('No organizations found');
         }
-        $cmd = $this->em->getClassMetadata(Organization::class);
+        $organizationRepository = $this->em->getRepository(Organization::class);
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
         try {
-            $connection->query('DELETE FROM ' . $cmd->getTableName());
+            $organizationRepository->deleteOrganizations();
             foreach ($organizationsMap as $id => $name) {
                 $organization = new Organization;
                 $organization->setId($id);
