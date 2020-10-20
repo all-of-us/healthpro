@@ -625,36 +625,44 @@ abstract class AbstractApplication extends Application
 
     public function getLogMetaData()
     {
-        if (($user = $this->getUser()) && is_object($user)) {
-            $user = $user->getUsername();
-        } elseif ($user = $this->getGoogleUser()) {
-            $user = $user->getEmail();
-        } else {
-            $user = null;
-        }
-        $site = $this->getSiteId();
+        $user = $site = $ip = null;
 
-        if ($request = $this['request_stack']->getCurrentRequest()) {
-            // http://symfony.com/doc/3.4/deployment/proxies.html#but-what-if-the-ip-of-my-reverse-proxy-changes-constantly
-            $trustedProxies = ['127.0.0.1', $request->server->get('REMOTE_ADDR')];
-            $originalTrustedProxies = Request::getTrustedProxies();
-            $originalTrustedHeaderSet = Request::getTrustedHeaderSet();
-            // specififying HEADER_X_FORWARDED_FOR because App Engine 2nd Gen also adds a FORWARDED
-            Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_FOR);
-
-            // getClientIps reverses the order, so we want the last ip which will be the user's origin ip
-            $ips = $request->getClientIps();
-            $ip = array_pop($ips);
-
-            // reset trusted proxies
-            Request::setTrustedProxies($originalTrustedProxies, $originalTrustedHeaderSet);
-
-            // identify cron user
-            if ($user === null && $request->headers->get('X-Appengine-Cron') === 'true') {
-                $user = 'Appengine-Cron';
+        try {
+            if (($userObj = $this->getUser()) && is_object($userObj)) {
+                $user = $userObj->getUsername();
+            } elseif ($userObj = $this->getGoogleUser()) {
+                $user = $userObj->getEmail();
             }
-        } else {
-            $ip = null;
+        } catch (Exception $e) {
+        }
+
+        try {
+            $site = $this->getSiteId();
+        } catch (Exception $e) {
+        }
+
+        try {
+            if ($request = $this['request_stack']->getCurrentRequest()) {
+                // http://symfony.com/doc/3.4/deployment/proxies.html#but-what-if-the-ip-of-my-reverse-proxy-changes-constantly
+                $trustedProxies = ['127.0.0.1', $request->server->get('REMOTE_ADDR')];
+                $originalTrustedProxies = Request::getTrustedProxies();
+                $originalTrustedHeaderSet = Request::getTrustedHeaderSet();
+                // specififying HEADER_X_FORWARDED_FOR because App Engine 2nd Gen also adds a FORWARDED
+                Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_FOR);
+
+                // getClientIps reverses the order, so we want the last ip which will be the user's origin ip
+                $ips = $request->getClientIps();
+                $ip = array_pop($ips);
+
+                // reset trusted proxies
+                Request::setTrustedProxies($originalTrustedProxies, $originalTrustedHeaderSet);
+
+                // identify cron user
+                if ($user === null && $request->headers->get('X-Appengine-Cron') === 'true') {
+                    $user = 'Appengine-Cron';
+                }
+            }
+        } catch (Exception $e) {
         }
 
         return [
