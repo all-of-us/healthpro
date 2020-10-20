@@ -73,7 +73,7 @@ class RequestListener
 
     private function checkSiteSelect()
     {
-        if (!$this->session->has('site') && !preg_match('/^(\/s)?\/(cron|admin|help)\/.*/', $this->request->getPathInfo())) {
+        if (!$this->session->has('site') && !preg_match('/^(\/s)?\/(cron|admin|help|settings)\/.*/', $this->request->getPathInfo())) {
             return new RedirectResponse('/');
         }
     }
