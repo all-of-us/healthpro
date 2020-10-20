@@ -99,7 +99,7 @@ class SiteSyncService
                     } else {
                         $siteData = new Site;
                     }
-                    $siteData->setStatus(isset($site->enrollingStatus) && $site->enrollingStatus === 'ACTIVE' ? 1 : 0);
+                    $siteData->setStatus(isset($site->enrollingStatus) && $site->enrollingStatus === 'ACTIVE' ? true : false);
                     $siteData->setName($site->displayName);
                     $siteData->setGoogleGroup($siteId); // backwards compatibility
                     $siteData->setOrganization($awardee->id); // backwards compatibility
@@ -168,7 +168,7 @@ class SiteSyncService
             }
             foreach ($deleted as $siteId) {
                 $site = $existingSites[$siteId];
-                $site->setDeleted(1);
+                $site->setDeleted(true);
                 $this->em->persist($siteData);
                 $this->em->flush();
                 $this->loggerService->log(Log::SITE_DELETE, $existingSites[$siteId]->getId());
