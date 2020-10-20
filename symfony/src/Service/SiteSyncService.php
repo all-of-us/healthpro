@@ -8,6 +8,8 @@ use App\Entity\Site;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class SiteSyncService
 {
@@ -75,6 +77,7 @@ class SiteSyncService
         $existingSites = $this->getSitesFromDb();
         $deleted = array_keys($existingSites); // add everything to the deleted array, then remove as we find them
         $entries = $this->getAwardeeEntriesFromRdr();
+        $serializer = new Serializer([new ObjectNormalizer()]);
         foreach ($entries as $entry) {
             $awardee = $entry->resource;
             if (!isset($awardee->organizations) || !is_array($awardee->organizations)) {
@@ -133,8 +136,8 @@ class SiteSyncService
                     if ($existing) {
                         if ($existing != $siteData) {
                             $modified[] = [
-                                'old' => $existing->toArray(),
-                                'new' => $siteData->toArray()
+                                'old' => $serializer->normalize($existing),
+                                'new' => $serializer->normalize($siteData)
                             ];
                             if (!$preview) {
                                 $this->em->persist($siteData);
@@ -148,7 +151,7 @@ class SiteSyncService
                         }
                         unset($deleted[array_search($siteId, $deleted)]);
                     } else {
-                        $created[] = $siteData->toArray();
+                        $created[] = $serializer->normalize($siteData);
                         if (!$preview) {
                             $this->em->persist($siteData);
                             $this->em->flush();
