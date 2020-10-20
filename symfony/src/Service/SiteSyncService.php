@@ -8,8 +8,7 @@ use App\Entity\Site;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class SiteSyncService
 {
@@ -17,6 +16,8 @@ class SiteSyncService
     private $em;
     private $env;
     private $loggerService;
+    private $params;
+    private $normalizer;
     private $orgEndpoint = 'rdr/v1/Awardee?_inactive=true';
     private $entries;
 
@@ -25,13 +26,15 @@ class SiteSyncService
         EntityManagerInterface $em,
         EnvironmentService $env,
         LoggerService $loggerService,
-        ParameterBagInterface $params
+        ParameterBagInterface $params,
+        NormalizerInterface $normalizer
     ) {
         $this->rdrApiService = $rdrApiService;
         $this->em = $em;
         $this->env = $env;
         $this->loggerService = $loggerService;
         $this->params = $params;
+        $this->normalizer = $normalizer;
     }
 
     private function getAwardeeEntriesFromRdr()
@@ -77,7 +80,6 @@ class SiteSyncService
         $existingSites = $this->getSitesFromDb();
         $deleted = array_keys($existingSites); // add everything to the deleted array, then remove as we find them
         $entries = $this->getAwardeeEntriesFromRdr();
-        $serializer = new Serializer([new ObjectNormalizer()]);
         foreach ($entries as $entry) {
             $awardee = $entry->resource;
             if (!isset($awardee->organizations) || !is_array($awardee->organizations)) {
@@ -136,8 +138,8 @@ class SiteSyncService
                     if ($existing) {
                         if ($existing != $siteData) {
                             $modified[] = [
-                                'old' => $serializer->normalize($existing),
-                                'new' => $serializer->normalize($siteData)
+                                'old' => $this->normalizer->normalize($existing),
+                                'new' => $this->normalizer->normalize($siteData)
                             ];
                             if (!$preview) {
                                 $this->em->persist($siteData);
@@ -151,7 +153,7 @@ class SiteSyncService
                         }
                         unset($deleted[array_search($siteId, $deleted)]);
                     } else {
-                        $created[] = $serializer->normalize($siteData);
+                        $created[] = $this->normalizer->normalize($siteData);
                         if (!$preview) {
                             $this->em->persist($siteData);
                             $this->em->flush();
