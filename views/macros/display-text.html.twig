@@ -114,13 +114,3 @@
         (--)
     {% endif %}
 {% endmacro %}
-
-{% macro displayRetentionType(value) %}
-    {% if value == 'ACTIVE' %}
-        <i class="fa fa-check text-success" aria-hidden="true"></i> (Actively Retained)
-    {% elseif value == 'PASSIVE' %}
-        <i class="fa fa-times text-success" aria-hidden="true"></i> (Passively Retained)
-    {% else %}
-        <i class="fa fa-times text-danger" aria-hidden="true"></i> (Not Retained)
-    {% endif %}
-{% endmacro %}
