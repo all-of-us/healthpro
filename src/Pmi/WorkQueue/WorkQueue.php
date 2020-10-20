@@ -69,8 +69,8 @@ class WorkQueue
         'questionnaireOnCopeJuneAuthored',
         'questionnaireOnCopeJuly',
         'questionnaireOnCopeJulyAuthored',
-        'questionnaireOnCopeOct',
-        'questionnaireOnCopeOctAuthored',
+        'questionnaireOnCopeNov',
+        'questionnaireOnCopeNovAuthored',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -276,7 +276,7 @@ class WorkQueue
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
         'CopeJuly' => 'COPE July',
-        'CopeOct' => 'COPE Oct'
+        'CopeNov' => 'COPE Nov'
     ];
 
     public static $initialSurveys = [
