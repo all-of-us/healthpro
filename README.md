@@ -32,7 +32,7 @@ Install front end assets and build tooling via NPM:
 
 Compile assets using [Webpack Encore](https://symfony.com/doc/4.4/frontend.html) and recompile on the fly as assets change:
 
-`npx encore dev --watch`
+`npm run watch`
 
 Run local Datastore emulator
 

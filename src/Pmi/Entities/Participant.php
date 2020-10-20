@@ -25,7 +25,6 @@ class Participant
     public $editExistingOnly = false;
 
     private $disableTestAccess;
-    private $genomicsStartTime;
     private $cohortOneLaunchTime;
     private $siteType;
 
@@ -55,7 +54,6 @@ class Participant
             }
             if (isset($rdrParticipant->options)) {
                 $this->disableTestAccess = $rdrParticipant->options['disableTestAccess'];
-                $this->genomicsStartTime = $rdrParticipant->options['genomicsStartTime'];
                 $this->cohortOneLaunchTime = $rdrParticipant->options['cohortOneLaunchTime'];
                 $this->siteType = $rdrParticipant->options['siteType'];
                 unset($rdrParticipant->options);
@@ -86,7 +84,7 @@ class Participant
             $this->status = false;
             $this->statusReason = 'basics';
         }
-        if (!empty($this->genomicsStartTime) && isset($participant->consentForStudyEnrollmentAuthored) && $participant->consentForStudyEnrollmentAuthored >= $this->genomicsStartTime) {
+        if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_3') {
             if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                 $this->status = false;
                 $this->statusReason = 'genomics';

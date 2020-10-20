@@ -126,7 +126,7 @@ class DeployCommand extends Command {
         $this->generatePhpConfig();
         $this->generateCronConfig();
 
-        // If not local, compile assets. Run `npx encore dev --watch` when developing locally.
+        // If not local, compile assets. Run `npm run watch` when developing locally.
         if (!$this->local) {
             // ensure that we are up-to-date with the latest NPM dependencies
             $output->writeln('');
@@ -136,7 +136,7 @@ class DeployCommand extends Command {
             // compile (concat/minify/copy) assets
             $output->writeln('');
             $output->writeln("Compiling assets...");
-            $this->exec("npx encore prod");
+            $this->exec("npm run build");
         }
 
         // security checks
