@@ -11,7 +11,7 @@
         <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> Sync Sites</h2>
     </div>
 
-    <h3>Preview of sync changes</em></h3>
+    <h3>Preview of sync changes</h3>
     <ul>
         <li>Delete: <strong>{{ preview.deleted|length }}</strong></li>
         <li>Modify: <strong>{{ preview.modified|length }}</strong></li>
@@ -44,19 +44,19 @@
 
     <h3 class="text-warning"><i class="fa fa-pencil" aria-hidden="true"></i> Sites to be modified</h3>
     {% for site in preview.modified %}
-        <h4>{{ site.new.name }} <small>{{ site.new.site_id }}</small></h4>
+        <h4>{{ site.new.name }} <small>{{ site.new.siteId }}</small></h4>
         <table class="table table-condensed table-bordered" style="width: auto">
             <thead>
-                <tr><th>Attribute</th><th>Old</th><th>New</th></tr>
+            <tr><th>Attribute</th><th>Old</th><th>New</th></tr>
             </thead>
             <tbody>
-                {% for key, value in site.old if site.old[key] != site.new[key] %}
-                    <tr>
-                        <td>{{ key }}</td>
-                        <td class="text-danger">{{ site.old[key] }}</td>
-                        <td class="text-success">{{ site.new[key] }}</td>
-                    </tr>
-                {% endfor %}
+            {% for key, value in site.old if site.old[key] != site.new[key] %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td class="text-danger">{{ site.old[key] }}</td>
+                    <td class="text-success">{{ site.new[key] }}</td>
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
     {% else %}
@@ -66,12 +66,14 @@
 
     <h3 class="text-success"><i class="fa fa-plus-circle" aria-hidden="true"></i> Sites to be added</h3>
     {% for site in preview.created %}
-        <h4>{{ site.name }} <small>{{ site.site_id }}</small></h4>
+        <h4>{{ site.name }} <small>{{ site.siteId }}</small></h4>
         <dl class="dl-horizontal">
-        {% for key, value in site %}
-            <dt>{{ key }}</dt>
-            <dd>{{ value }}</dd>
-        {% endfor %}
+            {% for key, value in site %}
+                {% if value is not empty %}
+                    <dt>{{ key }}</dt>
+                    <dd>{{ value }}</dd>
+                {% endif %}
+            {% endfor %}
         </dl>
     {% else %}
         <p>No new sites</p>

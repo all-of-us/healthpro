@@ -34,4 +34,37 @@ class SiteRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    /**
+     * @return Site[] Returns an array of Site objects
+     */
+
+    public function getDuplicateSiteGoogleGroup($googleGroup, $id)
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.id')
+            ->where('s.deleted = 0')
+            ->andWhere('s.googleGroup = :googleGroup')
+            ->andWhere('s.id != :id')
+            ->setParameters(['googleGroup' => $googleGroup, 'id' => $id])
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+     * @return Site[] Returns an array of Site objects
+     */
+
+    public function getDuplicateGoogleGroup($googleGroup)
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.id')
+            ->where('s.deleted = 0')
+            ->andWhere('s.googleGroup = :googleGroup')
+            ->setParameter('googleGroup', $googleGroup)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

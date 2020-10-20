@@ -11,10 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Awardee
 {
     /**
-     * @var binary
-     *
-     * @ORM\Column(name="id", type="binary", nullable=false)
-     * @ORM\Id
+     * @ORM\Id()
+     * @ORM\Column(type="string", length=80)
      */
     private $id;
 
@@ -28,6 +26,12 @@ class Awardee
     public function getId(): ?string
     {
         return $this->id;
+    }
+
+    public function setId(string $id): self
+    {
+        $this->id = $id;
+        return $this;
     }
 
     public function getName(): ?string

@@ -18,4 +18,13 @@ class AwardeeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Awardee::class);
     }
+
+    public function deleteAwardees()
+    {
+        return $this->createQueryBuilder('a')
+            ->delete()
+            ->getQuery()
+            ->execute()
+            ;
+    }
 }
