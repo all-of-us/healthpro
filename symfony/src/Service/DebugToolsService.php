@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use GuzzleHttp\Exception\ClientException;
+
 
 class DebugToolsService
 {
@@ -14,7 +16,11 @@ class DebugToolsService
 
     public function getParticipantById($participantId)
     {
-        $response = $this->api->get(sprintf('rdr/v1/Participant/%s/Summary', $participantId));
-        return json_decode($response->getBody(), true);
+        try {
+            $response = $this->api->get(sprintf('rdr/v1/Participant/%s/Summary', $participantId));
+            return json_decode($response->getBody(), true);
+        } catch (ClientException $e) {
+            return false;
+        }
     }
 }
