@@ -50,10 +50,10 @@
                             <td>{{ participant.participantOrigin }}</td>
                         {% endif %}
                         <td>
-                            {% if not participant.status and participant.statusReason == 'basics' %}
-                                <i class="fa fa-times-circle text-danger" aria-hidden="true"></i>
-                            {% else %}
+                            {% if participant.questionnaireOnTheBasics == 'SUBMITTED' %}
                                 <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="fa fa-times-circle text-danger" aria-hidden="true"></i>
                             {% endif %}
                         </td>
                         <td class="text-right">
