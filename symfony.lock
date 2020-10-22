@@ -166,7 +166,7 @@
         "version": "2.2.3"
     },
     "paragonie/random_compat": {
-        "version": "v1.4.3"
+        "version": "v9.99.99"
     },
     "phar-io/manifest": {
         "version": "1.0.3"
@@ -506,6 +506,9 @@
         "files": [
             "config/packages/security.yaml"
         ]
+    },
+    "symfony/serializer": {
+        "version": "v4.4.15"
     },
     "symfony/service-contracts": {
         "version": "v1.1.8"

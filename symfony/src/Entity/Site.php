@@ -18,7 +18,7 @@ class Site
     private $id;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="boolean")
      */
     private $status;
 
@@ -88,16 +88,16 @@ class Site
     private $workqueueDownload;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="boolean")
      */
-    private $deleted;
+    private $deleted = false;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getStatus(): ?int
+    public function getStatus(): ?bool
     {
         return $this->status;
     }
@@ -128,7 +128,7 @@ class Site
 
     public function setSiteId(?string $siteId): self
     {
-        $this->site_id = $siteId;
+        $this->siteId = $siteId;
 
         return $this;
     }
@@ -164,7 +164,7 @@ class Site
 
     public function setGoogleGroup(string $googleGroup): self
     {
-        $this->google_group = $googleGroup;
+        $this->googleGroup = $googleGroup;
 
         return $this;
     }
@@ -265,7 +265,7 @@ class Site
         return $this;
     }
 
-    public function getDeleted(): ?int
+    public function getDeleted(): ?bool
     {
         return $this->deleted;
     }
