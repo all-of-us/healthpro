@@ -4,6 +4,8 @@ namespace App\Service;
 
 use Google_Client as GoogleClient;
 use Google_Service_Oauth2 as GoogleServiceOauth2;
+use Psr\Log\LoggerInterface;
+use Pmi\Cache\DatastoreAdapter;
 use Pmi\HttpClient;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -15,7 +17,7 @@ class RdrApiService
     protected $config = [];
     protected $cache;
 
-    public function __construct(EnvironmentService $environment, KernelInterface $appKernel, GoogleClient $googleClient, ParameterBagInterface $params)
+    public function __construct(EnvironmentService $environment, KernelInterface $appKernel, GoogleClient $googleClient, ParameterBagInterface $params, LoggerInterface $logger)
     {
         $this->googleClient = $googleClient;
         $basePath = $appKernel->getProjectDir();
@@ -26,6 +28,11 @@ class RdrApiService
         // Load endpoint from configuration
         if ($params->has('rdr_endpoint')) {
             $this->endpoint = $params->get('rdr_endpoint');
+        }
+        // Set up OAuth Cache
+        if ($params->has('ds_clean_up_limit')) {
+            $this->cache = new DatastoreAdapter($params->get('ds_clean_up_limit'));
+            $this->cache->setLogger($logger);
         }
     }
 
