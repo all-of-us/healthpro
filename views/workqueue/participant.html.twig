@@ -51,11 +51,13 @@
 {% block pagejs %}
 <script>
     $(document).ready(function() {
-        JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
-            width: 2,
-            height: 50,
-            displayValue: true
-        });
+        if ($("#participant-barcode").length === 1) {
+            JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
+                width: 2,
+                height: 50,
+                displayValue: true
+            });
+        }
         $('#order-overflow-show').on('click', function (e) {
             $(this).hide();
             $('#order-overflow').show();
