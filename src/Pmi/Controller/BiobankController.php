@@ -166,7 +166,8 @@ class BiobankController extends AbstractController
             'participant' => $participant,
             'orders' => $orders,
             'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled(),
-            'biobankView' => true
+            'biobankView' => true,
+            'canViewOrders' => $participant->status || $participant->editExistingOnly
         ]);
     }
 
@@ -187,7 +188,7 @@ class BiobankController extends AbstractController
         if (!$order->isValid()) {
             $app->abort(404);
         }
-        if (!$order->getParticipant()->status || $app->isTestSite()) {
+        if (!($participant->status || $participant->editExistingOnly)) {
             $app->abort(403);
         }
         // Available steps
