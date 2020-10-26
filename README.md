@@ -46,7 +46,7 @@ Run local App Engine dev server:
 
 ### Automated credential scanning
 
-**Important:** Install and use [`git-secrets`](https://github.com/awslabs/git-secrets) to avoid exposing API keys and certificates by screening commits for matched strings. An installation script has been provided.
+**Important:** Install and use [`git-secrets`](https://github.com/awslabs/git-secrets) to avoid exposing API keys and certificates by screening commits for matched strings. After installing that utility, run the script below to configure the hooks for this project.
 
 `./bin/installHooks`
 
