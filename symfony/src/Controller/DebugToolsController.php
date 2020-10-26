@@ -20,7 +20,7 @@ class DebugToolsController extends AbstractController
     public function participantsAction(Request $request, EnvironmentService $env, DebugToolsService $debugToolsService)
     {
         if ($env->isProd()) {
-            throw $this->createNotFoundException('Page Not Found!');
+            throw $this->createNotFoundException();
         }
         $participantLookupForm = $this->createForm(DebugParticipantLookupType::class);
         $participantLookupForm->handleRequest($request);
@@ -43,11 +43,11 @@ class DebugToolsController extends AbstractController
     public function participantAction($id, EnvironmentService $env, DebugToolsService $debugToolsService)
     {
         if ($env->isProd()) {
-            throw $this->createNotFoundException('Page Not Found!');
+            throw $this->createNotFoundException();
         }
         $participant = $debugToolsService->getParticipantById($id);
         if (!$participant) {
-            throw $this->createNotFoundException('Page Not Found!');
+            throw $this->createNotFoundException();
         }
         ksort($participant);
         return $this->render('admin/debug/participant.html.twig', [
