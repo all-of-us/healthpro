@@ -216,6 +216,11 @@ label.label-normal {
     padding-right: 20px;
     padding-left: 20px;
 }
+#physicalEvaluation .bp-warnings .alert {
+    font-size: 14px;
+    margin-top: 16px;
+    font-weight: normal;
+}
 .help-header-text {
     color: #337ab7;
     margin-top: 0;
@@ -441,10 +446,4 @@ table.table-samples td {
   padding: 0.5rem;
   border: solid 2pt white;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-}
-
-.bp-warnings .alert {
-    font-size: 14px;
-    margin-top: 16px;
-    font-weight: normal;
 }
