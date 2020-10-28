@@ -106,6 +106,8 @@ def main(argv):
             continue
         if user.get('primaryEmail')==DELEGATE_ACCOUNT:
             continue
+        if user.get('primaryEmail') in ('redcap-user@pmi-ops.org'):
+            continue            
         if not DRYRUN:
             user["suspended"]=True
             user["suspensionReason"]="Inactivity"
