@@ -4,11 +4,9 @@ namespace Pmi\Controller;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Pmi\Service\WithdrawalService;
 use Pmi\Service\DeactivateService;
 use Pmi\Service\EvaluationsQueueService;
-use Pmi\Service\SiteSyncService;
 use Pmi\Service\NotifyMissingMeasurementsAndOrdersService;
 use Pmi\Service\PatientStatusService;
 use Pmi\Service\SessionService;
@@ -22,8 +20,6 @@ class CronController extends AbstractController
         ['withdrawal', '/withdrawal'],
         ['deactivate', '/deactivate'],
         ['resendEvaluationsToRdr', '/resend-evaluations-rdr'],
-        ['sites', '/sites'],
-        ['awardeesAndOrganizations', '/awardees-organizations'],
         ['missingMeasurementsOrders', '/missing-measurements-orders'],
         ['sendPatientStatusToRdr', '/send-patient-status-rdr'],
         ['deleteCacheKeys', '/delete-cache-keys'],
@@ -83,27 +79,6 @@ class CronController extends AbstractController
 
         $withdrawal = new EvaluationsQueueService($app);
         $withdrawal->resendEvaluationsToRdr();
-        return new JsonResponse(['success' => true]);
-    }
-
-    public function sitesAction(Application $app)
-    {
-        if (!$app->getConfig('sites_use_rdr')) {
-            return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
-        }
-        $siteSync = new SiteSyncService($app);
-        $siteSync->sync();
-        return (new JsonResponse())->setData(true);
-    }
-
-    public function awardeesAndOrganizationsAction(Application $app, Request $request)
-    {
-        if (!$app->getConfig('sites_use_rdr')) {
-            return (new JsonResponse())->setData(['error' => 'RDR Awardee API disabled']);
-        }
-        $siteSync = new SiteSyncService($app);
-        $siteSync->syncAwardees();
-        $siteSync->syncOrganizations();
         return new JsonResponse(['success' => true]);
     }
 

@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Service\DeceasedNotificationService;
 use App\Service\SiteSyncService;
-use Doctrine\ORM\Query\Parameter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Routing\Annotation\Route;
