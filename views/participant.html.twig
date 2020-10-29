@@ -600,11 +600,13 @@ $(document).ready(function() {
         $('#problem-overflow').show();
         e.preventDefault();
     });
-    JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
-        width: 2,
-        height: 50,
-        displayValue: true
-    });
+    if ($("#participant-barcode").length === 1) {
+        JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
+            width: 2,
+            height: 50,
+            displayValue: true
+        });
+    }
 });
 </script>
 {# Paient status tab #}
