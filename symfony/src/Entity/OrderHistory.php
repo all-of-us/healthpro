@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * @ORM\Table(name="orders_history")
  * @ORM\Entity(repositoryClass="App\Repository\OrderHistoryRepository")
  */
 class OrderHistory
@@ -20,7 +21,7 @@ class OrderHistory
      * @ORM\OneToOne(targetEntity="App\Entity\Order", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
-    private $orderId;
+    private $order;
 
     /**
      * @ORM\Column(type="integer")
@@ -52,14 +53,14 @@ class OrderHistory
         return $this->id;
     }
 
-    public function getOrderId(): ?Order
+    public function getOrder(): ?Order
     {
-        return $this->orderId;
+        return $this->order;
     }
 
-    public function setOrderId(Order $orderId): self
+    public function setOrderId(Order $order): self
     {
-        $this->orderId = $orderId;
+        $this->order = $order;
 
         return $this;
     }

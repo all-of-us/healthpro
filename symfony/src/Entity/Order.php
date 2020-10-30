@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\OrderRepository")
- * @ORM\Table(name="`order`")
+ * @ORM\Table(name="`orders`")
  */
 class Order
 {
@@ -113,7 +113,7 @@ class Order
     private $processedSamples;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     private $processedSamplesTs;
 
@@ -175,7 +175,7 @@ class Order
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\OrderHistory", cascade={"persist", "remove"})
      */
-    private $historyId;
+    private $history;
 
     public function getId(): ?int
     {
@@ -554,14 +554,14 @@ class Order
         return $this;
     }
 
-    public function getHistoryId(): ?OrderHistory
+    public function getHistory(): ?OrderHistory
     {
-        return $this->historyId;
+        return $this->history;
     }
 
-    public function setHistoryId(?OrderHistory $historyId): self
+    public function setHistoryId(?OrderHistory $history): self
     {
-        $this->historyId = $historyId;
+        $this->history = $history;
 
         return $this;
     }

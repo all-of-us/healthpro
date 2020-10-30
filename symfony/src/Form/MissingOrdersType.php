@@ -6,7 +6,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class MissingEvaluationsType extends AbstractType
+class MissingOrdersType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

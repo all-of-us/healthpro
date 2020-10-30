@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Form\DebugParticipantLookupType;
 use App\Form\MissingEvaluationsType;
+use App\Form\MissingOrdersType;
 use App\Repository\EvaluationRepository;
+use App\Repository\OrderRepository;
 use App\Service\DebugToolsService;
 use App\Service\EnvironmentService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -60,7 +62,7 @@ class DebugToolsController extends AbstractController
     /**
      * @Route("/missing/measurements", name="admin_debug_missing_measurements")
      */
-    public function missingMeasurementsAction(Request $request, EvaluationRepository $evaluationRepository, $_route)
+    public function missingMeasurementsAction(Request $request, EvaluationRepository $evaluationRepository)
     {
         $missing = $evaluationRepository->getMissingEvaluations();
         $choices = [];
@@ -79,6 +81,33 @@ class DebugToolsController extends AbstractController
             }
         }
         return $this->render('admin/debug/missing-measurements.html.twig', [
+            'missing' => $missing,
+            'form' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/missing/orders", name="admin_debug_missing_orders")
+     */
+    public function missingOrdersAction(Request $request, OrderRepository $orderRepository)
+    {
+        $missing = $orderRepository->getMissingOrders();
+        $choices = [];
+        foreach ($missing as $orders) {
+            $choices[$orders->getId()] = $orders->getId();
+        }
+        $form = $this->createForm(MissingOrdersType::class, null, ['choices' => $choices]);
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $ids = $form->get('ids')->getData();
+            if (!empty($ids) && $form->isValid()) {
+                // TODO
+                // Send orders to RDR
+            } else {
+                $this->addFlash('error', 'Please select at least one order');
+            }
+        }
+        return $this->render('admin/debug/missing-orders.html.twig', [
             'missing' => $missing,
             'form' => $form->createView()
         ]);
