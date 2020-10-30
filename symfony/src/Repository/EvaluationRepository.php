@@ -19,32 +19,20 @@ class EvaluationRepository extends ServiceEntityRepository
         parent::__construct($registry, Evaluation::class);
     }
 
-    // /**
-    //  * @return Evaluation[] Returns an array of Evaluation objects
-    //  */
-    /*
-    public function findByExampleField($value)
+     /**
+      * @return Evaluation[] Returns an array of Evaluation objects
+      */
+    public function getMissingEvaluations()
     {
         return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
+            ->leftJoin('e.history', 'eh')
+            ->where('e.finalizedTs is not null')
+            ->andWhere('e.rdrId is null')
+            ->andWhere('eh.type != :type OR eh.type is null')
+            ->setParameter('type', 'cancel')
             ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Evaluation
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * @ORM\Table(name="evaluations_history")
  * @ORM\Entity(repositoryClass="App\Repository\EvaluationHistoryRepository")
  */
 class EvaluationHistory
@@ -20,7 +21,7 @@ class EvaluationHistory
      * @ORM\OneToOne(targetEntity="App\Entity\Evaluation", inversedBy="evaluationHistory", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
-    private $evaluationId;
+    private $evaluation;
 
     /**
      * @ORM\Column(type="integer")
@@ -47,24 +48,20 @@ class EvaluationHistory
      */
     private $createdTs;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Evaluation", mappedBy="historyId", cascade={"persist", "remove"})
-     */
-    private $evaluation;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getEvaluationId(): ?Evaluation
+    public function getEvaluation(): ?Evaluation
     {
-        return $this->evaluationId;
+        return $this->evaluation;
     }
 
-    public function setEvaluationId(Evaluation $evaluationId): self
+    public function setEvaluation(Evaluation $evaluation): self
     {
-        $this->evaluationId = $evaluationId;
+        $this->evaluation = $evaluation;
 
         return $this;
     }
@@ -125,24 +122,6 @@ class EvaluationHistory
     public function setCreatedTs(\DateTimeInterface $createdTs): self
     {
         $this->createdTs = $createdTs;
-
-        return $this;
-    }
-
-    public function getEvaluation(): ?Evaluation
-    {
-        return $this->evaluation;
-    }
-
-    public function setEvaluation(?Evaluation $evaluation): self
-    {
-        $this->evaluation = $evaluation;
-
-        // set (or unset) the owning side of the relation if necessary
-        $newHistoryId = null === $evaluation ? null : $this;
-        if ($evaluation->getHistoryId() !== $newHistoryId) {
-            $evaluation->setHistoryId($newHistoryId);
-        }
 
         return $this;
     }

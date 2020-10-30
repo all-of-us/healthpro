@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * @ORM\Table(name="evaluations")
  * @ORM\Entity(repositoryClass="App\Repository\EvaluationRepository")
  */
 class Evaluation
@@ -82,14 +83,9 @@ class Evaluation
     private $data;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\EvaluationHistory", mappedBy="evaluationId", cascade={"persist", "remove"})
-     */
-    private $evaluationHistory;
-
-    /**
      * @ORM\OneToOne(targetEntity="App\Entity\EvaluationHistory", inversedBy="evaluation", cascade={"persist", "remove"})
      */
-    private $historyId;
+    private $history;
 
     public function getId(): ?int
     {
@@ -252,31 +248,14 @@ class Evaluation
         return $this;
     }
 
-    public function getEvaluationHistory(): ?EvaluationHistory
+    public function getHistory(): ?EvaluationHistory
     {
-        return $this->evaluationHistory;
+        return $this->history;
     }
 
-    public function setEvaluationHistory(EvaluationHistory $evaluationHistory): self
+    public function setHistoryId(?EvaluationHistory $history): self
     {
-        $this->evaluationHistory = $evaluationHistory;
-
-        // set the owning side of the relation if necessary
-        if ($evaluationHistory->getEvaluationId() !== $this) {
-            $evaluationHistory->setEvaluationId($this);
-        }
-
-        return $this;
-    }
-
-    public function getHistoryId(): ?EvaluationHistory
-    {
-        return $this->historyId;
-    }
-
-    public function setHistoryId(?EvaluationHistory $historyId): self
-    {
-        $this->historyId = $historyId;
+        $this->history = $history;
 
         return $this;
     }
