@@ -1440,6 +1440,7 @@ class Order
         $this->order['failedToReachRDR'] = false;
         $this->order['orderStatus'] = 'Finalized';
         $this->order['status'] = 'finalized';
+        $this->order['biobank_finalized'] = false;
 
         $this->order['origin'] = $object->origin;
 
