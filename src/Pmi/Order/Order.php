@@ -1431,6 +1431,7 @@ class Order
         $this->order['collected_user_id'] = !empty($object->collectedInfo) ? $object->collectedInfo->author->value : false;
         $this->order['collected_site'] = null;
         $this->order['collected_site_name'] = 'A Quest Site';
+        $this->order['collected_site_address'] = !empty($object->collectedInfo->address) ? $object->collectedInfo->address : null;
         $this->order['processed_user_id'] = !empty($object->processedInfo) ? $object->processedInfo->author->value : false;
         $this->order['processed_site'] = null;
         $this->order['processed_site_name'] = 'A Quest Site';

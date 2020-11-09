@@ -114,3 +114,14 @@
         (--)
     {% endif %}
 {% endmacro %}
+
+{% macro displayQuestSiteAddress(address) %}
+    {% if (address.line) %}
+        {% for line in address.line %}
+            {{ line }}<br />
+        {% endfor %}
+    {% endif %}
+    {% if address.city|default(false) %}{{ address.city }},{% endif %}
+    {{ address.state|default('') }}
+    {{ address.postalCode|default('') }}
+{% endmacro %}
