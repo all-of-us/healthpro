@@ -1,11 +1,14 @@
 {% extends 'base.html.twig' %}
 {% block title %}Biobank {{ participant.biobankId }} - {% endblock %}
+
+{% import 'macros/display-text.html.twig' as macros %}
+
 {% block body %}
     <div class="page-header">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Details</h2>
     </div>
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-6">
             <dl class="dl-horizontal">
                 {% if is_granted('ROLE_SCRIPPS') or is_granted('ROLE_AWARDEE') %}
                     <dt>Participant ID</dt>
@@ -23,9 +26,13 @@
                 <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
                 <dt>Paired Site</dt>
                 <dd>{{ participant.site ? app.getSiteDisplayName(participant.siteSuffix) : '(not paired)' }}</dd>
+                {% if order.collected_site_address %}
+                    <dt>Quest Collection Site<dt>
+                    <dd>{{ macros.displayQuestSiteAddress(order.collected_site_address) }}</dd>
+                {% endif %}
             </dl>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-6">
             <p class="lead">
                 Order ID: <strong>{{ order.order_id }}</strong>
             </p>

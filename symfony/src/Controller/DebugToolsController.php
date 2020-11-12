@@ -19,9 +19,6 @@ class DebugToolsController extends AbstractController
      */
     public function participantsAction(Request $request, EnvironmentService $env, DebugToolsService $debugToolsService)
     {
-        if ($env->isProd()) {
-            throw $this->createNotFoundException();
-        }
         $participantLookupForm = $this->createForm(DebugParticipantLookupType::class);
         $participantLookupForm->handleRequest($request);
         if ($participantLookupForm->isSubmitted() && $participantLookupForm->isValid()) {
@@ -42,9 +39,6 @@ class DebugToolsController extends AbstractController
      */
     public function participantAction($id, EnvironmentService $env, DebugToolsService $debugToolsService)
     {
-        if ($env->isProd()) {
-            throw $this->createNotFoundException();
-        }
         $participant = $debugToolsService->getParticipantById($id);
         if (!$participant) {
             throw $this->createNotFoundException();
