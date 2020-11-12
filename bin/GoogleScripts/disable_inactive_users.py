@@ -97,7 +97,7 @@ def main(argv):
             print("Days since last login: %s" % (datetime.today()-lastLogin).days)
             if (datetime.today()-creationtime).days==-1:
                 continue
-            if ((datetime.today()-lastLogin).days > INACTIVEDAYS and (datetime.today()-creationtime).days > INACTIVEDAYS+1) or ((datetime.today()-lastLogin).days > 2000 and (datetime.today()-creationtime).days > INACTIVEDAYS):
+            if ((datetime.today()-lastLogin).days > INACTIVEDAYS+3 and (datetime.today()-creationtime).days > INACTIVEDAYS+1) or ((datetime.today()-lastLogin).days > 2000 and (datetime.today()-creationtime).days > INACTIVEDAYS):
                 usersToDisable.append(u)
                 continue
 
