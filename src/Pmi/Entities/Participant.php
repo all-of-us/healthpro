@@ -389,13 +389,8 @@ class Participant
         }
 
         // Deactivated
-        if (isset($participant->suspensionStatus)) {
-            switch ($participant->suspensionStatus) {
-                case 'NOT_SUSPENDED':
-                    return 'active';
-                case 'NO_CONTACT':
-                    return 'deactivated';
-            }
+        if (isset($participant->suspensionStatus) && $participant->suspensionStatus === 'NO_CONTACT') {
+            return 'deactivated';
         }
 
         // Deceased Status
@@ -404,7 +399,7 @@ class Participant
         }
 
         // Default
-        return '';
+        return 'active';
     }
 
     private function getConsentCohortText($participant)
