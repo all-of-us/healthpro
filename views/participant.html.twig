@@ -1,9 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block title %}Participant {{ participant.id }} - {% endblock %}
 {% block body %}
-
-<tt>{{ participant.withdrawalStatus }}</tt>
-
 {% import 'macros/display-text.html.twig' as macros %}
 {% if hasNoParticipantAccess %}
     <div class="row">
