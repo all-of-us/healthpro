@@ -423,6 +423,9 @@ class WorkQueue
                     }
                 }
                 $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED', $participant->{'sampleStatus' . $newSample . 'Time'}, false);
+                if ($sample === '1SAL' && self::getSalivaCollectionMethod($participant->sample1SAL2CollectionMethod)) {
+                    $row["sample{$sample}"] .= self::getSalivaCollectionMethod($participant->sample1SAL2CollectionMethod);
+                }
             }
             $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
 
@@ -642,5 +645,15 @@ class WorkQueue
             default:
                 return self::HTML_DANGER . ' (Not Retained)';
         }
+    }
+
+    public static function getSalivaCollectionMethod($value)
+    {
+        if ($value === 'MAIL_KIT') {
+            return ' Mail Kit';
+        } elseif ($value === 'ON_SITE') {
+            return ' On Site';
+        }
+        return '';
     }
 }

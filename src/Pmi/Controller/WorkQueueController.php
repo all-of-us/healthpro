@@ -422,6 +422,7 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'COPE Nov PPI Survey Complete';
                 $headers[] = 'COPE Nov PPI Survey Completion Date';
                 $headers[] = 'Retention Status';
+                $headers[] = 'Saliva Collection';
             }
             fputcsv($output, $headers);
 
@@ -541,6 +542,7 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeNov"});
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeNovAuthored"}, $app->getUserTimezone());
                         $row[] = WorkQueue::csvRetentionType($participant->retentionType);
+                        $row[] = WorkQueue::getSalivaCollectionMethod($participant->sample1SAL2CollectionMethod);
                     }
                     fputcsv($output, $row);
                 }
