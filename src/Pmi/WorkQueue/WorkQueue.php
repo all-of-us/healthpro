@@ -37,6 +37,7 @@ class WorkQueue
         'consentForCABoRAuthored',
         'withdrawalAuthored',
         'retentionEligibleTime',
+        'retentionType',
         'withdrawalReason',
         'patientStatus',
         'patientStatus',
@@ -216,6 +217,15 @@ class WorkQueue
                 'Yes' => 'ELIGIBLE',
                 'No' => 'NOT_ELIGIBLE'
             ]
+        ],
+        'retentionType' => [
+            'label' => 'Retention Status',
+            'options' => [
+                'Active Only' => 'ACTIVE',
+                'Passive Only' => 'PASSIVE',
+                'Active and Passive' => 'ACTIVE_AND_PASSIVE',
+                'Not Retained' => 'UNSET'
+            ]
         ]
     ];
 
@@ -365,6 +375,7 @@ class WorkQueue
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
             $row['activityStatus'] = $this->getActivityStatus($participant);
             $row['retentionEligibleStatus'] = $this->getRetentionEligibleStatus($participant->retentionEligibleStatus, $participant->retentionEligibleTime);
+            $row['retentionType'] = $this->getRetentionType($participant->retentionType);
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
 
@@ -469,6 +480,20 @@ class WorkQueue
             return 0;
         }
         return '';
+    }
+
+    public static function csvRetentionType($value)
+    {
+        switch ($value) {
+            case 'ACTIVE':
+                return 2;
+            case 'PASSIVE':
+                return 1;
+            case 'ACTIVE_AND_PASSIVE':
+                return 3;
+            default:
+                return 0;
+        }
     }
 
     public function displayStatus($value, $successStatus, $time = null, $displayTime = true)
@@ -603,5 +628,19 @@ class WorkQueue
             return self::HTML_DANGER . ' (No)';
         }
         return '';
+    }
+
+    public function getRetentionType($value)
+    {
+        switch ($value) {
+            case 'ACTIVE':
+                return self::HTML_SUCCESS . ' (Actively Retained)';
+            case 'PASSIVE':
+                return self::HTML_SUCCESS . ' (Passively Retained)';
+            case 'ACTIVE_AND_PASSIVE':
+                return self::HTML_SUCCESS . ' (Actively and Passively Retained)';
+            default:
+                return self::HTML_DANGER . ' (Not Retained)';
+        }
     }
 }

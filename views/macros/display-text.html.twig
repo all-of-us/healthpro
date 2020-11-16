@@ -115,6 +115,18 @@
     {% endif %}
 {% endmacro %}
 
+{% macro displayRetentionType(value) %}
+    {% if value == 'ACTIVE' %}
+        <i class="fa fa-check text-success" aria-hidden="true"></i> (Actively Retained)
+    {% elseif value == 'PASSIVE' %}
+        <i class="fa fa-times text-success" aria-hidden="true"></i> (Passively Retained)
+    {% elseif value == 'ACTIVE_AND_PASSIVE' %}
+        <i class="fa fa-times text-success" aria-hidden="true"></i> (Actively and Passively Retained)
+    {% else %}
+        <i class="fa fa-times text-danger" aria-hidden="true"></i> (Not Retained)
+    {% endif %}
+{% endmacro %}
+
 {% macro displayQuestSiteAddress(address) %}
     {% if (address.line) %}
         {% for line in address.line %}
