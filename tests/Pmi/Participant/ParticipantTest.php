@@ -393,4 +393,50 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         ]);
         $this->assertSame(true, $participant->status);
     }
+
+    public function testActivityStatus()
+    {
+        // Withdrawn
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NO_USE'
+        ]);
+        $this->assertSame('withdrawn', $participant->activityStatus);
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'EARLY_OUT'
+        ]);
+        $this->assertSame('withdrawn', $participant->activityStatus);
+
+        // Deactivated
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NOT_WITHDRAWN',
+            'suspensionStatus' => 'NO_CONTACT'
+        ]);
+        $this->assertSame('deactivated', $participant->activityStatus);
+
+        // Deceased
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NOT_WITHDRAWN',
+            'deceasedStatus' => 'PENDING'
+        ]);
+        $this->assertSame('deceased', $participant->activityStatus);
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NOT_WITHDRAWN',
+            'deceasedStatus' => 'APPROVED'
+        ]);
+        $this->assertSame('deceased', $participant->activityStatus);
+
+        // Priority
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NO_USE',
+            'deceasedStatus' => 'APPROVED'
+        ]);
+        $this->assertSame('withdrawn', $participant->activityStatus);
+
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NOT_WITHDRAWN',
+            'suspensionStatus' => 'NO_CONTACT',
+            'deceasedStatus' => 'APPROVED'
+        ]);
+        $this->assertSame('deactivated', $participant->activityStatus);
+    }
 }
