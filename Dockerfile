@@ -1,4 +1,4 @@
-FROM php:7.2
+FROM php:7.3
 
 # Fix for issue with OpenJDK install
 RUN mkdir -p /usr/share/man/man1
