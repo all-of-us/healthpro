@@ -418,6 +418,7 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Date of Death Approval';
                 $headers[] = 'COPE Nov PPI Survey Complete';
                 $headers[] = 'COPE Nov PPI Survey Completion Date';
+                $headers[] = 'Retention Status';
             }
             fputcsv($output, $headers);
 
@@ -536,6 +537,7 @@ class WorkQueueController extends AbstractController
                         $row[] = $participant->deceasedStatus == 'APPROVED' ? WorkQueue::dateFromString($participant->deceasedAuthored, $app->getUserTimezone(), false) : '';
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeNov"});
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeNovAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvRetentionType($participant->retentionType);
                     }
                     fputcsv($output, $row);
                 }
