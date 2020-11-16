@@ -217,6 +217,15 @@ class WorkQueue
                 'Yes' => 'ELIGIBLE',
                 'No' => 'NOT_ELIGIBLE'
             ]
+        ],
+        'retentionType' => [
+            'label' => 'Retention Status',
+            'options' => [
+                'Active Only' => 'ACTIVE',
+                'Passive Only' => 'PASSIVE',
+                'Active and Passive' => 'ACTIVE_AND_PASSIVE',
+                'Not Retained' => 'UNSET'
+            ]
         ]
     ];
 
