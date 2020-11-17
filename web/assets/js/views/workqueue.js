@@ -177,7 +177,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-demographics',
                     '.col-group-contact',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
                 ]
             },
             {
@@ -193,7 +194,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-demographics',
                     '.col-group-contact',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
                 ]
             },
             {
@@ -209,7 +211,8 @@ $(document).ready(function() {
                     '.col-group-ppi-time',
                     '.col-group-demographics',
                     '.col-group-contact',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
                 ]
             },
             {
@@ -225,7 +228,8 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-contact',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
                 ]
             },
             {
@@ -242,7 +246,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-metrics'
                 ]
             },
             {
@@ -259,7 +264,26 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
+                ]
+            },
+            {
+                extend: 'colvisGroup',
+                text: 'Metrics',
+                show: [
+                    'dateOfBirth:name',
+                    '.col-group-default',
+                    '.col-group-metrics'
+                ],
+                hide: [
+                    '.col-group-demographics',
+                    '.col-group-info:not(.col-group-default)',
+                    '.col-group-inperson',
+                    '.col-group-ppi',
+                    '.col-group-ppi-time',
+                    '.col-group-patient-status',
+                    '.col-group-contact'
                 ]
             },
             {
