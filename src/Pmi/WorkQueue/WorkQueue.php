@@ -228,6 +228,13 @@ class WorkQueue
                 'Active and Passive' => 'ACTIVE_AND_PASSIVE',
                 'Not Retained' => 'UNSET'
             ]
+        ],
+        'isEhrDataAvailable' => [
+            'label' => 'EHR Data Transfer',
+            'options' => [
+                'Yes' => 1,
+                'No' => 0
+            ]
         ]
     ];
 

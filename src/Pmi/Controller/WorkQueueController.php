@@ -129,6 +129,9 @@ class WorkQueueController extends AbstractController
         if (!empty($params['retentionType'])) {
             $rdrParams['retentionType'] = $params['retentionType'];
         }
+        if (!empty($params['isEhrDataAvailable'])) {
+            $rdrParams['isEhrDataAvailable'] = $params['isEhrDataAvailable'];
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];
