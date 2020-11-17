@@ -542,7 +542,7 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeNov"});
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeNovAuthored"}, $app->getUserTimezone());
                         $row[] = WorkQueue::csvRetentionType($participant->retentionType);
-                        $row[] = WorkQueue::getSalivaCollectionMethod($participant->sample1SAL2CollectionMethod);
+                        $row[] = $participant->sample1SAL2CollectionMethod;
                     }
                     fputcsv($output, $row);
                 }
