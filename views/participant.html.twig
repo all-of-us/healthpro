@@ -373,6 +373,16 @@
                                         <dd>
                                             {{ macros.displayRetentionType(participant.retentionType) }}
                                         </dd>
+                                        <dt>EHR Transfer Status</dt>
+                                        <dd>
+                                            {{ macros.displayEhrTransferStatus(participant.isEhrDataAvailable) }}
+                                        </dd>
+                                        <dt>Most Recent EHR Receipt</dt>
+                                        <dd>
+                                            {% if participant.latestEhrReceiptTime %}
+                                                {{ participant.latestEhrReceiptTime|date('m/d/Y', app.userTimezone) }}
+                                            {% endif %}
+                                        </dd>
                                     </dl>
                                 </div>
                             </div>
