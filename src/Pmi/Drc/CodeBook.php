@@ -130,6 +130,9 @@ class CodeBook
 
     public static function display($code)
     {
+        if (is_bool($code)) {
+            return $code;
+        }
         if (array_key_exists($code, self::$map)) {
             return self::$map[$code];
         } elseif (strpos($code, 'PIIState_') === 0) {
