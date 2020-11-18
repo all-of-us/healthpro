@@ -232,8 +232,8 @@ class WorkQueue
         'isEhrDataAvailable' => [
             'label' => 'EHR Data Transfer',
             'options' => [
-                'Yes' => 1,
-                'No' => 0
+                'Yes' => 'yes',
+                'No' => 'no'
             ]
         ]
     ];
