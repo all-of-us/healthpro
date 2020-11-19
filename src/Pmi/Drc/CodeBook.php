@@ -125,7 +125,9 @@ class CodeBook
         'en' => 'English',
         'es' => 'Spanish',
         'vibrent' => 'PTSC Portal',
-        'careevolution' => 'DV Pilot Portal'
+        'careevolution' => 'DV Pilot Portal',
+        'MAIL_KIT' => 'Mail Kit',
+        'ON_SITE' => 'On Site'
     ];
 
     public static function display($code)
