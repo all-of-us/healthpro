@@ -87,7 +87,7 @@ $(document).ready(function() {
       { name: 'retentionEligibleStatus', visible: false, data: 'retentionEligibleStatus', class: 'text-center' },
       { name: 'retentionType', visible: false, data: 'retentionType', class: 'text-center', orderable: false },
       { name: 'isEhrDataAvailable', visible: false, data: 'isEhrDataAvailable', class: 'text-center' },
-      { name: 'latestEhrReceiptTime', visible: false, data: 'latestEhrReceiptTime', class: 'text-center' },
+      { name: 'ehrUpdateTime', visible: false, data: 'ehrUpdateTime', class: 'text-center' },
       { name: 'patientStatusYes', visible: false, data: 'patientStatusYes', orderable: false },
       { name: 'patientStatusNo', visible: false, data: 'patientStatusNo', orderable: false },
       { name: 'patientStatusUnknown', visible: false, data: 'patientStatusUnknown', orderable: false },
