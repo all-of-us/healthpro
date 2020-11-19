@@ -129,6 +129,9 @@ class WorkQueueController extends AbstractController
         if (!empty($params['retentionType'])) {
             $rdrParams['retentionType'] = $params['retentionType'];
         }
+        if (!empty($params['isEhrDataAvailable'])) {
+            $rdrParams['isEhrDataAvailable'] = $params['isEhrDataAvailable'] === 'yes' ? 1 : 0;
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];
@@ -422,6 +425,8 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'COPE Nov PPI Survey Complete';
                 $headers[] = 'COPE Nov PPI Survey Completion Date';
                 $headers[] = 'Retention Status';
+                $headers[] = 'EHR Data Transfer';
+                $headers[] = 'Most Recent EHR Receipt';
                 $headers[] = 'Saliva Collection';
             }
             fputcsv($output, $headers);
@@ -542,6 +547,8 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeNov"});
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeNovAuthored"}, $app->getUserTimezone());
                         $row[] = WorkQueue::csvRetentionType($participant->retentionType);
+                        $row[] = $participant->isEhrDataAvailable ? 1 : 0;
+                        $row[] = WorkQueue::dateFromString($participant->latestEhrReceiptTime, $app->getUserTimezone());
                         $row[] = $participant->sample1SAL2CollectionMethod;
                     }
                     fputcsv($output, $row);

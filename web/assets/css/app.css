@@ -303,6 +303,9 @@ label.label-normal {
 .multiheader-patient-status {
     background-color: #ffd;
 }
+.multiheader-metrics {
+    background-color: #edb;
+}
 .dataTables_processing {
     z-index: 1000;
     color: #fff;

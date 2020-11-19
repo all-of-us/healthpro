@@ -83,9 +83,11 @@ $(document).ready(function() {
       { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
       { name: 'activityStatus', data: 'activityStatus', class: 'text-center', orderable: false },
-      { name: 'retentionEligibleStatus', data: 'retentionEligibleStatus', class: 'text-center' },
-      { name: 'retentionType', data: 'retentionType', class: 'text-center', orderable: false },
       { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
+      { name: 'retentionEligibleStatus', visible: false, data: 'retentionEligibleStatus', class: 'text-center' },
+      { name: 'retentionType', visible: false, data: 'retentionType', class: 'text-center', orderable: false },
+      { name: 'isEhrDataAvailable', visible: false, data: 'isEhrDataAvailable', class: 'text-center' },
+      { name: 'latestEhrReceiptTime', visible: false, data: 'latestEhrReceiptTime', class: 'text-center' },
       { name: 'patientStatusYes', visible: false, data: 'patientStatusYes', orderable: false },
       { name: 'patientStatusNo', visible: false, data: 'patientStatusNo', orderable: false },
       { name: 'patientStatusUnknown', visible: false, data: 'patientStatusUnknown', orderable: false },
@@ -159,7 +161,8 @@ $(document).ready(function() {
                     '.col-group-inperson:not(.col-group-default)',
                     '.col-group-demographics',
                     '.col-group-contact',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
                 ]
             },
             {
@@ -175,7 +178,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-demographics',
                     '.col-group-contact',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
                 ]
             },
             {
@@ -191,7 +195,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-demographics',
                     '.col-group-contact',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
                 ]
             },
             {
@@ -207,7 +212,8 @@ $(document).ready(function() {
                     '.col-group-ppi-time',
                     '.col-group-demographics',
                     '.col-group-contact',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
                 ]
             },
             {
@@ -223,7 +229,8 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-contact',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
                 ]
             },
             {
@@ -240,7 +247,8 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-metrics'
                 ]
             },
             {
@@ -257,7 +265,26 @@ $(document).ready(function() {
                     '.col-group-inperson',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
+                ]
+            },
+            {
+                extend: 'colvisGroup',
+                text: 'Metrics',
+                show: [
+                    'dateOfBirth:name',
+                    '.col-group-default',
+                    '.col-group-metrics'
+                ],
+                hide: [
+                    '.col-group-demographics',
+                    '.col-group-info:not(.col-group-default)',
+                    '.col-group-inperson',
+                    '.col-group-ppi',
+                    '.col-group-ppi-time',
+                    '.col-group-patient-status',
+                    '.col-group-contact'
                 ]
             },
             {

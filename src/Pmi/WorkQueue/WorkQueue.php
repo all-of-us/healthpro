@@ -36,9 +36,11 @@ class WorkQueue
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
         'withdrawalAuthored',
+        'withdrawalReason',
         'retentionEligibleTime',
         'retentionType',
-        'withdrawalReason',
+        'isEhrDataAvailable',
+        'latestEhrReceiptTime',
         'patientStatus',
         'patientStatus',
         'patientStatus',
@@ -226,6 +228,13 @@ class WorkQueue
                 'Active and Passive' => 'ACTIVE_AND_PASSIVE',
                 'Not Retained' => 'UNSET'
             ]
+        ],
+        'isEhrDataAvailable' => [
+            'label' => 'EHR Data Transfer',
+            'options' => [
+                'Yes' => 'yes',
+                'No' => 'no'
+            ]
         ]
     ];
 
@@ -378,6 +387,8 @@ class WorkQueue
             $row['retentionType'] = $this->getRetentionType($participant->retentionType);
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
+            $row['isEhrDataAvailable'] = $this->getEhrAvailableStatus($participant->isEhrDataAvailable);
+            $row['latestEhrReceiptTime'] = self::dateFromString($participant->latestEhrReceiptTime, $app->getUserTimezone());
 
             //Contact
             $row['contactMethod'] = $e($participant->recontactMethod);
@@ -645,5 +656,13 @@ class WorkQueue
             default:
                 return self::HTML_DANGER . ' (Not Retained)';
         }
+    }
+
+    public function getEhrAvailableStatus($value)
+    {
+        if ($value) {
+            return self::HTML_SUCCESS . ' Yes';
+        }
+        return self::HTML_DANGER . ' No';
     }
 }

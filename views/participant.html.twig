@@ -364,7 +364,7 @@
                                     <h3 class="panel-title">Retention and EHR Metrics</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <dl class="dl-horizontal">
+                                    <dl class="dl-horizontal dl-horizontal-lg">
                                         <dt>Retention Eligible</dt>
                                         <dd>
                                             {{ macros.displayRetentionEligibleStatus(participant.retentionEligibleStatus, participant.retentionEligibleTime) }}
@@ -372,6 +372,16 @@
                                         <dt>Retention Status</dt>
                                         <dd>
                                             {{ macros.displayRetentionType(participant.retentionType) }}
+                                        </dd>
+                                        <dt>EHR Transfer Status</dt>
+                                        <dd>
+                                            {{ macros.displayEhrTransferStatus(participant.isEhrDataAvailable) }}
+                                        </dd>
+                                        <dt>Most Recent EHR Receipt</dt>
+                                        <dd>
+                                            {% if participant.latestEhrReceiptTime %}
+                                                {{ participant.latestEhrReceiptTime|date('m/d/Y', app.userTimezone) }}
+                                            {% endif %}
                                         </dd>
                                     </dl>
                                 </div>
