@@ -427,6 +427,7 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Retention Status';
                 $headers[] = 'EHR Data Transfer';
                 $headers[] = 'Most Recent EHR Receipt';
+                $headers[] = 'Saliva Collection';
             }
             fputcsv($output, $headers);
 
@@ -548,6 +549,7 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::csvRetentionType($participant->retentionType);
                         $row[] = $participant->isEhrDataAvailable ? 1 : 0;
                         $row[] = WorkQueue::dateFromString($participant->latestEhrReceiptTime, $app->getUserTimezone());
+                        $row[] = $participant->sample1SAL2CollectionMethod;
                     }
                     fputcsv($output, $row);
                 }
