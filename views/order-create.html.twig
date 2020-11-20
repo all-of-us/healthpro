@@ -30,7 +30,7 @@
         {{ form_start(confirmForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(confirmForm) }}
             <div class="row row-equal-height">
-                {% if app.isDvType is empty %}
+                {% if app.getOrderType == 'hpo' %}
                     <div class="col-sm-6 col-md-6">
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -76,7 +76,7 @@
                         </div>
                     </div>
                 {% endif %}
-                {% if app.isDvType %}
+                {% if app.getOrderType == 'dv' %}
                     <div class="col-sm-8 col-sm-offset-2">
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -103,7 +103,7 @@
                         </div>
                     </div>
                 {% endif %}
-                {% if app.isDvType is empty %}
+                {% if app.getOrderType == 'hpo' %}
                     <div class="col-sm-6 col-md-6">
                         <div class="panel panel-default">
                             <div class="panel-heading">

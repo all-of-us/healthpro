@@ -345,6 +345,23 @@ class HpoApplication extends AbstractApplication
         return !empty($site);
     }
 
+    public function isDiversionPouchSite() {
+        $site = $this['em']->getRepository('sites')->fetchBy([
+            'deleted' => 0,
+            'google_group' => $this->getSiteId(),
+            'site_type' => 'diversion'
+        ]);
+        return !empty($site);
+    }
+
+    public function getOrderType() {
+        if ($this->isDVType()) {
+            return $this->isDiversionPouchSite() ? 'hpo' : 'dv';
+        } else {
+            return 'hpo';
+        }
+    }
+
     public function getSiteType()
     {
         return $this->isDVType() ? 'dv' : 'hpo';

@@ -79,7 +79,7 @@ class OrderController extends AbstractController
             $app->abort(403);
         }
         $formBuilder = $app['form.factory']->createBuilder(FormType::class);
-        if ($app->isDVType()) {
+        if ($app->getOrderType() === 'dv') {
             $formBuilder->add('kitId', Type\RepeatedType::class, [
                 'type' => Type\TextType::class,
                 'invalid_message' => 'The kit order ID fields must match.',
@@ -105,7 +105,7 @@ class OrderController extends AbstractController
             ]);
         }
         $order = new Order($app);
-        if (!$app->isDVType()) {
+        if ($app->getOrderType() === 'hpo') {
             $formBuilder->add('samples', Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,

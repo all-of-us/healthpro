@@ -502,7 +502,7 @@ class Order
                 ],
                 'required' => false
             ]);
-            if ($this->app->isDVType()) {
+            if ($this->app->getOrderType() === 'dv') {
                 $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
                     'deleted' => 0,
                     'google_group' => $this->app->getSiteId()
