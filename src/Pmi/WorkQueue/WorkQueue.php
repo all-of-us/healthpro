@@ -40,7 +40,7 @@ class WorkQueue
         'retentionEligibleTime',
         'retentionType',
         'isEhrDataAvailable',
-        'latestEhrReceiptTime',
+        'ehrUpdateTime',
         'patientStatus',
         'patientStatus',
         'patientStatus',
@@ -388,7 +388,7 @@ class WorkQueue
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['isEhrDataAvailable'] = $this->getEhrAvailableStatus($participant->isEhrDataAvailable);
-            $row['latestEhrReceiptTime'] = self::dateFromString($participant->latestEhrReceiptTime, $app->getUserTimezone());
+            $row['ehrUpdateTime'] = self::dateFromString($participant->ehrUpdateTime, $app->getUserTimezone());
 
             //Contact
             $row['contactMethod'] = $e($participant->recontactMethod);
