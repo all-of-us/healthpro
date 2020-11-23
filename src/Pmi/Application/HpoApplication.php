@@ -345,7 +345,8 @@ class HpoApplication extends AbstractApplication
         return !empty($site);
     }
 
-    public function isDiversionPouchSite() {
+    public function isDiversionPouchSite()
+    {
         $site = $this['em']->getRepository('sites')->fetchBy([
             'deleted' => 0,
             'google_group' => $this->getSiteId(),
@@ -354,12 +355,12 @@ class HpoApplication extends AbstractApplication
         return !empty($site);
     }
 
-    public function getOrderType() {
-        if ($this->isDVType()) {
-            return $this->isDiversionPouchSite() ? 'hpo' : 'dv';
-        } else {
-            return 'hpo';
+    public function getOrderType()
+    {
+        if ($this->isDVType() && !$this->isDiversionPouchSite()) {
+            return 'dv';
         }
+        return 'hpo';
     }
 
     public function getSiteType()
