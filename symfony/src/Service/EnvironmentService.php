@@ -16,7 +16,7 @@ class EnvironmentService
     const DATASTORE_EMULATOR_HOST = 'localhost:8081';
 
     protected $name;
-    protected $configuration = [];
+    public $configuration = [];
     public $values = [];
 
     public static $timezoneOptions = [

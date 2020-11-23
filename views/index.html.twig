@@ -45,7 +45,7 @@
                 </a>
             </div>
         {% endif %}
-        {% if is_granted('ROLE_USER') and app.session.get('site') and app.isDvType and app.reportKitUrl %}
+        {% if is_granted('ROLE_USER') and app.session.get('site') and app.getOrderType == 'dv' and app.reportKitUrl %}
             <div class="col-sm-6 col-md-4">
                 <a data-href="{{ app.reportKitUrl }}" class="btn btn-lg btn-default btn-block external-link">
                     <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
