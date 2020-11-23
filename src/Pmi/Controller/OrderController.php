@@ -161,7 +161,7 @@ class OrderController extends AbstractController
                 $orderData['biobank_id'] = $participant->biobankId;
                 $orderData['created_ts'] = new \DateTime();
                 $orderData['version'] = $order->version;
-                if (!$app->isDVType()) {
+                if ($app->getOrderType() === 'hpo') {
                     $orderData['processed_centrifuge_type'] = Order::SWINGING_BUCKET;
                 }
                 $orderId = null;
