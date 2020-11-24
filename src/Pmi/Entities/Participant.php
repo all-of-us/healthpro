@@ -383,20 +383,23 @@ class Participant
 
     private function getActivityStatus($participant)
     {
+        // Withdrawn
         if (in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
             return 'withdrawn';
-        } elseif (in_array($participant->deceasedStatus, self::$deceasedStatusValues, true)) {
-            return 'deceased';
-        } else {
-            switch (isset($participant->suspensionStatus) ? $participant->suspensionStatus : null) {
-                case 'NOT_SUSPENDED':
-                    return 'active';
-                case 'NO_CONTACT':
-                    return 'deactivated';
-                default:
-                    return '';
-            }
         }
+
+        // Deactivated
+        if (isset($participant->suspensionStatus) && $participant->suspensionStatus === 'NO_CONTACT') {
+            return 'deactivated';
+        }
+
+        // Deceased Status
+        if (in_array($participant->deceasedStatus, self::$deceasedStatusValues, true)) {
+            return 'deceased';
+        }
+
+        // Default
+        return 'active';
     }
 
     private function getConsentCohortText($participant)

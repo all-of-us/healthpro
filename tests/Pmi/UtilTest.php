@@ -6,14 +6,14 @@ class UtilTest extends PHPUnit\Framework\TestCase
     public function testUuid()
     {
         $uuid = Util::generateUuid();
-        $this->assertRegExp('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $uuid);
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $uuid);
     }
 
     public function testShortUuid()
     {
-        $this->assertRegExp('/^[0-9A-F]{16}$/', Util::generateShortUuid());
-        $this->assertRegExp('/^[0-9A-F]{24}$/', Util::generateShortUuid(24));
-        $this->assertRegExp('/^[0-9a-f]{32}$/', Util::generateShortUuid(32, false));
+        $this->assertMatchesRegularExpression('/^[0-9A-F]{16}$/', Util::generateShortUuid());
+        $this->assertMatchesRegularExpression('/^[0-9A-F]{24}$/', Util::generateShortUuid(24));
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', Util::generateShortUuid(32, false));
     }
 
     public function testVersionIsAtLeast()

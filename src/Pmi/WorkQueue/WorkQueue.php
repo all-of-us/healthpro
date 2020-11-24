@@ -36,8 +36,11 @@ class WorkQueue
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
         'withdrawalAuthored',
-        'retentionEligibleTime',
         'withdrawalReason',
+        'retentionEligibleTime',
+        'retentionType',
+        'isEhrDataAvailable',
+        'ehrUpdateTime',
         'patientStatus',
         'patientStatus',
         'patientStatus',
@@ -216,6 +219,22 @@ class WorkQueue
                 'Yes' => 'ELIGIBLE',
                 'No' => 'NOT_ELIGIBLE'
             ]
+        ],
+        'retentionType' => [
+            'label' => 'Retention Status',
+            'options' => [
+                'Active Only' => 'ACTIVE',
+                'Passive Only' => 'PASSIVE',
+                'Active and Passive' => 'ACTIVE_AND_PASSIVE',
+                'Not Retained' => 'UNSET'
+            ]
+        ],
+        'isEhrDataAvailable' => [
+            'label' => 'EHR Data Transfer',
+            'options' => [
+                'Yes' => 'yes',
+                'No' => 'no'
+            ]
         ]
     ];
 
@@ -365,8 +384,11 @@ class WorkQueue
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
             $row['activityStatus'] = $this->getActivityStatus($participant);
             $row['retentionEligibleStatus'] = $this->getRetentionEligibleStatus($participant->retentionEligibleStatus, $participant->retentionEligibleTime);
+            $row['retentionType'] = $this->getRetentionType($participant->retentionType);
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
+            $row['isEhrDataAvailable'] = $this->getEhrAvailableStatus($participant->isEhrDataAvailable);
+            $row['ehrUpdateTime'] = self::dateFromString($participant->ehrUpdateTime, $app->getUserTimezone());
 
             //Contact
             $row['contactMethod'] = $e($participant->recontactMethod);
@@ -412,6 +434,9 @@ class WorkQueue
                     }
                 }
                 $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED', $participant->{'sampleStatus' . $newSample . 'Time'}, false);
+                if ($sample === '1SAL' && $participant->{'sampleStatus' . $newSample} === 'RECEIVED' && $participant->{'sampleStatus' . $newSample . 'Time'} && $participant->sample1SAL2CollectionMethod) {
+                    $row["sample{$sample}"] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
+                }
             }
             $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
 
@@ -469,6 +494,20 @@ class WorkQueue
             return 0;
         }
         return '';
+    }
+
+    public static function csvRetentionType($value)
+    {
+        switch ($value) {
+            case 'ACTIVE':
+                return 2;
+            case 'PASSIVE':
+                return 1;
+            case 'ACTIVE_AND_PASSIVE':
+                return 3;
+            default:
+                return 0;
+        }
     }
 
     public function displayStatus($value, $successStatus, $time = null, $displayTime = true)
@@ -603,5 +642,27 @@ class WorkQueue
             return self::HTML_DANGER . ' (No)';
         }
         return '';
+    }
+
+    public function getRetentionType($value)
+    {
+        switch ($value) {
+            case 'ACTIVE':
+                return self::HTML_SUCCESS . ' (Actively Retained)';
+            case 'PASSIVE':
+                return self::HTML_SUCCESS . ' (Passively Retained)';
+            case 'ACTIVE_AND_PASSIVE':
+                return self::HTML_SUCCESS . ' (Actively and Passively Retained)';
+            default:
+                return self::HTML_DANGER . ' (Not Retained)';
+        }
+    }
+
+    public function getEhrAvailableStatus($value)
+    {
+        if ($value) {
+            return self::HTML_SUCCESS . ' Yes';
+        }
+        return self::HTML_DANGER . ' No';
     }
 }
