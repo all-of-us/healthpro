@@ -164,6 +164,9 @@ class OrderController extends AbstractController
                 if ($app->getOrderType() === 'hpo') {
                     $orderData['processed_centrifuge_type'] = Order::SWINGING_BUCKET;
                 }
+                if ($app->isDVType() && $app->isDiversionPouchSite()) {
+                    $orderData['type'] = 'diversion';
+                }
                 $orderId = null;
                 $ordersRepository->wrapInTransaction(function() use ($ordersRepository, $order, &$orderData, &$orderId) {
                     if (!isset($orderData['order_id'])) {

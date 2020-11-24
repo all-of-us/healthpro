@@ -150,7 +150,7 @@ class Order
                 // For custom order creation (always display swinging bucket i-test codes)
                 if (empty($this->order)) {
                     $sampleId = $sampleInformation['icodeSwingingBucket'];
-                } elseif (!empty($this->order) && empty($this->order['type'])) {
+                } elseif (!empty($this->order) && (empty($this->order['type']) || $this->order['type'] === 'diversion')) {
                     if ($this->order['processed_centrifuge_type'] === self::SWINGING_BUCKET) {
                         $sampleId = $sampleInformation['icodeSwingingBucket'];
                     } elseif ($this->order['processed_centrifuge_type'] === self::FIXED_ANGLE) {
@@ -525,7 +525,7 @@ class Order
                 }
             }
         }
-        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+        if ($set === 'finalized' && ($this->order['type'] === 'kit' || $this->order['type'] === 'diversion')) {
             $formBuilder->add('fedex_tracking', Type\RepeatedType::class, [
                 'type' => Type\TextType::class,
                 'disabled' => $disabled,
