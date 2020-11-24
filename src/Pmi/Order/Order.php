@@ -502,12 +502,13 @@ class Order
                 ],
                 'required' => false
             ]);
-            if ($this->app->getOrderType() === 'dv') {
+            // Display centrifuge type for kit orders only
+            if ($this->order['type'] === 'kit') {
                 $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
                     'deleted' => 0,
                     'google_group' => $this->app->getSiteId()
                 ]);
-                if ($this->order['type'] !== 'saliva' && !empty($enabledSamples) && empty($sites['centrifuge_type'])) {
+                if (!empty($enabledSamples) && empty($sites['centrifuge_type'])) {
                     $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
                         'label' => 'Centrifuge type',
                         'required' => true,
@@ -525,6 +526,7 @@ class Order
                 }
             }
         }
+        // Display fedex tracking for kit and diversion type orders
         if ($set === 'finalized' && ($this->order['type'] === 'kit' || $this->order['type'] === 'diversion')) {
             $formBuilder->add('fedex_tracking', Type\RepeatedType::class, [
                 'type' => Type\TextType::class,
