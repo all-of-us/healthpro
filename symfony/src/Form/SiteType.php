@@ -72,6 +72,12 @@ class SiteType extends AbstractType
                 'constraints' => new Constraints\Type('string'),
                 'disabled' => $options['isDisabled'],
             ])
+            ->add('site_type', Type\TextType::class, [
+                'label' => 'Site Type',
+                'required' => false,
+                'constraints' => new Constraints\Type('string'),
+                'disabled' => $options['isDisabled'],
+            ])
             ->add('email', Type\TextType::class, [
                 'label' => 'Email address(es)',
                 'required' => false,
