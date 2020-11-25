@@ -428,6 +428,8 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'EHR Data Transfer';
                 $headers[] = 'Most Recent EHR Receipt';
                 $headers[] = 'Saliva Collection';
+                $headers[] = 'COPE Dec PPI Survey Complete';
+                $headers[] = 'COPE Dec PPI Survey Completion Date';
             }
             fputcsv($output, $headers);
 
@@ -550,6 +552,8 @@ class WorkQueueController extends AbstractController
                         $row[] = $participant->isEhrDataAvailable ? 1 : 0;
                         $row[] = WorkQueue::dateFromString($participant->ehrUpdateTime, $app->getUserTimezone());
                         $row[] = $participant->sample1SAL2CollectionMethod;
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeDec"});
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeDecAuthored"}, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
                 }
