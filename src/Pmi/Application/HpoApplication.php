@@ -350,7 +350,7 @@ class HpoApplication extends AbstractApplication
         $site = $this['em']->getRepository('sites')->fetchBy([
             'deleted' => 0,
             'google_group' => $this->getSiteId(),
-            'site_type' => 'diversion'
+            'site_type' => 'ECDC DV Diversion Pouch'
         ]);
         return !empty($site);
     }

@@ -339,7 +339,7 @@ class Order
                 }
             }
         }
-        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+        if ($set === 'finalized' && ($this->order['type'] === 'kit' || $this->order['type'] === 'diversion')) {
             $updateArray['fedex_tracking'] = $formData['fedex_tracking'];
         }
         return $updateArray;
@@ -800,7 +800,7 @@ class Order
                 $formData["processed_centrifuge_type"] = $this->order["processed_centrifuge_type"];
             }
         }
-        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+        if ($set === 'finalized' && ($this->order['type'] === 'kit' || $this->order['type'] === 'diversion')) {
             $formData['fedex_tracking'] = $this->order['fedex_tracking'];
         }
         return $formData;
