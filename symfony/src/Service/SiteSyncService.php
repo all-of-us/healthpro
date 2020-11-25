@@ -125,6 +125,7 @@ class SiteSyncService
                     }
                     $siteData->setTimezone(isset($site->timeZoneId) ? $site->timeZoneId : null);
                     $siteData->setType($awardee->type);
+                    $siteData->setSiteType(isset($site->siteType) ? $site->siteType : null);
                     if ($this->env->isProd()) {
                         if (isset($site->adminEmails) && is_array($site->adminEmails)) {
                             $siteData->setEmail(join(', ', $site->adminEmails));
