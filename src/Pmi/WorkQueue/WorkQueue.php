@@ -434,7 +434,7 @@ class WorkQueue
                     }
                 }
                 $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED', $participant->{'sampleStatus' . $newSample . 'Time'}, false);
-                if ($sample === '1SAL' && $participant->sample1SAL2CollectionMethod) {
+                if ($sample === '1SAL' && $participant->{'sampleStatus' . $newSample} === 'RECEIVED' && $participant->{'sampleStatus' . $newSample . 'Time'} && $participant->sample1SAL2CollectionMethod) {
                     $row["sample{$sample}"] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
                 }
             }

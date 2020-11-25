@@ -239,7 +239,8 @@ $(document).ready(function() {
                 show: [
                     'dateOfBirth:name',
                     '.col-group-default',
-                    '.col-group-patient-status'
+                    '.col-group-patient-status',
+                    '.col-group-metrics-ehr'
                 ],
                 hide: [
                     '.col-group-demographics',
@@ -248,7 +249,7 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-contact',
-                    '.col-group-metrics'
+                    '.col-group-metrics:not(.col-group-metrics-ehr)'
                 ]
             },
             {
