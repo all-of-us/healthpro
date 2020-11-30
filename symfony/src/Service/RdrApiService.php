@@ -26,7 +26,7 @@ class RdrApiService
         if ($environment->isLocal() && file_exists($basePath . '/../dev_config/rdr_key.json')) {
             $this->config['key_file'] = $basePath . '/../dev_config/rdr_key.json';
         }
-        if ($params->has('rdr_auth_json') && !$params->has('rdr_auth_json_disabled')) {
+        if ($params->has('rdr_auth_json')) {
             $this->config['rdr_auth_json'] = $params->get('rdr_auth_json');
         }
         // Load endpoint from configuration
@@ -34,9 +34,11 @@ class RdrApiService
             $this->endpoint = $params->get('rdr_endpoint');
         }
         // Set up OAuth Cache
-        $this->logger = $logger;
-        $this->cache = new DatastoreAdapter($params->get('ds_clean_up_limit'));
-        $this->cache->setLogger($this->logger);
+        if (!$params->has('rdr_auth_cache_disabled')) {
+            $this->logger = $logger;
+            $this->cache = new DatastoreAdapter($params->get('ds_clean_up_limit'));
+            $this->cache->setLogger($this->logger);
+        }
     }
 
     public function get($path, $params = [])
@@ -71,7 +73,9 @@ class RdrApiService
             $endpoint = $this->endpoint;
         }
 
-        $this->googleClient->setCache($this->cache);
+        if ($this->cache) {
+            $this->googleClient->setCache($this->cache);
+        }
 
         return $this->googleClient->authorize(new HttpClient([
             'base_uri' => $endpoint,
