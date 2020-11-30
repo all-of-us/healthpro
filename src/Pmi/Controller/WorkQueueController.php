@@ -550,7 +550,7 @@ class WorkQueueController extends AbstractController
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeNovAuthored"}, $app->getUserTimezone());
                         $row[] = WorkQueue::csvRetentionType($participant->retentionType);
                         $row[] = $participant->isEhrDataAvailable ? 1 : 0;
-                        $row[] = WorkQueue::dateFromString($participant->ehrUpdateTime, $app->getUserTimezone());
+                        $row[] = WorkQueue::dateFromString($participant->latestEhrReceiptTime, $app->getUserTimezone());
                         $row[] = $participant->sample1SAL2CollectionMethod;
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeDec"});
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeDecAuthored"}, $app->getUserTimezone());
