@@ -40,7 +40,7 @@ class WorkQueue
         'retentionEligibleTime',
         'retentionType',
         'isEhrDataAvailable',
-        'ehrUpdateTime',
+        'latestEhrReceiptTime',
         'patientStatus',
         'patientStatus',
         'patientStatus',
@@ -74,6 +74,8 @@ class WorkQueue
         'questionnaireOnCopeJulyAuthored',
         'questionnaireOnCopeNov',
         'questionnaireOnCopeNovAuthored',
+        'questionnaireOnCopeDec',
+        'questionnaireOnCopeDecAuthored',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -295,7 +297,8 @@ class WorkQueue
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
         'CopeJuly' => 'COPE July',
-        'CopeNov' => 'COPE Nov'
+        'CopeNov' => 'COPE Nov',
+        'CopeDec' => 'COPE Dec'
     ];
 
     public static $initialSurveys = [
@@ -388,7 +391,7 @@ class WorkQueue
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['isEhrDataAvailable'] = $this->getEhrAvailableStatus($participant->isEhrDataAvailable);
-            $row['ehrUpdateTime'] = self::dateFromString($participant->ehrUpdateTime, $app->getUserTimezone());
+            $row['latestEhrReceiptTime'] = self::dateFromString($participant->latestEhrReceiptTime, $app->getUserTimezone());
 
             //Contact
             $row['contactMethod'] = $e($participant->recontactMethod);

@@ -379,8 +379,8 @@
                                         </dd>
                                         <dt>Most Recent EHR Receipt</dt>
                                         <dd>
-                                            {% if participant.ehrUpdateTime %}
-                                                {{ participant.ehrUpdateTime|date('m/d/Y', app.userTimezone) }}
+                                            {% if participant.latestEhrReceiptTime %}
+                                                {{ participant.latestEhrReceiptTime|date('m/d/Y', app.userTimezone) }}
                                             {% endif %}
                                         </dd>
                                     </dl>

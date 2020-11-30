@@ -8,6 +8,7 @@ use App\Service\DeceasedReportsService;
 use App\Service\ParticipantSummaryService;
 use Pmi\Cache\DatastoreAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,6 +21,13 @@ class DeceasedReportsController extends AbstractController
 {
     const ORG_PENDING_CACHE_TTL = 500;
     const ORG_PENDING_CACHE_KEY = 'deceased_reports.org-%s.pending.count';
+
+    protected $cache;
+
+    public function __construct(ParameterBagInterface $params)
+    {
+        $this->cache = new DatastoreAdapter($params->get('ds_clean_up_limit'));
+    }
 
     /**
      * @Route("/", name="deceased_reports_index")
@@ -149,8 +157,7 @@ class DeceasedReportsController extends AbstractController
     public function getStats(SessionInterface $session, DeceasedReportsService $deceasedReportsService)
     {
         $organizationId = $session->get('siteOrganizationId');
-        $cache = new DatastoreAdapter(100);
-        $pendingReportCountCache = $cache->getItem(sprintf(self::ORG_PENDING_CACHE_KEY, $organizationId));
+        $pendingReportCountCache = $this->cache->getItem(sprintf(self::ORG_PENDING_CACHE_KEY, $organizationId));
         if ($cacheHit = $pendingReportCountCache->isHit()) {
             $pendingReportCount = (int) $pendingReportCountCache->get();
         } else {
@@ -158,7 +165,7 @@ class DeceasedReportsController extends AbstractController
             $reports = $deceasedReportsService->getDeceasedReports($organizationId, 'preliminary');
             $pendingReportCount = count($reports);
             $pendingReportCountCache->set($pendingReportCount);
-            $cache->save($pendingReportCountCache);
+            $this->cache->save($pendingReportCountCache);
         }
 
         return $this->json([
@@ -171,8 +178,7 @@ class DeceasedReportsController extends AbstractController
 
     private function resetPendingCountCache($organizationId): bool
     {
-        $cache = new DatastoreAdapter(100);
-        $cache->deleteItem(sprintf(self::ORG_PENDING_CACHE_KEY, $organizationId));
+        $this->cache->deleteItem(sprintf(self::ORG_PENDING_CACHE_KEY, $organizationId));
         return true;
     }
 
