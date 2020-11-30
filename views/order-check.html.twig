@@ -13,7 +13,7 @@
 
     <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#">Safety Check</a></li>
-        {% if app.isDvType %}
+        {% if app.getOrderType == 'dv' %}
             {% set steps = ['Create', 'Collect', 'Process', 'Finalize'] %}
         {% else %}
             {% set steps = ['Create', 'Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}

@@ -15,7 +15,7 @@
     <ul class="nav nav-tabs">
         <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
         <li role="presentation" class="active"><a href="#">Create</a></li>
-        {% if app.isDvType %}
+        {% if app.getOrderType == 'dv' %}
             {% set steps = ['Collect', 'Process', 'Finalize'] %}
         {% else %}
             {% set steps = ['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
