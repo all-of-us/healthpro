@@ -31,7 +31,7 @@
             {{ form_errors(confirmForm) }}
             <div class="row row-equal-height">
                 {% if app.getOrderType == 'hpo' %}
-                    <div class="col-sm-6 col-md-6">
+                    <div class="col-sm-6 col-md-6 {% if app.isDvType %} col-sm-offset-3 col-md-offset-3 {% endif %}">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title text-center">HPO Biobank Order</h3>
