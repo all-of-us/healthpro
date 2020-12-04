@@ -15,7 +15,7 @@
     <ul class="nav nav-tabs">
         <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
         <li role="presentation" class="active"><a href="#">Create</a></li>
-        {% if app.isDvType %}
+        {% if app.getOrderType == 'dv' %}
             {% set steps = ['Collect', 'Process', 'Finalize'] %}
         {% else %}
             {% set steps = ['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
@@ -30,8 +30,8 @@
         {{ form_start(confirmForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(confirmForm) }}
             <div class="row row-equal-height">
-                {% if app.isDvType is empty %}
-                    <div class="col-sm-6 col-md-6">
+                {% if app.getOrderType == 'hpo' %}
+                    <div class="col-sm-6 col-md-6 {% if app.isDvType %} col-sm-offset-3 col-md-offset-3 {% endif %}">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title text-center">HPO Biobank Order</h3>
@@ -76,7 +76,7 @@
                         </div>
                     </div>
                 {% endif %}
-                {% if app.isDvType %}
+                {% if app.getOrderType == 'dv' %}
                     <div class="col-sm-8 col-sm-offset-2">
                         <div class="panel panel-default">
                             <div class="panel-heading">

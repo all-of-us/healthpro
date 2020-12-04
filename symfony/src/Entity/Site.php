@@ -92,6 +92,11 @@ class Site
      */
     private $deleted = false;
 
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $siteType;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -273,6 +278,18 @@ class Site
     public function setDeleted(int $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getSiteType(): ?string
+    {
+        return $this->siteType;
+    }
+
+    public function setSiteType(?string $siteType): self
+    {
+        $this->siteType = $siteType;
 
         return $this;
     }

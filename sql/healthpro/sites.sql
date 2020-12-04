@@ -10,6 +10,7 @@ CREATE TABLE `sites` (
   `timezone` varchar(100) DEFAULT NULL,
   `organization` varchar(100) DEFAULT NULL,
   `type` varchar(100) DEFAULT NULL,
+  `site_type` varchar(100) DEFAULT NULL,
   `awardee` varchar(100) DEFAULT NULL, 
   `email` varchar(512) DEFAULT NULL,
   `centrifuge_type` varchar(50) NULL DEFAULT NULL,

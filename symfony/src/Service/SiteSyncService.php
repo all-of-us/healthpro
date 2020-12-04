@@ -112,19 +112,23 @@ class SiteSyncService
                         $siteData->setMayolinkAccount(isset($site->mayolinkClientNumber) ? $site->mayolinkClientNumber : null);
                     } elseif ($this->env->isStable()) {
                         if (strtolower($awardee->type) === 'dv') {
-                            // Set to default dv account number if existing mayo account number is empty or equal to default hpo account number
-                            if (empty($existing) || (empty($existing->getMayolinkAccount()) || ($existing->getMayolinkAccount() === $this->params->get('ml_account_hpo')))) {
-                                $siteData->setMayolinkAccount($this->params->get('ml_account_dv'));
+                            // For diversion pouch site set hpo mayo account number
+                            if (isset($site->siteType) && $site->siteType === 'ECDC DV Diversion Pouch') {
+                                $mayoAccountType = 'ml_account_hpo';
+                            } else {
+                                $mayoAccountType = 'ml_account_dv';
                             }
                         } else {
-                            // Set to default hpo account number if existing mayo account number is empty or equal to default dv account number
-                            if (empty($existing) || (empty($existing->getMayolinkAccount()) || ($existing->getMayolinkAccount() === $this->params->get('ml_account_dv')))) {
-                                $siteData->setMayolinkAccount($this->params->get('ml_account_hpo'));
-                            }
+                            $mayoAccountType = 'ml_account_hpo';
+                        }
+                        // Set to default hpo/dv account number if existing mayo account number is empty or equal to default hpo/dv account number
+                        if (empty($existing) || (empty($existing->getMayolinkAccount()) || ($existing->getMayolinkAccount() === $this->params->get($mayoAccountType)))) {
+                            $siteData->setMayolinkAccount($this->params->get($mayoAccountType));
                         }
                     }
                     $siteData->setTimezone(isset($site->timeZoneId) ? $site->timeZoneId : null);
                     $siteData->setType($awardee->type);
+                    $siteData->setSiteType(isset($site->siteType) ? $site->siteType : null);
                     if ($this->env->isProd()) {
                         if (isset($site->adminEmails) && is_array($site->adminEmails)) {
                             $siteData->setEmail(join(', ', $site->adminEmails));
