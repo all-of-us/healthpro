@@ -67,7 +67,8 @@ enforce2fa: 0
 sites_use_rdr: true
 
 # Enable Google Analytics by setting property ID
-# google_analytics_property: UA-XXXXXXXX-NN
+google_analytics_property: UA-XXXXXXXX-NN
+
 # order_samples_version:
 # order_samples_info_3:
 
@@ -95,3 +96,6 @@ ml_account_dv:
 
 # Set mock login
 # local_mock_auth: 1
+
+# Report Kit url
+reportKitUrl:

@@ -50,7 +50,7 @@
                 {% if is_granted('ROLE_DV_ADMIN') %}
                     <li><a href="{{ path('problem_reports') }}">Problem Reports</a></li>
                 {% endif %}
-                {% if is_granted('ROLE_USER') and app.session.get('site') and isDvType and reportKitUrl %}
+                {% if is_granted('ROLE_USER') and app.session.get('site') and app.session.get('orderType') == 'dv' and reportKitUrl %}
                     <li><a data-href="{{ reportKitUrl }}" class="external-link">Report Kit Problem</a></li>
                 {% endif %}
                 {% if is_granted('ROLE_ADMIN') %}
