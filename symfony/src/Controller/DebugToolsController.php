@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use App\Form\DebugParticipantLookupType;
-use App\Form\MissingEvaluationsType;
+use App\Form\MissingMeasurementsType;
 use App\Form\MissingOrdersType;
-use App\Repository\EvaluationRepository;
+use App\Repository\MeasurementRepository;
 use App\Repository\OrderRepository;
 use App\Service\DebugToolsService;
 use App\Service\EnvironmentService;
@@ -62,20 +62,20 @@ class DebugToolsController extends AbstractController
     /**
      * @Route("/missing/measurements", name="admin_debug_missing_measurements")
      */
-    public function missingMeasurementsAction(Request $request, EvaluationRepository $evaluationRepository)
+    public function missingMeasurementsAction(Request $request, MeasurementRepository $measurementRepository)
     {
-        $missing = $evaluationRepository->getMissingEvaluations();
+        $missing = $measurementRepository->getMissingMeasurements();
         $choices = [];
         foreach ($missing as $physicalMeasurements) {
             $choices[$physicalMeasurements->getId()] = $physicalMeasurements->getId();
         }
-        $form = $this->createForm(MissingEvaluationsType::class, null, ['choices' => $choices]);
+        $form = $this->createForm(MissingMeasurementsType::class, null, ['choices' => $choices]);
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             $ids = $form->get('ids')->getData();
             if (!empty($ids) && $form->isValid()) {
                 // TODO
-                // Send evaluations to RDR
+                // Send measurements to RDR
             } else {
                 $this->addFlash('error', 'Please select at least one physical measurements');
             }

@@ -6,9 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="evaluations")
- * @ORM\Entity(repositoryClass="App\Repository\EvaluationRepository")
+ * @ORM\Entity(repositoryClass="MeasurementRepository")
  */
-class Evaluation
+class Measurement
 {
     /**
      * @ORM\Id()
@@ -83,7 +83,7 @@ class Evaluation
     private $data;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\EvaluationHistory", inversedBy="evaluation", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\MeasurementHistory", inversedBy="measurement", cascade={"persist", "remove"})
      */
     private $history;
 
@@ -248,12 +248,12 @@ class Evaluation
         return $this;
     }
 
-    public function getHistory(): ?EvaluationHistory
+    public function getHistory(): ?MeasurementHistory
     {
         return $this->history;
     }
 
-    public function setHistoryId(?EvaluationHistory $history): self
+    public function setHistoryId(?MeasurementHistory $history): self
     {
         $this->history = $history;
 

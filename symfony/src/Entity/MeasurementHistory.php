@@ -6,9 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="evaluations_history")
- * @ORM\Entity(repositoryClass="App\Repository\EvaluationHistoryRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\MeasurementHistoryRepository")
  */
-class EvaluationHistory
+class MeasurementHistory
 {
     /**
      * @ORM\Id()
@@ -18,10 +18,10 @@ class EvaluationHistory
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Evaluation", inversedBy="evaluationHistory", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="Measurement", inversedBy="measurementHistory", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
-    private $evaluation;
+    private $measurement;
 
     /**
      * @ORM\Column(type="integer")
@@ -54,14 +54,14 @@ class EvaluationHistory
         return $this->id;
     }
 
-    public function getEvaluation(): ?Evaluation
+    public function getMeasurement(): ?Measurement
     {
-        return $this->evaluation;
+        return $this->measurement;
     }
 
-    public function setEvaluation(Evaluation $evaluation): self
+    public function setMeasurement(Measurement $measurement): self
     {
-        $this->evaluation = $evaluation;
+        $this->measurement = $measurement;
 
         return $this;
     }
