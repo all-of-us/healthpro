@@ -76,6 +76,9 @@ label.label-normal {
     .dl-horizontal-lg dd {
         margin-left: 220px;
     }
+    .dl-horizontal-lg.samples-received dt {
+        width: 206px;
+    }
 }
 .dl-vertical dd {
     margin-bottom: 10px;
