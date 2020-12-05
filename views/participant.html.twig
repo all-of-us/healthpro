@@ -299,15 +299,15 @@
                                         {% endif %}
                                     </div>
                                     <hr />
-                                    <dl class="dl-horizontal dl-horizontal-lg">
-                                        <dt>Biospecimens Received</dt>
+                                    <dl class="dl-horizontal dl-horizontal-lg samples-received">
+                                        <dt>Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
                                         <dd>
                                             {% if participant.numBaselineSamplesArrived >= 7 %}
                                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
                                             {% endif %}
                                             {{ participant.numBaselineSamplesArrived }}
                                         </dd>
-                                        <dt>Samples for DNA Received?</dt>
+                                        <dt>Samples for DNA Received? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
                                         <dd>
                                             {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
                                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
@@ -413,15 +413,15 @@
                                         {% endif %}
                                     </div>
                                     <hr />
-                                    <dl class="dl-horizontal dl-horizontal-lg">
-                                        <dt>Biospecimens Received</dt>
+                                    <dl class="dl-horizontal dl-horizontal-lg samples-received">
+                                        <dt>Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
                                         <dd>
                                             {% if participant.numBaselineSamplesArrived >= 7 %}
                                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
                                             {% endif %}
                                             {{ participant.numBaselineSamplesArrived }}
                                         </dd>
-                                        <dt>Samples for DNA Received?</dt>
+                                        <dt>Samples for DNA Received? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
                                         <dd>
                                             {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
                                                 <i class="fa fa-check text-success" aria-hidden="true"></i>

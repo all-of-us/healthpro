@@ -378,7 +378,7 @@ class WorkQueueController extends AbstractController
             $headers[] = 'Paired Organization';
             $headers[] = 'Physical Measurements Site';
             $headers[] = 'Samples for DNA Received';
-            $headers[] = 'Biospecimens';
+            $headers[] = 'Baseline Samples';
             foreach (WorkQueue::$samples as $sample => $label) {
                 $headers[] = $label . ' Received';
                 $headers[] = $label . ' Received Date';
