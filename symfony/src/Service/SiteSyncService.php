@@ -114,16 +114,19 @@ class SiteSyncService
                         if (strtolower($awardee->type) === 'dv') {
                             // For diversion pouch site set hpo mayo account number
                             if (isset($site->siteType) && $site->siteType === 'ECDC DV Diversion Pouch') {
-                                $mayoAccountType = 'ml_account_hpo';
+                                $checkMayoAccountType = 'dv';
+                                $setMayoAccountType = 'hpo';
                             } else {
-                                $mayoAccountType = 'ml_account_dv';
+                                $checkMayoAccountType = 'hpo';
+                                $setMayoAccountType = 'dv';
                             }
                         } else {
-                            $mayoAccountType = 'ml_account_hpo';
+                            $checkMayoAccountType = 'dv';
+                            $setMayoAccountType = 'hpo';
                         }
-                        // Set to default hpo/dv account number if existing mayo account number is empty or equal to default hpo/dv account number
-                        if (empty($existing) || (empty($existing->getMayolinkAccount()) || ($existing->getMayolinkAccount() === $this->params->get($mayoAccountType)))) {
-                            $siteData->setMayolinkAccount($this->params->get($mayoAccountType));
+                        // Set to default hpo/dv account number if existing mayo account number is empty or equal to default dv/hpo account number
+                        if (empty($existing) || (empty($existing->getMayolinkAccount()) || ($existing->getMayolinkAccount() === $this->params->get('ml_account_' . $checkMayoAccountType)))) {
+                            $siteData->setMayolinkAccount($this->params->get('ml_account_' . $setMayoAccountType));
                         }
                     }
                     $siteData->setTimezone(isset($site->timeZoneId) ? $site->timeZoneId : null);
