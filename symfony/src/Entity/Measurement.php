@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="evaluations")
- * @ORM\Entity(repositoryClass="MeasurementRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\MeasurementRepository")
  */
 class Measurement
 {

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Measurement;
 use App\Form\DebugParticipantLookupType;
 use App\Form\MissingMeasurementsType;
 use App\Form\MissingOrdersType;
@@ -9,6 +10,8 @@ use App\Repository\MeasurementRepository;
 use App\Repository\OrderRepository;
 use App\Service\DebugToolsService;
 use App\Service\EnvironmentService;
+use App\Service\MeasurementsService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -62,7 +65,7 @@ class DebugToolsController extends AbstractController
     /**
      * @Route("/missing/measurements", name="admin_debug_missing_measurements")
      */
-    public function missingMeasurementsAction(Request $request, MeasurementRepository $measurementRepository)
+    public function missingMeasurementsAction(Request $request, MeasurementRepository $measurementRepository, EntityManagerInterface $em, MeasurementsService $measurementsService)
     {
         $missing = $measurementRepository->getMissingMeasurements();
         $choices = [];
@@ -74,8 +77,25 @@ class DebugToolsController extends AbstractController
         if ($form->isSubmitted()) {
             $ids = $form->get('ids')->getData();
             if (!empty($ids) && $form->isValid()) {
-                // TODO
-                // Send measurements to RDR
+                $repository = $em->getRepository(Measurement::class);
+                foreach ($ids as $id) {
+                    $measurement = $repository->findOneBy(['id' => $id]);
+                    if (!$measurement) {
+                        continue;
+                    }
+                    $measurementsService->loadFromAObject($measurement);
+                    $parentRdrId = null;
+                    if ($measurement->getParentId()) {
+                        $parentEvaluation = $repository->findOneBy(['id' => $measurement->getParentId()]);
+                        if ($parentEvaluation) {
+                            $parentRdrId = $parentEvaluation->getRdrId();
+                        }
+                    }
+                    // Get FHIR bundle
+                    $fhir = $measurementsService->getFhir($measurement->getFinalizedTs(), $parentRdrId);
+                    // TODO
+                    // Send measurements to RDR
+                }
             } else {
                 $this->addFlash('error', 'Please select at least one physical measurements');
             }
