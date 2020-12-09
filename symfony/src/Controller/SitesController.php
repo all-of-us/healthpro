@@ -105,8 +105,6 @@ class SitesController extends AbstractController
      */
     public function siteSyncAction(SiteSyncService $siteSyncService, ParameterBagInterface $params, Request $request)
     {
-        $preview = $siteSyncService->dryRun();
-
         if (!$params->has('sites_use_rdr')) {
             $formView = false;
         } else {
@@ -124,6 +122,7 @@ class SitesController extends AbstractController
             }
             $formView = $form->createView();
         }
+        $preview = $siteSyncService->dryRun();
         $canSync = !empty($preview['deleted']) || !empty($preview['modified']) || !empty($preview['created']);
         return $this->render('admin/sites/sync.html.twig', [
             'preview' => $preview,
