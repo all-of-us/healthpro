@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Pmi\Util;
 use Pmi\Evaluation\Fhir;
 use Pmi\Evaluation\InvalidSchemaException;
 use Pmi\Evaluation\MissingSchemaException;
@@ -13,11 +12,6 @@ use Pmi\Evaluation\MissingSchemaException;
 class MeasurementService
 {
     const CURRENT_VERSION = '0.3.3';
-    const LIMIT_TEXT_SHORT = 1000;
-    const LIMIT_TEXT_LONG = 10000;
-    const EVALUATION_ACTIVE = 'active';
-    const EVALUATION_CANCEL = 'cancel';
-    const EVALUATION_RESTORE = 'restore';
 
     protected $em;
     protected $session;
@@ -34,19 +28,6 @@ class MeasurementService
     protected $finalizedSite;
     protected $locked = false;
 
-    public $measurement;
-
-    public static $cancelReasons = [
-        'Data entered for wrong participant' => 'PM_CANCEL_WRONG_PARTICIPANT',
-        'Other' => 'OTHER'
-    ];
-
-    public static $restoreReasons = [
-        'Physical Measurements cancelled for wrong participant' => 'PM_RESTORE_WRONG_PARTICIPANT',
-        'Physical Measurements can be amended instead of cancelled' => 'PM_RESTORE_AMEND',
-        'Other' => 'OTHER'
-    ];
-
     public function __construct(EntityManagerInterface $em, SessionInterface $session, LoggerService $loggerService, UserService $userService, RdrApiService $rdrApiService)
     {
         $this->em = $em;
@@ -60,49 +41,35 @@ class MeasurementService
         $this->normalizeData();
     }
 
-    public function loadFromAObject($object)
+    public function loadFromAObject($measurement)
     {
-        $this->measurement = $object;
-        if (array_key_exists('version', $object)) {
-            $this->version = $object->getVersion();
+        if (!empty($measurement->getVersion())) {
+            $this->version = $measurement->getVersion();
         }
-        if (is_object($object->getData())) {
-            $this->data = $object->getData();
+        if (is_object($measurement->getData())) {
+            $this->data = $measurement->getData();
         } else {
-            $this->data = json_decode($object->getData());
+            $this->data = json_decode($measurement->getData());
         }
-        if (!empty($object->getFinalizedTs())) {
+        if (!empty($measurement->getFinalizedTs())) {
             $this->locked = true;
         }
-        $this->participant = $object->getParticipantId();
-        $createdUser = $this->em->getRepository(User::class)->findOneBy(['id' => $object->getUserId()]);
-        if (!$object->getFinalizedUserId()) {
-            $finalizedUserId = $object->getFinalizedTs() ? $object->getUserId() : $this->userService->getUser()->getId();
-            $finalizedSite = $object->getFinalizedTs() ? $object->getSite() : $this->session->get('site')->id;
+        $this->participant = $measurement->getParticipantId();
+        $createdUser = $this->em->getRepository(User::class)->findOneBy(['id' => $measurement->getUserId()]);
+        if (!$measurement->getFinalizedUserId()) {
+            $finalizedUserId = $measurement->getFinalizedTs() ? $measurement->getUserId() : $this->userService->getUser()->getId();
+            $finalizedSite = $measurement->getFinalizedTs() ? $measurement->getSite() : $this->session->get('site')->id;
         } else {
-            $finalizedUserId = $object->getFinalizedUserId();
-            $finalizedSite = $object->getFinalizedSite();
+            $finalizedUserId = $measurement->getFinalizedUserId();
+            $finalizedSite = $measurement->getFinalizedSite();
         }
         $finalizedUser = $this->em->getRepository(User::class)->findOneBy(['id' => $finalizedUserId]);
         $this->createdUser = $createdUser->getEmail();
-        $this->createdSite = $object->getSite();
+        $this->createdSite = $measurement->getSite();
         $this->finalizedUser = $finalizedUser->getEmail();
         $this->finalizedSite = $finalizedSite;
         $this->loadSchema();
         $this->normalizeData();
-    }
-
-    public function toArray($serializeData = true)
-    {
-        return [
-            'version' => $this->version,
-            'data' => $serializeData ? json_encode($this->data) : $this->data
-        ];
-    }
-
-    public function getVersion()
-    {
-        return $this->version;
     }
 
     public function getSchema()
@@ -121,28 +88,6 @@ class MeasurementService
         return $schema;
     }
 
-    public function getWarnings()
-    {
-        $warnings = [];
-        foreach ($this->schema->fields as $metric) {
-            if (!empty($metric->warnings) && is_array($metric->warnings)) {
-                $warnings[$metric->name] = $metric->warnings;
-            }
-        }
-        return $warnings;
-    }
-
-    public function getConversions()
-    {
-        $conversions = [];
-        foreach ($this->schema->fields as $metric) {
-            if (!empty($metric->convert)) {
-                $conversions[$metric->name] = $metric->convert;
-            }
-        }
-        return $conversions;
-    }
-
     public function loadSchema()
     {
         $file = __DIR__ . "/../../../src/Pmi/Evaluation/versions/{$this->version}.json";
@@ -158,12 +103,6 @@ class MeasurementService
                 $this->data->{$field->name} = null;
             }
         }
-    }
-
-    public function setData($data)
-    {
-        $this->data = $data;
-        $this->normalizeData();
     }
 
     protected function normalizeData()
@@ -204,55 +143,6 @@ class MeasurementService
             'summary' => $this->getSummary()
         ]);
         return $fhir->toObject();
-    }
-
-    protected function isMinVersion($minVersion)
-    {
-        return Util::versionIsAtLeast($this->version, $minVersion);
-    }
-
-    public function getFinalizeErrors()
-    {
-        $errors = [];
-
-        if (!$this->isMinVersion('0.3.0')) {
-            // prior to version 0.3.0, any state is valid
-            return $errors;
-        }
-
-        foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
-            foreach ($this->data->$field as $k => $value) {
-                if (!$this->data->{'blood-pressure-protocol-modification'}[$k] && !$value) {
-                    $errors[] = [$field, $k];
-                }
-            }
-        }
-        foreach (['height', 'weight'] as $field) {
-            if (!$this->data->{$field . '-protocol-modification'} && !$this->data->$field) {
-                $errors[] = $field;
-            }
-        }
-        if (!$this->data->pregnant && !$this->data->wheelchair) {
-            foreach (['hip-circumference', 'waist-circumference'] as $field) {
-                foreach ($this->data->$field as $k => $value) {
-                    if ($k == 2) {
-                        // not an error on the third measurement if first two aren't completed
-                        // or first two measurements are within 1 cm
-                        if (!$this->data->{$field}[0] || !$this->data->{$field}[1]) {
-                            break;
-                        }
-                        if (abs($this->data->{$field}[0] - $this->data->{$field}[1]) <= 1) {
-                            break;
-                        }
-                    }
-                    if (!$this->data->{$field . '-protocol-modification'}[$k] && !$value) {
-                        $errors[] = [$field, $k];
-                    }
-                }
-            }
-        }
-
-        return $errors;
     }
 
     protected static function cmToFtIn($cm)
@@ -357,21 +247,7 @@ class MeasurementService
         return $summary;
     }
 
-    protected function getEvaluationUserSiteData($user, $site)
-    {
-        return [
-            'author' => [
-                'system' => 'https://www.pmi-ops.org/healthpro-username',
-                'value' => $user
-            ],
-            'site' => [
-                'system' => 'https://www.pmi-ops.org/site-id',
-                'value' => $site
-            ]
-        ];
-    }
-
-    public function createEvaluation($participantId, $fhir)
+    public function createMeasurement($participantId, $fhir)
     {
         try {
             $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/PhysicalMeasurements", $fhir);
