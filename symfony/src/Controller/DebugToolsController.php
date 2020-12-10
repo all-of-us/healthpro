@@ -10,7 +10,7 @@ use App\Repository\MeasurementRepository;
 use App\Repository\OrderRepository;
 use App\Service\DebugToolsService;
 use App\Service\EnvironmentService;
-use App\Service\MeasurementsService;
+use App\Service\MeasurementService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,7 +65,7 @@ class DebugToolsController extends AbstractController
     /**
      * @Route("/missing/measurements", name="admin_debug_missing_measurements")
      */
-    public function missingMeasurementsAction(Request $request, MeasurementRepository $measurementRepository, EntityManagerInterface $em, MeasurementsService $measurementsService)
+    public function missingMeasurementsAction(Request $request, MeasurementRepository $measurementRepository, EntityManagerInterface $em, MeasurementService $measurementsService)
     {
         $missing = $measurementRepository->getMissingMeasurements();
         $choices = [];

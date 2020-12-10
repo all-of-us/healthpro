@@ -10,7 +10,7 @@ use Pmi\Evaluation\Fhir;
 use Pmi\Evaluation\InvalidSchemaException;
 use Pmi\Evaluation\MissingSchemaException;
 
-class MeasurementsService
+class MeasurementService
 {
     const CURRENT_VERSION = '0.3.3';
     const LIMIT_TEXT_SHORT = 1000;
