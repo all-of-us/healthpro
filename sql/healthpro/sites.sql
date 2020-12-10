@@ -10,10 +10,12 @@ CREATE TABLE `sites` (
   `timezone` varchar(100) DEFAULT NULL,
   `organization` varchar(100) DEFAULT NULL,
   `type` varchar(100) DEFAULT NULL,
+  `site_type` varchar(100) DEFAULT NULL,
   `awardee` varchar(100) DEFAULT NULL, 
   `email` varchar(512) DEFAULT NULL,
   `centrifuge_type` varchar(50) NULL DEFAULT NULL,
   `workqueue_download` varchar(50) NOT NULL,
   `deleted` tinyint(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `site_id` (`site_id`)
 ) DEFAULT CHARSET=utf8mb4;

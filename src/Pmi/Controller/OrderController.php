@@ -79,7 +79,7 @@ class OrderController extends AbstractController
             $app->abort(403);
         }
         $formBuilder = $app['form.factory']->createBuilder(FormType::class);
-        if ($app->isDVType()) {
+        if ($app->getOrderType() === 'dv') {
             $formBuilder->add('kitId', Type\RepeatedType::class, [
                 'type' => Type\TextType::class,
                 'invalid_message' => 'The kit order ID fields must match.',
@@ -105,7 +105,7 @@ class OrderController extends AbstractController
             ]);
         }
         $order = new Order($app);
-        if (!$app->isDVType()) {
+        if ($app->getOrderType() === 'hpo') {
             $formBuilder->add('samples', Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
@@ -161,8 +161,11 @@ class OrderController extends AbstractController
                 $orderData['biobank_id'] = $participant->biobankId;
                 $orderData['created_ts'] = new \DateTime();
                 $orderData['version'] = $order->version;
-                if (!$app->isDVType()) {
+                if ($app->getOrderType() === 'hpo') {
                     $orderData['processed_centrifuge_type'] = Order::SWINGING_BUCKET;
+                }
+                if ($app->isDVType() && $app->isDiversionPouchSite()) {
+                    $orderData['type'] = 'diversion';
                 }
                 $orderId = null;
                 $ordersRepository->wrapInTransaction(function() use ($ordersRepository, $order, &$orderData, &$orderId) {
@@ -415,7 +418,7 @@ class OrderController extends AbstractController
                     $label = Order::$identifierLabel[$type[0]];
                     $finalizeForm['finalized_notes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
-                if ($order->get('type') === 'kit' && $finalizeForm->has('fedex_tracking') && !empty($finalizeForm['fedex_tracking']->getData())) {
+                if (($order->get('type') === 'kit' || $order->get('type') === 'diversion') && $finalizeForm->has('fedex_tracking') && !empty($finalizeForm['fedex_tracking']->getData())) {
                     $duplicateFedexTracking = $app['em']->getRepository('orders')->fetchBySql('fedex_tracking = ? and id != ?', [
                         $finalizeForm['fedex_tracking']->getData(),
                         $orderId
