@@ -21,7 +21,9 @@ class MeasurementsService
 
     protected $em;
     protected $session;
+    protected $loggerService;
     protected $userService;
+    protected $rdrApiService;
     protected $version;
     protected $data;
     protected $schema;
@@ -45,11 +47,13 @@ class MeasurementsService
         'Other' => 'OTHER'
     ];
 
-    public function __construct(EntityManagerInterface $em, SessionInterface $session, UserService $userService)
+    public function __construct(EntityManagerInterface $em, SessionInterface $session, LoggerService $loggerService, UserService $userService, RdrApiService $rdrApiService)
     {
         $this->em = $em;
         $this->session = $session;
+        $this->loggerService = $loggerService;
         $this->userService = $userService;
+        $this->rdrApiService = $rdrApiService;
         $this->version = self::CURRENT_VERSION;
         $this->data = new \StdClass();
         $this->loadSchema();
@@ -365,5 +369,20 @@ class MeasurementsService
                 'value' => $site
             ]
         ];
+    }
+
+    public function createEvaluation($participantId, $fhir)
+    {
+        try {
+            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/PhysicalMeasurements", $fhir);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
+            }
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return false;
+        }
+        return false;
     }
 }

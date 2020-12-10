@@ -93,9 +93,20 @@ class DebugToolsController extends AbstractController
                     }
                     // Get FHIR bundle
                     $fhir = $measurementsService->getFhir($measurement->getFinalizedTs(), $parentRdrId);
-                    // TODO
+
                     // Send measurements to RDR
+                    if ($rdrEvalId = $measurementsService->createEvaluation($measurement->getParticipantId(), $fhir)) {
+                        $updateMeasurement = $repository->find($measurement->getId());
+                        $updateMeasurement->setRdrId($rdrEvalId);
+                        $updateMeasurement->setFhirVersion(\Pmi\Evaluation\Fhir::CURRENT_VERSION);
+                        $em->flush();
+                        $em->clear();
+                        $this->addFlash('success', "#{$id} successfully sent to RDR");
+                    } else {
+                        $this->addFlash('error', "#{$id} failed sending to RDR");
+                    }
                 }
+                return $this->redirectToRoute('admin_debug_missing_measurements');
             } else {
                 $this->addFlash('error', 'Please select at least one physical measurements');
             }
