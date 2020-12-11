@@ -177,6 +177,11 @@ class Order
      */
     private $history;
 
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $finalizedSite;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -410,12 +415,12 @@ class Order
         return $this;
     }
 
-    public function getProcessedSamplesTs(): ?\DateTimeInterface
+    public function getProcessedSamplesTs(): ?string
     {
         return $this->processedSamplesTs;
     }
 
-    public function setProcessedSamplesTs(?\DateTimeInterface $processedSamplesTs): self
+    public function setProcessedSamplesTs(?string $processedSamplesTs): self
     {
         $this->processedSamplesTs = $processedSamplesTs;
 
@@ -562,6 +567,18 @@ class Order
     public function setHistoryId(?OrderHistory $history): self
     {
         $this->history = $history;
+
+        return $this;
+    }
+
+    public function getFinalizedSite(): ?string
+    {
+        return $this->finalizedSite;
+    }
+
+    public function setFinalizedSite(?string $finalizedSite): self
+    {
+        $this->finalizedSite = $finalizedSite;
 
         return $this;
     }

@@ -3,14 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Measurement;
+use App\Entity\Order;
 use App\Form\DebugParticipantLookupType;
 use App\Form\MissingMeasurementsType;
 use App\Form\MissingOrdersType;
-use App\Repository\MeasurementRepository;
-use App\Repository\OrderRepository;
 use App\Service\DebugToolsService;
 use App\Service\EnvironmentService;
 use App\Service\MeasurementService;
+use App\Service\OrderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,9 +65,9 @@ class DebugToolsController extends AbstractController
     /**
      * @Route("/missing/measurements", name="admin_debug_missing_measurements")
      */
-    public function missingMeasurementsAction(Request $request, MeasurementRepository $measurementRepository, EntityManagerInterface $em, MeasurementService $measurementsService)
+    public function missingMeasurementsAction(Request $request, EntityManagerInterface $em, MeasurementService $measurementsService)
     {
-        $missing = $measurementRepository->getMissingMeasurements();
+        $missing = $em->getRepository(Measurement::class)->getMissingMeasurements();
         $choices = [];
         foreach ($missing as $physicalMeasurements) {
             $choices[$physicalMeasurements->getId()] = $physicalMeasurements->getId();
@@ -120,9 +120,9 @@ class DebugToolsController extends AbstractController
     /**
      * @Route("/missing/orders", name="admin_debug_missing_orders")
      */
-    public function missingOrdersAction(Request $request, OrderRepository $orderRepository)
+    public function missingOrdersAction(Request $request, EntityManagerInterface $em, OrderService $orderService)
     {
-        $missing = $orderRepository->getMissingOrders();
+        $missing = $em->getRepository(Order::class)->getMissingOrders();
         $choices = [];
         foreach ($missing as $orders) {
             $choices[$orders->getId()] = $orders->getId();
@@ -132,8 +132,19 @@ class DebugToolsController extends AbstractController
         if ($form->isSubmitted()) {
             $ids = $form->get('ids')->getData();
             if (!empty($ids) && $form->isValid()) {
-                // TODO
+                $repository = $em->getRepository(Order::class);
                 // Send orders to RDR
+                foreach ($ids as $id) {
+                    $order = $repository->find(['id' => $id]);
+                    if (!$order) {
+                        continue;
+                    }
+                    // Get order payload
+                    $orderRdrObject = $orderService->getRdrObject($order);
+
+                    //TODO
+                    // Send order to RDR
+                }
             } else {
                 $this->addFlash('error', 'Please select at least one order');
             }
