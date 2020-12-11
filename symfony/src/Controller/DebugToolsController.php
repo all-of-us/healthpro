@@ -136,8 +136,28 @@ class DebugToolsController extends AbstractController
                     // Get order payload
                     $orderRdrObject = $orderService->getRdrObject($order);
 
-                    //TODO
                     // Send order to RDR
+                    if ($rdrId = $orderService->createOrder($order->getParticipantId(), $orderRdrObject)) {
+                        $updateOrder = $repository->find($order->getId());
+                        $updateOrder->setRdrId($rdrId);
+                        $updateOrder->flush();
+                        $updateOrder->clear();
+                        $this->addFlash('success', "#{$id} successfully sent to RDR");
+                    } elseif ($orderService->getLastErrorCode() === 409) {
+                        $rdrOrder = $orderService->getOrder($order->getParticipantId(), $order->getMayoId());
+                        // Check if order exists in RDR
+                        if (!empty($rdrOrder) && $rdrOrder->id === $order->getMayoId()) {
+                            $updateOrder = $repository->find($order->getId());
+                            $updateOrder->setRdrId($rdrId);
+                            $updateOrder->flush();
+                            $updateOrder->clear();
+                            $this->addFlash('success', "#{$id} successfully reconciled");
+                        } else {
+                            $this->addFlash('error', "#{$id} failed to finalize: " . $orderService->getLastError());
+                        }
+                    } else {
+                        $this->addFlash('error', "#{$id} failed sending to RDR: " . $orderService->getLastError());
+                    }
                 }
             } else {
                 $this->addFlash('error', 'Please select at least one order');
