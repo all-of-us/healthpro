@@ -76,6 +76,9 @@ label.label-normal {
     .dl-horizontal-lg dd {
         margin-left: 220px;
     }
+    .dl-horizontal-lg.samples-received dt {
+        width: 206px;
+    }
 }
 .dl-vertical dd {
     margin-bottom: 10px;
@@ -302,6 +305,9 @@ label.label-normal {
 }
 .multiheader-patient-status {
     background-color: #ffd;
+}
+.multiheader-metrics {
+    background-color: #edb;
 }
 .dataTables_processing {
     z-index: 1000;

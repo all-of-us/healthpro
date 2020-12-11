@@ -71,8 +71,9 @@
                 <th rowspan="2" class="col-group-info">DV-only EHR Sharing <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
                 <th rowspan="2" class="col-group-info">CABoR Consent <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
                 <th rowspan="2" class="col-group-default col-group-info">Activity Status</th>
-                <th rowspan="2" class="col-group-default col-group-info">Retention Eligibile</th>
                 <th rowspan="2" class="col-group-info">Withdrawal Reason</th>
+
+                <th colspan="4" class="topheader multiheader-metrics">Metrics</th>
 
                 <th colspan="4" class="topheader multiheader-patient-status">Patient Status</th>
 
@@ -85,6 +86,11 @@
                 <th colspan="5" class="topheader multiheader-demographics">Demographics</th>
             </tr>
             <tr>
+                <th class="secondaryheader col-group-metrics multiheader-metrics">Retention Eligibile</th>
+                <th class="secondaryheader col-group-metrics multiheader-metrics">Retention Status</th>
+                <th class="secondaryheader col-group-metrics col-group-metrics-ehr multiheader-metrics">EHR Data Transfer</th>
+                <th class="secondaryheader col-group-metrics col-group-metrics-ehr multiheader-metrics">Most Recent EHR Receipt</th>
+
                 <th class="secondaryheader col-group-patient-status multiheader-patient-status">Yes</th>
                 <th class="secondaryheader col-group-patient-status multiheader-patient-status">No</th>
                 <th class="secondaryheader col-group-patient-status multiheader-patient-status">No Access</th>
@@ -107,8 +113,8 @@
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Paired Organization {{ display_message('pairing_info', 'tooltip')|raw }}</th>
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Phys Measurements</th>
                 <th class="secondaryheader col-group-inperson multiheader-inperson">Phys Meas Site</th>
-                <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Samples for DNA Received?</th>
-                <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Bio&shy;specimens</th>
+                <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Samples for DNA Received? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
+                <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Baseline Samples <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction." data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
                 {% for field, label in samples %}
                     <th class="secondaryheader col-group-inperson multiheader-inperson">{{ label }}</th>
                 {% endfor %}

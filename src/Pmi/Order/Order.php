@@ -150,7 +150,7 @@ class Order
                 // For custom order creation (always display swinging bucket i-test codes)
                 if (empty($this->order)) {
                     $sampleId = $sampleInformation['icodeSwingingBucket'];
-                } elseif (!empty($this->order) && empty($this->order['type'])) {
+                } elseif (!empty($this->order) && (empty($this->order['type']) || $this->order['type'] === 'diversion')) {
                     if ($this->order['processed_centrifuge_type'] === self::SWINGING_BUCKET) {
                         $sampleId = $sampleInformation['icodeSwingingBucket'];
                     } elseif ($this->order['processed_centrifuge_type'] === self::FIXED_ANGLE) {
@@ -339,7 +339,7 @@ class Order
                 }
             }
         }
-        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+        if ($set === 'finalized' && ($this->order['type'] === 'kit' || $this->order['type'] === 'diversion')) {
             $updateArray['fedex_tracking'] = $formData['fedex_tracking'];
         }
         return $updateArray;
@@ -502,12 +502,13 @@ class Order
                 ],
                 'required' => false
             ]);
-            if ($this->app->isDVType()) {
+            // Display centrifuge type for kit orders only
+            if ($this->order['type'] === 'kit') {
                 $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
                     'deleted' => 0,
                     'google_group' => $this->app->getSiteId()
                 ]);
-                if ($this->order['type'] !== 'saliva' && !empty($enabledSamples) && empty($sites['centrifuge_type'])) {
+                if (!empty($enabledSamples) && empty($sites['centrifuge_type'])) {
                     $formBuilder->add('processed_centrifuge_type', Type\ChoiceType::class, [
                         'label' => 'Centrifuge type',
                         'required' => true,
@@ -525,7 +526,8 @@ class Order
                 }
             }
         }
-        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+        // Display fedex tracking for kit and diversion type orders
+        if ($set === 'finalized' && ($this->order['type'] === 'kit' || $this->order['type'] === 'diversion')) {
             $formBuilder->add('fedex_tracking', Type\RepeatedType::class, [
                 'type' => Type\TextType::class,
                 'disabled' => $disabled,
@@ -798,7 +800,7 @@ class Order
                 $formData["processed_centrifuge_type"] = $this->order["processed_centrifuge_type"];
             }
         }
-        if ($set === 'finalized' && $this->order['type'] === 'kit') {
+        if ($set === 'finalized' && ($this->order['type'] === 'kit' || $this->order['type'] === 'diversion')) {
             $formData['fedex_tracking'] = $this->order['fedex_tracking'];
         }
         return $formData;
@@ -1431,6 +1433,7 @@ class Order
         $this->order['collected_user_id'] = !empty($object->collectedInfo) ? $object->collectedInfo->author->value : false;
         $this->order['collected_site'] = null;
         $this->order['collected_site_name'] = 'A Quest Site';
+        $this->order['collected_site_address'] = !empty($object->collectedInfo->address) ? $object->collectedInfo->address : null;
         $this->order['processed_user_id'] = !empty($object->processedInfo) ? $object->processedInfo->author->value : false;
         $this->order['processed_site'] = null;
         $this->order['processed_site_name'] = 'A Quest Site';
@@ -1440,6 +1443,7 @@ class Order
         $this->order['failedToReachRDR'] = false;
         $this->order['orderStatus'] = 'Finalized';
         $this->order['status'] = 'finalized';
+        $this->order['biobank_finalized'] = false;
 
         $this->order['origin'] = $object->origin;
 

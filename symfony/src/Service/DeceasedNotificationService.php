@@ -50,8 +50,8 @@ class DeceasedNotificationService extends EmailNotificationService
         ];
         if ($lastDeceased) {
             $filterTime = clone $lastDeceased;
-            // Go back 1 day to make sure no participants are missed
-            $filterTime->sub(new \DateInterval('P1D'));
+            // Go back 1 month to make sure no participants are missed
+            $filterTime->sub(new \DateInterval('P1M'));
             $searchParams['deceasedAuthored'] = 'ge' . $filterTime->format('Y-m-d\TH:i:s');
         }
         return $searchParams;

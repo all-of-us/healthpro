@@ -91,12 +91,12 @@ class SiteSyncService
                 }
                 foreach ($organization->sites as $site) {
                     $sitesCount++;
-                    $existing = false;
+                    $existingArray = false;
                     $primaryId = null;
                     $siteId = self::getSiteSuffix($site->id);
                     if (array_key_exists($siteId, $existingSites)) {
-                        $existing = $existingSites[$siteId];
-                        $siteData = clone $existing;
+                        $existingArray = $this->normalizer->normalize($existingSites[$siteId]);
+                        $siteData = $existingSites[$siteId];
                         $primaryId = $siteData->getId();
                     } else {
                         $siteData = new Site;
@@ -112,19 +112,26 @@ class SiteSyncService
                         $siteData->setMayolinkAccount(isset($site->mayolinkClientNumber) ? $site->mayolinkClientNumber : null);
                     } elseif ($this->env->isStable()) {
                         if (strtolower($awardee->type) === 'dv') {
-                            // Set to default dv account number if existing mayo account number is empty or equal to default hpo account number
-                            if (empty($existing) || (empty($existing->getMayolinkAccount()) || ($existing->getMayolinkAccount() === $this->params->get('ml_account_hpo')))) {
-                                $siteData->setMayolinkAccount($this->params->get('ml_account_dv'));
+                            // For diversion pouch site set hpo mayo account number
+                            if (isset($site->siteType) && $site->siteType === 'ECDC DV Diversion Pouch') {
+                                $checkMayoAccountType = 'dv';
+                                $setMayoAccountType = 'hpo';
+                            } else {
+                                $checkMayoAccountType = 'hpo';
+                                $setMayoAccountType = 'dv';
                             }
                         } else {
-                            // Set to default hpo account number if existing mayo account number is empty or equal to default dv account number
-                            if (empty($existing) || (empty($existing->getMayolinkAccount()) || ($existing->getMayolinkAccount() === $this->params->get('ml_account_dv')))) {
-                                $siteData->setMayolinkAccount($this->params->get('ml_account_hpo'));
-                            }
+                            $checkMayoAccountType = 'dv';
+                            $setMayoAccountType = 'hpo';
+                        }
+                        // Set to default hpo/dv account number if existing mayo account number is empty or equal to default dv/hpo account number
+                        if (empty($existingArray) || (empty($existingArray['mayolinkAccount']) || ($existingArray['mayolinkAccount'] === $this->params->get('ml_account_' . $checkMayoAccountType)))) {
+                            $siteData->setMayolinkAccount($this->params->get('ml_account_' . $setMayoAccountType));
                         }
                     }
                     $siteData->setTimezone(isset($site->timeZoneId) ? $site->timeZoneId : null);
                     $siteData->setType($awardee->type);
+                    $siteData->setSiteType(isset($site->siteType) ? $site->siteType : null);
                     if ($this->env->isProd()) {
                         if (isset($site->adminEmails) && is_array($site->adminEmails)) {
                             $siteData->setEmail(join(', ', $site->adminEmails));
@@ -135,19 +142,19 @@ class SiteSyncService
                     if (empty($siteData->getWorkqueueDownload())) {
                         $siteData->setWorkqueueDownload('full_data'); // default value for workqueue downlaod
                     }
-                    if ($existing) {
-                        if ($existing != $siteData) {
+                    if ($existingArray) {
+                        $siteDataArray = $this->normalizer->normalize($siteData);
+                        if ($existingArray != $siteDataArray) {
                             $modified[] = [
-                                'old' => $this->normalizer->normalize($existing),
-                                'new' => $this->normalizer->normalize($siteData)
+                                'old' => $existingArray,
+                                'new' => $siteDataArray
                             ];
                             if (!$preview) {
-                                $this->em->persist($siteData);
                                 $this->em->flush();
                                 $this->loggerService->log(Log::SITE_EDIT, [
                                     'id' => $primaryId,
-                                    'old' => $existing,
-                                    'new' => $siteData
+                                    'old' => $existingArray,
+                                    'new' => $siteDataArray
                                 ]);
                             }
                         }

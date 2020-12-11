@@ -205,14 +205,16 @@ abstract class AbstractApplication extends Application
                 $request = $app['request_stack']->getCurrentRequest();
                 $siteMetaData = $app->getLogMetaData();
                 $record['extra']['labels'] = [
-                    'requestMethod' => $request->getMethod(),
-                    'requestUrl' => $request->getPathInfo(),
                     'user' => $siteMetaData['user'],
                     'site' => $siteMetaData['site'],
                     'ip' => $siteMetaData['ip']
                 ];
-                if ($traceHeader = $request->headers->get('X-Cloud-Trace-Context')) {
-                    $record['extra']['trace_header'] = $traceHeader;
+                if ($request) {
+                    $record['extra']['labels']['requestMethod'] = $request->getMethod();
+                    $record['extra']['labels']['requestUrl'] = $request->getPathInfo();
+                    if ($traceHeader = $request->headers->get('X-Cloud-Trace-Context')) {
+                        $record['extra']['trace_header'] = $traceHeader;
+                    }
                 }
                 return $record;
             });

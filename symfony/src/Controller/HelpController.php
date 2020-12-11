@@ -29,7 +29,7 @@ class HelpController extends AbstractController
 
     public function videosAction(SessionInterface $session)
     {
-        $id = $session->get('siteType') === 'dv' ? 'biobank-dv' : 'biobank-hpo';
+        $id = $session->get('orderType') === 'dv' ? 'biobank-dv' : 'biobank-hpo';
         return $this->redirectToRoute('help_videosPlaylist', ['id' => $id]);
     }
 
