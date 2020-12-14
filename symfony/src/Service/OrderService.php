@@ -354,14 +354,4 @@ class OrderService
         }
         return false;
     }
-
-    public function getLastError()
-    {
-        return $this->rdrApiService->getLastError();
-    }
-
-    public function getLastErrorCode()
-    {
-        return $this->rdrApiService->getLastErrorCode();
-    }
 }

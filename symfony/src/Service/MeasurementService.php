@@ -256,7 +256,7 @@ class MeasurementService
                 return $result->id;
             }
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            $this->rdrApiService->logException($e);
             return false;
         }
         return false;

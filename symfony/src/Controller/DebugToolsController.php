@@ -11,6 +11,7 @@ use App\Service\DebugToolsService;
 use App\Service\EnvironmentService;
 use App\Service\MeasurementService;
 use App\Service\OrderService;
+use App\Service\RdrApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,7 +60,7 @@ class DebugToolsController extends AbstractController
     /**
      * @Route("/missing/measurements", name="admin_debug_missing_measurements")
      */
-    public function missingMeasurementsAction(Request $request, EntityManagerInterface $em, MeasurementService $measurementsService)
+    public function missingMeasurementsAction(Request $request, EntityManagerInterface $em, MeasurementService $measurementsService, RdrApiService $rdrApiService)
     {
         $missing = $em->getRepository(Measurement::class)->getMissingMeasurements();
         $choices = [];
@@ -97,7 +98,7 @@ class DebugToolsController extends AbstractController
                         $em->clear();
                         $this->addFlash('success', "#{$id} successfully sent to RDR");
                     } else {
-                        $this->addFlash('error', "#{$id} failed sending to RDR");
+                        $this->addFlash('error', "#{$id} failed sending to RDR: " . $rdrApiService->getLastError());
                     }
                 }
                 return $this->redirectToRoute('admin_debug_missing_measurements');
@@ -114,7 +115,7 @@ class DebugToolsController extends AbstractController
     /**
      * @Route("/missing/orders", name="admin_debug_missing_orders")
      */
-    public function missingOrdersAction(Request $request, EntityManagerInterface $em, OrderService $orderService)
+    public function missingOrdersAction(Request $request, EntityManagerInterface $em, OrderService $orderService, RdrApiService $rdrApiService)
     {
         $missing = $em->getRepository(Order::class)->getMissingOrders();
         $choices = [];
@@ -153,10 +154,10 @@ class DebugToolsController extends AbstractController
                             $updateOrder->clear();
                             $this->addFlash('success', "#{$id} successfully reconciled");
                         } else {
-                            $this->addFlash('error', "#{$id} failed to finalize: " . $orderService->getLastError());
+                            $this->addFlash('error', "#{$id} failed to finalize: " . $rdrApiService->getLastError());
                         }
                     } else {
-                        $this->addFlash('error', "#{$id} failed sending to RDR: " . $orderService->getLastError());
+                        $this->addFlash('error', "#{$id} failed sending to RDR: " . $rdrApiService->getLastError());
                     }
                 }
             } else {
