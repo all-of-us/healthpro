@@ -18,9 +18,9 @@ class Measurement
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
      */
-    private $userId;
+    private $user;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -53,9 +53,9 @@ class Measurement
     private $updatedTs;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
      */
-    private $finalizedUserId;
+    private $finalizedUser;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
@@ -92,14 +92,14 @@ class Measurement
         return $this->id;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(int $userId): self
+    public function setUser(?User $user): self
     {
-        $this->userId = $userId;
+        $this->user = $user;
 
         return $this;
     }
@@ -176,14 +176,14 @@ class Measurement
         return $this;
     }
 
-    public function getFinalizedUserId(): ?int
+    public function getFinalizedUser(): ?User
     {
-        return $this->finalizedUserId;
+        return $this->finalizedUser;
     }
 
-    public function setFinalizedUserId(?int $finalizedUserId): self
+    public function setFinalizedUser(?User $finalizedUser): self
     {
-        $this->finalizedUserId = $finalizedUserId;
+        $this->finalizedUser = $finalizedUser;
 
         return $this;
     }
