@@ -141,17 +141,17 @@ class DebugToolsController extends AbstractController
                     if ($rdrId = $orderService->createOrder($order->getParticipantId(), $orderRdrObject)) {
                         $updateOrder = $repository->find($order->getId());
                         $updateOrder->setRdrId($rdrId);
-                        $updateOrder->flush();
-                        $updateOrder->clear();
+                        $em->flush();
+                        $em->clear();
                         $this->addFlash('success', "#{$id} successfully sent to RDR");
-                    } elseif ($orderService->getLastErrorCode() === 409) {
+                    } elseif ($rdrApiService->getLastErrorCode() === 409) {
                         $rdrOrder = $orderService->getOrder($order->getParticipantId(), $order->getMayoId());
                         // Check if order exists in RDR
                         if (!empty($rdrOrder) && $rdrOrder->id === $order->getMayoId()) {
                             $updateOrder = $repository->find($order->getId());
-                            $updateOrder->setRdrId($rdrId);
-                            $updateOrder->flush();
-                            $updateOrder->clear();
+                            $updateOrder->setRdrId($order->getMayoId());
+                            $em->flush();
+                            $em->clear();
                             $this->addFlash('success', "#{$id} successfully reconciled");
                         } else {
                             $this->addFlash('error', "#{$id} failed to finalize: " . $rdrApiService->getLastError());
@@ -160,6 +160,7 @@ class DebugToolsController extends AbstractController
                         $this->addFlash('error', "#{$id} failed sending to RDR: " . $rdrApiService->getLastError());
                     }
                 }
+                return $this->redirectToRoute('admin_debug_missing_orders');
             } else {
                 $this->addFlash('error', 'Please select at least one order');
             }
