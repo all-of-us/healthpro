@@ -54,7 +54,7 @@
                         <li><a data-href="{{ app.reportKitUrl }}" class="external-link">Report Kit Problem</a></li>
                     {% endif %}
                     {% if is_granted('ROLE_ADMIN') %}
-                        <li><a href="{{ path('admin_home') }}">Admin</a></li>
+                        <li><a href="s/admin">Admin</a></li>
                     {% endif %}
                     {% if is_granted('ROLE_DASHBOARD') %}
                         <li><a href="{{ path('dashboard_home') }}">Dashboard</a></li>
