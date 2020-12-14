@@ -87,7 +87,7 @@ class DebugToolsController extends AbstractController
                         }
                     }
                     // Get FHIR bundle
-                    $fhir = $measurementsService->getFhir($measurement->getFinalizedTs(), $parentRdrId);
+                    $fhir = $measurement->getFhir($measurement->getFinalizedTs(), $parentRdrId);
 
                     // Send measurements to RDR
                     if ($rdrEvalId = $measurementsService->createMeasurement($measurement->getParticipantId(), $fhir)) {

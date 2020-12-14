@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Pmi\Evaluation\Fhir;
+use Pmi\Evaluation\InvalidSchemaException;
+use Pmi\Evaluation\MissingSchemaException;
 
 /**
  * @ORM\Table(name="evaluations")
@@ -10,6 +13,19 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Measurement
 {
+
+    const CURRENT_VERSION = '0.3.3';
+
+    private $currentVersion;
+
+    private $fieldData;
+
+    private $schema;
+
+    protected $finalizedUserEmail;
+
+    protected $finalizedSiteInfo;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -258,5 +274,198 @@ class Measurement
         $this->history = $history;
 
         return $this;
+    }
+
+    public function loadFromAObject($finalizedUserEmail = null, $finalizedSite = null)
+    {
+        if (!empty($this->getVersion())) {
+            $this->currentVersion = $this->getVersion();
+        } else {
+            $this->currentVersion = self::CURRENT_VERSION;
+        }
+        if (is_object($this->getData())) {
+            $this->fieldData = $this->getData();
+        } else {
+            $this->fieldData = json_decode($this->getData());
+        }
+        $this->finalizedUserEmail = $finalizedUserEmail;
+        $this->finalizedSiteInfo = $finalizedSite;
+        $this->loadSchema();
+        $this->normalizeData();
+    }
+
+    public function getSchema()
+    {
+        return $this->schema;
+    }
+
+    public function getAssociativeSchema()
+    {
+        $schema = clone $this->schema;
+        $associativeFields = [];
+        foreach ($schema->fields as $field) {
+            $associativeFields[$field->name] = $field;
+        }
+        $schema->fields = $associativeFields;
+        return $schema;
+    }
+
+    public function loadSchema()
+    {
+        $file = __DIR__ . "/../../../src/Pmi/Evaluation/versions/{$this->version}.json";
+        if (!file_exists($file)) {
+            throw new MissingSchemaException();
+        }
+        $this->schema = json_decode(file_get_contents($file));
+        if (!is_object($this->schema) || !is_array($this->schema->fields)) {
+            throw new InvalidSchemaException();
+        }
+        foreach ($this->schema->fields as $field) {
+            if (!isset($this->fieldData->{$field->name})) {
+                $this->fieldData->{$field->name} = null;
+            }
+        }
+    }
+
+    protected function normalizeData()
+    {
+        foreach ($this->fieldData as $key => $value) {
+            if ($value === 0) {
+                $this->fieldData->$key = null;
+            }
+        }
+        foreach ($this->schema->fields as $field) {
+            if (isset($field->replicates)) {
+                $key = $field->name;
+                if (is_null($this->fieldData->$key)) {
+                    $dataArray = array_fill(0, $field->replicates, null);
+                    $this->fieldData->$key = $dataArray;
+                } elseif (!is_null($this->fieldData->$key) && !is_array($this->fieldData->$key)) {
+                    $dataArray = array_fill(0, $field->replicates, null);
+                    $dataArray[0] = $this->fieldData->$key;
+                    $this->fieldData->$key = $dataArray;
+                }
+            }
+        }
+    }
+
+    public function getFhir($datetime, $parentRdr = null)
+    {
+        $fhir = new Fhir([
+            'data' => $this->fieldData,
+            'schema' => $this->getAssociativeSchema(),
+            'patient' => $this->getParticipantId(),
+            'version' => $this->version,
+            'datetime' => $datetime,
+            'parent_rdr' => $parentRdr,
+            'created_user' => $this->getUser()->getEmail(),
+            'created_site' => $this->getSite(),
+            'finalized_user' => $this->finalizedUserEmail,
+            'finalized_site' => $this->finalizedSiteInfo,
+            'summary' => $this->getSummary()
+        ]);
+        return $fhir->toObject();
+    }
+
+    protected static function cmToFtIn($cm)
+    {
+        $inches = self::cmToIn($cm);
+        $feet = floor($inches / 12);
+        $inches = round(fmod($inches, 12));
+        return "$feet ft $inches in";
+    }
+
+    protected static function cmToIn($cm)
+    {
+        return round($cm * 0.3937, 1);
+    }
+
+    protected static function kgToLb($kg)
+    {
+        return round($kg * 2.2046, 1);
+    }
+
+    protected function calculateMean($field)
+    {
+        $secondThirdFields = [
+            'blood-pressure-systolic',
+            'blood-pressure-diastolic',
+            'heart-rate'
+        ];
+        $twoClosestFields = [
+            'hip-circumference',
+            'waist-circumference'
+        ];
+        if (in_array($field, $secondThirdFields)) {
+            $values = [$this->fieldData->{$field}[1], $this->fieldData->{$field}[2]];
+        } else {
+            $values = $this->fieldData->{$field};
+        }
+        $values = array_filter($values);
+        if (count($values) > 0) {
+            if (count($values) === 3 && in_array($field, $twoClosestFields)) {
+                sort($values);
+                if ($values[1] - $values[0] < $values[2] - $values[1]) {
+                    array_pop($values);
+                } elseif ($values[2] - $values[1] < $values[1] - $values[0]) {
+                    array_shift($values);
+                }
+            }
+            return array_sum($values) / count($values);
+        } else {
+            return null;
+        }
+    }
+
+    protected static function calculateBmi($height, $weight)
+    {
+        if ($height && $weight) {
+            return $weight / (($height / 100) * ($height / 100));
+        }
+        return false;
+    }
+
+    public function getSummary()
+    {
+        $summary = [];
+        if ($this->fieldData->height) {
+            $summary['height'] = [
+                'cm' => $this->fieldData->height,
+                'ftin' => self::cmToFtIn($this->fieldData->height)
+            ];
+        }
+        if ($this->fieldData->weight) {
+            $summary['weight'] = [
+                'kg' => $this->fieldData->weight,
+                'lb' => self::kgToLb($this->fieldData->weight)
+            ];
+        }
+        if ($this->fieldData->weight && $this->fieldData->height) {
+            $summary['bmi'] = self::calculateBmi($this->fieldData->height, $this->fieldData->weight);
+        }
+        if ($hip = $this->calculateMean('hip-circumference')) {
+            $summary['hip'] = [
+                'cm' => $hip,
+                'in' => self::cmToIn($hip)
+            ];
+        }
+        if ($waist = $this->calculateMean('waist-circumference')) {
+            $summary['waist'] = [
+                'cm' => $waist,
+                'in' => self::cmToIn($waist)
+            ];
+        }
+        $systolic = $this->calculateMean('blood-pressure-systolic');
+        $diastolic = $this->calculateMean('blood-pressure-diastolic');
+        if ($systolic && $diastolic) {
+            $summary['bloodpressure'] = [
+                'systolic' => $systolic,
+                'diastolic' => $diastolic
+            ];
+        }
+        if ($heartrate = $this->calculateMean('heart-rate')) {
+            $summary['heartrate'] = $heartrate;
+        }
+        return $summary;
     }
 }
