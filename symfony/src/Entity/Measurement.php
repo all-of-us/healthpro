@@ -355,7 +355,7 @@ class Measurement
             'data' => $this->fieldData,
             'schema' => $this->getAssociativeSchema(),
             'patient' => $this->getParticipantId(),
-            'version' => $this->version,
+            'version' => $this->currentVersion,
             'datetime' => $datetime,
             'parent_rdr' => $parentRdr,
             'created_user' => $this->getUser()->getEmail(),

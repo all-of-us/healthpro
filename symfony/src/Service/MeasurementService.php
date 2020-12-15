@@ -8,28 +8,15 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class MeasurementService
 {
-    const CURRENT_VERSION = '0.3.3';
-
     protected $em;
     protected $session;
-    protected $loggerService;
     protected $userService;
     protected $rdrApiService;
-    protected $version;
-    protected $fieldData;
-    protected $schema;
-    protected $participant;
-    protected $createdUser;
-    protected $createdSite;
-    protected $finalizedUserEmail;
-    protected $finalizedSiteInfo;
-    protected $locked = false;
 
-    public function __construct(EntityManagerInterface $em, SessionInterface $session, LoggerService $loggerService, UserService $userService, RdrApiService $rdrApiService)
+    public function __construct(EntityManagerInterface $em, SessionInterface $session, UserService $userService, RdrApiService $rdrApiService)
     {
         $this->em = $em;
         $this->session = $session;
-        $this->loggerService = $loggerService;
         $this->userService = $userService;
         $this->rdrApiService = $rdrApiService;
     }
