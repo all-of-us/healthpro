@@ -18,9 +18,9 @@ class Order
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
      */
-    private $userId;
+    private $user;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -68,9 +68,9 @@ class Order
     private $printedTs;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
      */
-    private $collectedUserId;
+    private $collectedUser;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
@@ -93,9 +93,9 @@ class Order
     private $collectedNotes;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
      */
-    private $processedUserId;
+    private $processedUser;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
@@ -128,9 +128,9 @@ class Order
     private $processedNotes;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
      */
-    private $finalizedUserId;
+    private $finalizedUser;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -187,14 +187,14 @@ class Order
         return $this->id;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(int $userId): self
+    public function setUser(?User $user): self
     {
-        $this->userId = $userId;
+        $this->user = $user;
 
         return $this;
     }
@@ -307,14 +307,14 @@ class Order
         return $this;
     }
 
-    public function getCollectedUserId(): ?int
+    public function getCollectedUser(): ?User
     {
-        return $this->collectedUserId;
+        return $this->collectedUser;
     }
 
-    public function setCollectedUserId(?int $collectedUserId): self
+    public function setCollectedUser(?User $collectedUser): self
     {
-        $this->collectedUserId = $collectedUserId;
+        $this->collectedUser = $collectedUser;
 
         return $this;
     }
@@ -367,14 +367,14 @@ class Order
         return $this;
     }
 
-    public function getProcessedUserId(): ?int
+    public function getProcessedUser(): ?User
     {
-        return $this->processedUserId;
+        return $this->processedUser;
     }
 
-    public function setProcessedUserId(?int $processedUserId): self
+    public function setProcessedUser(?User $processedUser): self
     {
-        $this->processedUserId = $processedUserId;
+        $this->processedUser = $processedUser;
 
         return $this;
     }
@@ -451,14 +451,14 @@ class Order
         return $this;
     }
 
-    public function getFinalizedUserId(): ?int
+    public function getFinalizedUser(): ?User
     {
-        return $this->finalizedUserId;
+        return $this->finalizedUser;
     }
 
-    public function setFinalizedUserId(?int $finalizedUserId): self
+    public function setFinalizedUser(?User $finalizedUser): self
     {
-        $this->finalizedUserId = $finalizedUserId;
+        $this->finalizedUser = $finalizedUser;
 
         return $this;
     }
