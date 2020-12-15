@@ -646,8 +646,8 @@ class Order
 
     public function loadSamplesSchema($params)
     {
-        if ($params->has('order_samples_version') && !empty($params->get('order_samples_version'))) {
-            $currentVersion = $params->get('order_samples_version');
+        if (!empty($params['order_samples_version'])) {
+            $currentVersion = $params['order_samples_version'];
         }
         $this->params = $params;
         $file = __DIR__ . "/../../../src/Pmi/Order/versions/{$currentVersion}.json";
@@ -685,12 +685,10 @@ class Order
             $sampleId = $sample;
             if (isset($sampleInformation['icodeSwingingBucket'])) {
                 // For custom order creation (always display swinging bucket i-test codes)
-                if (empty($this->order)) {
-                    $sampleId = $sampleInformation['icodeSwingingBucket'];
-                } elseif (!empty($this->order) && (empty($this->order->getType()) || $this->order->getType() === 'diversion')) {
-                    if ($this->order['processed_centrifuge_type'] === self::SWINGING_BUCKET) {
+                if (empty($this->getType()) || $this->getType() === 'diversion') {
+                    if ($this->getProcessedCentrifugeType() === self::SWINGING_BUCKET) {
                         $sampleId = $sampleInformation['icodeSwingingBucket'];
-                    } elseif ($this->order['processed_centrifuge_type'] === self::FIXED_ANGLE) {
+                    } elseif ($this->getProcessedCentrifugeType() === self::FIXED_ANGLE) {
                         $sampleId = $sampleInformation['icodeFixedAngle'];
                     }
                 }
@@ -720,7 +718,7 @@ class Order
                 ];
             }
         }
-        if (!$this->params->has('ml_mock_order') && $this->getMayoId() != 'pmitest') {
+        if (empty($this->params['ml_mock_order']) && $this->getMayoId() != 'pmitest') {
             $identifiers[] = [
                 'system' => 'https://orders.mayomedicallaboratories.com',
                 'value' => $this->getMayoId()

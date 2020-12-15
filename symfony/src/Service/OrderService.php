@@ -17,7 +17,19 @@ class OrderService
 
     public function loadSamplesSchema($order)
     {
-        $order->loadSamplesSchema($this->params);
+        $params = $this->getOrderParams(['order_samples_version', 'ml_mock_order']);
+        $order->loadSamplesSchema($params);
+    }
+
+    protected function getOrderParams($fields)
+    {
+        $params = [];
+        foreach ($fields as $field) {
+            if ($this->params->has($field) && !empty($this->params->get($field))) {
+                $params[$field] = $this->params->get($field);
+            }
+        }
+        return $params;
     }
 
     public function createOrder($participantId, $order)
