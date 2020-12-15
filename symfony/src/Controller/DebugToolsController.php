@@ -135,7 +135,8 @@ class DebugToolsController extends AbstractController
                         continue;
                     }
                     // Get order payload
-                    $orderRdrObject = $orderService->getRdrObject($order);
+                    $orderService->loadSamplesSchema($order);
+                    $orderRdrObject = $order->getRdrObject();
 
                     // Send order to RDR
                     if ($rdrId = $orderService->createOrder($order->getParticipantId(), $orderRdrObject)) {

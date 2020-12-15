@@ -10,6 +10,67 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Order
 {
+    const FIXED_ANGLE = 'fixed_angle';
+    const SWINGING_BUCKET = 'swinging_bucket';
+
+    private $params;
+    private $samples;
+    private $samplesInformation;
+    private $salivaSamples;
+    private $salivaSamplesInformation;
+    private $salivaInstructions;
+
+    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL', '1SAL2'];
+
+    public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
+
+    public static $identifierLabel = [
+        'name' => 'name',
+        'dob' => 'date of birth',
+        'phone' => 'phone number',
+        'address' => 'street address',
+        'email' => 'email address'
+    ];
+
+    public static $centrifugeType = [
+        'swinging_bucket' => 'Swinging Bucket',
+        'fixed_angle' => 'Fixed Angle'
+    ];
+
+    public static $sst = ['1SST8', '1SS08'];
+
+    public static $pst = ['1PST8', '1PS08'];
+
+    public static $sampleMessageLabels = [
+        '1SST8' => 'sst',
+        '1SS08' => 'sst',
+        '1PST8' => 'pst',
+        '1PS08' => 'pst',
+        '1SAL' => 'sal',
+        '1SAL2' => 'sal'
+    ];
+
+    public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2'];
+
+    public static $mapRdrSamples = [
+        '1SST8' => [
+            'code' => '1SS08',
+            'centrifuge_type' => 'swinging_bucket'
+        ],
+        '2SST8' => [
+            'code' => '1SS08',
+            'centrifuge_type' => 'fixed_angle'
+        ],
+        '1PST8' => [
+            'code' => '1PS08',
+            'centrifuge_type' => 'swinging_bucket'
+        ],
+        '2PST8' => [
+            'code' => '1PS08',
+            'centrifuge_type' => 'fixed_angle'
+        ]
+    ];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -581,5 +642,225 @@ class Order
         $this->finalizedSite = $finalizedSite;
 
         return $this;
+    }
+
+    public function loadSamplesSchema($params)
+    {
+        if ($params->has('order_samples_version') && !empty($params->get('order_samples_version'))) {
+            $currentVersion = $params->get('order_samples_version');
+        }
+        $this->params = $params;
+        $file = __DIR__ . "/../../../src/Pmi/Order/versions/{$currentVersion}.json";
+        if (!file_exists($file)) {
+            throw new \Exception('Samples version file not found');
+        }
+        $schema = json_decode(file_get_contents($file), true);
+        if (!is_array($schema) && !empty($schema)) {
+            throw new \Exception('Invalid samples schema');
+        }
+        $this->samplesInformation = $schema['samplesInformation'];
+        $samples = [];
+        foreach ($this->samplesInformation as $sample => $info) {
+            $label = "({$info['number']}) {$info['label']} [{$sample}]";
+            $samples[$label] = $sample;
+        }
+        $this->samples = $samples;
+
+        $this->salivaSamplesInformation = $schema['salivaSamplesInformation'];
+        $salivaSamples = [];
+        foreach ($this->salivaSamplesInformation as $salivaSample => $info) {
+            $salivaSamples[$info['label']] = $salivaSample;
+            $this->salivaSamplesInformation[$salivaSample]['sampleId'] = $salivaSample;
+        }
+        $this->salivaSamples = $salivaSamples;
+
+        $this->salivaInstructions = $schema['salivaInstructions'];
+
+        $this->setSampleIds();
+    }
+
+    public function setSampleIds()
+    {
+        foreach ($this->samplesInformation as $sample => $sampleInformation) {
+            $sampleId = $sample;
+            if (isset($sampleInformation['icodeSwingingBucket'])) {
+                // For custom order creation (always display swinging bucket i-test codes)
+                if (empty($this->order)) {
+                    $sampleId = $sampleInformation['icodeSwingingBucket'];
+                } elseif (!empty($this->order) && (empty($this->order->getType()) || $this->order->getType() === 'diversion')) {
+                    if ($this->order['processed_centrifuge_type'] === self::SWINGING_BUCKET) {
+                        $sampleId = $sampleInformation['icodeSwingingBucket'];
+                    } elseif ($this->order['processed_centrifuge_type'] === self::FIXED_ANGLE) {
+                        $sampleId = $sampleInformation['icodeFixedAngle'];
+                    }
+                }
+            }
+            $this->samplesInformation[$sample]['sampleId'] = $sampleId;
+        }
+    }
+
+    public function getRdrObject()
+    {
+        $obj = new \StdClass();
+        $obj->subject = 'Patient/' . $this->getParticipantId();
+        $identifiers = [];
+        $identifiers[] = [
+            'system' => 'https://www.pmi-ops.org',
+            'value' => $this->getOrderId()
+        ];
+        if ($this->getType() === 'kit') {
+            $identifiers[] = [
+                'system' => 'https://orders.mayomedicallaboratories.com/kit-id',
+                'value' => $this->getOrderId()
+            ];
+            if (!empty($this->getFedexTracking())) {
+                $identifiers[] = [
+                    'system' => 'https://orders.mayomedicallaboratories.com/tracking-number',
+                    'value' => $this->getFedexTracking()
+                ];
+            }
+        }
+        if (!$this->params->has('ml_mock_order') && $this->getMayoId() != 'pmitest') {
+            $identifiers[] = [
+                'system' => 'https://orders.mayomedicallaboratories.com',
+                'value' => $this->getMayoId()
+            ];
+        } else {
+            $identifiers[] = [
+                'system' => 'https://orders.mayomedicallaboratories.com',
+                'value' => 'PMITEST-' . $this->getOrderId()
+            ];
+        }
+        $createdUser = $this->getOrderUser($this->getUser());
+        $createdSite = $this->getOrderSite($this->getSite());
+        $collectedUser = $this->getOrderUser($this->getCollectedUser());
+        $collectedSite = $this->getOrderSite($this->getCollectedSite());
+        $processedUser = $this->getOrderUser($this->getProcessedUser());
+        $processedSite = $this->getOrderSite($this->getProcessedSite());
+        $finalizedUser = $this->getOrderUser($this->getFinalizedUser());
+        $finalizedSite = $this->getOrderSite($this->getFinalizedSite());
+        $obj->createdInfo = $this->getOrderUserSiteData($createdUser, $createdSite);
+        $obj->collectedInfo = $this->getOrderUserSiteData($collectedUser, $collectedSite);
+        $obj->processedInfo = $this->getOrderUserSiteData($processedUser, $processedSite);
+        $obj->finalizedInfo = $this->getOrderUserSiteData($finalizedUser, $finalizedSite);
+        $obj->identifier = $identifiers;
+        $created = clone $this->getCreatedTs();
+        $created->setTimezone(new \DateTimeZone('UTC'));
+        $obj->created = $created->format('Y-m-d\TH:i:s\Z');
+        $obj->samples = $this->getRdrSamples();
+        $notes = [];
+        foreach (['Collected', 'Processed', 'Finalized'] as $step) {
+            if ($this->{'get' . $step . 'Notes'}()) {
+                $notes[$step] = $this->{'get' . $step . 'Notes'}();
+            }
+        }
+        if (!empty($notes)) {
+            $obj->notes = $notes;
+        }
+        return $obj;
+    }
+
+    protected function getOrderUser($user)
+    {
+        if ($this->getBiobankFinalized() && empty($userId)) {
+            return 'BiobankUser';
+        }
+        $user = $user ?: $this->getUser();
+        return $user->getEmail() ?? '';
+    }
+
+    protected function getOrderSite($site)
+    {
+        $site = $site ?: $this->getSite();
+        return \Pmi\Security\User::SITE_PREFIX . $site;
+    }
+
+    protected function getOrderUserSiteData($user, $site)
+    {
+        return [
+            'author' => [
+                'system' => 'https://www.pmi-ops.org/healthpro-username',
+                'value' => $user
+            ],
+            'site' => [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => $site
+            ]
+        ];
+    }
+
+    protected function getSampleTime($set, $sample)
+    {
+        $samples = json_decode($this->{'get' . $set . 'Samples'}());
+        if (!is_array($samples) || !in_array($sample, $samples)) {
+            return false;
+        }
+        if ($set == 'Processed') {
+            $processedSampleTimes = json_decode($this->getProcessedSamplesTs(), true);
+            if (!empty($processedSampleTimes[$sample])) {
+                try {
+                    $time = new \DateTime();
+                    $time->setTimestamp($processedSampleTimes[$sample]);
+                    return $time->format('Y-m-d\TH:i:s\Z');
+                } catch (\Exception $e) {
+                }
+            }
+        } else {
+            if ($this->{'get' . $set . 'Ts'}()) {
+                $time = clone $this->{'get' . $set . 'Ts'}();
+                $time->setTimezone(new \DateTimeZone('UTC'));
+                return $time->format('Y-m-d\TH:i:s\Z');
+            }
+        }
+    }
+
+    protected function getRdrSamples()
+    {
+        $samples = [];
+        foreach ($this->getModifiedRequestedSamples() as $description => $test) {
+            // Convert new samples
+            $rdrTest = $test;
+            if ($test == '1SS08') {
+                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2SST8' : '1SST8';
+            }
+            if ($test == '1PS08') {
+                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2PST8' : '1PST8';
+            }
+            $sample = [
+                'test' => $rdrTest,
+                'description' => $description,
+                'processingRequired' => in_array($test, self::$samplesRequiringProcessing)
+            ];
+            if ($collected = $this->getSampleTime('Collected', $test)) {
+                $sample['collected'] = $collected;
+            }
+            if ($sample['processingRequired']) {
+                $processed = $this->getSampleTime('Processed', $test);
+                if ($processed) {
+                    $sample['processed'] = $processed;
+                }
+            }
+            if ($finalized = $this->getSampleTime('Finalized', $test)) {
+                $sample['finalized'] = $finalized;
+            }
+            $samples[] = $sample;
+        }
+        return $samples;
+    }
+
+    protected function getModifiedRequestedSamples()
+    {
+        if ($this->getType() == 'saliva') {
+            return $this->salivaSamples;
+        }
+        if ($this->getRequestedSamples() &&
+            ($requestedArray = json_decode($this->getRequestedSamples())) &&
+            is_array($requestedArray) &&
+            count($requestedArray) > 0
+        ) {
+            return array_intersect($this->samples, $requestedArray);
+        } else {
+            return $this->samples;
+        }
     }
 }
