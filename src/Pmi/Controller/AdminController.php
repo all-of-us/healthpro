@@ -19,6 +19,11 @@ class AdminController extends AbstractController
         ['patientStatusHistoryRdrJson', '/patientstatus/{participantId}/organization/{organizationId}/history/rdr.json', ['method' => 'GET']]
     ];
 
+    public function homeAction(Application $app)
+    {
+        return $app['twig']->render('admin/index.html.twig');
+    }
+
     public function patientStatusRdrJsonAction($participantId, $organizationId, Application $app)
     {
         $object = $app['pmi.drc.participants']->getPatientStatus($participantId, $organizationId);

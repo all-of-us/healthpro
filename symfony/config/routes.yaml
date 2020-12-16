@@ -40,6 +40,9 @@ workqueue_index:
 problem_reports:
     path: /problem/reports
 
+admin_home:
+    path: /admin
+
 dashboard_home:
     path: /dashboard
 
