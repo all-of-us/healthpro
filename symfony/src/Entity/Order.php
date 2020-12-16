@@ -760,7 +760,7 @@ class Order
 
     protected function getOrderUser($user)
     {
-        if ($this->getBiobankFinalized() && empty($userId)) {
+        if ($this->getBiobankFinalized() && empty($user)) {
             return 'BiobankUser';
         }
         $user = $user ?: $this->getUser();
