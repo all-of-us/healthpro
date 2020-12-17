@@ -19,6 +19,7 @@ class EhrWithdrawalNotificationService extends EmailNotificationService
     protected $filterSummaries = true;
     protected $statusText = 'EHR withdrawn';
     protected $log = Log::EHR_WITHDRAWAL_NOTIFY;
+    protected $render = 'ehr-withdrawal';
 
     public function __construct(
         ManagerRegistry $managerRegistry,
