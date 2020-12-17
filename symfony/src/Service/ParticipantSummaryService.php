@@ -33,7 +33,6 @@ class ParticipantSummaryService
                 'query' => $params
             ]);
         } catch (\Exception $e) {
-            throw $e;
             throw new FailedRequestException();
         }
 

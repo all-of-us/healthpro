@@ -27,36 +27,11 @@ class EmailNotificationService
     protected $filterSummaries = false;
     protected $logEntity;
 
-    protected function getResults()
-    {
-        if ($this->level === 'awardee') {
-            return $this->getAwardees();
-        }
-        return $this->getOrganizations();
-    }
-
-
     public function getOrganizations()
     {
         $rows = $this->siteRepository->getOrganizations();
-        $organizations = [];
         $lastTypes = $this->getLatestOrganizationsFromLogs();
-        foreach ($rows as $row) {
-            $emails = [];
-            $list = explode(',', trim($row['emails']));
-            foreach ($list as $email) {
-                $email = trim(strtolower($email));
-                if (!empty($email) && !in_array($email, $emails)) {
-                    $emails[] = $email;
-                }
-            }
-            $organizations[] = [
-                'id' => $row['organizationId'],
-                'emails' => $emails,
-                'last' => isset($lastTypes[$row['organizationId']]) ? new \DateTime($lastTypes[$row['organizationId']]) : false
-            ];
-        }
-        return $organizations;
+        return $this->getCustomArray($rows, $lastTypes);
     }
 
     protected function getLatestOrganizationsFromLogs()
@@ -72,24 +47,8 @@ class EmailNotificationService
     public function getAwardees()
     {
         $rows = $this->siteRepository->getAwardees();
-        $awardees = [];
         $lastTypes = $this->getLatestAwardeesFromLogs();
-        foreach ($rows as $row) {
-            $emails = [];
-            $list = explode(',', trim($row['emails']));
-            foreach ($list as $email) {
-                $email = trim(strtolower($email));
-                if (!empty($email) && !in_array($email, $emails)) {
-                    $emails[] = $email;
-                }
-            }
-            $awardees[] = [
-                'id' => $row['awardeeId'],
-                'emails' => $emails,
-                'last' => isset($lastTypes[$row['awardeeId']]) ? new \DateTime($lastTypes[$row['awardeeId']]) : false
-            ];
-        }
-        return $awardees;
+        return $this->getCustomArray($rows, $lastTypes);
     }
 
     protected function getLatestAwardeesFromLogs()
@@ -102,7 +61,37 @@ class EmailNotificationService
         return $lastTypes;
     }
 
-    protected function getResultTypes($id, $latest)
+    protected function getResults()
+    {
+        if ($this->level === 'awardee') {
+            return $this->getAwardees();
+        }
+        return $this->getOrganizations();
+    }
+
+
+    protected function getCustomArray($rows, $lastTypes)
+    {
+        $data = [];
+        foreach ($rows as $row) {
+            $emails = [];
+            $list = explode(',', trim($row['emails']));
+            foreach ($list as $email) {
+                $email = trim(strtolower($email));
+                if (!empty($email) && !in_array($email, $emails)) {
+                    $emails[] = $email;
+                }
+            }
+            $data[] = [
+                'id' => $row[$this->levelField],
+                'emails' => $emails,
+                'last' => isset($lastTypes[$row[$this->levelField]]) ? new \DateTime($lastTypes[$row[$this->levelField]]) : false
+            ];
+        }
+        return $data;
+    }
+
+    protected function getParticipants($id, $latest)
     {
         $searchParams = $this->getSearchParams($id, $latest);
         $participants = [];
@@ -123,7 +112,6 @@ class EmailNotificationService
 
             }
         } catch (\Exception $e) {
-            throw $e;
             // RDR error already logged
         }
         return $participants;
@@ -138,7 +126,7 @@ class EmailNotificationService
                 $log->setParticipantId($participant['id']);
                 $log->setInsertTs($insert);
                 $log->{'set' . $this->type . 'Ts'}(new \DateTime($participant['time']));
-                $log->{'set' . $this->levelField}($result['id']);
+                $log->{'set' . ucfirst($this->levelField)}($result['id']);
                 $log->setEmailNotified(implode(', ', $result['emails']));
                 if (!empty($this->status) && !empty($participant['status'])) {
                     $log->{'set' . $this->type . 'Status'}($participant['status']);
@@ -158,7 +146,7 @@ class EmailNotificationService
     {
         $results = $this->getResults();
         foreach ($results as $result) {
-            $participants = $this->getResultTypes($result['id'], $result['last']);
+            $participants = $this->getParticipants($result['id'], $result['last']);
             $this->insertLogsRemoveDups($result, $participants);
             if (count($participants) === 0) {
                 $this->loggerService->log($this->log, [

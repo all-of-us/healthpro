@@ -15,7 +15,7 @@ class DeceasedNotificationService extends EmailNotificationService
     protected $time = 'deceasedAuthored';
     protected $status = 'deceasedStatus';
     protected $level = 'organization';
-    protected $levelField = 'OrganizationId';
+    protected $levelField = 'organizationId';
     protected $logEntity = 'App\Entity\DeceasedLog';
 
     public function __construct(

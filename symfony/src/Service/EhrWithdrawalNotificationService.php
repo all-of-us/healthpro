@@ -13,7 +13,7 @@ class EhrWithdrawalNotificationService extends EmailNotificationService
     protected $type = 'EhrWithdrawal';
     protected $time = 'consentForElectronicHealthRecordsAuthored';
     protected $level = 'awardee';
-    protected $levelField = 'AwardeeId';
+    protected $levelField = 'awardeeId';
     protected $logEntity = 'App\Entity\EhrWithdrawalLog';
     protected $filterSummaries = true;
 
@@ -45,8 +45,8 @@ class EhrWithdrawalNotificationService extends EmailNotificationService
         ];
         if ($lastEhrWithdrawn) {
             $filterTime = clone $lastEhrWithdrawn;
-            // Go back 1 month to make sure no participants are missed
-            $filterTime->sub(new \DateInterval('P1M'));
+            // Go back 1 day to make sure no participants are missed
+            $filterTime->sub(new \DateInterval('P1D'));
             $searchParams['consentForElectronicHealthRecordsTime'] = 'ge' . $filterTime->format('Y-m-d\TH:i:s');
         }
         return $searchParams;
