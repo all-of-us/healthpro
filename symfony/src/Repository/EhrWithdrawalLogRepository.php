@@ -18,4 +18,18 @@ class EhrWithdrawalLogRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, EhrWithdrawalLog::class);
     }
+
+    /**
+     * @return EhrWithdrawalLog[] Returns an array of EhrWithdrawalLog objects
+     */
+
+    public function getLatestAwardees()
+    {
+        return $this->createQueryBuilder('e')
+            ->select('e.awardeeId, max(e.ehrWithdrawalTs) as ts')
+            ->groupBy('e.awardeeId')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

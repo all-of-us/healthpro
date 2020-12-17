@@ -13,7 +13,8 @@ class EhrWithdrawalNotificationService extends EmailNotificationService
     protected $type = 'EhrWithdrawal';
     protected $time = 'consentForElectronicHealthRecordsAuthored';
     protected $level = 'awardee';
-    protected $levelField = 'Awardee';
+    protected $levelField = 'AwardeeId';
+    protected $logEntity = 'App\Entity\EhrWithdrawalLog';
     protected $filterSummaries = true;
 
     public function __construct(
@@ -39,13 +40,14 @@ class EhrWithdrawalNotificationService extends EmailNotificationService
     {
         $searchParams = [
             'awardee' => $id,
-            '_sort:desc' => 'consentForElectronicHealthRecordsAuthored'
+            'consentForElectronicHealthRecords' => 'SUBMITTED_NO_CONSENT',
+            '_sort:desc' => 'consentForElectronicHealthRecordsTime'
         ];
         if ($lastEhrWithdrawn) {
             $filterTime = clone $lastEhrWithdrawn;
             // Go back 1 month to make sure no participants are missed
             $filterTime->sub(new \DateInterval('P1M'));
-            $searchParams['consentForElectronicHealthRecordsAuthored'] = 'ge' . $filterTime->format('Y-m-d\TH:i:s');
+            $searchParams['consentForElectronicHealthRecordsTime'] = 'ge' . $filterTime->format('Y-m-d\TH:i:s');
         }
         return $searchParams;
     }
@@ -54,7 +56,7 @@ class EhrWithdrawalNotificationService extends EmailNotificationService
     {
         $newSummaries = [];
         foreach ($summaries as $summary) {
-            if (!empty($summary->resource->consentForElectronicHealthRecordsFirstYesAuthored) && ($summary->resource->consentForElectronicHealthRecords === 'SUBMITTED_NOT_SURE' || $summary->resource->consentForElectronicHealthRecords === 'SUBMITTED_NO_CONSENT')) {
+            if (!empty($summary->resource->consentForElectronicHealthRecordsFirstYesAuthored)) {
                 $newSummaries[] = $summary;
             }
         }
