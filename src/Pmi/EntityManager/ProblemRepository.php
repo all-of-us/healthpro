@@ -2,27 +2,15 @@
 
 namespace Pmi\EntityManager;
 
+/**
+ * @deprecated 2020-12-21 Left in place for Silex Workqueue and Participant views.
+ */
 class ProblemRepository extends DoctrineRepository
 {
-
-    public function getProblemsWithCommentsCount()
-    {
-        $problemsQuery = "
-            SELECT p.*,
-                   IFNULL(MAX(pc.created_ts), updated_ts) AS last_update_ts,
-                   count(pc.comment) AS comment_count
-            FROM problems p
-            LEFT JOIN problem_comments pc ON p.id = pc.problem_id
-            GROUP BY p.id
-            ORDER BY IFNULL(MAX(pc.created_ts), updated_ts) DESC
-        ";
-        return $this->dbal->fetchAll($problemsQuery);
-    }
-
     public function getParticipantProblemsWithCommentsCount($participantId)
     {
         $problemsQuery = "
-            SELECT p.id, 
+            SELECT p.id,
                    p.updated_ts,
                    p.finalized_ts,
                    MAX(pc.created_ts) as last_comment_ts,

@@ -22,32 +22,33 @@
             </tr>
         </thead>
         <tbody>
-            {% for problem in problems %}
+            {% for problemRow in problems %}
+                {% set problem = problemRow[0] %}
                 <tr>
                     <td><a href="{{ path('problem_details', {problemId: problem.id }) }}">{{ problem.id }}</a></td>
-                    <td>{{ problem.participant_id }}</td>
+                    <td>{{ problem.participantId }}</td>
                     <td>
-                        {% if problem.problem_type == optionsValue[0] %}
+                        {% if problem.problemType == optionsValue[0] %}
                             {{ optionsText[0] }}
-                        {% elseif problem.problem_type == optionsValue[1] %}
+                        {% elseif problem.problemType == optionsValue[1] %}
                             {{ optionsText[1] }}
                         {% else %}
                             {{ optionsText[2] }}
                         {% endif %}
                     </td>
-                    <td>{{ problem.enrollment_site }}</td>
-                    <td>{{ problem.staff_name }}</td>
-                    <td>{{ problem.problem_date ? problem.problem_date|date('m/d/Y') }}</td>
-                    <td>{{ problem.created_ts ? problem.created_ts|date('m/d/Y') }}</td>
+                    <td>{{ problem.enrollmentSite }}</td>
+                    <td>{{ problem.staffName }}</td>
+                    <td>{{ problem.problemDate ? problem.problemDate|date('m/d/Y') }}</td>
+                    <td>{{ problem.createdTs ? problem.createdTs|date('m/d/Y') }}</td>
                     <td>
-                        {% if problem.finalized_ts %}
-                            {{ problem.finalized_ts|date('m/d/Y') }}
+                        {% if problem.finalizedTs %}
+                            {{ problem.finalizedTs|date('m/d/Y') }}
                         {% else %}
                             <span class="label label-danger">Draft</span>
                         {% endif %}
                     </td>
-                    <td>{{ problem.comment_count }}</td>
-                    <td>{{ problem.last_update_ts ? problem.last_update_ts|date('m/d/Y') }}</td>
+                    <td>{{ problemRow.commentCount }}</td>
+                    <td>{{ problemRow.lastUpdateTs ? problemRow.lastUpdateTs|date('m/d/Y') }}</td>
                     <td><a href="{{ path('problem_details', {problemId: problem.id }) }}">View Details</a></td>
                 </tr>
             {% endfor %}

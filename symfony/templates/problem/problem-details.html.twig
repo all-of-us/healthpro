@@ -16,43 +16,43 @@
                         <table class="table table-bordered">
                             <tr>
                                 <th>Problem Type</th>
-                                <td>{{ problem.problem_type }}</td>
+                                <td>{{ problem.problemType }}</td>
                             </tr>
                             <tr>
                                 <th>Enrollment Site</th>
-                                <td>{{ problem.enrollment_site }}</td>
+                                <td>{{ problem.enrollmentSite }}</td>
                             </tr>
                             <tr>
                                 <th>Staff Name</th>
-                                <td>{{ problem.staff_name }}</td>
+                                <td>{{ problem.staffName }}</td>
                             </tr>
                             <tr>
                                 <th>Problem Date</th>
-                                <td>{{ problem.problem_date ? problem.problem_date|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                <td>{{ problem.problemDate ? problem.problemDate|date('n/j/Y g:ia', app.user.timezone) }}</td>
                             </tr>
                             <tr>
                                 <th>Date provider became aware of problem</th>
-                                <td>{{ problem.provider_aware_date ? problem.provider_aware_date|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                <td>{{ problem.providerAwareDate ? problem.providerAwareDate|date('n/j/Y g:ia', app.user.timezone) }}</td>
                             </tr>
                             <tr>
                                 <th>Problem Description</th>
-                                <td>{{ problem.description }}</td>
+                                <td>{{ problem.description|nl2br }}</td>
                             </tr>
                             <tr>
                                 <th>Action Taken</th>
-                                <td>{{ problem.action_taken }}</td>
+                                <td>{{ problem.actionTaken|nl2br }}</td>
                             </tr>
                             <tr>
                                 <th>Created</th>
-                                <td>{{ problem.created_ts ? problem.created_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                <td>{{ problem.createdTs ? problem.createdTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
                             </tr>
                             <tr>
                                 <th>Updated</th>
-                                <td>{{ problem.updated_ts ? problem.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                <td>{{ problem.updatedTs ? problem.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
                             </tr>
                             <tr>
                                 <th>Finalized</th>
-                                <td>{{ problem.finalized_ts ? problem.finalized_ts|date('n/j/Y g:ia', app.userTimezone) }}</td>
+                                <td>{{ problem.finalizedTs ? problem.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
                             </tr>
                         </table>
                     </div>
@@ -67,10 +67,10 @@
                 {% endif %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                    <strong>{{ comment.staff_name }}</strong> <small class="text-muted">Commented on {{ comment.created_ts|date('D n/j/Y g:ia', app.userTimezone) }}</small>
+                    <strong>{{ comment.staffName }}</strong> <small class="text-muted">Commented on {{ comment.createdTs|date('D n/j/Y g:ia', app.user.timezone) }}</small>
                     </div>
                     <div class="panel-body">
-                    {{ comment.comment }}
+                    {{ comment.comment|nl2br }}
                     </div>
                 </div>
             {% endfor %}

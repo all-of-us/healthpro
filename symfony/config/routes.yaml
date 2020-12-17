@@ -37,9 +37,6 @@ review_measurementsRecentModify:
 workqueue_index:
     path: /workqueue
 
-problem_reports:
-    path: /problem/reports
-
 admin_home:
     path: /admin
 
