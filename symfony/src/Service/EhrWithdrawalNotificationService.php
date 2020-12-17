@@ -7,6 +7,7 @@ use App\Entity\Site;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
+use Pmi\Audit\Log;
 
 class EhrWithdrawalNotificationService extends EmailNotificationService
 {
@@ -16,6 +17,8 @@ class EhrWithdrawalNotificationService extends EmailNotificationService
     protected $levelField = 'awardeeId';
     protected $logEntity = 'App\Entity\EhrWithdrawalLog';
     protected $filterSummaries = true;
+    protected $statusText = 'EHR withdrawn';
+    protected $log = Log::EHR_WITHDRAWAL_NOTIFY;
 
     public function __construct(
         ManagerRegistry $managerRegistry,
