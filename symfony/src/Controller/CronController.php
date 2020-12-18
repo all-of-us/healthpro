@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\DeceasedNotificationService;
+use App\Service\EhrWithdrawalNotificationService;
 use App\Service\SiteSyncService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -45,6 +46,15 @@ class CronController extends AbstractController
         }
         $siteSyncService->syncAwardees();
         $siteSyncService->syncOrganizations();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/ehr-withdrawal", name="cron_ehr_withdrawal")
+     */
+    public function ehrWithdrawal(EhrWithdrawalNotificationService $ehrWithdrawalNotificationService)
+    {
+        $ehrWithdrawalNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }
 }

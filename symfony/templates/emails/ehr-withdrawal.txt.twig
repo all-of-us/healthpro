@@ -1,0 +1,17 @@
+Subject: PARTICIPANT EHR CONSENT WITHDRAWN
+
+Hello,
+
+One or more participants paired with your awardee ({{ awardee }}) has either withdrawn their EHR consent or had it expire. Please check the information listed under the “EHR Consent Status” and “EHR Consent Expiration Status” columns of the WorkQueue if more information is needed. Please be advised that EHR data for the participant(s) should not be transferred to the DRC until the participant(s) re-sign EHR consent. The list of affected participant IDs are as follows:
+
+{% for participant in participants %}
+    {{ participant.id }}
+{% endfor %}
+
+Additionally, please alert all relevant staff and update your local systems accordingly.
+
+For questions, please contact 844-842-2854.
+
+Thank you.
+
+Precision Medicine Initiative, PMI, All of Us, the All of Us logo, and The Future of Health Begins With You are service marks of the U.S. Department of Health and Human Services.”

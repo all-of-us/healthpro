@@ -47,3 +47,7 @@ cron:
   url: /s/cron/deceased/approved
   schedule: every day 07:10
   timezone: America/Chicago
+- description: "Ehr Withdrawal Notifications"
+  url: /s/cron/ehr-withdrawal
+  schedule: every day 07:15
+  timezone: America/Chicago
