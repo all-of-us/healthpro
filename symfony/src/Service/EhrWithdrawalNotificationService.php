@@ -16,10 +16,10 @@ class EhrWithdrawalNotificationService extends EmailNotificationService
     protected $level = 'awardee';
     protected $levelField = 'awardeeId';
     protected $logEntity = 'App\Entity\EhrWithdrawalLog';
-    protected $filterSummaries = true;
     protected $statusText = 'EHR withdrawn';
     protected $log = Log::EHR_WITHDRAWAL_NOTIFY;
     protected $render = 'ehr-withdrawal';
+    protected $launchDate = '2017-01-01T00:00:00';
 
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -45,6 +45,7 @@ class EhrWithdrawalNotificationService extends EmailNotificationService
         $searchParams = [
             'awardee' => $id,
             'consentForElectronicHealthRecords' => 'SUBMITTED_NO_CONSENT',
+            'consentForElectronicHealthRecordsFirstYesAuthored' => 'ge' . $this->launchDate,
             '_sort:desc' => 'consentForElectronicHealthRecordsTime'
         ];
         if ($lastEhrWithdrawn) {
@@ -54,16 +55,5 @@ class EhrWithdrawalNotificationService extends EmailNotificationService
             $searchParams['consentForElectronicHealthRecordsTime'] = 'ge' . $filterTime->format('Y-m-d\TH:i:s');
         }
         return $searchParams;
-    }
-
-    protected function filterSummaries($summaries)
-    {
-        $newSummaries = [];
-        foreach ($summaries as $summary) {
-            if (!empty($summary->resource->consentForElectronicHealthRecordsFirstYesAuthored)) {
-                $newSummaries[] = $summary;
-            }
-        }
-        return $newSummaries;
     }
 }
