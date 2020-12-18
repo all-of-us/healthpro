@@ -22,7 +22,6 @@ class SiteRepository extends ServiceEntityRepository
     /**
      * @return Site[] Returns an array of Site objects
      */
-
     public function getOrganizations()
     {
         return $this->createQueryBuilder('s')
@@ -38,7 +37,6 @@ class SiteRepository extends ServiceEntityRepository
     /**
      * @return Site[] Returns an array of Site objects
      */
-
     public function getAwardees()
     {
         return $this->createQueryBuilder('s')
@@ -54,7 +52,6 @@ class SiteRepository extends ServiceEntityRepository
     /**
      * @return Site[] Returns an array of Site objects
      */
-
     public function getDuplicateSiteGoogleGroup($googleGroup, $id)
     {
         return $this->createQueryBuilder('s')
@@ -71,7 +68,6 @@ class SiteRepository extends ServiceEntityRepository
     /**
      * @return Site[] Returns an array of Site objects
      */
-
     public function getDuplicateGoogleGroup($googleGroup)
     {
         return $this->createQueryBuilder('s')
