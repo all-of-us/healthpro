@@ -259,7 +259,8 @@ $(document).ready(function() {
                 show: [
                     'dateOfBirth:name',
                     '.col-group-default',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-retention'
                 ],
                 hide: [
                     '.col-group-demographics',
@@ -268,7 +269,7 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-patient-status',
-                    '.col-group-metrics',
+                    '.col-group-metrics:not(.col-group-retention)',
                     '.col-group-consent-cohort',
                     '.col-group-program-update',
                     '.col-group-language-primary-consent',
