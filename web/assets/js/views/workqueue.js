@@ -240,11 +240,12 @@ $(document).ready(function() {
                     'dateOfBirth:name',
                     '.col-group-default',
                     '.col-group-patient-status',
+                    '.col-group-ehr-expire-status',
                     '.col-group-metrics-ehr'
                 ],
                 hide: [
                     '.col-group-demographics',
-                    '.col-group-info:not(.col-group-default)',
+                    '.col-group-info:not(.col-group-default, .col-group-ehr-expire-status)',
                     '.col-group-inperson',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
@@ -281,11 +282,12 @@ $(document).ready(function() {
                 show: [
                     'dateOfBirth:name',
                     '.col-group-default',
+                    '.col-group-ehr-expire-status',
                     '.col-group-metrics'
                 ],
                 hide: [
                     '.col-group-demographics',
-                    '.col-group-info:not(.col-group-default)',
+                    '.col-group-info:not(.col-group-default, .col-group-ehr-expire-status)',
                     '.col-group-inperson',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
