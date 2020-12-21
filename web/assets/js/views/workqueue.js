@@ -267,7 +267,12 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-patient-status',
-                    '.col-group-metrics'
+                    '.col-group-metrics',
+                    '.col-group-consent-cohort',
+                    '.col-group-program-update',
+                    '.col-group-language-primary-consent',
+                    '.col-group-ehr-expire-status'
+
                 ]
             },
             {
