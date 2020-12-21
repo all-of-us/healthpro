@@ -78,7 +78,7 @@ $(document).ready(function() {
       { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'firstEhrConsent', visible: false, data: 'firstEhrConsent', class: 'text-center' },
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
-      { name: 'ehrConsentExpireStatus', data: 'ehrConsentExpireStatus', class: 'text-center' },
+      { name: 'ehrConsentExpireStatus', visible: false, data: 'ehrConsentExpireStatus', class: 'text-center' },
       { name: 'gRoRConsent', data: 'gRoRConsent', class: 'text-center' },
       { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
