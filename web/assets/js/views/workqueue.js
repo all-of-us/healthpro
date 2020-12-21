@@ -66,7 +66,7 @@ $(document).ready(function() {
       { name: 'firstName', data: 'firstName' },
       { name: 'middleName', data: 'middleName' },
       { name: 'dateOfBirth', data: 'dateOfBirth' },
-      { name: 'participantId', visible: false, data: 'participantId' },
+      { name: 'participantId', data: 'participantId' },
       { name: 'biobankId', visible: false, data: 'biobankId' },
       { name: 'language', visible: false, data: 'language', orderable: false  },
       { name: 'participantStatus', data: 'participantStatus' },
