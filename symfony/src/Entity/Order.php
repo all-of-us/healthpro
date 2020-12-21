@@ -644,8 +644,9 @@ class Order
         return $this;
     }
 
-    public function loadSamplesSchema($params)
+    public function loadSamplesSchema($params = [])
     {
+        $currentVersion = $this->getVersion();
         if (!empty($params['order_samples_version'])) {
             $currentVersion = $params['order_samples_version'];
         }
