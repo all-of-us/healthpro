@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -326,4 +327,35 @@ class Problem
 
         return $this;
     }
+
+    /**
+     * @return Collection|ProblemComment[]
+     */
+     public function getProblemComments(): Collection
+     {
+         return $this->problemComments;
+     }
+
+     public function addProblemComment(ProblemComment $problemComment): self
+     {
+         if (!$this->problemComments->contains($problemComment)) {
+             $this->problemComments[] = $problemComment;
+             $problemComment->setProblem($this);
+         }
+
+         return $this;
+     }
+
+     public function removeProblemComment(ProblemComment $problemComment): self
+     {
+         if ($this->problemComments->contains($problemComment)) {
+             $this->problemComments->removeElement($problemComment);
+             // set the owning side to null (unless already changed)
+             if ($problemComment->getProblem() === $this) {
+                 $problemComment->setProblem(null);
+             }
+         }
+
+         return $this;
+     }
 }
