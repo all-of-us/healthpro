@@ -8,8 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class OrderTest extends TestCase
 {
-    protected $order;
-
     protected function getUser()
     {
         $user = new User;
@@ -40,6 +38,7 @@ class OrderTest extends TestCase
         $order->setProcessedSamplesTs($params['processedSamplesTs']);
         $order->setProcessedCentrifugeType($params['processedCentrifugeType']);
         $order->setFinalizedUser($params['finalizedUser'] ?? $params['user']);
+        $order->setFinalizedSite($params['finalizedSite'] ?? $params['site']);
         $order->setFinalizedTs($params['finalizedTs'] ?? $params['ts']);
         $order->setFinalizedSamples($params['finalizedSamples']);
         $order->setVersion($params['version']);

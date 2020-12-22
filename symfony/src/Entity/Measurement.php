@@ -312,7 +312,7 @@ class Measurement
 
     public function loadSchema()
     {
-        $file = __DIR__ . "/../../../src/Pmi/Evaluation/versions/{$this->version}.json";
+        $file = __DIR__ . "/../../../src/Pmi/Evaluation/versions/{$this->currentVersion}.json";
         if (!file_exists($file)) {
             throw new MissingSchemaException();
         }
