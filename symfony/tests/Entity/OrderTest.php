@@ -80,5 +80,14 @@ class OrderTest extends TestCase
         // Assert processingRequired
         $this->assertEquals('1', $order->getRdrObject()->samples[0]['processingRequired']);
         $this->assertEquals('1', $order->getRdrObject()->samples[1]['processingRequired']);
+
+        // DV order
+        $orderArray['type'] = 'kit';
+        $orderArray['processedCentrifugeType'] = 'fixed_angle';
+        $order = $this->createOrder($orderArray);
+        $order->loadSamplesSchema();
+        // Assert processed sample codes
+        $this->assertEquals('2SST8', $order->getRdrObject()->samples[0]['test']);
+        $this->assertEquals('2PST8', $order->getRdrObject()->samples[1]['test']);
     }
 }
