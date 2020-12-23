@@ -11,7 +11,7 @@ class SymfonyMigrationController extends AbstractController
         ['deceased_reports_index', '/deceased-participant'],
         ['deceased_report_new', '/deceased-participant/{participantId}/new'],
         ['deceased_report_history', '/deceased-participant/{participantId}/history'],
-        ['admin', '/admin']
+        ['admin_home', '/admin']
     ];
 
     public function deceased_reports_indexAction(Application $app)
@@ -43,7 +43,7 @@ class SymfonyMigrationController extends AbstractController
     /**
      * @deprecated 2020-12-23
      */
-    public function adminAction(Application $app)
+    public function admin_homeAction(Application $app)
     {
         return $app->redirect('/s/admin');
     }
