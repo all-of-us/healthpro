@@ -258,7 +258,7 @@ class HpoApplicationTest extends AbstractWebTestCase
         $client->followRedirects();
         $this->assertSame(null, $this->app->getSite());
         $crawler = $client->request('GET', '/admin');
-        $this->assertEquals(1, count($crawler->filterXPath('//a[@href="/s/admin/sites/"]')));
+        $this->assertEquals('/admin', $this->app['session']->get('loginDestUrl'));
     }
 
     public function testDashboardAutoselect()
