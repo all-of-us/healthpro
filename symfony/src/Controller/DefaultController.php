@@ -19,4 +19,12 @@ class DefaultController extends AbstractController
     {
         return $this->render('index.html.twig');
     }
+
+    /**
+     * @Route("/admin", name="admin_home")
+     */
+    public function adminIndex()
+    {
+        return $this->render('admin/index.html.twig');
+    }
 }
