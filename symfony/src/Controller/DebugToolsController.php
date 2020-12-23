@@ -11,11 +11,13 @@ use App\Service\DebugToolsService;
 use App\Service\EnvironmentService;
 use App\Service\MeasurementService;
 use App\Service\OrderService;
+use App\Service\PatientStatusService;
 use App\Service\RdrApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * @Route("/s/admin/debug")
@@ -170,5 +172,27 @@ class DebugToolsController extends AbstractController
             'missing' => $missing,
             'form' => $form->createView()
         ]);
+    }
+
+    /**
+     * @Route("/patientstatus/{participantId}/organization/{organizationId}/json-rdr", name="admin_debug_patient_status_json_rdr")
+     */
+    public function patientStatusRdrJsonAction($participantId, $organizationId, PatientStatusService $patientStatusService)
+    {
+        $object = $patientStatusService->getPatientStatus($participantId, $organizationId);
+        $response = new JsonResponse($object);
+        $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
+        return $response;
+    }
+
+    /**
+     * @Route("/patientstatus/{participantId}/organization/{organizationId}/history/json-rdr", name="admin_debug_patient_status_history_json_rdr")
+     */
+    public function patientStatusHistoryRdrJsonAction($participantId, $organizationId, PatientStatusService $patientStatusService)
+    {
+        $object = $patientStatusService->getPatientStatusHistory($participantId, $organizationId);
+        $response = new JsonResponse($object);
+        $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
+        return $response;
     }
 }
