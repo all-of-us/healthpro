@@ -101,4 +101,4 @@ ml_account_dv:
 reportKitUrl:
 
 # Set diversion pouch site name
-diversion_pouch_site:
+diversion_pouch_site: ECDC DV Diversion Pouch
