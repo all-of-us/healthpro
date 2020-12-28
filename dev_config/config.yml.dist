@@ -99,3 +99,6 @@ ml_account_dv:
 
 # Report Kit url
 reportKitUrl:
+
+# Set diversion pouch site name
+diversion_pouch_site:

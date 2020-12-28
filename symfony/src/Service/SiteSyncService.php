@@ -113,7 +113,7 @@ class SiteSyncService
                     } elseif ($this->env->isStable()) {
                         if (strtolower($awardee->type) === 'dv') {
                             // For diversion pouch site set hpo mayo account number
-                            if (isset($site->siteType) && $site->siteType === 'ECDC DV Diversion Pouch') {
+                            if (isset($site->siteType) && $this->params->has('diversion_pouch_site') && $site->siteType === $this->params->get('diversion_pouch_site')) {
                                 $checkMayoAccountType = 'dv';
                                 $setMayoAccountType = 'hpo';
                             } else {
