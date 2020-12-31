@@ -255,10 +255,9 @@ class HpoApplicationTest extends AbstractWebTestCase
         $groupEmail = User::ADMIN_GROUP . '@gapps.com';
         AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
-        $client->followRedirects();
         $this->assertSame(null, $this->app->getSite());
         $crawler = $client->request('GET', '/admin');
-        $this->assertEquals(1, count($crawler->filterXPath('//a[@href="/s/admin/sites/"]')));
+        $this->assertEquals('/admin', $this->app['session']->get('loginDestUrl'));
     }
 
     public function testDashboardAutoselect()

@@ -296,7 +296,7 @@ class WorkQueueController extends AbstractController
     public function exportAction(Application $app, Request $request)
     {
         $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
-        if ($siteWorkQueueDownload === AdminController::DOWNLOAD_DISABLED) {
+        if ($siteWorkQueueDownload === WorkQueue::DOWNLOAD_DISABLED) {
             $app->abort(403);
         }
         if ($app->hasRole('ROLE_AWARDEE')) {
@@ -314,7 +314,7 @@ class WorkQueueController extends AbstractController
         $limit = $exportConfiguration['limit'];
         $pageSize = $exportConfiguration['pageSize'];
 
-        $hasFullDataAccess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
+        $hasFullDataAccess = $siteWorkQueueDownload === WorkQueue::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
 
         $params = array_filter($request->query->all());
         $params['_count'] = $pageSize;
@@ -590,7 +590,7 @@ class WorkQueueController extends AbstractController
 
     public function isDownloadDisabled($value)
     {
-        return $value === AdminController::DOWNLOAD_DISABLED;
+        return $value === WorkQueue::DOWNLOAD_DISABLED;
     }
 
     public function participantAction($id, Application $app, Request $request)
