@@ -66,7 +66,7 @@ $(document).ready(function() {
       { name: 'firstName', data: 'firstName' },
       { name: 'middleName', data: 'middleName' },
       { name: 'dateOfBirth', data: 'dateOfBirth' },
-      { name: 'participantId', visible: false, data: 'participantId' },
+      { name: 'participantId', data: 'participantId' },
       { name: 'biobankId', visible: false, data: 'biobankId' },
       { name: 'language', visible: false, data: 'language', orderable: false  },
       { name: 'participantStatus', data: 'participantStatus' },
@@ -78,7 +78,7 @@ $(document).ready(function() {
       { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'firstEhrConsent', visible: false, data: 'firstEhrConsent', class: 'text-center' },
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
-      { name: 'ehrConsentExpireStatus', data: 'ehrConsentExpireStatus', class: 'text-center' },
+      { name: 'ehrConsentExpireStatus', visible: false, data: 'ehrConsentExpireStatus', class: 'text-center' },
       { name: 'gRoRConsent', data: 'gRoRConsent', class: 'text-center' },
       { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
@@ -240,11 +240,12 @@ $(document).ready(function() {
                     'dateOfBirth:name',
                     '.col-group-default',
                     '.col-group-patient-status',
+                    '.col-group-ehr-expire-status',
                     '.col-group-metrics-ehr'
                 ],
                 hide: [
                     '.col-group-demographics',
-                    '.col-group-info:not(.col-group-default)',
+                    '.col-group-info:not(.col-group-default, .col-group-ehr-expire-status)',
                     '.col-group-inperson',
                     '.col-group-ppi',
                     '.col-group-ppi-time',
@@ -258,7 +259,8 @@ $(document).ready(function() {
                 show: [
                     'dateOfBirth:name',
                     '.col-group-default',
-                    '.col-group-contact'
+                    '.col-group-contact',
+                    '.col-group-retention'
                 ],
                 hide: [
                     '.col-group-demographics',
@@ -267,7 +269,12 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-ppi-time',
                     '.col-group-patient-status',
-                    '.col-group-metrics'
+                    '.col-group-metrics:not(.col-group-retention)',
+                    '.col-group-consent-cohort',
+                    '.col-group-program-update',
+                    '.col-group-language-primary-consent',
+                    '.col-group-ehr-expire-status'
+
                 ]
             },
             {
@@ -276,11 +283,12 @@ $(document).ready(function() {
                 show: [
                     'dateOfBirth:name',
                     '.col-group-default',
+                    '.col-group-ehr-expire-status',
                     '.col-group-metrics'
                 ],
                 hide: [
                     '.col-group-demographics',
-                    '.col-group-info:not(.col-group-default)',
+                    '.col-group-info:not(.col-group-default, .col-group-ehr-expire-status)',
                     '.col-group-inperson',
                     '.col-group-ppi',
                     '.col-group-ppi-time',

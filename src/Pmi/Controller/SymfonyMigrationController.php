@@ -15,7 +15,8 @@ class SymfonyMigrationController extends AbstractController
         ['problemForm', '/participant/{participantId}/problem/{problemId}', [
             'method' => 'GET|POST',
             'defaults' => ['problemId' => null]
-        ]]
+        ]],
+        ['admin_home', '/admin']
     ];
 
     public function deceased_reports_indexAction(Application $app)
@@ -69,5 +70,14 @@ class SymfonyMigrationController extends AbstractController
             $participantId,
             $problemId
         ));
+
+    }
+
+    /**
+     * @deprecated 2020-12-23
+     */
+    public function admin_homeAction(Application $app)
+    {
+        return $app->redirect('/s/admin');
     }
 }
