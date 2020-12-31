@@ -6,4 +6,4 @@ doctrine:
         dql:
           string_functions:
             GROUP_CONCAT: DoctrineExtensions\Query\Mysql\GroupConcat
-
+            IFNULL: DoctrineExtensions\Query\Mysql\IfNull
