@@ -2,17 +2,21 @@
 
 namespace App\Service;
 
+use App\Entity\Order;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderService
 {
     protected $rdrApiService;
     protected $params;
+    protected $em;
 
-    public function __construct(RdrApiService $rdrApiService, ParameterBagInterface $params)
+    public function __construct(RdrApiService $rdrApiService, ParameterBagInterface $params, EntityManagerInterface $em)
     {
         $this->rdrApiService = $rdrApiService;
         $this->params = $params;
+        $this->em = $em;
     }
 
     public function loadSamplesSchema($order)
@@ -60,5 +64,23 @@ class OrderService
             return false;
         }
         return false;
+    }
+
+    public function generateId()
+    {
+        $attempts = 0;
+        $orderRepository = $this->em->getRepository(Order::class);
+        while (++$attempts <= 20) {
+            $id = $this->getNumericId();
+            if ($orderRepository->fetchOneBy(['order_id' => $id])) {
+                $id = null;
+            } else {
+                break;
+            }
+        }
+        if (is_null($id)) {
+            throw new \Exception('Failed to generate unique order id');
+        }
+        return $id;
     }
 }

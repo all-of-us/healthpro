@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+{% import 'order/samples.html.twig' as samples %}
+{% form_theme confirmForm 'form/simple_checkbox.html.twig' %}
+{% block title %}Order - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-medkit" aria-hidden="true"></i>
+            New Biobank order
+            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+        </h2>
+    </div>
+    {% include 'partials/participant-dl.html.twig' %}
+
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
+        <li role="presentation" class="active"><a href="#">Create</a></li>
+        {% if app.session.get('orderType')  == 'dv' %}
+            {% set steps = ['Collect', 'Process', 'Finalize'] %}
+        {% else %}
+            {% set steps = ['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
+        {% endif %}
+        {% for step in steps %}
+            <li role="presentation" class="disabled"><a href="#">{{ step }}</a></li>
+        {% endfor %}
+    </ul>
+    <br />
+
+    <div id="createOrder">
+        {{ form_start(confirmForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+        {{ form_errors(confirmForm) }}
+        <div class="row row-equal-height">
+            {% if app.session.get('orderType') == 'hpo' %}
+                <div class="col-sm-6 col-md-6 {% if app.session.get('siteType') == 'dv' %} col-sm-offset-3 col-md-offset-3 {% endif %}">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title text-center">HPO Biobank Order</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="text-center">
+                                <div id="customize-off" {% if showCustom %} style="display:none"{% endif %}>
+                                    <p>Create an order for all {{ samplesInfo|length }} All of Us℠ biospecimens</p>
+                                    <p>
+                                        <button type="submit" name="standard" class="btn btn-primary">Create</button>
+                                    </p>
+                                    <p>
+                                        <a href="#" id="customize-enable">Customize order</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div{% if not showCustom %} style="display:none"{% endif %} id="customize-on">
+                                {% if not showBloodTubes %}
+                                    <p class="text-center text-warning">
+                                        <i class="fa fa-info-circle" aria-hidden="true"></i> Biobank orders for blood draws cannot be created at this moment due to safety checks. Only urine sample can be created.
+                                    </p>
+                                {% else %}
+                                    <p class="text-center">Customize your All of Us℠ biobank order</p>
+                                {% endif %}
+                                <div class="form-group{% if not confirmForm.samples.vars.valid %} has-error{% endif %}">
+                                    {{ form_label(confirmForm.samples) }}
+                                    {{ samples.form_widget(confirmForm.samples, false, samplesInfo, version) }}
+                                    {{ form_errors(confirmForm.samples) }}
+                                </div>
+                                <div class="text-center">
+                                    <p>
+                                        <button type="submit" name="custom" class="btn btn-primary">Create {% if showBloodTubes %} custom {% endif %} order</button>
+                                    </p>
+                                    {% if showBloodTubes %}
+                                        <p>
+                                            <a href="#" id="customize-disable">Revert to standard order</a>
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if app.session.get('orderType') == 'dv' %}
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title text-center">DV Biobank Order</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p class="text-center">Register an All of Us℠ Biospecimen Kit</p>
+                            {% if not showBloodTubes %}
+                                <p class="text-center text-warning">
+                                    <i class="fa fa-info-circle" aria-hidden="true"></i> Biobank orders for blood draws cannot be created at this moment due to safety checks. Only urine sample can be created.
+                                </p>
+                            {% endif %}
+                            <br />
+                            {{ form_row(confirmForm.kitId) }}
+                            <p class="text-center">
+                                <button type="submit" name="existing" class="btn btn-primary">Create</button>
+                            </p>
+                            {% if app.reportKitUrl %}
+                                <p class="text-center">
+                                    <a data-href="{{ app.reportKitUrl }}" class="external-link text-danger">Report Kit Problem</a>
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if app.session.get('siteType') != 'dv' %}
+                <div class="col-sm-6 col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title text-center">Saliva Biobank Order</h3>
+                        </div>
+                        <div class="panel-body text-center">
+                            {% if showSalivaTubes %}
+                                <p>
+                                    {{ salivaInstructions }}
+                                </p>
+                                <p>
+                                    <button type="submit" name="saliva" class="btn btn-primary">Create</button>
+                                </p>
+                            {% else %}
+                                <p class="text-center text-warning">
+                                    <i class="fa fa-info-circle" aria-hidden="true"></i> Saliva order cannot be created at this moment due to safety checks.
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <p class="text-center">
+            <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+        </p>
+        {{ form_rest(confirmForm) }}
+        <input type="hidden" name="show-blood-tubes" value="{{ showBloodTubes ? 'yes' : 'no' }}" />
+        <input type="hidden" name="show-saliva-tubes" value="{{ showSalivaTubes ? 'yes' : 'no' }}" />
+        {{ form_end(confirmForm) }}
+    </div>
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('order-create') }}
+    <script>
+        $(document).ready(function() {
+            {% if not showBloodTubes %}
+            $( "input:not(:checked)").closest('tr').addClass("custom-text-muted");
+            {% endif %}
+        });
+    </script>
+{% endblock %}

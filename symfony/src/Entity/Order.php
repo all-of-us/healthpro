@@ -14,11 +14,12 @@ class Order
     const SWINGING_BUCKET = 'swinging_bucket';
 
     private $params;
-    private $samples;
-    private $samplesInformation;
-    private $salivaSamples;
-    private $salivaSamplesInformation;
-    private $salivaInstructions;
+
+    public $samples;
+    public $samplesInformation;
+    public $salivaSamples;
+    public $salivaSamplesInformation;
+    public $salivaInstructions;
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL', '1SAL2'];
 
@@ -221,7 +222,7 @@ class Order
     /**
      * @ORM\Column(type="string", length=10, nullable=true)
      */
-    private $version;
+    private $version = 2;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
