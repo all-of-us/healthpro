@@ -14,12 +14,12 @@ class Order
     const SWINGING_BUCKET = 'swinging_bucket';
 
     private $params;
-
-    public $samples;
-    public $samplesInformation;
-    public $salivaSamples;
-    public $salivaSamplesInformation;
-    public $salivaInstructions;
+    private $samples;
+    private $samplesInformation;
+    private $salivaSamples;
+    private $salivaSamplesInformation;
+    private $salivaInstructions;
+    private $currentVersion;
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL', '1SAL2'];
 
@@ -222,12 +222,12 @@ class Order
     /**
      * @ORM\Column(type="string", length=10, nullable=true)
      */
-    private $version = 2;
+    private $version;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $biobankFinalized;
+    private $biobankFinalized = false;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -645,14 +645,44 @@ class Order
         return $this;
     }
 
+    public function getSamples()
+    {
+        return $this->samples;
+    }
+
+    public function getSamplesInformation()
+    {
+        return $this->samplesInformation;
+    }
+
+    public function getSalivaSamples()
+    {
+        return $this->salivaSamples;
+    }
+
+    public function getSalivaSamplesInformation()
+    {
+        return $this->salivaSamplesInformation;
+    }
+
+    public function getSalivaInstructions()
+    {
+        return $this->salivaInstructions;
+    }
+
+    public function getCurrentVersion()
+    {
+        return $this->currentVersion;
+    }
+
     public function loadSamplesSchema($params = [])
     {
-        $currentVersion = $this->getVersion();
+        $this->currentVersion = $this->getVersion();
         if (!empty($params['order_samples_version'])) {
-            $currentVersion = $params['order_samples_version'];
+            $this->currentVersion = $params['order_samples_version'];
         }
         $this->params = $params;
-        $file = __DIR__ . "/../../../src/Pmi/Order/versions/{$currentVersion}.json";
+        $file = __DIR__ . "/../../../src/Pmi/Order/versions/{$this->currentVersion}.json";
         if (!file_exists($file)) {
             throw new \Exception('Samples version file not found');
         }

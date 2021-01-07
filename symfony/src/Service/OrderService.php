@@ -72,7 +72,7 @@ class OrderService
         $orderRepository = $this->em->getRepository(Order::class);
         while (++$attempts <= 20) {
             $id = $this->getNumericId();
-            if ($orderRepository->fetchOneBy(['order_id' => $id])) {
+            if ($orderRepository->findOneBy(['orderId' => $id])) {
                 $id = null;
             } else {
                 break;
@@ -80,6 +80,17 @@ class OrderService
         }
         if (is_null($id)) {
             throw new \Exception('Failed to generate unique order id');
+        }
+        return $id;
+    }
+
+    private function getNumericId()
+    {
+        $length = 10;
+        // Avoid leading 0s
+        $id = (string)rand(1, 9);
+        for ($i = 0; $i < $length - 1; $i++) {
+            $id .= (string)rand(0, 9);
         }
         return $id;
     }

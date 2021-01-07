@@ -2,8 +2,6 @@
 
 namespace App\Form;
 
-use App\Entity\User;
-use App\Service\TimezoneService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -63,7 +61,6 @@ class OrderCreateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => User::class,
             'orderType' => null,
             'samples' => null,
             'showBloodTubes' => null,

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
-{% form_theme confirmForm 'form/simple_checkbox.html.twig' %}
+{% form_theme createForm 'form/simple_checkbox.html.twig' %}
 {% block title %}Order - {% endblock %}
 {% block body %}
     <div class="page-header">
@@ -27,8 +27,8 @@
     <br />
 
     <div id="createOrder">
-        {{ form_start(confirmForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
-        {{ form_errors(confirmForm) }}
+        {{ form_start(createForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+        {{ form_errors(createForm) }}
         <div class="row row-equal-height">
             {% if app.session.get('orderType') == 'hpo' %}
                 <div class="col-sm-6 col-md-6 {% if app.session.get('siteType') == 'dv' %} col-sm-offset-3 col-md-offset-3 {% endif %}">
@@ -56,10 +56,10 @@
                                 {% else %}
                                     <p class="text-center">Customize your All of Us℠ biobank order</p>
                                 {% endif %}
-                                <div class="form-group{% if not confirmForm.samples.vars.valid %} has-error{% endif %}">
-                                    {{ form_label(confirmForm.samples) }}
-                                    {{ samples.form_widget(confirmForm.samples, false, samplesInfo, version) }}
-                                    {{ form_errors(confirmForm.samples) }}
+                                <div class="form-group{% if not createForm.samples.vars.valid %} has-error{% endif %}">
+                                    {{ form_label(createForm.samples) }}
+                                    {{ samples.form_widget(createForm.samples, false, samplesInfo, version) }}
+                                    {{ form_errors(createForm.samples) }}
                                 </div>
                                 <div class="text-center">
                                     <p>
@@ -90,7 +90,7 @@
                                 </p>
                             {% endif %}
                             <br />
-                            {{ form_row(confirmForm.kitId) }}
+                            {{ form_row(createForm.kitId) }}
                             <p class="text-center">
                                 <button type="submit" name="existing" class="btn btn-primary">Create</button>
                             </p>
@@ -130,10 +130,10 @@
         <p class="text-center">
             <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
         </p>
-        {{ form_rest(confirmForm) }}
+        {{ form_rest(createForm) }}
         <input type="hidden" name="show-blood-tubes" value="{{ showBloodTubes ? 'yes' : 'no' }}" />
         <input type="hidden" name="show-saliva-tubes" value="{{ showSalivaTubes ? 'yes' : 'no' }}" />
-        {{ form_end(confirmForm) }}
+        {{ form_end(createForm) }}
     </div>
 {% endblock %}
 {% block pagejs %}
