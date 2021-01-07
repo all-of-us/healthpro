@@ -12,6 +12,12 @@ class Order
 {
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
+    const ORDER_ACTIVE = 'active';
+    const ORDER_CANCEL = 'cancel';
+    const ORDER_RESTORE = 'restore';
+    const ORDER_UNLOCK = 'unlock';
+    const ORDER_EDIT = 'edit';
+    const ORDER_REVERT = 'revert';
 
     private $params;
     private $samples;

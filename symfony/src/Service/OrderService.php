@@ -11,6 +11,7 @@ class OrderService
     protected $rdrApiService;
     protected $params;
     protected $em;
+    protected $order;
 
     public function __construct(RdrApiService $rdrApiService, ParameterBagInterface $params, EntityManagerInterface $em)
     {
@@ -22,7 +23,8 @@ class OrderService
     public function loadSamplesSchema($order)
     {
         $params = $this->getOrderParams(['order_samples_version', 'ml_mock_order']);
-        $order->loadSamplesSchema($params);
+        $this->order = $order;
+        $this->order->loadSamplesSchema($params);
     }
 
     protected function getOrderParams($fields)
@@ -64,6 +66,30 @@ class OrderService
             return false;
         }
         return false;
+    }
+
+    public function getCurrentStep()
+    {
+        $columns = [
+            'print_labels' => 'Printed',
+            'collect' => 'Collected',
+            'process' => 'Processed',
+            'finalize' => 'Finalized',
+            'print_requisition' => 'Finalized'
+        ];
+        if ($this->order->getType() === 'kit') {
+            unset($columns['print_labels']);
+            unset($columns['print_requisition']);
+        }
+        $step = 'finalize';
+        foreach ($columns as $name => $column) {
+            if (!$this->order->{'get' . $column . 'Ts'}()) {
+                $step = $name;
+                break;
+            }
+        }
+        // TODO handle canceled orders
+        return $step;
     }
 
     public function generateId()

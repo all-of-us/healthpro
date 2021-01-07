@@ -25,6 +25,24 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 class OrderController extends AbstractController
 {
     /**
+     * @Route("/participant/{participantId}/{orderId}/order", name="order")
+     */
+    public function orderAction($participantId, $orderId, OrderService $orderService, EntityManagerInterface $em)
+    {
+        $orderRepository = $em->getRepository(Order::class);
+        $order = $orderRepository->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $orderService->loadSamplesSchema($order);
+        $action = $orderService->getCurrentStep();
+        return $this->redirectToRoute("order_{$action}", [
+            'participantId' => $participantId,
+            'orderId' => $orderId
+        ]);
+    }
+
+    /**
      * @Route("/participant/{participantId}/order/check", name="order_check")
      */
     public function orderCheck($participantId, ParticipantSummaryService $participantSummaryService, SiteService $siteService)
@@ -52,8 +70,7 @@ class OrderController extends AbstractController
         ParticipantSummaryService $participantSummaryService,
         SiteService $siteService,
         EntityManagerInterface $em,
-        LoggerService $loggerService,
-        ParameterBagInterface $params
+        LoggerService $loggerService
     ) {
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -69,8 +86,7 @@ class OrderController extends AbstractController
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         $order = new Order;
-        $orderParams = $params->has('order_samples_version') ? ['order_samples_version' => $params->get('order_samples_version')] : [];
-        $order->loadSamplesSchema($orderParams);
+        $orderService->loadSamplesSchema($order);
         $createForm = $this->createForm(OrderCreateType::class, null, [
             'orderType' => $session->get('orderType'),
             'samples' => $order->getSamples(),
