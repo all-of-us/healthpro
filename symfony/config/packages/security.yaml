@@ -6,7 +6,7 @@ security:
             id: App\Security\UserProvider
     firewalls:
         dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            pattern: ^/(s\/)?(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             anonymous: lazy
@@ -25,7 +25,8 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
      - { path: ^/s/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-     - { path: ^/s/admin/.*, roles: ROLE_ADMIN }
+     - { path: ^/s/admin($|\/).*, roles: ROLE_ADMIN }
+     - { path: ^/s/problem($|\/).*, roles: ROLE_DV_ADMIN }
      - { path: ^/s/settings($|\/), roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
      - { path: ^/s/help/.*, roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
      - { path: ^/.*$, roles: ROLE_USER }

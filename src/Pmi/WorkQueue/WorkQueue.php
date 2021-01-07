@@ -5,6 +5,9 @@ class WorkQueue
 {
     const LIMIT_EXPORT = 10000;
     const LIMIT_EXPORT_PAGE_SIZE = 1000;
+    const FULL_DATA_ACCESS = 'full_data';
+    const LIMITED_DATA_ACCESS = 'limited_data';
+    const DOWNLOAD_DISABLED = 'disabled';
 
     const HTML_SUCCESS = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
     const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';

@@ -347,10 +347,13 @@ class HpoApplication extends AbstractApplication
 
     public function isDiversionPouchSite()
     {
+        if (!isset($this->configuration['diversion_pouch_site'])) {
+            return false;
+        }
         $site = $this['em']->getRepository('sites')->fetchBy([
             'deleted' => 0,
             'google_group' => $this->getSiteId(),
-            'site_type' => 'ECDC DV Diversion Pouch'
+            'site_type' => $this->configuration['diversion_pouch_site']
         ]);
         return !empty($site);
     }
