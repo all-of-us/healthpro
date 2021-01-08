@@ -899,4 +899,59 @@ class Order
             return $this->samples;
         }
     }
+
+    public function getStatus()
+    {
+        $history = $this->getHistory();
+        if (!empty($history)) {
+            return !empty($history->getType()) ? $history->getType() : self::ORDER_ACTIVE;
+        }
+    }
+
+    public function isOrderExpired()
+    {
+        return empty($this->getFinalizedTs()) && empty($this->getVersion());
+    }
+
+    // Finalized form is only disabled when rdr_id is set
+    public function isOrderDisabled()
+    {
+        return ($this->getRdrId() || $this->isOrderExpired()|| $this->isOrderCancelled()) && $this->getStatus() !== 'unlock';
+    }
+
+    // Except finalize form all forms are disabled when finalized_ts is set
+    public function isOrderFormDisabled()
+    {
+        return ($this->getFinalizedTs() || $this->isOrderExpired() || $this->isOrderCancelled()) && $this->getStatus() !== 'unlock';
+    }
+
+    public function isOrderCancelled()
+    {
+        return $this->getStatus() === self::ORDER_CANCEL;
+    }
+
+    public function isOrderUnlocked()
+    {
+        return $this->getStatus()=== self::ORDER_UNLOCK;
+    }
+
+    public function isOrderFailedToReachRdr()
+    {
+        return !empty($this->getFinalizedTs()) && !empty($this->getMayoId()) && empty($this->getRdrId());
+    }
+
+    public function canCancel()
+    {
+        return !$this->isOrderCancelled() && !$this->isOrderUnlocked() && !$this->isOrderFailedToReachRdr();
+    }
+
+    public function canRestore()
+    {
+        return !$this->isOrderExpired() && $this->isOrderCancelled() && !$this->isOrderUnlocked() && !$this->isOrderFailedToReachRdr();
+    }
+
+    public function canUnlock()
+    {
+        return !$this->isOrderExpired() && !empty($this->getRdrId()) && !$this->isOrderUnlocked() && !$this->isOrderCancelled();
+    }
 }

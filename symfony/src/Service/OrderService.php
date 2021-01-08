@@ -88,7 +88,10 @@ class OrderService
                 break;
             }
         }
-        // TODO handle canceled orders
+        // For canceled orders set print labels step to collect
+        if ($this->order->isOrderCancelled() && $step === 'print_labels') {
+            return 'collect';
+        }
         return $step;
     }
 
