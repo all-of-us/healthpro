@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use Pmi\HttpClient;
+use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
@@ -9,10 +11,11 @@ use App\Entity\Order;
 
 class MayolinkOrderService
 {
-    protected $rdrApiService;
     protected $params;
     protected $em;
     protected $twig;
+    protected $logger;
+    protected $client;
     protected $ordersEndpoint;
     // This namespace is the same across all environments, regardless of the endpoint.
     // Also, note that this is just an XML namespace and is never used to make a request
@@ -23,12 +26,13 @@ class MayolinkOrderService
     protected $password;
 
 
-    public function __construct(RdrApiService $rdrApiService, ParameterBagInterface $params, EntityManagerInterface $em, Environment $twig)
+    public function __construct(ParameterBagInterface $params, EntityManagerInterface $em, Environment $twig, LoggerInterface $logger)
     {
-        $this->rdrApiService = $rdrApiService;
         $this->params = $params;
         $this->em = $em;
         $this->twig = $twig;
+        $this->logger = $logger;
+        $this->client = new HttpClient(['cookies' => true]);
         $this->ordersEndpoint = $params->get('ml_orders_endpoint');
         $this->userName = $params->get('ml_username');
         $this->password = $params->get('ml_password');
@@ -44,12 +48,12 @@ class MayolinkOrderService
         $xmlFile = "mayolink/order-create.xml.twig";
         $xml = $this->twig->render($xmlFile, $parameters);
         try {
-            $response = $this->rdrApiService->post("{$this->ordersEndpoint}/{$this->createOrder}", [
+            $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->createOrder}", [
                 'auth' => [$this->userName, $this->password],
                 'body' => $xml
             ]);
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->logger->critical($e->getMessage());
             return false;
         }
         if ($response->getStatusCode() !== 201) {
@@ -68,12 +72,12 @@ class MayolinkOrderService
         $xmlFile = "mayolink/order-labels.xml.twig";
         $xml = $this->twig->render($xmlFile, $parameters);
         try {
-            $response = $this->rdrApiService->post("{$this->ordersEndpoint}/{$this->labelPdf}", [
+            $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->labelPdf}", [
                 'auth' => [$this->userName, $this->password],
                 'body' => $xml
             ]);
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->logger->critical($e->getMessage());
             return false;
         }
         if ($response->getStatusCode() !== 200) {
@@ -88,11 +92,11 @@ class MayolinkOrderService
     public function getRequisitionPdf($id)
     {
         try {
-            $response = $this->rdrApiService->post("{$this->ordersEndpoint}/orders/{$id}.xml", [
+            $response = $this->client->request('GET', "{$this->ordersEndpoint}/orders/{$id}.xml", [
                 'auth' => [$this->userName, $this->password]
             ]);
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->logger->critical($e->getMessage());
             return false;
         }
         if ($response->getStatusCode() !== 200) {

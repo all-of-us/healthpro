@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -24,18 +25,51 @@ use Symfony\Component\Security\Csrf\CsrfToken;
  */
 class OrderController extends AbstractController
 {
+
+    protected $em;
+    protected $orderService;
+    protected $participantSummaryService;
+    protected $loggerService;
+
+    public function __construct(
+        EntityManagerInterface $em,
+        OrderService $orderService,
+        ParticipantSummaryService $participantSummaryService,
+        LoggerService $loggerService
+    ) {
+        $this->em = $em;
+        $this->orderService = $orderService;
+        $this->participantSummaryService = $participantSummaryService;
+        $this->loggerService = $loggerService;
+    }
+
+    public function loadOrder($participantId, $orderId)
+    {
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $orderRepository = $this->em->getRepository(Order::class);
+        $order = $orderRepository->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Order not found.');
+        }
+        $this->orderService->loadSamplesSchema($order);
+        return [$participant, $order];
+    }
+
     /**
      * @Route("/participant/{participantId}/{orderId}/order", name="order")
      */
-    public function orderAction($participantId, $orderId, OrderService $orderService, EntityManagerInterface $em)
+    public function orderAction($participantId, $orderId)
     {
-        $orderRepository = $em->getRepository(Order::class);
+        $orderRepository = $this->em->getRepository(Order::class);
         $order = $orderRepository->find($orderId);
         if (empty($order)) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        $orderService->loadSamplesSchema($order);
-        $action = $orderService->getCurrentStep();
+        $this->orderService->loadSamplesSchema($order);
+        $action = $order->getCurrentStep();
         return $this->redirectToRoute("order_{$action}", [
             'participantId' => $participantId,
             'orderId' => $orderId
@@ -45,9 +79,9 @@ class OrderController extends AbstractController
     /**
      * @Route("/participant/{participantId}/order/check", name="order_check")
      */
-    public function orderCheck($participantId, ParticipantSummaryService $participantSummaryService, SiteService $siteService)
+    public function orderCheck($participantId, SiteService $siteService)
     {
-        $participant = $participantSummaryService->getParticipantById($participantId);
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
@@ -66,13 +100,9 @@ class OrderController extends AbstractController
         $participantId,
         Request $request,
         SessionInterface $session,
-        OrderService $orderService,
-        ParticipantSummaryService $participantSummaryService,
-        SiteService $siteService,
-        EntityManagerInterface $em,
-        LoggerService $loggerService
+        SiteService $siteService
     ) {
-        $participant = $participantSummaryService->getParticipantById($participantId);
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
@@ -86,7 +116,7 @@ class OrderController extends AbstractController
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         $order = new Order;
-        $orderService->loadSamplesSchema($order);
+        $this->orderService->loadSamplesSchema($order);
         $createForm = $this->createForm(OrderCreateType::class, null, [
             'orderType' => $session->get('orderType'),
             'samples' => $order->getSamples(),
@@ -95,12 +125,13 @@ class OrderController extends AbstractController
         ]);
         $showCustom = false;
         $createForm->handleRequest($request);
-        if (!$createForm->isSubmitted() && !$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('orderCheck', $request->request->get('csrf_token')))) {
+        if (!$createForm->isSubmitted() && !$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('orderCheck',
+                $request->request->get('csrf_token')))) {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         if ($createForm->isSubmitted() && $createForm->isValid()) {
             if ($request->request->has('existing')) {
-                $orderRepository = $em->getRepository(Order::class);
+                $orderRepository = $this->em->getRepository(Order::class);
                 if (empty($createForm['kitId']->getData())) {
                     $createForm['kitId']['first']->addError(new FormError('Please enter a kit order ID'));
                 } elseif ($orderRepository->findOneBy(['order_id' => $createForm['kitId']->getData()])) {
@@ -126,7 +157,7 @@ class OrderController extends AbstractController
                 }
             }
             if ($createForm->isValid()) {
-                $userRepository = $em->getRepository(User::class);
+                $userRepository = $this->em->getRepository(User::class);
                 $order->setUser($userRepository->find($this->getUser()->getId()));
                 $order->setSite($siteService->getSiteId());
                 $order->setParticipantId($participant->id);
@@ -139,12 +170,12 @@ class OrderController extends AbstractController
                 if ($session->get('siteType') === 'dv' && $siteService->isDiversionPouchSite()) {
                     $order->setType('diversion');
                 }
-                $order->setOrderId($orderService->generateId());
-                $em->persist($order);
-                $em->flush();
+                $order->setOrderId($this->orderService->generateId());
+                $this->em->persist($order);
+                $this->em->flush();
                 $orderId = $order->getId();
                 if ($orderId) {
-                    $loggerService->log(Log::ORDER_CREATE, $orderId);
+                    $this->loggerService->log(Log::ORDER_CREATE, $orderId);
                     return $this->redirectToRoute('order', [
                         'participantId' => $participant->id,
                         'orderId' => $orderId
@@ -166,5 +197,60 @@ class OrderController extends AbstractController
             'version' => $order->getVersion(),
             'salivaInstructions' => $order->getSalivaInstructions(),
         ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/print/labels", name="order_print_labels")
+     */
+    public function orderPrintLabelsAction($participantId, $orderId)
+    {
+        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        if ($order->isOrderDisabled() || $order->isOrderUnlocked()) {
+            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+        }
+        if (!in_array('print_labels', $order->getAvailableSteps())) {
+            // 404 because print is not a valid route for kit orders regardless of state
+            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+        }
+        $result = $this->orderService->getLabelsPdf($participant);
+        if (!$order->getPrintedTs() && $result['status'] === 'success') {
+            $order->setPrintedTs(new \DateTime());
+            $this->em->persist($order);
+            $this->em->flush();
+            $this->loggerService->log(Log::ORDER_EDIT, $orderId);
+        }
+        $errorMessage = !empty($result['errorMessage']) ? $result['errorMessage'] : '';
+        return $this->render('order/print-labels.html.twig', [
+            'participant' => $participant,
+            'order' => $order,
+            'processTabClass' => $order->getProcessTabClass(),
+            'errorMessage' => $errorMessage
+        ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/labels/pdf", name="order_labels_pdf")
+     */
+    public function orderLabelsPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
+    {
+        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        if ($order->isOrderDisabled() || $order->isOrderUnlocked()) {
+            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+        }
+        if (!in_array('print_labels', $order->getAvailableSteps())) {
+            // 404 because print is not a valid route for kit orders regardless of state
+            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+        }
+        if ($params->has('ml_mock_order')) {
+            return $this->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
+        } else {
+            $result = $this->orderService->getLabelsPdf($participant);
+            if ($result['status'] === 'success') {
+                return new Response($result['pdf'], 200, ['Content-Type' => 'application/pdf']);
+            } else {
+                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>' . $result['errorMessage'] . '</strong></body></html>';
+                return new Response($html, 200, ['Content-Type' => 'text/html']);
+            }
+        }
     }
 }

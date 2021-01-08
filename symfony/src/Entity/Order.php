@@ -954,4 +954,122 @@ class Order
     {
         return !$this->isOrderExpired() && !empty($this->getRdrId()) && !$this->isOrderUnlocked() && !$this->isOrderCancelled();
     }
+
+    public function getCurrentStep()
+    {
+        $columns = [
+            'print_labels' => 'Printed',
+            'collect' => 'Collected',
+            'process' => 'Processed',
+            'finalize' => 'Finalized',
+            'print_requisition' => 'Finalized'
+        ];
+        if ($this->getType() === 'kit') {
+            unset($columns['print_labels']);
+            unset($columns['print_requisition']);
+        }
+        $step = 'finalize';
+        foreach ($columns as $name => $column) {
+            if (!$this->{'get' . $column . 'Ts'}()) {
+                $step = $name;
+                break;
+            }
+        }
+        // For canceled orders set print labels step to collect
+        if ($this->isOrderCancelled() && $step === 'print_labels') {
+            return 'collect';
+        }
+        return $step;
+    }
+
+    public function getAvailableSteps()
+    {
+        $columns = [
+            'print_labels' => 'Printed',
+            'collect' => 'Collected',
+            'process' => 'Processed',
+            'finalize' => 'Finalized',
+            'print_requisition' => 'Finalized'
+        ];
+        if ($this->getType() === 'kit') {
+            unset($columns['print_labels']);
+            unset($columns['print_requisition']);
+        }
+        $steps = [];
+        foreach ($columns as $name => $column) {
+            $steps[] = $name;
+            if (!$this->{'get' . $column . 'Ts'}()) {
+                break;
+            }
+        }
+        // For canceled orders include collect in available steps if not exists
+        if ($this->isOrderCancelled() && !in_array('collect', $steps)) {
+            $steps[] = 'collect';
+        }
+        return $steps;
+    }
+
+    public function getWarnings()
+    {
+        $warnings = [];
+        if ($this->getType() !== 'saliva' && !empty($this->getCollectedTs()) && !empty($this->getProcessedSamplesTs())) {
+            $collectedTs = clone $this->getCollectedTs();
+            $processedSamples = json_decode($this->getProcessedSamples(), true);
+            $processedSamplesTs = json_decode($this->getProcessedSamplesTs(), true);
+            $sst = array_values(array_intersect($processedSamples, self::$sst));
+            $pst = array_values(array_intersect($processedSamples, self::$pst));
+            //Check if SST processing time is less than 30 mins after collection time
+            $collectedTs->modify('+30 minutes');
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] < $collectedTs->getTimestamp()) {
+                $warnings['sst'] = 'SST Specimen Processed Less than 30 minutes after Collection';
+            }
+            //Check if SST processing time is greater than 4 hrs after collection time
+            $collectedTs->modify('+210 minutes');
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] > $collectedTs->getTimestamp()) {
+                $warnings['sst'] = 'Processing Time is Greater than 4 hours after Collection';
+            }
+            //Check if PST processing time is greater than 4 hrs after collection time
+            if (!empty($pst) && !empty($processedSamplesTs[$pst[0]]) && $processedSamplesTs[$pst[0]] > $collectedTs->getTimestamp()) {
+                $warnings['pst'] = 'Processing Time is Greater than 4 hours after Collection';
+            }
+        }
+        return $warnings;
+    }
+
+    public function getErrors()
+    {
+        $errors = [];
+        if (!empty($this->getCollectedTs()) && !empty($this->getProcessedSamplesTs())) {
+            $collectedTs = clone $this->getCollectedTs();
+            $processedSamples = json_decode($this->getProcessedSamples(), true);
+            $processedSamplesTs = json_decode($this->getProcessedSamplesTs(), true);
+            $sst = array_values(array_intersect($processedSamples, self::$sst));
+            $pst = array_values(array_intersect($processedSamples, self::$pst));
+            $sal = array_values(array_intersect($processedSamples, $this->salivaSamples));
+            //Check if SST processing time is less than collection time
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] <= $collectedTs->getTimestamp()) {
+                $errors['sst'] = 'SST Processing Time is before Collection Time';
+            }
+            //Check if PST processing time is less than collection time
+            if (!empty($pst) && !empty($processedSamplesTs[$pst[0]]) && $processedSamplesTs[$pst[0]] <= $collectedTs->getTimestamp()) {
+                $errors['pst'] = 'PST Processing Time is before Collection Time';
+            }
+            //Check if SAL processing time is less than collection time
+            if (!empty($sal) && !empty($processedSamplesTs[$sal[0]]) && $processedSamplesTs[$sal[0]] <= $collectedTs->getTimestamp()) {
+                $errors['sal'] = 'SAL Processing Time is before Collection Time';
+            }
+        }
+        return $errors;
+    }
+
+    public function getProcessTabClass()
+    {
+        $class = 'fa fa-check-circle text-success';
+        if (!empty($this->getErrors())) {
+            $class = 'fa fa-exclamation-circle text-danger';
+        } elseif (!empty($this->getWarnings())) {
+            $class = 'fa fa-exclamation-triangle text-warning';
+        }
+        return $class;
+    }
 }

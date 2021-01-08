@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Order;
+use App\Entity\Site;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -11,13 +12,26 @@ class OrderService
     protected $rdrApiService;
     protected $params;
     protected $em;
+    protected $mayolinkOrderService;
+    protected $env;
+    protected $siteService;
     protected $order;
 
-    public function __construct(RdrApiService $rdrApiService, ParameterBagInterface $params, EntityManagerInterface $em)
-    {
+    public function __construct(
+        RdrApiService $rdrApiService,
+        ParameterBagInterface $params,
+        EntityManagerInterface $em,
+        MayolinkOrderService $mayolinkOrderService,
+        UserService $userService,
+        SiteService $siteService
+    ) {
         $this->rdrApiService = $rdrApiService;
         $this->params = $params;
         $this->em = $em;
+        $this->mayolinkOrderService = $mayolinkOrderService;
+        $this->userService = $userService;
+        $this->mayolinkOrderService = $mayolinkOrderService;
+        $this->siteService = $siteService;
     }
 
     public function loadSamplesSchema($order)
@@ -68,31 +82,49 @@ class OrderService
         return false;
     }
 
-    public function getCurrentStep()
+    public function getLabelsPdf($participant)
     {
-        $columns = [
-            'print_labels' => 'Printed',
-            'collect' => 'Collected',
-            'process' => 'Processed',
-            'finalize' => 'Finalized',
-            'print_requisition' => 'Finalized'
-        ];
-        if ($this->order->getType() === 'kit') {
-            unset($columns['print_labels']);
-            unset($columns['print_requisition']);
+        // Always return true for mock orders
+        if ($this->params->has('ml_mock_order')) {
+            return ['status' => 'success'];
         }
-        $step = 'finalize';
-        foreach ($columns as $name => $column) {
-            if (!$this->order->{'get' . $column . 'Ts'}()) {
-                $step = $name;
-                break;
+        $result = ['status' => 'fail'];
+        // Set collected time to created date at midnight local time
+        $collectedAt = new \DateTime($this->order->getCreatedTs()->format('Y-m-d'), new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+        if ($site = $this->em->getRepository(Site::class)->findOneBy(['deleted' => 0, 'googleGroup' => $this->siteService->getSiteId()])) {
+            $mayoClientId = $site->getMayolinkAccount();
+        }
+        // Check if mayo account number exists
+        if (!empty($mayoClientId)) {
+            $birthDate = $this->params->has('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+            if ($birthDate) {
+                $birthDate = $birthDate->format('Y-m-d');
             }
+            $options = [
+                'type' => $this->order->getType(),
+                'biobank_id' => $participant->biobankId,
+                'first_name' => '*',
+                'gender' => $participant->gender,
+                'birth_date' => $birthDate,
+                'order_id' => $this->order->getOrderId(),
+                'collected_at' => $collectedAt->format('c'),
+                'mayoClientId' => $mayoClientId,
+                'requested_samples' => $this->order->getRequestedSamples(),
+                'version' => $this->order->getVersion(),
+                'tests' => $this->order->getSamplesInformation(),
+                'salivaTests' => $this->order->getSalivaSamplesInformation()
+            ];
+            $pdf = $this->mayolinkOrderService->getLabelsPdf($options);
+            if (!empty($pdf)) {
+                $result['status'] = 'success';
+                $result['pdf'] = $pdf;
+            } else {
+                $result['errorMessage'] = 'Error loading labels.';
+            }
+        } else {
+            $result['errorMessage'] = 'A MayoLINK account number is not set for this site. Please contact an administrator.';
         }
-        // For canceled orders set print labels step to collect
-        if ($this->order->isOrderCancelled() && $step === 'print_labels') {
-            return 'collect';
-        }
-        return $step;
+        return $result;
     }
 
     public function generateId()
