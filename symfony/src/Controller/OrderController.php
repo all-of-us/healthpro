@@ -205,7 +205,7 @@ class OrderController extends AbstractController
     public function orderPrintLabelsAction($participantId, $orderId)
     {
         list($participant, $order) = $this->loadOrder($participantId, $orderId);
-        if ($order->isOrderDisabled() || $order->isOrderUnlocked()) {
+        if ($order->isDisabled() || $order->isUnlocked()) {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         if (!in_array('print_labels', $order->getAvailableSteps())) {
@@ -234,7 +234,7 @@ class OrderController extends AbstractController
     public function orderLabelsPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
     {
         list($participant, $order) = $this->loadOrder($participantId, $orderId);
-        if ($order->isOrderDisabled() || $order->isOrderUnlocked()) {
+        if ($order->isDisabled() || $order->isUnlocked()) {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         if (!in_array('print_labels', $order->getAvailableSteps())) {
@@ -252,5 +252,41 @@ class OrderController extends AbstractController
                 return new Response($html, 200, ['Content-Type' => 'text/html']);
             }
         }
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/collect", name="order_collect")
+     */
+    public function orderCollectAction($participantId, $orderId)
+    {
+        //Todo
+        return '';
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/process", name="order_collect")
+     */
+    public function orderProcessAction($participantId, $orderId)
+    {
+        //Todo
+        return '';
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/finalize", name="order_collect")
+     */
+    public function orderFinalizeAction($participantId, $orderId)
+    {
+        //Todo
+        return '';
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/modify/{type}", name="order_modify")
+     */
+    public function orderModifyAction($participantId, $orderId, $type)
+    {
+        //Todo
+        return '';
     }
 }

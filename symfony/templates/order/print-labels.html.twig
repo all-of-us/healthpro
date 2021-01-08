@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block title %}Print Labels - Order {{ order.orderId }} - {% endblock %}
 {% block body %}
-    {#{% include 'order-header.html.twig' with { active: 'printLabels' } %}#}
+    {% include 'order/header.html.twig' with { active: 'print_labels' } %}
     <div class="row">
         <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
             {% if order.printedTs and errorMessage is empty %}

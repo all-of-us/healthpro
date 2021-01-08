@@ -908,21 +908,21 @@ class Order
         }
     }
 
-    public function isOrderExpired()
+    public function isExpired()
     {
         return empty($this->getFinalizedTs()) && empty($this->getVersion());
     }
 
     // Finalized form is only disabled when rdr_id is set
-    public function isOrderDisabled()
+    public function isDisabled()
     {
-        return ($this->getRdrId() || $this->isOrderExpired()|| $this->isOrderCancelled()) && $this->getStatus() !== 'unlock';
+        return ($this->getRdrId() || $this->isExpired()|| $this->isOrderCancelled()) && $this->getStatus() !== 'unlock';
     }
 
     // Except finalize form all forms are disabled when finalized_ts is set
     public function isOrderFormDisabled()
     {
-        return ($this->getFinalizedTs() || $this->isOrderExpired() || $this->isOrderCancelled()) && $this->getStatus() !== 'unlock';
+        return ($this->getFinalizedTs() || $this->isExpired() || $this->isOrderCancelled()) && $this->getStatus() !== 'unlock';
     }
 
     public function isOrderCancelled()
@@ -930,7 +930,7 @@ class Order
         return $this->getStatus() === self::ORDER_CANCEL;
     }
 
-    public function isOrderUnlocked()
+    public function isUnlocked()
     {
         return $this->getStatus()=== self::ORDER_UNLOCK;
     }
@@ -942,17 +942,17 @@ class Order
 
     public function canCancel()
     {
-        return !$this->isOrderCancelled() && !$this->isOrderUnlocked() && !$this->isOrderFailedToReachRdr();
+        return !$this->isOrderCancelled() && !$this->isUnlocked() && !$this->isOrderFailedToReachRdr();
     }
 
     public function canRestore()
     {
-        return !$this->isOrderExpired() && $this->isOrderCancelled() && !$this->isOrderUnlocked() && !$this->isOrderFailedToReachRdr();
+        return !$this->isExpired() && $this->isOrderCancelled() && !$this->isUnlocked() && !$this->isOrderFailedToReachRdr();
     }
 
     public function canUnlock()
     {
-        return !$this->isOrderExpired() && !empty($this->getRdrId()) && !$this->isOrderUnlocked() && !$this->isOrderCancelled();
+        return !$this->isExpired() && !empty($this->getRdrId()) && !$this->isUnlocked() && !$this->isOrderCancelled();
     }
 
     public function getCurrentStep()
