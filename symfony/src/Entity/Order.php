@@ -920,7 +920,7 @@ class Order
     }
 
     // Except finalize form all forms are disabled when finalized_ts is set
-    public function isOrderFormDisabled()
+    public function isFormDisabled()
     {
         return ($this->getFinalizedTs() || $this->isExpired() || $this->isOrderCancelled()) && $this->getStatus() !== 'unlock';
     }
@@ -953,6 +953,70 @@ class Order
     public function canUnlock()
     {
         return !$this->isExpired() && !empty($this->getRdrId()) && !$this->isUnlocked() && !$this->isOrderCancelled();
+    }
+
+    public function hasBloodSample($samples)
+    {
+        foreach ($samples as $sampleCode) {
+            if (!in_array($sampleCode, self::$nonBloodSamples)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getCustomRequestedSamples()
+    {
+        if ($this->getType() == 'saliva') {
+            return $this->salivaSamples;
+        }
+        if ($this->getRequestedSamples() &&
+            ($requestedArray = json_decode($this->getRequestedSamples())) &&
+            is_array($requestedArray) &&
+            count($requestedArray) > 0
+        ) {
+            return array_intersect($this->samples, $requestedArray);
+        } else {
+            return $this->samples;
+        }
+    }
+
+    public function getEnabledSamples($set)
+    {
+        if ($this->getCollectedSamples() &&
+            ($collectedArray = json_decode($this->getCollectedSamples())) &&
+            is_array($collectedArray)
+        ) {
+            $collected = $collectedArray;
+        } else {
+            $collected = [];
+        }
+
+        if ($this->getProcessedSamples() &&
+            ($processedArray = json_decode($this->getProcessedSamples())) &&
+            is_array($processedArray)
+        ) {
+            $processed = $processedArray;
+        } else {
+            $processed = [];
+        }
+
+        switch ($set) {
+            case 'processed':
+                return array_intersect($collected, self::$samplesRequiringProcessing, $this->getCustomRequestedSamples());
+            case 'finalized':
+                $enabled = array_intersect($collected, $this->getCustomRequestedSamples());
+                foreach ($enabled as $key => $sample) {
+                    if (in_array($sample, self::$samplesRequiringProcessing) &&
+                        !in_array($sample, $processed)
+                    ) {
+                        unset($enabled[$key]);
+                    }
+                }
+                return array_values($enabled);
+            default:
+                return array_values($this->getCustomRequestedSamples());
+        }
     }
 
     public function getCurrentStep()

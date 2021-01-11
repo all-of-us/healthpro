@@ -155,4 +155,167 @@ class OrderService
         }
         return $id;
     }
+
+    public function getOrderUpdateFromForm($step, $form)
+    {
+        $updateArray = [];
+        $formData = $form->getData();
+        if ($formData["{$step}_notes"]) {
+            $updateArray["{$step}_notes"] = $formData["{$step}_notes"];
+            $this->order->{'set' . ucfirst($step) . 'Notes'}($formData["{$step}_notes"]);
+        } else {
+            $this->order->{'set' . ucfirst($step) . 'Notes'}(null);
+        }
+        if ($step != 'processed') {
+            if ($formData["{$step}_ts"]) {
+                $this->order->{'set' . ucfirst($step) . 'Ts'}($formData["{$step}_ts"]);
+            } else {
+                $this->order->{'set' . ucfirst($step) . 'Ts'}(null);
+            }
+        }
+        if ($form->has("{$step}_samples")) {
+            $hasSampleArray = $formData["{$step}_samples"] && is_array($formData["{$step}_samples"]);
+            $samples = [];
+            if ($hasSampleArray) {
+                $samples = array_values($formData["{$step}_samples"]);
+            }
+            $this->order->{'set' . ucfirst($step) . 'Samples'}(json_encode($samples));
+            if ($step === 'collected') {
+                // Remove processed samples when not collected
+                if (!empty($this->order->getProcessedSamplesTs())) {
+                    $newProcessedSamples = $this->getNewProcessedSamples($samples);
+                    $this->order->setProcessedSamples($newProcessedSamples['samples']);
+                    $this->order->setProcessedSamplesTs($newProcessedSamples['timeStamps']);
+                }
+                // Remove finalized samples when not collected
+                if (!empty($this->order->getFinalizedSamples())) {
+                    $newFinalizedSamples = $this->getNewFinalizedSamples('collected', $samples);
+                    $this->order->setFinalizedSamples($newFinalizedSamples);
+                }
+            }
+            if ($step === 'processed') {
+                $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
+                if ($hasSampleArray && $hasSampleTimeArray) {
+                    $processedSampleTimes = [];
+                    foreach ($formData['processed_samples_ts'] as $sample => $dateTime) {
+                        if ($dateTime && in_array($sample, $formData["{$step}_samples"])) {
+                            $processedSampleTimes[$sample] = $dateTime->getTimestamp();
+                        }
+                    }
+                    $this->order->setProcessedSamplesTs(json_encode($processedSampleTimes));
+                } else {
+                    $this->order->setProcessedSamplesTs(json_encode([]));
+                }
+                if ($this->order->getType() !== 'saliva' && !empty($formData["processed_centrifuge_type"])) {
+                    $this->order->setProcessedCentrifugeType($formData["processed_centrifuge_type"]);
+                }
+                // Remove finalized samples when not processed
+                if (!empty($this->order->getFinalizedSamples())) {
+                    $newFinalizedSamples = $this->getNewFinalizedSamples('processed', $samples);
+                    $this->order->setFinalizedSamples($newFinalizedSamples);
+                }
+            }
+        }
+        if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
+            $this->order->getFedexTracking($formData['fedex_tracking']);
+        }
+        return $updateArray;
+    }
+
+    public function getNewProcessedSamples($samples)
+    {
+        $processedSamplesTs = json_decode($this->order->getProcessedSamplesTs(), true);
+        $newProcessedSamples = [];
+        $newProcessedSamplesTs = [];
+        foreach ($processedSamplesTs as $sample => $timestamp) {
+            // Check if each processed sample exists in collected samples list
+            if (in_array($sample, $samples)) {
+                $newProcessedSamples[] = $sample;
+                $newProcessedSamplesTs[$sample] = $timestamp;
+            }
+        }
+        return [
+            'samples' => json_encode($newProcessedSamples),
+            'timeStamps' => json_encode($newProcessedSamplesTs)
+        ];
+    }
+
+    public function getNewFinalizedSamples($type, $samples)
+    {
+        $finalizedSamples = json_decode($this->order->getFinalizedSamples(), true);
+        $newFinalizedSamples = [];
+        if ($type === 'collected') {
+            foreach ($finalizedSamples as $sample) {
+                // Check if each finalized sample exists in collected samples list
+                if (in_array($sample, $samples)) {
+                    $newFinalizedSamples[] = $sample;
+                }
+            }
+        } elseif ($type === 'processed') {
+            // Determine processing samples which needs to be removed
+            $processedSamples = array_intersect($finalizedSamples, Order::$samplesRequiringProcessing);
+            $removeProcessedSamples = [];
+            foreach ($processedSamples as $processedSample) {
+                if (!in_array($processedSample, $samples)) {
+                    $removeProcessedSamples[] = $processedSample;
+                }
+            }
+            // Remove processing samples which are not processed
+            if (!empty($removeProcessedSamples)) {
+                foreach ($finalizedSamples as $key => $sample) {
+                    if (in_array($sample, $removeProcessedSamples)) {
+                        unset($finalizedSamples[$key]);
+                    }
+                }
+            }
+            $newFinalizedSamples = array_values($finalizedSamples);
+        }
+        return json_encode($newFinalizedSamples);
+    }
+
+    public function getOrderFormData($step)
+    {
+        $formData = [];
+        if ($this->order->{'get' . ucfirst($step) . 'Notes'}()) {
+            $formData["{$step}Notes"] = $this->order->{'get' . ucfirst($step) . 'Notes'}();
+        };
+        if ($step != 'processed') {
+            if ($this->order->{'get' . ucfirst($step) . 'Ts'}()) {
+                $formData["{$step}Ts"] = $this->order->{'get' . ucfirst($step) . 'Ts'}();
+            }
+        }
+        if ($this->order->{'get' . ucfirst($step) . 'Samples'}()) {
+            $samples = json_decode($this->order->{'get' . ucfirst($step) . 'Samples'}());
+            if (is_array($samples) && count($samples) > 0) {
+                $formData["{$step}Samples"] = $samples;
+            }
+        }
+        if ($step == 'processed') {
+            $processedSampleTimes = [];
+            if (!empty($this->order->getProcessedSamplesTs())) {
+                $processedSampleTimes = json_decode($this->order->getProcessedSamplesTs(), true);
+            }
+            foreach (Order::$samplesRequiringProcessing as $sample) {
+                if (!empty($processedSampleTimes[$sample])) {
+                    try {
+                        $sampleTs = new \DateTime();
+                        $sampleTs->setTimestamp($processedSampleTimes[$sample]);
+                        $sampleTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+                        $formData['processedSamplesTs'][$sample] = $sampleTs;
+                    } catch (\Exception $e) {
+                        $formData['processedSamplesTs'][$sample] = null;
+                    }
+                } else {
+                    $formData['processedSamplesTs'][$sample] = null;
+                }
+            }
+            if ($this->order["processedCentrifugeType"]) {
+                $formData["processedCentrifugeType"] = $this->order->getProcessedCentrifugeType();
+            }
+        }
+        if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
+            $formData['fedex_tracking'] = $this->order->getFedextTracking();
+        }
+        return $formData;
+    }
 }

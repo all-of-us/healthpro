@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+{% import 'order/samples.html.twig' as samples %}
+{% if order.type != 'saliva' %}
+    {% form_theme collectForm 'form/simple_checkbox.html.twig' %}
+{% endif %}
+{% block title %}Collect - Order {{ order.orderId }} - {% endblock %}
+{% block body %}
+    {% include 'order/header.html.twig' with { active: 'collect' } %}
+
+    {{ form_start(collectForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+    {{ form_errors(collectForm) }}
+    <div class="form-group{% if not collectForm.collectedTs.vars.valid %} has-error{% endif %}">
+        {{ form_label(collectForm.collectedTs) }}
+        <span class="toggle-help-image" data-caption="Collection time help text placeholder.">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
+        {{ form_widget(collectForm.collectedTs) }}
+        {{ form_errors(collectForm.collectedTs) }}
+    </div>
+
+    <div class="form-group{% if not collectForm.collectedSamples.vars.valid %} has-error{% endif %}">
+        {{ form_label(collectForm.collectedSamples) }}
+        <span class="toggle-help-image" data-caption="Collected samples help text placeholder.">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
+        {% if order.type == 'saliva' %}
+            {{ form_widget(collectForm.collectedSamples) }}
+        {% else %}
+            {{ samples.form_widget(collectForm.collectedSamples, order.formDisabled ? false : true, samplesInfo, version) }}
+        {% endif %}
+        {{ form_errors(collectForm.collectedSamples) }}
+    </div>
+
+    <div class="form-group{% if not collectForm.collectedNotes.vars.valid %} has-error{% endif %}">
+        {{ form_label(collectForm.collectedNotes) }}
+        <span class="toggle-help-image" data-caption="Collected notes help text placeholder.">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
+        {{ form_widget(collectForm.collectedNotes) }}
+        <small class="text-warning">Comments entered in this field must be transmitted to the Biobank via reconciliation reporting. You may not enter any participant identifying information here.</small>
+        {{ form_errors(collectForm.collectedNotes) }}
+    </div>
+
+    {{ form_rest(collectForm) }}
+    {% if not order.formDisabled %}
+        <p>
+            <button type="submit" class="btn btn-primary" name="save">
+                {% if order.collectedTs %}
+                    Update
+                {% else %}
+                    Save and mark as collected
+                {% endif %}
+            </button>
+        </p>
+    {% endif %}
+    {{ form_end(collectForm) }}
+    {#{% if order.status == 'unlock' %}#}
+        {#{{ form_start(revertForm, { 'action': path('orderRevert', { participantId: participant.id, orderId: order.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}#}
+        {#{{ form_errors(revertForm) }}#}
+        {#{{ form_end(revertForm) }}#}
+    {#{% endif %}#}
+{% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('order-sub') }}
+    <script>
+        $(document).ready(function() {
+            $('#checkall').on('change', function() {
+                $('#form_collected_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
+            });
+            $('#form_collected_ts').pmiDateTimePicker();
+            var orderView = new PMI.views['OrderSubPage']({
+                el: $("body")
+            });
+        });
+    </script>
+{% endblock %}

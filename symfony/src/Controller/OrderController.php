@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Order;
 use App\Entity\User;
 use App\Form\OrderCreateType;
+use App\Form\OrderType;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
@@ -30,17 +31,20 @@ class OrderController extends AbstractController
     protected $orderService;
     protected $participantSummaryService;
     protected $loggerService;
+    protected $siteService;
 
     public function __construct(
         EntityManagerInterface $em,
         OrderService $orderService,
         ParticipantSummaryService $participantSummaryService,
-        LoggerService $loggerService
+        LoggerService $loggerService,
+        SiteService $siteService
     ) {
         $this->em = $em;
         $this->orderService = $orderService;
         $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;
+        $this->siteService = $siteService;
     }
 
     public function loadOrder($participantId, $orderId)
@@ -79,13 +83,13 @@ class OrderController extends AbstractController
     /**
      * @Route("/participant/{participantId}/order/check", name="order_check")
      */
-    public function orderCheck($participantId, SiteService $siteService)
+    public function orderCheck($participantId)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        if (!$participant->status || $siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
+        if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         return $this->render('order/check.html.twig', [
@@ -96,17 +100,13 @@ class OrderController extends AbstractController
     /**
      * @Route("/participant/{participantId}/order/create", name="order_create")
      */
-    public function orderCreateAction(
-        $participantId,
-        Request $request,
-        SessionInterface $session,
-        SiteService $siteService
-    ) {
+    public function orderCreateAction($participantId, Request $request, SessionInterface $session)
+    {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        if (!$participant->status || $siteService->isTestSite() || ($session->get('siteType') === 'dv' && $request->request->has('saliva')) || $participant->activityStatus === 'deactivated') {
+        if (!$participant->status || $this->siteService->isTestSite() || ($session->get('siteType') === 'dv' && $request->request->has('saliva')) || $participant->activityStatus === 'deactivated') {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         if ($request->request->has('show-blood-tubes') && $request->request->has('show-saliva-tubes')) {
@@ -159,7 +159,7 @@ class OrderController extends AbstractController
             if ($createForm->isValid()) {
                 $userRepository = $this->em->getRepository(User::class);
                 $order->setUser($userRepository->find($this->getUser()->getId()));
-                $order->setSite($siteService->getSiteId());
+                $order->setSite($this->siteService->getSiteId());
                 $order->setParticipantId($participant->id);
                 $order->setBiobankId($participant->biobankId);
                 $order->setCreatedTs(new \DateTime());
@@ -167,7 +167,7 @@ class OrderController extends AbstractController
                 if ($session->get('orderType') === 'hpo') {
                     $order->setProcessedCentrifugeType(Order::SWINGING_BUCKET);
                 }
-                if ($session->get('siteType') === 'dv' && $siteService->isDiversionPouchSite()) {
+                if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite()) {
                     $order->setType('diversion');
                 }
                 $order->setOrderId($this->orderService->generateId());
@@ -257,14 +257,65 @@ class OrderController extends AbstractController
     /**
      * @Route("/participant/{participantId}/order/{orderId}/collect", name="order_collect")
      */
-    public function orderCollectAction($participantId, $orderId)
+    public function orderCollectAction($participantId, $orderId, Request $request)
     {
-        //Todo
-        return '';
+        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        if (!in_array('collect', $order->getAvailableSteps())) {
+            return $this->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
+        }
+        $formData = $this->orderService->getOrderFormData('collected');
+        $collectForm = $this->createForm(OrderType::class, $formData, [
+            'step' => 'collected',
+            'order' => $order,
+            'em' => $this->em,
+            'timeZone' => $this->getUser()->getInfo()['timezone'],
+            'siteId' => $this->siteService->getSiteId()
+        ]);
+        $collectForm->handleRequest($request);
+        if ($collectForm->isSubmitted()) {
+            if ($order->isOrderDisabled()) {
+                throw $this->createAccessDeniedException('Participant ineligible for order create.');
+            }
+            if ($type = $order->checkIdentifiers($collectForm['collectedNotes']->getData())) {
+                $label = Order::$identifierLabel[$type[0]];
+                $collectForm['collectedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+            }
+            if ($collectForm->isValid()) {
+                $this->orderService->getOrderUpdateFromForm('collected', $collectForm);
+                if (!$order->isOrderUnlocked()) {
+                    $userRepository = $this->em->getRepository(User::class);
+                    $order->setCollectedUser($userRepository->find($this->getUser()->getId()));
+                    $order->setCollectedSite($this->siteService->getSiteId());
+                }
+                // Save order
+                $this->em->persist($order);
+                $this->em->flush();
+                $this->loggerService->log(Log::ORDER_EDIT, $orderId);
+                $this->addFlash('notice', 'Order collection updated\'');
+                return $this->redirectToRoute('order_collect', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId
+                ]);
+            } else {
+                $collectForm->addError(new FormError('Please correct the errors below'));
+            }
+        }
+        return $this->render('order/collect.html.twig', [
+            'participant' => $participant,
+            'order' => $order,
+            'collectForm' => $collectForm->createView(),
+            'samplesInfo' => $order->getSamplesInformation(),
+            'version' => $order->getVersion(),
+            'processTabClass' => $order->getProcessTabClass(),
+//            'revertForm' => $order->getOrderRevertForm()->createView()
+        ]);
     }
 
     /**
-     * @Route("/participant/{participantId}/order/{orderId}/process", name="order_collect")
+     * @Route("/participant/{participantId}/order/{orderId}/process", name="order_process")
      */
     public function orderProcessAction($participantId, $orderId)
     {
@@ -273,7 +324,7 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @Route("/participant/{participantId}/order/{orderId}/finalize", name="order_collect")
+     * @Route("/participant/{participantId}/order/{orderId}/finalize", name="order_finalize")
      */
     public function orderFinalizeAction($participantId, $orderId)
     {
