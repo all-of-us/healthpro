@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Order;
 use App\Entity\User;
 use App\Form\OrderCreateType;
+use App\Form\OrderRevertType;
 use App\Form\OrderType;
 use App\Service\LoggerService;
 use App\Service\OrderService;
@@ -310,7 +311,7 @@ class OrderController extends AbstractController
             'samplesInfo' => $order->getSamplesInformation(),
             'version' => $order->getVersion(),
             'processTabClass' => $order->getProcessTabClass(),
-//            'revertForm' => $order->getOrderRevertForm()->createView()
+            'revertForm' => $this->createForm(OrderRevertType::class, null)
         ]);
     }
 
