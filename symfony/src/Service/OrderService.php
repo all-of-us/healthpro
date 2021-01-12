@@ -156,9 +156,8 @@ class OrderService
         return $id;
     }
 
-    public function getOrderUpdateFromForm($step, $form)
+    public function setOrderUpdateFromForm($step, $form)
     {
-        $updateArray = [];
         $formData = $form->getData();
         if ($formData["{$step}Notes"]) {
             $updateArray["{$step}Notes"] = $formData["{$step}Notes"];
@@ -219,7 +218,6 @@ class OrderService
         if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
             $this->order->getFedexTracking($formData['fedexTracking']);
         }
-        return $updateArray;
     }
 
     public function getNewProcessedSamples($samples)
@@ -309,12 +307,12 @@ class OrderService
                     $formData['processedSamplesTs'][$sample] = null;
                 }
             }
-            if ($this->order["processedCentrifugeType"]) {
+            if ($this->order->getProcessedCentrifugeType()) {
                 $formData["processedCentrifugeType"] = $this->order->getProcessedCentrifugeType();
             }
         }
         if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
-            $formData['fedex_tracking'] = $this->order->getFedextTracking();
+            $formData['fedexTracking'] = $this->order->getFedextTracking();
         }
         return $formData;
     }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Order;
+use App\Entity\Site;
 use App\Entity\User;
 use App\Form\OrderCreateType;
 use App\Form\OrderRevertType;
@@ -285,7 +286,7 @@ class OrderController extends AbstractController
                 $collectForm['collectedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
             if ($collectForm->isValid()) {
-                $this->orderService->getOrderUpdateFromForm('collected', $collectForm);
+                $this->orderService->setOrderUpdateFromForm('collected', $collectForm);
                 if (!$order->isUnlocked()) {
                     $userRepository = $this->em->getRepository(User::class);
                     $order->setCollectedUser($userRepository->find($this->getUser()->getId()));
@@ -318,10 +319,90 @@ class OrderController extends AbstractController
     /**
      * @Route("/participant/{participantId}/order/{orderId}/process", name="order_process")
      */
-    public function orderProcessAction($participantId, $orderId)
+    public function orderProcessAction($participantId, $orderId, Request $request)
     {
-        //Todo
-        return '';
+        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        if (!in_array('process', $order->getAvailableSteps())) {
+            return $this->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
+        }
+        $formData = $this->orderService->getOrderFormData('processed');
+        $processForm = $this->createForm(OrderType::class, $formData, [
+            'step' => 'processed',
+            'order' => $order,
+            'em' => $this->em,
+            'timeZone' => $this->getUser()->getInfo()['timezone'],
+            'siteId' => $this->siteService->getSiteId()
+        ]);
+        $processForm->handleRequest($request);
+        if ($processForm->isSubmitted()) {
+            if ($order->isDisabled()) {
+                throw $this->createAccessDeniedException('Participant ineligible for order create.');
+            }
+            if ($processForm->has('processedSamples')) {
+                $processedSampleTimes = $processForm->get('processedSamplesTs')->getData();
+                foreach ($processForm->get('processedSamples')->getData() as $sample) {
+                    if (empty($processedSampleTimes[$sample])) {
+                        $processForm->get('processedSamples')->addError(new FormError('Please specify time of blood processing completion for each sample'));
+                        break;
+                    }
+                }
+            }
+            if ($type = $participant->checkIdentifiers($processForm['processedNotes']->getData())) {
+                $label = Order::$identifierLabel[$type[0]];
+                $processForm['processedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+            }
+            if ($processForm->isValid()) {
+                $this->orderService->setOrderUpdateFromForm('processed', $processForm);
+                $order->setProcessedTs(empty($order->getProcessedTs()) ? new \DateTime() : $order->getProcessedTs());
+                // Set processed_ts to the most recent processed sample time if exists
+                if (!empty($order->getProcessedSamplesTs())) {
+                    $processedSamplesTs = json_decode($order->getProcessedSamplesTs(), true);
+                    if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
+                        $processedTs = new \DateTime();
+                        $processedTs->setTimestamp(max($processedSamplesTs));
+                        $order->setProcessedTs($processedTs);
+                    }
+                }
+                if (!$order->isUnlocked()) {
+                    $userRepository = $this->em->getRepository(User::class);
+                    $order->setProcessedUser($userRepository->find($this->getUser()->getId()));
+                    $order->setProcessedSite($this->siteService->getSiteId());
+                }
+                if ($order->getType() !== 'saliva') {
+                    $site = $this->em->getRepository(Site::class)->findOneBy([
+                        'deleted' => 0,
+                        'googleGroup' => $this->siteService->getSiteId()
+                    ]);
+                    if ($processForm->has('processedCentrifugeType')) {
+                        $order->setProcessedCentrifugeType($processForm['processedCentrifugeType']->getData());
+                    } elseif (!empty($site->getCentrifugeType())) {
+                        $order->setProcessedCentrifugeType($site->getCentrifugeType());
+                    }
+                }
+                $this->em->persist($order);
+                $this->em->flush();
+                $this->loggerService->log(Log::ORDER_EDIT, $orderId);
+                $this->addFlash('notice', 'Order processing updated');
+                return $this->redirectToRoute('order_process', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId
+                ]);
+            } else {
+                $processForm->addError(new FormError('Please correct the errors below'));
+            }
+        }
+        return $this->render('order/process.html.twig', [
+            'participant' => $participant,
+            'order' => $order,
+            'processForm' => $processForm->createView(),
+            'samplesInfo' => $order->getSamplesInformation(),
+            'version' => $order->getVersion(),
+            'processTabClass' => $order->getProcessTabClass(),
+            'revertForm' => $this->createForm(OrderRevertType::class, null)
+        ]);
     }
 
     /**

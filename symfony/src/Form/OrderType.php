@@ -106,10 +106,10 @@ class OrderType extends AbstractType
                 'choice_attr' => function ($val) use ($enabledSamples, $options) {
                     $attr = [];
                     if ($options['step'] === 'finalized') {
-                        $collectedSamples = json_decode($options['order']['collected_samples'], true);
-                        $processedSamples = json_decode($options['order']['processed_samples_ts'], true);
+                        $collectedSamples = json_decode($options['order']->getCollectedSamples(), true);
+                        $processedSamples = json_decode($options['order']->getProcessedSamplesTs(), true);
                         if (in_array($val, $collectedSamples)) {
-                            $attr = ['collected' => $options['order']['collected_ts']->format('n/j/Y g:ia')];
+                            $attr = ['collected' => $options['order']->getCollectedTs()->format('n/j/Y g:ia')];
                         }
                         if (!empty($processedSamples[$val])) {
                             $time = new \DateTime();
@@ -122,8 +122,8 @@ class OrderType extends AbstractType
                         }
                     }
                     if ($options['step'] === 'processed' || $options['step'] === 'finalized') {
-                        $warnings = $this->getWarnings();
-                        $errors = $this->getErrors();
+                        $warnings = $options['order']->getWarnings();
+                        $errors = $options['order']->getErrors();
                         if (array_key_exists($val, Order::$sampleMessageLabels)) {
                             $type = Order::$sampleMessageLabels[$val];
                             if (!empty($errors[$type])) {
@@ -171,8 +171,8 @@ class OrderType extends AbstractType
                     'deleted' => 0,
                     'google_group' => $options['siteId']
                 ]);
-                if (!empty($enabledSamples) && empty($sites['centrifuge_type'])) {
-                    $builder->add('processed_centrifuge_type', Type\ChoiceType::class, [
+                if (!empty($enabledSamples) && empty($sites->getCentrifugeType())) {
+                    $builder->add('processedCentrifugeType', Type\ChoiceType::class, [
                         'label' => 'Centrifuge type',
                         'required' => true,
                         'disabled' => $disabled,
