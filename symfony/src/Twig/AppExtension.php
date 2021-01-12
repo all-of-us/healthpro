@@ -4,6 +4,7 @@ namespace App\Twig;
 
 use App\Entity\Awardee;
 use App\Entity\Organization;
+use App\Entity\Site;
 use App\Service\TimezoneService;
 use Pmi\Drc\CodeBook;
 use Doctrine\Persistence\ManagerRegistry;
@@ -35,7 +36,8 @@ class AppExtension extends AbstractExtension
             new TwigFunction('timezone_display', [$this, 'timezoneDisplay']),
             new TwigFunction('codebook_display', [$this, 'getCodeBookDisplay']),
             new TwigFunction('organization_display', [$this, 'getAwardeeDisplay']),
-            new TwigFunction('awardee_display', [$this, 'getAwardeeDisplay'])
+            new TwigFunction('awardee_display', [$this, 'getAwardeeDisplay']),
+            new TwigFunction('site_display', [$this, 'getSiteDisplay'])
         ];
     }
 
@@ -104,5 +106,20 @@ class AppExtension extends AbstractExtension
             return $record->getName();
         }
         return $organization;
+    }
+
+    public function getSiteDisplay(string $site): string
+    {
+        $cacheKey = 'sites.' . $site;
+        if (isset($this->cache[$cacheKey]) && $this->cache[$cacheKey]) {
+            return $this->cache[$cacheKey];
+        }
+        $repository = $this->doctrine->getRepository(Site::class);
+        $record = $repository->find($site);
+        if ($record) {
+            $this->cache[$cacheKey] = $record->getName();
+            return $record->getName();
+        }
+        return $site;
     }
 }

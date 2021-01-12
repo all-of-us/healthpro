@@ -9,7 +9,7 @@
         {{ order.created_ts|date('n/j/Y', app.userTimezone) }}
         <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
     </h2>
-</div>m
+</div>
 <p class="lead">
     Order ID: <strong>{{ order.order_id }}</strong>
     {% set params = { participantId: participant.id, orderId: order.id } %}

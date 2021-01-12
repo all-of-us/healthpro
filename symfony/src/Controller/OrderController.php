@@ -276,16 +276,16 @@ class OrderController extends AbstractController
         ]);
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
-            if ($order->isOrderDisabled()) {
+            if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException('Participant ineligible for order create.');
             }
-            if ($type = $order->checkIdentifiers($collectForm['collectedNotes']->getData())) {
+            if ($type = $participant->checkIdentifiers($collectForm['collectedNotes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collectedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
             if ($collectForm->isValid()) {
                 $this->orderService->getOrderUpdateFromForm('collected', $collectForm);
-                if (!$order->isOrderUnlocked()) {
+                if (!$order->isUnlocked()) {
                     $userRepository = $this->em->getRepository(User::class);
                     $order->setCollectedUser($userRepository->find($this->getUser()->getId()));
                     $order->setCollectedSite($this->siteService->getSiteId());
@@ -294,7 +294,7 @@ class OrderController extends AbstractController
                 $this->em->persist($order);
                 $this->em->flush();
                 $this->loggerService->log(Log::ORDER_EDIT, $orderId);
-                $this->addFlash('notice', 'Order collection updated\'');
+                $this->addFlash('notice', 'Order collection updated');
                 return $this->redirectToRoute('order_collect', [
                     'participantId' => $participantId,
                     'orderId' => $orderId

@@ -160,24 +160,24 @@ class OrderService
     {
         $updateArray = [];
         $formData = $form->getData();
-        if ($formData["{$step}_notes"]) {
-            $updateArray["{$step}_notes"] = $formData["{$step}_notes"];
-            $this->order->{'set' . ucfirst($step) . 'Notes'}($formData["{$step}_notes"]);
+        if ($formData["{$step}Notes"]) {
+            $updateArray["{$step}Notes"] = $formData["{$step}Notes"];
+            $this->order->{'set' . ucfirst($step) . 'Notes'}($formData["{$step}Notes"]);
         } else {
             $this->order->{'set' . ucfirst($step) . 'Notes'}(null);
         }
         if ($step != 'processed') {
-            if ($formData["{$step}_ts"]) {
-                $this->order->{'set' . ucfirst($step) . 'Ts'}($formData["{$step}_ts"]);
+            if ($formData["{$step}Ts"]) {
+                $this->order->{'set' . ucfirst($step) . 'Ts'}($formData["{$step}Ts"]);
             } else {
                 $this->order->{'set' . ucfirst($step) . 'Ts'}(null);
             }
         }
-        if ($form->has("{$step}_samples")) {
-            $hasSampleArray = $formData["{$step}_samples"] && is_array($formData["{$step}_samples"]);
+        if ($form->has("{$step}Samples")) {
+            $hasSampleArray = $formData["{$step}Samples"] && is_array($formData["{$step}Samples"]);
             $samples = [];
             if ($hasSampleArray) {
-                $samples = array_values($formData["{$step}_samples"]);
+                $samples = array_values($formData["{$step}Samples"]);
             }
             $this->order->{'set' . ucfirst($step) . 'Samples'}(json_encode($samples));
             if ($step === 'collected') {
@@ -194,11 +194,11 @@ class OrderService
                 }
             }
             if ($step === 'processed') {
-                $hasSampleTimeArray = $formData['processed_samples_ts'] && is_array($formData['processed_samples_ts']);
+                $hasSampleTimeArray = $formData['processedSamplesTs'] && is_array($formData['processedSamplesTs']);
                 if ($hasSampleArray && $hasSampleTimeArray) {
                     $processedSampleTimes = [];
-                    foreach ($formData['processed_samples_ts'] as $sample => $dateTime) {
-                        if ($dateTime && in_array($sample, $formData["{$step}_samples"])) {
+                    foreach ($formData['processedSamplesTs'] as $sample => $dateTime) {
+                        if ($dateTime && in_array($sample, $formData["{$step}Samples"])) {
                             $processedSampleTimes[$sample] = $dateTime->getTimestamp();
                         }
                     }
@@ -206,8 +206,8 @@ class OrderService
                 } else {
                     $this->order->setProcessedSamplesTs(json_encode([]));
                 }
-                if ($this->order->getType() !== 'saliva' && !empty($formData["processed_centrifuge_type"])) {
-                    $this->order->setProcessedCentrifugeType($formData["processed_centrifuge_type"]);
+                if ($this->order->getType() !== 'saliva' && !empty($formData["processedCentrifugeType"])) {
+                    $this->order->setProcessedCentrifugeType($formData["processedCentrifugeType"]);
                 }
                 // Remove finalized samples when not processed
                 if (!empty($this->order->getFinalizedSamples())) {
@@ -217,7 +217,7 @@ class OrderService
             }
         }
         if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
-            $this->order->getFedexTracking($formData['fedex_tracking']);
+            $this->order->getFedexTracking($formData['fedexTracking']);
         }
         return $updateArray;
     }
