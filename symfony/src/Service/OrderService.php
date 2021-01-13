@@ -408,4 +408,9 @@ class OrderService
         }
         return false;
     }
+
+    public function getRequisitionPdf()
+    {
+        return $this->mayolinkOrderService->getRequisitionPdf($this->order->getMayoId());
+    }
 }

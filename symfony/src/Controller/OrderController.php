@@ -531,10 +531,55 @@ class OrderController extends AbstractController
     /**
      * @Route("/participant/{participantId}/order/{orderId}/print/requisition", name="order_print_requisition")
      */
-    public function orderPrintRequisitionAction($participantId, $orderId)
+    public function orderPrintRequisitionAction($participantId, $orderId, SessionInterface $session)
     {
-        //Todo
-        return '';
+        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        if ($order->isCancelled()) {
+            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+        }
+        if ($session->get('siteType') == 'dv' && !in_array('print_requisition', $order->getAvailableSteps())) {
+            // 404 because print is not a valid route for kit orders regardless of state
+            throw $this->createNotFoundException('Order not found.');
+        }
+        if (!in_array('print_requisition', $order->getAvailableSteps())) {
+            return $this->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
+        }
+
+        return $this->render('order/print-requisition.html.twig', [
+            'participant' => $participant,
+            'order' => $order,
+            'processTabClass' => $order->getProcessTabClass()
+        ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/requisition/pdf", name="order_requisition_pdf")
+     */
+    public function orderRequisitionPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
+    {
+        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        if (empty($order->getFinalizedTs()) || empty($order->getMayoId()) || $order->isCancelled() || $order->isUnlocked()) {
+            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+        }
+        if (!in_array('print_requisition', $order->getAvailableSteps())) {
+            throw $this->createNotFoundException('Order not found.');
+        }
+        if ($params->has('ml_mock_order')) {
+            return $this->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
+        } else {
+            if ($order->getMayoId()) {
+                $pdf = $this->orderService->getRequisitionPdf();
+            }
+            if (!empty($pdf)) {
+                return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+            } else {
+                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Requisition pdf file could not be loaded</strong></body></html>';
+                return new Response($html, 200, array('Content-Type' => 'text/html'));
+            }
+        }
     }
 
     /**

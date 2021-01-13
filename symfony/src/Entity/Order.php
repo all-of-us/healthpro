@@ -916,16 +916,16 @@ class Order
     // Finalized form is only disabled when rdr_id is set
     public function isDisabled()
     {
-        return ($this->getRdrId() || $this->isExpired()|| $this->isOrderCancelled()) && $this->getStatus() !== 'unlock';
+        return ($this->getRdrId() || $this->isExpired()|| $this->isCancelled()) && $this->getStatus() !== 'unlock';
     }
 
     // Except finalize form all forms are disabled when finalized_ts is set
     public function isFormDisabled()
     {
-        return ($this->getFinalizedTs() || $this->isExpired() || $this->isOrderCancelled()) && $this->getStatus() !== 'unlock';
+        return ($this->getFinalizedTs() || $this->isExpired() || $this->isCancelled()) && $this->getStatus() !== 'unlock';
     }
 
-    public function isOrderCancelled()
+    public function isCancelled()
     {
         return $this->getStatus() === self::ORDER_CANCEL;
     }
@@ -942,17 +942,17 @@ class Order
 
     public function canCancel()
     {
-        return !$this->isOrderCancelled() && !$this->isUnlocked() && !$this->isFailedToReachRdr();
+        return !$this->isCancelled() && !$this->isUnlocked() && !$this->isFailedToReachRdr();
     }
 
     public function canRestore()
     {
-        return !$this->isExpired() && $this->isOrderCancelled() && !$this->isUnlocked() && !$this->isFailedToReachRdr();
+        return !$this->isExpired() && $this->isCancelled() && !$this->isUnlocked() && !$this->isFailedToReachRdr();
     }
 
     public function canUnlock()
     {
-        return !$this->isExpired() && !empty($this->getRdrId()) && !$this->isUnlocked() && !$this->isOrderCancelled();
+        return !$this->isExpired() && !empty($this->getRdrId()) && !$this->isUnlocked() && !$this->isCancelled();
     }
 
     public function hasBloodSample($samples)
@@ -1040,7 +1040,7 @@ class Order
             }
         }
         // For canceled orders set print labels step to collect
-        if ($this->isOrderCancelled() && $step === 'print_labels') {
+        if ($this->isCancelled() && $step === 'print_labels') {
             return 'collect';
         }
         return $step;
@@ -1067,7 +1067,7 @@ class Order
             }
         }
         // For canceled orders include collect in available steps if not exists
-        if ($this->isOrderCancelled() && !in_array('collect', $steps)) {
+        if ($this->isCancelled() && !in_array('collect', $steps)) {
             $steps[] = 'collect';
         }
         return $steps;
