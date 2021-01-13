@@ -16,6 +16,7 @@ class OrderService
     protected $env;
     protected $siteService;
     protected $order;
+    protected $participant;
 
     public function __construct(
         RdrApiService $rdrApiService,
@@ -50,6 +51,16 @@ class OrderService
             }
         }
         return $params;
+    }
+
+    public function setParticipant($participant)
+    {
+        $this->participant = $participant;
+    }
+
+    public function getParticipant()
+    {
+        return $this->participant;
     }
 
     public function createOrder($participantId, $order)
@@ -101,7 +112,7 @@ class OrderService
         return false;
     }
 
-    public function getLabelsPdf($participant)
+    public function getLabelsPdf()
     {
         // Always return true for mock orders
         if ($this->params->has('ml_mock_order')) {
@@ -115,15 +126,15 @@ class OrderService
         }
         // Check if mayo account number exists
         if (!empty($mayoClientId)) {
-            $birthDate = $this->params->has('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+            $birthDate = $this->params->has('ml_real_dob') ? $this->participant->dob : $this->participant->getMayolinkDob();
             if ($birthDate) {
                 $birthDate = $birthDate->format('Y-m-d');
             }
             $options = [
                 'type' => $this->order->getType(),
-                'biobank_id' => $participant->biobankId,
+                'biobank_id' => $this->participant->biobankId,
                 'first_name' => '*',
-                'gender' => $participant->gender,
+                'gender' => $this->participant->gender,
                 'birth_date' => $birthDate,
                 'order_id' => $this->order->getOrderId(),
                 'collected_at' => $collectedAt->format('c'),
@@ -336,7 +347,7 @@ class OrderService
         return $formData;
     }
 
-    public function sendOrderToMayo($mayoClientId, $participant)
+    public function sendOrderToMayo($mayoClientId)
     {
         // Return mock id for mock orders
         if ($this->params->has('ml_mock_order')) {
@@ -347,15 +358,15 @@ class OrderService
         $collectedAt = new \DateTime($this->order->getCollectedTs()->format('Y-m-d H:i:s'), new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
         // Check if mayo account number exists
         if (!empty($mayoClientId)) {
-            $birthDate = $this->params->has('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+            $birthDate = $this->params->has('ml_real_dob') ? $this->participant->dob : $this->participant->getMayolinkDob();
             if ($birthDate) {
                 $birthDate = $birthDate->format('Y-m-d');
             }
             $options = [
                 'type' => $this->order->getType(),
-                'biobank_id' => $participant->biobankId,
+                'biobank_id' => $this->participant->biobankId,
                 'first_name' => '*',
-                'gender' => $participant->gender,
+                'gender' => $this->participant->gender,
                 'birth_date' => $birthDate,
                 'order_id' => $this->order->getOrderId(),
                 'collected_at' => $collectedAt->format('c'),

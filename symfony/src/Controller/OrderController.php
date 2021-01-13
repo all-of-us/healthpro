@@ -60,8 +60,9 @@ class OrderController extends AbstractController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
+        $this->orderService->setParticipant($participant);
         $this->orderService->loadSamplesSchema($order);
-        return [$participant, $order];
+        return $order;
     }
 
     /**
@@ -206,7 +207,7 @@ class OrderController extends AbstractController
      */
     public function orderPrintLabelsAction($participantId, $orderId)
     {
-        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        $order = $this->loadOrder($participantId, $orderId);
         if ($order->isDisabled() || $order->isUnlocked()) {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
@@ -214,7 +215,7 @@ class OrderController extends AbstractController
             // 404 because print is not a valid route for kit orders regardless of state
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
-        $result = $this->orderService->getLabelsPdf($participant);
+        $result = $this->orderService->getLabelsPdf();
         if (!$order->getPrintedTs() && $result['status'] === 'success') {
             $order->setPrintedTs(new \DateTime());
             $this->em->persist($order);
@@ -223,7 +224,7 @@ class OrderController extends AbstractController
         }
         $errorMessage = !empty($result['errorMessage']) ? $result['errorMessage'] : '';
         return $this->render('order/print-labels.html.twig', [
-            'participant' => $participant,
+            'participant' => $this->orderService->getParticipant(),
             'order' => $order,
             'processTabClass' => $order->getProcessTabClass(),
             'errorMessage' => $errorMessage
@@ -235,7 +236,7 @@ class OrderController extends AbstractController
      */
     public function orderLabelsPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
     {
-        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        $order = $this->loadOrder($participantId, $orderId);
         if ($order->isDisabled() || $order->isUnlocked()) {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
@@ -246,7 +247,7 @@ class OrderController extends AbstractController
         if ($params->has('ml_mock_order')) {
             return $this->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
         } else {
-            $result = $this->orderService->getLabelsPdf($participant);
+            $result = $this->orderService->getLabelsPdf();
             if ($result['status'] === 'success') {
                 return new Response($result['pdf'], 200, ['Content-Type' => 'application/pdf']);
             } else {
@@ -261,7 +262,7 @@ class OrderController extends AbstractController
      */
     public function orderCollectAction($participantId, $orderId, Request $request)
     {
-        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        $order = $this->loadOrder($participantId, $orderId);
         if (!in_array('collect', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -281,7 +282,7 @@ class OrderController extends AbstractController
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException('Participant ineligible for order create.');
             }
-            if ($type = $participant->checkIdentifiers($collectForm['collectedNotes']->getData())) {
+            if ($type = $this->orderService->getParticipant()->checkIdentifiers($collectForm['collectedNotes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collectedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
@@ -306,7 +307,7 @@ class OrderController extends AbstractController
             }
         }
         return $this->render('order/collect.html.twig', [
-            'participant' => $participant,
+            'participant' => $this->orderService->getParticipant(),
             'order' => $order,
             'collectForm' => $collectForm->createView(),
             'samplesInfo' => $order->getSamplesInformation(),
@@ -321,7 +322,7 @@ class OrderController extends AbstractController
      */
     public function orderProcessAction($participantId, $orderId, Request $request)
     {
-        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        $order = $this->loadOrder($participantId, $orderId);
         if (!in_array('process', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -350,7 +351,7 @@ class OrderController extends AbstractController
                     }
                 }
             }
-            if ($type = $participant->checkIdentifiers($processForm['processedNotes']->getData())) {
+            if ($type = $this->orderService->getParticipant()->checkIdentifiers($processForm['processedNotes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $processForm['processedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
@@ -395,7 +396,7 @@ class OrderController extends AbstractController
             }
         }
         return $this->render('order/process.html.twig', [
-            'participant' => $participant,
+            'participant' => $this->orderService->getParticipant(),
             'order' => $order,
             'processForm' => $processForm->createView(),
             'samplesInfo' => $order->getSamplesInformation(),
@@ -411,7 +412,7 @@ class OrderController extends AbstractController
     public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
     {
 
-        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        $order = $this->loadOrder($participantId, $orderId);
         if (!in_array('finalize', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -444,7 +445,7 @@ class OrderController extends AbstractController
                     }
                 }
                 // Check identifiers in notes
-                if ($type = $participant->checkIdentifiers($finalizeForm['finalizedNotes']->getData())) {
+                if ($type = $this->orderService->getParticipant()->checkIdentifiers($finalizeForm['finalizedNotes']->getData())) {
                     $label = Order::$identifierLabel[$type[0]];
                     $finalizeForm['finalizedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
@@ -476,7 +477,7 @@ class OrderController extends AbstractController
                                 'googleGroup' => $this->siteService->getSiteId()
                             ]);
                             $mayoClientId = $site->getMayolinkAccount() ?: null;
-                            $result = $this->orderService->sendOrderToMayo($mayoClientId, $participant);
+                            $result = $this->orderService->sendOrderToMayo($mayoClientId);
                             if ($result['status'] === 'success' && !empty($result['mayoId'])) {
                                 //Save mayo id and finalized time
                                 $order->setFinalizedTs($finalizeForm['finalizedTs']->getData());
@@ -516,7 +517,7 @@ class OrderController extends AbstractController
         $hasErrors = !empty($order->getErrors()) ? true : false;
         $showUnfinalizeMsg = empty($order->getFinalizedTs()) && !empty($order->getFinalizedSamples()) && empty($session->getFlashBag()->peekAll());
         return $this->render('order/finalize.html.twig', [
-            'participant' => $participant,
+            'participant' => $this->orderService->getParticipant(),
             'order' => $order,
             'finalizeForm' => $finalizeForm->createView(),
             'samplesInfo' => $order->getSamplesInformation(),
@@ -533,7 +534,7 @@ class OrderController extends AbstractController
      */
     public function orderPrintRequisitionAction($participantId, $orderId, SessionInterface $session)
     {
-        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        $order = $this->loadOrder($participantId, $orderId);
         if ($order->isCancelled()) {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
@@ -549,7 +550,7 @@ class OrderController extends AbstractController
         }
 
         return $this->render('order/print-requisition.html.twig', [
-            'participant' => $participant,
+            'participant' => $this->orderService->getParticipant(),
             'order' => $order,
             'processTabClass' => $order->getProcessTabClass()
         ]);
@@ -560,7 +561,7 @@ class OrderController extends AbstractController
      */
     public function orderRequisitionPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
     {
-        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        $order = $this->loadOrder($participantId, $orderId);
         if (empty($order->getFinalizedTs()) || empty($order->getMayoId()) || $order->isCancelled() || $order->isUnlocked()) {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
