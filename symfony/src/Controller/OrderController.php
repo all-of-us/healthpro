@@ -408,10 +408,120 @@ class OrderController extends AbstractController
     /**
      * @Route("/participant/{participantId}/order/{orderId}/finalize", name="order_finalize")
      */
-    public function orderFinalizeAction($participantId, $orderId)
+    public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
     {
-        //Todo
-        return '';
+
+        list($participant, $order) = $this->loadOrder($participantId, $orderId);
+        if (!in_array('finalize', $order->getAvailableSteps())) {
+            return $this->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
+        }
+        $formData = $this->orderService->getOrderFormData('finalized');
+        $finalizeForm = $this->createForm(OrderType::class, $formData, [
+            'step' => 'finalized',
+            'order' => $order,
+            'em' => $this->em,
+            'timeZone' => $this->getUser()->getInfo()['timezone'],
+            'siteId' => $this->siteService->getSiteId()
+        ]);
+        $finalizeForm->handleRequest($request);
+        if ($finalizeForm->isSubmitted()) {
+            if ($order->isDisabled()) {
+                throw $this->createAccessDeniedException('Participant ineligible for order create.');
+            }
+            if (!$order->isFormDisabled()) {
+                // Check empty samples
+                if (empty($finalizeForm['finalizedSamples']->getData())) {
+                    $finalizeForm['finalizedSamples']->addError(new FormError('Please select at least one sample'));
+                }
+                $errors = $order->getErrors();
+                // Check sample errors
+                if (!empty($errors)) {
+                    foreach ($errors as $error) {
+                        $finalizeForm['finalizedSamples']->addError(new FormError($error));
+                    }
+                }
+                // Check identifiers in notes
+                if ($type = $participant->checkIdentifiers($finalizeForm['finalizedNotes']->getData())) {
+                    $label = Order::$identifierLabel[$type[0]];
+                    $finalizeForm['finalizedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+                }
+                if (($order->getType()=== 'kit' || $order->getType() === 'diversion') && $finalizeForm->has('fedexTracking') && !empty($finalizeForm['fedexTracking']->getData())) {
+                    $duplicateFedexTracking = $this->em->getRepository(Order::class)->getDuplicateFedexTracking($finalizeForm['fedex_tracking']->getData(), $orderId);
+                    if (!empty($duplicateFedexTracking)) {
+                        $finalizeForm['fedexTracking']['first']->addError(new FormError('This tracking number has already been used for another order.'));
+                    }
+                }
+                if ($finalizeForm->isValid()) {
+                    $this->orderService->setOrderUpdateFromForm('finalized', $finalizeForm);
+                    if (!$order->isUnlocked()) {
+                        $userRepository = $this->em->getRepository(User::class);
+                        $order->setFinalizedUser($userRepository->find($this->getUser()->getId()));
+                        $order->setFinalizedSite($this->siteService->getSiteId());
+                    }
+                    // Unset finalized_ts for all types of orders
+                    $order->setFinalizedTs(null);
+                    // Finalized time will not be saved at this point
+                    $this->em->persist($order);
+                    $this->em->flush();
+                    $this->loggerService->log(Log::ORDER_EDIT, $orderId);
+                    if (!empty($finalizeForm['finalizedTs']->getData()) || $order->isUnlocked()) {
+                        //Send order to mayo if mayo id is empty
+                        if (empty($order->getMayoId())) {
+                            $site = $this->em->getRepository(Site::class)->findOneBy(['deleted' => 0, 'googleGroup' => $this->siteService->getSiteId()]);
+                            $mayoClientId = $site->getMayolinkAccount() ?: null;
+                            $result = $this->orderService->sendOrderToMayo($mayoClientId, $participant);
+                            if ($result['status'] === 'success' && !empty($result['mayoId'])) {
+                                //Save mayo id and finalized time
+                                $order->setFinalizedTs($finalizeForm['finalizedTs']->getData());
+                                $order->setMayoId($result['mayoId']);
+                                $this->em->persist($order);
+                                $this->em->flush();
+                            } else {
+                                $this->addFlash('error', $result['errorMessage']);
+                            }
+                        } else {
+                            // Save finalized time
+                            $order->setFinalizedTs($finalizeForm['finalized_ts']->getData());
+                            $this->em->persist($order);
+                            $this->em->flush();
+                        }
+                    }
+                    $sendToRdr = true;
+                } else {
+                    $finalizeForm->addError(new FormError('Please correct the errors below'));
+                }
+            }
+            if (!empty($sendToRdr) || $order->isOrderFormDisabled()) {
+                //Send order to RDR if finalized_ts and mayo_id exists
+                if (!empty($order->getFinalizedTs()) && !empty($order->getMayoId())) {
+//                    if ($this->orderService->sendToRdr()) {
+//                        $this->addFlash('success', 'Order finalized');
+//                    } else {
+//                        $this->addFlash('error', 'Failed to finalize the order. Please try again.');
+//                    }
+                }
+                return $this->redirectToRoute('orderFinalize', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId
+                ]);
+            }
+        }
+        $hasErrors = !empty($order->getErrors()) ? true : false;
+        $showUnfinalizeMsg = empty($order->getFinalizedTs()) && !empty($order->getFinalizedSamples()) && empty($session->getFlashBag()->peekAll());
+        return $this->render('order/finalize.html.twig', [
+            'participant' => $participant,
+            'order' => $order,
+            'finalizeForm' => $finalizeForm->createView(),
+            'samplesInfo' => $order->getSamplesInformation(),
+            'version' => $order->getVersion(),
+            'hasErrors' => $hasErrors,
+            'processTabClass' => $order->getProcessTabClass(),
+            'revertForm' => $this->createForm(OrderRevertType::class, null),
+            'showUnfinalizeMsg' => $showUnfinalizeMsg
+        ]);
     }
 
     /**

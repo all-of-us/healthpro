@@ -316,4 +316,47 @@ class OrderService
         }
         return $formData;
     }
+
+    public function sendOrderToMayo($mayoClientId, $participant)
+    {
+        // Return mock id for mock orders
+        if ($this->params->has('ml_mock_order')) {
+            return ['status' => 'success', 'mayoId' => $this->params->get('ml_mock_order')];
+        }
+        $result = ['status' => 'fail'];
+        // Set collected time to user local time
+        $collectedAt = new \DateTime($this->order->getCollectedTs()->format('Y-m-d H:i:s'), new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+        // Check if mayo account number exists
+        if (!empty($mayoClientId)) {
+            $birthDate = $this->params->has('ml_real_dob') ? $participant->dob : $participant->getMayolinkDob();
+            if ($birthDate) {
+                $birthDate = $birthDate->format('Y-m-d');
+            }
+            $options = [
+                'type' => $this->order->getType(),
+                'biobank_id' => $participant->biobankId,
+                'first_name' => '*',
+                'gender' => $participant->gender,
+                'birth_date' => $birthDate,
+                'order_id' => $this->order->getOrderId(),
+                'collected_at' => $collectedAt->format('c'),
+                'mayoClientId' => $mayoClientId,
+                'collected_samples' => $this->order->getFinalizedSamples(),
+                'centrifugeType' => $this->order->getProcessedCentrifugeType(),
+                'version' => $this->order->getVersion(),
+                'tests' => $this->order->getSamplesInformation(),
+                'salivaTests' => $this->order->getSalivaSamplesInformation()
+            ];
+            $mayoId = $this->mayolinkOrderService->createOrder($options);
+            if (!empty($mayoId)) {
+                $result['status'] = 'success';
+                $result['mayoId'] = $mayoId;
+            } else {
+                $result['errorMessage'] = 'An error occurred while attempting to send this order. Please try again.';
+            }
+        } else {
+            $result['errorMessage'] = 'Mayo account number is not set for this site. Please contact the administrator.';
+        }
+        return $result;
+    }
 }
