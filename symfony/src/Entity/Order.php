@@ -785,9 +785,9 @@ class Order
         $obj->created = $created->format('Y-m-d\TH:i:s\Z');
         $obj->samples = $this->getRdrSamples();
         $notes = [];
-        foreach (['Collected', 'Processed', 'Finalized'] as $step) {
-            if ($this->{'get' . $step . 'Notes'}()) {
-                $notes[$step] = $this->{'get' . $step . 'Notes'}();
+        foreach (['collected', 'processed', 'finalized'] as $step) {
+            if ($this->{'get' . ucfirst($step) . 'Notes'}()) {
+                $notes[$step] = $this->{'get' . ucfirst($step) . 'Notes'}();
             }
         }
         if (!empty($notes)) {
@@ -935,19 +935,19 @@ class Order
         return $this->getStatus()=== self::ORDER_UNLOCK;
     }
 
-    public function isOrderFailedToReachRdr()
+    public function isFailedToReachRdr()
     {
         return !empty($this->getFinalizedTs()) && !empty($this->getMayoId()) && empty($this->getRdrId());
     }
 
     public function canCancel()
     {
-        return !$this->isOrderCancelled() && !$this->isUnlocked() && !$this->isOrderFailedToReachRdr();
+        return !$this->isOrderCancelled() && !$this->isUnlocked() && !$this->isFailedToReachRdr();
     }
 
     public function canRestore()
     {
-        return !$this->isExpired() && $this->isOrderCancelled() && !$this->isUnlocked() && !$this->isOrderFailedToReachRdr();
+        return !$this->isExpired() && $this->isOrderCancelled() && !$this->isUnlocked() && !$this->isFailedToReachRdr();
     }
 
     public function canUnlock()

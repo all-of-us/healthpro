@@ -67,6 +67,25 @@ class OrderService
         return false;
     }
 
+    public function editOrder($participantId, $orderId, $order)
+    {
+        try {
+            $result = $this->getOrder($participantId, $orderId);
+            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/BiobankOrder/{$orderId}", [
+                'json' => $order,
+                'headers' => ['If-Match' => $result->meta->versionId]
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->status) && $result->status === Order::ORDER_EDIT_STATUS) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
     public function getOrder($participantId, $orderId)
     {
         try {
@@ -358,5 +377,35 @@ class OrderService
             $result['errorMessage'] = 'Mayo account number is not set for this site. Please contact the administrator.';
         }
         return $result;
+    }
+
+    public function sendToRdr()
+    {
+        //Todo Implement Edit Order
+        return $this->createRdrOrder();
+    }
+
+    public function createRdrOrder()
+    {
+        $orderRdrObject = $this->order->getRdrObject();
+        $rdrId = $this->createOrder($this->order->getParticipantId(), $orderRdrObject);
+        if (!$rdrId) {
+            // Check for rdr id conflict error code
+            if ($this->rdrApiService->getLastErrorCode() === 409) {
+                $rdrOrder = $this->getOrder($this->order->getParticipantId(), $this->getMayoId());
+                // Check if order exists in RDR
+                if (!empty($rdrOrder) && $rdrOrder->id === $this->order['mayo_id']) {
+                    $rdrId = $this->getMayoId();
+                }
+            }
+        }
+        if (!empty($rdrId)) {
+            // Save RDR id
+            $this->order->setRdrId($rdrId);
+            $this->em->persist($this->order);
+            $this->em->flush();
+            return true;
+        }
+        return false;
     }
 }

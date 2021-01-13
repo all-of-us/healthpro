@@ -54,6 +54,12 @@ class RdrApiService
         return $this->getClient($path)->request('POST', $this->endpoint . $path, $params);
     }
 
+    public function put($path, $body, $params = [])
+    {
+        $params['json'] = $body;
+        return $this->getClient($path)->request('PUT', $this->endpoint . $path, $params);
+    }
+
     /* Private Methods */
 
     private function getClient($resourceEndpoint = null)
