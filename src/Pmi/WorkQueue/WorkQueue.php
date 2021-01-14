@@ -24,7 +24,6 @@ class WorkQueue
         'dateOfBirth',
         'participantId',
         'biobankId',
-        'language',
         'enrollmentStatus',
         'participantOrigin',
         'consentCohort',
@@ -63,8 +62,6 @@ class WorkQueue
         'questionnaireOnLifestyleAuthored',
         'questionnaireOnMedicalHistory',
         'questionnaireOnMedicalHistoryAuthored',
-        'questionnaireOnMedications',
-        'questionnaireOnMedicationsAuthored',
         'questionnaireOnFamilyHealth',
         'questionnaireOnFamilyHealthAuthored',
         'questionnaireOnHealthcareAccess',
@@ -293,11 +290,10 @@ class WorkQueue
 
     public static $surveys = [
         'TheBasics' => 'Basics',
-        'OverallHealth' => 'Health',
+        'OverallHealth' => 'Health Access',
         'Lifestyle' => 'Lifestyle',
-        'MedicalHistory' => 'Hist',
-        'Medications' => 'Meds',
-        'FamilyHealth' => 'Family',
+        'MedicalHistory' => 'Med History',
+        'FamilyHealth' => 'Family History',
         'HealthcareAccess' => 'Access',
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
@@ -312,7 +308,6 @@ class WorkQueue
         'OverallHealth',
         'Lifestyle',
         'MedicalHistory',
-        'Medications',
         'FamilyHealth',
         'HealthcareAccess'
     ];
@@ -376,7 +371,6 @@ class WorkQueue
             $row['patientStatusNoAccess'] = $this->getPatientStatus($participant, 'UNKNOWN');
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
-            $row['language'] = $e($participant->language);
             $row['participantOrigin'] = $e($participant->participantOrigin);
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
