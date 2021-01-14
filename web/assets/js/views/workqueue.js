@@ -169,7 +169,7 @@ $(document).ready(function() {
                 hide: [
                     '.col-group-info:not(.col-group-consent)',
                     '.col-group-default:not(.col-group-consent)',
-                    '.col-group-ppi-time',
+                    '.col-group-ppi',
                     '.col-group-inperson:not(.col-group-default)',
                     '.col-group-demographics',
                     '.col-group-contact',
