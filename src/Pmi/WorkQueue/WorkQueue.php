@@ -62,8 +62,6 @@ class WorkQueue
         'questionnaireOnLifestyleAuthored',
         'questionnaireOnMedicalHistory',
         'questionnaireOnMedicalHistoryAuthored',
-        'questionnaireOnMedications',
-        'questionnaireOnMedicationsAuthored',
         'questionnaireOnFamilyHealth',
         'questionnaireOnFamilyHealthAuthored',
         'questionnaireOnHealthcareAccess',
@@ -293,7 +291,6 @@ class WorkQueue
         'OverallHealth' => 'Health',
         'Lifestyle' => 'Lifestyle',
         'MedicalHistory' => 'Hist',
-        'Medications' => 'Meds',
         'FamilyHealth' => 'Family',
         'HealthcareAccess' => 'Access',
         'CopeMay' => 'COPE May',
@@ -308,7 +305,6 @@ class WorkQueue
         'OverallHealth',
         'Lifestyle',
         'MedicalHistory',
-        'Medications',
         'FamilyHealth',
         'HealthcareAccess'
     ];
