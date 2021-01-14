@@ -290,7 +290,7 @@ class WorkQueue
         'TheBasics' => 'Basics',
         'OverallHealth' => 'Health Access',
         'Lifestyle' => 'Lifestyle',
-        'MedicalHistory' => 'Hist',
+        'MedicalHistory' => 'Med History',
         'FamilyHealth' => 'Family',
         'HealthcareAccess' => 'Access',
         'CopeMay' => 'COPE May',
