@@ -56,29 +56,17 @@ class WorkQueue
         'numCompletedBaselinePPIModules',
         'numCompletedPPIModules',
         'questionnaireOnTheBasics',
-        'questionnaireOnTheBasicsAuthored',
         'questionnaireOnOverallHealth',
-        'questionnaireOnOverallHealthAuthored',
         'questionnaireOnLifestyle',
-        'questionnaireOnLifestyleAuthored',
         'questionnaireOnMedicalHistory',
-        'questionnaireOnMedicalHistoryAuthored',
         'questionnaireOnMedications',
-        'questionnaireOnMedicationsAuthored',
         'questionnaireOnFamilyHealth',
-        'questionnaireOnFamilyHealthAuthored',
         'questionnaireOnHealthcareAccess',
-        'questionnaireOnHealthcareAccessAuthored',
         'questionnaireOnCopeMay',
-        'questionnaireOnCopeMayAuthored',
         'questionnaireOnCopeJune',
-        'questionnaireOnCopeJuneAuthored',
         'questionnaireOnCopeJuly',
-        'questionnaireOnCopeJulyAuthored',
         'questionnaireOnCopeNov',
-        'questionnaireOnCopeNovAuthored',
         'questionnaireOnCopeDec',
-        'questionnaireOnCopeDecAuthored',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -416,8 +404,7 @@ class WorkQueue
             }
             $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
             foreach (array_keys(self::$surveys) as $field) {
-                $row["ppi{$field}"] = $this->displayStatus($participant->{'questionnaireOn' . $field}, 'SUBMITTED');
-                $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn' . $field . 'Authored'}, $app->getUserTimezone());
+                $row["ppi{$field}"] = $this->displayStatus($participant->{'questionnaireOn' . $field}, 'SUBMITTED', $participant->{'questionnaireOn' . $field . 'Authored'});
             }
 
             //In-Person Enrollment
