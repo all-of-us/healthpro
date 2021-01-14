@@ -63,6 +63,12 @@
                             {% if not participant.status and participant.statusReason == 'consent' %}
                                 <span class="label label-danger">Unconsented</span>
                             {% endif %}
+                            {% if not participant.status and participant.statusReason == 'deceased-approved' %}
+                                <span class="label label-danger">Deceased</span>
+                            {% endif %}
+                            {% if participant.activityStatus == 'deactivated' %}
+                                <span class="label label-danger">Deactivated</span>
+                            {% endif %}
                         </td>
                         {% if searchType is defined and searchType == 'phone' %}
                             <td>
