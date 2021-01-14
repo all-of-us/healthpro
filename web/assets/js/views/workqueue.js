@@ -69,20 +69,20 @@ $(document).ready(function() {
       { name: 'participantId', data: 'participantId' },
       { name: 'biobankId', visible: false, data: 'biobankId' },
       { name: 'participantStatus', data: 'participantStatus' },
+      { name: 'activityStatus', data: 'activityStatus', class: 'text-center', orderable: false },
       { name: 'participantOrigin', data: 'participantOrigin', visible: !!isDvType },
+      { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
       { name: 'consentCohort', data: 'consentCohort', class: 'text-center' },
       { name: 'firstPrimaryConsent', visible: false, data: 'firstPrimaryConsent', class: 'text-center' },
       { name: 'primaryConsent', data: 'primaryConsent', class: 'text-center' },
       { name: 'questionnaireOnDnaProgram', data: 'questionnaireOnDnaProgram', class: 'text-center' },
-      { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'firstEhrConsent', visible: false, data: 'firstEhrConsent', class: 'text-center' },
       { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
       { name: 'ehrConsentExpireStatus', visible: false, data: 'ehrConsentExpireStatus', class: 'text-center' },
       { name: 'gRoRConsent', data: 'gRoRConsent', class: 'text-center' },
+      { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
-      { name: 'activityStatus', data: 'activityStatus', class: 'text-center', orderable: false },
-      { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
       { name: 'retentionEligibleStatus', visible: false, data: 'retentionEligibleStatus', class: 'text-center' },
       { name: 'retentionType', visible: false, data: 'retentionType', class: 'text-center', orderable: false },
       { name: 'isEhrDataAvailable', visible: false, data: 'isEhrDataAvailable', class: 'text-center' },
@@ -110,7 +110,8 @@ $(document).ready(function() {
       { name: 'physicalMeasurementsStatus', data: 'physicalMeasurementsStatus', class: 'text-center' },
       { name: 'evaluationFinalizedSite', visible: false, data: 'evaluationFinalizedSite', orderable: false },
       { name: 'biobankDnaStatus', data: 'biobankDnaStatus', class: 'text-center' },
-      { name: 'biobankSamples', data: 'biobankSamples', class: 'text-center'}
+      { name: 'biobankSamples', data: 'biobankSamples', class: 'text-center'},
+      { name: 'orderCreatedSite', visible: false, data: 'orderCreatedSite', orderable: false }
     );
     Object.keys(samples).forEach(function(key, _i) {
       tableColumns.push(
@@ -118,7 +119,6 @@ $(document).ready(function() {
       );
     });
     tableColumns.push(
-      { name: 'orderCreatedSite', visible: false, data: 'orderCreatedSite', orderable: false },
       { name: 'age', visible: false, data: 'age' },
       { name: 'sex', visible: false, data: 'sex', orderable: false },
       { name: 'genderIdentity', visible: false, data: 'genderIdentity' },
@@ -134,7 +134,7 @@ $(document).ready(function() {
             url: url,
             type: "POST"
         },
-        order: [[11, 'desc']],
+        order: [[12, 'desc']],
         dom: 'lBrtip',
         columns: tableColumns,
         pageLength: 25,
@@ -153,6 +153,23 @@ $(document).ready(function() {
                 hide: [
                     '.col-group-info:not(.col-group-default)',
                     '.col-group-ppi:not(.col-group-default)',
+                    '.col-group-inperson:not(.col-group-default)',
+                    '.col-group-demographics',
+                    '.col-group-contact',
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
+                ]
+            },
+            {
+                extend: 'colvisGroup',
+                text: 'Consent',
+                show: [
+                    '.col-group-consent'
+                ],
+                hide: [
+                    '.col-group-info:not(.col-group-consent)',
+                    '.col-group-default:not(.col-group-consent)',
+                    '.col-group-ppi',
                     '.col-group-inperson:not(.col-group-default)',
                     '.col-group-demographics',
                     '.col-group-contact',
@@ -246,7 +263,8 @@ $(document).ready(function() {
                     '.col-group-consent-cohort',
                     '.col-group-program-update',
                     '.col-group-language-primary-consent',
-                    '.col-group-ehr-expire-status'
+                    '.col-group-ehr-expire-status',
+                    '.col-group-consent'
 
                 ]
             },

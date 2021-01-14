@@ -53,24 +53,16 @@
                 <th rowspan="2" class="col-group-name">First Name</th>
                 <th rowspan="2" class="col-group-name">Middle Initial</th>
 
-                <th rowspan="2" class="col-group-default">Date of Birth</th>
+                <th rowspan="2" class="col-group-default col-group-consent">Date of Birth</th>
                 <th rowspan="2" class="col-group-default col-group-info">PMI ID</th>
                 <th rowspan="2" class="col-group-info">Biobank ID</th>
-                <th rowspan="2" class="col-group-default">Participant Status</th>
+                <th rowspan="2" class="col-group-default col-group-consent">Participant Status</th>
+                <th rowspan="2" class="col-group-default col-group-info col-group-consent">Activity Status</th>
                 <th rowspan="2" class="{{  app.isDvType ? 'col-group-default' : 'col-group-info' }}">Participant Origination</th>
-                <th rowspan="2" class="col-group-default col-group-info col-group-consent-cohort">Consent Cohort</th>
-                <th rowspan="2" class="col-group-info">First Primary Consent</th>
-                <th rowspan="2" class="col-group-default col-group-info">Primary Consent</th>
-                <th rowspan="2" class="col-group-default col-group-info col-group-program-update">Program Update</th>
-                <th rowspan="2" class="col-group-default col-group-info col-group-language-primary-consent">Language of Primary Consent</th>
-                <th rowspan="2" class="col-group-info">First EHR Consent</th>
-                <th rowspan="2" class="col-group-default col-group-info">EHR Consent</th>
-                <th rowspan="2" class="col-group-info col-group-ehr-expire-status">EHR Expiration Status</th>
-                <th rowspan="2" class="col-group-default col-group-info">gRoR Consent</th>
-                <th rowspan="2" class="col-group-info">DV-only EHR Sharing <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
-                <th rowspan="2" class="col-group-info">CABoR Consent <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
-                <th rowspan="2" class="col-group-default col-group-info">Activity Status</th>
-                <th rowspan="2" class="col-group-info">Withdrawal Reason</th>
+
+                <th rowspan="2" class="col-group-info col-group-consent">Withdrawal Reason</th>
+
+                <th colspan="11" class="topheader multiheader-consent">Consent</th>
 
                 <th colspan="4" class="topheader multiheader-metrics">Metrics</th>
 
@@ -85,6 +77,18 @@
                 <th colspan="5" class="topheader multiheader-demographics">Demographics</th>
             </tr>
             <tr>
+                <th class="secondaryheader col-group-default col-group-info col-group-consent-cohort col-group-consent multiheader-consent">Consent Cohort</th>
+                <th class="secondaryheader col-group-info col-group-consent multiheader-consent">First Primary Consent</th>
+                <th class="secondaryheader col-group-default col-group-info col-group-consent multiheader-consent">Primary Consent</th>
+                <th class="secondaryheader col-group-default col-group-info col-group-program-update col-group-consent multiheader-consent">Program Update</th>
+                <th class="secondaryheader col-group-info col-group-consent multiheader-consent">First EHR Consent</th>
+                <th class="secondaryheader col-group-default col-group-info col-group-consent multiheader-consent">EHR Consent</th>
+                <th class="secondaryheader col-group-info col-group-ehr-expire-status col-group-consent multiheader-consent">EHR Expiration Status</th>
+                <th class="secondaryheader col-group-default col-group-info col-group-consent multiheader-consent">gRoR Consent</th>
+                <th class="secondaryheader col-group-default col-group-info col-group-language-primary-consent col-group-consent multiheader-consent">Language of Primary Consent</th>
+                <th class="secondaryheader col-group-info col-group-consent multiheader-consent">DV-only EHR Sharing <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
+                <th class="secondaryheader col-group-info col-group-consent multiheader-consent">CABoR Consent <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
+
                 <th class="secondaryheader col-group-metrics col-group-retention multiheader-metrics">Retention Eligibile</th>
                 <th class="secondaryheader col-group-metrics col-group-retention multiheader-metrics">Retention Status</th>
                 <th class="secondaryheader col-group-metrics col-group-metrics-ehr multiheader-metrics">EHR Data Transfer</th>
@@ -113,10 +117,10 @@
                 <th class="secondaryheader col-group-inperson multiheader-inperson">Phys Meas Site</th>
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Samples to Isolate DNA? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
                 <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Baseline Samples <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction." data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
+                <th class="secondaryheader col-group-inperson multiheader-inperson">Bio&shy;specimens Site</th>
                 {% for field, label in samples %}
                     <th class="secondaryheader col-group-inperson multiheader-inperson">{{ label }}</th>
                 {% endfor %}
-                <th class="secondaryheader col-group-inperson multiheader-inperson">Bio&shy;specimens Site</th>
 
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Age</th>
                 <th class="secondaryheader col-group-demographics multiheader-demographics">Sex</th>

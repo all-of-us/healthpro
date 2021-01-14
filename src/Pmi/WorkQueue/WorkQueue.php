@@ -25,20 +25,20 @@ class WorkQueue
         'participantId',
         'biobankId',
         'enrollmentStatus',
+        'withdrawalAuthored',
         'participantOrigin',
+        'withdrawalReason',
         'consentCohort',
         'consentForStudyEnrollmentFirstYesAuthored',
         'consentForStudyEnrollmentAuthored',
         'questionnaireOnDnaProgramAuthored',
-        'primaryLanguage',
         'consentForElectronicHealthRecordsFirstYesAuthored',
         'consentForElectronicHealthRecordsAuthored',
         'ehrConsentExpireStatus',
         'consentForGenomicsRORAuthored',
+        'primaryLanguage',
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
-        'withdrawalAuthored',
-        'withdrawalReason',
         'retentionEligibleTime',
         'retentionType',
         'isEhrDataAvailable',
@@ -73,6 +73,7 @@ class WorkQueue
         'physicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
         'numBaselineSamplesArrived',
+        'biospecimenSourceSite',
         'sampleStatus1SST8Time',
         'sampleStatus1PST8Time',
         'sampleStatus1HEP4Time',
@@ -85,7 +86,6 @@ class WorkQueue
         'sampleStatus1UR10Time',
         'sampleStatus1UR90Time',
         'sampleStatus1SALTime',
-        'biospecimenSourceSite',
         'dateOfBirth',
         'sex',
         'genderIdentity',
@@ -363,22 +363,22 @@ class WorkQueue
             $row['participantOrigin'] = $e($participant->participantOrigin);
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
+            $row['activityStatus'] = $this->getActivityStatus($participant);
+            $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['consentCohort'] = $e($participant->consentCohortText);
             $row['primaryConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
             $row['firstPrimaryConsent'] = $this->displayFirstConsentStatusTime($participant->consentForStudyEnrollmentFirstYesAuthored);
             $row['questionnaireOnDnaProgram'] = $this->displayProgramUpdate($participant);
-            $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['firstEhrConsent'] = $this->displayFirstConsentStatusTime($participant->consentForElectronicHealthRecordsFirstYesAuthored, 'ehr');
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
             $row['ehrConsentExpireStatus'] = $this->displayEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords, $participant->ehrConsentExpireAuthored);
             $row['gRoRConsent'] = $this->displayGenomicsConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
+            $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
-            $row['activityStatus'] = $this->getActivityStatus($participant);
             $row['retentionEligibleStatus'] = $this->getRetentionEligibleStatus($participant->retentionEligibleStatus, $participant->retentionEligibleTime);
             $row['retentionType'] = $this->getRetentionType($participant->retentionType);
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
-            $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['isEhrDataAvailable'] = $this->getEhrAvailableStatus($participant->isEhrDataAvailable);
             $row['latestEhrReceiptTime'] = self::dateFromString($participant->latestEhrReceiptTime, $app->getUserTimezone());
 
@@ -416,6 +416,7 @@ class WorkQueue
             } else {
                 $row['biobankSamples'] = $e($participant->numBaselineSamplesArrived);;
             }
+            $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
             foreach (array_keys(self::$samples) as $sample) {
                 $newSample = $sample;
                 foreach (self::$samplesAlias as $sampleAlias) {
@@ -429,7 +430,6 @@ class WorkQueue
                     $row["sample{$sample}"] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
                 }
             }
-            $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
 
             //Demographics
             $row['age'] = $e($participant->age);
