@@ -291,7 +291,7 @@ class WorkQueue
         'OverallHealth' => 'Health Access',
         'Lifestyle' => 'Lifestyle',
         'MedicalHistory' => 'Med History',
-        'FamilyHealth' => 'Family',
+        'FamilyHealth' => 'Family History',
         'HealthcareAccess' => 'Access',
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
