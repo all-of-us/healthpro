@@ -68,7 +68,6 @@ $(document).ready(function() {
       { name: 'dateOfBirth', data: 'dateOfBirth' },
       { name: 'participantId', data: 'participantId' },
       { name: 'biobankId', visible: false, data: 'biobankId' },
-      { name: 'language', visible: false, data: 'language', orderable: false  },
       { name: 'participantStatus', data: 'participantStatus' },
       { name: 'participantOrigin', data: 'participantOrigin', visible: !!isDvType },
       { name: 'consentCohort', data: 'consentCohort', class: 'text-center' },
