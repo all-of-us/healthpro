@@ -103,9 +103,6 @@ $(document).ready(function() {
       tableColumns.push(
         { name: 'ppi'+key, visible: false, data: 'ppi'+key, class: 'text-center' }
       );
-      tableColumns.push(
-        { name: 'ppi'+key+'Time', visible: false, data: 'ppi'+key+'Time' }
-      );
     });
     tableColumns.push(
       { name: 'pairedSite', data: 'pairedSite' },
@@ -156,7 +153,6 @@ $(document).ready(function() {
                 hide: [
                     '.col-group-info:not(.col-group-default)',
                     '.col-group-ppi:not(.col-group-default)',
-                    '.col-group-ppi-time',
                     '.col-group-inperson:not(.col-group-default)',
                     '.col-group-demographics',
                     '.col-group-contact',
@@ -172,24 +168,6 @@ $(document).ready(function() {
                     '.col-group-ppi'
                 ],
                 hide: [
-                    '.col-group-info',
-                    '.col-group-ppi-time',
-                    '.col-group-inperson',
-                    '.col-group-demographics',
-                    '.col-group-contact',
-                    '.col-group-patient-status',
-                    '.col-group-metrics'
-                ]
-            },
-            {
-                extend: 'colvisGroup',
-                text: 'PPI Surveys + Dates',
-                show: [
-                    '.col-group-ppi',
-                    '.col-group-ppi-time'
-                ],
-                hide: [
-                    'dateOfBirth:name',
                     '.col-group-info',
                     '.col-group-inperson',
                     '.col-group-demographics',
@@ -208,7 +186,6 @@ $(document).ready(function() {
                 hide: [
                     '.col-group-info',
                     '.col-group-ppi',
-                    '.col-group-ppi-time',
                     '.col-group-demographics',
                     '.col-group-contact',
                     '.col-group-patient-status',
@@ -226,7 +203,6 @@ $(document).ready(function() {
                     '.col-group-info',
                     '.col-group-inperson',
                     '.col-group-ppi',
-                    '.col-group-ppi-time',
                     '.col-group-contact',
                     '.col-group-patient-status',
                     '.col-group-metrics'
@@ -247,7 +223,6 @@ $(document).ready(function() {
                     '.col-group-info:not(.col-group-default, .col-group-ehr-expire-status)',
                     '.col-group-inperson',
                     '.col-group-ppi',
-                    '.col-group-ppi-time',
                     '.col-group-contact',
                     '.col-group-metrics:not(.col-group-metrics-ehr)'
                 ]
@@ -266,7 +241,6 @@ $(document).ready(function() {
                     '.col-group-info:not(.col-group-default)',
                     '.col-group-inperson',
                     '.col-group-ppi',
-                    '.col-group-ppi-time',
                     '.col-group-patient-status',
                     '.col-group-metrics:not(.col-group-retention)',
                     '.col-group-consent-cohort',
@@ -290,7 +264,6 @@ $(document).ready(function() {
                     '.col-group-info:not(.col-group-default, .col-group-ehr-expire-status)',
                     '.col-group-inperson',
                     '.col-group-ppi',
-                    '.col-group-ppi-time',
                     '.col-group-patient-status',
                     '.col-group-contact'
                 ]
