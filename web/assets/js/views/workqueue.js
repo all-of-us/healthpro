@@ -72,6 +72,7 @@ $(document).ready(function() {
       { name: 'participantStatus', data: 'participantStatus' },
       { name: 'activityStatus', data: 'activityStatus', class: 'text-center', orderable: false },
       { name: 'participantOrigin', data: 'participantOrigin', visible: !!isDvType },
+      { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
       { name: 'consentCohort', data: 'consentCohort', class: 'text-center' },
       { name: 'firstPrimaryConsent', visible: false, data: 'firstPrimaryConsent', class: 'text-center' },
       { name: 'primaryConsent', data: 'primaryConsent', class: 'text-center' },
@@ -83,7 +84,6 @@ $(document).ready(function() {
       { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
       { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
-      { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
       { name: 'retentionEligibleStatus', visible: false, data: 'retentionEligibleStatus', class: 'text-center' },
       { name: 'retentionType', visible: false, data: 'retentionType', class: 'text-center', orderable: false },
       { name: 'isEhrDataAvailable', visible: false, data: 'isEhrDataAvailable', class: 'text-center' },
@@ -138,7 +138,7 @@ $(document).ready(function() {
             url: url,
             type: "POST"
         },
-        order: [[11, 'desc']],
+        order: [[13, 'desc']],
         dom: 'lBrtip',
         columns: tableColumns,
         pageLength: 25,
@@ -157,6 +157,23 @@ $(document).ready(function() {
                 hide: [
                     '.col-group-info:not(.col-group-default)',
                     '.col-group-ppi:not(.col-group-default)',
+                    '.col-group-ppi-time',
+                    '.col-group-inperson:not(.col-group-default)',
+                    '.col-group-demographics',
+                    '.col-group-contact',
+                    '.col-group-patient-status',
+                    '.col-group-metrics'
+                ]
+            },
+            {
+                extend: 'colvisGroup',
+                text: 'Consent',
+                show: [
+                    '.col-group-consent'
+                ],
+                hide: [
+                    '.col-group-info:not(.col-group-consent)',
+                    '.col-group-default:not(.col-group-consent)',
                     '.col-group-ppi-time',
                     '.col-group-inperson:not(.col-group-default)',
                     '.col-group-demographics',
@@ -273,7 +290,8 @@ $(document).ready(function() {
                     '.col-group-consent-cohort',
                     '.col-group-program-update',
                     '.col-group-language-primary-consent',
-                    '.col-group-ehr-expire-status'
+                    '.col-group-ehr-expire-status',
+                    '.col-group-consent'
 
                 ]
             },

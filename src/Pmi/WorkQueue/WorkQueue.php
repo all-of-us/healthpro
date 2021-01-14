@@ -28,6 +28,7 @@ class WorkQueue
         'enrollmentStatus',
         'withdrawalAuthored',
         'participantOrigin',
+        'withdrawalReason',
         'consentCohort',
         'consentForStudyEnrollmentFirstYesAuthored',
         'consentForStudyEnrollmentAuthored',
@@ -39,7 +40,6 @@ class WorkQueue
         'primaryLanguage',
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
-        'withdrawalReason',
         'retentionEligibleTime',
         'retentionType',
         'isEhrDataAvailable',
@@ -378,6 +378,7 @@ class WorkQueue
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
             $row['activityStatus'] = $this->getActivityStatus($participant);
+            $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['consentCohort'] = $e($participant->consentCohortText);
             $row['primaryConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
             $row['firstPrimaryConsent'] = $this->displayFirstConsentStatusTime($participant->consentForStudyEnrollmentFirstYesAuthored);
@@ -392,7 +393,6 @@ class WorkQueue
             $row['retentionEligibleStatus'] = $this->getRetentionEligibleStatus($participant->retentionEligibleStatus, $participant->retentionEligibleTime);
             $row['retentionType'] = $this->getRetentionType($participant->retentionType);
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
-            $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['isEhrDataAvailable'] = $this->getEhrAvailableStatus($participant->isEhrDataAvailable);
             $row['latestEhrReceiptTime'] = self::dateFromString($participant->latestEhrReceiptTime, $app->getUserTimezone());
 
