@@ -336,7 +336,6 @@ class WorkQueueController extends AbstractController
                     'Last Name',
                     'First Name',
                     'Date of Birth',
-                    'Language',
                     'Participant Status',
                     'Primary Consent Status',
                     'Primary Consent Date',
@@ -377,7 +376,7 @@ class WorkQueueController extends AbstractController
             $headers[] = 'Paired Site';
             $headers[] = 'Paired Organization';
             $headers[] = 'Physical Measurements Site';
-            $headers[] = 'Samples for DNA Received';
+            $headers[] = 'Samples to Isolate DNA';
             $headers[] = 'Baseline Samples';
             foreach (WorkQueue::$samples as $sample => $label) {
                 $headers[] = $label . ' Received';
@@ -430,6 +429,8 @@ class WorkQueueController extends AbstractController
                 $headers[] = 'Saliva Collection';
                 $headers[] = 'COPE Dec PPI Survey Complete';
                 $headers[] = 'COPE Dec PPI Survey Completion Date';
+                $headers[] = 'COPE Jan PPI Survey Complete';
+                $headers[] = 'COPE Jan PPI Survey Completion Date';
             }
             fputcsv($output, $headers);
 
@@ -443,7 +444,6 @@ class WorkQueueController extends AbstractController
                             $participant->lastName,
                             $participant->firstName,
                             WorkQueue::csvDateFromObject($participant->dob),
-                            $participant->language,
                             $participant->enrollmentStatus,
                             WorkQueue::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
                             WorkQueue::dateFromString($participant->consentForStudyEnrollmentAuthored, $app->getUserTimezone()),
@@ -554,6 +554,8 @@ class WorkQueueController extends AbstractController
                         $row[] = $participant->sample1SAL2CollectionMethod;
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeDec"});
                         $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeDecAuthored"}, $app->getUserTimezone());
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJan"});
+                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJanAuthored"}, $app->getUserTimezone());
                     }
                     fputcsv($output, $row);
                 }

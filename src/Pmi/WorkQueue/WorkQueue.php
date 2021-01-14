@@ -24,7 +24,6 @@ class WorkQueue
         'dateOfBirth',
         'participantId',
         'biobankId',
-        'language',
         'enrollmentStatus',
         'withdrawalAuthored',
         'participantOrigin',
@@ -56,29 +55,18 @@ class WorkQueue
         'numCompletedBaselinePPIModules',
         'numCompletedPPIModules',
         'questionnaireOnTheBasics',
-        'questionnaireOnTheBasicsAuthored',
         'questionnaireOnOverallHealth',
-        'questionnaireOnOverallHealthAuthored',
         'questionnaireOnLifestyle',
-        'questionnaireOnLifestyleAuthored',
         'questionnaireOnMedicalHistory',
-        'questionnaireOnMedicalHistoryAuthored',
         'questionnaireOnMedications',
-        'questionnaireOnMedicationsAuthored',
         'questionnaireOnFamilyHealth',
-        'questionnaireOnFamilyHealthAuthored',
         'questionnaireOnHealthcareAccess',
-        'questionnaireOnHealthcareAccessAuthored',
         'questionnaireOnCopeMay',
-        'questionnaireOnCopeMayAuthored',
         'questionnaireOnCopeJune',
-        'questionnaireOnCopeJuneAuthored',
         'questionnaireOnCopeJuly',
-        'questionnaireOnCopeJulyAuthored',
         'questionnaireOnCopeNov',
-        'questionnaireOnCopeNovAuthored',
         'questionnaireOnCopeDec',
-        'questionnaireOnCopeDecAuthored',
+        'questionnaireOnCopeJan',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -291,17 +279,17 @@ class WorkQueue
 
     public static $surveys = [
         'TheBasics' => 'Basics',
-        'OverallHealth' => 'Health',
+        'OverallHealth' => 'Health Access',
         'Lifestyle' => 'Lifestyle',
-        'MedicalHistory' => 'Hist',
-        'Medications' => 'Meds',
-        'FamilyHealth' => 'Family',
+        'MedicalHistory' => 'Med History',
+        'FamilyHealth' => 'Family History',
         'HealthcareAccess' => 'Access',
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
         'CopeJuly' => 'COPE July',
         'CopeNov' => 'COPE Nov',
-        'CopeDec' => 'COPE Dec'
+        'CopeDec' => 'COPE Dec',
+        'CopeJan' => 'COPE Jan'
     ];
 
     public static $initialSurveys = [
@@ -309,7 +297,6 @@ class WorkQueue
         'OverallHealth',
         'Lifestyle',
         'MedicalHistory',
-        'Medications',
         'FamilyHealth',
         'HealthcareAccess'
     ];
@@ -373,7 +360,6 @@ class WorkQueue
             $row['patientStatusNoAccess'] = $this->getPatientStatus($participant, 'UNKNOWN');
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
-            $row['language'] = $e($participant->language);
             $row['participantOrigin'] = $e($participant->participantOrigin);
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
@@ -416,8 +402,7 @@ class WorkQueue
             }
             $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
             foreach (array_keys(self::$surveys) as $field) {
-                $row["ppi{$field}"] = $this->displayStatus($participant->{'questionnaireOn' . $field}, 'SUBMITTED');
-                $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn' . $field . 'Authored'}, $app->getUserTimezone());
+                $row["ppi{$field}"] = $this->displayStatus($participant->{'questionnaireOn' . $field}, 'SUBMITTED', $participant->{'questionnaireOn' . $field . 'Authored'});
             }
 
             //In-Person Enrollment
