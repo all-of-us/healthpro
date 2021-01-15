@@ -501,6 +501,19 @@ class WorkQueue
         }
     }
 
+    public static function csvDeceasedStatus($value)
+    {
+        switch ($value) {
+            case 'PENDING':
+                return 1;
+            case 'APPROVED':
+                return 2;
+                break;
+            default:
+                return 0;
+        }
+    }
+
     public function displayStatus($value, $successStatus, $time = null, $displayTime = true)
     {
         if ($value === $successStatus) {

@@ -39,7 +39,7 @@
         </form>
     </div>
 
-    {% if isDownloadDisabled == false %}
+    {% if canExport %}
         <p class="text-right">
             <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
         </p>
@@ -131,7 +131,7 @@
         </thead>
         <tbody id="participant_info"></tbody>
     </table>
-    {% if isDownloadDisabled == false %}
+    {% if canExport %}
         <p class="text-right">
             <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
         </p>
