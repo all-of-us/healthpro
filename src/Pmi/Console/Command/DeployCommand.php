@@ -391,8 +391,8 @@ class DeployCommand extends Command {
         $process->run();
         $vulnerabilities = json_decode($process->getOutput(), true);
 
-        // Ignore vulnerabilities mentioned in sensioignore file
-        $vulnerabilities = $this->removeSensioIgnoredVulnerabilities($vulnerabilities);
+        // Ignore vulnerabilities in composerignore.json file
+        $vulnerabilities = $this->removeComposerIgnore($vulnerabilities);
         if (count($vulnerabilities) === 0) {
             $this->out->writeln('No packages have known vulnerabilities');
         } else {
@@ -449,16 +449,16 @@ class DeployCommand extends Command {
         return $process;
     }
 
-    private function removeSensioIgnoredVulnerabilities($vulnerabilities)
+    private function removeComposerIgnore($vulnerabilities)
     {
         $newVulnerabilities = $vulnerabilities;
-        $sensioIgnoredVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'sensioignore.json'), true);
+        $ignoredVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'composerignore.json'), true);
         foreach ($vulnerabilities as $key => $vulnerability) {
             if (!empty($vulnerability['advisories'])) {
                 $advisories = $vulnerability['advisories'];
                 foreach($vulnerability['advisories'] as $advisoryKey => $advisory) {
                     if (!empty($advisory['link'])) {
-                        if ($this->isVulnerabilityIgnored($sensioIgnoredVulnerabilities, $advisory['link'])) {
+                        if ($this->isVulnerabilityIgnored($ignoredVulnerabilities, $advisory['link'])) {
                             //Remove ignored advisories
                             unset($advisories[$advisoryKey]);
                         }
