@@ -292,15 +292,6 @@ class WorkQueue
         'CopeJan' => 'COPE Jan'
     ];
 
-    public static $initialSurveys = [
-        'TheBasics',
-        'OverallHealth',
-        'Lifestyle',
-        'MedicalHistory',
-        'FamilyHealth',
-        'HealthcareAccess'
-    ];
-
     public static $samples = [
         '1SST8' => '8 mL SST',
         '1PST8' => '8 mL PST',
