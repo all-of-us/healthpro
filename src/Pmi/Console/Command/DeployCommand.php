@@ -2,8 +2,6 @@
 namespace Pmi\Console\Command;
 
 use Pmi\Application\AbstractApplication;
-use SensioLabs\Security\SecurityChecker;
-use SensioLabs\Security\Exception\HttpException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
