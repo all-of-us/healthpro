@@ -278,7 +278,7 @@ class WorkQueue
 
     public static $surveys = [
         'TheBasics' => 'Basics',
-        'OverallHealth' => 'Health Access',
+        'OverallHealth' => 'Health',
         'Lifestyle' => 'Lifestyle',
         'MedicalHistory' => 'Med History',
         'FamilyHealth' => 'Family History',
