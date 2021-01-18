@@ -388,18 +388,11 @@ class DeployCommand extends Command {
 
     private function runSecurityCheck()
     {
-        $composerLockFile = $this->appDir . DIRECTORY_SEPARATOR . 'composer.lock';
-        $this->out->writeln("Running SensioLabs Security Checker...");
-        $checker = new SecurityChecker();
-        $helper = $this->getHelper('question');
-        try {
-            $vulnerabilities = json_decode((string)$checker->check($composerLockFile), true);
-        } catch (HttpException $e) {
-            $this->out->writeln('<error>' . $e->getMessage() . '</error>');
-            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
-                throw new \Exception('Aborting due to SensioLabs Security Checker network error');
-            }
-        }
+        $this->out->writeln("Running Symfony Security Check...");
+        $process = new Process('symfony security:check --format=json --dir=' . escapeshellarg($this->appDir));
+        $process->run();
+        $vulnerabilities = json_decode($process->getOutput(), true);
+
         // Ignore vulnerabilities mentioned in sensioignore file
         $vulnerabilities = $this->removeSensioIgnoredVulnerabilities($vulnerabilities);
         if (count($vulnerabilities) === 0) {
@@ -411,6 +404,7 @@ class DeployCommand extends Command {
                 if (!$this->local) {
                     throw new \Exception('Fix security vulnerabilities before deploying');
                 } else {
+                    $helper = $this->getHelper('question');
                     if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
                         throw new \Exception('Aborting due to security vulnerability');
                     }
