@@ -382,8 +382,10 @@ class WorkQueueController extends AbstractController
                 'Completed Surveys'
             ];
             foreach (WorkQueue::$surveys as $survey => $label) {
-                $headers[] = $label . ' PPI Survey Complete';
-                $headers[] = $label . ' PPI Survey Completion Date';
+                if (in_array($survey, WorkQueue::$initialSurveys)) {
+                    $headers[] = $label . ' PPI Survey Complete';
+                    $headers[] = $label . ' PPI Survey Completion Date';
+                }
             }
             $headers[] = 'Paired Site';
             $headers[] = 'Paired Organization';
@@ -467,8 +469,10 @@ class WorkQueueController extends AbstractController
                         $participant->numCompletedPPIModules,
                     ];
                     foreach (WorkQueue::$surveys as $survey => $label) {
-                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
+                        if (in_array($survey, WorkQueue::$initialSurveys)) {
+                            $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
+                            $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
+                        }
                     }
                     $row[] = $participant->siteSuffix;
                     $row[] = $participant->organization;
