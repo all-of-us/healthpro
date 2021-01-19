@@ -9,6 +9,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderService
 {
+    const ORDER_CANCEL_STATUS = 'CANCELLED';
+    const ORDER_RESTORE_STATUS = 'UNSET';
+    const ORDER_EDIT_STATUS = 'AMENDED';
+
     protected $rdrApiService;
     protected $params;
     protected $em;
@@ -87,7 +91,7 @@ class OrderService
                 'headers' => ['If-Match' => $result->meta->versionId]
             ]);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->status) && $result->status === Order::ORDER_EDIT_STATUS) {
+            if (is_object($result) && isset($result->status) && $result->status === self::ORDER_EDIT_STATUS) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -155,6 +159,45 @@ class OrderService
             $result['errorMessage'] = 'A MayoLINK account number is not set for this site. Please contact an administrator.';
         }
         return $result;
+    }
+
+    public function cancelRestoreOrder($type, $orderObject)
+    {
+        try {
+            $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
+            $response = $this->rdrApiService->patch("Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}", [
+                'json' => $orderObject,
+                'headers' => ['If-Match' => $result->meta->versionId]
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            $rdrStatus = $type === Order::ORDER_CANCEL ? self::ORDER_CANCEL_STATUS : self::ORDER_RESTORE_STATUS;
+            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+
+    public function cancelRestoreRdrOrder($type, $reason)
+    {
+        $order = $this->getCancelRestoreRdrObject($type, $reason);
+        return $this->cancelRestoreOrder($type, $order);
+    }
+
+    public function getCancelRestoreRdrObject($type, $reason)
+    {
+        $obj = new \StdClass();
+        $statusType = $type === Order::ORDER_CANCEL ? 'cancelled' : 'restored';
+        $obj->status = $statusType;
+        $obj->amendedReason = $reason;
+        $user = $this->getOrderUser($this->userService->getUser()->getId());
+        $site = $this->getOrderSite($this->siteService->getSiteId());
+        $obj->{$statusType . 'Info'} = $this->order->getOrderUserSiteData($user, $site);
+        return $obj;
     }
 
     public function generateId()
@@ -423,5 +466,46 @@ class OrderService
     public function getRequisitionPdf()
     {
         return $this->mayolinkOrderService->getRequisitionPdf($this->order->getMayoId());
+    }
+
+    public function getCustomSamplesInfo()
+    {
+        $samples = [];
+        $samplesInfo = $this->order->getType() === 'saliva' ? $this->order->getSalivaSamplesInformation() : $this->order->getSamplesInformation();
+        foreach ($this->order->getCustomRequestedSamples() as $key => $value) {
+            $sample = [
+                'code' => $key,
+                'color' => isset($samplesInfo[$value]['color']) ? $samplesInfo[$value]['color'] : ''
+            ];
+            if (!empty($this->order->getCollectedTs())) {
+                $sample['collected_ts'] = $this->order->getCollectedTs();
+            }
+            if (!empty($this->order->getCollectedSamples()) && in_array($value, json_decode($this->order->getCollectedSamples()))) {
+                $sample['collected_checked'] = true;
+            }
+            if (!empty($this->order->getFinalizedTs())) {
+                $sample['finalized_ts'] = $this->order->getFinalizedTs();
+            }
+            if (!empty($this->order->getFinalizedSamples()) && in_array($value, json_decode($this->order->getFinalizedSamples()))) {
+                $sample['finalized_checked'] = true;
+            }
+            if (!empty($this->order->getProcessedSamplesTs())) {
+                $processedSamplesTs = json_decode($this->order->getProcessedSamplesTs(), true);
+                if (!empty($processedSamplesTs[$value])) {
+                    $processedTs = new \DateTime();
+                    $processedTs->setTimestamp($processedSamplesTs[$value]);
+                    $processedTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+                    $sample['processed_ts'] = $processedTs;
+                }
+            }
+            if (!empty($this->order->getProcessedSamples()) && in_array($value, json_decode($this->order->getProcessedSamples()))) {
+                $sample['processed_checked'] = true;
+            }
+            if (in_array($value, Order::$samplesRequiringProcessing)) {
+                $sample['process'] = true;
+            }
+            $samples[] = $sample;
+        }
+        return $samples;
     }
 }

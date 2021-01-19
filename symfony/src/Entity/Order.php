@@ -78,6 +78,26 @@ class Order
         ]
     ];
 
+    public static $cancelReasons = [
+        'Order created in error' => 'ORDER_CANCEL_ERROR',
+        'Order created for wrong participant' => 'ORDER_CANCEL_WRONG_PARTICIPANT',
+        'Labeling error identified after finalization' => 'ORDER_CANCEL_LABEL_ERROR',
+        'Other' => 'OTHER'
+    ];
+
+    public static $unlockReasons = [
+        'Add/Remove collected or processed samples' => 'ORDER_AMEND_SAMPLES',
+        'Change collection or processing timestamps' => 'ORDER_AMEND_TIMESTAMPS',
+        'Change Tracking number' => 'ORDER_AMEND_TRACKING',
+        'Other' => 'OTHER'
+    ];
+
+    public static $restoreReasons = [
+        'Order cancelled for wrong participant' => 'ORDER_RESTORE_WRONG_PARTICIPANT',
+        'Order can be amended instead of cancelled' => 'ORDER_RESTORE_AMEND',
+        'Other' => 'OTHER'
+    ];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

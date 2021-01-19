@@ -6,6 +6,7 @@ use App\Entity\Order;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Form\OrderCreateType;
+use App\Form\OrderModifyType;
 use App\Form\OrderRevertType;
 use App\Form\OrderType;
 use App\Service\LoggerService;
@@ -586,9 +587,76 @@ class OrderController extends AbstractController
     /**
      * @Route("/participant/{participantId}/order/{orderId}/modify/{type}", name="order_modify")
      */
-    public function orderModifyAction($participantId, $orderId, $type)
+    public function orderModifyAction($participantId, $orderId, $type, Request $request)
     {
-        //Todo
-        return '';
+        $order = $this->loadOrder($participantId, $orderId);
+        // Allow cancel for active and restored orders
+        // Allow restore for only canceled orders
+        // Allow unlock for active, restored and edited orders
+        if (!in_array($type, [$order::ORDER_CANCEL, $order::ORDER_RESTORE, $order::ORDER_UNLOCK])) {
+            throw $this->createNotFoundException();
+        }
+        if (($type === $order::ORDER_CANCEL && !$order->canCancel())
+            || ($type === $order::ORDER_RESTORE && !$order->canRestore())
+            || ($type === $order::ORDER_UNLOCK && !$order->canUnlock())) {
+            throw $this->createAccessDeniedException();
+        }
+        $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId]);
+        $orderModifyForm = $this->createForm(OrderModifyType::class, null, [
+            'type' => $type,
+            'orderType' => $order->getType()
+        ]);
+        $orderModifyForm->handleRequest($request);
+        if ($orderModifyForm->isSubmitted()) {
+            $orderModifyData = $orderModifyForm->getData();
+            if ($orderModifyData['reason'] === 'OTHER' && empty($orderModifyData['other_text'])) {
+                $orderModifyForm['other_text']->addError(new FormError('Please enter a reason'));
+            }
+            if ($type === $order::ORDER_CANCEL && strtolower($orderModifyData['confirm']) !== $order::ORDER_CANCEL) {
+                $orderModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
+            }
+            if ($orderModifyForm->isValid()) {
+                if ($orderModifyData['reason'] === 'OTHER') {
+                    $orderModifyData['reason'] = $orderModifyData['other_text'];
+                }
+                $status = true;
+                // Cancel/Restore order in RDR if exists
+                if (!empty($order->getRdrId()) && ($type === $order::ORDER_CANCEL || $type === $order::ORDER_RESTORE)) {
+                    $status = $this->orderService->cancelRestoreRdrOrder($type, $orderModifyData['reason']);
+                }
+                // Create order history
+                if ($status && $this->orderService->createOrderHistory($type, $orderModifyData['reason'])) {
+                    $successText = 'unlocked';
+                    if ($type === $order::ORDER_CANCEL) {
+                        $successText = 'cancelled';
+                    } elseif ($type === $order::ORDER_RESTORE) {
+                        $successText = 'restored';
+                    }
+                    $this->addFlash('success', "Order {$successText}");
+                    if ($type === $order::ORDER_UNLOCK && $request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
+                        return $this->redirect($request->query->get('return'));
+                    } else {
+                        return $this->redirectToRoute('participant', [
+                            'id' => $participantId
+                        ]);
+                    }
+                } else {
+                    $this->addFlash('error', "Failed to {$type} order. Please try again.");
+                }
+            } else {
+                $this->addFlash('error', 'Please correct the errors below');
+            }
+        }
+        $historyType = !empty($order->getHistory()) ? $order->getHistory()->getType() : null;
+        return $this->render('order/modify.html.twig', [
+            'participant' => $this->orderService->getParticipant(),
+            'order' => $order,
+            'samplesInfo' => $this->orderService->getCustomSamplesInfo(),
+            'orders' => $orders,
+            'orderId' => $orderId,
+            'orderModifyForm' => $orderModifyForm->createView(),
+            'type' => $type,
+            'historyType' => $historyType
+        ]);
     }
 }
