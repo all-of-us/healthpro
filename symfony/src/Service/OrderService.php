@@ -3,9 +3,11 @@
 namespace App\Service;
 
 use App\Entity\Order;
+use App\Entity\OrderHistory;
 use App\Entity\Site;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Pmi\Audit\Log;
 
 class OrderService
 {
@@ -19,6 +21,7 @@ class OrderService
     protected $mayolinkOrderService;
     protected $env;
     protected $siteService;
+    protected $loggerService;
     protected $order;
     protected $participant;
 
@@ -28,7 +31,8 @@ class OrderService
         EntityManagerInterface $em,
         MayolinkOrderService $mayolinkOrderService,
         UserService $userService,
-        SiteService $siteService
+        SiteService $siteService,
+        LoggerService $loggerService
     ) {
         $this->rdrApiService = $rdrApiService;
         $this->params = $params;
@@ -37,6 +41,7 @@ class OrderService
         $this->userService = $userService;
         $this->mayolinkOrderService = $mayolinkOrderService;
         $this->siteService = $siteService;
+        $this->loggerService = $loggerService;
     }
 
     public function loadSamplesSchema($order)
@@ -507,5 +512,34 @@ class OrderService
             $samples[] = $sample;
         }
         return $samples;
+    }
+
+    public function createOrderHistory($type, $reason = '')
+    {
+        $status = false;
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $orderHistory = new OrderHistory();
+            $orderHistory->setReason($reason);
+            $orderHistory->setOrderId($this->order);
+            $orderHistory->setUserId($this->userService->getUser()->getId());
+            $orderHistory->setSite($this->siteService->getSiteId());
+            $orderHistory->setType($type === Order::ORDER_REVERT ? Order::ORDER_ACTIVE : $type);
+            $orderHistory->setCreatedTs(new \DateTime());
+            $this->em->persist($orderHistory);
+            $this->em->flush();
+            $this->loggerService->log(Log::ORDER_HISTORY_CREATE, $orderHistory->getId());
+
+            // Update history id in order entity
+            $this->order->setHistoryId($orderHistory);
+            $this->em->persist($this->order);
+            $this->em->flush();
+            $connection->commit();
+            $status = true;
+        } catch (\Exception $e) {
+            $connection->rollback();
+        }
+        return $status;
     }
 }
