@@ -28,7 +28,6 @@ $app
     ->mount('/cron', new Controller\CronController())
     ->mount('/dashboard', new Controller\DashboardController())
     ->mount('/workqueue', new Controller\WorkQueueController())
-    ->mount('/review', new Controller\ReviewController())
     ->mount('/biobank', new Controller\BiobankController())
     ->mount('/_ah', new Controller\AppEngineController())
 ;

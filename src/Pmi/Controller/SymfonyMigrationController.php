@@ -16,7 +16,8 @@ class SymfonyMigrationController extends AbstractController
             'method' => 'GET|POST',
             'defaults' => ['problemId' => null]
         ]],
-        ['admin_home', '/admin']
+        ['admin_home', '/admin'],
+        ['review_today', '/review']
     ];
 
     public function deceased_reports_indexAction(Application $app)
@@ -80,4 +81,13 @@ class SymfonyMigrationController extends AbstractController
     {
         return $app->redirect('/s/admin');
     }
+
+    /**
+     * @deprecated 2021-01-20
+     */
+    public function review_todayAction(Application $app)
+    {
+        return $app->redirect('/s/review');
+    }
+
 }
