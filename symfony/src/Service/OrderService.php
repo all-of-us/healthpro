@@ -529,12 +529,13 @@ class OrderService
             $orderHistory->setCreatedTs(new \DateTime());
             $this->em->persist($orderHistory);
             $this->em->flush();
-            $this->loggerService->log(Log::ORDER_HISTORY_CREATE, $orderHistory->getId());
+            $this->loggerService->log(Log::ORDER_HISTORY_CREATE, ['id' => $orderHistory->getId(), 'type' => $orderHistory->getType()]);
 
             // Update history id in order entity
             $this->order->setHistoryId($orderHistory);
             $this->em->persist($this->order);
             $this->em->flush();
+            $this->loggerService->log(Log::ORDER_EDIT, $this->order->getId());
             $connection->commit();
             $status = true;
         } catch (\Exception $e) {

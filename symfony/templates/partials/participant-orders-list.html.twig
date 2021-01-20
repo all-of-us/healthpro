@@ -21,14 +21,15 @@
                     <small class="text-muted"><strong>{{ order.orderId }}</strong></small>
                     <br/>
                     <small class="text-muted">
+                        {% set historyType = order.history.type is defined ? order.history.type : '' %}
                         {% if historyType == 'cancel' %}
-                            <span class="label label-danger">Cancelled</span> {{ order.oh_createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-danger">Cancelled</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
                         {% elseif not order.finalizedTs and not order.version %}
                             <span class="label label-danger">Expired</span>
                         {% elseif historyType == 'unlock' %}
-                            <span class="label label-primary">Unlocked for editing</span> {{ order.oh_created_ts|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-primary">Unlocked for editing</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
                         {% elseif historyType == 'edit' %}
-                            <span class="label label-success">Edited &amp; Finalized</span> {{ order.oh_created_ts|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-success">Edited &amp; Finalized</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
                         {% elseif order.finalizedTs and order.rdrId %}
                             {% if order.biobankFinalized %}
                                 <span class="label label-warning">Biobank Finalized</span>

@@ -602,7 +602,7 @@ class OrderController extends AbstractController
             throw $this->createAccessDeniedException();
         }
         $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId]);
-        $orderModifyForm = $this->createForm(OrderModifyType::class, null, [
+        $orderModifyForm = $this->get('form.factory')->createNamed('form', OrderModifyType::class, null, [
             'type' => $type,
             'orderType' => $order->getType()
         ]);
@@ -647,7 +647,6 @@ class OrderController extends AbstractController
                 $this->addFlash('error', 'Please correct the errors below');
             }
         }
-        $historyType = !empty($order->getHistory()) ? $order->getHistory()->getType() : null;
         return $this->render('order/modify.html.twig', [
             'participant' => $this->orderService->getParticipant(),
             'order' => $order,
@@ -655,8 +654,7 @@ class OrderController extends AbstractController
             'orders' => $orders,
             'orderId' => $orderId,
             'orderModifyForm' => $orderModifyForm->createView(),
-            'type' => $type,
-            'historyType' => $historyType
+            'type' => $type
         ]);
     }
 }
