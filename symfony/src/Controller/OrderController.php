@@ -525,7 +525,7 @@ class OrderController extends AbstractController
             'version' => $order->getVersion(),
             'hasErrors' => $hasErrors,
             'processTabClass' => $order->getProcessTabClass(),
-            'revertForm' => $this->createForm(OrderRevertType::class, null),
+            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
             'showUnfinalizeMsg' => $showUnfinalizeMsg
         ]);
     }
@@ -655,6 +655,31 @@ class OrderController extends AbstractController
             'orderId' => $orderId,
             'orderModifyForm' => $orderModifyForm->createView(),
             'type' => $type
+        ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/revert", name="order_revert")
+     */
+    public function orderRevertAction($participantId, $orderId, Request $request)
+    {
+        $order = $this->loadOrder($participantId, $orderId);
+        if ($order->isDisabled() || !$order->isUnlocked()) {
+            throw $this->createAccessDeniedException();
+        }
+        $orderRevertForm = $this->createForm(OrderRevertType::class, null);
+        $orderRevertForm->handleRequest($request);
+        if ($orderRevertForm->isSubmitted() && $orderRevertForm->isValid()) {
+            // Revert Order
+            if ($this->orderService->revertOrder()) {
+                $this->addFlash('notice', 'Order reverted');
+            } else {
+                $this->addFlash('error', 'Failed to revert order. Please try again.');
+            }
+        }
+        return $this->redirectToRoute('order', [
+            'participantId' => $participantId,
+            'orderId' => $orderId
         ]);
     }
 }

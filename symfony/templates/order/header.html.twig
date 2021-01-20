@@ -27,7 +27,7 @@
     <div class="alert alert-warning well-sm">
         <i class="fa fa-info-circle" aria-hidden="true"></i>
         <strong>
-            Unlocked for editing by {{ app.getUserEmailById(order.history.userId)|default('Unknown') }} at {{ site_display(order.history.siteId) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.getInfo.timezone) }}
+            Unlocked for editing by {{ app.order.history.user.email|default('Unknown') }} at {{ site_display(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.getInfo.timezone) }}
         </strong>
     </div>
 {% elseif order.status == 'cancel' %}

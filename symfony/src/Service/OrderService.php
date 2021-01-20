@@ -545,4 +545,76 @@ class OrderService
         }
         return $status;
     }
+
+    /**
+     * Revert collected, processed, finalized samples and timestamps
+     */
+    public function revertOrder()
+    {
+        // Get order object from RDR
+        $object = $this->getOrder($this->participant->id, $this->order->getRdrId());
+        //Update samples
+        if (!empty($object->samples)) {
+            foreach ($object->samples as $sample) {
+                $sampleCode = $sample->test;
+                if (!array_key_exists($sample->test, $this->order->getSamplesInformation()) && array_key_exists($sample->test, Order::$mapRdrSamples)) {
+                    $sampleCode = Order::$mapRdrSamples[$sample->test]['code'];
+                    $centrifugeType = Order::$mapRdrSamples[$sample->test]['centrifuge_type'];
+                }
+                if (!empty($sample->collected)) {
+                    $collectedSamples[] = $sampleCode;
+                    $collectedTs = $sample->collected;
+                }
+                if (!empty($sample->processed)) {
+                    $processedSamples[] = $sampleCode;
+                    $processedTs = new \DateTime($sample->processed);
+                    $processedSamplesTs[$sampleCode] = $processedTs->getTimestamp();
+                }
+                if (!empty($sample->finalized)) {
+                    $finalizedSamples[] = $sampleCode;
+                    $finalizedTs = $sample->finalized;
+                }
+            }
+        }
+        // Update notes field
+        $collectedNotes = !empty($object->notes->collected) ? $object->notes->collected : null;
+        $processedNotes = !empty($object->notes->processed) ? $object->notes->processed : null;
+        $finalizedNotes = !empty($object->notes->finalized) ? $object->notes->finalized : null;
+        // Update tracking number
+        if (!empty($object->identifier)) {
+            foreach ($object->identifier as $identifier) {
+                if (preg_match("/tracking-number/i", $identifier->system)) {
+                    $trackingNumber = $identifier->value;
+                    break;
+                }
+            }
+        }
+        $status = false;
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $this->order->setCollectedSamples(json_encode(!empty($collectedSamples) ? $collectedSamples : []));
+            $this->order->setCollectedTs(!empty($collectedTs) ? new \DateTime($collectedTs) : null);
+            $this->order->setProcessedSamples(json_encode(!empty($processedSamples) ? $processedSamples : []));
+            $this->order->setProcessedSamplesTs(json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []));
+            $this->order->setFinalizedSamples(json_encode(!empty($finalizedSamples) ? $finalizedSamples : []));
+            $this->order->setFinalizedTs(!empty($finalizedTs) ? new \DateTime($finalizedTs) : null);
+            $this->order->setCollectedNotes($collectedNotes);
+            $this->order->setProcessedNotes($processedNotes);
+            $this->order->setFinalizedNotes($finalizedNotes);
+            $this->order->setFedexTracking(!empty($trackingNumber) ? $trackingNumber : null);
+            //Update centrifuge type
+            if (!empty($centrifugeType)) {
+                $this->order->setProcessedCentrifugeType($centrifugeType);
+            }
+            $this->em->persist($this->order);
+            $this->em->flush();
+            $this->createOrderHistory(Order::ORDER_REVERT);
+            $connection->commit();
+            $status = true;
+        } catch (\Exception $e) {
+            $connection->rollback();
+        }
+        return $status;
+    }
 }
