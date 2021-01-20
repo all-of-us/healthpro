@@ -24,9 +24,9 @@ class OrderHistory
     private $order;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
      */
-    private $userId;
+    private $user;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -65,14 +65,14 @@ class OrderHistory
         return $this;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(int $userId): self
+    public function setUser(?User $user): self
     {
-        $this->userId = $userId;
+        $this->user = $user;
 
         return $this;
     }
@@ -123,5 +123,11 @@ class OrderHistory
         $this->createdTs = $createdTs;
 
         return $this;
+    }
+
+    public function getReasonDisplayText()
+    {
+        $reasonDisplayText = array_search($this->getReason(), Order::$cancelReasons);
+        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 }

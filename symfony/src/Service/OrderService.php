@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Order;
 use App\Entity\OrderHistory;
 use App\Entity\Site;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Pmi\Audit\Log;
@@ -523,7 +524,8 @@ class OrderService
             $orderHistory = new OrderHistory();
             $orderHistory->setReason($reason);
             $orderHistory->setOrderId($this->order);
-            $orderHistory->setUserId($this->userService->getUser()->getId());
+            $userRepository = $this->em->getRepository(User::class);
+            $orderHistory->setUser($userRepository->find($this->userService->getUser()->getId()));
             $orderHistory->setSite($this->siteService->getSiteId());
             $orderHistory->setType($type === Order::ORDER_REVERT ? Order::ORDER_ACTIVE : $type);
             $orderHistory->setCreatedTs(new \DateTime());
