@@ -583,7 +583,7 @@ class OrderController extends AbstractController
             || ($type === $order::ORDER_UNLOCK && !$order->canUnlock())) {
             throw $this->createAccessDeniedException();
         }
-        $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId]);
+        $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId], ['id' => 'desc']);
         $orderModifyForm = $this->get('form.factory')->createNamed('form', OrderModifyType::class, null, [
             'type' => $type,
             'orderType' => $order->getType()
