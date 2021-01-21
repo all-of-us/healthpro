@@ -9,6 +9,7 @@ use App\Form\OrderCreateType;
 use App\Form\OrderModifyType;
 use App\Form\OrderRevertType;
 use App\Form\OrderType;
+use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
@@ -18,6 +19,7 @@ use Pmi\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -663,6 +665,30 @@ class OrderController extends AbstractController
             'participantId' => $participantId,
             'orderId' => $orderId
         ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/json-response", name="order_json")
+     * For debugging generated JSON representation - only allowed in local dev
+     */
+    public function orderJsonAction($participantId, $orderId, Request $request, EnvironmentService $env)
+    {
+        if (!$env->isLocal()) {
+            throw $this->createNotFoundException();
+        }
+        $order = $this->loadOrder($participantId, $orderId);
+        if ($request->query->has('rdr')) {
+            if ($order->getRdrId()) {
+                $object = $this->orderService->getOrder($participantId, $order->getRdrId());
+            } else {
+                $object = ['error' => 'Order does not have rdr_id'];
+            }
+        } else {
+            $object = $order->getRdrObject();
+        }
+        $response = new JsonResponse($object);
+        $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
+        return $response;
     }
 
     /**
