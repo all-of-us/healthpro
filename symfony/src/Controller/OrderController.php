@@ -490,7 +490,7 @@ class OrderController extends AbstractController
                             }
                         } else {
                             // Save finalized time
-                            $order->setFinalizedTs($finalizeForm['finalized_ts']->getData());
+                            $order->setFinalizedTs($finalizeForm['finalizedTs']->getData());
                             $this->em->persist($order);
                             $this->em->flush();
                         }

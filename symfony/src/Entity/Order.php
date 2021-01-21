@@ -816,7 +816,17 @@ class Order
         return $obj;
     }
 
-    protected function getOrderUser($user)
+    public function getEditRdrObject()
+    {
+        $obj = $this->getRdrObject();
+        $obj->amendedReason = $this->getHistory()->getReason();
+        $user = $this->getOrderUser($this->getHistory()->getUser());
+        $site = $this->getOrderSite($this->getHistory()->getSite());
+        $obj->amendedInfo = $this->getOrderUserSiteData($user, $site);
+        return $obj;
+    }
+
+    public function getOrderUser($user)
     {
         if ($this->getBiobankFinalized() && empty($user)) {
             return 'BiobankUser';
@@ -825,13 +835,13 @@ class Order
         return $user->getEmail() ?? '';
     }
 
-    protected function getOrderSite($site)
+    public function getOrderSite($site)
     {
         $site = $site ?: $this->getSite();
         return \Pmi\Security\User::SITE_PREFIX . $site;
     }
 
-    protected function getOrderUserSiteData($user, $site)
+    public function getOrderUserSiteData($user, $site)
     {
         return [
             'author' => [

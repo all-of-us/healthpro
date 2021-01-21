@@ -73,10 +73,10 @@ class OrderService
         return $this->participant;
     }
 
-    public function createOrder($participantId, $order)
+    public function createOrder($participantId, $orderObject)
     {
         try {
-            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/BiobankOrder", $order);
+            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/BiobankOrder", $orderObject);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result->id;
@@ -88,16 +88,32 @@ class OrderService
         return false;
     }
 
-    public function editOrder($participantId, $orderId, $order)
+    public function editOrder($orderObject)
     {
         try {
-            $result = $this->getOrder($participantId, $orderId);
-            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/BiobankOrder/{$orderId}", [
-                'json' => $order,
-                'headers' => ['If-Match' => $result->meta->versionId]
-            ]);
+            $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
+            $response = $this->rdrApiService->put("rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}", $orderObject,
+                ['headers' => ['If-Match' => $result->meta->versionId]]);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->status) && $result->status === self::ORDER_EDIT_STATUS) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function cancelRestoreOrder($type, $orderObject)
+    {
+        try {
+            $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
+            $response = $this->rdrApiService->patch("rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}", $orderObject,
+                ['headers' => ['If-Match' => $result->meta->versionId]]);
+            $result = json_decode($response->getBody()->getContents());
+            $rdrStatus = $type === Order::ORDER_CANCEL ? self::ORDER_CANCEL_STATUS : self::ORDER_RESTORE_STATUS;
+            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -167,27 +183,6 @@ class OrderService
         return $result;
     }
 
-    public function cancelRestoreOrder($type, $orderObject)
-    {
-        try {
-            $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
-            $response = $this->rdrApiService->patch("Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}", [
-                'json' => $orderObject,
-                'headers' => ['If-Match' => $result->meta->versionId]
-            ]);
-            $result = json_decode($response->getBody()->getContents());
-            $rdrStatus = $type === Order::ORDER_CANCEL ? self::ORDER_CANCEL_STATUS : self::ORDER_RESTORE_STATUS;
-            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
-                return true;
-            }
-        } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
-            return false;
-        }
-        return false;
-    }
-
-
     public function cancelRestoreRdrOrder($type, $reason)
     {
         $order = $this->getCancelRestoreRdrObject($type, $reason);
@@ -200,8 +195,8 @@ class OrderService
         $statusType = $type === Order::ORDER_CANCEL ? 'cancelled' : 'restored';
         $obj->status = $statusType;
         $obj->amendedReason = $reason;
-        $user = $this->getOrderUser($this->userService->getUser()->getId());
-        $site = $this->getOrderSite($this->siteService->getSiteId());
+        $user = $this->order->getOrderUser($this->userService->getUser());
+        $site = $this->order->getOrderSite($this->siteService->getSiteId());
         $obj->{$statusType . 'Info'} = $this->order->getOrderUserSiteData($user, $site);
         return $obj;
     }
@@ -441,8 +436,11 @@ class OrderService
 
     public function sendToRdr()
     {
-        //Todo Implement Edit Order
-        return $this->createRdrOrder();
+        if ($this->order->getStatus() === Order::ORDER_UNLOCK) {
+            return $this->editRdrOrder();
+        } else {
+            return $this->createRdrOrder();
+        }
     }
 
     public function createRdrOrder()
@@ -465,6 +463,16 @@ class OrderService
             $this->em->persist($this->order);
             $this->em->flush();
             return true;
+        }
+        return false;
+    }
+
+    public function editRdrOrder()
+    {
+        $orderRdrObject = $this->order->getEditRdrObject();
+        $status = $this->editOrder($orderRdrObject);
+        if ($status) {
+            return $this->createOrderHistory(Order::ORDER_EDIT);
         }
         return false;
     }
