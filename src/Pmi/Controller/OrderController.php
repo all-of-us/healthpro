@@ -16,11 +16,11 @@ use Pmi\Order\Mayolink\MayolinkOrder;
 class OrderController extends AbstractController
 {
     protected static $routes = [
-        ['orderCheck', '/participant/{participantId}/order/check'],
+        //['orderCheck', '/participant/{participantId}/order/check'],
         ['orderCreate', '/participant/{participantId}/order/create', ['method' => 'POST']],
         ['orderLabelsPdf', '/participant/{participantId}/order/{orderId}/labels.pdf'],
         ['orderRequisitionPdf', '/participant/{participantId}/order/{orderId}/requisition.pdf'],
-        ['order', '/participant/{participantId}/order/{orderId}'],
+        //['order', '/participant/{participantId}/order/{orderId}'],
         ['orderPrintLabels', '/participant/{participantId}/order/{orderId}/print/labels'],
         ['orderCollect', '/participant/{participantId}/order/{orderId}/collect', ['method' => 'GET|POST']],
         ['orderProcess', '/participant/{participantId}/order/{orderId}/process', ['method' => 'GET|POST']],

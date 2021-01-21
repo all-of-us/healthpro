@@ -67,24 +67,6 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @Route("/participant/{participantId}/{orderId}/order", name="order")
-     */
-    public function orderAction($participantId, $orderId)
-    {
-        $orderRepository = $this->em->getRepository(Order::class);
-        $order = $orderRepository->find($orderId);
-        if (empty($order)) {
-            throw $this->createNotFoundException('Participant not found.');
-        }
-        $this->orderService->loadSamplesSchema($order);
-        $action = $order->getCurrentStep();
-        return $this->redirectToRoute("order_{$action}", [
-            'participantId' => $participantId,
-            'orderId' => $orderId
-        ]);
-    }
-
-    /**
      * @Route("/participant/{participantId}/order/check", name="order_check")
      */
     public function orderCheck($participantId)
@@ -678,6 +660,24 @@ class OrderController extends AbstractController
             }
         }
         return $this->redirectToRoute('order', [
+            'participantId' => $participantId,
+            'orderId' => $orderId
+        ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}", name="order")
+     */
+    public function orderAction($participantId, $orderId)
+    {
+        $orderRepository = $this->em->getRepository(Order::class);
+        $order = $orderRepository->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $this->orderService->loadSamplesSchema($order);
+        $action = $order->getCurrentStep();
+        return $this->redirectToRoute("order_{$action}", [
             'participantId' => $participantId,
             'orderId' => $orderId
         ]);
