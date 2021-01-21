@@ -387,10 +387,12 @@ class DeployCommand extends Command {
     private function runSecurityCheck()
     {
         $this->out->writeln("Running Symfony Security Check...");
-        $process = new Process('symfony security:check --format=json --dir=' . escapeshellarg($this->appDir));
-        $process->run();
+        $process = new Process('symfony security:check --disable-exit-code --format=json --dir=' . escapeshellarg($this->appDir));
+        $process->mustRun();
         $vulnerabilities = json_decode($process->getOutput(), true);
-
+        if (!is_array($vulnerabilities)) {
+            throw new \Exception('Unexpected result from symfony security:check');
+        }
         // Ignore vulnerabilities in composerignore.json file
         $vulnerabilities = $this->removeComposerIgnore($vulnerabilities);
         if (count($vulnerabilities) === 0) {
