@@ -3,9 +3,12 @@
 namespace App\Service;
 
 use App\Entity\Order;
+use App\Entity\OrderHistory;
 use App\Entity\Site;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Pmi\Audit\Log;
 
 class OrderService
 {
@@ -19,6 +22,7 @@ class OrderService
     protected $mayolinkOrderService;
     protected $env;
     protected $siteService;
+    protected $loggerService;
     protected $order;
     protected $participant;
 
@@ -28,7 +32,8 @@ class OrderService
         EntityManagerInterface $em,
         MayolinkOrderService $mayolinkOrderService,
         UserService $userService,
-        SiteService $siteService
+        SiteService $siteService,
+        LoggerService $loggerService
     ) {
         $this->rdrApiService = $rdrApiService;
         $this->params = $params;
@@ -37,6 +42,7 @@ class OrderService
         $this->userService = $userService;
         $this->mayolinkOrderService = $mayolinkOrderService;
         $this->siteService = $siteService;
+        $this->loggerService = $loggerService;
     }
 
     public function loadSamplesSchema($order)
@@ -67,10 +73,10 @@ class OrderService
         return $this->participant;
     }
 
-    public function createOrder($participantId, $order)
+    public function createOrder($participantId, $orderObject)
     {
         try {
-            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/BiobankOrder", $order);
+            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/BiobankOrder", $orderObject);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result->id;
@@ -82,16 +88,32 @@ class OrderService
         return false;
     }
 
-    public function editOrder($participantId, $orderId, $order)
+    public function editOrder($orderObject)
     {
         try {
-            $result = $this->getOrder($participantId, $orderId);
-            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/BiobankOrder/{$orderId}", [
-                'json' => $order,
-                'headers' => ['If-Match' => $result->meta->versionId]
-            ]);
+            $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
+            $response = $this->rdrApiService->put("rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}", $orderObject,
+                ['headers' => ['If-Match' => $result->meta->versionId]]);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->status) && $result->status === self::ORDER_EDIT_STATUS) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function cancelRestoreOrder($type, $orderObject)
+    {
+        try {
+            $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
+            $response = $this->rdrApiService->patch("rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}", $orderObject,
+                ['headers' => ['If-Match' => $result->meta->versionId]]);
+            $result = json_decode($response->getBody()->getContents());
+            $rdrStatus = $type === Order::ORDER_CANCEL ? self::ORDER_CANCEL_STATUS : self::ORDER_RESTORE_STATUS;
+            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -161,27 +183,6 @@ class OrderService
         return $result;
     }
 
-    public function cancelRestoreOrder($type, $orderObject)
-    {
-        try {
-            $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
-            $response = $this->rdrApiService->patch("Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}", [
-                'json' => $orderObject,
-                'headers' => ['If-Match' => $result->meta->versionId]
-            ]);
-            $result = json_decode($response->getBody()->getContents());
-            $rdrStatus = $type === Order::ORDER_CANCEL ? self::ORDER_CANCEL_STATUS : self::ORDER_RESTORE_STATUS;
-            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
-                return true;
-            }
-        } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
-            return false;
-        }
-        return false;
-    }
-
-
     public function cancelRestoreRdrOrder($type, $reason)
     {
         $order = $this->getCancelRestoreRdrObject($type, $reason);
@@ -194,8 +195,8 @@ class OrderService
         $statusType = $type === Order::ORDER_CANCEL ? 'cancelled' : 'restored';
         $obj->status = $statusType;
         $obj->amendedReason = $reason;
-        $user = $this->getOrderUser($this->userService->getUser()->getId());
-        $site = $this->getOrderSite($this->siteService->getSiteId());
+        $user = $this->order->getOrderUser($this->userService->getUser());
+        $site = $this->order->getOrderSite($this->siteService->getSiteId());
         $obj->{$statusType . 'Info'} = $this->order->getOrderUserSiteData($user, $site);
         return $obj;
     }
@@ -435,8 +436,11 @@ class OrderService
 
     public function sendToRdr()
     {
-        //Todo Implement Edit Order
-        return $this->createRdrOrder();
+        if ($this->order->getStatus() === Order::ORDER_UNLOCK) {
+            return $this->editRdrOrder();
+        } else {
+            return $this->createRdrOrder();
+        }
     }
 
     public function createRdrOrder()
@@ -459,6 +463,16 @@ class OrderService
             $this->em->persist($this->order);
             $this->em->flush();
             return true;
+        }
+        return false;
+    }
+
+    public function editRdrOrder()
+    {
+        $orderRdrObject = $this->order->getEditRdrObject();
+        $status = $this->editOrder($orderRdrObject);
+        if ($status) {
+            return $this->createOrderHistory(Order::ORDER_EDIT);
         }
         return false;
     }
@@ -507,5 +521,108 @@ class OrderService
             $samples[] = $sample;
         }
         return $samples;
+    }
+
+    public function createOrderHistory($type, $reason = '')
+    {
+        $status = false;
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $orderHistory = new OrderHistory();
+            $orderHistory->setReason($reason);
+            $orderHistory->setOrderId($this->order);
+            $userRepository = $this->em->getRepository(User::class);
+            $orderHistory->setUser($userRepository->find($this->userService->getUser()->getId()));
+            $orderHistory->setSite($this->siteService->getSiteId());
+            $orderHistory->setType($type === Order::ORDER_REVERT ? Order::ORDER_ACTIVE : $type);
+            $orderHistory->setCreatedTs(new \DateTime());
+            $this->em->persist($orderHistory);
+            $this->em->flush();
+            $this->loggerService->log(Log::ORDER_HISTORY_CREATE, ['id' => $orderHistory->getId(), 'type' => $orderHistory->getType()]);
+
+            // Update history id in order entity
+            $this->order->setHistoryId($orderHistory);
+            $this->em->persist($this->order);
+            $this->em->flush();
+            $this->loggerService->log(Log::ORDER_EDIT, $this->order->getId());
+            $connection->commit();
+            $status = true;
+        } catch (\Exception $e) {
+            $connection->rollback();
+        }
+        return $status;
+    }
+
+    /**
+     * Revert collected, processed, finalized samples and timestamps
+     */
+    public function revertOrder()
+    {
+        // Get order object from RDR
+        $object = $this->getOrder($this->participant->id, $this->order->getRdrId());
+        //Update samples
+        if (!empty($object->samples)) {
+            foreach ($object->samples as $sample) {
+                $sampleCode = $sample->test;
+                if (!array_key_exists($sample->test, $this->order->getSamplesInformation()) && array_key_exists($sample->test, Order::$mapRdrSamples)) {
+                    $sampleCode = Order::$mapRdrSamples[$sample->test]['code'];
+                    $centrifugeType = Order::$mapRdrSamples[$sample->test]['centrifuge_type'];
+                }
+                if (!empty($sample->collected)) {
+                    $collectedSamples[] = $sampleCode;
+                    $collectedTs = $sample->collected;
+                }
+                if (!empty($sample->processed)) {
+                    $processedSamples[] = $sampleCode;
+                    $processedTs = new \DateTime($sample->processed);
+                    $processedSamplesTs[$sampleCode] = $processedTs->getTimestamp();
+                }
+                if (!empty($sample->finalized)) {
+                    $finalizedSamples[] = $sampleCode;
+                    $finalizedTs = $sample->finalized;
+                }
+            }
+        }
+        // Update notes field
+        $collectedNotes = !empty($object->notes->collected) ? $object->notes->collected : null;
+        $processedNotes = !empty($object->notes->processed) ? $object->notes->processed : null;
+        $finalizedNotes = !empty($object->notes->finalized) ? $object->notes->finalized : null;
+        // Update tracking number
+        if (!empty($object->identifier)) {
+            foreach ($object->identifier as $identifier) {
+                if (preg_match("/tracking-number/i", $identifier->system)) {
+                    $trackingNumber = $identifier->value;
+                    break;
+                }
+            }
+        }
+        $status = false;
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $this->order->setCollectedSamples(json_encode(!empty($collectedSamples) ? $collectedSamples : []));
+            $this->order->setCollectedTs(!empty($collectedTs) ? new \DateTime($collectedTs) : null);
+            $this->order->setProcessedSamples(json_encode(!empty($processedSamples) ? $processedSamples : []));
+            $this->order->setProcessedSamplesTs(json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []));
+            $this->order->setFinalizedSamples(json_encode(!empty($finalizedSamples) ? $finalizedSamples : []));
+            $this->order->setFinalizedTs(!empty($finalizedTs) ? new \DateTime($finalizedTs) : null);
+            $this->order->setCollectedNotes($collectedNotes);
+            $this->order->setProcessedNotes($processedNotes);
+            $this->order->setFinalizedNotes($finalizedNotes);
+            $this->order->setFedexTracking(!empty($trackingNumber) ? $trackingNumber : null);
+            //Update centrifuge type
+            if (!empty($centrifugeType)) {
+                $this->order->setProcessedCentrifugeType($centrifugeType);
+            }
+            $this->em->persist($this->order);
+            $this->em->flush();
+            $this->createOrderHistory(Order::ORDER_REVERT);
+            $connection->commit();
+            $status = true;
+        } catch (\Exception $e) {
+            $connection->rollback();
+        }
+        return $status;
     }
 }

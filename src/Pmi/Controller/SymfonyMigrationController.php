@@ -17,7 +17,9 @@ class SymfonyMigrationController extends AbstractController
             'defaults' => ['problemId' => null]
         ]],
         ['admin_home', '/admin'],
-        ['review_today', '/review']
+        ['review_today', '/review'],
+        ['orderCheck', '/participant/{participantId}/order/check'],
+        ['order', '/participant/{participantId}/order/{orderId}']
     ];
 
     public function deceased_reports_indexAction(Application $app)
@@ -62,7 +64,7 @@ class SymfonyMigrationController extends AbstractController
         if (!$problemId) {
             return $app->redirect(sprintf(
                 '/s/participant/%s/problem',
-                $participantId,
+                $participantId
             ));
         }
 
@@ -87,7 +89,29 @@ class SymfonyMigrationController extends AbstractController
      */
     public function review_todayAction(Application $app)
     {
-        return $app->redirect('/s/review');
+       return $app->redirect('/s/review');
     }
 
+    /**
+     * @deprecated 2021-01-21
+     */
+    public function orderCheckAction($participantId, Application $app)
+    {
+        return $app->redirect(sprintf(
+            '/s/participant/%s/order/check',
+            $participantId
+        ));
+    }
+
+    /**
+     * @deprecated 2021-01-21
+     */
+    public function orderAction($participantId, $orderId, Application $app)
+    {
+        return $app->redirect(sprintf(
+            '/s/participant/%s/order/%d',
+            $participantId,
+            $orderId
+        ));
+    }
 }

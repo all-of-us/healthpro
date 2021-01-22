@@ -27,17 +27,17 @@
     <div class="alert alert-warning well-sm">
         <i class="fa fa-info-circle" aria-hidden="true"></i>
         <strong>
-            Unlocked for editing by {{ app.getUserEmailById(order.oh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.oh_site) }} on {{ order.oh_created_ts|date('F j, Y g:ia', app.userTimezone) }}
+            Unlocked for editing by {{ app.order.history.user.email|default('Unknown') }} at {{ site_display(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.getInfo.timezone) }}
         </strong>
     </div>
 {% elseif order.status == 'cancel' %}
     <div class="alert alert-danger well-sm">
         <i class="fa fa-info-circle" aria-hidden="true"></i>
         <strong>
-            Cancelled by {{ app.getUserEmailById(order.oh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.oh_site) }} on {{ order.oh_created_ts|date('F j, Y g:ia', app.userTimezone) }}
+            Cancelled by {{ order.history.user.email|default('Unknown') }} at {{ site_display(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.getInfo.timezone) }}
         </strong>
-        {% if order.reasonDisplayText is not empty %}
-            <br/><strong>Reason:</strong> {{ order.reasonDisplayText }}
+        {% if order.history.reasonDisplayText is not empty %}
+            <br/><strong>Reason:</strong> {{ order.history.reasonDisplayText }}
         {% endif %}
     </div>
     {% endif %}

@@ -9,6 +9,7 @@ use App\Form\OrderCreateType;
 use App\Form\OrderModifyType;
 use App\Form\OrderRevertType;
 use App\Form\OrderType;
+use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
@@ -18,6 +19,7 @@ use Pmi\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -64,24 +66,6 @@ class OrderController extends AbstractController
         $this->orderService->setParticipant($participant);
         $this->orderService->loadSamplesSchema($order);
         return $order;
-    }
-
-    /**
-     * @Route("/participant/{participantId}/{orderId}/order", name="order")
-     */
-    public function orderAction($participantId, $orderId)
-    {
-        $orderRepository = $this->em->getRepository(Order::class);
-        $order = $orderRepository->find($orderId);
-        if (empty($order)) {
-            throw $this->createNotFoundException('Participant not found.');
-        }
-        $this->orderService->loadSamplesSchema($order);
-        $action = $order->getCurrentStep();
-        return $this->redirectToRoute("order_{$action}", [
-            'participantId' => $participantId,
-            'orderId' => $orderId
-        ]);
     }
 
     /**
@@ -490,7 +474,7 @@ class OrderController extends AbstractController
                             }
                         } else {
                             // Save finalized time
-                            $order->setFinalizedTs($finalizeForm['finalized_ts']->getData());
+                            $order->setFinalizedTs($finalizeForm['finalizedTs']->getData());
                             $this->em->persist($order);
                             $this->em->flush();
                         }
@@ -525,7 +509,7 @@ class OrderController extends AbstractController
             'version' => $order->getVersion(),
             'hasErrors' => $hasErrors,
             'processTabClass' => $order->getProcessTabClass(),
-            'revertForm' => $this->createForm(OrderRevertType::class, null),
+            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
             'showUnfinalizeMsg' => $showUnfinalizeMsg
         ]);
     }
@@ -601,8 +585,8 @@ class OrderController extends AbstractController
             || ($type === $order::ORDER_UNLOCK && !$order->canUnlock())) {
             throw $this->createAccessDeniedException();
         }
-        $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId]);
-        $orderModifyForm = $this->createForm(OrderModifyType::class, null, [
+        $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId], ['id' => 'desc']);
+        $orderModifyForm = $this->get('form.factory')->createNamed('form', OrderModifyType::class, null, [
             'type' => $type,
             'orderType' => $order->getType()
         ]);
@@ -647,7 +631,6 @@ class OrderController extends AbstractController
                 $this->addFlash('error', 'Please correct the errors below');
             }
         }
-        $historyType = !empty($order->getHistory()) ? $order->getHistory()->getType() : null;
         return $this->render('order/modify.html.twig', [
             'participant' => $this->orderService->getParticipant(),
             'order' => $order,
@@ -655,8 +638,74 @@ class OrderController extends AbstractController
             'orders' => $orders,
             'orderId' => $orderId,
             'orderModifyForm' => $orderModifyForm->createView(),
-            'type' => $type,
-            'historyType' => $historyType
+            'type' => $type
+        ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/revert", name="order_revert")
+     */
+    public function orderRevertAction($participantId, $orderId, Request $request)
+    {
+        $order = $this->loadOrder($participantId, $orderId);
+        if ($order->isDisabled() || !$order->isUnlocked()) {
+            throw $this->createAccessDeniedException();
+        }
+        $orderRevertForm = $this->createForm(OrderRevertType::class, null);
+        $orderRevertForm->handleRequest($request);
+        if ($orderRevertForm->isSubmitted() && $orderRevertForm->isValid()) {
+            // Revert Order
+            if ($this->orderService->revertOrder()) {
+                $this->addFlash('notice', 'Order reverted');
+            } else {
+                $this->addFlash('error', 'Failed to revert order. Please try again.');
+            }
+        }
+        return $this->redirectToRoute('order', [
+            'participantId' => $participantId,
+            'orderId' => $orderId
+        ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/json-response", name="order_json")
+     * For debugging generated JSON representation - only allowed in local dev
+     */
+    public function orderJsonAction($participantId, $orderId, Request $request, EnvironmentService $env)
+    {
+        if (!$env->isLocal()) {
+            throw $this->createNotFoundException();
+        }
+        $order = $this->loadOrder($participantId, $orderId);
+        if ($request->query->has('rdr')) {
+            if ($order->getRdrId()) {
+                $object = $this->orderService->getOrder($participantId, $order->getRdrId());
+            } else {
+                $object = ['error' => 'Order does not have rdr_id'];
+            }
+        } else {
+            $object = $order->getRdrObject();
+        }
+        $response = new JsonResponse($object);
+        $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
+        return $response;
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}", name="order")
+     */
+    public function orderAction($participantId, $orderId)
+    {
+        $orderRepository = $this->em->getRepository(Order::class);
+        $order = $orderRepository->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $this->orderService->loadSamplesSchema($order);
+        $action = $order->getCurrentStep();
+        return $this->redirectToRoute("order_{$action}", [
+            'participantId' => $participantId,
+            'orderId' => $orderId
         ]);
     }
 }
