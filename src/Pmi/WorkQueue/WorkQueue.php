@@ -58,7 +58,6 @@ class WorkQueue
         'questionnaireOnOverallHealth',
         'questionnaireOnLifestyle',
         'questionnaireOnMedicalHistory',
-        'questionnaireOnMedications',
         'questionnaireOnFamilyHealth',
         'questionnaireOnHealthcareAccess',
         'questionnaireOnCopeMay',
