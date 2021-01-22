@@ -112,6 +112,31 @@ class OrderTest extends TestCase
         $this->assertEquals('2PST8', $order->getRdrObject()->samples[1]['test']);
     }
 
+    public function testEditRdrObject()
+    {
+        $orderHistory = $this->createOrderHistory([
+            'user' => $this->getUser(),
+            'site' => 'test',
+            'reason' => 'Test reason'
+        ]);
+        $orderData = $this->getOrderData();
+        $order = $this->createOrder($orderData);
+        $order->setHistory($orderHistory);
+        $order->loadSamplesSchema();
+        $amendedInfo = [
+            'author' => [
+                'system' => 'https://www.pmi-ops.org/healthpro-username',
+                'value' => $this->getUser()->getEmail()
+            ],
+            'site' => [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => 'hpo-site-test'
+            ]
+        ];
+        $this->assertEquals('Test reason', $order->getEditRdrObject()->amendedReason);
+        $this->assertEquals($amendedInfo, $order->getEditRdrObject()->amendedInfo);
+    }
+
     public function testHpoOrdersSampleIds()
     {
         $data = [
