@@ -652,7 +652,7 @@ class Order
         return $this->history;
     }
 
-    public function setHistoryId(?OrderHistory $history): self
+    public function setHistory(?OrderHistory $history): self
     {
         $this->history = $history;
 
