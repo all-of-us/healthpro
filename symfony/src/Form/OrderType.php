@@ -109,7 +109,7 @@ class OrderType extends AbstractType
                         $collectedSamples = json_decode($options['order']->getCollectedSamples(), true);
                         $processedSamples = json_decode($options['order']->getProcessedSamplesTs(), true);
                         if (in_array($val, $collectedSamples)) {
-                            $attr = ['collected' => $options['order']->getCollectedTs()->format('n/j/Y g:ia')];
+                            $attr = ['collected' => $options['order']->getCollectedTs()->setTimezone(new \DateTimeZone($options['timeZone']))->format('n/j/Y g:ia')];
                         }
                         if (!empty($processedSamples[$val])) {
                             $time = new \DateTime();
