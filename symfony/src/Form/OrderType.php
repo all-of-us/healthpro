@@ -169,7 +169,7 @@ class OrderType extends AbstractType
             if ($options['order']->getType() === 'kit') {
                 $sites = $options['em']->getRepository(Site::class)->findOneBy([
                     'deleted' => 0,
-                    'google_group' => $options['siteId']
+                    'googleGroup' => $options['siteId']
                 ]);
                 if (!empty($enabledSamples) && empty($sites->getCentrifugeType())) {
                     $builder->add('processedCentrifugeType', Type\ChoiceType::class, [
@@ -191,7 +191,7 @@ class OrderType extends AbstractType
         }
         // Display fedex tracking for kit and diversion type orders
         if ($options['step'] === 'finalized' && ($options['order']->getType() === 'kit' || $options['order']->getType() === 'diversion')) {
-            $builder->add('fedex_tracking', Type\RepeatedType::class, [
+            $builder->add('fedexTracking', Type\RepeatedType::class, [
                 'type' => Type\TextType::class,
                 'disabled' => $disabled,
                 'invalid_message' => 'Tracking numbers must match.',

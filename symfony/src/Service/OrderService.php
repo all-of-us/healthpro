@@ -290,7 +290,7 @@ class OrderService
             }
         }
         if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
-            $this->order->getFedexTracking($formData['fedexTracking']);
+            $this->order->setFedexTracking($formData['fedexTracking']);
         }
     }
 
@@ -386,7 +386,7 @@ class OrderService
             }
         }
         if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
-            $formData['fedexTracking'] = $this->order->getFedextTracking();
+            $formData['fedexTracking'] = $this->order->getFedexTracking();
         }
         return $formData;
     }
