@@ -290,7 +290,7 @@ class OrderService
             }
         }
         if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
-            $this->order->getFedexTracking($formData['fedexTracking']);
+            $this->order->setFedexTracking($formData['fedexTracking']);
         }
     }
 
@@ -386,7 +386,7 @@ class OrderService
             }
         }
         if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
-            $formData['fedexTracking'] = $this->order->getFedextTracking();
+            $formData['fedexTracking'] = $this->order->getFedexTracking();
         }
         return $formData;
     }
@@ -542,7 +542,7 @@ class OrderService
             $this->loggerService->log(Log::ORDER_HISTORY_CREATE, ['id' => $orderHistory->getId(), 'type' => $orderHistory->getType()]);
 
             // Update history id in order entity
-            $this->order->setHistoryId($orderHistory);
+            $this->order->setHistory($orderHistory);
             $this->em->persist($this->order);
             $this->em->flush();
             $this->loggerService->log(Log::ORDER_EDIT, $this->order->getId());

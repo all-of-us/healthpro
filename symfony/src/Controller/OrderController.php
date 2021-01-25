@@ -122,7 +122,7 @@ class OrderController extends AbstractController
                 $orderRepository = $this->em->getRepository(Order::class);
                 if (empty($createForm['kitId']->getData())) {
                     $createForm['kitId']['first']->addError(new FormError('Please enter a kit order ID'));
-                } elseif ($orderRepository->findOneBy(['order_id' => $createForm['kitId']->getData()])) {
+                } elseif ($orderRepository->findOneBy(['orderId' => $createForm['kitId']->getData()])) {
                     $createForm['kitId']['first']->addError(new FormError('This order ID already exists'));
                 } else {
                     $order->setOrderId($createForm['kitId']->getData());
@@ -194,11 +194,11 @@ class OrderController extends AbstractController
     {
         $order = $this->loadOrder($participantId, $orderId);
         if ($order->isDisabled() || $order->isUnlocked()) {
-            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+            throw $this->createAccessDeniedException();
         }
         if (!in_array('print_labels', $order->getAvailableSteps())) {
             // 404 because print is not a valid route for kit orders regardless of state
-            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+            throw $this->createAccessDeniedException();
         }
         $result = $this->orderService->getLabelsPdf();
         if (!$order->getPrintedTs() && $result['status'] === 'success') {
@@ -223,11 +223,11 @@ class OrderController extends AbstractController
     {
         $order = $this->loadOrder($participantId, $orderId);
         if ($order->isDisabled() || $order->isUnlocked()) {
-            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+            throw $this->createAccessDeniedException();
         }
         if (!in_array('print_labels', $order->getAvailableSteps())) {
             // 404 because print is not a valid route for kit orders regardless of state
-            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+            throw $this->createAccessDeniedException();
         }
         if ($params->has('ml_mock_order')) {
             return $this->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
@@ -265,7 +265,7 @@ class OrderController extends AbstractController
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
             if ($order->isDisabled()) {
-                throw $this->createAccessDeniedException('Participant ineligible for order create.');
+                throw $this->createAccessDeniedException();
             }
             if ($type = $this->orderService->getParticipant()->checkIdentifiers($collectForm['collectedNotes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
@@ -325,7 +325,7 @@ class OrderController extends AbstractController
         $processForm->handleRequest($request);
         if ($processForm->isSubmitted()) {
             if ($order->isDisabled()) {
-                throw $this->createAccessDeniedException('Participant ineligible for order create.');
+                throw $this->createAccessDeniedException();
             }
             if ($processForm->has('processedSamples')) {
                 $processedSampleTimes = $processForm->get('processedSamplesTs')->getData();
@@ -415,7 +415,7 @@ class OrderController extends AbstractController
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {
             if ($order->isDisabled()) {
-                throw $this->createAccessDeniedException('Participant ineligible for order create.');
+                throw $this->createAccessDeniedException();
             }
             if (!$order->isFormDisabled()) {
                 // Check empty samples
@@ -435,7 +435,7 @@ class OrderController extends AbstractController
                     $finalizeForm['finalizedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
                 if (($order->getType() === 'kit' || $order->getType() === 'diversion') && $finalizeForm->has('fedexTracking') && !empty($finalizeForm['fedexTracking']->getData())) {
-                    $duplicateFedexTracking = $this->em->getRepository(Order::class)->getDuplicateFedexTracking($finalizeForm['fedex_tracking']->getData(),
+                    $duplicateFedexTracking = $this->em->getRepository(Order::class)->getDuplicateFedexTracking($finalizeForm['fedexTracking']->getData(),
                         $orderId);
                     if (!empty($duplicateFedexTracking)) {
                         $finalizeForm['fedexTracking']['first']->addError(new FormError('This tracking number has already been used for another order.'));
@@ -521,11 +521,11 @@ class OrderController extends AbstractController
     {
         $order = $this->loadOrder($participantId, $orderId);
         if ($order->isCancelled()) {
-            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+            throw $this->createAccessDeniedException();
         }
         if ($session->get('siteType') == 'dv' && !in_array('print_requisition', $order->getAvailableSteps())) {
             // 404 because print is not a valid route for kit orders regardless of state
-            throw $this->createNotFoundException('Order not found.');
+            throw $this->createNotFoundException();
         }
         if (!in_array('print_requisition', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
@@ -548,10 +548,10 @@ class OrderController extends AbstractController
     {
         $order = $this->loadOrder($participantId, $orderId);
         if (empty($order->getFinalizedTs()) || empty($order->getMayoId()) || $order->isCancelled() || $order->isUnlocked()) {
-            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+            throw $this->createAccessDeniedException();
         }
         if (!in_array('print_requisition', $order->getAvailableSteps())) {
-            throw $this->createNotFoundException('Order not found.');
+            throw $this->createNotFoundException();
         }
         if ($params->has('ml_mock_order')) {
             return $this->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
