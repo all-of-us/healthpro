@@ -39,10 +39,10 @@ class SiteService
         if (!$this->params->has('diversion_pouch_site')) {
             return false;
         }
-        $site = $this->em->getRepository(Site::class)->fetchBy([
+        $site = $this->em->getRepository(Site::class)->findOneBy([
             'deleted' => 0,
-            'google_group' => $this->getSiteId(),
-            'site_type' => $this->params->get('diversion_pouch_site')
+            'googleGroup' => $this->getSiteId(),
+            'siteType' => $this->params->get('diversion_pouch_site')
         ]);
         return !empty($site);
     }
