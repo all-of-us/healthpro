@@ -524,6 +524,9 @@ class WorkQueueController extends AbstractController
 
     public function canExport($app)
     {
+        if ($app->hasRole('ROLE_AWARDEE')) {
+            return true;
+        }
         $site = $app['em']->getRepository('sites')->fetchOneBy([
             'deleted' => 0,
             'google_group' => $app->getSiteId(),
