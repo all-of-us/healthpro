@@ -234,7 +234,6 @@ class OrderService
     {
         $formData = $form->getData();
         if ($formData["{$step}Notes"]) {
-            $updateArray["{$step}Notes"] = $formData["{$step}Notes"];
             $this->order->{'set' . ucfirst($step) . 'Notes'}($formData["{$step}Notes"]);
         } else {
             $this->order->{'set' . ucfirst($step) . 'Notes'}(null);
