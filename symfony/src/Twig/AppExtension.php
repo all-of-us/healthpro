@@ -115,7 +115,7 @@ class AppExtension extends AbstractExtension
             return $this->cache[$cacheKey];
         }
         $repository = $this->doctrine->getRepository(Site::class);
-        $record = $repository->find($site);
+        $record = $repository->findOneBy(['siteId' => $site]);
         if ($record) {
             $this->cache[$cacheKey] = $record->getName();
             return $record->getName();
