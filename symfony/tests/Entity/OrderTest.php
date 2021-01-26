@@ -16,7 +16,7 @@ class OrderTest extends TestCase
         return $user;
     }
 
-    public function createOrder($params = [])
+    protected function createOrder($params = [])
     {
         $order = new Order;
         foreach ($params as $key => $value) {
@@ -25,7 +25,7 @@ class OrderTest extends TestCase
         return $order;
     }
 
-    public function createOrderHistory($params = [])
+    protected function createOrderHistory($params = [])
     {
         $order = new OrderHistory();
         foreach ($params as $key => $value) {
