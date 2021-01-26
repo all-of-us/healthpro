@@ -284,4 +284,78 @@ class OrderTest extends TestCase
             }
         }
     }
+
+    public function testCanCancel()
+    {
+        $orderHistory = $this->createOrderHistory([
+            'type' => 'cancel'
+        ]);
+        $order = $this->createOrder([
+            'finalizedTs' => new \DateTime('2021-01-01 12:00:00'),
+            'mayoId' => 'WEB123456789',
+            'rdrId' => 'WEB123456789'
+        ]);
+        $order->setHistory($orderHistory);
+
+        // Assert can cancel
+        $this->assertSame(false, $order->canCancel());
+        $orderHistory->setType('unlock');
+        $this->assertSame(false, $order->canCancel());
+        $orderHistory->setType('active');
+        $order->setRdrId('');
+        $this->assertSame(false, $order->canCancel());
+        $order->setRdrId('WEB123456789');
+        $this->assertSame(true, $order->canCancel());
+    }
+
+    public function testCanRestore()
+    {
+        $orderHistory = $this->createOrderHistory([
+            'type' => 'cancel'
+        ]);
+        $order = $this->createOrder([
+            'mayoId' => 'WEB123456789',
+            'rdrId' => 'WEB123456789'
+        ]);
+        $order->setHistory($orderHistory);
+
+        // Assert can restore
+        $this->assertSame(false, $order->canRestore());
+        $order->setVersion('3.1');
+        $order->setFinalizedTs(new \DateTime('2021-01-01 12:00:00'));
+        $orderHistory->setType('unlock');
+        $this->assertSame(false, $order->canRestore());
+        $orderHistory->setType('active');
+        $order->setRdrId('');
+        $this->assertSame(false, $order->canRestore());
+        $orderHistory->setType('cancel');
+        $order->setRdrId('WEB123456789');
+        $this->assertSame(true, $order->canRestore());
+    }
+
+    public function testCanUnlock()
+    {
+        $orderHistory = $this->createOrderHistory([
+            'type' => 'active'
+        ]);
+        $order = $this->createOrder([
+            'mayoId' => 'WEB123456789',
+            'rdrId' => 'WEB123456789'
+        ]);
+        $order->setHistory($orderHistory);
+
+        // Assert can restore
+        $this->assertSame(false, $order->canUnlock());
+        $order->setVersion('3.1');
+        $order->setFinalizedTs(new \DateTime('2021-01-01 12:00:00'));
+        $order->setRdrId('');
+        $this->assertSame(false, $order->canUnlock());
+        $order->setRdrId('WEB123456789');
+        $orderHistory->setType('unlock');
+        $this->assertSame(false, $order->canUnlock());
+        $orderHistory->setType('cancel');
+        $this->assertSame(false, $order->canUnlock());
+        $orderHistory->setType('active');
+        $this->assertSame(true, $order->canUnlock());
+    }
 }
