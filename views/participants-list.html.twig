@@ -20,7 +20,7 @@
                 {% if app.isDVType %}
                     <th>Participant Origination</th>
                 {% endif %}
-                <th>Basics Complete</th>
+                <th>PM&amp;B Eligible?</th>
                 <th></th>
                 {% if searchType is defined and searchType == 'phone' %}
                     <th>Matched Phone Number</th>
@@ -50,7 +50,7 @@
                             <td>{{ participant.participantOrigin }}</td>
                         {% endif %}
                         <td>
-                            {% if participant.questionnaireOnTheBasics == 'SUBMITTED' %}
+                            {% if participant.status and participant.activityStatus != 'deactivated' %}
                                 <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                             {% else %}
                                 <i class="fa fa-times-circle text-danger" aria-hidden="true"></i>
@@ -62,6 +62,12 @@
                             {% endif %}
                             {% if not participant.status and participant.statusReason == 'consent' %}
                                 <span class="label label-danger">Unconsented</span>
+                            {% endif %}
+                            {% if not participant.status and participant.statusReason == 'deceased-approved' %}
+                                <span class="label label-danger">Deceased</span>
+                            {% endif %}
+                            {% if participant.activityStatus == 'deactivated' %}
+                                <span class="label label-danger">Deactivated</span>
                             {% endif %}
                         </td>
                         {% if searchType is defined and searchType == 'phone' %}

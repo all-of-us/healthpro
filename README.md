@@ -21,6 +21,7 @@ Prerequisites:
 * [MySQL](https://dev.mysql.com/downloads/mysql/) (select version 5.7 which is used by Google Cloud SQL)
 * [Composer](https://getcomposer.org/doc/00-intro.md#globally)
 * [git-secrets](https://github.com/awslabs/git-secrets#installing-git-secrets)
+* [Symfony CLI](https://symfony.com/download)
 
 Install PHP dependencies via Composer:
 
