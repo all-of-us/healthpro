@@ -13,7 +13,6 @@
         "google/apiclient": "^2.0",
         "guzzlehttp/guzzle": "^6.2",
         "ramsey/uuid": "^3.5",
-        "sensiolabs/security-checker": "^5.0",
         "silex/silex": "~2.0",
         "symfony/browser-kit": "^4.4",
         "symfony/config": "^4.4",
@@ -65,8 +64,7 @@
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd",
-            "security-checker security:check": "script"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
         }
     }
 }
