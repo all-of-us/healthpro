@@ -99,7 +99,7 @@ class Measurement
     private $data;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\MeasurementHistory", inversedBy="measurement", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\MeasurementHistory", cascade={"persist", "remove"})
      */
     private $history;
 
