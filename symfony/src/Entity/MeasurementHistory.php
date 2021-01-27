@@ -18,7 +18,7 @@ class MeasurementHistory
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="Measurement", inversedBy="measurementHistory", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\Measurement", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $measurement;
