@@ -396,7 +396,6 @@ class OrderController extends AbstractController
      */
     public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
     {
-
         $order = $this->loadOrder($participantId, $orderId);
         if (!in_array('finalize', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
@@ -560,10 +559,10 @@ class OrderController extends AbstractController
                 $pdf = $this->orderService->getRequisitionPdf();
             }
             if (!empty($pdf)) {
-                return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+                return new Response($pdf, 200, ['Content-Type' => 'application/pdf']);
             } else {
                 $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Requisition pdf file could not be loaded</strong></body></html>';
-                return new Response($html, 200, array('Content-Type' => 'text/html'));
+                return new Response($html, 200, ['Content-Type' => 'text/html']);
             }
         }
     }

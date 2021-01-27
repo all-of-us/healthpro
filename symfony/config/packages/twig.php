@@ -16,6 +16,6 @@ $container->loadFromExtension('twig', [
         'sessionWarning' => $env->values['sessionWarning'],
         'timeZones' => $env->getTimeZones(),
         'confluenceResources' => HelpService::$confluenceResources,
-        'orderSampleInfo' => $env->configuration['order_samples_info_3']
+        'orderSampleInfo' => $env->configuration['order_samples_info_3'] ?? null
     ],
 ]);

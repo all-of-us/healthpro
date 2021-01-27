@@ -40,7 +40,6 @@ class OrderService
         $this->em = $em;
         $this->mayolinkOrderService = $mayolinkOrderService;
         $this->userService = $userService;
-        $this->mayolinkOrderService = $mayolinkOrderService;
         $this->siteService = $siteService;
         $this->loggerService = $loggerService;
     }
@@ -481,6 +480,7 @@ class OrderService
         return $this->mayolinkOrderService->getRequisitionPdf($this->order->getMayoId());
     }
 
+    // Returns sample's display text and color
     public function getCustomSamplesInfo()
     {
         $samples = [];
