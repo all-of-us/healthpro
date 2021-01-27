@@ -404,7 +404,7 @@ class WorkQueue
             }
             $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
             foreach (array_keys(self::$surveys) as $field) {
-                $row["ppi{$field}"] = $this->displayStatus($participant->{'questionnaireOn' . $field}, 'SUBMITTED', $participant->{'questionnaireOn' . $field . 'Authored'});
+                $row["ppi{$field}"] = $this->displaySurveyStatus($participant->{'questionnaireOn' . $field}, $participant->{'questionnaireOn' . $field . 'Authored'});
             }
 
             //In-Person Enrollment
@@ -524,6 +524,18 @@ class WorkQueue
             return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
         }
         return self::HTML_DANGER;
+    }
+
+    public function displaySurveyStatus($value, $time, $displayTime = true)
+    {
+        if ($value === 'SUBMITTED') {
+            $status = self::HTML_SUCCESS;
+        } elseif ($value === 'SUBMITTED_NOT_SURE') {
+            $status = self::HTML_WARNING;
+        } else {
+            $status = self::HTML_DANGER;
+        }
+        return $status . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
     }
 
     public function displayConsentStatus($value, $time, $displayTime = true)
