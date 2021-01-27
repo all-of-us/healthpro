@@ -32,10 +32,18 @@ class MayolinkOrderService
         $this->em = $em;
         $this->twig = $twig;
         $this->logger = $logger;
+        if (!$this->params->has('ml_mock_order')) {
+            $this->setMayoCredentials();
+        }
+
+    }
+
+    private function setMayoCredentials()
+    {
         $this->client = new HttpClient(['cookies' => true]);
-        $this->ordersEndpoint = $params->get('ml_orders_endpoint');
-        $this->userName = $params->get('ml_username');
-        $this->password = $params->get('ml_password');
+        $this->ordersEndpoint = $this->params->get('ml_orders_endpoint');
+        $this->userName = $this->params->get('ml_username');
+        $this->password = $this->params->get('ml_password');
         if (empty($this->ordersEndpoint) || empty($this->userName) || empty($this->password)) {
             throw new \Exception('MayoLINK connection is not configured.');
         }
