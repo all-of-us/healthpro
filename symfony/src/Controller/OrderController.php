@@ -298,7 +298,7 @@ class OrderController extends AbstractController
             'samplesInfo' => $order->getSamplesInformation(),
             'version' => $order->getVersion(),
             'processTabClass' => $order->getProcessTabClass(),
-            'revertForm' => $this->createForm(OrderRevertType::class, null)
+            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView()
         ]);
     }
 
@@ -387,7 +387,7 @@ class OrderController extends AbstractController
             'samplesInfo' => $order->getSamplesInformation(),
             'version' => $order->getVersion(),
             'processTabClass' => $order->getProcessTabClass(),
-            'revertForm' => $this->createForm(OrderRevertType::class, null)
+            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView()
         ]);
     }
 
