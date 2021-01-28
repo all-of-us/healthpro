@@ -309,6 +309,9 @@ label.label-normal {
 .multiheader-metrics {
     background-color: #edb;
 }
+.multiheader-consent {
+    background-color: #efd;
+}
 .dataTables_processing {
     z-index: 1000;
     color: #fff;

@@ -24,22 +24,21 @@ class WorkQueue
         'dateOfBirth',
         'participantId',
         'biobankId',
-        'language',
         'enrollmentStatus',
+        'withdrawalAuthored',
+        'withdrawalReason',
         'participantOrigin',
         'consentCohort',
         'consentForStudyEnrollmentFirstYesAuthored',
         'consentForStudyEnrollmentAuthored',
         'questionnaireOnDnaProgramAuthored',
-        'primaryLanguage',
         'consentForElectronicHealthRecordsFirstYesAuthored',
         'consentForElectronicHealthRecordsAuthored',
         'ehrConsentExpireStatus',
         'consentForGenomicsRORAuthored',
+        'primaryLanguage',
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
-        'withdrawalAuthored',
-        'withdrawalReason',
         'retentionEligibleTime',
         'retentionType',
         'isEhrDataAvailable',
@@ -56,35 +55,23 @@ class WorkQueue
         'numCompletedBaselinePPIModules',
         'numCompletedPPIModules',
         'questionnaireOnTheBasics',
-        'questionnaireOnTheBasicsAuthored',
         'questionnaireOnOverallHealth',
-        'questionnaireOnOverallHealthAuthored',
         'questionnaireOnLifestyle',
-        'questionnaireOnLifestyleAuthored',
         'questionnaireOnMedicalHistory',
-        'questionnaireOnMedicalHistoryAuthored',
-        'questionnaireOnMedications',
-        'questionnaireOnMedicationsAuthored',
         'questionnaireOnFamilyHealth',
-        'questionnaireOnFamilyHealthAuthored',
         'questionnaireOnHealthcareAccess',
-        'questionnaireOnHealthcareAccessAuthored',
         'questionnaireOnCopeMay',
-        'questionnaireOnCopeMayAuthored',
         'questionnaireOnCopeJune',
-        'questionnaireOnCopeJuneAuthored',
         'questionnaireOnCopeJuly',
-        'questionnaireOnCopeJulyAuthored',
         'questionnaireOnCopeNov',
-        'questionnaireOnCopeNovAuthored',
         'questionnaireOnCopeDec',
-        'questionnaireOnCopeDecAuthored',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
         'physicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
         'numBaselineSamplesArrived',
+        'biospecimenSourceSite',
         'sampleStatus1SST8Time',
         'sampleStatus1PST8Time',
         'sampleStatus1HEP4Time',
@@ -97,7 +84,6 @@ class WorkQueue
         'sampleStatus1UR10Time',
         'sampleStatus1UR90Time',
         'sampleStatus1SALTime',
-        'biospecimenSourceSite',
         'dateOfBirth',
         'sex',
         'genderIdentity',
@@ -293,9 +279,8 @@ class WorkQueue
         'TheBasics' => 'Basics',
         'OverallHealth' => 'Health',
         'Lifestyle' => 'Lifestyle',
-        'MedicalHistory' => 'Hist',
-        'Medications' => 'Meds',
-        'FamilyHealth' => 'Family',
+        'MedicalHistory' => 'Med History',
+        'FamilyHealth' => 'Family History',
         'HealthcareAccess' => 'Access',
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
@@ -309,9 +294,13 @@ class WorkQueue
         'OverallHealth',
         'Lifestyle',
         'MedicalHistory',
-        'Medications',
         'FamilyHealth',
-        'HealthcareAccess'
+        'HealthcareAccess',
+        'CopeMay',
+        'CopeJune',
+        'CopeJuly',
+        'CopeNov',
+        'CopeDec'
     ];
 
     public static $samples = [
@@ -373,26 +362,25 @@ class WorkQueue
             $row['patientStatusNoAccess'] = $this->getPatientStatus($participant, 'UNKNOWN');
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
-            $row['language'] = $e($participant->language);
             $row['participantOrigin'] = $e($participant->participantOrigin);
             $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
             $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
+            $row['activityStatus'] = $this->getActivityStatus($participant);
+            $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['consentCohort'] = $e($participant->consentCohortText);
             $row['primaryConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
             $row['firstPrimaryConsent'] = $this->displayFirstConsentStatusTime($participant->consentForStudyEnrollmentFirstYesAuthored);
             $row['questionnaireOnDnaProgram'] = $this->displayProgramUpdate($participant);
-            $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['firstEhrConsent'] = $this->displayFirstConsentStatusTime($participant->consentForElectronicHealthRecordsFirstYesAuthored, 'ehr');
             $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
             $row['ehrConsentExpireStatus'] = $this->displayEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords, $participant->ehrConsentExpireAuthored);
             $row['gRoRConsent'] = $this->displayGenomicsConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
+            $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
             $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
-            $row['activityStatus'] = $this->getActivityStatus($participant);
             $row['retentionEligibleStatus'] = $this->getRetentionEligibleStatus($participant->retentionEligibleStatus, $participant->retentionEligibleTime);
             $row['retentionType'] = $this->getRetentionType($participant->retentionType);
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
-            $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['isEhrDataAvailable'] = $this->getEhrAvailableStatus($participant->isEhrDataAvailable);
             $row['latestEhrReceiptTime'] = self::dateFromString($participant->latestEhrReceiptTime, $app->getUserTimezone());
 
@@ -416,8 +404,7 @@ class WorkQueue
             }
             $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
             foreach (array_keys(self::$surveys) as $field) {
-                $row["ppi{$field}"] = $this->displayStatus($participant->{'questionnaireOn' . $field}, 'SUBMITTED');
-                $row["ppi{$field}Time"] = self::dateFromString($participant->{'questionnaireOn' . $field . 'Authored'}, $app->getUserTimezone());
+                $row["ppi{$field}"] = $this->displaySurveyStatus($participant->{'questionnaireOn' . $field}, $participant->{'questionnaireOn' . $field . 'Authored'});
             }
 
             //In-Person Enrollment
@@ -431,6 +418,7 @@ class WorkQueue
             } else {
                 $row['biobankSamples'] = $e($participant->numBaselineSamplesArrived);;
             }
+            $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
             foreach (array_keys(self::$samples) as $sample) {
                 $newSample = $sample;
                 foreach (self::$samplesAlias as $sampleAlias) {
@@ -444,7 +432,6 @@ class WorkQueue
                     $row["sample{$sample}"] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
                 }
             }
-            $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
 
             //Demographics
             $row['age'] = $e($participant->age);
@@ -516,6 +503,19 @@ class WorkQueue
         }
     }
 
+    public static function csvDeceasedStatus($value)
+    {
+        switch ($value) {
+            case 'PENDING':
+                return 1;
+            case 'APPROVED':
+                return 2;
+                break;
+            default:
+                return 0;
+        }
+    }
+
     public function displayStatus($value, $successStatus, $time = null, $displayTime = true)
     {
         if ($value === $successStatus) {
@@ -524,6 +524,18 @@ class WorkQueue
             return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
         }
         return self::HTML_DANGER;
+    }
+
+    public function displaySurveyStatus($value, $time, $displayTime = true)
+    {
+        if ($value === 'SUBMITTED') {
+            $status = self::HTML_SUCCESS;
+        } elseif ($value === 'SUBMITTED_NOT_SURE') {
+            $status = self::HTML_WARNING;
+        } else {
+            $status = self::HTML_DANGER;
+        }
+        return $status . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
     }
 
     public function displayConsentStatus($value, $time, $displayTime = true)
