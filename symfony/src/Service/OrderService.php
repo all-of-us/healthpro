@@ -40,7 +40,6 @@ class OrderService
         $this->em = $em;
         $this->mayolinkOrderService = $mayolinkOrderService;
         $this->userService = $userService;
-        $this->mayolinkOrderService = $mayolinkOrderService;
         $this->siteService = $siteService;
         $this->loggerService = $loggerService;
     }
@@ -234,7 +233,6 @@ class OrderService
     {
         $formData = $form->getData();
         if ($formData["{$step}Notes"]) {
-            $updateArray["{$step}Notes"] = $formData["{$step}Notes"];
             $this->order->{'set' . ucfirst($step) . 'Notes'}($formData["{$step}Notes"]);
         } else {
             $this->order->{'set' . ucfirst($step) . 'Notes'}(null);
@@ -482,6 +480,7 @@ class OrderService
         return $this->mayolinkOrderService->getRequisitionPdf($this->order->getMayoId());
     }
 
+    // Returns sample's display text and color
     public function getCustomSamplesInfo()
     {
         $samples = [];

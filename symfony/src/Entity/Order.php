@@ -704,7 +704,7 @@ class Order
     public function loadSamplesSchema($params = [])
     {
         $this->currentVersion = $this->getVersion();
-        if (!empty($params['order_samples_version'])) {
+        if (empty($this->currentVersion) && !empty($params['order_samples_version'])) {
             $this->currentVersion = $params['order_samples_version'];
         }
         $this->params = $params;
@@ -995,6 +995,7 @@ class Order
         return false;
     }
 
+    // Returns sample's code and display text
     public function getCustomRequestedSamples()
     {
         if ($this->getType() == 'saliva') {

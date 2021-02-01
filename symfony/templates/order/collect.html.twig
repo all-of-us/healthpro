@@ -55,7 +55,7 @@
     {% endif %}
     {{ form_end(collectForm) }}
     {% if order.status == 'unlock' %}
-        {{ form_start(revertForm, { 'action': path('orderRevert', { participantId: participant.id, orderId: order.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}
+        {{ form_start(revertForm, { 'action': path('order_revert', { participantId: participant.id, orderId: order.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}
         {{ form_errors(revertForm) }}
         {{ form_end(revertForm) }}
     {% endif %}

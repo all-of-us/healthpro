@@ -42,7 +42,7 @@
     </div>
     {% endif %}
     {% if app.session.get('orderType') == 'dv'and reportKitUrl and order.type == 'kit' %}
-        <button type="button" data-href="{{ app.reportKitUrl }}" class="btn btn-danger pull-right external-link">Report Kit Problem</button>
+        <button type="button" data-href="{{ reportKitUrl }}" class="btn btn-danger pull-right external-link">Report Kit Problem</button>
     {% endif %}
 </p>
 
