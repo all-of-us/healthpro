@@ -158,7 +158,9 @@ class OrderController extends AbstractController
                 if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite()) {
                     $order->setType('diversion');
                 }
-                $order->setOrderId($this->orderService->generateId());
+                if (empty($order->getOrderId())) {
+                    $order->setOrderId($this->orderService->generateId());
+                }
                 $this->em->persist($order);
                 $this->em->flush();
                 $orderId = $order->getId();
