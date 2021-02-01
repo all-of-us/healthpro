@@ -31,12 +31,5 @@
                 </tbody>
             </table>
         </div>
-        {% if orderSampleInfo is not empty %}
-            <div class="{% if app.request.get('_route') != 'order_create' %} col-sm-4 {% else %} col-sm-12 {% endif %}">
-                <div class="alert alert-info" role="alert">
-                    {{ orderSampleInfo|raw }}
-                </div>
-            </div>
-        {% endif %}
     </div>
 {% endmacro %}
