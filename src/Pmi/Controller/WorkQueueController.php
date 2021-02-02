@@ -404,6 +404,8 @@ class WorkQueueController extends AbstractController
             $headers[] = 'Gender Identity';
             $headers[] = 'Race/Ethnicity';
             $headers[] = 'Education';
+            $headers[] = 'COPE Feb PPI Survey Complete';
+            $headers[] = 'COPE Feb PPI Survey Completion Date';
 
             fputcsv($output, $headers);
 
@@ -498,6 +500,8 @@ class WorkQueueController extends AbstractController
                     $row[] = $participant->genderIdentity;
                     $row[] = $participant->race;
                     $row[] = $participant->education;
+                    $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeFeb);
+                    $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeFebAuthored, $app->getUserTimezone());
                     fputcsv($output, $row);
                 }
                 unset($participants);
