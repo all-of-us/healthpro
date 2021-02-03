@@ -200,13 +200,20 @@ class HpoApplication extends AbstractApplication
         }
     }
 
-    public function setNewRoles($user)
+    protected function setNewRoles($user)
     {
         $userRoles = UserService::getRoles($user->getAllRoles(), $this['session']->get('site'), $this['session']->get('awardee'));
         if ($user->getAllRoles() != $userRoles) {
             $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
             $this['security.token_storage']->setToken($token);
         }
+    }
+
+    protected function canManageUsers($userEmail, $groupEmail)
+    {
+        $role = $this['pmi.drc.appsclient']->getRole($userEmail, $groupEmail);
+
+        return in_array($role, ['OWNER', 'MANAGER']);
     }
 
     /** Returns the user's currently selected HPO site. */
