@@ -34,6 +34,10 @@ RUN export CLOUDSDK_PYTHON=/usr/bin/python \
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Symfony CLI
+RUN curl -sSL https://get.symfony.com/cli/installer | bash - \
+      && mv /root/.symfony/bin/symfony /usr/local/bin/symfony
+
 # Start emulator and the web server
 WORKDIR /app
 CMD ["/bin/sh", "-c", "/opt/google-cloud-sdk/bin/gcloud beta emulators datastore start & bin/console pmi:deploy --local --no-interaction 2>&1"]
