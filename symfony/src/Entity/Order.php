@@ -12,6 +12,12 @@ class Order
 {
     const FIXED_ANGLE = 'fixed_angle';
     const SWINGING_BUCKET = 'swinging_bucket';
+    const ORDER_ACTIVE = 'active';
+    const ORDER_CANCEL = 'cancel';
+    const ORDER_RESTORE = 'restore';
+    const ORDER_UNLOCK = 'unlock';
+    const ORDER_EDIT = 'edit';
+    const ORDER_REVERT = 'revert';
 
     private $params;
     private $samples;
@@ -19,6 +25,7 @@ class Order
     private $salivaSamples;
     private $salivaSamplesInformation;
     private $salivaInstructions;
+    private $currentVersion;
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL', '1SAL2'];
 
@@ -69,6 +76,26 @@ class Order
             'code' => '1PS08',
             'centrifuge_type' => 'fixed_angle'
         ]
+    ];
+
+    public static $cancelReasons = [
+        'Order created in error' => 'ORDER_CANCEL_ERROR',
+        'Order created for wrong participant' => 'ORDER_CANCEL_WRONG_PARTICIPANT',
+        'Labeling error identified after finalization' => 'ORDER_CANCEL_LABEL_ERROR',
+        'Other' => 'OTHER'
+    ];
+
+    public static $unlockReasons = [
+        'Add/Remove collected or processed samples' => 'ORDER_AMEND_SAMPLES',
+        'Change collection or processing timestamps' => 'ORDER_AMEND_TIMESTAMPS',
+        'Change Tracking number' => 'ORDER_AMEND_TRACKING',
+        'Other' => 'OTHER'
+    ];
+
+    public static $restoreReasons = [
+        'Order cancelled for wrong participant' => 'ORDER_RESTORE_WRONG_PARTICIPANT',
+        'Order can be amended instead of cancelled' => 'ORDER_RESTORE_AMEND',
+        'Other' => 'OTHER'
     ];
 
     /**
@@ -226,7 +253,7 @@ class Order
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $biobankFinalized;
+    private $biobankFinalized = false;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -625,7 +652,7 @@ class Order
         return $this->history;
     }
 
-    public function setHistoryId(?OrderHistory $history): self
+    public function setHistory(?OrderHistory $history): self
     {
         $this->history = $history;
 
@@ -644,14 +671,44 @@ class Order
         return $this;
     }
 
+    public function getSamples()
+    {
+        return $this->samples;
+    }
+
+    public function getSamplesInformation()
+    {
+        return $this->samplesInformation;
+    }
+
+    public function getSalivaSamples()
+    {
+        return $this->salivaSamples;
+    }
+
+    public function getSalivaSamplesInformation()
+    {
+        return $this->salivaSamplesInformation;
+    }
+
+    public function getSalivaInstructions()
+    {
+        return $this->salivaInstructions;
+    }
+
+    public function getCurrentVersion()
+    {
+        return $this->currentVersion;
+    }
+
     public function loadSamplesSchema($params = [])
     {
-        $currentVersion = $this->getVersion();
-        if (!empty($params['order_samples_version'])) {
-            $currentVersion = $params['order_samples_version'];
+        $this->currentVersion = $this->getVersion();
+        if (empty($this->currentVersion) && !empty($params['order_samples_version'])) {
+            $this->currentVersion = $params['order_samples_version'];
         }
         $this->params = $params;
-        $file = __DIR__ . "/../../../src/Pmi/Order/versions/{$currentVersion}.json";
+        $file = __DIR__ . "/../../../src/Pmi/Order/versions/{$this->currentVersion}.json";
         if (!file_exists($file)) {
             throw new \Exception('Samples version file not found');
         }
@@ -748,9 +805,9 @@ class Order
         $obj->created = $created->format('Y-m-d\TH:i:s\Z');
         $obj->samples = $this->getRdrSamples();
         $notes = [];
-        foreach (['Collected', 'Processed', 'Finalized'] as $step) {
-            if ($this->{'get' . $step . 'Notes'}()) {
-                $notes[$step] = $this->{'get' . $step . 'Notes'}();
+        foreach (['collected', 'processed', 'finalized'] as $step) {
+            if ($this->{'get' . ucfirst($step) . 'Notes'}()) {
+                $notes[$step] = $this->{'get' . ucfirst($step) . 'Notes'}();
             }
         }
         if (!empty($notes)) {
@@ -759,7 +816,17 @@ class Order
         return $obj;
     }
 
-    protected function getOrderUser($user)
+    public function getEditRdrObject()
+    {
+        $obj = $this->getRdrObject();
+        $obj->amendedReason = $this->getHistory()->getReason();
+        $user = $this->getOrderUser($this->getHistory()->getUser());
+        $site = $this->getOrderSite($this->getHistory()->getSite());
+        $obj->amendedInfo = $this->getOrderUserSiteData($user, $site);
+        return $obj;
+    }
+
+    public function getOrderUser($user)
     {
         if ($this->getBiobankFinalized() && empty($user)) {
             return 'BiobankUser';
@@ -768,13 +835,13 @@ class Order
         return $user->getEmail() ?? '';
     }
 
-    protected function getOrderSite($site)
+    public function getOrderSite($site)
     {
         $site = $site ?: $this->getSite();
         return \Pmi\Security\User::SITE_PREFIX . $site;
     }
 
-    protected function getOrderUserSiteData($user, $site)
+    public function getOrderUserSiteData($user, $site)
     {
         return [
             'author' => [
@@ -861,5 +928,243 @@ class Order
         } else {
             return $this->samples;
         }
+    }
+
+    public function getStatus()
+    {
+        $history = $this->getHistory();
+        if (!empty($history)) {
+            return !empty($history->getType()) ? $history->getType() : self::ORDER_ACTIVE;
+        }
+    }
+
+    public function isExpired()
+    {
+        return empty($this->getFinalizedTs()) && empty($this->getVersion());
+    }
+
+    // Finalized form is only disabled when rdr_id is set
+    public function isDisabled()
+    {
+        return ($this->getRdrId() || $this->isExpired()|| $this->isCancelled()) && $this->getStatus() !== 'unlock';
+    }
+
+    // Except finalize form all forms are disabled when finalized_ts is set
+    public function isFormDisabled()
+    {
+        return ($this->getFinalizedTs() || $this->isExpired() || $this->isCancelled()) && $this->getStatus() !== 'unlock';
+    }
+
+    public function isCancelled()
+    {
+        return $this->getStatus() === self::ORDER_CANCEL;
+    }
+
+    public function isUnlocked()
+    {
+        return $this->getStatus()=== self::ORDER_UNLOCK;
+    }
+
+    public function isFailedToReachRdr()
+    {
+        return !empty($this->getFinalizedTs()) && !empty($this->getMayoId()) && empty($this->getRdrId());
+    }
+
+    public function canCancel()
+    {
+        return !$this->isCancelled() && !$this->isUnlocked() && !$this->isFailedToReachRdr();
+    }
+
+    public function canRestore()
+    {
+        return !$this->isExpired() && $this->isCancelled() && !$this->isUnlocked() && !$this->isFailedToReachRdr();
+    }
+
+    public function canUnlock()
+    {
+        return !$this->isExpired() && !empty($this->getRdrId()) && !$this->isUnlocked() && !$this->isCancelled();
+    }
+
+    public function hasBloodSample($samples)
+    {
+        foreach ($samples as $sampleCode) {
+            if (!in_array($sampleCode, self::$nonBloodSamples)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Returns sample's code and display text
+    public function getCustomRequestedSamples()
+    {
+        if ($this->getType() == 'saliva') {
+            return $this->salivaSamples;
+        }
+        if ($this->getRequestedSamples() &&
+            ($requestedArray = json_decode($this->getRequestedSamples())) &&
+            is_array($requestedArray) &&
+            count($requestedArray) > 0
+        ) {
+            return array_intersect($this->samples, $requestedArray);
+        } else {
+            return $this->samples;
+        }
+    }
+
+    public function getEnabledSamples($set)
+    {
+        if ($this->getCollectedSamples() &&
+            ($collectedArray = json_decode($this->getCollectedSamples())) &&
+            is_array($collectedArray)
+        ) {
+            $collected = $collectedArray;
+        } else {
+            $collected = [];
+        }
+
+        if ($this->getProcessedSamples() &&
+            ($processedArray = json_decode($this->getProcessedSamples())) &&
+            is_array($processedArray)
+        ) {
+            $processed = $processedArray;
+        } else {
+            $processed = [];
+        }
+
+        switch ($set) {
+            case 'processed':
+                return array_intersect($collected, self::$samplesRequiringProcessing, $this->getCustomRequestedSamples());
+            case 'finalized':
+                $enabled = array_intersect($collected, $this->getCustomRequestedSamples());
+                foreach ($enabled as $key => $sample) {
+                    if (in_array($sample, self::$samplesRequiringProcessing) &&
+                        !in_array($sample, $processed)
+                    ) {
+                        unset($enabled[$key]);
+                    }
+                }
+                return array_values($enabled);
+            default:
+                return array_values($this->getCustomRequestedSamples());
+        }
+    }
+
+    public function getCurrentStep()
+    {
+        $columns = [
+            'print_labels' => 'Printed',
+            'collect' => 'Collected',
+            'process' => 'Processed',
+            'finalize' => 'Finalized',
+            'print_requisition' => 'Finalized'
+        ];
+        if ($this->getType() === 'kit') {
+            unset($columns['print_labels']);
+            unset($columns['print_requisition']);
+        }
+        $step = 'finalize';
+        foreach ($columns as $name => $column) {
+            if (!$this->{'get' . $column . 'Ts'}()) {
+                $step = $name;
+                break;
+            }
+        }
+        // For canceled orders set print labels step to collect
+        if ($this->isCancelled() && $step === 'print_labels') {
+            return 'collect';
+        }
+        return $step;
+    }
+
+    public function getAvailableSteps()
+    {
+        $columns = [
+            'print_labels' => 'Printed',
+            'collect' => 'Collected',
+            'process' => 'Processed',
+            'finalize' => 'Finalized',
+            'print_requisition' => 'Finalized'
+        ];
+        if ($this->getType() === 'kit') {
+            unset($columns['print_labels']);
+            unset($columns['print_requisition']);
+        }
+        $steps = [];
+        foreach ($columns as $name => $column) {
+            $steps[] = $name;
+            if (!$this->{'get' . $column . 'Ts'}()) {
+                break;
+            }
+        }
+        // For canceled orders include collect in available steps if not exists
+        if ($this->isCancelled() && !in_array('collect', $steps)) {
+            $steps[] = 'collect';
+        }
+        return $steps;
+    }
+
+    public function getWarnings()
+    {
+        $warnings = [];
+        if ($this->getType() !== 'saliva' && !empty($this->getCollectedTs()) && !empty($this->getProcessedSamplesTs())) {
+            $collectedTs = clone $this->getCollectedTs();
+            $processedSamples = json_decode($this->getProcessedSamples(), true);
+            $processedSamplesTs = json_decode($this->getProcessedSamplesTs(), true);
+            $sst = array_values(array_intersect($processedSamples, self::$sst));
+            $pst = array_values(array_intersect($processedSamples, self::$pst));
+            //Check if SST processing time is less than 30 mins after collection time
+            $collectedTs->modify('+30 minutes');
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] < $collectedTs->getTimestamp()) {
+                $warnings['sst'] = 'SST Specimen Processed Less than 30 minutes after Collection';
+            }
+            //Check if SST processing time is greater than 4 hrs after collection time
+            $collectedTs->modify('+210 minutes');
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] > $collectedTs->getTimestamp()) {
+                $warnings['sst'] = 'Processing Time is Greater than 4 hours after Collection';
+            }
+            //Check if PST processing time is greater than 4 hrs after collection time
+            if (!empty($pst) && !empty($processedSamplesTs[$pst[0]]) && $processedSamplesTs[$pst[0]] > $collectedTs->getTimestamp()) {
+                $warnings['pst'] = 'Processing Time is Greater than 4 hours after Collection';
+            }
+        }
+        return $warnings;
+    }
+
+    public function getErrors()
+    {
+        $errors = [];
+        if (!empty($this->getCollectedTs()) && !empty($this->getProcessedSamplesTs())) {
+            $collectedTs = clone $this->getCollectedTs();
+            $processedSamples = json_decode($this->getProcessedSamples(), true);
+            $processedSamplesTs = json_decode($this->getProcessedSamplesTs(), true);
+            $sst = array_values(array_intersect($processedSamples, self::$sst));
+            $pst = array_values(array_intersect($processedSamples, self::$pst));
+            $sal = array_values(array_intersect($processedSamples, $this->salivaSamples));
+            //Check if SST processing time is less than collection time
+            if (!empty($sst) && !empty($processedSamplesTs[$sst[0]]) && $processedSamplesTs[$sst[0]] <= $collectedTs->getTimestamp()) {
+                $errors['sst'] = 'SST Processing Time is before Collection Time';
+            }
+            //Check if PST processing time is less than collection time
+            if (!empty($pst) && !empty($processedSamplesTs[$pst[0]]) && $processedSamplesTs[$pst[0]] <= $collectedTs->getTimestamp()) {
+                $errors['pst'] = 'PST Processing Time is before Collection Time';
+            }
+            //Check if SAL processing time is less than collection time
+            if (!empty($sal) && !empty($processedSamplesTs[$sal[0]]) && $processedSamplesTs[$sal[0]] <= $collectedTs->getTimestamp()) {
+                $errors['sal'] = 'SAL Processing Time is before Collection Time';
+            }
+        }
+        return $errors;
+    }
+
+    public function getProcessTabClass()
+    {
+        $class = 'fa fa-check-circle text-success';
+        if (!empty($this->getErrors())) {
+            $class = 'fa fa-exclamation-circle text-danger';
+        } elseif (!empty($this->getWarnings())) {
+            $class = 'fa fa-exclamation-triangle text-warning';
+        }
+        return $class;
     }
 }

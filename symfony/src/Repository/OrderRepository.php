@@ -35,4 +35,18 @@ class OrderRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    /**
+     * @return Order[] Returns an array of Order objects
+     */
+    public function getDuplicateFedexTracking($orderId, $fedexTracking)
+    {
+        return $this->createQueryBuilder('o')
+            ->where('o.fedexTracking = :fedexTracking')
+            ->andWhere('o.id != :orderId')
+            ->setParameters(['fedexTracking' => $fedexTracking, 'orderId' => $orderId])
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

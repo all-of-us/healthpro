@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Service\RdrApiService;
+use App\Helper\Participant;
 use Pmi\Drc\Exception\FailedRequestException;
 use Pmi\Drc\Exception\InvalidResponseException;
 
@@ -19,7 +20,8 @@ class ParticipantSummaryService
     {
         try {
             $response = $this->api->get(sprintf('rdr/v1/Participant/%s/Summary', $participantId));
-            return json_decode($response->getBody());
+            $participant = json_decode($response->getBody()->getContents());
+            return new Participant($participant);
         } catch (\Exception $e) {
             error_log($e->getMessage());
             return false;
