@@ -8,6 +8,7 @@ use App\Entity\Site;
 use App\Service\TimezoneService;
 use Pmi\Drc\CodeBook;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
@@ -18,13 +19,15 @@ class AppExtension extends AbstractExtension
     private $doctrine;
     private $requestStack;
     private $router;
+    private $params;
     private $cache = [];
 
-    public function __construct(ManagerRegistry $doctrine, RouterInterface $router, RequestStack $requestStack)
+    public function __construct(ManagerRegistry $doctrine, RouterInterface $router, RequestStack $requestStack, ParameterBagInterface $params)
     {
         $this->doctrine = $doctrine;
         $this->requestStack = $requestStack;
         $this->router = $router;
+        $this->params = $params;
     }
 
     public function getFunctions()
@@ -37,7 +40,8 @@ class AppExtension extends AbstractExtension
             new TwigFunction('codebook_display', [$this, 'getCodeBookDisplay']),
             new TwigFunction('organization_display', [$this, 'getAwardeeDisplay']),
             new TwigFunction('awardee_display', [$this, 'getAwardeeDisplay']),
-            new TwigFunction('site_display', [$this, 'getSiteDisplay'])
+            new TwigFunction('site_display', [$this, 'getSiteDisplay']),
+            new TwigFunction('display_message', [$this, 'displayMessage'])
         ];
     }
 
@@ -121,5 +125,28 @@ class AppExtension extends AbstractExtension
             return $record->getName();
         }
         return $site;
+    }
+
+    public function displayMessage($name, $type = false, $options = [])
+    {
+        $configPrefix = 'messaging_';
+        $message = $this->params->has($configPrefix . $name) ? $this->params->get($configPrefix . $name) : '';
+        if (empty($message)) {
+            return '';
+        }
+        switch ($type) {
+            case 'alert':
+                if (isset($options['closeButton']) && $options['closeButton']) {
+                    $message .= ' <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                }
+                return '<div class="alert alert-info">' . $message . '</div>';
+                break;
+            case 'tooltip':
+                $tooltipText = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                return '<span title="' . $tooltipText . '" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span>';
+                break;
+            default:
+                return $message;
+        }
     }
 }

@@ -42,14 +42,14 @@ class WorkQueueController extends AbstractController
         $filters = WorkQueue::$filters;
 
         if ($this->isGranted('ROLE_AWARDEE')) {
-            // Add awardees to filters
-            $awardeesList = [];
-            $awardeesList['awardee']['label'] = 'Awardee';
+            // Add awardees list to filters
+            $organizationsList = [];
+            $organizationsList['awardee']['label'] = 'Awardee';
             foreach ($awardees as $awardee) {
-                $awardeesList['awardee']['options'][$siteService->getAwardeeDisplayName($awardee)] = $awardee;
+                $organizationsList['awardee']['options'][$siteService->getAwardeeDisplayName($awardee)] = $awardee;
             }
-            $awardeesList['awardee']['options']['Salivary Pilot'] = 'salivary_pilot';
-            $filters = array_merge($filters, $awardeesList);
+            $organizationsList['awardee']['options']['Salivary Pilot'] = 'salivary_pilot';
+            $filters = array_merge($filters, $organizationsList);
 
             // Set to selected awardee
             if (isset($params['awardee'])) {
@@ -72,7 +72,7 @@ class WorkQueueController extends AbstractController
             $filters['patientStatus']['label'] = 'Patient Status at ' . $siteService->getOrganizationDisplayName($siteService->getSiteOrganization());
         }
 
-        $sites = $siteService->getSitesFromOrganization($awardee);
+        $sites = $siteService->getAwardeeSites($awardee);
         if (!empty($sites)) {
             //Add sites filter
             $sitesList = [];
@@ -86,15 +86,15 @@ class WorkQueueController extends AbstractController
             $filters = array_merge($filters, $sitesList);
 
             //Add organization filter
-            $awardeesList = [];
-            $awardeesList['organization_id']['label'] = 'Paired Organization';
+            $organizationsList = [];
+            $organizationsList['organization_id']['label'] = 'Paired Organization';
             foreach ($sites as $site) {
                 if (!empty($site['organization_id'])) {
-                    $awardeesList['organization_id']['options'][$app->getOrganizationDisplayName($site['organization_id'])] = $site['organization_id'];
+                    $organizationsList['organization_id']['options'][$siteService->getOrganizationDisplayName($site['organization_id'])] = $site['organization_id'];
                 }
             }
-            $awardeesList['organization_id']['options']['Unpaired'] = 'UNSET';
-            $filters = array_merge($filters, $awardeesList);
+            $organizationsList['organization_id']['options']['Unpaired'] = 'UNSET';
+            $filters = array_merge($filters, $organizationsList);
         }
 
         //For ajax requests
@@ -103,16 +103,15 @@ class WorkQueueController extends AbstractController
             if (!empty($params['patientStatus'])) {
                 $params['siteOrganizationId'] = $siteService->getSiteOrganization();
             }
-            $participants = $workQueueService->participantSummarySearch($awardee, $params, $app, $type = 'wQTable');
+            $participants = $workQueueService->participantSummarySearch($awardee, $params, $type = 'wQTable');
             $ajaxData = [];
-            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $app['pmi.drc.participants']->getTotal();
-            $WorkQueue = new WorkQueue;
-            $ajaxData['data'] = $WorkQueue->generateTableRows($participants, $app);
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $workQueueService->getTotal();
+            $ajaxData['data'] = $workQueueService->generateTableRows($participants);
             $responseCode = 200;
-            if ($this->rdrError) {
+            if ($workQueueService->getRdrError()) {
                 $responseCode = 500;
             }
-            return new JsonResponse($ajaxData, $responseCode);
+            return $this->json($ajaxData, $responseCode);
         } else {
             return $this->render('workqueue/index.html.twig', [
                 'filters' => $filters,
@@ -121,11 +120,19 @@ class WorkQueueController extends AbstractController
                 'participants' => [],
                 'params' => $params,
                 'organization' => $awardee,
-                'isRdrError' => $this->rdrError,
+                'isRdrError' => $workQueueService->getRdrError(),
                 'samplesAlias' => WorkQueue::$samplesAlias,
-                'canExport' => $this->canExport($app),
-                'exportConfiguration' => $this->getExportConfiguration($app)
+                'canExport' => $workQueueService->canExport(),
+                'exportConfiguration' => $workQueueService->getExportConfiguration()
             ]);
         }
+    }
+
+    /**
+     * @Route("/export", name="workqueue_export")
+     */
+    public function exportAction(Request $request)
+    {
+        return '';
     }
 }

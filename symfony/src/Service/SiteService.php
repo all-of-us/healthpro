@@ -74,7 +74,7 @@ class SiteService
 
     public function getSuperUserAwardees()
     {
-        $sites = $this->getSiteAwardees();
+        $sites = $this->getAwardeeSites();
         if (!$sites) {
             return null;
         } else {
@@ -92,7 +92,7 @@ class SiteService
         }
     }
 
-    public function getSiteAwardees($awardee = null)
+    public function getAwardeeSites($awardee = null)
     {
         $awardee = $awardee ?? $this->getAwardeeId();
         if (!$awardee) {
@@ -105,7 +105,7 @@ class SiteService
         ]);
     }
 
-    public function getSiteOrganizations($organization)
+    public function getOrganizationSites($organization)
     {
         return $this->em->getRepository(Site::class)->findBy([
             'deleted' => 0,
@@ -123,7 +123,7 @@ class SiteService
             } else {
                 $awardee = $this->em->getRepository(Awardee::class)->findOneBy(['id' => $awardeeId]);
                 if (!empty($awardee)) {
-                    $awardeeName = $this->awardeeNameMapper[$awardeeId] = $awardee['name'];
+                    $awardeeName = $this->awardeeNameMapper[$awardeeId] = $awardee->getName();
                 }
             }
         }
@@ -139,10 +139,29 @@ class SiteService
             } else {
                 $organization = $this->em->getRepository(Organization::class)->findOneBy(['id' => $organizationId]);
                 if (!empty($organization)) {
-                    $organizationName = $this->organizationNameMapper[$organizationId] = $organization['name'];
+                    $organizationName = $this->organizationNameMapper[$organizationId] = $organization->getName();
                 }
             }
         }
         return $organizationName;
+    }
+
+    public function getSiteDisplayName($siteSuffix, $defaultToSiteSuffix = true)
+    {
+        $siteName = $defaultToSiteSuffix ? $siteSuffix : null;
+        if (!empty($siteSuffix)) {
+            if (array_key_exists($siteSuffix, $this->siteNameMapper)) {
+                $siteName = $this->siteNameMapper[$siteSuffix];
+            } else {
+                $site = $this->em->getRepository(Site::class)->findOneBy([
+                    'deleted' => 0,
+                    'googleGroup' => $siteSuffix
+                ]);
+                if (!empty($site)) {
+                    $siteName = $this->siteNameMapper[$siteSuffix] = $site->getName();
+                }
+            }
+        }
+        return $siteName;
     }
 }

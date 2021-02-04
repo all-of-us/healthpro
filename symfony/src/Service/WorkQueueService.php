@@ -2,10 +2,14 @@
 
 namespace App\Service;
 
+use App\Entity\Site;
+use App\Helper\Participant;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use App\Helper\WorkQueue;
 use Pmi\Drc\CodeBook;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 
 class WorkQueueService
@@ -16,8 +20,10 @@ class WorkQueueService
     protected $env;
     protected $siteService;
     protected $loggerService;
-    protected $order;
-    protected $participant;
+    protected $authorizationChecker;
+    protected $urlGenerator;
+
+    protected $rdrError = false;
 
     public function __construct(
         ParticipantSummaryService $participantSummaryService,
@@ -25,7 +31,9 @@ class WorkQueueService
         EntityManagerInterface $em,
         UserService $userService,
         SiteService $siteService,
-        LoggerService $loggerService
+        LoggerService $loggerService,
+        AuthorizationCheckerInterface $authorizationChecker,
+        UrlGeneratorInterface $urlGenerator
     ) {
         $this->participantSummaryService = $participantSummaryService;
         $this->params = $params;
@@ -33,9 +41,11 @@ class WorkQueueService
         $this->userService = $userService;
         $this->siteService = $siteService;
         $this->loggerService = $loggerService;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->urlGenerator = $urlGenerator;
     }
 
-    public function participantSummarySearch($organization, &$params, $app, $type = null)
+    public function participantSummarySearch($organization, &$params, $type = null)
     {
         $rdrParams = [];
         $next = true;
@@ -174,7 +184,7 @@ class WorkQueueService
         }
         $results = [];
         try {
-            $summaries = $this->participantSummaryService->listParticipantSummaries($rdrParams);
+            $summaries = $this->participantSummaryService->listWorkQueueParticipantSummaries($rdrParams, $next);
             foreach ($summaries as $summary) {
                 if (isset($summary->resource)) {
                     $results[] = new Participant($summary->resource);
@@ -184,5 +194,192 @@ class WorkQueueService
             $this->rdrError = true;
         }
         return $results;
+    }
+
+    public function generateTableRows($participants)
+    {
+        $e = function ($string) {
+            return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        };
+        $rows = [];
+        $userTimezone = $this->userService->getUser()->getInfo()['timezone'];
+        foreach ($participants as $participant) {
+            $row = [];
+            //Identifiers and status
+            if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
+                $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
+                $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
+                $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
+            } else {
+                $row['lastName'] = $e($participant->lastName);
+                $row['firstName'] = $e($participant->firstName);
+                $row['middleName'] = $e($participant->middleName);
+            }
+            if (!empty($participant->dob)) {
+                $row['dateOfBirth'] = $participant->dob->format('m/d/Y');
+            } else {
+                $row['dateOfBirth'] = '';
+            }
+            $row['patientStatusYes'] = $this->getPatientStatus($participant, 'YES');
+            $row['patientStatusNo'] = $this->getPatientStatus($participant, 'NO');
+            $row['patientStatusUnknown'] = $this->getPatientStatus($participant, 'NO_ACCESS');
+            $row['patientStatusNoAccess'] = $this->getPatientStatus($participant, 'UNKNOWN');
+            $row['participantId'] = $e($participant->id);
+            $row['biobankId'] = $e($participant->biobankId);
+            $row['participantOrigin'] = $e($participant->participantOrigin);
+            $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . WorkQueue::dateFromString($participant->enrollmentStatusCoreStoredSampleTime,
+                    $app->getUserTimezone()) : '';
+            $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
+            $row['activityStatus'] = WorkQueue::getActivityStatus($participant, $userTimezone);
+            $row['withdrawalReason'] = $e($participant->withdrawalReason);
+            $row['consentCohort'] = $e($participant->consentCohortText);
+            $row['primaryConsent'] = WorkQueue::displayConsentStatus($participant->consentForStudyEnrollment,
+                $participant->consentForStudyEnrollmentAuthored, $userTimezone);
+            $row['firstPrimaryConsent'] = WorkQueue::displayFirstConsentStatusTime($participant->consentForStudyEnrollmentFirstYesAuthored,
+                $userTimezone);
+            $row['questionnaireOnDnaProgram'] = WorkQueue::displayProgramUpdate($participant, $userTimezone);
+            $row['firstEhrConsent'] = WorkQueue::displayFirstConsentStatusTime($participant->consentForElectronicHealthRecordsFirstYesAuthored,
+                $userTimezone, 'ehr');
+            $row['ehrConsent'] = WorkQueue::displayConsentStatus($participant->consentForElectronicHealthRecords,
+                $participant->consentForElectronicHealthRecordsAuthored, $userTimezone);
+            $row['ehrConsentExpireStatus'] = WorkQueue::displayEhrConsentExpireStatus($participant->ehrConsentExpireStatus,
+                $participant->consentForElectronicHealthRecords, $participant->ehrConsentExpireAuthored, $userTimezone);
+            $row['gRoRConsent'] = WorkQueue::displayGenomicsConsentStatus($participant->consentForGenomicsROR,
+                $participant->consentForGenomicsRORAuthored, $userTimezone);
+            $row['primaryLanguage'] = $e($participant->primaryLanguage);
+            $row['dvEhrStatus'] = WorkQueue::displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing,
+                $participant->consentForDvElectronicHealthRecordsSharingAuthored, $userTimezone);
+            $row['caborConsent'] = WorkQueue::displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored,
+                $userTimezone);
+            $row['retentionEligibleStatus'] = WorkQueue::getRetentionEligibleStatus($participant->retentionEligibleStatus,
+                $participant->retentionEligibleTime, $userTimezone);
+            $row['retentionType'] = WorkQueue::getRetentionType($participant->retentionType);
+            $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
+            $row['isEhrDataAvailable'] = WorkQueue::getEhrAvailableStatus($participant->isEhrDataAvailable);
+            $row['latestEhrReceiptTime'] = WorkQueue::dateFromString($participant->latestEhrReceiptTime, $userTimezone);
+
+            //Contact
+            $row['contactMethod'] = $e($participant->recontactMethod);
+            if ($participant->getAddress()) {
+                $row['address'] = $e($participant->getAddress());
+            } else {
+                $row['address'] = '';
+            }
+            $row['email'] = $e($participant->email);
+            $row['loginPhone'] = $e($participant->loginPhoneNumber);
+            $row['phone'] = $e($participant->phoneNumber);
+
+            //PPI Surveys
+            if ($participant->numCompletedBaselinePPIModules == 3) {
+                $row['ppiStatus'] = WorkQueue::HTML_SUCCESS;
+            } else {
+                $row['ppiStatus'] = WorkQueue::HTML_DANGER;
+            }
+            $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
+            foreach (array_keys(WorkQueue::$surveys) as $field) {
+                $row["ppi{$field}"] = WorkQueue::displaySurveyStatus($participant->{'questionnaireOn' . $field},
+                    $participant->{'questionnaireOn' . $field . 'Authored'}, $userTimezone);
+            }
+
+            //In-Person Enrollment
+            $row['pairedSite'] = $this->siteService->getSiteDisplayName($e($participant->siteSuffix));
+            $row['pairedOrganization'] = $this->siteService->getOrganizationDisplayName($e($participant->organization));
+            $row['physicalMeasurementsStatus'] = WorkQueue::displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED',
+                $participant->physicalMeasurementsFinalizedTime, $userTimezone, false);
+            $row['evaluationFinalizedSite'] = $this->siteService->getSiteDisplayName($e($participant->evaluationFinalizedSite));
+            $row['biobankDnaStatus'] = WorkQueue::displayStatus($participant->samplesToIsolateDNA, 'RECEIVED', $userTimezone);
+            if ($participant->numBaselineSamplesArrived >= 7) {
+                $row['biobankSamples'] = WorkQueue::HTML_SUCCESS . ' ' . $e($participant->numBaselineSamplesArrived);
+            } else {
+                $row['biobankSamples'] = $e($participant->numBaselineSamplesArrived);;
+            }
+            $row['orderCreatedSite'] = $this->siteService->getSiteDisplayName($e($participant->orderCreatedSite));
+            foreach (array_keys(WorkQueue::$samples) as $sample) {
+                $newSample = $sample;
+                foreach (WorkQueue::$samplesAlias as $sampleAlias) {
+                    if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} == 'RECEIVED') {
+                        $newSample = $sampleAlias[$sample];
+                        break;
+                    }
+                }
+                $row["sample{$sample}"] = WorkQueue::displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED', $userTimezone,
+                    $participant->{'sampleStatus' . $newSample . 'Time'}, false);
+                if ($sample === '1SAL' && $participant->{'sampleStatus' . $newSample} === 'RECEIVED' && $participant->{'sampleStatus' . $newSample . 'Time'} && $participant->sample1SAL2CollectionMethod) {
+                    $row["sample{$sample}"] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
+                }
+            }
+
+            //Demographics
+            $row['age'] = $e($participant->age);
+            $row['sex'] = $e($participant->sex);
+            $row['genderIdentity'] = $e($participant->genderIdentity);
+            $row['race'] = $e($participant->race);
+            $row['education'] = $e($participant->education);
+            array_push($rows, $row);
+        }
+        return $rows;
+    }
+
+    public function generateLink($id, $name)
+    {
+        if ($this->authorizationChecker->isGranted('ROLE_USER')) {
+            $url = "/participant/{$id}";
+        } else {
+            $url = "/workqueue/participant/{$id}";
+        }
+        $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        return sprintf('<a href="%s">%s</a>', $url, $text);
+    }
+
+    public function getPatientStatus($participant, $value, $type = 'wq')
+    {
+        // Clear patient status for withdrawn participants
+        if ($participant->isWithdrawn) {
+            return '';
+        }
+        $organizations = [];
+        foreach ($participant->patientStatus as $patientStatus) {
+            if ($patientStatus->status === $value) {
+                if ($type === 'export') {
+                    $organizations[] = $patientStatus->organization;
+                } else {
+                    $organizations[] = $this->siteService->getOrganizationDisplayName($patientStatus->organization);
+                }
+            }
+        }
+        return implode('; ', $organizations);
+    }
+
+
+    public function canExport()
+    {
+        if ($this->authorizationChecker->isGranted('ROLE_AWARDEE')) {
+            return true;
+        }
+        $site = $this->em->getRepository(Site::class)->findOneBy([
+            'deleted' => 0,
+            'googleGroup' => $this->siteService->getSiteId(),
+            'workqueueDownload' => WorkQueue::FULL_DATA_ACCESS
+        ]);
+        return !empty($site) ? true : null;
+    }
+
+    public function getExportConfiguration()
+    {
+        return [
+            'limit' => $this->params->has('workqueue_export_limit') ? $this->params->get('workqueue_export_limit') : WorkQueue::LIMIT_EXPORT,
+            'pageSize' => $this->params->has('workqueue_export_page_size') ? $this->params->get('workqueue_export_page_size') : WorkQueue::LIMIT_EXPORT_PAGE_SIZE
+        ];
+    }
+
+    public function getRdrError()
+    {
+        return $this->rdrError;
+    }
+
+    public function getTotal()
+    {
+        return $this->participantSummaryService->getTotal();
     }
 }

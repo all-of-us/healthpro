@@ -15,8 +15,6 @@ class WorkQueue
     const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
     const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
 
-    protected $app;
-
     // These are used to map a DataTables column index to an RDR field for sorting
     public static $sortColumns = [
         'lastName',
@@ -335,117 +333,6 @@ class WorkQueue
         ]
     ];
 
-    public function generateTableRows($participants, $app)
-    {
-        $e = function($string) {
-            return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        };
-        $this->app = $app;
-        $rows = [];
-        foreach ($participants as $participant) {
-            $row = [];
-            //Identifiers and status
-            if ($this->app->hasRole('ROLE_USER') || $this->app->hasRole('ROLE_AWARDEE_SCRIPPS')) {
-                $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
-                $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
-                $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
-            } else {
-                $row['lastName'] = $e($participant->lastName);
-                $row['firstName'] = $e($participant->firstName);
-                $row['middleName'] = $e($participant->middleName);
-            }
-            if (!empty($participant->dob)) {
-                $row['dateOfBirth'] = $participant->dob->format('m/d/Y');
-            } else {
-                $row['dateOfBirth'] = '';
-            }
-            $row['patientStatusYes'] = $this->getPatientStatus($participant, 'YES');
-            $row['patientStatusNo'] = $this->getPatientStatus($participant, 'NO');
-            $row['patientStatusUnknown'] = $this->getPatientStatus($participant, 'NO_ACCESS');
-            $row['patientStatusNoAccess'] = $this->getPatientStatus($participant, 'UNKNOWN');
-            $row['participantId'] = $e($participant->id);
-            $row['biobankId'] = $e($participant->biobankId);
-            $row['participantOrigin'] = $e($participant->participantOrigin);
-            $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
-            $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
-            $row['activityStatus'] = $this->getActivityStatus($participant);
-            $row['withdrawalReason'] = $e($participant->withdrawalReason);
-            $row['consentCohort'] = $e($participant->consentCohortText);
-            $row['primaryConsent'] = $this->displayConsentStatus($participant->consentForStudyEnrollment, $participant->consentForStudyEnrollmentAuthored);
-            $row['firstPrimaryConsent'] = $this->displayFirstConsentStatusTime($participant->consentForStudyEnrollmentFirstYesAuthored);
-            $row['questionnaireOnDnaProgram'] = $this->displayProgramUpdate($participant);
-            $row['firstEhrConsent'] = $this->displayFirstConsentStatusTime($participant->consentForElectronicHealthRecordsFirstYesAuthored, 'ehr');
-            $row['ehrConsent'] = $this->displayConsentStatus($participant->consentForElectronicHealthRecords, $participant->consentForElectronicHealthRecordsAuthored);
-            $row['ehrConsentExpireStatus'] = $this->displayEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords, $participant->ehrConsentExpireAuthored);
-            $row['gRoRConsent'] = $this->displayGenomicsConsentStatus($participant->consentForGenomicsROR, $participant->consentForGenomicsRORAuthored);
-            $row['primaryLanguage'] = $e($participant->primaryLanguage);
-            $row['dvEhrStatus'] = $this->displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing, $participant->consentForDvElectronicHealthRecordsSharingAuthored);
-            $row['caborConsent'] = $this->displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored);
-            $row['retentionEligibleStatus'] = $this->getRetentionEligibleStatus($participant->retentionEligibleStatus, $participant->retentionEligibleTime);
-            $row['retentionType'] = $this->getRetentionType($participant->retentionType);
-            $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
-            $row['isEhrDataAvailable'] = $this->getEhrAvailableStatus($participant->isEhrDataAvailable);
-            $row['latestEhrReceiptTime'] = self::dateFromString($participant->latestEhrReceiptTime, $app->getUserTimezone());
-
-            //Contact
-            $row['contactMethod'] = $e($participant->recontactMethod);
-            if ($participant->getAddress()) {
-                $row['address'] = $e($participant->getAddress());
-            } else {
-                $row['address'] = '';
-            }
-            $row['email'] = $e($participant->email);
-            $row['loginPhone'] = $e($participant->loginPhoneNumber);
-            $row['phone'] = $e($participant->phoneNumber);
-
-            //PPI Surveys
-            if ($participant->numCompletedBaselinePPIModules == 3) {
-                $row['ppiStatus'] = self::HTML_SUCCESS;
-            }
-            else {
-                $row['ppiStatus'] = self::HTML_DANGER;
-            }
-            $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
-            foreach (array_keys(self::$surveys) as $field) {
-                $row["ppi{$field}"] = $this->displaySurveyStatus($participant->{'questionnaireOn' . $field}, $participant->{'questionnaireOn' . $field . 'Authored'});
-            }
-
-            //In-Person Enrollment
-            $row['pairedSite'] = $this->app->getSiteDisplayName($e($participant->siteSuffix));
-            $row['pairedOrganization'] = $this->app->getOrganizationDisplayName($e($participant->organization));
-            $row['physicalMeasurementsStatus'] = $this->displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $participant->physicalMeasurementsFinalizedTime, false);
-            $row['evaluationFinalizedSite'] = $this->app->getSiteDisplayName($e($participant->evaluationFinalizedSite));
-            $row['biobankDnaStatus'] = $this->displayStatus($participant->samplesToIsolateDNA, 'RECEIVED');
-            if ($participant->numBaselineSamplesArrived >= 7) {
-                $row['biobankSamples'] = self::HTML_SUCCESS . ' ' . $e($participant->numBaselineSamplesArrived);
-            } else {
-                $row['biobankSamples'] = $e($participant->numBaselineSamplesArrived);;
-            }
-            $row['orderCreatedSite'] = $this->app->getSiteDisplayName($e($participant->orderCreatedSite));
-            foreach (array_keys(self::$samples) as $sample) {
-                $newSample = $sample;
-                foreach (self::$samplesAlias as $sampleAlias) {
-                    if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} == 'RECEIVED') {
-                        $newSample = $sampleAlias[$sample];
-                        break;
-                    }
-                }
-                $row["sample{$sample}"] = $this->displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED', $participant->{'sampleStatus' . $newSample . 'Time'}, false);
-                if ($sample === '1SAL' && $participant->{'sampleStatus' . $newSample} === 'RECEIVED' && $participant->{'sampleStatus' . $newSample . 'Time'} && $participant->sample1SAL2CollectionMethod) {
-                    $row["sample{$sample}"] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
-                }
-            }
-
-            //Demographics
-            $row['age'] = $e($participant->age);
-            $row['sex'] = $e($participant->sex);
-            $row['genderIdentity'] = $e($participant->genderIdentity);
-            $row['race'] = $e($participant->race);
-            $row['education'] = $e($participant->education);
-            array_push($rows, $row);
-        }
-        return $rows;
-    }
 
     public static function dateFromString($string, $timezone, $displayTime = true)
     {
@@ -519,17 +406,17 @@ class WorkQueue
         }
     }
 
-    public function displayStatus($value, $successStatus, $time = null, $displayTime = true)
+    public static function displayStatus($value, $successStatus, $userTimezone, $time = null, $displayTime = true)
     {
         if ($value === $successStatus) {
-            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
         } elseif ($value === "{$successStatus}_NOT_SURE") {
-            return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
+            return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
         }
         return self::HTML_DANGER;
     }
 
-    public function displaySurveyStatus($value, $time, $displayTime = true)
+    public static function displaySurveyStatus($value, $time, $userTimezone, $displayTime = true)
     {
         if ($value === 'SUBMITTED') {
             $status = self::HTML_SUCCESS;
@@ -538,105 +425,81 @@ class WorkQueue
         } else {
             $status = self::HTML_DANGER;
         }
-        return $status . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
+        return $status . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
     }
 
-    public function displayConsentStatus($value, $time, $displayTime = true)
+    public static function displayConsentStatus($value, $time, $userTimezone, $displayTime = true)
     {
         switch ($value) {
             case 'SUBMITTED':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Consented Yes)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Consented Yes)';
             case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Refused Consent)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Refused Consent)';
             case 'SUBMITTED_NOT_SURE':
-                return self::HTML_WARNING . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Responded Not Sure)';
+                return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Responded Not Sure)';
             case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Invalid)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Invalid)';
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
     }
 
-    public function displayFirstConsentStatusTime($time, $type = 'primary', $displayTime = true)
+    public static function displayFirstConsentStatusTime($time, $userTimezone, $type = 'primary', $displayTime = true)
     {
         if (!empty($time)) {
-            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime);
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
         } elseif ($type === 'ehr') {
             return self::HTML_DANGER . ' (never consented yes)';
         }
         return '';
     }
 
-    public function displayGenomicsConsentStatus($value, $time, $displayTime = true)
+    public static function displayGenomicsConsentStatus($value, $time, $userTimezone, $displayTime = true)
     {
         switch ($value) {
             case 'SUBMITTED':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Consented Yes)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Consented Yes)';
             case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Refused Consent)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Refused Consent)';
             case 'SUBMITTED_NOT_SURE':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Responded Not Sure)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Responded Not Sure)';
             case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Invalid)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Invalid)';
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
     }
 
-    public function displayEhrConsentExpireStatus($ehrConsentExpireStatus, $consentForElectronicHealthRecords, $time, $displayTime = true)
-    {
+    public static function displayEhrConsentExpireStatus(
+        $ehrConsentExpireStatus,
+        $consentForElectronicHealthRecords,
+        $time,
+        $userTimezone,
+        $displayTime = true
+    ) {
         if ($ehrConsentExpireStatus === 'EXPIRED') {
-            return self::HTML_DANGER . ' ' . self::dateFromString($time, $this->app->getUserTimezone(), $displayTime) . ' (Expired)';
+            return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Expired)';
         } elseif ($consentForElectronicHealthRecords === 'SUBMITTED' && empty($ehrConsentExpireStatus)) {
             return self::HTML_SUCCESS . ' Active';
         }
         return '';
     }
 
-    public function generateLink($id, $name)
-    {
-        if($this->app->hasRole('ROLE_USER')) {
-            $url = $this->app['url_generator']->generate('participant', ['id' => $id]);
-        } else {
-            $url = $this->app['url_generator']->generate('workqueue_participant', ['id' => $id]);
-        }
-        $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-
-        return sprintf('<a href="%s">%s</a>', $url, $text);
-    }
-
-    public function getPatientStatus($participant, $value, $type = 'wq')
-    {
-        // Clear patient status for withdrawn participants
-        if ($participant->isWithdrawn) {
-            return '';
-        }
-        $organizations = [];
-        foreach ($participant->patientStatus as $patientStatus) {
-            if ($patientStatus->status === $value) {
-                if ($type === 'export') {
-                    $organizations[] = $patientStatus->organization;
-                } else {
-                    $organizations[] = $this->app->getOrganizationDisplayName($patientStatus->organization);
-                }
-            }
-        }
-        return implode('; ', $organizations);
-    }
-
-    public function getActivityStatus($participant)
+    public static function getActivityStatus($participant, $userTimezone)
     {
         switch ($participant->activityStatus) {
             case 'withdrawn':
-                return self::HTML_DANGER . '<span class="text-danger"> Withdrawn </span>' . self::dateFromString($participant->withdrawalAuthored, $this->app->getUserTimezone());
+                return self::HTML_DANGER . '<span class="text-danger"> Withdrawn </span>' . self::dateFromString($participant->withdrawalAuthored,
+                        $userTimezone);
             case 'active':
                 return self::HTML_SUCCESS . ' Active';
             case 'deactivated':
-                return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $this->app->getUserTimezone());
+                return self::HTML_NOTICE . ' Deactivated ' . self::dateFromString($participant->suspensionTime, $userTimezone);
             case 'deceased':
                 if ($participant->dateOfDeath) {
                     $dateOfDeath = date('n/j/Y', strtotime($participant->dateOfDeath));
-                    return sprintf(self::HTML_DANGER . ' %s %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased', $dateOfDeath);
+                    return sprintf(self::HTML_DANGER . ' %s %s',
+                        ($participant->deceasedStatus == 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased', $dateOfDeath);
                 }
                 return sprintf(self::HTML_DANGER . ' %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased');
             default:
@@ -644,28 +507,28 @@ class WorkQueue
         }
     }
 
-    public function displayProgramUpdate($participant)
+    public static function displayProgramUpdate($participant, $userTimezone)
     {
         if ($participant->consentCohort !== 'COHORT_2') {
             return self::HTML_NOTICE . ' (not applicable) ';
         } elseif ($participant->questionnaireOnDnaProgram === 'SUBMITTED') {
-            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->questionnaireOnDnaProgramAuthored, $this->app->getUserTimezone());
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->questionnaireOnDnaProgramAuthored, $userTimezone);
         } else {
             return self::HTML_DANGER . '<span class="text-danger"> (review not completed) </span>';
         }
     }
 
-    public function getRetentionEligibleStatus($value, $time)
+    public static function getRetentionEligibleStatus($value, $time, $userTimezone)
     {
         if ($value === 'ELIGIBLE') {
-            return self::HTML_SUCCESS . ' (Yes) <br/>' . self::dateFromString($time, $this->app->getUserTimezone());
+            return self::HTML_SUCCESS . ' (Yes) <br/>' . self::dateFromString($time, $userTimezone);
         } elseif ($value === 'NOT_ELIGIBLE') {
             return self::HTML_DANGER . ' (No)';
         }
         return '';
     }
 
-    public function getRetentionType($value)
+    public static function getRetentionType($value)
     {
         switch ($value) {
             case 'ACTIVE':
@@ -679,7 +542,7 @@ class WorkQueue
         }
     }
 
-    public function getEhrAvailableStatus($value)
+    public static function getEhrAvailableStatus($value)
     {
         if ($value) {
             return self::HTML_SUCCESS . ' Yes';
