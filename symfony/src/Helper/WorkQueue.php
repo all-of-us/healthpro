@@ -15,7 +15,10 @@ class WorkQueue
     const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
     const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
 
-    // These are used to map a DataTables column index to an RDR field for sorting
+    /**
+     * @var array
+     * These are used to map a DataTables column index to an RDR field for sorting
+     */
     public static $sortColumns = [
         'lastName',
         'firstName',
@@ -91,6 +94,9 @@ class WorkQueue
         'education',
     ];
 
+    /**
+     * @var array
+     */
     public static $filters = [
         'activityStatus' => [
             'label' => 'Activity Status',
@@ -229,7 +235,10 @@ class WorkQueue
         ]
     ];
 
-    // These are currently not working in the RDR
+    /**
+     * @var array
+     * These are currently not working in the RDR
+     */
     public static $filtersDisabled = [
         'language' => [
             'label' => 'Language',
@@ -275,6 +284,9 @@ class WorkQueue
         ]
     ];
 
+    /**
+     * @var array
+     */
     public static $surveys = [
         'TheBasics' => 'Basics',
         'OverallHealth' => 'Health',
@@ -290,6 +302,9 @@ class WorkQueue
         'CopeFeb' => 'COPE Feb'
     ];
 
+    /**
+     * @var array
+     */
     public static $initialSurveys = [
         'TheBasics',
         'OverallHealth',
@@ -304,6 +319,9 @@ class WorkQueue
         'CopeDec'
     ];
 
+    /**
+     * @var array
+     */
     public static $samples = [
         '1SST8' => '8 mL SST',
         '1PST8' => '8 mL PST',
@@ -319,6 +337,9 @@ class WorkQueue
         '1SAL' => 'Saliva'
     ];
 
+    /**
+     * @var array
+     */
     public static $samplesAlias = [
         [
             '1SST8' => '1SS08',
@@ -334,6 +355,12 @@ class WorkQueue
     ];
 
 
+    /**
+     * @param $string
+     * @param $timezone
+     * @param bool $displayTime
+     * @return string
+     */
     public static function dateFromString($string, $timezone, $displayTime = true)
     {
         if (!empty($string)) {
@@ -352,11 +379,19 @@ class WorkQueue
         }
     }
 
+    /**
+     * @param $date
+     * @return string
+     */
     public static function csvDateFromObject($date)
     {
         return is_object($date) ? $date->format('m/d/Y') : '';
     }
 
+    /**
+     * @param $status
+     * @return int
+     */
     public static function csvStatusFromSubmitted($status)
     {
         switch ($status) {
@@ -369,6 +404,11 @@ class WorkQueue
         }
     }
 
+    /**
+     * @param $ehrConsentExpireStatus
+     * @param $consentForElectronicHealthRecords
+     * @return int|string
+     */
     public static function csvEhrConsentExpireStatus($ehrConsentExpireStatus, $consentForElectronicHealthRecords)
     {
         if ($ehrConsentExpireStatus === 'EXPIRED') {
@@ -379,6 +419,10 @@ class WorkQueue
         return '';
     }
 
+    /**
+     * @param $value
+     * @return int
+     */
     public static function csvRetentionType($value)
     {
         switch ($value) {
@@ -393,6 +437,10 @@ class WorkQueue
         }
     }
 
+    /**
+     * @param $value
+     * @return int
+     */
     public static function csvDeceasedStatus($value)
     {
         switch ($value) {
@@ -406,6 +454,14 @@ class WorkQueue
         }
     }
 
+    /**
+     * @param $value
+     * @param $successStatus
+     * @param $userTimezone
+     * @param null $time
+     * @param bool $displayTime
+     * @return string
+     */
     public static function displayStatus($value, $successStatus, $userTimezone, $time = null, $displayTime = true)
     {
         if ($value === $successStatus) {
@@ -416,6 +472,13 @@ class WorkQueue
         return self::HTML_DANGER;
     }
 
+    /**
+     * @param $value
+     * @param $time
+     * @param $userTimezone
+     * @param bool $displayTime
+     * @return string
+     */
     public static function displaySurveyStatus($value, $time, $userTimezone, $displayTime = true)
     {
         if ($value === 'SUBMITTED') {
@@ -428,6 +491,13 @@ class WorkQueue
         return $status . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
     }
 
+    /**
+     * @param $value
+     * @param $time
+     * @param $userTimezone
+     * @param bool $displayTime
+     * @return string
+     */
     public static function displayConsentStatus($value, $time, $userTimezone, $displayTime = true)
     {
         switch ($value) {
@@ -444,6 +514,13 @@ class WorkQueue
         }
     }
 
+    /**
+     * @param $time
+     * @param $userTimezone
+     * @param string $type
+     * @param bool $displayTime
+     * @return string
+     */
     public static function displayFirstConsentStatusTime($time, $userTimezone, $type = 'primary', $displayTime = true)
     {
         if (!empty($time)) {
@@ -454,6 +531,13 @@ class WorkQueue
         return '';
     }
 
+    /**
+     * @param $value
+     * @param $time
+     * @param $userTimezone
+     * @param bool $displayTime
+     * @return string
+     */
     public static function displayGenomicsConsentStatus($value, $time, $userTimezone, $displayTime = true)
     {
         switch ($value) {
@@ -470,6 +554,14 @@ class WorkQueue
         }
     }
 
+    /**
+     * @param $ehrConsentExpireStatus
+     * @param $consentForElectronicHealthRecords
+     * @param $time
+     * @param $userTimezone
+     * @param bool $displayTime
+     * @return string
+     */
     public static function displayEhrConsentExpireStatus(
         $ehrConsentExpireStatus,
         $consentForElectronicHealthRecords,
@@ -485,6 +577,11 @@ class WorkQueue
         return '';
     }
 
+    /**
+     * @param $participant
+     * @param $userTimezone
+     * @return string
+     */
     public static function getActivityStatus($participant, $userTimezone)
     {
         switch ($participant->activityStatus) {
@@ -499,14 +596,19 @@ class WorkQueue
                 if ($participant->dateOfDeath) {
                     $dateOfDeath = date('n/j/Y', strtotime($participant->dateOfDeath));
                     return sprintf(self::HTML_DANGER . ' %s %s',
-                        ($participant->deceasedStatus == 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased', $dateOfDeath);
+                        ($participant->deceasedStatus === 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased', $dateOfDeath);
                 }
-                return sprintf(self::HTML_DANGER . ' %s', ($participant->deceasedStatus == 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased');
+                return sprintf(self::HTML_DANGER . ' %s', ($participant->deceasedStatus === 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased');
             default:
                 return '';
         }
     }
 
+    /**
+     * @param $participant
+     * @param $userTimezone
+     * @return string
+     */
     public static function displayProgramUpdate($participant, $userTimezone)
     {
         if ($participant->consentCohort !== 'COHORT_2') {
@@ -518,6 +620,12 @@ class WorkQueue
         }
     }
 
+    /**
+     * @param $value
+     * @param $time
+     * @param $userTimezone
+     * @return string
+     */
     public static function getRetentionEligibleStatus($value, $time, $userTimezone)
     {
         if ($value === 'ELIGIBLE') {
@@ -528,6 +636,10 @@ class WorkQueue
         return '';
     }
 
+    /**
+     * @param $value
+     * @return string
+     */
     public static function getRetentionType($value)
     {
         switch ($value) {
@@ -542,6 +654,10 @@ class WorkQueue
         }
     }
 
+    /**
+     * @param $value
+     * @return string
+     */
     public static function getEhrAvailableStatus($value)
     {
         if ($value) {
@@ -550,6 +666,9 @@ class WorkQueue
         return self::HTML_DANGER . ' No';
     }
 
+    /**
+     * @return array
+     */
     public static function getExportHeaders()
     {
         $headers = [
@@ -609,7 +728,7 @@ class WorkQueue
             'Completed Surveys'
         ];
         foreach (self::$surveys as $survey => $label) {
-            if (in_array($survey, self::$initialSurveys)) {
+            if (in_array($survey, self::$initialSurveys, true)) {
                 $headers[] = $label . ' PPI Survey Complete';
                 $headers[] = $label . ' PPI Survey Completion Date';
             }
