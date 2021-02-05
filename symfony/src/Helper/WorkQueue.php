@@ -549,4 +549,90 @@ class WorkQueue
         }
         return self::HTML_DANGER . ' No';
     }
+
+    public static function getExportHeaders()
+    {
+        $headers = [
+            'Last Name',
+            'First Name',
+            'Middle Initial',
+            'Date of Birth',
+            'PMI ID',
+            'Biobank ID',
+            'Participant Status',
+            'Core Participant Date',
+            'Withdrawal Status',
+            'Withdrawal Date',
+            'Withdrawal Reason',
+            'Deactivation Status',
+            'Deactivation Date',
+            'Deceased',
+            'Date of Death',
+            'Date of Death Approval',
+            'Participant Origination',
+            'Consent Cohort',
+            'Date of First Primary Consent',
+            'Primary Consent Status',
+            'Primary Consent Date',
+            'Program Update',
+            'Date of Program Update',
+            'Date of First EHR Consent',
+            'EHR Consent Status',
+            'EHR Consent Date',
+            'EHR Expiration Status',
+            'EHR Expiration Date',
+            'gRoR Consent Status',
+            'gRoR Consent Date',
+            'Language of Primary Consent',
+            'DV-only EHR Sharing',
+            'DV-only EHR Sharing Date',
+            'CABoR Consent Status',
+            'CABoR Consent Date',
+            'Retention Eligible',
+            'Date of Retention Eligibility',
+            'Retention Status',
+            'EHR Data Transfer',
+            'Most Recent EHR Receipt',
+            'Patient Status: Yes',
+            'Patient Status: No',
+            'Patient Status: No Access',
+            'Patient Status: Unknown',
+            'Street Address',
+            'Street Address2',
+            'City',
+            'State',
+            'ZIP',
+            'Email',
+            'Login Phone',
+            'Phone',
+            'Required PPI Surveys Complete',
+            'Completed Surveys'
+        ];
+        foreach (self::$surveys as $survey => $label) {
+            if (in_array($survey, self::$initialSurveys)) {
+                $headers[] = $label . ' PPI Survey Complete';
+                $headers[] = $label . ' PPI Survey Completion Date';
+            }
+        }
+        $headers[] = 'Paired Site';
+        $headers[] = 'Paired Organization';
+        $headers[] = 'Physical Measurements Status';
+        $headers[] = 'Physical Measurements Completion Date';
+        $headers[] = 'Physical Measurements Site';
+        $headers[] = 'Samples to Isolate DNA';
+        $headers[] = 'Baseline Samples';
+        $headers[] = 'Biospecimens Site';
+        foreach (self::$samples as $sample => $label) {
+            $headers[] = $label . ' Received';
+            $headers[] = $label . ' Received Date';
+        }
+        $headers[] = 'Saliva Collection';
+        $headers[] = 'Sex';
+        $headers[] = 'Gender Identity';
+        $headers[] = 'Race/Ethnicity';
+        $headers[] = 'Education';
+        $headers[] = 'COPE Feb PPI Survey Complete';
+        $headers[] = 'COPE Feb PPI Survey Completion Date';
+        return $headers;
+    }
 }

@@ -112,4 +112,9 @@ class ParticipantSummaryService
     {
         return $this->total;
     }
+
+    public function getNextToken()
+    {
+        return $this->nextToken;
+    }
 }
