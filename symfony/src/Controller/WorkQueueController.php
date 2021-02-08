@@ -45,7 +45,7 @@ class WorkQueueController extends AbstractController
     }
 
     /**
-     * @Route("/", name="workqueue_home")
+     * @Route("/", name="workqueue_index")
      */
     public function index(Request $request)
     {

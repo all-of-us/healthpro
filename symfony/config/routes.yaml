@@ -34,9 +34,6 @@ review_ordersRecentModify:
 review_measurementsRecentModify:
     path: /review/measurements/recent/modify
 
-workqueue_index:
-    path: /workqueue
-
 dashboard_home:
     path: /dashboard
 
