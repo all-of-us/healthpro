@@ -66,39 +66,6 @@ class OrderRepository extends DoctrineRepository
         return $orders;
     }
 
-    public function getSiteUnfinalizedOrders($siteId)
-    {
-        $ordersQuery = "
-            SELECT o.*,
-                   oh.order_id AS oh_order_id,
-                   oh.user_id AS oh_user_id,
-                   oh.site AS oh_site,
-                   oh.type AS h_type,
-                   oh.created_ts AS oh_created_ts
-            FROM orders o
-            LEFT JOIN orders_history oh ON o.history_id = oh.id
-            WHERE o.site = :site
-              AND (o.finalized_ts IS NULL OR o.biobank_finalized = :biobankFinalized)
-              AND ((oh.type != :type1 AND oh.type != :type2)
-              OR oh.type IS NULL)
-            ORDER BY o.created_ts DESC
-        ";
-        $orders = $this->dbal->fetchAll($ordersQuery, [
-            'site' => $siteId,
-            'type1' => Order::ORDER_CANCEL,
-            'type2' => Order::ORDER_EDIT,
-            'biobankFinalized' => 1
-        ]);
-        foreach ($orders as $key => $order) {
-            foreach (Review::$orderStatus as $field => $status) {
-                if ($order[$field]) {
-                    $orders[$key]['orderStatus'] = Review::getOrderStatus($order, $status);
-                }
-            }
-        }
-        return $orders;
-    }
-
     public function getUnlockedOrders()
     {
         $ordersQuery = "
@@ -124,29 +91,6 @@ class OrderRepository extends DoctrineRepository
         return $this->dbal->fetchAll($ordersQuery, [
             'type' => Order::ORDER_UNLOCK,
             'deleted' => 0
-        ]);
-    }
-
-
-    public function getSiteUnlockedOrders($siteId)
-    {
-        $ordersQuery = "
-            SELECT o.*,
-                   oh.order_id AS oh_order_id,
-                   oh.user_id AS oh_user_id,
-                   oh.site AS oh_site,
-                   oh.type AS h_type,
-                   oh.created_ts AS oh_created_ts,
-                   'Unlocked' as orderStatus
-            FROM orders o
-            INNER JOIN orders_history oh ON o.history_id = oh.id
-            WHERE o.site = :site
-              AND oh.type = :type
-            ORDER BY o.created_ts DESC
-        ";
-        return $this->dbal->fetchAll($ordersQuery, [
-            'site' => $siteId,
-            'type' => Order::ORDER_UNLOCK
         ]);
     }
 
@@ -178,30 +122,6 @@ class OrderRepository extends DoctrineRepository
             'type1' => Order::ORDER_ACTIVE,
             'type2' => Order::ORDER_RESTORE,
             'deleted' => 0
-        ]);
-    }
-
-    public function getSiteRecentModifiedOrders($siteId)
-    {
-        $ordersQuery = "
-            SELECT o.*,
-                   oh.order_id AS oh_order_id,
-                   oh.user_id AS oh_user_id,
-                   oh.site AS oh_site,
-                   oh.type AS oh_type,
-                   oh.created_ts AS oh_created_ts
-            FROM orders o
-            INNER JOIN orders_history oh ON o.history_id = oh.id
-            WHERE o.site = :site
-              AND oh.type != :type1
-              AND oh.type != :type2
-              AND oh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
-            ORDER BY oh.created_ts DESC
-        ";
-        return $this->dbal->fetchAll($ordersQuery, [
-            'site' => $siteId,
-            'type1' => Order::ORDER_ACTIVE,
-            'type2' => Order::ORDER_RESTORE
         ]);
     }
 }

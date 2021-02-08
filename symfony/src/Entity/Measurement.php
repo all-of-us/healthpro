@@ -15,6 +15,11 @@ class Measurement
 {
 
     const CURRENT_VERSION = '0.3.3';
+    const LIMIT_TEXT_SHORT = 1000;
+    const LIMIT_TEXT_LONG = 10000;
+    const EVALUATION_ACTIVE = 'active';
+    const EVALUATION_CANCEL = 'cancel';
+    const EVALUATION_RESTORE = 'restore';
 
     private $currentVersion;
 
