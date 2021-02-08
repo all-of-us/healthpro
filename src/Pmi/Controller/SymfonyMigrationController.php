@@ -17,9 +17,10 @@ class SymfonyMigrationController extends AbstractController
             'defaults' => ['problemId' => null]
         ]],
         ['admin_home', '/admin'],
+        ['review_today', '/review'],
         ['orderCheck', '/participant/{participantId}/order/check'],
         ['order', '/participant/{participantId}/order/{orderId}'],
-        ['workqueue_index', '/workqueue', ['method' => 'GET|POST']],
+        ['workqueue_index', '/workqueue', ['method' => 'GET|POST']]
     ];
 
     public function deceased_reports_indexAction(Application $app)
@@ -82,6 +83,14 @@ class SymfonyMigrationController extends AbstractController
     public function admin_homeAction(Application $app)
     {
         return $app->redirect('/s/admin');
+    }
+
+    /**
+     * @deprecated 2021-01-20
+     */
+    public function review_todayAction(Application $app)
+    {
+       return $app->redirect('/s/review');
     }
 
     /**

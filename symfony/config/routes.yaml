@@ -19,20 +19,13 @@ participants:
 orders:
     path: /orders
 
-review_today:
-    path: /review
+evaluation:
+    path: /participant/{participantId}/measurements/{evalId}
+    defaults:
+      - evalId: null
 
-review_orders:
-    path: /review/orders
-
-review_measurements:
-    path: /review/measurements
-
-review_ordersRecentModify:
-    path: /review/orders/recent/modify
-
-review_measurementsRecentModify:
-    path: /review/measurements/recent/modify
+evaluation_modify:
+    path: /participant/{participantId}/measurements/{evalId}/modify/{type}
 
 dashboard_home:
     path: /dashboard
