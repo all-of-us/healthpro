@@ -74,14 +74,14 @@ class SiteService
 
     public function getSuperUserAwardees()
     {
-        $sites = $this->getAwardeeSites();
+        $sites = $this->getSuperUserAwardeeSites();
         if (!$sites) {
             return null;
         } else {
             $awardees = [];
             foreach ($sites as $site) {
-                if (!empty($site['awardee'])) {
-                    $awardees[] = $site['awardee'];
+                if (!empty($site->getAwardeeId())) {
+                    $awardees[] = $site->getAwardeeId();
                 }
             }
             if (empty($awardees)) {
@@ -90,6 +90,18 @@ class SiteService
                 return $awardees;
             }
         }
+    }
+
+    public function getSuperUserAwardeeSites($awardee = null)
+    {
+        $awardee = $awardee ?? $this->getAwardeeId();
+        if (!$awardee) {
+            return null;
+        }
+        return $this->em->getRepository(Site::class)->findBy([
+            'deleted' => 0,
+            'awardee' => $awardee,
+        ]);
     }
 
     public function getAwardeeSites($awardee = null)
@@ -101,7 +113,7 @@ class SiteService
         return $this->em->getRepository(Site::class)->findBy([
             'deleted' => 0,
             'status' => 1,
-            'awardee' => $awardee,
+            'awardeeId' => $awardee,
         ]);
     }
 

@@ -107,8 +107,8 @@ class WorkQueueController extends AbstractController
             $sitesList = [];
             $sitesList['site']['label'] = 'Paired Site';
             foreach ($sites as $site) {
-                if (!empty($site['google_group'])) {
-                    $sitesList['site']['options'][$site['name']] = $site['google_group'];
+                if (!empty($site->getGoogleGroup())) {
+                    $sitesList['site']['options'][$site->getName()] = $site->getGoogleGroup();
                 }
             }
             $sitesList['site']['options']['Unpaired'] = 'UNSET';
@@ -118,8 +118,8 @@ class WorkQueueController extends AbstractController
             $organizationsList = [];
             $organizationsList['organization_id']['label'] = 'Paired Organization';
             foreach ($sites as $site) {
-                if (!empty($site['organization_id'])) {
-                    $organizationsList['organization_id']['options'][$this->siteService->getOrganizationDisplayName($site['organization_id'])] = $site['organization_id'];
+                if (!empty($site->getOrganizationId())) {
+                    $organizationsList['organization_id']['options'][$this->siteService->getOrganizationDisplayName($site->getOrganizationId())] = $site->getOrganizationId();
                 }
             }
             $organizationsList['organization_id']['options']['Unpaired'] = 'UNSET';
@@ -148,7 +148,7 @@ class WorkQueueController extends AbstractController
                 'samples' => WorkQueue::$samples,
                 'participants' => [],
                 'params' => $params,
-                'organization' => $awardee,
+                'awardee' => $awardee,
                 'isRdrError' => $this->workQueueService->getRdrError(),
                 'samplesAlias' => WorkQueue::$samplesAlias,
                 'canExport' => $this->workQueueService->canExport(),
