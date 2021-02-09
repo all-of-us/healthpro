@@ -38,7 +38,6 @@ class AppExtension extends AbstractExtension
             new TwigFunction('slugify', [$this, 'slugify']),
             new TwigFunction('timezone_display', [$this, 'timezoneDisplay']),
             new TwigFunction('codebook_display', [$this, 'getCodeBookDisplay']),
-            new TwigFunction('organization_display', [$this, 'getAwardeeDisplay']),
             new TwigFunction('awardee_display', [$this, 'getAwardeeDisplay']),
             new TwigFunction('site_display', [$this, 'getSiteDisplay']),
             new TwigFunction('display_message', [$this, 'displayMessage'])
@@ -95,21 +94,6 @@ class AppExtension extends AbstractExtension
             return $record->getName();
         }
         return $awardee;
-    }
-
-    public function getOrganizationDisplay(string $organization): string
-    {
-        $cacheKey = 'organizations.' . $organization;
-        if (isset($this->cache[$cacheKey]) && $this->cache[$cacheKey]) {
-            return $this->cache[$cacheKey];
-        }
-        $repository = $this->doctrine->getRepository(Organization::class);
-        $record = $repository->find($organization);
-        if ($record) {
-            $this->cache[$cacheKey] = $record->getName();
-            return $record->getName();
-        }
-        return $organization;
     }
 
     public function getSiteDisplay(string $site): string
