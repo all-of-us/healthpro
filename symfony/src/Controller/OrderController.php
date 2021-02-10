@@ -65,6 +65,9 @@ class OrderController extends AbstractController
         }
         $this->orderService->setParticipant($participant);
         $this->orderService->loadSamplesSchema($order);
+        if (!$this->orderService->canEdit() || $this->siteService->isTestSite()) {
+            throw $this->createAccessDeniedException();
+        }
         return $order;
     }
 

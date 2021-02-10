@@ -624,4 +624,10 @@ class OrderService
         }
         return $status;
     }
+
+    public function canEdit()
+    {
+        // Allow cohort 1 and 2 participants to edit existing orders even if status is false
+        return !$this->participant->status && !empty($this->order->getId()) ? $this->participant->editExistingOnly : $this->participant->status;
+    }
 }
