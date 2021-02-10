@@ -90,7 +90,7 @@ class SymfonyMigrationController extends AbstractController
      */
     public function review_todayAction(Application $app)
     {
-       return $app->redirect('/s/review');
+       return $app->redirect('/s/review/');
     }
 
     /**
