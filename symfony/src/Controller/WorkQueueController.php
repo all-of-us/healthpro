@@ -72,13 +72,13 @@ class WorkQueueController extends AbstractController
 
         if ($this->isGranted('ROLE_AWARDEE')) {
             // Add awardees list to filters
-            $organizationsList = [];
-            $organizationsList['awardee']['label'] = 'Awardee';
+            $awardeesList = [];
+            $awardeesList['awardee']['label'] = 'Awardee';
             foreach ($awardees as $awardee) {
-                $organizationsList['awardee']['options'][$this->siteService->getAwardeeDisplayName($awardee)] = $awardee;
+                $awardeesList['awardee']['options'][$this->siteService->getAwardeeDisplayName($awardee)] = $awardee;
             }
-            $organizationsList['awardee']['options']['Salivary Pilot'] = 'salivary_pilot';
-            $filters = array_merge($filters, $organizationsList);
+            $awardeesList['awardee']['options']['Salivary Pilot'] = 'salivary_pilot';
+            $filters = array_merge($filters, $awardeesList);
 
             // Set to selected awardee
             if (isset($params['awardee'])) {
