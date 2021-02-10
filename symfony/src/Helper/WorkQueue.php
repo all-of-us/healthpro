@@ -741,7 +741,7 @@ class WorkQueue
         $headers[] = 'Samples to Isolate DNA';
         $headers[] = 'Baseline Samples';
         $headers[] = 'Biospecimens Site';
-        foreach (self::$samples as $sample => $label) {
+        foreach (self::$samples as $label) {
             $headers[] = $label . ' Received';
             $headers[] = $label . ' Received Date';
         }

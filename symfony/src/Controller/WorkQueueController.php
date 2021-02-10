@@ -132,12 +132,12 @@ class WorkQueueController extends AbstractController
             if (!empty($params['patientStatus'])) {
                 $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
             }
-            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, $type = 'wQTable');
+            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable');
             $ajaxData = [];
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
             $ajaxData['data'] = $this->workQueueService->generateTableRows($participants);
             $responseCode = 200;
-            if ($this->workQueueService->getRdrError()) {
+            if ($this->workQueueService->isRdrError()) {
                 $responseCode = 500;
             }
             return $this->json($ajaxData, $responseCode);
@@ -149,7 +149,7 @@ class WorkQueueController extends AbstractController
                 'participants' => [],
                 'params' => $params,
                 'awardee' => $awardee,
-                'isRdrError' => $this->workQueueService->getRdrError(),
+                'isRdrError' => $this->workQueueService->isRdrError(),
                 'samplesAlias' => WorkQueue::$samplesAlias,
                 'canExport' => $this->workQueueService->canExport(),
                 'exportConfiguration' => $this->workQueueService->getExportConfiguration()

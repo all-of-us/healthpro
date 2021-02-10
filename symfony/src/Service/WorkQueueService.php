@@ -86,7 +86,7 @@ class WorkQueueService
         $rdrParams = [];
         $next = true;
 
-        if ($type == 'wQTable') {
+        if ($type === 'wQTable') {
             $rdrParams['_count'] = isset($params['length']) ? $params['length'] : 10;
             $rdrParams['_offset'] = isset($params['start']) ? $params['start'] : 0;
 
@@ -95,7 +95,7 @@ class WorkQueueService
                 $sortColumnIndex = $params['order'][0]['column'];
                 $sortColumnName = WorkQueue::$sortColumns[$sortColumnIndex];
                 $sortDir = $params['order'][0]['dir'];
-                if ($sortDir == 'asc') {
+                if ($sortDir === 'asc') {
                     $rdrParams['_sort'] = $sortColumnName;
                 } else {
                     $rdrParams['_sort:desc'] = $sortColumnName;
@@ -108,7 +108,7 @@ class WorkQueueService
 
         // Unset other params when activity status is withdrawn
         if (isset($params['activityStatus']) && $params['activityStatus'] === 'withdrawn') {
-            foreach ($params as $key => $value) {
+            foreach (array_keys($params) as $key) {
                 if ($key === 'activityStatus' || $key === 'organization') {
                     continue;
                 }
@@ -337,7 +337,7 @@ class WorkQueueService
             foreach (array_keys(WorkQueue::$samples) as $sample) {
                 $newSample = $sample;
                 foreach (WorkQueue::$samplesAlias as $sampleAlias) {
-                    if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} == 'RECEIVED') {
+                    if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} === 'RECEIVED') {
                         $newSample = $sampleAlias[$sample];
                         break;
                     }
@@ -383,7 +383,7 @@ class WorkQueueService
             WorkQueue::dateFromString($participant->suspensionTime, $userTimezone),
             WorkQueue::csvDeceasedStatus($participant->deceasedStatus),
             $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '',
-            $participant->deceasedStatus == 'APPROVED' ? WorkQueue::dateFromString($participant->deceasedAuthored, $userTimezone, false) : '',
+            $participant->deceasedStatus === 'APPROVED' ? WorkQueue::dateFromString($participant->deceasedAuthored, $userTimezone, false) : '',
             $participant->participantOrigin,
             $participant->consentCohortText,
             WorkQueue::dateFromString($participant->consentForStudyEnrollmentFirstYesAuthored, $userTimezone),
@@ -423,7 +423,7 @@ class WorkQueueService
             $participant->numCompletedBaselinePPIModules == 3 ? '1' : '0',
             $participant->numCompletedPPIModules,
         ];
-        foreach (WorkQueue::$surveys as $survey => $label) {
+        foreach (array_keys(WorkQueue::$surveys) as $survey) {
             if (in_array($survey, WorkQueue::$initialSurveys)) {
                 $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
                 $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $userTimezone);
@@ -431,21 +431,21 @@ class WorkQueueService
         }
         $row[] = $participant->siteSuffix;
         $row[] = $participant->organization;
-        $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
+        $row[] = $participant->physicalMeasurementsStatus === 'COMPLETED' ? '1' : '0';
         $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $userTimezone, false);
         $row[] = $participant->evaluationFinalizedSite;
-        $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
+        $row[] = $participant->samplesToIsolateDNA === 'RECEIVED' ? '1' : '0';
         $row[] = $participant->numBaselineSamplesArrived;
         $row[] = $participant->orderCreatedSite;
         foreach (array_keys(WorkQueue::$samples) as $sample) {
             $newSample = $sample;
             foreach (WorkQueue::$samplesAlias as $sampleAlias) {
-                if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} == 'RECEIVED') {
+                if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} === 'RECEIVED') {
                     $newSample = $sampleAlias[$sample];
                     break;
                 }
             }
-            $row[] = $participant->{"sampleStatus{$newSample}"} == 'RECEIVED' ? '1' : '0';
+            $row[] = $participant->{"sampleStatus{$newSample}"} === 'RECEIVED' ? '1' : '0';
             $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $userTimezone, false);
         }
         $row[] = $participant->sample1SAL2CollectionMethod;
@@ -531,7 +531,7 @@ class WorkQueueService
     /**
      * @return bool
      */
-    public function getRdrError()
+    public function isRdrError()
     {
         return $this->rdrError;
     }
