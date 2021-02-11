@@ -19,9 +19,6 @@ participants:
 orders:
     path: /orders
 
-biobankSummary:
-    path: /participant/{participantId}/order/{orderId}/biobank/summary
-
 evaluation:
     path: /participant/{participantId}/measurements/{evalId}
     defaults:
