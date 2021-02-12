@@ -12,6 +12,7 @@ class ParticipantSummaryService
     protected $api;
     protected $nextToken;
     protected $total;
+    protected $disableTestAccess;
 
     public function __construct(RdrApiService $api)
     {
@@ -116,5 +117,37 @@ class ParticipantSummaryService
     public function getNextToken()
     {
         return $this->nextToken;
+    }
+
+    public function search($params)
+    {
+        try {
+            $response = $this->api->get('rdr/v1/ParticipantSummary', [
+                'query' => $params
+            ]);
+        } catch (\Exception $e) {
+            throw new FailedRequestException();
+        }
+
+        $contents = $response->getBody()->getContents();
+        $responseObject = json_decode($contents);
+
+        if (!is_object($responseObject)) {
+            throw new InvalidResponseException();
+        }
+        if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
+            return [];
+        }
+        $results = [];
+        foreach ($responseObject->entry as $participant) {
+            if (isset($participant->resource) && is_object($participant->resource)) {
+                $participant->resource->disableTestAccess = $this->disableTestAccess;
+                if ($result = new Participant($participant->resource)) {
+                    $results[] = $result;
+                }
+            }
+        }
+
+        return $results;
     }
 }

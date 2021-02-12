@@ -13,9 +13,6 @@ logout:
 selectSite:
     path: /site/select
 
-participants:
-    path: /participants
-
 orders:
     path: /orders
 

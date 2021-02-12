@@ -69,6 +69,14 @@ class SiteService
     }
 
     /**
+     * @return string|null
+     */
+    public function getSiteType(): ?string
+    {
+        return $this->session->get('siteType');
+    }
+
+    /**
      * @return null
      */
     public function getAwardeeId()
