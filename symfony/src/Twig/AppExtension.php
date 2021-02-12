@@ -38,8 +38,6 @@ class AppExtension extends AbstractExtension
             new TwigFunction('slugify', [$this, 'slugify']),
             new TwigFunction('timezone_display', [$this, 'timezoneDisplay']),
             new TwigFunction('codebook_display', [$this, 'getCodeBookDisplay']),
-            new TwigFunction('awardee_display', [$this, 'getAwardeeDisplay']),
-            new TwigFunction('site_display', [$this, 'getSiteDisplay']),
             new TwigFunction('display_message', [$this, 'displayMessage'])
         ];
     }
@@ -79,36 +77,6 @@ class AppExtension extends AbstractExtension
     public function getCodeBookDisplay(string $code): string
     {
         return CodeBook::display($code);
-    }
-
-    public function getAwardeeDisplay(string $awardee): string
-    {
-        $cacheKey = 'awardees.' . $awardee;
-        if (isset($this->cache[$cacheKey]) && $this->cache[$cacheKey]) {
-            return $this->cache[$cacheKey];
-        }
-        $repository = $this->doctrine->getRepository(Awardee::class);
-        $record = $repository->find($awardee);
-        if ($record) {
-            $this->cache[$cacheKey] = $record->getName();
-            return $record->getName();
-        }
-        return $awardee;
-    }
-
-    public function getSiteDisplay(string $site): string
-    {
-        $cacheKey = 'sites.' . $site;
-        if (isset($this->cache[$cacheKey]) && $this->cache[$cacheKey]) {
-            return $this->cache[$cacheKey];
-        }
-        $repository = $this->doctrine->getRepository(Site::class);
-        $record = $repository->findOneBy(['siteId' => $site]);
-        if ($record) {
-            $this->cache[$cacheKey] = $record->getName();
-            return $record->getName();
-        }
-        return $site;
     }
 
     public function displayMessage($name, $type = false, $options = [])
