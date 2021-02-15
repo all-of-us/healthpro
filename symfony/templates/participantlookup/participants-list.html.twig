@@ -17,7 +17,7 @@
                 <th>Date of Birth</th>
                 <th>ZIP Code</th>
                 <th>Participant Paired Awardee</th>
-                {% if site.siteType == 'dv' %}
+                {% if siteInfo.siteType == 'dv' %}
                     <th>Participant Origination</th>
                 {% endif %}
                 <th>PM&amp;B Eligible?</th>
@@ -37,16 +37,16 @@
                         <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.zipCode }}</a></td>
                         <td>
                             {% if participant.hpoId %}
-                                {% if participant.hpoId != site.getSiteOrganization %}
+                                {% if participant.hpoId != siteInfo.getSiteOrganization %}
                                     <i class="fa fa-info-circle text-warning" title="Participant paired awardee is different from your awardee" data-toggle="tooltip"></i>
                                 {% endif %}
-                                {{ site.getAwardeeDisplayName(participant.hpoId) }}
+                                {{ siteInfo.getAwardeeDisplayName(participant.hpoId) }}
                             {% else %}
                                 <i class="fa fa-info-circle text-warning" title="Participant is unpaired" data-toggle="tooltip"></i>
                                 <span class="text-muted">Unpaired</span>
                             {% endif %}
                         </td>
-                        {% if site.siteType == 'dv' %}
+                        {% if siteInfo.siteType == 'dv' %}
                             <td>{{ participant.participantOrigin }}</td>
                         {% endif %}
                         <td>
