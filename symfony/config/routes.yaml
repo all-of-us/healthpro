@@ -21,8 +21,7 @@ orders:
 
 evaluation:
     path: /participant/{participantId}/measurements/{evalId}
-    defaults:
-      - evalId: null
+    defaults: { evalId: null }
 
 evaluation_modify:
     path: /participant/{participantId}/measurements/{evalId}/modify/{type}

@@ -1,0 +1,58 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h3>
+    </div>
+    <div class="panel-body">
+        {% if (readOnly is defined or participant.activityStatus == 'deactivated' or participant.editExistingOnly) and evaluations|length == 0 %}
+            <small class="text-warning">No Records Found</small>
+        {% else %}
+            {% for evaluation in evaluations %}
+                {% if type is not defined and loop.index == 6 %}
+                    <div id="evaluation-overflow">
+                {% endif %}
+                {% if readOnly is defined %}
+                    <div class="btn btn-block btn-lg btn-default btn-readonly">
+                {% else %}
+                    <a href="{{ path('evaluation', { participantId: participant.id, evalId: evaluation.id }) }}" class="btn btn-block btn-lg {% if evalId is defined and evaluation.id == evalId %} btn-warning {% else %} btn-default {% endif %}">
+                {% endif %}
+                    {{ evaluation.createdTs|date('D n/j/Y', app.user.getInfo.timezone) }}<br />
+                    <small class="text-muted">
+                        {% set historyType = evaluation.history.type is defined ? evaluation.history.type : '' %}
+                        {% if historyType == 'cancel' %}
+                            <span class="label label-danger">Cancelled</span> {{ evaluation.eh_createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                        {% elseif evaluation.rdrId is empty and evaluation.parentId is empty %}
+                            <span class="label label-default">Saved &amp; Unfinalized</span> {{ evaluation.updatedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                        {% elseif evaluation.rdrId and evaluation.parentId %}
+                            <span class="label label-success">Edited &amp; Finalized</span> {{ evaluation.finalizedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                        {% elseif evaluation.rdrId %}
+                            <span class="label label-success">Finalized</span> {{ evaluation.finalizedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                        {% elseif evaluation.parent_id and evaluation.rdrId is empty %}
+                            <span class="label label-warning">Edited &amp; Unfinalized</span> {{ evaluation.updatedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                        {% endif %}
+                    </small>
+                {% if readOnly is defined %}
+                    </div> {# close .btn-readonly div above #}
+                {% else %}
+                    </a>
+                {% endif %}
+            {% endfor %}
+            {% if type is not defined and evaluations|length > 5 %}
+                </div> {# close .evaluation-overflow div above #}
+                <a href="#" class="btn btn-block btn-lg btn-default" id="evaluation-overflow-show">
+                    <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
+                </a>
+            {% endif %}
+            {% if type is not defined and readOnly is not defined and participant.activityStatus != 'deactivated' and participant.status %}
+                <a href="{{ path('evaluation', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    {% if evaluations|length > 0 %}
+                        New
+                    {% else %}
+                        Start
+                    {% endif %}
+                    Physical Measurements
+                </a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
