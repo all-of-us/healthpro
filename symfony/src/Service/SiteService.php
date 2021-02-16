@@ -58,6 +58,14 @@ class SiteService
     }
 
     /**
+     * @return bool
+     */
+    public function isDvType(): bool
+    {
+        return $this->session->get('siteType') === 'dv' ? true : false;
+    }
+
+    /**
      * @return null
      */
     public function getSiteId()
@@ -70,6 +78,7 @@ class SiteService
 
     /**
      * @return null
+     * Super user ex: STSI
      */
     public function getAwardeeId()
     {
@@ -105,6 +114,7 @@ class SiteService
 
     /**
      * @return mixed
+     * This is equivalent to getSiteOrganizationId method in HpoApplication Class
      */
     public function getSiteOrganization()
     {

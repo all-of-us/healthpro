@@ -4,16 +4,20 @@ namespace App\Controller;
 
 use App\Entity\Measurement;
 use App\Entity\Order;
+use App\Entity\PatientStatus;
 use App\Entity\Problem;
 use App\Form\CrossOriginAgreeType;
+use App\Form\PatientStatusType;
 use App\Helper\WorkQueue;
 use App\Service\LoggerService;
 use App\Service\ParticipantSummaryService;
+use App\Service\PatientStatusService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -34,7 +38,8 @@ class ParticipantDetailsController extends AbstractController
         EntityManagerInterface $em,
         ParticipantSummaryService $participantSummaryService,
         SiteService $siteService,
-        ParameterBagInterface $params
+        ParameterBagInterface $params,
+        PatientStatusService $patientStatusService
     ) {
         $refresh = $request->query->get('refresh');
         $participant = $participantSummaryService->getParticipantById($id, $refresh);
@@ -112,12 +117,52 @@ class ParticipantDetailsController extends AbstractController
             }
         }
 
-        // TODO: Implement patient status create
-        $patientStatusForm = null;
-        $orgPatientStatusData = null;
-        $orgPatientStatusHistoryData = null;
-        $awardeePatientStatusData = null;
-        $canViewPatientStatus = false;
+        // Check if patient status is allowed for this participant
+        if ($patientStatusService->hasAccess($participant)) {
+            // Patient Status
+            $patientStatusRepository = $em->getRepository(PatientStatus::class);
+            $orgPatientStatusData = $patientStatusRepository->getOrgPatientStatusData($id, $siteService->getSiteOrganization());
+            // Determine if comment field is required
+            $isCommentRequired = !empty($orgPatientStatusData) ? true : false;
+            // Get patient status form
+            $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => $isCommentRequired]);
+            $patientStatusForm->handleRequest($request);
+            if ($patientStatusForm->isSubmitted()) {
+                $patientStatusData = $em->getRepository(PatientStatus::class)->findOneBy([
+                    'participantId' => $id,
+                    'organization' => $siteService->getSiteOrganization()
+                ]);
+                if (!empty($patientStatusData) && empty($patientStatusForm['comments']->getData())) {
+                    $patientStatusForm['comments']->addError(new FormError('Please enter comment'));
+                }
+                if ($patientStatusForm->isValid()) {
+                    $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
+                    $patientStatusService->loadData($id, $patientStatusId, $patientStatusForm->getData());
+                    if ($patientStatusService->sendToRdr() && $patientStatusService->saveData()) {
+                        $this->addFlash('success', 'Patient status saved');
+                        // Load newly entered data
+                        $orgPatientStatusData = $patientStatusRepository->getOrgPatientStatusData($id);
+                        // Get new form
+                        $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => true]);
+                    } else {
+                        $this->addFlash('error', 'Failed to create patient status. Please try again.');
+                    }
+                } else {
+                    $patientStatusForm->addError(new FormError('Please correct the errors below'));
+                }
+            }
+            $orgPatientStatusHistoryData = $patientStatusRepository->getOrgPatientStatusHistoryData($id, $siteService->getSiteOrganization());
+            $awardeePatientStatusData = $patientStatusRepository->getAwardeePatientStatusData($id, $siteService->getSiteOrganization());
+            $patientStatusForm = $patientStatusForm->createView();
+            $canViewPatientStatus = $patientStatusService->hasAccess($participant);
+        } else {
+            $patientStatusForm = null;
+            $orgPatientStatusData = null;
+            $orgPatientStatusHistoryData = null;
+            $awardeePatientStatusData = null;
+            $canViewPatientStatus = false;
+        }
+
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
         return $this->render('/participant/details.html.twig', [
