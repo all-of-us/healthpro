@@ -86,7 +86,7 @@ class ParticipantDetailsController extends AbstractController
                 'organization' => $participant->hpoId
             ]);
         }
-        $evaluations = $em->getRepository(Measurement::class)->findBy(['participantId' => $id], ['id' => 'desc']);
+        $measurements = $em->getRepository(Measurement::class)->findBy(['participantId' => $id], ['id' => 'desc']);
         $orders = $em->getRepository(Order::class)->findBy(['participantId' => $id], ['id' => 'desc']);
         $problems = $em->getRepository(Problem::class)->getProblemsWithCommentsCount($id);
 
@@ -95,7 +95,7 @@ class ParticipantDetailsController extends AbstractController
         }
         foreach ($orders as $order) {
             // Display most recent processed sample time if exists
-            // This is for old orders where this calculation is not implemented in the order process save step
+            // This is for supporting old orders where this calculation is not implemented in the order process save step
             $processedSamplesTs = json_decode($order->getProcessedSamplesTs(), true);
             if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
                 $processedTs = new \DateTime();
@@ -123,7 +123,7 @@ class ParticipantDetailsController extends AbstractController
         return $this->render('/participant/details.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
-            'evaluations' => $evaluations,
+            'measurements' => $measurements,
             'problems' => $problems,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
