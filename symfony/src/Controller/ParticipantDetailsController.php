@@ -86,21 +86,22 @@ class ParticipantDetailsController extends AbstractController
                 'organization' => $participant->hpoId
             ]);
         }
-        $evaluations = $em->getRepository(Measurement::class)->findBy(['participantId' => $id]);
-        $orders = $em->getRepository(Order::class)->findBy(['participantId' => $id]);
+        $evaluations = $em->getRepository(Measurement::class)->findBy(['participantId' => $id], ['id' => 'desc']);
+        $orders = $em->getRepository(Order::class)->findBy(['participantId' => $id], ['id' => 'desc']);
         $problems = $em->getRepository(Problem::class)->getProblemsWithCommentsCount($id);
 
         if (empty($participant->cacheTime)) {
             $participant->cacheTime = new \DateTime();
         }
-        foreach ($orders as $key => $order) {
+        foreach ($orders as $order) {
             // Display most recent processed sample time if exists
+            // This is for old orders where this calculation is not implemented in the order process save step
             $processedSamplesTs = json_decode($order->getProcessedSamplesTs(), true);
             if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
                 $processedTs = new \DateTime();
                 $processedTs->setTimestamp(max($processedSamplesTs));
                 $processedTs->setTimezone(new \DateTimeZone($this->getUser()->getInfo()['timezone']));
-                //$orders[$key]['processed_ts'] = $processedTs;
+                $order->setProcessedTs($processedTs);
             }
         }
         // Determine cancel route
