@@ -242,4 +242,15 @@ class SiteService
         }
         return $siteName;
     }
+
+    /**
+     * @return null|string
+     */
+    public function getSiteIdWithPrefix()
+    {
+        if ($this->getSiteId()) {
+            return \Pmi\Security\User::SITE_PREFIX . $this->getSiteId();
+        }
+        return null;
+    }
 }

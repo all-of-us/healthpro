@@ -128,20 +128,20 @@ class ParticipantDetailsController extends AbstractController
             $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => $isCommentRequired]);
             $patientStatusForm->handleRequest($request);
             if ($patientStatusForm->isSubmitted()) {
-                $patientStatusData = $em->getRepository(PatientStatus::class)->findOneBy([
+                $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
                     'participantId' => $id,
                     'organization' => $siteService->getSiteOrganization()
                 ]);
-                if (!empty($patientStatusData) && empty($patientStatusForm['comments']->getData())) {
+                if (!empty($patientStatus) && empty($patientStatusForm['comments']->getData())) {
                     $patientStatusForm['comments']->addError(new FormError('Please enter comment'));
                 }
                 if ($patientStatusForm->isValid()) {
-                    $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
+                    $patientStatusId = !empty($patientStatus) ? $patientStatus->getId() : null;
                     $patientStatusService->loadData($id, $patientStatusId, $patientStatusForm->getData());
                     if ($patientStatusService->sendToRdr() && $patientStatusService->saveData()) {
                         $this->addFlash('success', 'Patient status saved');
                         // Load newly entered data
-                        $orgPatientStatusData = $patientStatusRepository->getOrgPatientStatusData($id);
+                        $orgPatientStatusData = $patientStatusRepository->getOrgPatientStatusData($id, $siteService->getSiteOrganization());
                         // Get new form
                         $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => true]);
                     } else {

@@ -3,14 +3,39 @@
 namespace App\Service;
 
 
+use App\Entity\PatientStatus;
+use App\Entity\PatientStatusHistory;
+use App\Entity\PatientStatusImport;
+use Doctrine\ORM\EntityManagerInterface;
+use Pmi\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PatientStatusService
 {
+    /**
+     * @var RdrApiService
+     */
     protected $rdrApiService;
+    /**
+     * @var SiteService
+     */
     protected $siteService;
+    /**
+     * @var UserService
+     */
     protected $userService;
+    /**
+     * @var ParameterBagInterface
+     */
     protected $params;
+    /**
+     * @var EntityManagerInterface
+     */
+    protected $em;
+    /**
+     * @var LoggerService
+     */
+    protected $loggerService;
 
     protected $participantId;
     protected $patientStatusId;
@@ -23,15 +48,38 @@ class PatientStatusService
     protected $comments;
     protected $status;
     protected $createdTs;
+    protected $importId;
 
-    public function __construct(RdrApiService $rdrApiService, SiteService $siteService, UserService $userService, ParameterBagInterface $params)
-    {
+    /**
+     * PatientStatusService constructor.
+     * @param RdrApiService $rdrApiService
+     * @param SiteService $siteService
+     * @param UserService $userService
+     * @param ParameterBagInterface $params
+     * @param EntityManagerInterface $em
+     * @param LoggerService $loggerService
+     */
+    public function __construct(
+        RdrApiService $rdrApiService,
+        SiteService $siteService,
+        UserService $userService,
+        ParameterBagInterface $params,
+        EntityManagerInterface $em,
+        LoggerService $loggerService
+    ) {
         $this->rdrApiService = $rdrApiService;
         $this->siteService = $siteService;
         $this->userService = $userService;
         $this->params = $params;
+        $this->em = $em;
+        $this->loggerService = $loggerService;
     }
 
+    /**
+     * @param $participantId
+     * @param $organizationId
+     * @return bool|mixed
+     */
     public function getPatientStatus($participantId, $organizationId)
     {
         try {
@@ -47,6 +95,11 @@ class PatientStatusService
         return false;
     }
 
+    /**
+     * @param $participantId
+     * @param $organizationId
+     * @return bool|mixed
+     */
     public function getPatientStatusHistory($participantId, $organizationId)
     {
         try {
@@ -62,6 +115,10 @@ class PatientStatusService
         return false;
     }
 
+    /**
+     * @param $participant
+     * @return bool
+     */
     public function hasAccess($participant)
     {
         return
@@ -72,6 +129,11 @@ class PatientStatusService
             empty($this->params->get('disable_patient_status_message'));
     }
 
+    /**
+     * @param $participantId
+     * @param $patientStatusId
+     * @param $formData
+     */
     public function loadData($participantId, $patientStatusId, $formData)
     {
         $this->participantId = $participantId;
@@ -87,6 +149,9 @@ class PatientStatusService
         $this->createdTs = new \DateTime();
     }
 
+    /**
+     * @return \StdClass
+     */
     public function getRdrObject()
     {
         $obj = new \StdClass();
@@ -101,6 +166,9 @@ class PatientStatusService
         return $obj;
     }
 
+    /**
+     * @return bool
+     */
     public function sendToRdr()
     {
         $postData = $this->getRdrObject();
@@ -117,4 +185,68 @@ class PatientStatusService
         return false;
     }
 
+    /**
+     * @return bool
+     */
+    public function saveData()
+    {
+        $status = false;
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            //Create patient status if not exists
+            if (!empty($this->patientStatusId)) {
+                $patientStatus = $this->em->getRepository(PatientStatus::class)->find($this->patientStatusId);
+            } else {
+                $patientStatus = new PatientStatus;
+                $patientStatus->setParticipantId($this->participantId);
+                $patientStatus->setOrganization($this->organizationId);
+                $patientStatus->setAwardee($this->awardeeId);
+                $this->em->persist($patientStatus);
+                $this->em->flush();
+
+                $this->loggerService->log(Log::PATIENT_STATUS_ADD, [
+                    'id' => $patientStatus->getId()
+                ]);
+            }
+
+            //Create patient status history
+            $patientStatusHistory = new PatientStatusHistory;
+            $patientStatusHistory->setUserId($this->userId);
+            $patientStatusHistory->setSite($this->siteId);
+            $patientStatusHistory->setComments($this->comments);
+            $patientStatusHistory->setStatus($this->status);
+            $patientStatusHistory->setCreatedTs($this->createdTs);
+            $patientStatusHistory->setRdrTs($this->createdTs);
+            $patientStatusHistory->setPatientStatus($patientStatus);
+            // Set import id if exists
+            if (!empty($this->importId)) {
+                $patientStatusImport = $this->em->getRepository(PatientStatusImport::class)->find($this->importId);
+                $patientStatusHistory->setImport($patientStatusImport);
+            }
+            $this->em->persist($patientStatusHistory);
+            $this->em->flush();
+
+            $this->loggerService->log(Log::PATIENT_STATUS_HISTORY_ADD, [
+                'id' => $patientStatusHistory->getId()
+            ]);
+
+            //Update history id in patient status table
+            $patientStatus->setHistory($patientStatusHistory);
+            $this->em->persist($patientStatus);
+            $this->em->flush();
+
+            //Log if it's a patient status edit
+            if (!empty($this->patientStatusId)) {
+                $this->loggerService->log(Log::PATIENT_STATUS_EDIT, [
+                    'id' => $this->patientStatusId
+                ]);
+            }
+            $connection->commit();
+            $status = true;
+        } catch (\Exception $e) {
+            $connection->rollback();
+        }
+        return $status;
+    }
 }
