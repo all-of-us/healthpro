@@ -46,3 +46,6 @@ hideTZWarning:
 
 participant:
     path: /participant/{id}
+
+biobank_order:
+    path: /{biobankId}/quanum-order/{orderId}
