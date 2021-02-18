@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
-use Pmi\WorkQueue\WorkQueue;
+use App\Helper\WorkQueue;
 use Pmi\Order\Order;
 use Pmi\Security\User;
 
