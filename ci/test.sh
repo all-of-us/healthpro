@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./bin/phpunit
+./bin/phpunit -v

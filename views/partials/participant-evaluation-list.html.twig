@@ -3,7 +3,7 @@
         <h3 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h3>
     </div>
     <div class="panel-body">
-        {% if (readOnly is defined or participant.activityStatus == 'deactivated') and evaluations|length == 0 %}
+        {% if (readOnly is defined or participant.activityStatus == 'deactivated' or participant.editExistingOnly) and evaluations|length == 0 %}
             <small class="text-warning">No Records Found</small>
         {% else %}
             {% for evaluation in evaluations %}
@@ -41,8 +41,8 @@
                     <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
                 </a>
             {% endif %}
-            {% if type is not defined and readOnly is not defined and participant.activityStatus != 'deactivated' %}
-                <a href="{{ path(evaluationUrl, { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
+            {% if type is not defined and readOnly is not defined and participant.activityStatus != 'deactivated' and participant.status %}
+                <a href="{{ path('evaluation', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i>
                     {% if evaluations|length > 0 %}
                         New

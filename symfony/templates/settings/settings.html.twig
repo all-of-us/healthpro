@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+{% block title %}Settings - {% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="page-header">
+                <h2>Settings</h2>
+            </div>
+            {{ form_start(settingsForm, { attr: { class: 'warn-unsaved prevent-resubmit' } }) }}
+                {{ form_errors(settingsForm) }}
+                {{ form_widget(settingsForm) }}
+                <p><button type="submit" class="btn btn-primary">Update Settings</button></p>
+            {{ form_end(settingsForm) }}
+        </div>
+    </div>
+{% endblock %}
+{% block pagejs %}
+<script>
+$(document).ready(function() {
+    if (PMI.isTimeZoneDiff) {
+        var html = '<div class="alert alert-warning tz-info">Your computer\'s time zone does not appear to match your HealthPro time zone preference. ';
+            html += '<button type="button" class="btn btn-primary tz-change-btn">Change to '+PMI.timeZones[PMI.browserTimeZone]+'</button>';
+            html += '</div>';
+        $('.page-header').after(html);
+    } else if (!PMI.userTimeZone && PMI.browserTimeZone && PMI.browserTimeZone in PMI.timeZones) {
+        var html = '<div class="alert alert-info tz-info"><p>It looks like you are in ' + PMI.timeZones[PMI.browserTimeZone] + '.</p>';
+            html += '<p><button type="button" class="btn btn-primary tz-change-btn">Set to '+PMI.timeZones[PMI.browserTimeZone]+'</button>';
+            html += ' or select time zone below</p>';
+            html += '</div>';
+        $('.page-header').after(html);
+    }
+    $('.tz-change-btn').on('click', function(){
+        $('#settings_timezone').val(PMI.browserTimeZone);
+        $('form[name=settings]').submit();
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+{% block title %}Deceased Participant {{ participant.participantId }} - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participant <small><a href="{{ path('participant', {id: participant.participantId} )}}">{{ participant.lastName }}, {{ participant.firstName }}</a></small></h2>
+    </div>
+    
+    {% include 'deceasedreports/_review-details.html.twig' %}
+
+    {% if report.id %}
+    <div class="alert alert-info">
+      <div class="pull-right">
+        <a class="btn btn-sm btn-primary" href="{{ path('deceased_report_history', {participantId: participant.participantId}) }}">View Report(s)</a>
+      </div>
+      <div style="line-height:2em;">
+        <i class="fas fa-info-circle"></i> There is already one or more Deceased Report for this Participant.
+      </div>
+    </div>
+    <dl class="dl-horizontal">
+      <dt>Status</dt>
+      <dd><span class="label label-default">{{ report.reportStatusDisplay }}</span></dd>
+      <dt>Submitted</dt>
+      <dd>{{ report.submittedOn|date('n/j/Y g:ia', app.user.timezone) }} ({{ report.submittedBy }})</dd>
+      {% if report.reviewedBy %}
+      <dt>Reviewed</dt>
+      <dd>{{ report.reviewedOn|date('n/j/Y g:ia', app.user.timezone) }} ({{ report.reviewedBy }})</dd>
+      {% endif %}
+    </dl>
+    <hr />
+    {% endif %}
+
+    {{ form_start(form) }}
+    <div class="row">
+      <div class="col-sm-4">
+        {{ form_row(form.reportMechanism) }}
+      </div>
+      <div class="col-sm-8">
+        <div class="next_of_kin_details">
+          {{ form_row(form.nextOfKinName) }}
+          {{ form_row(form.nextOfKinRelationship) }}
+          {{ form_row(form.nextOfKinTelephoneNumber) }}
+          {{ form_row(form.nextOfKinEmail) }}
+        </div>
+        <div class="other_details">
+          {{ form_row(form.reportMechanismOtherDescription) }}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        {{ form_row(form.dateOfDeath) }}
+      </div>
+      <div class="col-sm-6">
+        {{ form_row(form.causeOfDeath) }}
+      </div>
+    </div>
+    <br />
+    <div class="row">
+      <div class="col-sm-6">
+        {{ form_widget(form.submit) }}
+      </div>
+    </div>
+    {{ form_rest(form) }}
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block pagejs %}
+<script>
+$(document).ready(function () {
+  // Form error display/UX
+  $('form[name="deceased_report"]').parsley({
+      errorClass: "has-error",
+      classHandler: function(el) {
+          return el.$element.closest(".form-group");
+      },
+      errorsContainer: function(el) {
+          return el.$element.closest(".form-group");
+      },
+      errorsWrapper: '<div class="deceased-report-errors help-block"></div>',
+      errorTemplate: '<div></div>',
+      trigger: "keyup change"
+  });
+  
+  $('#deceased_report_dateOfDeath').pmiDateTimePicker({format: 'MM/DD/YYYY', maxDate: Date(), useCurrent: false});
+
+  var reportMechanism = $('input[name="deceased_report[reportMechanism]"]')
+  var reportMechanismChecked = $('input[name="deceased_report[reportMechanism]"]:checked')
+  var nextOfKinName = $('input[name="deceased_report[nextOfKinName]"]')
+  var nextOfKinRelationship = $('select[name="deceased_report[nextOfKinRelationship]"]')
+  var reportMechanismOtherDescription = $('textarea[name="deceased_report[reportMechanismOtherDescription]"]')
+
+  // Set initial state of form on load
+  if (reportMechanismChecked.length == 0
+    || reportMechanismChecked.val() == 'EHR'
+  ) {
+    $('.next_of_kin_details').addClass('collapse');
+    $('.other_details').addClass('collapse')
+  } else if (reportMechanismChecked.val() == 'OTHER') {
+    $('.next_of_kin_details').addClass('collapse');
+    $('.other_details').removeClass('collapse')
+  }
+
+  // Handle onChange event for Report Mechanism
+  $(reportMechanism).on('change', function (e) {
+    switch ($(e.target).val()) {
+      case 'EHR':
+        $('.next_of_kin_details').addClass('collapse');
+        $('.other_details').addClass('collapse');
+        nextOfKinName.attr('required', false);
+        nextOfKinRelationship.attr('required', false);
+        reportMechanismOtherDescription.attr('required', false);
+        break;
+      case 'OTHER':
+        $('.next_of_kin_details').addClass('collapse');
+        $('.other_details').removeClass('collapse');
+        nextOfKinName.attr('required', false);
+        nextOfKinRelationship.attr('required', false);
+        reportMechanismOtherDescription.attr('required', true);
+        break;
+      default:
+        $('.next_of_kin_details').removeClass('collapse');
+        $('.other_details').addClass('collapse');
+        nextOfKinName.attr('required', true);
+        nextOfKinRelationship.attr('required', true);
+        reportMechanismOtherDescription.attr('required', false);
+    }
+  })
+})
+</script>
+{% endblock %}

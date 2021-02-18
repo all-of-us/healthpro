@@ -1,4 +1,4 @@
-FROM php:7.2
+FROM php:7.3
 
 # Fix for issue with OpenJDK install
 RUN mkdir -p /usr/share/man/man1
@@ -33,6 +33,10 @@ RUN export CLOUDSDK_PYTHON=/usr/bin/python \
 
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Symfony CLI
+RUN curl -sSL https://get.symfony.com/cli/installer | bash - \
+      && mv /root/.symfony/bin/symfony /usr/local/bin/symfony
 
 # Start emulator and the web server
 WORKDIR /app

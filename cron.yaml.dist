@@ -20,11 +20,11 @@ cron:
   schedule: every 1 hours
   timezone: America/Chicago
 - description: "Sync sites meta data"
-  url: /cron/sites
+  url: /s/cron/sites
   schedule: every day 20:00
   timezone: America/Chicago
 - description: "Sync awardees and organizations"
-  url: /cron/awardees-organizations
+  url: /s/cron/awardees-organizations
   schedule: every day 20:01
   timezone: America/Chicago
 - description: "Delete datastore session keys"
@@ -38,4 +38,16 @@ cron:
 - description: "Delete patient status imports unconfirmed data"
   url: /cron/delete-unconfirmed-patient-status-import-data
   schedule: every day 02:00
+  timezone: America/Chicago
+- description: "Deceased status pending"
+  url: /s/cron/deceased/pending
+  schedule: every day 07:05
+  timezone: America/Chicago
+- description: "Deceased status approved"
+  url: /s/cron/deceased/approved
+  schedule: every day 07:10
+  timezone: America/Chicago
+- description: "Ehr Withdrawal Notifications"
+  url: /s/cron/ehr-withdrawal
+  schedule: every day 07:15
   timezone: America/Chicago

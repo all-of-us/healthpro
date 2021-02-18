@@ -7,23 +7,8 @@ index:
 home:
     path: /
 
-settings:
-    path: /settings
-
 logout:
     path: /logout
-
-help_home:
-    path: /help
-
-help_videos:
-    path: /help/videos
-
-help_faq:
-    path: /help/faq
-
-help_sop:
-    path: /help/sop
 
 selectSite:
     path: /site/select
@@ -34,20 +19,34 @@ participants:
 orders:
     path: /orders
 
-review_today:
-    path: /review
+evaluation:
+    path: /participant/{participantId}/measurements/{evalId}
+    defaults:
+      - evalId: null
+
+evaluation_modify:
+    path: /participant/{participantId}/measurements/{evalId}/modify/{type}
 
 workqueue_index:
     path: /workqueue
-
-problem_reports:
-    path: /problem/reports
-
-admin_home:
-    path: /admin
 
 dashboard_home:
     path: /dashboard
 
 biobank_home:
     path: /biobank
+
+clientTimeout:
+    path: /client-timeout
+
+keepAlive:
+    path: /keepalive
+
+agreeUsage:
+    path: /agree
+
+hideTZWarning:
+    path: /hide-tz-warning
+
+participant:
+    path: /participant/{id}

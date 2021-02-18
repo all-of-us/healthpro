@@ -57,6 +57,7 @@ abstract class AbstractWebTestCase extends TestCase
         putenv('PMI_ENV=' . HpoApplication::ENV_LOCAL);
         $app = new HpoApplication([
             'templatesDirectory' => __DIR__ . '/../../views',
+            'webpackBuildDirectory' => __DIR__ . '/../../web/build',
             'errorTemplate' => 'error.html.twig',
             'isUnitTest' => true,
             'sessionTimeout' => 7 * 60,
@@ -80,13 +81,11 @@ abstract class AbstractWebTestCase extends TestCase
             'local_mock_auth' => true,
             'enforce2fa' => true
         ]);
+
         $app->mount('/', new Controller\DefaultController());
+        $app->mount('/', new Controller\SymfonyMigrationController());
         $app->mount('/dashboard', new Controller\DashboardController());
-        $app->mount('/help', new Controller\HelpController());
-        $app->mount('/admin', new Controller\AdminController());
         $app->mount('/workqueue', new Controller\WorkQueueController());
-        $app->mount('/problem', new Controller\ProblemReportController());
-        $app->mount('/review', new Controller\ReviewController());
 
         return $app;
     }

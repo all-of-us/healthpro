@@ -295,10 +295,10 @@ class User implements UserInterface
         // we don't actually store any credentials
     }
 
-    public function getTimezone()
+    public function getTimezone($useDefault = true)
     {
         if (!$this->timezone) {
-            return self::DEFAULT_TIMEZONE;
+            return $useDefault ? self::DEFAULT_TIMEZONE : null;
         }
         return $this->timezone;
     }

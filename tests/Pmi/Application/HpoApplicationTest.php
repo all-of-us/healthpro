@@ -196,17 +196,17 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testUsageAgreement()
     {
         $email = 'testUsageAgreement@example.com';
-        MockUserService::switchCurrentUser($email);
+        MockUserService::switchCurrentUser($email, 'America\Chicago');
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
         $client->followRedirects();
         $crawler = $client->request('GET', '/');
-        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
+        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on initial page load.');
         $crawler = $client->reload();
-        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')));
+        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on reload.');
         $client->request('POST', '/agree', ['csrf_token' => $this->app['csrf.token_manager']->getToken('agreeUsage')]);
         $crawler = $client->request('GET', '/');
-        $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')));
+        $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')), 'Do not see usage modal after confirmation.');
     }
 
     public function testSiteAutoselect()
@@ -242,10 +242,9 @@ class HpoApplicationTest extends AbstractWebTestCase
         $groupEmail = User::ADMIN_DV . '@gapps.com';
         AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
-        $client->followRedirects();
         $this->assertSame(null, $this->app->getSite());
         $crawler = $client->request('GET', '/problem/reports');
-        $this->assertEquals(1, count($crawler->filter('#problem_reports')));
+        $this->assertEquals('/problem/reports', $this->app['session']->get('loginDestUrl'));
     }
 
     public function testAdminAutoselect()
@@ -255,10 +254,9 @@ class HpoApplicationTest extends AbstractWebTestCase
         $groupEmail = User::ADMIN_GROUP . '@gapps.com';
         AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $client = $this->createClient();
-        $client->followRedirects();
         $this->assertSame(null, $this->app->getSite());
         $crawler = $client->request('GET', '/admin');
-        $this->assertEquals(1, count($crawler->filterXPath('//a[@href="/admin/sites"]')));
+        $this->assertEquals('/admin', $this->app['session']->get('loginDestUrl'));
     }
 
     public function testDashboardAutoselect()

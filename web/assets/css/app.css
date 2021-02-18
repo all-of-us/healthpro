@@ -43,7 +43,7 @@ iframe.pdf {
         font-size: 20px;
     }
 }
-label.required::after {
+label.control-label.required::after {
     content: "*";
     color: #a94442;
     margin-left: 2px;
@@ -76,6 +76,9 @@ label.label-normal {
     .dl-horizontal-lg dd {
         margin-left: 220px;
     }
+    .dl-horizontal-lg.samples-received dt {
+        width: 206px;
+    }
 }
 .dl-vertical dd {
     margin-bottom: 10px;
@@ -88,8 +91,15 @@ label.label-normal {
 /* Nav bar customization */
 .navbar-brand-subtitle {
     font-size: 11px;
-    margin-top: -7px;
+    margin-top: -17px;
     text-align: right;
+}
+.navbar-brand img {
+    margin-top: -10px;
+    margin-right: 5px;
+    height: 40px;
+    vertical-align: top;
+    display: inline-block;
 }
 .navbar-inverse {
     border: 0;
@@ -209,6 +219,11 @@ label.label-normal {
     padding-right: 20px;
     padding-left: 20px;
 }
+#physicalEvaluation .bp-warnings .alert {
+    font-size: 14px;
+    margin-top: 16px;
+    font-weight: normal;
+}
 .help-header-text {
     color: #337ab7;
     margin-top: 0;
@@ -290,6 +305,12 @@ label.label-normal {
 }
 .multiheader-patient-status {
     background-color: #ffd;
+}
+.multiheader-metrics {
+    background-color: #edb;
+}
+.multiheader-consent {
+    background-color: #efd;
 }
 .dataTables_processing {
     z-index: 1000;
@@ -380,4 +401,58 @@ table.table-samples td {
 .btn-readonly {
     pointer-events: none;
     cursor: default;
+}
+
+.align-middle {
+    vertical-align: middle !important;
+}
+
+.badge-info {
+    background-color: #5bc0de;
+}
+
+.badge-warning {
+    background-color: #f0ad4e;
+}
+
+.badge-success {
+    background-color: #5cb85c;
+}
+
+.today-filter-well {
+    position: relative;
+}
+
+.today-filter-well:before {
+    content: attr(data-title);
+    position: absolute;
+    background: #363272;
+    color: #ffffff;
+    padding: 0 20px;
+    left: 0;
+    top: 0;
+}
+
+.today-filter-well .alert-danger {
+    margin-top: 5px;
+}
+
+.today-filter > div {
+    padding: 0 10px 0 10px;
+    height: 45px;
+}
+
+.welcome-page-badge {
+  display: inline-block;
+  font-weight: bold;
+  position: absolute;
+  color: white;
+  background-color: red;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  top: -0.5rem;
+  right: 0.5rem;
+  padding: 0.5rem;
+  border: solid 2pt white;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }

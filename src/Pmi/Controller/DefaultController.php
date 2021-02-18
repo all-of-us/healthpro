@@ -35,7 +35,6 @@ class DefaultController extends AbstractController
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
-        ['settings', '/settings', ['method' => 'GET|POST']],
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
         ['patientStatus', '/participant/{participantId}/patient/status/{patientStatusId}', ['method' => 'GET']],
         ['mockLogin', '/mock-login', ['method' => 'GET|POST']]
@@ -64,12 +63,12 @@ class DefaultController extends AbstractController
             return $app->abort(403);
         }
     }
-    
+
     public function dashSplashAction(Application $app)
     {
         return $app['twig']->render('dash-splash.html.twig');
     }
-    
+
     public function logoutAction(Application $app, Request $request)
     {
         $timeout = $request->get('timeout');
@@ -84,25 +83,25 @@ class DefaultController extends AbstractController
         $url = $app['session']->get('loginDestUrl', $app->generateUrl('home'));
         return $app->redirect($url);
     }
-    
+
     public function timeoutAction(Application $app)
     {
         return $app['twig']->render('timeout.html.twig');
     }
-    
+
     /** Dummy action that serves to extend the user's session. */
     public function keepAliveAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('keepAlive', $request->get('csrf_token')))) {
             return $app->abort(403);
         }
-        
+
         $request->getSession()->set('pmiLastUsed', time());
         $response = new JsonResponse();
         $response->setData(array());
         return $response;
     }
-    
+
     /**
      * Handles a clientside session timeout, which might not be a true session
      * timeout if the user is working in multiple tabs.
@@ -116,23 +115,23 @@ class DefaultController extends AbstractController
             return $app->redirect($app->generateUrl('home'));
         }
     }
-    
+
     public function agreeUsageAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('agreeUsage', $request->get('csrf_token')))) {
             return $app->abort(403);
         }
-        
+
         $request->getSession()->set('isUsageAgreed', true);
         return (new JsonResponse())->setData([]);
     }
-    
+
     public function groupsAction(Application $app)
     {
         $token = $app['security.token_storage']->getToken();
         $user = $token->getUser();
         $groups = $user->getGroups();
-        
+
         $groupNames = [];
         foreach ($groups as $group) {
             $groupNames[] = $group->getName();
@@ -141,7 +140,7 @@ class DefaultController extends AbstractController
             'groupNames' => $groupNames
         ]);
     }
-    
+
     public function selectSiteAction(Application $app, Request $request)
     {
         if ($request->request->has('site')) {
@@ -333,7 +332,7 @@ class DefaultController extends AbstractController
 
         if ($idForm->isSubmitted() && $idForm->isValid()) {
             $id = $idForm->get('orderId')->getData();
-            
+
             // New barcodes include a 4-digit sample identifier appended to the 10 digit order id
             // If the string matches this format, remove the sample identifier to get the order id
             if (preg_match('/^\d{14}$/', $id)) {
@@ -397,7 +396,7 @@ class DefaultController extends AbstractController
         }
 
         $isCrossOrg = $participant->hpoId !== $app->getSiteOrganization();
-        $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, ['test-participant', 'basics', 'genomics', 'ehr-consent', 'program-update', 'primary-consent-update']));
+        $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, ['test-participant', 'basics', 'genomics', 'ehr-consent', 'program-update', 'primary-consent-update', 'deceased-pending', 'deceased-approved']));
         $hasNoParticipantAccess = $isCrossOrg && empty($app['session']->get('agreeCrossOrg_'.$id));
         if ($hasNoParticipantAccess) {
             $app->log(Log::CROSS_ORG_PARTICIPANT_ATTEMPT, [
@@ -504,7 +503,7 @@ class DefaultController extends AbstractController
             'isDVType' => $app->isDVType(),
             'canViewPatientStatus' => $canViewPatientStatus,
             'displayPatientStatusBlock' => !$app->isDVType(),
-            'evaluationUrl' => $evaluationUrl
+            'canEdit' => $participant->status || $participant->editExistingOnly
         ]);
     }
 
@@ -536,42 +535,12 @@ class DefaultController extends AbstractController
         ]);
     }
 
-    public function settingsAction(Application $app, Request $request)
-    {
-        $settingsData = ['timezone' => $app->getUserTimezone(false)];
-        $settingsForm = $app['form.factory']->createBuilder(FormType::class, $settingsData)
-            ->add('timezone', Type\ChoiceType::class, [
-                'label' => 'Time zone',
-                'choices' => array_flip($app::$timezoneOptions),
-                'placeholder' => '-- Select your time zone --',
-                'constraints' => new Constraints\NotBlank()
-            ])
-            ->getForm();
-
-        $settingsForm->handleRequest($request);
-        if ($settingsForm->isSubmitted() && $settingsForm->isValid()) {
-            $app['em']->getRepository('users')->update($app->getUserId(), [
-                'timezone' => $settingsForm['timezone']->getData()
-            ]);
-            $app->addFlashSuccess('Your settings have been updated');
-            if ($request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
-                return $app->redirect($request->query->get('return'));
-            } else {
-                return $app->redirectToRoute('home');
-            }
-        }
-
-        return $app['twig']->render('settings.html.twig', [
-            'settingsForm' => $settingsForm->createView()
-        ]);
-    }
-
     public function hideTZWarningAction(Application $app, Request $request)
     {
         if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('hideTZWarning', $request->get('csrf_token')))) {
             return $app->abort(403);
         }
-        
+
         $request->getSession()->set('hideTZWarning', true);
         return (new JsonResponse())->setData([]);
     }

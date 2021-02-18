@@ -5,7 +5,7 @@
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Details</h2>
     </div>
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-6">
             <dl class="dl-horizontal">
                 {% if is_granted('ROLE_SCRIPPS') or is_granted('ROLE_AWARDEE') %}
                     <dt>Participant ID</dt>
@@ -25,7 +25,7 @@
                 <dd>{{ participant.site ? app.getSiteDisplayName(participant.siteSuffix) : '(not paired)' }}</dd>
             </dl>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-6">
             <p class="lead">
                 Order ID: <strong>{{ order.order_id }}</strong>
             </p>
@@ -97,6 +97,7 @@
     </div>
 {% endblock %}
 {% block pagejs %}
+    {{ webpack_entry('order-sub', 'js') }}
     <script>
         $(document).ready(function() {
             var currentStep = {{ currentStep|json_encode|raw }};

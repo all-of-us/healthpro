@@ -21,18 +21,19 @@ Prerequisites:
 * [MySQL](https://dev.mysql.com/downloads/mysql/) (select version 5.7 which is used by Google Cloud SQL)
 * [Composer](https://getcomposer.org/doc/00-intro.md#globally)
 * [git-secrets](https://github.com/awslabs/git-secrets#installing-git-secrets)
+* [Symfony CLI](https://symfony.com/download)
 
 Install PHP dependencies via Composer:
 
 `composer install`
 
-Install asset and Gulp dependencies via NPM:
+Install front end assets and build tooling via NPM:
 
 `npm install`
 
-Initialize assets and recompile on the fly as assets change:
+Compile assets using [Webpack Encore](https://symfony.com/doc/4.4/frontend.html) and recompile on the fly as assets change:
 
-`./bin/gulp`
+`npm run watch`
 
 Run local Datastore emulator
 
@@ -44,15 +45,15 @@ Run local App Engine dev server:
 
 ## Credentials and configuration
 
+### Automated credential scanning
+
+**Important:** Install and use [`git-secrets`](https://github.com/awslabs/git-secrets) to avoid exposing API keys and certificates by screening commits for matched strings. After installing that utility, run the script below to configure the hooks for this project.
+
+`./bin/installHooks`
+
 ### config.yml
 
-Configure your local development parameters by copying the `dev_config/config.yml.dist` file to `dev_config/config.yml`.  Edit `config.yml` as needed.  This file is .gitignore'd.  See comments in the dist file for more details.
+Configure your local development parameters by copying the `dev_config/config.yml.dist` file to `dev_config/config.yml`.  Edit `config.yml` as needed.  This file is .gitignore'd.  See comments in the `config.yml.dist` file for more details.
 
 #### MySQL database configuration
 Create a new MySQL for this application.  Configure the MySQL connection in `config.yml`.  Then, import the SQL scripts in `/sql` into the new database.
-
-## Browser sync (optional)
-
-Use the following command to enable Browsersync which will reload your browswer as compiled assets are updated.
-
-`./bin/gulp browser-sync --option localhost:8080`

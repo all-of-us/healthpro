@@ -2,7 +2,6 @@
 namespace Pmi\Review;
 
 use Pmi\Order\Order;
-use Pmi\Evaluation\Evaluation;
 
 class Review
 {
@@ -17,95 +16,6 @@ class Review
         'processed_ts' => 'Processed',
         'finalized_ts' => 'Finalized'
     ];
-
-    protected static $measurementsStatus = [
-        'created_ts' => 'Created',
-        'finalized_ts' => 'Finalized'
-    ];
-
-    protected static $emptyParticipant = [
-        'order' => null,
-        'orderCount' => 0,
-        'orderStatus' => '',
-        'finalizedSamples' => null,
-        'physicalMeasurement' => null,
-        'physicalMeasurementCount' => 0,
-        'physicalMeasurementStatus' => ''
-    ];
-
-    protected function getTodayRows($today, $site)
-    {
-        $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, o.biobank_finalized, ' .
-            'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
-            'oh.type as h_type ' .
-            'FROM orders o ' .
-            'LEFT JOIN orders_history oh ' .
-            'ON o.history_id = oh.id WHERE ' .
-            '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ' .
-            'AND (o.site = :site OR o.collected_site = :site OR o.processed_site = :site OR o.finalized_site = :site) ';
-        $measurementsQuery = 'SELECT e.participant_id, \'measurement\' as type, e.id, e.parent_id, null, e.rdr_id, e.created_ts, null, null, e.finalized_ts, null, null, ' .
-            'greatest(coalesce(e.created_ts, 0), coalesce(e.finalized_ts, 0), coalesce(eh.created_ts, 0)) as latest_ts, ' .
-            'eh.type as h_type ' .
-            'FROM evaluations e ' .
-            'LEFT JOIN evaluations_history eh ' .
-            'ON e.history_id = eh.id WHERE ' .
-            'e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL) ' .
-            'AND (e.created_ts >= :today OR e.finalized_ts >= :today OR eh.created_ts >= :today) ' .
-            'AND (e.site = :site OR e.finalized_site = :site)';
-        $query = "($ordersQuery) UNION ($measurementsQuery) ORDER BY latest_ts DESC";
-
-        return $this->db->fetchAll($query, [
-            'today' => $today,
-            'site' => $site
-        ]);
-    }
-
-    public function getTodayParticipants($today, $site = null)
-    {
-        $participants = [];
-        foreach ($this->getTodayRows($today, $site) as $row) {
-            $participantId = $row['participant_id'];
-            if (!array_key_exists($participantId, $participants)) {
-                $participants[$participantId] = self::$emptyParticipant;
-            }
-            switch ($row['type']) {
-                case 'order':
-                    if (is_null($participants[$participantId]['order'])) {
-                        $participants[$participantId]['order'] = $row;
-                        $participants[$participantId]['orderCount'] = 1;
-                        // Get order status
-                        foreach (self::$orderStatus as $field => $status) {
-                            if ($row[$field]) {
-                                $participants[$participantId]['orderStatus'] = self::getOrderStatus($row, $status);
-                            }
-                        }
-                        // Get number of finalized samples
-                        if ($row['finalized_samples'] && ($samples = json_decode($row['finalized_samples'])) && is_array($samples)) {
-                            $participants[$participantId]['finalizedSamples'] = count($samples);
-                        }
-                    } else {
-                        $participants[$participantId]['orderCount']++;
-                    }
-                    break;
-                case 'measurement':
-                    if (is_null($participants[$participantId]['physicalMeasurement'])) {
-                        $participants[$participantId]['physicalMeasurement'] = $row;
-                        $participants[$participantId]['physicalMeasurementCount'] = 1;
-                        // Get physical measurements status
-                        foreach (self::$measurementsStatus as $field => $status) {
-                            if ($row[$field]) {
-                                $participants[$participantId]['physicalMeasurementStatus'] = $this->getEvaluationStatus($row, $status);
-                            }
-                        }
-                    } else {
-                        $participants[$participantId]['physicalMeasurementCount']++;
-                    }
-                    break;
-            }
-        }
-
-        return $participants;
-    }
 
     protected function getTodayOrderRows($today)
     {
@@ -163,20 +73,6 @@ class Review
             $status = 'Processed';
         } elseif (!empty($row['finalized_ts']) && $row['biobank_finalized']) {
             $status = 'Biobank Finalized';
-        }
-        return $status;
-    }
-
-    public function getEvaluationStatus($row, $status)
-    {
-        if ($row['h_type'] === Evaluation::EVALUATION_CANCEL) {
-            $status = 'Cancelled';
-        } elseif (!empty($row['parent_id']) && empty($row['rdr_id'])){
-            $status = 'Unlocked';
-        } elseif (!empty($row['parent_id']) && !empty($row['rdr_id'])) {
-            $status = 'Edited & Finalized';
-        } elseif (!empty($row['finalized_ts']) && empty($row['rdr_id'])) {
-            $status = 'Created';
         }
         return $status;
     }

@@ -22,9 +22,9 @@ class Participant
     public $isSuspended = false;
     public $isWithdrawn = false;
     public $consentCohortText;
+    public $editExistingOnly = false;
 
     private $disableTestAccess;
-    private $genomicsStartTime;
     private $cohortOneLaunchTime;
     private $siteType;
 
@@ -40,6 +40,11 @@ class Participant
         'EARLY_OUT'
     ];
 
+    private static $deceasedStatusValues = [
+        'PENDING',
+        'APPROVED'
+    ];
+
     public function __construct($rdrParticipant = null)
     {
         if (is_object($rdrParticipant)) {
@@ -49,7 +54,6 @@ class Participant
             }
             if (isset($rdrParticipant->options)) {
                 $this->disableTestAccess = $rdrParticipant->options['disableTestAccess'];
-                $this->genomicsStartTime = $rdrParticipant->options['genomicsStartTime'];
                 $this->cohortOneLaunchTime = $rdrParticipant->options['cohortOneLaunchTime'];
                 $this->siteType = $rdrParticipant->options['siteType'];
                 unset($rdrParticipant->options);
@@ -80,7 +84,7 @@ class Participant
             $this->status = false;
             $this->statusReason = 'basics';
         }
-        if (!empty($this->genomicsStartTime) && isset($participant->consentForStudyEnrollmentAuthored) && $participant->consentForStudyEnrollmentAuthored >= $this->genomicsStartTime) {
+        if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_3') {
             if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                 $this->status = false;
                 $this->statusReason = 'genomics';
@@ -94,10 +98,12 @@ class Participant
             if (isset($participant->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->physicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
                 if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
+                    $this->editExistingOnly = true;
                     $this->statusReason = 'genomics';
                 }
                 if (isset($participant->questionnaireOnDnaProgram) && $participant->questionnaireOnDnaProgram !== 'SUBMITTED') {
                     $this->status = false;
+                    $this->editExistingOnly = true;
                     $this->statusReason = 'program-update';
                 }
             }
@@ -107,24 +113,41 @@ class Participant
             if (isset($participant->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->physicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
                 if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
+                    $this->editExistingOnly = true;
                     $this->statusReason = 'genomics';
                 }
                 if (isset($participant->consentForStudyEnrollmentAuthored) && !empty($this->cohortOneLaunchTime) && $participant->consentForStudyEnrollmentAuthored <= $this->cohortOneLaunchTime) {
                     $this->status = false;
+                    $this->editExistingOnly = true;
                     $this->statusReason = 'primary-consent-update';
                 }
             }
+        }
+
+        // Deceased Participant
+        if (isset($participant->deceasedStatus)) {
+            if ($participant->deceasedStatus === 'PENDING') {
+                $this->status = false;
+                $this->statusReason = 'deceased-pending';
+                $this->editExistingOnly = true;
+            }
+            if ($participant->deceasedStatus === 'APPROVED') {
+                $this->status = false;
+                $this->statusReason = 'deceased-approved';
+                $this->editExistingOnly = true;
+            }
+        }
+
+        if (!empty($participant->withdrawalStatus) && in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
+            $this->status = false;
+            $this->statusReason = 'withdrawal';
+            $this->isWithdrawn = true;
         }
         // RDR should not be returning participant data for unconsented participants, but adding this check to be safe
         // Participant details tab is disabled for the below two status reasons
         if (empty($participant->consentForStudyEnrollment) || $participant->consentForStudyEnrollment !== 'SUBMITTED') {
             $this->status = false;
             $this->statusReason = 'consent';
-        }
-        if (!empty($participant->withdrawalStatus) && in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
-            $this->status = false;
-            $this->statusReason = 'withdrawal';
-            $this->isWithdrawn = true;
         }
 
         // Map gender identity to gender options for MayoLINK.
@@ -360,18 +383,23 @@ class Participant
 
     private function getActivityStatus($participant)
     {
+        // Withdrawn
         if (in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
             return 'withdrawn';
-        } else {
-            switch (isset($participant->suspensionStatus) ? $participant->suspensionStatus : null) {
-                case 'NOT_SUSPENDED':
-                    return 'active';
-                case 'NO_CONTACT':
-                    return 'deactivated';
-                default:
-                    return '';
-            }
         }
+
+        // Deactivated
+        if (isset($participant->suspensionStatus) && $participant->suspensionStatus === 'NO_CONTACT') {
+            return 'deactivated';
+        }
+
+        // Deceased Status
+        if (in_array($participant->deceasedStatus, self::$deceasedStatusValues, true)) {
+            return 'deceased';
+        }
+
+        // Default
+        return 'active';
     }
 
     private function getConsentCohortText($participant)

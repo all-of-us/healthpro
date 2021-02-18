@@ -834,6 +834,14 @@ class Evaluation
 
     public function getFormFieldErrorMessage($field = null, $replicate = null)
     {
-        return !empty($field) && $this->isSdbbForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1 ? 'Please complete.' : 'Please complete or add protocol modification.';
+        return !empty($field) && $this->isSdbbForm() && in_array($field,
+            self::$bloodPressureFields) && $replicate === 1 ? 'Please complete.' : 'Please complete or add protocol modification.';
+    }
+
+    public function canEdit($evalId, $participant)
+    {
+        // Allow cohort 1 and 2 participants to edit existing PMs even if status is false
+        return !$participant->status && !empty($evalId) ? $participant->editExistingOnly : $participant->status;
+
     }
 }

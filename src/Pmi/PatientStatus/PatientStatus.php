@@ -278,7 +278,17 @@ class PatientStatus
         $this->createdTs = new \DateTime($patientStatusHistory['authored']);
         $this->siteId = $patientStatusHistory['site'];
         $this->userId = $patientStatusHistory['user_id'];
-        $this->patientStatusId = $patientStatusHistory['patient_status_id'];
+        $patientStatusId = $patientStatusHistory['patient_status_id'];
+        if (empty($patientStatusId)) {
+            $patientStatus = $this->app['em']->getRepository('patient_status')->fetchOneBy([
+                'participant_id' => $patientStatusHistory['participant_id'],
+                'organization' => $patientStatusHistory['organization']
+            ]);
+            if (!empty($patientStatus)) {
+                $patientStatusId = $patientStatus['id'];
+            }
+        }
+        $this->patientStatusId = $patientStatusId;
         $this->importId = $patientStatusHistory['import_id'];
     }
 }

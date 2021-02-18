@@ -78,8 +78,14 @@ class WorkQueueController extends AbstractController
                 $rdrParams['withdrawalStatus'] = 'NOT_WITHDRAWN';
                 if ($params['activityStatus'] === 'active') {
                     $rdrParams['suspensionStatus'] = 'NOT_SUSPENDED';
+                    $rdrParams['deceasedStatus'] = 'UNSET';
                 } elseif ($params['activityStatus'] === 'deactivated') {
                     $rdrParams['suspensionStatus'] = 'NO_CONTACT';
+                    $rdrParams['deceasedStatus'] = 'UNSET';
+                } elseif ($params['activityStatus'] === 'deceased') {
+                    $rdrParams['deceasedStatus'] = 'APPROVED';
+                } elseif ($params['activityStatus'] === 'deceased_pending') {
+                    $rdrParams['deceasedStatus'] = 'PENDING';
                 }
             }
         }
@@ -116,6 +122,15 @@ class WorkQueueController extends AbstractController
             } else {
                 $rdrParams['ehrConsentExpireStatus'] = $params['ehrConsentExpireStatus'];
             }
+        }
+        if (!empty($params['retentionEligibleStatus'])) {
+            $rdrParams['retentionEligibleStatus'] = $params['retentionEligibleStatus'];
+        }
+        if (!empty($params['retentionType'])) {
+            $rdrParams['retentionType'] = $params['retentionType'];
+        }
+        if (!empty($params['isEhrDataAvailable'])) {
+            $rdrParams['isEhrDataAvailable'] = $params['isEhrDataAvailable'] === 'yes' ? 1 : 0;
         }
         // Add site prefix
         if (!empty($params['site'])) {
@@ -241,9 +256,8 @@ class WorkQueueController extends AbstractController
                     $organizationsList['organization_id']['options'][$app->getOrganizationDisplayName($site['organization_id'])] = $site['organization_id'];
                 }
             }
-            if (!empty($organizationsList['organization_id']['options'])) {
-                $filters = array_merge($filters, $organizationsList);
-            }
+            $organizationsList['organization_id']['options']['Unpaired'] = 'UNSET';
+            $filters = array_merge($filters, $organizationsList);
         }
 
         //For ajax requests
@@ -263,7 +277,6 @@ class WorkQueueController extends AbstractController
             }
             return new JsonResponse($ajaxData, $responseCode);
         } else {
-            $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
             return $app['twig']->render('workqueue/index.html.twig', [
                 'filters' => $filters,
                 'surveys' => WorkQueue::$surveys,
@@ -273,7 +286,7 @@ class WorkQueueController extends AbstractController
                 'organization' => $organization,
                 'isRdrError' => $this->rdrError,
                 'samplesAlias' => WorkQueue::$samplesAlias,
-                'isDownloadDisabled' => $this->isDownloadDisabled($siteWorkQueueDownload),
+                'canExport' => $this->canExport($app),
                 'exportConfiguration' => $this->getExportConfiguration($app)
             ]);
         }
@@ -281,8 +294,7 @@ class WorkQueueController extends AbstractController
 
     public function exportAction(Application $app, Request $request)
     {
-        $siteWorkQueueDownload = $this->getSiteWorkQueueDownload($app);
-        if ($siteWorkQueueDownload === AdminController::DOWNLOAD_DISABLED) {
+        if (!$this->canExport($app)) {
             $app->abort(403);
         }
         if ($app->hasRole('ROLE_AWARDEE')) {
@@ -300,8 +312,6 @@ class WorkQueueController extends AbstractController
         $limit = $exportConfiguration['limit'];
         $pageSize = $exportConfiguration['pageSize'];
 
-        $hasFullDataAccess = $siteWorkQueueDownload === AdminController::FULL_DATA_ACCESS || $app->hasRole('ROLE_AWARDEE');
-
         $params = array_filter($request->query->all());
         $params['_count'] = $pageSize;
         $params['_sort:desc'] = 'consentForStudyEnrollmentAuthored';
@@ -309,156 +319,171 @@ class WorkQueueController extends AbstractController
             $params['siteOrganizationId'] = $app->getSiteOrganizationId();
         }
 
-        $stream = function() use ($app, $params, $organization, $hasFullDataAccess, $limit, $pageSize) {
+        $stream = function() use ($app, $params, $organization, $limit, $pageSize) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
             fwrite($output, "\"\"\n");
-            if ($hasFullDataAccess) {
-                $headers = [
-                    'PMI ID',
-                    'Biobank ID',
-                    'Last Name',
-                    'First Name',
-                    'Date of Birth',
-                    'Language',
-                    'Participant Status',
-                    'Primary Consent Status',
-                    'Primary Consent Date',
-                    'EHR Consent Status',
-                    'EHR Consent Date',
-                    'CABoR Consent Status',
-                    'CABoR Consent Date',
-                    'Withdrawal Status',
-                    'Withdrawal Date',
-                    'Street Address',
-                    'City',
-                    'State',
-                    'ZIP',
-                    'Email',
-                    'Phone',
-                    'Sex',
-                    'Gender Identity',
-                    'Race/Ethnicity',
-                    'Education',
-                    'Required PPI Surveys Complete',
-                    'Completed Surveys'
-                ];
-                foreach (WorkQueue::$surveys as $survey => $label) {
-                    if (in_array($survey, WorkQueue::$initialSurveys)) {
-                        $headers[] = $label . ' PPI Survey Complete';
-                        $headers[] = $label . ' PPI Survey Completion Date';
-                    }
+            $headers = [
+                'Last Name',
+                'First Name',
+                'Middle Initial',
+                'Date of Birth',
+                'PMI ID',
+                'Biobank ID',
+                'Participant Status',
+                'Core Participant Date',
+                'Withdrawal Status',
+                'Withdrawal Date',
+                'Withdrawal Reason',
+                'Deactivation Status',
+                'Deactivation Date',
+                'Deceased',
+                'Date of Death',
+                'Date of Death Approval',
+                'Participant Origination',
+                'Consent Cohort',
+                'Date of First Primary Consent',
+                'Primary Consent Status',
+                'Primary Consent Date',
+                'Program Update',
+                'Date of Program Update',
+                'Date of First EHR Consent',
+                'EHR Consent Status',
+                'EHR Consent Date',
+                'EHR Expiration Status',
+                'EHR Expiration Date',
+                'gRoR Consent Status',
+                'gRoR Consent Date',
+                'Language of Primary Consent',
+                'DV-only EHR Sharing',
+                'DV-only EHR Sharing Date',
+                'CABoR Consent Status',
+                'CABoR Consent Date',
+                'Retention Eligible',
+                'Date of Retention Eligibility',
+                'Retention Status',
+                'EHR Data Transfer',
+                'Most Recent EHR Receipt',
+                'Patient Status: Yes',
+                'Patient Status: No',
+                'Patient Status: No Access',
+                'Patient Status: Unknown',
+                'Street Address',
+                'Street Address2',
+                'City',
+                'State',
+                'ZIP',
+                'Email',
+                'Login Phone',
+                'Phone',
+                'Required PPI Surveys Complete',
+                'Completed Surveys'
+            ];
+            foreach (WorkQueue::$surveys as $survey => $label) {
+                if (in_array($survey, WorkQueue::$initialSurveys)) {
+                    $headers[] = $label . ' PPI Survey Complete';
+                    $headers[] = $label . ' PPI Survey Completion Date';
                 }
-            } else {
-                $headers = [
-                    'PMI ID',
-                    'Biobank ID',
-                    'ZIP'
-                ];
             }
-            $headers[] = 'Physical Measurements Status';
-            $headers[] = 'Physical Measurements Completion Date';
             $headers[] = 'Paired Site';
             $headers[] = 'Paired Organization';
+            $headers[] = 'Physical Measurements Status';
+            $headers[] = 'Physical Measurements Completion Date';
             $headers[] = 'Physical Measurements Site';
-            $headers[] = 'Samples for DNA Received';
-            $headers[] = 'Biospecimens';
+            $headers[] = 'Samples to Isolate DNA';
+            $headers[] = 'Baseline Samples';
+            $headers[] = 'Biospecimens Site';
             foreach (WorkQueue::$samples as $sample => $label) {
                 $headers[] = $label . ' Received';
                 $headers[] = $label . ' Received Date';
             }
-            $headers[] = 'Biospecimens Site';
-            $headers[] = 'Withdrawal Reason';
-            $headers[] = 'Language of Primary Consent';
-            $headers[] = 'DV-only EHR Sharing Status';
-            $headers[] = 'DV-only EHR Sharing Date';
-            if ($hasFullDataAccess) {
-                $headers[] = 'Login Phone';
-                $headers[] = 'Street Address2';
-                $headers[] = 'Patient Status: Yes';
-                $headers[] = 'Patient Status: No';
-                $headers[] = 'Patient Status: No Access';
-                $headers[] = 'Patient Status: Unknown';
-                $headers[] = 'Middle Initial';
-                $headers[] = 'Core Participant Date';
-            }
-            $headers[] = 'Participant Origination';
-            if ($hasFullDataAccess) {
-                $headers[] = 'Deactivation Status';
-                $headers[] = 'Deactivation Date';
-                $headers[] = 'gRoR Consent Status';
-                $headers[] = 'gRoR Consent Date';
-                $headers[] = 'COPE May PPI Survey Complete';
-                $headers[] = 'COPE May PPI Survey Completion Date';
-                $headers[] = 'COPE June PPI Survey Complete';
-                $headers[] = 'COPE June PPI Survey Completion Date';
-                $headers[] = 'COPE July PPI Survey Complete';
-                $headers[] = 'COPE July PPI Survey Completion Date';
-                $headers[] = 'Consent Cohort';
-                $headers[] = 'Program Update';
-                $headers[] = 'Date of Program Update';
-                $headers[] = 'EHR Expiration Status';
-                $headers[] = 'EHR Expiration Date';
-                $headers[] = 'Date of First Primary Consent';
-                $headers[] = 'Date of First EHR Consent';
-            }
+            $headers[] = 'Saliva Collection';
+            $headers[] = 'Sex';
+            $headers[] = 'Gender Identity';
+            $headers[] = 'Race/Ethnicity';
+            $headers[] = 'Education';
+            $headers[] = 'COPE Feb PPI Survey Complete';
+            $headers[] = 'COPE Feb PPI Survey Completion Date';
+
             fputcsv($output, $headers);
+
+            $workQueue = new WorkQueue;
 
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
                 $participants = $this->participantSummarySearch($organization, $params, $app);
                 foreach ($participants as $participant) {
-                    if ($hasFullDataAccess) {
-                        $row = [
-                            $participant->id,
-                            $participant->biobankId,
-                            $participant->lastName,
-                            $participant->firstName,
-                            WorkQueue::csvDateFromObject($participant->dob),
-                            $participant->language,
-                            $participant->enrollmentStatus,
-                            WorkQueue::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-                            WorkQueue::dateFromString($participant->consentForStudyEnrollmentAuthored, $app->getUserTimezone()),
-                            WorkQueue::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-                            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsAuthored, $app->getUserTimezone()),
-                            WorkQueue::csvStatusFromSubmitted($participant->consentForCABoR),
-                            WorkQueue::dateFromString($participant->consentForCABoRAuthored, $app->getUserTimezone()),
-                            $participant->isWithdrawn ? '1' : '0',
-                            WorkQueue::dateFromString($participant->withdrawalAuthored, $app->getUserTimezone()),
-                            $participant->streetAddress,
-                            $participant->city,
-                            $participant->state,
-                            $participant->zipCode,
-                            $participant->email,
-                            $participant->phoneNumber,
-                            $participant->sex,
-                            $participant->genderIdentity,
-                            $participant->race,
-                            $participant->education,
-                            $participant->numCompletedBaselinePPIModules == 3 ? '1' : '0',
-                            $participant->numCompletedPPIModules
-                        ];
-                        foreach (WorkQueue::$surveys as $survey => $label) {
-                            if (in_array($survey, WorkQueue::$initialSurveys)) {
-                                $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                                $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
-                            }
+                    $row = [
+                        $participant->lastName,
+                        $participant->firstName,
+                        $participant->middleName,
+                        WorkQueue::csvDateFromObject($participant->dob),
+                        $participant->id,
+                        $participant->biobankId,
+                        $participant->enrollmentStatus,
+                        WorkQueue::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimeZone()),
+                        $participant->isWithdrawn ? '1' : '0',
+                        WorkQueue::dateFromString($participant->withdrawalAuthored, $app->getUserTimezone()),
+                        $participant->withdrawalReason,
+                        $participant->isSuspended ? '1' : '0',
+                        WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone()),
+                        WorkQueue::csvDeceasedStatus($participant->deceasedStatus),
+                        $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '',
+                        $participant->deceasedStatus == 'APPROVED' ? WorkQueue::dateFromString($participant->deceasedAuthored, $app->getUserTimezone(), false) : '',
+                        $participant->participantOrigin,
+                        $participant->consentCohortText,
+                        WorkQueue::dateFromString($participant->consentForStudyEnrollmentFirstYesAuthored, $app->getUserTimezone()),
+                        WorkQueue::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
+                        WorkQueue::dateFromString($participant->consentForStudyEnrollmentAuthored, $app->getUserTimezone()),
+                        WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnDnaProgram),
+                        WorkQueue::dateFromString($participant->questionnaireOnDnaProgramAuthored, $app->getUserTimezone()),
+                        WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsFirstYesAuthored, $app->getUserTimezone()),
+                        WorkQueue::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
+                        WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsAuthored, $app->getUserTimezone()),
+                        WorkQueue::csvEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords),
+                        WorkQueue::dateFromString($participant->ehrConsentExpireAuthored, $app->getUserTimezone()),
+                        WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsROR),
+                        WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $app->getUserTimezone()),
+                        $participant->primaryLanguage,
+                        WorkQueue::csvStatusFromSubmitted($participant->consentForDvElectronicHealthRecordsSharing),
+                        WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingAuthored, $app->getUserTimezone()),
+                        WorkQueue::csvStatusFromSubmitted($participant->consentForCABoR),
+                        WorkQueue::dateFromString($participant->consentForCABoRAuthored, $app->getUserTimezone()),
+                        $participant->retentionEligibleStatus === 'ELIGIBLE' ? 1 : 0,
+                        WorkQueue::dateFromString($participant->retentionEligibleTime, $app->getUserTimezone()),
+                        WorkQueue::csvRetentionType($participant->retentionType),
+                        $participant->isEhrDataAvailable ? 1 : 0,
+                        WorkQueue::dateFromString($participant->latestEhrReceiptTime, $app->getUserTimezone()),
+                        $workQueue->getPatientStatus($participant, 'YES', 'export'),
+                        $workQueue->getPatientStatus($participant, 'NO', 'export'),
+                        $workQueue->getPatientStatus($participant, 'NO ACCESS', 'export'),
+                        $workQueue->getPatientStatus($participant, 'UNKNOWN', 'export'),
+                        $participant->streetAddress,
+                        !empty($participant->streetAddress2) ? $participant->streetAddress2 : '',
+                        $participant->city,
+                        $participant->state,
+                        $participant->zipCode,
+                        $participant->email,
+                        $participant->loginPhoneNumber,
+                        $participant->phoneNumber,
+                        $participant->numCompletedBaselinePPIModules == 3 ? '1' : '0',
+                        $participant->numCompletedPPIModules,
+                    ];
+                    foreach (WorkQueue::$surveys as $survey => $label) {
+                        if (in_array($survey, WorkQueue::$initialSurveys)) {
+                            $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
+                            $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $app->getUserTimezone());
                         }
-                    } else {
-                        $row = [
-                            $participant->id,
-                            $participant->biobankId,
-                            $participant->zipCode,
-                        ];
                     }
-                    $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
-                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone(), false);
                     $row[] = $participant->siteSuffix;
                     $row[] = $participant->organization;
+                    $row[] = $participant->physicalMeasurementsStatus == 'COMPLETED' ? '1' : '0';
+                    $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $app->getUserTimezone(), false);
                     $row[] = $participant->evaluationFinalizedSite;
                     $row[] = $participant->samplesToIsolateDNA == 'RECEIVED' ? '1' : '0';
                     $row[] = $participant->numBaselineSamplesArrived;
+                    $row[] = $participant->orderCreatedSite;
                     foreach (array_keys(WorkQueue::$samples) as $sample) {
                         $newSample = $sample;
                         foreach (WorkQueue::$samplesAlias as $sampleAlias) {
@@ -470,42 +495,13 @@ class WorkQueueController extends AbstractController
                         $row[] = $participant->{"sampleStatus{$newSample}"} == 'RECEIVED' ? '1' : '0';
                         $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $app->getUserTimezone(), false);
                     }
-                    $row[] = $participant->orderCreatedSite;
-                    $row[] = $participant->withdrawalReason;
-                    $row[] = $participant->primaryLanguage;
-                    $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForDvElectronicHealthRecordsSharing);
-                    $row[] = WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingAuthored, $app->getUserTimezone());
-                    if ($hasFullDataAccess) {
-                        $row[] = $participant->loginPhoneNumber;
-                        $row[] = !empty($participant->streetAddress2) ? $participant->streetAddress2 : '';
-                        $workQueue = new WorkQueue;
-                        $row[] = $workQueue->getPatientStatus($participant, 'YES', 'export');
-                        $row[] = $workQueue->getPatientStatus($participant, 'NO', 'export');
-                        $row[] = $workQueue->getPatientStatus($participant, 'NO ACCESS', 'export');
-                        $row[] = $workQueue->getPatientStatus($participant, 'UNKNOWN', 'export');
-                        $row[] = $participant->middleName;
-                        $row[] = WorkQueue::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimeZone());
-                    }
-                    $row[] = $participant->participantOrigin;
-                    if ($hasFullDataAccess) {
-                        $row[] = $participant->isSuspended ? '1' : '0';
-                        $row[] = WorkQueue::dateFromString($participant->suspensionTime, $app->getUserTimezone());
-                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsROR);
-                        $row[] = WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $app->getUserTimezone());
-                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeMay"});
-                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeMayAuthored"}, $app->getUserTimezone());
-                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJune"});
-                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJuneAuthored"}, $app->getUserTimezone());
-                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOnCopeJuly"});
-                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnCopeJulyAuthored"}, $app->getUserTimezone());
-                        $row[] = $participant->consentCohortText;
-                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnDnaProgram);
-                        $row[] = WorkQueue::dateFromString($participant->{"questionnaireOnDnaProgramAuthored"}, $app->getUserTimezone());
-                        $row[] = WorkQueue::csvEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords);
-                        $row[] = WorkQueue::dateFromString($participant->{"ehrConsentExpireAuthored"}, $app->getUserTimezone());
-                        $row[] = WorkQueue::dateFromString($participant->{"consentForStudyEnrollmentFirstYesAuthored"}, $app->getUserTimezone());
-                        $row[] = WorkQueue::dateFromString($participant->{"consentForElectronicHealthRecordsFirstYesAuthored"}, $app->getUserTimezone());
-                    }
+                    $row[] = $participant->sample1SAL2CollectionMethod;
+                    $row[] = $participant->sex;
+                    $row[] = $participant->genderIdentity;
+                    $row[] = $participant->race;
+                    $row[] = $participant->education;
+                    $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeFeb);
+                    $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeFebAuthored, $app->getUserTimezone());
                     fputcsv($output, $row);
                 }
                 unset($participants);
@@ -530,18 +526,17 @@ class WorkQueueController extends AbstractController
         ]);
     }
 
-    public function getSiteWorkQueueDownload($app)
+    public function canExport($app)
     {
+        if ($app->hasRole('ROLE_AWARDEE')) {
+            return true;
+        }
         $site = $app['em']->getRepository('sites')->fetchOneBy([
             'deleted' => 0,
-            'google_group' => $app->getSiteId()
+            'google_group' => $app->getSiteId(),
+            'workqueue_download' => WorkQueue::FULL_DATA_ACCESS
         ]);
-        return !empty($site) ? $site['workqueue_download'] : null;
-    }
-
-    public function isDownloadDisabled($value)
-    {
-        return $value === AdminController::DOWNLOAD_DISABLED;
+        return !empty($site) ? true : null;
     }
 
     public function participantAction($id, Application $app, Request $request)

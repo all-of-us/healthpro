@@ -29,7 +29,7 @@
         <br />
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="inperson">
-                {% if participant.status %}
+                {% if canViewOrders %}
                     <div class="row">
                         <div class="col-sm-6 col-sm-offset-3">
                             {% include 'partials/participant-orders-list.html.twig' %}

@@ -2,8 +2,6 @@
 namespace Pmi\Console\Command;
 
 use Pmi\Application\AbstractApplication;
-use SensioLabs\Security\SecurityChecker;
-use SensioLabs\Security\Exception\HttpException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -126,7 +124,7 @@ class DeployCommand extends Command {
         $this->generatePhpConfig();
         $this->generateCronConfig();
 
-        // If not local, compile assets. Run ./bin/gulp when developing locally.
+        // If not local, compile assets. Run `npm run watch` when developing locally.
         if (!$this->local) {
             // ensure that we are up-to-date with the latest NPM dependencies
             $output->writeln('');
@@ -136,7 +134,7 @@ class DeployCommand extends Command {
             // compile (concat/minify/copy) assets
             $output->writeln('');
             $output->writeln("Compiling assets...");
-            $this->exec("{$this->appDir}/bin/gulp compile");
+            $this->exec("npm run build");
         }
 
         // security checks
@@ -388,20 +386,15 @@ class DeployCommand extends Command {
 
     private function runSecurityCheck()
     {
-        $composerLockFile = $this->appDir . DIRECTORY_SEPARATOR . 'composer.lock';
-        $this->out->writeln("Running SensioLabs Security Checker...");
-        $checker = new SecurityChecker();
-        $helper = $this->getHelper('question');
-        try {
-            $vulnerabilities = json_decode((string)$checker->check($composerLockFile), true);
-        } catch (HttpException $e) {
-            $this->out->writeln('<error>' . $e->getMessage() . '</error>');
-            if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
-                throw new \Exception('Aborting due to SensioLabs Security Checker network error');
-            }
+        $this->out->writeln("Running Symfony Security Check...");
+        $process = new Process('symfony security:check --disable-exit-code --format=json --dir=' . escapeshellarg($this->appDir));
+        $process->mustRun();
+        $vulnerabilities = json_decode($process->getOutput(), true);
+        if (!is_array($vulnerabilities)) {
+            throw new \Exception('Unexpected result from symfony security:check');
         }
-        // Ignore vulnerabilities mentioned in sensioignore file
-        $vulnerabilities = $this->removeSensioIgnoredVulnerabilities($vulnerabilities);
+        // Ignore vulnerabilities in composerignore.json file
+        $vulnerabilities = $this->removeComposerIgnore($vulnerabilities);
         if (count($vulnerabilities) === 0) {
             $this->out->writeln('No packages have known vulnerabilities');
         } else {
@@ -411,6 +404,7 @@ class DeployCommand extends Command {
                 if (!$this->local) {
                     throw new \Exception('Fix security vulnerabilities before deploying');
                 } else {
+                    $helper = $this->getHelper('question');
                     if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
                         throw new \Exception('Aborting due to security vulnerability');
                     }
@@ -457,16 +451,16 @@ class DeployCommand extends Command {
         return $process;
     }
 
-    private function removeSensioIgnoredVulnerabilities($vulnerabilities)
+    private function removeComposerIgnore($vulnerabilities)
     {
         $newVulnerabilities = $vulnerabilities;
-        $sensioIgnoredVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'sensioignore.json'), true);
+        $ignoredVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'composerignore.json'), true);
         foreach ($vulnerabilities as $key => $vulnerability) {
             if (!empty($vulnerability['advisories'])) {
                 $advisories = $vulnerability['advisories'];
                 foreach($vulnerability['advisories'] as $advisoryKey => $advisory) {
                     if (!empty($advisory['link'])) {
-                        if ($this->isVulnerabilityIgnored($sensioIgnoredVulnerabilities, $advisory['link'])) {
+                        if ($this->isVulnerabilityIgnored($ignoredVulnerabilities, $advisory['link'])) {
                             //Remove ignored advisories
                             unset($advisories[$advisoryKey]);
                         }

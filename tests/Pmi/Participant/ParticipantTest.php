@@ -18,11 +18,32 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $this->assertSame('1933-03-03', $participant->getMayolinkDob()->format('Y-m-d'));
     }
 
+    public function testDeceasedParticipantPendingAccessStatus()
+    {
+        $participant = new Participant((object)[
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'deceasedStatus' => 'PENDING'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('deceased-pending', $participant->statusReason);
+        $this->assertSame(false, $participant->isWithdrawn);
+    }
+
+    public function testDeceasedParticipantApprovedAccessStatus()
+    {
+        $participant = new Participant((object)[
+            'consentForStudyEnrollment' => 'SUBMITTED',
+            'deceasedStatus' => 'APPROVED'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('deceased-approved', $participant->statusReason);
+        $this->assertSame(false, $participant->isWithdrawn);
+    }
+
     public function testParticipantDisableTestAccessStatus()
     {
         $options = [
             'disableTestAccess' => true,
-            'genomicsStartTime' => '2020-03-23T12:44:33',
             'siteType' => 'hpo',
             'cohortOneLaunchTime' => ''
         ];
@@ -58,6 +79,14 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         $this->assertSame(false, $participant->status);
         $this->assertSame('consent', $participant->statusReason);
         $this->assertSame(false, $participant->isWithdrawn);
+
+        $participant = new Participant((object)[
+            'questionnaireOnTheBasics' => 'SUBMITTED',
+            'consentForStudyEnrollment' => 'UNSET',
+            'withdrawalStatus' => 'NO_USE'
+        ]);
+        $this->assertSame(false, $participant->status);
+        $this->assertSame('consent', $participant->statusReason);
     }
 
     public function testParticipantWithdrawalStatusNoUse()
@@ -88,7 +117,6 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
     {
         $options = [
             'disableTestAccess' => false,
-            'genomicsStartTime' => '2020-03-23T12:44:33',
             'siteType' => 'hpo',
             'cohortOneLaunchTime' => ''
         ];
@@ -96,10 +124,10 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         // Assert genomics status (Criteria 1)
         $participant = new Participant((object)[
             'options' => $options,
+            'consentCohort' => 'COHORT_3',
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
-            'consentForGenomicsROR' => 'UNSET',
-            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
+            'consentForGenomicsROR' => 'UNSET'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('genomics', $participant->statusReason);
@@ -174,7 +202,6 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
     {
         $options = [
             'disableTestAccess' => false,
-            'genomicsStartTime' => '2020-03-23T12:44:33',
             'siteType' => 'hpo',
             'cohortOneLaunchTime' => ''
         ];
@@ -183,11 +210,11 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         // Assert not submitted ehr consent (UNSET)
         $participant = new Participant((object)[
             'options' => $options,
+            'consentCohort' => 'COHORT_3',
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentForGenomicsROR' => 'SUBMITTED',
-            'consentForElectronicHealthRecords' => 'UNSET',
-            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
+            'consentForElectronicHealthRecords' => 'UNSET'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('ehr-consent', $participant->statusReason);
@@ -195,11 +222,11 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         // Assert not submitted ehr consent (SUBMITTED_NOT_SURE)
         $participant = new Participant((object)[
             'options' => $options,
+            'consentCohort' => 'COHORT_3',
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentForGenomicsROR' => 'SUBMITTED',
-            'consentForElectronicHealthRecords' => 'SUBMITTED_NOT_SURE',
-            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
+            'consentForElectronicHealthRecords' => 'SUBMITTED_NOT_SURE'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('ehr-consent', $participant->statusReason);
@@ -207,11 +234,11 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
         // Assert UNSET gRoR and Ehr consent
         $participant = new Participant((object)[
             'options' => $options,
+            'consentCohort' => 'COHORT_3',
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentForGenomicsROR' => 'UNSET',
-            'consentForElectronicHealthRecords' => 'UNSET',
-            'consentForStudyEnrollmentAuthored' => '2020-03-24T12:44:33'
+            'consentForElectronicHealthRecords' => 'UNSET'
         ]);
         $this->assertSame(false, $participant->status);
         $this->assertSame('ehr-consent', $participant->statusReason);
@@ -313,7 +340,6 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
     {
         $options = [
             'disableTestAccess' => false,
-            'genomicsStartTime' => '',
             'siteType' => 'hpo',
             'cohortOneLaunchTime' => '2020-03-24T12:44:33'
         ];
@@ -366,5 +392,51 @@ class ParticipantTest extends PHPUnit\Framework\TestCase
             'consentForStudyEnrollmentAuthored' => '2020-03-24T12:45:33'
         ]);
         $this->assertSame(true, $participant->status);
+    }
+
+    public function testActivityStatus()
+    {
+        // Withdrawn
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NO_USE'
+        ]);
+        $this->assertSame('withdrawn', $participant->activityStatus);
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'EARLY_OUT'
+        ]);
+        $this->assertSame('withdrawn', $participant->activityStatus);
+
+        // Deactivated
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NOT_WITHDRAWN',
+            'suspensionStatus' => 'NO_CONTACT'
+        ]);
+        $this->assertSame('deactivated', $participant->activityStatus);
+
+        // Deceased
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NOT_WITHDRAWN',
+            'deceasedStatus' => 'PENDING'
+        ]);
+        $this->assertSame('deceased', $participant->activityStatus);
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NOT_WITHDRAWN',
+            'deceasedStatus' => 'APPROVED'
+        ]);
+        $this->assertSame('deceased', $participant->activityStatus);
+
+        // Priority
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NO_USE',
+            'deceasedStatus' => 'APPROVED'
+        ]);
+        $this->assertSame('withdrawn', $participant->activityStatus);
+
+        $participant = new Participant((object)[
+            'withdrawalStatus' => 'NOT_WITHDRAWN',
+            'suspensionStatus' => 'NO_CONTACT',
+            'deceasedStatus' => 'APPROVED'
+        ]);
+        $this->assertSame('deactivated', $participant->activityStatus);
     }
 }

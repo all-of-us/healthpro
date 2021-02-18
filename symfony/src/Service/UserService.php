@@ -47,7 +47,7 @@ class UserService
 
     public function canMockLogin()
     {
-        return $this->env->isLocal() && $this->params->get('local_mock_auth');
+        return $this->env->isLocal() && $this->params->has('local_mock_auth') && $this->params->get('local_mock_auth');
     }
 
     public function getUserInfo($googleUser)
@@ -57,6 +57,7 @@ class UserService
                 'id' => 1,
                 'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getUserId(),
+                'timezone' => $googleUser->getTimzezone()
             ];
         }
         $user = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);

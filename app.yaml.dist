@@ -1,4 +1,4 @@
-runtime: php72
+runtime: php73
 
 # default is `public/index.php` or `index.php`
 entrypoint: serve web/index.php
@@ -14,6 +14,11 @@ handlers:
   secure: always
 - url: /assets
   static_dir: web/assets
+  secure: always
+  http_headers:
+    X-Content-Type-Options: nosniff
+- url: /build
+  static_dir: web/build
   secure: always
   http_headers:
     X-Content-Type-Options: nosniff

@@ -28,7 +28,9 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function supports(Request $request)
     {
-        if ($request->getSession()->has('isLogin') && $request->getSession()->has('_security_main')) {
+        if (($request->getSession()->has('isLogin') && $request->getSession()->has('_security_main')) ||
+            (preg_match('/^(\/s)?\/cron\/.*/', $request->getPathInfo()) && ($request->headers->get('X-Appengine-Cron') === 'true' || $this->env->isLocal()))
+        ) {
             return false;
         }
         return true;
@@ -62,7 +64,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             // just a safeguard in case the Google user and our user get out of sync somehow
             strcasecmp($credentials['googleUser']->getEmail(), $user->getEmail()) === 0;
 
-        if (!$this->env->isProd() && $this->params->get('gaBypass')) {
+        if (!$this->env->isProd() && $this->params->has('gaBypass') && $this->params->get('gaBypass')) {
             return $validCredentials; // Bypass groups auth
         } else {
             $valid2fa = !$this->params->get('enforce2fa') || $user->hasTwoFactorAuth();

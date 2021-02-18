@@ -3,7 +3,7 @@
         <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
     </div>
     <div class="panel-body">
-        {% if (readOnly is defined or biobankView is defined or participant.isSuspended) and orders|length == 0 %}
+        {% if (readOnly is defined or biobankView is defined or participant.isSuspended or participant.editExistingOnly) and orders|length == 0 %}
             <small class="text-warning">No Records Found</small>
         {% else %}
             {% for order in orders %}
@@ -50,7 +50,7 @@
                     <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
                 </a>
             {% endif %}
-            {% if type is not defined  and readOnly is not defined and biobankView is not defined and not participant.isSuspended %}
+            {% if type is not defined  and readOnly is not defined and biobankView is not defined and not participant.isSuspended and participant.status %}
                 <a href="{{ path('orderCheck', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
             {% endif %}
         {% endif %}

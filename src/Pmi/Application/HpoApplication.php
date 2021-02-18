@@ -11,6 +11,7 @@ use Pmi\Service\UserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
+use App\Service\HelpService;
 
 class HpoApplication extends AbstractApplication
 {
@@ -78,9 +79,9 @@ class HpoApplication extends AbstractApplication
                 [['path' => '^/problem($|\/)'], ['ROLE_DV_ADMIN']],
                 [['path' => '^/site($|\/)'], ['ROLE_USER', 'ROLE_AWARDEE']],
                 [['path' => '^/help($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
-                [['path' => '^/settings($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN']],
                 [['path' => '^/biobank\/\w+\/(order|quanum-order)\/\w+$'], ['ROLE_AWARDEE', 'ROLE_BIOBANK', 'ROLE_SCRIPPS']],
                 [['path' => '^/biobank($|\/)'], ['ROLE_BIOBANK', 'ROLE_SCRIPPS']],
+                [['path' => '^/settings($|\/)'], ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_AWARDEE', 'ROLE_DV_ADMIN', 'ROLE_BIOBANK', 'ROLE_SCRIPPS', 'ROLE_AWARDEE_SCRIPPS']],
                 [['path' => '^/.*$'], 'ROLE_USER'],
             ]
         ]);
@@ -344,6 +345,27 @@ class HpoApplication extends AbstractApplication
         return !empty($site);
     }
 
+    public function isDiversionPouchSite()
+    {
+        if (!isset($this->configuration['diversion_pouch_site'])) {
+            return false;
+        }
+        $site = $this['em']->getRepository('sites')->fetchBy([
+            'deleted' => 0,
+            'google_group' => $this->getSiteId(),
+            'site_type' => $this->configuration['diversion_pouch_site']
+        ]);
+        return !empty($site);
+    }
+
+    public function getOrderType()
+    {
+        if ($this->isDVType() && !$this->isDiversionPouchSite()) {
+            return 'dv';
+        }
+        return 'hpo';
+    }
+
     public function getSiteType()
     {
         return $this->isDVType() ? 'dv' : 'hpo';
@@ -358,6 +380,8 @@ class HpoApplication extends AbstractApplication
 
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
+        $app['twig']->addGlobal('confluenceResources', HelpService::$confluenceResources);
+
         $app->log(Log::REQUEST);
 
         // log the user out if their session is expired
@@ -450,7 +474,7 @@ class HpoApplication extends AbstractApplication
             }
         }
     }
-    
+
     protected function finishCallback(Request $request, Response $response)
     {
         // moved to afterCallBack to fix session start error
@@ -462,7 +486,7 @@ class HpoApplication extends AbstractApplication
         if (!$user || !$user->belongsToSite($email)) {
             return false;
         }
-        if ($this->isProd()) {
+        if ($this->isStable() || $this->isProd()) {
             $siteGroup = $user->getSite($email);
             $site = $this['em']->getRepository('sites')->fetchOneBy([
                 'deleted' => 0,
@@ -585,6 +609,8 @@ class HpoApplication extends AbstractApplication
             $this['session']->set('siteAwardeeId', $site['awardee_id']);
             $this['session']->set('siteAwardeeDisplayName', $this->getAwardeeDisplayName($site['awardee_id']));
             $this['session']->set('currentSiteDisplayName', $this->getAwardeeDisplayName($site['name']));
+            $this['session']->set('siteType', $this->getSiteType());
+            $this['session']->set('orderType', $this->getOrderType());
         } else {
             $this['session']->remove('siteOrganization');
             $this['session']->remove('siteOrganizationId');
@@ -593,6 +619,8 @@ class HpoApplication extends AbstractApplication
             $this['session']->remove('siteAwardeeId');
             $this['session']->remove('siteAwardeeDisplayName');
             $this['session']->remove('currentSiteDisplayName');
+            $this['session']->remove('siteType');
+            $this['session']->remove('orderType');
         }
     }
 
