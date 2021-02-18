@@ -13,50 +13,15 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class WorkQueueService
 {
-    /**
-     * @var ParticipantSummaryService
-     */
     protected $participantSummaryService;
-    /**
-     * @var ParameterBagInterface
-     */
     protected $params;
-    /**
-     * @var EntityManagerInterface
-     */
     protected $em;
-    /**
-     * @var
-     */
     protected $env;
-    /**
-     * @var SiteService
-     */
     protected $siteService;
-    /**
-     * @var LoggerService
-     */
     protected $loggerService;
-    /**
-     * @var AuthorizationCheckerInterface
-     */
     protected $authorizationChecker;
-
-    /**
-     * @var bool
-     */
     protected $rdrError = false;
 
-    /**
-     * WorkQueueService constructor.
-     * @param ParticipantSummaryService $participantSummaryService
-     * @param ParameterBagInterface $params
-     * @param EntityManagerInterface $em
-     * @param UserService $userService
-     * @param SiteService $siteService
-     * @param LoggerService $loggerService
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         ParticipantSummaryService $participantSummaryService,
         ParameterBagInterface $params,
@@ -75,12 +40,6 @@ class WorkQueueService
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * @param $organization
-     * @param $params
-     * @param null $type
-     * @return array
-     */
     public function participantSummarySearch($organization, &$params, $type = null)
     {
         $rdrParams = [];
@@ -232,10 +191,6 @@ class WorkQueueService
         return $results;
     }
 
-    /**
-     * @param $participants
-     * @return array
-     */
     public function generateTableRows($participants)
     {
         $e = function ($string) {
@@ -360,10 +315,6 @@ class WorkQueueService
         return $rows;
     }
 
-    /**
-     * @param $participant
-     * @return array
-     */
     public function generateExportRow($participant)
     {
         $userTimezone = $this->userService->getUser()->getInfo()['timezone'];
@@ -458,11 +409,6 @@ class WorkQueueService
         return $row;
     }
 
-    /**
-     * @param $id
-     * @param $name
-     * @return string
-     */
     public function generateLink($id, $name)
     {
         if ($this->authorizationChecker->isGranted('ROLE_USER')) {
@@ -475,12 +421,6 @@ class WorkQueueService
         return sprintf('<a href="%s">%s</a>', $url, $text);
     }
 
-    /**
-     * @param $participant
-     * @param $value
-     * @param string $type
-     * @return string
-     */
     public function getPatientStatus($participant, $value, $type = 'wq')
     {
         // Clear patient status for withdrawn participants
@@ -501,9 +441,6 @@ class WorkQueueService
     }
 
 
-    /**
-     * @return bool|null
-     */
     public function canExport()
     {
         if ($this->authorizationChecker->isGranted('ROLE_AWARDEE')) {
@@ -517,9 +454,6 @@ class WorkQueueService
         return !empty($site) ? true : null;
     }
 
-    /**
-     * @return array
-     */
     public function getExportConfiguration()
     {
         return [
@@ -528,25 +462,16 @@ class WorkQueueService
         ];
     }
 
-    /**
-     * @return bool
-     */
     public function isRdrError()
     {
         return $this->rdrError;
     }
 
-    /**
-     * @return mixed
-     */
     public function getTotal()
     {
         return $this->participantSummaryService->getTotal();
     }
 
-    /**
-     * @return mixed
-     */
     public function getNextToken()
     {
         return $this->participantSummaryService->getNextToken();

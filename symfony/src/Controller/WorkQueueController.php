@@ -18,25 +18,10 @@ use Pmi\Audit\Log;
  */
 class WorkQueueController extends AbstractController
 {
-    /**
-     * @var SessionInterface
-     */
     protected $session;
-    /**
-     * @var WorkQueueService
-     */
     protected $workQueueService;
-    /**
-     * @var SiteService
-     */
     protected $siteService;
 
-    /**
-     * WorkQueueController constructor.
-     * @param SessionInterface $session
-     * @param WorkQueueService $workQueueService
-     * @param SiteService $siteService
-     */
     public function __construct(SessionInterface $session, WorkQueueService $workQueueService, SiteService $siteService)
     {
         $this->session = $session;
