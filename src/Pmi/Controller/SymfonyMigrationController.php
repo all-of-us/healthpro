@@ -122,6 +122,6 @@ class SymfonyMigrationController extends AbstractController
      */
     public function workqueue_indexAction(Application $app)
     {
-        return $app->redirect('/s/workqueue');
+        return $app->redirect('/s/workqueue/');
     }
 }

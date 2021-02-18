@@ -11,37 +11,13 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class SiteService
 {
-    /**
-     * @var ParameterBagInterface
-     */
     private $params;
-    /**
-     * @var SessionInterface
-     */
     private $session;
-    /**
-     * @var EntityManagerInterface
-     */
     private $em;
-    /**
-     * @var array
-     */
     protected $siteNameMapper = [];
-    /**
-     * @var array
-     */
     protected $organizationNameMapper = [];
-    /**
-     * @var array
-     */
     protected $awardeeNameMapper = [];
 
-    /**
-     * SiteService constructor.
-     * @param ParameterBagInterface $params
-     * @param SessionInterface $session
-     * @param EntityManagerInterface $em
-     */
     public function __construct(ParameterBagInterface $params, SessionInterface $session, EntityManagerInterface $em)
     {
         $this->params = $params;
@@ -49,25 +25,17 @@ class SiteService
         $this->em = $em;
     }
 
-    /**
-     * @return bool
-     */
     public function isTestSite(): bool
     {
         return $this->params->has('disable_test_access') && !empty($this->params->get('disable_test_access')) && $this->session->get('siteAwardeeId') === 'TEST';
     }
 
-    /**
-     * @return bool
-     */
+
     public function isDvType(): bool
     {
         return $this->session->get('siteType') === 'dv' ? true : false;
     }
 
-    /**
-     * @return null
-     */
     public function getSiteId()
     {
         if ($site = $this->session->get('site')) {
@@ -76,10 +44,8 @@ class SiteService
         return null;
     }
 
-    /**
-     * @return null
-     * Super user ex: STSI
-     */
+
+    //Super user ex: STSI
     public function getAwardeeId()
     {
         if ($awardee = $this->session->get('awardee')) {
@@ -88,9 +54,6 @@ class SiteService
         return null;
     }
 
-    /**
-     * @return bool
-     */
     public function isDiversionPouchSite()
     {
         if (!$this->params->has('diversion_pouch_site')) {
@@ -104,28 +67,18 @@ class SiteService
         return !empty($site);
     }
 
-    /**
-     * @return mixed
-     */
     public function getSiteAwardee()
     {
         return $this->session->get('siteOrganization');
     }
 
-    /**
-     * @return mixed
-     * This is equivalent to getSiteOrganizationId method in HpoApplication Class
-     */
+
+    //This is equivalent to getSiteOrganizationId method in HpoApplication Class
     public function getSiteOrganization()
     {
         return $this->session->get('siteOrganizationId');
     }
 
-
-    /**
-     * @return array|null
-     * This is equivalent to getAwardeeOrganization method in HpoApplication Class
-     */
     public function getSuperUserAwardees()
     {
         $sites = $this->getSuperUserAwardeeSites();
@@ -144,11 +97,6 @@ class SiteService
         return $awardees;
     }
 
-    /**
-     * @param null $awardee
-     * @return null|object[]
-     * This is equivalent to getAwardeeEntity method in HpoApplication Class
-     */
     public function getSuperUserAwardeeSites()
     {
         $awardee = $this->getAwardeeId();
@@ -161,11 +109,6 @@ class SiteService
         ]);
     }
 
-    /**
-     * @param null $awardee
-     * @return null|object[]
-     * This is equivalent to getSitesFromOrganization method in HpoApplication Class
-     */
     public function getAwardeeSites($awardee = null)
     {
         $awardee = $awardee ?? $this->getAwardeeId();
@@ -179,10 +122,6 @@ class SiteService
         ]);
     }
 
-    /**
-     * @param $awardeeId
-     * @return mixed
-     */
     public function getAwardeeDisplayName($awardeeId)
     {
         $awardeeName = $awardeeId;
@@ -199,10 +138,6 @@ class SiteService
         return $awardeeName;
     }
 
-    /**
-     * @param $organizationId
-     * @return mixed
-     */
     public function getOrganizationDisplayName($organizationId)
     {
         $organizationName = $organizationId;
@@ -219,11 +154,6 @@ class SiteService
         return $organizationName;
     }
 
-    /**
-     * @param $siteSuffix
-     * @param bool $defaultToSiteSuffix
-     * @return mixed|null
-     */
     public function getSiteDisplayName($siteSuffix, $defaultToSiteSuffix = true)
     {
         $siteName = $defaultToSiteSuffix ? $siteSuffix : null;
@@ -242,10 +172,7 @@ class SiteService
         }
         return $siteName;
     }
-
-    /**
-     * @return null|string
-     */
+    
     public function getSiteIdWithPrefix()
     {
         if ($this->getSiteId()) {
