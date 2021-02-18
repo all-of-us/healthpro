@@ -14,7 +14,6 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
 use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
-use App\Helper\WorkQueue;
 use Pmi\Order\Order;
 use Pmi\Security\User;
 
@@ -34,7 +33,6 @@ class DefaultController extends AbstractController
         ['selectSite', '/site/select', ['method' => 'GET|POST']],
         ['participants', '/participants', ['method' => 'GET|POST']],
         ['orders', '/orders', ['method' => 'GET|POST']],
-        ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
         ['patientStatus', '/participant/{participantId}/patient/status/{patientStatusId}', ['method' => 'GET']],
         ['mockLogin', '/mock-login', ['method' => 'GET|POST']]
@@ -362,146 +360,6 @@ class DefaultController extends AbstractController
         return $app['twig']->render('orders.html.twig', [
             'idForm' => $idForm->createView(),
             'recentOrders' => $recentOrders
-        ]);
-    }
-
-    public function participantAction($id, Application $app, Request $request)
-    {
-        $refresh = $request->query->get('refresh');
-        $participant = $app['pmi.drc.participants']->getById($id, $refresh);
-        if ($refresh) {
-            return $app->redirectToRoute('participant', [
-                'id' => $id
-            ]);
-        }
-        if (!$participant) {
-            $app->abort(404);
-        }
-
-        $agreeForm = $app['form.factory']->createBuilder(FormType::class)->getForm();
-        $agreeForm->handleRequest($request);
-        if ($agreeForm->isSubmitted() && $agreeForm->isValid()) {
-            $app['session']->set('agreeCrossOrg_'.$id, true);
-            $app->log(Log::CROSS_ORG_PARTICIPANT_AGREE, [
-                'participantId' => $id,
-                'organization' => $participant->hpoId
-            ]);
-            // Check for return url and re-direct
-            if ($request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
-                return $app->redirect($request->query->get('return'));
-            }
-            return $app->redirectToRoute('participant', [
-                'id' => $id
-            ]);
-        }
-
-        $isCrossOrg = $participant->hpoId !== $app->getSiteOrganization();
-        $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, ['test-participant', 'basics', 'genomics', 'ehr-consent', 'program-update', 'primary-consent-update', 'deceased-pending', 'deceased-approved']));
-        $hasNoParticipantAccess = $isCrossOrg && empty($app['session']->get('agreeCrossOrg_'.$id));
-        if ($hasNoParticipantAccess) {
-            $app->log(Log::CROSS_ORG_PARTICIPANT_ATTEMPT, [
-                'participantId' => $id,
-                'organization' => $participant->hpoId
-            ]);
-        } elseif ($isCrossOrg) {
-            $app->log(Log::CROSS_ORG_PARTICIPANT_VIEW, [
-                'participantId' => $id,
-                'organization' => $participant->hpoId
-            ]);
-        }
-
-        $evaluations = $app['em']->getRepository('evaluations')->getEvaluationsWithHistory($id);
-        $orders = $app['em']->getRepository('orders')->getParticipantOrdersWithHistory($id);
-        $problems = $app['em']->getRepository('problems')->getParticipantProblemsWithCommentsCount($id);
-
-        if (empty($participant->cacheTime)) {
-            $participant->cacheTime = new \DateTime();
-        }
-        foreach ($orders as $key => $order) {
-            // Display most recent processed sample time if exists
-            $processedSamplesTs = json_decode($order['processed_samples_ts'], true);
-            if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
-                $processedTs = new \DateTime();
-                $processedTs->setTimestamp(max($processedSamplesTs));
-                $processedTs->setTimezone(new \DateTimeZone($app->getUserTimezone()));
-                $orders[$key]['processed_ts'] = $processedTs;
-            }
-        }
-        // Determine cancel route
-        $cancelRoute = 'participants';
-        if ($request->query->has('return')) {
-            if (strpos($request->query->get('return'), '/order/') !== false) {
-                $cancelRoute = 'orders';
-            }
-        }
-
-        $patientStatus = new PatientStatus($app);
-        // Check if patient status is allowed for this participant
-        if ($patientStatus->hasAccess($participant)) {
-            // Patient Status
-            $patientStatus = new PatientStatus($app);
-            $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
-            // Determine if comment field is required
-            $isCommentRequired = !empty($orgPatientStatusData) ? true : false;
-            // Get patient status form
-            $patientStatusForm = $patientStatus->getForm($isCommentRequired);
-            $patientStatusForm->handleRequest($request);
-            if ($patientStatusForm->isSubmitted()) {
-                $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
-                    'participant_id' => $id,
-                    'organization' => $app->getSiteOrganizationId()
-                ]);
-                if (!empty($patientStatusData) && empty($patientStatusForm['comments']->getData())) {
-                    $patientStatusForm['comments']->addError(new FormError('Please enter comment'));
-                }
-                if ($patientStatusForm->isValid()) {
-                    $patientStatusId = !empty($patientStatusData) ? $patientStatusData['id'] : null;
-                    $patientStatus->loadData($id, $patientStatusId, $patientStatusForm->getData());
-                    if ($patientStatus->sendToRdr() && $patientStatus->saveData()) {
-                        $app->addFlashSuccess('Patient status saved');
-                        // Load newly entered data
-                        $orgPatientStatusData = $patientStatus->getOrgPatientStatusData($id);
-                        // Get new form
-                        $patientStatusForm = $patientStatus->getForm(true);
-                    } else {
-                        $app->addFlashError("Failed to create patient status. Please try again.");
-                    }
-                } else {
-                    $patientStatusForm->addError(new FormError('Please correct the errors below'));
-                }
-            }
-            $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($id, $app->getSiteOrganizationId());
-            $awardeePatientStatusData = $patientStatus->getAwardeePatientStatusData($id);
-            $patientStatusForm = $patientStatusForm->createView();
-            $canViewPatientStatus = $patientStatus->hasAccess($participant);
-        } else {
-            $patientStatusForm = null;
-            $orgPatientStatusData = null;
-            $orgPatientStatusHistoryData = null;
-            $awardeePatientStatusData = null;
-            $canViewPatientStatus = false;
-        }
-        return $app['twig']->render('participant.html.twig', [
-            'participant' => $participant,
-            'orders' => $orders,
-            'evaluations' => $evaluations,
-            'problems' => $problems,
-            'hasNoParticipantAccess' => $hasNoParticipantAccess,
-            'agreeForm' => $agreeForm->createView(),
-            'cacheEnabled' => $app['pmi.drc.participants']->getCacheEnabled(),
-            'canViewDetails' => $canViewDetails,
-            'samples' => WorkQueue::$samples,
-            'surveys' => WorkQueue::$surveys,
-            'samplesAlias' => WorkQueue::$samplesAlias,
-            'cancelRoute' => $cancelRoute,
-            'patientStatusForm' => $patientStatusForm,
-            'orgPatientStatusData' => $orgPatientStatusData,
-            'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
-            'awardeePatientStatusData' => $awardeePatientStatusData,
-            'isDVType' => $app->isDVType(),
-            'canViewPatientStatus' => $canViewPatientStatus,
-            'displayPatientStatusBlock' => !$app->isDVType(),
-            'canEdit' => $participant->status || $participant->editExistingOnly
         ]);
     }
 
