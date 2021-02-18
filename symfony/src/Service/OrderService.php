@@ -720,6 +720,7 @@ class OrderService
         $this->order->setProcessedNotes($processedNotes);
         $this->order->setFinalizedNotes($finalizedNotes);
         $this->order->setFedexTracking(!empty($trackingNumber) ? $trackingNumber : null);
+        $this->order->setOrigin($object->origin);
         // TODO: Set site and user names for biobank order details view
         return $this->order;
     }
