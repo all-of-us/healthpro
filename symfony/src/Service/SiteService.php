@@ -79,6 +79,7 @@ class SiteService
         return $this->session->get('siteOrganizationId');
     }
 
+    //This is equivalent to getAwardeeOrganization method in HpoApplication Class
     public function getSuperUserAwardees()
     {
         $sites = $this->getSuperUserAwardeeSites();
@@ -97,6 +98,7 @@ class SiteService
         return $awardees;
     }
 
+    //This is equivalent to getAwardeeEntity method in HpoApplication Class
     public function getSuperUserAwardeeSites()
     {
         $awardee = $this->getAwardeeId();
@@ -109,6 +111,7 @@ class SiteService
         ]);
     }
 
+    //This is equivalent to getSitesFromOrganization method in HpoApplication Class
     public function getAwardeeSites($awardee = null)
     {
         $awardee = $awardee ?? $this->getAwardeeId();
