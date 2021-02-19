@@ -74,7 +74,7 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
-            Height and Weight
+            Weight
             <span class="toggle-help-image" data-id="heightWeightModal">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
             </span>
@@ -82,7 +82,7 @@
     </div>
     <div class="panel-body">
         <div class="row row-equal-height">
-            <div class="col-sm-4">
+            <div class="col-sm-4" style="display: none;">
                 <div class="panel panel-default">
                     <div class="panel-body">
                         {{ metrics.form_row(evaluationForm, schema.fields['height']) }}
@@ -105,26 +105,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">
-                            BMI
-                            <span class="toggle-help-image" data-id="bmiModal" style="color:white">
-                                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                            </span>
-                        </h3>
-                    </div>
-                    <div class="panel-body">
-                        <p class="text-center lead" id="bmi"></p>
-                        <div id="bmi-warning" class="metric-warnings text-warning"></div>
-                    </div>
-                </div>
-            </div>
-            <p class="text-info small">
-                <i class="fa fa-info-circle"></i>
-                If the participant is NOT an apheresis donor, please select a protocol modification of “SDBB DV Blood Donor” for height and weight
-            </p>
         </div>
     </div>
 </div>
@@ -145,17 +125,9 @@
 </div>
 
 <div id="heightWeightModal" style="display:none">
-    <h4 class="help-header-text">Height &amp; Weight</h4>
+    <h4 class="help-header-text">Weight</h4>
     <div class="row">
-        <div class="col-sm-4 col-md-3">
-            <img src="{{ asset('img/eval/height.png') }}" class="img-responsive" />
-        </div>
-        <div class="col-sm-8 col-md-9">
-            <h5>Height</h5>
-            <ul>
-                <li>Ask participant to remove shoes and stand tall, heels against the wall, with feet positioned close together.</li>
-                <li>Lower the stadiometer headplate so it rests firmly on top of participant’s head.</li>
-            </ul>
+        <div class="col-sm-12 col-md-12">
             <h5>Weight</h5>
             <ul>
                 <li>Ask participant to remove heavy outer layers and shoes.</li>
@@ -163,6 +135,7 @@
                 <li>Ensure participant stands tall, eyes looking straight ahead.</li>
             </ul>
             <i>See SOP for special considerations.</i>
+            <p>* If the participant is NOT an apheresis donor, please select a protocol modification of Whole Blood Donor</p>
         </div>
     </div>
 </div>

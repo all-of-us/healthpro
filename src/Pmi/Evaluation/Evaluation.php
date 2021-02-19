@@ -733,6 +733,7 @@ class Evaluation
     {
         $this->addBloodDonorProtocolModificationForWaistandHip();
         $this->addBloodDonorProtocolModificationForBloodPressure(2);
+        $this->addBloodDonorProtocolModificationForHeight();
     }
 
     public function addBloodDonorProtocolModificationForWaistandHip()
@@ -756,6 +757,11 @@ class Evaluation
             $this->data->{$field}[$reading] = false;
         }
         $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+    }
+
+    public function addBloodDonorProtocolModificationForHeight()
+    {
+        $this->data->{"height-protocol-modification"} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
     }
 
     public function isSdbbBloodPressureOutOfRange($key)

@@ -18,7 +18,6 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
         "change .field-irregular-heart-rate input": "calculateIrregularHeartRate",
         "change #form_pregnant, #form_wheelchair": "handlePregnantOrWheelchair",
-        "change #form_height-protocol-modification": "handleHeightProtocol",
         "change #form_weight-protocol-modification": "handleWeightProtocol",
         "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic",
         "click .modification-toggle a": "showModification",
@@ -118,24 +117,6 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
             if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-bound') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
-        }
-    },
-    handleHeightProtocol: function() {
-        var selected = this.$('#form_height-protocol-modification').val();
-        if (selected === 'refusal') {
-            this.$('#form_height').valChange('').attr('disabled', true);
-            this.$('.field-height').next('.alt-units-block').hide();
-        } else {
-            if (!this.finalized) {
-                this.$('#form_height').attr('disabled', false);
-                this.$('.field-height').next('.alt-units-block').show();
-            }
-        }
-        if (selected === 'other') {
-            this.$('.field-height-protocol-modification-notes').parent().show();
-        } else {
-            this.$('.field-height-protocol-modification-notes').parent().hide();
-            this.$('#form_height-protocol-modification-notes').val('');
         }
     },
     handleWeightProtocol: function() {
@@ -478,7 +459,6 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
                 $('#form_' + field + '-protocol-modification').val(reason);
             }
         });
-        self.handleHeightProtocol();
         self.handleWeightProtocol();
     },
     enableAltUnits: function(e) {
@@ -606,7 +586,6 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         this.calculateCuff();
         this.calculateIrregularHeartRate();
         this.handlePregnantOrWheelchair();
-        this.handleHeightProtocol();
         this.handleWeightProtocol();
         this.toggleSecondBloodPressure();
         if (this.finalized) {
