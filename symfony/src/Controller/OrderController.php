@@ -712,4 +712,16 @@ class OrderController extends AbstractController
             'orderId' => $orderId
         ]);
     }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/biobank/summary", name="biobank_summary")
+     */
+
+    public function biobankSummaryAction($participantId, $orderId)
+    {
+        $order = $this->loadOrder($participantId, $orderId);
+        return $this->render('biobank/summary.html.twig', [
+            'biobankChanges' => $order->getBiobankChangesDetails($this->getUser()->getInfo()['timezone'])
+        ]);
+    }
 }
