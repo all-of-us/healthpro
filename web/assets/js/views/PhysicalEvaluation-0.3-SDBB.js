@@ -11,8 +11,6 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         "click .toggle-help-image": "displayHelpModal",
         "change input, select": "inputChange",
         "keyup input": "inputKeyup",
-        "keyup #form_height, #form_weight": "calculateBmi",
-        "change #form_height, #form_weight": "calculateBmi",
         "change .blood-pressure input": "toggleSecondBloodPressure",
         "change #form_blood-pressure-arm-circumference": "calculateCuff",
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
@@ -51,25 +49,6 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         window.setTimeout(function() {
             $(window).trigger('pmi.equalize');
         }, 50);
-    },
-    calculateBmi: function() {
-        var height = parseFloat(this.$('#form_height').val());
-        var weight = parseFloat(this.$('#form_weight').val());
-        this.$('#bmi-warning').text('');
-        if (this.rendered || (height && weight)) {
-            this.$('#form_height').parsley().validate();
-            this.$('#form_weight').parsley().validate();
-        }
-        if (height && weight) {
-            var bmi = weight / ((height/100) * (height/100));
-            bmi = bmi.toFixed(1);
-            this.$('#bmi').html('<strong>' + bmi + '</strong>');
-            if (bmi < 15 || bmi > 50) {
-                this.$('#bmi-warning').text('Please verify that the height and weight are correct');
-            }
-        } else {
-            this.$('#bmi').text('--');
-        }
     },
     calculateCuff: function() {
         var circumference = parseFloat(this.$('#form_blood-pressure-arm-circumference').val());
@@ -582,7 +561,6 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         });
         this.showModifications();
         this.displayWarnings();
-        this.calculateBmi();
         this.calculateCuff();
         this.calculateIrregularHeartRate();
         this.handlePregnantOrWheelchair();
