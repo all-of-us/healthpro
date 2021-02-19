@@ -482,6 +482,7 @@ class DefaultController extends AbstractController
             $canViewPatientStatus = false;
         }
         $evaluationService = new Evaluation($app);
+        // Generate url for blood donor check form
         $evaluationUrl = $evaluationService->requireBloodDonorCheck() ? 'evaluationBloodDonorCheck' : 'evaluation';
         return $app['twig']->render('participant.html.twig', [
             'participant' => $participant,

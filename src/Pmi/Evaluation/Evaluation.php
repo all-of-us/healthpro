@@ -721,7 +721,7 @@ class Evaluation
 
     public function requireBloodDonorCheck()
     {
-        return $this->app->getSiteAwardeeId() === self::SDBB;
+        return $this->app->isDVType() && $this->app->isDiversionPouchSite();
     }
 
     public function isSdbbForm()
