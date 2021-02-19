@@ -24,7 +24,7 @@ class Evaluation
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
     const SDBB = 'SDBB';
-    const SDBB_PROTOCOL_MODIFICATION = 'SDBB-DV-modified-protocol';
+    const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'whole-blood-donor';
 
     protected $app;
     protected $version;
@@ -729,20 +729,20 @@ class Evaluation
         return strpos($this->version, self::SDBB) !== false;
     }
 
-    public function addSbddProtocolModificationForRemovedFields()
+    public function addBloodDonorProtocolModificationForRemovedFields()
     {
-        $this->addSdbbProtocolModificationForWaistandHip();
-        $this->addSdbbProtocolModificationForBloodPressure(2);
+        $this->addBloodDonorProtocolModificationForWaistandHip();
+        $this->addBloodDonorProtocolModificationForBloodPressure(2);
     }
 
-    public function addSdbbProtocolModificationForWaistandHip()
+    public function addBloodDonorProtocolModificationForWaistandHip()
     {
         foreach (['waist-circumference-protocol-modification', 'hip-circumference-protocol-modification'] as $field) {
-            $this->data->{$field} = array_fill(0, 2, self::SDBB_PROTOCOL_MODIFICATION);
+            $this->data->{$field} = array_fill(0, 2, self::BLOOD_DONOR_PROTOCOL_MODIFICATION);
         }
     }
 
-    public function addSdbbProtocolModificationForBloodPressure($reading)
+    public function addBloodDonorProtocolModificationForBloodPressure($reading)
     {
         // Do not set default reading #2 values if reading #1 is out of range
         if ($reading === 1 && empty($this->data->{'blood-pressure-protocol-modification'}[0]) && $this->isSdbbBloodPressureOutOfRange(0)) {
@@ -755,7 +755,7 @@ class Evaluation
         foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
             $this->data->{$field}[$reading] = false;
         }
-        $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::SDBB_PROTOCOL_MODIFICATION;
+        $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
     }
 
     public function isSdbbBloodPressureOutOfRange($key)
