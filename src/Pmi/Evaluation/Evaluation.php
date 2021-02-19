@@ -428,16 +428,16 @@ class Evaluation
 
     protected function calculateMean($field)
     {
+        // Do not calculate mean for blood pressure fields in SDBB form
+        if ($this->isSdbbForm() && in_array($field, self::$bloodPressureFields)) {
+            return null;
+        }
         $secondThirdFields = self::$bloodPressureFields;
         $twoClosestFields = [
             'hip-circumference',
             'waist-circumference'
         ];
         $data = $this->data->{$field};
-        // For SDBB form return 1st or 2nd reading for blood pressure and heart rate
-        if ($this->isSdbbForm() && in_array($field, $secondThirdFields)) {
-            return $data[1] ?: $data[0];
-        }
         if (in_array($field, $secondThirdFields)) {
             $values = [$data[1], $data[2]];
         } else {
