@@ -17,7 +17,7 @@
                 <th>Date of Birth</th>
                 <th>ZIP Code</th>
                 <th>Participant Paired Awardee</th>
-                {% if siteInfo.siteType == 'dv' %}
+                {% if app.session.get('siteType') == 'dv' %}
                     <th>Participant Origination</th>
                 {% endif %}
                 <th>PM&amp;B Eligible?</th>
@@ -46,7 +46,7 @@
                                 <span class="text-muted">Unpaired</span>
                             {% endif %}
                         </td>
-                        {% if siteInfo.siteType == 'dv' %}
+                        {% if app.session.get('siteType') == 'dv' %}
                             <td>{{ participant.participantOrigin }}</td>
                         {% endif %}
                         <td>
