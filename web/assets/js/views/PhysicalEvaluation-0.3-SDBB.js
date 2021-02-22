@@ -325,8 +325,8 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
                             input.focus();
                             input.trigger('change');
                         },
-                        btnTextTrue: 'Confirm value and take action',
-                        btnTextFalse: 'Clear value and reenter'
+                        btnTextFalse: 'Clear value and reenter',
+                        showOk: false
                     });
                 }
                 self.$('#' + field + '-warning').html('<div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> ' + warning.message + '</div>');

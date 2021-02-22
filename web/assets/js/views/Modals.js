@@ -37,6 +37,7 @@ window.PmiConfirmModal = Backbone.View.extend({
     _titleClass: "",
     _tplId: "pmiConfirmTpl",
     _showX: false,
+    _showOk: true,
     constructor: function(options) {
         if (options.hasOwnProperty("msg") &&
             typeof options.msg === "string")
@@ -93,6 +94,11 @@ window.PmiConfirmModal = Backbone.View.extend({
         {
             this._showX = options.showX;
         }
+        if (options.hasOwnProperty("showOk") &&
+            _.isBoolean(options.showOk))
+        {
+            this._showOk = options.showOk;
+        }
         Backbone.View.prototype.constructor.call(this, options);
     },
     initialize: function() { this.render(); },
@@ -140,6 +146,7 @@ window.PmiConfirmModal = Backbone.View.extend({
         if (this._isHTML) this.$(".modal-body").html(this._msg);
         else this.$(".modal-body").text(this._msg);
         if (this._showX) this.$(".pmi-x-out").removeClass("hidden");
+        if (!this._showOk) this.$(".pmi-confirm-ok").addClass("hidden");
         
         // reset the dialog class
         this.$(".modal-dialog").attr("class", "modal-dialog");
