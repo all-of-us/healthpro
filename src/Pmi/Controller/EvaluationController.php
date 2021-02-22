@@ -244,7 +244,9 @@ class EvaluationController extends AbstractController
                                 }
                             }
                             $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                            $showAutoModification = true;
+                            if (!$evaluationService->isSdbbForm()) {
+                                $showAutoModification = true;
+                            }
                         }
                     }
                     if (!$evaluation || $request->request->has('copy')) {
@@ -326,7 +328,9 @@ class EvaluationController extends AbstractController
                     }
                 }
                 $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                $showAutoModification = true;
+                if (!$evaluationService->isSdbbForm()) {
+                    $showAutoModification = true;
+                }
             }
         }
 
