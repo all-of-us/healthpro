@@ -15,7 +15,6 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
         "change #form_blood-pressure-arm-circumference": "calculateCuff",
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
         "change .field-irregular-heart-rate input": "calculateIrregularHeartRate",
-        "change #form_pregnant, #form_wheelchair": "handlePregnantOrWheelchair",
         "change #form_weight-protocol-modification": "handleWeightProtocol",
         "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic",
         "click .modification-toggle a": "showModification",
@@ -64,40 +63,6 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
             this.$('#cuff-size').text('Adult thigh (16×42 cm)');
         }
     },
-    handlePregnantOrWheelchair: function() {
-        var isPregnant = (this.$('#form_pregnant').val() == 1);
-        var isWheelchairBound = (this.$('#form_wheelchair').val() == 1);
-        var self = this;
-        if (isPregnant) {
-            this.$('.field-weight-prepregnancy').show();
-            this.$('.field-weight-prepregnancy').next('.alt-units-block').show();
-            if (this.rendered) {
-                this.$('#form_weight-protocol-modification').valChange('pregnancy');
-            }
-        }
-        if (!isPregnant) {
-            this.$('#form_weight-prepregnancy').valChange('');
-            this.$('.field-weight-prepregnancy').hide();
-            this.$('.field-weight-prepregnancy').next('.alt-units-block').hide();
-            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'pregnancy') {
-                this.$('#form_weight-protocol-modification').valChange('');
-            }
-        }
-        if (isWheelchairBound) {
-            if (this.rendered) {
-                this.$('#form_height-protocol-modification').valChange('wheelchair-bound');
-                this.$('#form_weight-protocol-modification').valChange('wheelchair-bound');
-            }
-        }
-        if (!isWheelchairBound) {
-            if (this.rendered && this.$('#form_height-protocol-modification').val() == 'wheelchair-bound') {
-                this.$('#form_height-protocol-modification').valChange('');
-            }
-            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-bound') {
-                this.$('#form_weight-protocol-modification').valChange('');
-            }
-        }
-    },
     handleWeightProtocol: function() {
         var selected = this.$('#form_weight-protocol-modification').val();
         if (selected === 'cannot-balance-on-scale' || selected === 'refusal') {
@@ -130,18 +95,6 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
             this.$('.blood-pressure-second-reading-warning').hide();
         }
     },
-    toggleThirdReading: function(field) {
-        var first = parseFloat(this.$('#form_' + field + '_0').val());
-        var second = parseFloat(this.$('#form_' + field + '_1').val());
-        if (first > 0 && second > 0 && Math.abs(first - second) > 1) {
-            this.$('.panel-' + field + '-3').show();
-        } else {
-            this.$('.panel-' + field + '-3').hide();
-            this.$('.panel-' + field + '-3 input, .panel-' + field + '-3 select').each(function() {
-                $(this).valChange('');
-            });
-        }
-    },
     toggleSecondBloodPressure: function() {
         this.toggleSecondReading();
     },
@@ -152,7 +105,7 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
         input.find('.metric-warnings').remove();
         input.find('input:text').each(function () {
             $(this).parsley().validate();
-        })
+        });
         input.find('.help-block').remove();
     },
     calculateIrregularHeartRate: function() {
@@ -435,11 +388,9 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
                 }
             }
         });
-        _.each(['height', 'weight'], function(field) {
-            if (!$('#form_' + field).val() && !$('#form_' + field + '-protocol-modification').val()) {
-                $('#form_' + field + '-protocol-modification').val(reason);
-            }
-        });
+        if (!$('#form_weight').val() && !$('#form_weight-protocol-modification').val()) {
+            $('#form_weight-protocol-modification').val(reason);
+        }
         self.handleWeightProtocol();
     },
     enableAltUnits: function(e) {
@@ -461,23 +412,10 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
         var block = $(e.currentTarget).closest('.alt-units-field');
         var type = block.find('label').attr('for');
         var val;
-        if (type == 'alt-units-height') {
-            var inches = 0;
-            if (parseFloat($('#alt-units-height-ft').val())) {
-                inches += 12*parseFloat($('#alt-units-height-ft').val());
-            }
-            if (parseFloat($('#alt-units-height-in').val())) {
-                inches += parseFloat($('#alt-units-height-in').val());
-            }
-            val = this.inToCm(inches);
-        } else {
-            var unit = block.find('.input-group-addon').text();
-            val = block.find('input').val();
-            if (unit == 'in') {
-                val = this.inToCm(val);
-            } else if (unit == 'lb') {
-                val = this.lbToKg(val);
-            }
+        var unit = block.find('.input-group-addon').text();
+        val = block.find('input').val();
+        if (unit == 'lb') {
+            val = this.lbToKg(val);
         }
         if (isNaN(val)) {
             val = '';
@@ -489,41 +427,8 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
             block.parent().prev().find('input').parsley().validate(); // trigger parsley validation
         }
     },
-    // for parsley validator
-    validateHeightWeight: function(height, weight) {
-        if (height && weight) {
-            var bmi = weight / ((height/100) * (height/100));
-            bmi = bmi.toFixed(1);
-            if (bmi < 5 || bmi > 125) {
-                return false;
-            }
-        }
-        return true;
-    },
     initParsley: function() {
         self = this;
-        window.Parsley.addValidator('bmiHeight', {
-            validateString: function (value, weightSelector) {
-                var height = parseFloat(value);
-                var weight = parseRequirement(weightSelector);
-                return self.validateHeightWeight(height, weight);
-            },
-            messages: {
-                en: 'This height/weight combination has yielded an invalid BMI'
-            },
-            priority: 32
-        });
-        window.Parsley.addValidator('bmiWeight', {
-            validateString: function (value, heightSelector) {
-                var weight = parseFloat(value);
-                var height = parseRequirement(heightSelector);
-                return self.validateHeightWeight(height, weight);
-            },
-            messages: {
-                en: 'This height/weight combination has yielded an invalid BMI'
-            },
-            priority: 32
-        });
 
         this.$('form').parsley({
             errorClass: "has-error",
@@ -565,7 +470,6 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
         this.displayWarnings();
         this.calculateCuff();
         this.calculateIrregularHeartRate();
-        this.handlePregnantOrWheelchair();
         this.handleWeightProtocol();
         this.toggleSecondBloodPressure();
         if (this.finalized) {

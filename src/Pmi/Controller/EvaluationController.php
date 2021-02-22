@@ -136,7 +136,7 @@ class EvaluationController extends AbstractController
         if (!$participant) {
             $app->abort(404);
         }
-        if (!$participant->status || $app->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($evalId))) {
+        if (!$participant->status || $app->isTestSite() || ($participant->activityStatus === 'deactivated')) {
             $app->abort(403);
         }
         $bloodDonorCheckForm = $evaluationService->getBloodDonorCheckForm($app['form.factory']);
