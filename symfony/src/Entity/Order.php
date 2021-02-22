@@ -1167,4 +1167,69 @@ class Order
         }
         return $class;
     }
+
+    public function getBiobankChangesDetails($timeZone)
+    {
+        $samplesInfo = $this->getType() === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
+        if ($this->getType() === 'saliva') {
+            // Set color to empty string for saliva samples
+            foreach (array_keys($samplesInfo) as $key) {
+                if (empty($samplesInfo[$key]['color'])) {
+                    $samplesInfo[$key]['color'] = '';
+                }
+            }
+        }
+
+        $biobankChanges = !empty($this->getBiobankChanges()) ? json_decode($this->getBiobankChanges(), true) : [];
+        if (!empty($biobankChanges['collected']['time'])) {
+            $collectedTs = new \DateTime();
+            $collectedTs->setTimestamp($biobankChanges['collected']['time']);
+            $collectedTs->setTimezone(new \DateTimeZone($timeZone));
+            $biobankChanges['collected']['time'] = $collectedTs;
+        }
+
+        if (!empty($biobankChanges['collected']['samples'])) {
+            $sampleDetails = [];
+            foreach ($biobankChanges['collected']['samples'] as $sample) {
+                $sampleDetails[$sample]['code'] = array_search($sample, $this->getCustomRequestedSamples());
+                $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+            }
+            $biobankChanges['collected']['sample_details'] = $sampleDetails;
+        }
+
+        if (!empty($biobankChanges['processed']['samples_ts'])) {
+            $sampleDetails = [];
+            foreach ($biobankChanges['processed']['samples_ts'] as $sample => $time) {
+                $sampleDetails[$sample]['code'] = array_search($sample, $this->getCustomRequestedSamples());
+                $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+                $processedTs = new \DateTime();
+                $processedTs->setTimestamp($time);
+                $processedTs->setTimezone(new \DateTimeZone($timeZone));
+                $sampleDetails[$sample]['time'] = $processedTs;
+            }
+            $biobankChanges['processed']['sample_details'] = $sampleDetails;
+        }
+
+        if (!empty($biobankChanges['processed']['centrifuge_type'])) {
+            $biobankChanges['processed']['centrifuge_type'] = self::$centrifugeType[$biobankChanges['processed']['centrifuge_type']];
+        }
+
+        if (!empty($biobankChanges['finalized']['time'])) {
+            $collectedTs = new \DateTime();
+            $collectedTs->setTimestamp($biobankChanges['finalized']['time']);
+            $collectedTs->setTimezone(new \DateTimeZone($timeZone));
+            $biobankChanges['finalized']['time'] = $collectedTs;
+        }
+
+        if (!empty($biobankChanges['finalized']['samples'])) {
+            $sampleDetails = [];
+            foreach ($biobankChanges['finalized']['samples'] as $sample) {
+                $sampleDetails[$sample]['code'] = array_search($sample, $this->getCustomRequestedSamples());
+                $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
+            }
+            $biobankChanges['finalized']['sample_details'] = $sampleDetails;
+        }
+
+        return $biobankChanges;
+    }
 }
