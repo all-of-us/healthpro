@@ -27,9 +27,6 @@ evaluation:
 evaluation_modify:
     path: /participant/{participantId}/measurements/{evalId}/modify/{type}
 
-workqueue_index:
-    path: /workqueue
-
 dashboard_home:
     path: /dashboard
 
