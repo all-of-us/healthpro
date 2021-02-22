@@ -338,7 +338,12 @@ class Fhir
             $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1]) ? $this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1] : '';
         }
         $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
-        $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
+        // Add display text for whole-blood-donor
+        if ($conceptCode === 'whole-blood-donor') {
+            $conceptDisplay = 'Whole Blood Donor';
+        } else {
+            $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
+        }
         // Change wheelchair concept code
         if ($conceptCode === 'wheelchair-bound') {
             $conceptCode = 'wheelchair-user';
