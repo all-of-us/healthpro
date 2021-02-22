@@ -17,13 +17,13 @@ use Pmi\Audit\Log;
 class Evaluation
 {
     const CURRENT_VERSION = '0.3.3';
-    const SDBB_CURRENT_VERSION = '0.3.3-SDBB';
+    const DIVERSION_POUCH_CURRENT_VERSION = '0.3.3-diversion-pouch';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_ACTIVE = 'active';
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
-    const SDBB = 'SDBB';
+    const DIVERSION_POUCH = 'diversion-pouch';
     const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'whole-blood-donor';
 
     protected $app;
@@ -59,7 +59,7 @@ class Evaluation
     public function __construct($app = null, $type = null)
     {
         $this->app = $app;
-        $this->version = $type === self::SDBB ? self::SDBB_CURRENT_VERSION : self::CURRENT_VERSION;
+        $this->version = $type === self::DIVERSION_POUCH ? self::DIVERSION_POUCH_CURRENT_VERSION : self::CURRENT_VERSION;
         $this->data = new \StdClass();
         $this->loadSchema();
         $this->normalizeData();
@@ -372,7 +372,7 @@ class Evaluation
 
         foreach (self::$bloodPressureFields as $field) {
             foreach ($this->data->$field as $k => $value) {
-                // For SDBB form display error if 2nd reading is empty and
+                // For Diversion Pouch form display error if 2nd reading is empty and
                 // 1st reading is out of range even though it has a protocol modification
                 $displayError = $this->isSdbbForm() && $k === 1 && $this->isSdbbBloodPressureOutOfRange(0);
                 if ((!$this->data->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
@@ -428,7 +428,7 @@ class Evaluation
 
     protected function calculateMean($field)
     {
-        // Do not calculate mean for blood pressure fields in SDBB form
+        // Do not calculate mean for blood pressure fields in Diversion Pouch form
         if ($this->isSdbbForm() && in_array($field, self::$bloodPressureFields)) {
             return null;
         }
@@ -726,7 +726,7 @@ class Evaluation
 
     public function isSdbbForm()
     {
-        return strpos($this->version, self::SDBB) !== false;
+        return strpos($this->version, self::DIVERSION_POUCH) !== false;
     }
 
     public function addBloodDonorProtocolModificationForRemovedFields()

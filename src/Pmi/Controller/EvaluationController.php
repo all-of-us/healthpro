@@ -145,7 +145,7 @@ class EvaluationController extends AbstractController
             if ($bloodDonorCheckForm['bloodDonor']->getData() === 'yes') {
                 return $app->redirectToRoute('evaluation', [
                     'participantId' => $participant->id,
-                    'type' => $evaluationService::SDBB
+                    'type' => $evaluationService::DIVERSION_POUCH
                 ]);
             } else {
                 return $app->redirectToRoute('evaluation', [
@@ -341,7 +341,7 @@ class EvaluationController extends AbstractController
             'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
-            'latestVersion' => $evaluationService->isSdbbForm() ? $evaluationService::SDBB_CURRENT_VERSION : $evaluationService::CURRENT_VERSION,
+            'latestVersion' => $evaluationService->isSdbbForm() ? $evaluationService::DIVERSION_POUCH_CURRENT_VERSION : $evaluationService::CURRENT_VERSION,
             'showAutoModification' => $showAutoModification,
             'revertForm' => $evaluationService->getEvaluationRevertForm()->createView()
         ]);

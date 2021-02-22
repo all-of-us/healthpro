@@ -1,6 +1,6 @@
 {
-  "version": "0.3.3-SDBB",
-  "template": "0.3-SDBB",
+  "version": "0.3.3-diversion-pouch",
+  "template": "0.3-diversion-pouch",
   "fields": [
     {
       "name": "blood-pressure-location",
