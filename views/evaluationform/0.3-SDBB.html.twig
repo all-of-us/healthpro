@@ -52,13 +52,15 @@
                     </div>
                 </div>
             {% endfor %}
-            <div class="col-sm-4 alert alert-info blood-pressure-second-reading-warning" style="display:none">
-                <p>A second reading is required if any of the measurements in the first reading fall outside of the ranges below</p>
-                <ul>
-                    <li><strong>Systolic:</strong> 90-180 mmHg</li>
-                    <li><strong>Diastolic:</strong> 50-100 mmHg</li>
-                    <li><strong>Heart Rate:</strong> 50-100 bpm</li>
-                </ul>
+            <div class="col-sm-4 blood-pressure-second-reading-warning" style="display:none">
+                <div class="alert alert-info">
+                    <p>A second reading is required if any of the measurements in the first reading fall outside of the ranges below</p>
+                    <ul>
+                        <li><strong>Systolic:</strong> 90-180 mmHg</li>
+                        <li><strong>Diastolic:</strong> 50-100 mmHg</li>
+                        <li><strong>Heart Rate:</strong> 50-100 bpm</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -135,7 +137,9 @@
                 <li>Ensure participant stands tall, eyes looking straight ahead.</li>
             </ul>
             <i>See SOP for special considerations.</i>
-            <p>* If the participant is NOT an apheresis donor, please select a protocol modification of Whole Blood Donor</p>
+            <ul>
+                <li>If the participant is NOT an apheresis donor, please select a protocol modification of Whole Blood Donor.</li>
+            </ul>
         </div>
     </div>
 </div>
