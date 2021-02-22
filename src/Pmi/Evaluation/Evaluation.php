@@ -373,8 +373,8 @@ class Evaluation
         foreach (self::$bloodPressureFields as $field) {
             foreach ($this->data->$field as $k => $value) {
                 // For SDBB form display error if 2nd reading is empty and
-                // 1st reading is out of range or doesn't have any protocol modification
-                $displayError = $this->isSdbbForm() && $k === 1 && $this->isSdbbBloodPressureOutOfRange(0) && empty($this->data->{'blood-pressure-protocol-modification'}[0]);
+                // 1st reading is out of range even though it has a protocol modification
+                $displayError = $this->isSdbbForm() && $k === 1 && $this->isSdbbBloodPressureOutOfRange(0);
                 if ((!$this->data->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
                     $errors[] = [$field, $k];
                 }

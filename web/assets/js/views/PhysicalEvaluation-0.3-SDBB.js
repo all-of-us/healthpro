@@ -120,7 +120,8 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
         var firstSystolic = parseFloat(this.$('#form_blood-pressure-systolic_0').val());
         var firstDiastolic = parseFloat(this.$('#form_blood-pressure-diastolic_0').val());
         var firstHeartRate = parseFloat(this.$('#form_heart-rate_0').val());
-        if (firstSystolic < 90 || firstSystolic > 180 || firstDiastolic < 50 || firstDiastolic > 100 || firstHeartRate < 50 || firstHeartRate > 100) {
+        var firstProtocolModification = this.$('#form_blood-pressure-protocol-modification_0').val();
+        if (firstProtocolModification === 'refusal' || firstSystolic < 90 || firstSystolic > 180 || firstDiastolic < 50 || firstDiastolic > 100 || firstHeartRate < 50 || firstHeartRate > 100) {
             this.$('#blood-pressure_1').show();
             this.$('.blood-pressure-second-reading-warning').show();
         } else {
@@ -399,6 +400,7 @@ PMI.views['PhysicalEvaluation-0.3-SDBB'] = Backbone.View.extend({
             block.find('.modification-notes input').val('');
         }
         this.triggerEqualize();
+        this.toggleSecondReading();
     },
     showModificationBlock: function(block) {
         block.find('.modification-toggle').hide();
