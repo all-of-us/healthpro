@@ -15,6 +15,7 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
         "change #form_blood-pressure-arm-circumference": "calculateCuff",
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
         "change .field-irregular-heart-rate input": "calculateIrregularHeartRate",
+        "change #form_pregnant, #form_wheelchair": "handlePregnantOrWheelchair",
         "change #form_weight-protocol-modification": "handleWeightProtocol",
         "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic",
         "click .modification-toggle a": "showModification",
@@ -61,6 +62,36 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
             this.$('#cuff-size').text('Large adult (16×36 cm)');
         } else {
             this.$('#cuff-size').text('Adult thigh (16×42 cm)');
+        }
+    },
+    handlePregnantOrWheelchair: function() {
+        var isPregnant = (this.$('#form_pregnant').val() == 1);
+        var isWheelchairBound = (this.$('#form_wheelchair').val() == 1);
+        var self = this;
+        if (isPregnant) {
+            this.$('.field-weight-prepregnancy').show();
+            this.$('.field-weight-prepregnancy').next('.alt-units-block').show();
+            if (this.rendered) {
+                this.$('#form_weight-protocol-modification').valChange('pregnancy');
+            }
+        }
+        if (!isPregnant) {
+            this.$('#form_weight-prepregnancy').valChange('');
+            this.$('.field-weight-prepregnancy').hide();
+            this.$('.field-weight-prepregnancy').next('.alt-units-block').hide();
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'pregnancy') {
+                this.$('#form_weight-protocol-modification').valChange('');
+            }
+        }
+        if (isWheelchairBound) {
+            if (this.rendered) {
+                this.$('#form_weight-protocol-modification').valChange('wheelchair-bound');
+            }
+        }
+        if (!isWheelchairBound) {
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-bound') {
+                this.$('#form_weight-protocol-modification').valChange('');
+            }
         }
     },
     handleWeightProtocol: function() {
@@ -470,6 +501,7 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
         this.displayWarnings();
         this.calculateCuff();
         this.calculateIrregularHeartRate();
+        this.handlePregnantOrWheelchair();
         this.handleWeightProtocol();
         this.toggleSecondBloodPressure();
         if (this.finalized) {

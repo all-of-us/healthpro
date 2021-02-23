@@ -226,6 +226,7 @@
     {
       "name": "height",
       "label": "Height",
+      "formField": false,
       "unit": "cm",
       "decimals": 1,
       "max": 300,
@@ -256,6 +257,7 @@
     {
       "name": "height-protocol-modification",
       "label": "Modification to Height Protocol",
+      "formField": false,
       "options": {
         "None": "",
         "Height is more than measuring device range": "height-out-of-range",
@@ -304,6 +306,7 @@
     {
       "name": "height-protocol-modification-notes",
       "label": "Reason",
+      "formField": false,
       "type": "text"
     },
     {
