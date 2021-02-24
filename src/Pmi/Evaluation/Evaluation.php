@@ -279,8 +279,8 @@ class Evaluation
                     'required' => false,
                     'label' => isset($options['label']) ? $options['label'] : null
                 ];
-                if ($this->isSdbbForm() && in_array($field->name, self::$bloodPressureFields)) {
-                    $collectionOptions['constraints'] = $this->addSdbbSecondBloodPressureConstraint($form, $field);
+                if ($this->isDiversionPouchForm() && in_array($field->name, self::$bloodPressureFields)) {
+                    $collectionOptions['constraints'] = $this->addDiversionPouchSecondBloodPressureConstraint($form, $field);
                 }
                 if (isset($field->compare)) {
                     $collectionOptions['constraints'] = $this->addDiastolicBloodPressureConstraint($form, $field);
@@ -374,7 +374,7 @@ class Evaluation
             foreach ($this->data->$field as $k => $value) {
                 // For Diversion Pouch form display error if 2nd reading is empty and
                 // 1st reading is out of range even though it has a protocol modification
-                $displayError = $this->isSdbbForm() && $k === 1 && $this->isSdbbBloodPressureOutOfRange(0);
+                $displayError = $this->isDiversionPouchForm() && $k === 1 && $this->isDiversionPouchPressureOutOfRange(0);
                 if ((!$this->data->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
                     $errors[] = [$field, $k];
                 }
@@ -429,7 +429,7 @@ class Evaluation
     protected function calculateMean($field)
     {
         // Do not calculate mean for blood pressure fields in Diversion Pouch form
-        if ($this->isSdbbForm() && in_array($field, self::$bloodPressureFields)) {
+        if ($this->isDiversionPouchForm() && in_array($field, self::$bloodPressureFields)) {
             return null;
         }
         $secondThirdFields = self::$bloodPressureFields;
@@ -724,7 +724,7 @@ class Evaluation
         return $this->app->isDVType() && $this->app->isDiversionPouchSite();
     }
 
-    public function isSdbbForm()
+    public function isDiversionPouchForm()
     {
         return strpos($this->version, self::DIVERSION_POUCH) !== false;
     }
@@ -746,7 +746,7 @@ class Evaluation
     public function addBloodDonorProtocolModificationForBloodPressure($reading)
     {
         // Do not set default reading #2 values if reading #1 is out of range
-        if ($reading === 1 && empty($this->data->{'blood-pressure-protocol-modification'}[0]) && $this->isSdbbBloodPressureOutOfRange(0)) {
+        if ($reading === 1 && empty($this->data->{'blood-pressure-protocol-modification'}[0]) && $this->isDiversionPouchPressureOutOfRange(0)) {
             return false;
         }
         // Default reading #2 values are only set when finalized
@@ -764,7 +764,7 @@ class Evaluation
         $this->data->{"height-protocol-modification"} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
     }
 
-    public function isSdbbBloodPressureOutOfRange($key)
+    public function isDiversionPouchPressureOutOfRange($key)
     {
         $limits = $this->getSecondBloodPressureLimits();
         list($systolic, $diastolic, $heartRate) = self::$bloodPressureFields;
@@ -780,7 +780,7 @@ class Evaluation
         return false;
     }
 
-    private function addSdbbSecondBloodPressureConstraint($form, $field)
+    private function addDiversionPouchSecondBloodPressureConstraint($form, $field)
     {
         $secondMaxVal = $field->secondMax;
         $secondMinVal = $field->secondMin;
@@ -840,7 +840,7 @@ class Evaluation
 
     public function getFormFieldErrorMessage($field = null, $replicate = null)
     {
-        return !empty($field) && $this->isSdbbForm() && in_array($field,
+        return !empty($field) && $this->isDiversionPouchForm() && in_array($field,
             self::$bloodPressureFields) && $replicate === 1 ? 'Please complete.' : 'Please complete or add protocol modification.';
     }
 

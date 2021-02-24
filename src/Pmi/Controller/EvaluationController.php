@@ -194,7 +194,7 @@ class EvaluationController extends AbstractController
             // Check if finalized_ts is set and rdr_id is empty
             if (!$evaluationService->isEvaluationFailedToReachRDR()) {
                 if ($evaluationForm->isValid()) {
-                    if ($evaluationService->isSdbbForm()) {
+                    if ($evaluationService->isDiversionPouchForm()) {
                         $evaluationService->addBloodDonorProtocolModificationForRemovedFields();
                         if ($request->request->has('finalize') && (!$evaluation || empty($evaluation['rdr_id']))) {
                             $evaluationService->addBloodDonorProtocolModificationForBloodPressure(1);
@@ -244,7 +244,7 @@ class EvaluationController extends AbstractController
                                 }
                             }
                             $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                            if (!$evaluationService->isSdbbForm()) {
+                            if (!$evaluationService->isDiversionPouchForm()) {
                                 $showAutoModification = true;
                             }
                         }
@@ -328,7 +328,7 @@ class EvaluationController extends AbstractController
                     }
                 }
                 $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                if (!$evaluationService->isSdbbForm()) {
+                if (!$evaluationService->isDiversionPouchForm()) {
                     $showAutoModification = true;
                 }
             }
@@ -341,7 +341,7 @@ class EvaluationController extends AbstractController
             'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
-            'latestVersion' => $evaluationService->isSdbbForm() ? $evaluationService::DIVERSION_POUCH_CURRENT_VERSION : $evaluationService::CURRENT_VERSION,
+            'latestVersion' => $evaluationService->isDiversionPouchForm() ? $evaluationService::DIVERSION_POUCH_CURRENT_VERSION : $evaluationService::CURRENT_VERSION,
             'showAutoModification' => $showAutoModification,
             'revertForm' => $evaluationService->getEvaluationRevertForm()->createView()
         ]);
