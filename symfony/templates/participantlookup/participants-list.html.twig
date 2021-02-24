@@ -37,7 +37,7 @@
                         <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.zipCode }}</a></td>
                         <td>
                             {% if participant.hpoId %}
-                                {% if participant.hpoId != siteInfo.getSiteOrganization %}
+                                {% if participant.awardee != siteInfo.getSiteAwardee %}
                                     <i class="fa fa-info-circle text-warning" title="Participant paired awardee is different from your awardee" data-toggle="tooltip"></i>
                                 {% endif %}
                                 {{ siteInfo.getAwardeeDisplayName(participant.hpoId) }}
