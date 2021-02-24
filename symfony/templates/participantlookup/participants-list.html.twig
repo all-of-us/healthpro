@@ -36,11 +36,11 @@
                         <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.dob ? participant.dob|date('n/j/Y') }}</a></td>
                         <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.zipCode }}</a></td>
                         <td>
-                            {% if participant.hpoId %}
+                            {% if participant.awardee %}
                                 {% if participant.awardee != siteInfo.siteAwardee %}
                                     <i class="fa fa-info-circle text-warning" title="Participant paired awardee is different from your awardee" data-toggle="tooltip"></i>
                                 {% endif %}
-                                {{ siteInfo.awardeeDisplayName(participant.hpoId) }}
+                                {{ siteInfo.awardeeDisplayName(participant.awardee) }}
                             {% else %}
                                 <i class="fa fa-info-circle text-warning" title="Participant is unpaired" data-toggle="tooltip"></i>
                                 <span class="text-muted">Unpaired</span>
