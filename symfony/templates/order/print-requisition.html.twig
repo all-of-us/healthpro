@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
-{% block title %}Print Requisition - Order {{ order.order_id }} - {% endblock %}
+{% block title %}Print Requisition - Order {{ order.orderId }} - {% endblock %}
 {% block body %}
-    {% include 'order-header.html.twig' with { active: 'printRequisition' } %}
+    {% include 'order/header.html.twig' with { active: 'print_requisition' } %}
     <div class="row">
         <div class="col-sm-10 col-md-offset-1">
             {% if order.status == 'edit' or order.status == 'unlock' %}
@@ -12,10 +12,10 @@
                         The requisition cannot be generated for unlocked orders.
                     {% endif %}
                 </div>
-            {% elseif order.mayo_id is not empty %}
+            {% elseif order.mayoId is not empty %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <a class="pull-right" href="{{ path('orderRequisitionPdf', { participantId: participant.id, orderId: order.id }) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
+                        <a class="pull-right" href="{{ path('order_requisition_pdf', { participantId: participant.id, orderId: order.id }) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
                         <h3 class="panel-title">Requisition</h3>
                     </div>
                     <div class="panel-body">
@@ -27,7 +27,7 @@
                                 </a>
                             </p>
                         </div>
-                        <iframe name="requisition" class="pdf pdf-requisition" src="{{ path('orderRequisitionPdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>
+                        <iframe name="requisition" class="pdf pdf-requisition" src="{{ path('order_requisition_pdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>
                     </div>
                 </div>
             {% else %}
@@ -40,23 +40,23 @@
 {% endblock %}
 
 {% block pagejs %}
-<script>
-$(document).ready(function() {
-    $('#requisition-loaded').hide();
-    $('iframe[name=requisition]').on('load', function() {
-        try {
-            if (typeof window.requisition.print === 'function') {
-                $('#requisition-loading').hide();
-                $('#requisition-loaded').show();
-            } else {
-                $('#requisition-loading-widget').hide();
-            }
-        } catch (e) {
-            // catch firefox issue where pdf.js plugin makes the pdf frame cross-origin
-            // https://github.com/mozilla/pdf.js/issues/5397
-            $('#requisition-loading-widget').hide();
-        }
-    });
-});
-</script>
+    <script>
+        $(document).ready(function () {
+            $('#requisition-loaded').hide();
+            $('iframe[name=requisition]').on('load', function () {
+                try {
+                    if (typeof window.requisition.print === 'function') {
+                        $('#requisition-loading').hide();
+                        $('#requisition-loaded').show();
+                    } else {
+                        $('#requisition-loading-widget').hide();
+                    }
+                } catch (e) {
+                    // catch firefox issue where pdf.js plugin makes the pdf frame cross-origin
+                    // https://github.com/mozilla/pdf.js/issues/5397
+                    $('#requisition-loading-widget').hide();
+                }
+            });
+        });
+    </script>
 {% endblock %}

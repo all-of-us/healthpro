@@ -21,14 +21,12 @@ if ($app->isLocal()) {
 $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
-    ->mount('/', new Controller\OrderController())
     ->mount('/', new Controller\EvaluationController())
     ->mount('/', new Controller\SymfonyMigrationController())
     ->mount('/_dev', new Controller\DevController())
     ->mount('/cron', new Controller\CronController())
     ->mount('/dashboard', new Controller\DashboardController())
     ->mount('/workqueue', new Controller\WorkQueueController())
-    ->mount('/review', new Controller\ReviewController())
     ->mount('/biobank', new Controller\BiobankController())
     ->mount('/_ah', new Controller\AppEngineController())
 ;
