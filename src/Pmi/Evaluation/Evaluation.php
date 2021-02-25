@@ -657,7 +657,7 @@ class Evaluation
 
     public function isEvaluationCancelled()
     {
-        return $this->evaluation['eh_type'] === self::EVALUATION_CANCEL;
+        return isset($this->evaluation['eh_type']) ? $this->evaluation['eh_type'] === self::EVALUATION_CANCEL : false;
     }
 
     public function isEvaluationUnlocked()
