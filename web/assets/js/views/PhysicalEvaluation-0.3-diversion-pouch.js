@@ -301,6 +301,10 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
             if (isConsecutive) {
                 if (e && self.rendered) {
                     var input = $(e.currentTarget);
+                    var showOk = true;
+                    if (self.isBloodPressureOutOfRange(field, input)) {
+                        showOk = false;
+                    }
                     new PmiConfirmModal({
                         msg: warning.message,
                         isHTML: true,
@@ -309,8 +313,9 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
                             input.focus();
                             input.trigger('change');
                         },
+                        btnTextTrue: 'Confirm value and take action',
                         btnTextFalse: 'Clear value and reenter',
-                        showOk: false
+                        showOk: showOk
                     });
                 }
                 self.$('#' + field + '-warning').html('<div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> ' + warning.message + '</div>');
@@ -473,6 +478,13 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
             errorTemplate: '<div></div>',
             trigger: "keyup change"
         });
+    },
+    isBloodPressureOutOfRange: function (field, input) {
+        if (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'].includes(field)) {
+            var bloodPressure = parseFloat(input.val());
+            return bloodPressure < input.data('parsley-min') || bloodPressure > input.data('parsley-max');
+        }
+        return false;
     },
     initialize: function(obj) {
         this.warnings = obj.warnings;
