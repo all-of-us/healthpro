@@ -124,29 +124,21 @@ class AppsClient
     }
 
     /**
-     * Checks if the given user is subscribed to the given group.
-     * @param string $groupEmail the email address of the group.
-     * @param string $userEmail the potential subscriber.
-     * @return boolean true if the user is subscribed, false if not.
+     * Returns the user's role in a group or null if not subscribed
      */
-    public function isSubscribed($groupEmail, $userEmail)
+    public function getRole(string $userEmail, string $groupEmail): ?string
     {
         $subscribed = true;
-        // we'll have an exception with a 404 if user isn't in the group
+        // Will throw a 4xx exception if the user is not in the group
         try {
-            $this->callApi($this->directory, 'members', 'get', array($groupEmail, $userEmail));
-        }
-        catch (\Google_Service_Exception $e) {
-            if ($e->getCode() == 404) {
-                $subscribed = false;
-            } elseif ($e->getCode() == 400) {
-                // also seeing "(400) Missing required field: memberKey" when
-                // trying this on members who are not part of the group
-                $subscribed = false;
+            $result = $this->callApi($this->directory, 'members', 'get', [$groupEmail, $userEmail]);
+            if ($result) {
+                return $result->getRole();
             } else {
-                throw $e;
+                return null;
             }
+        } catch (\Google_Service_Exception $e) {
+            return null;
         }
-        return $subscribed;
     }
 }
