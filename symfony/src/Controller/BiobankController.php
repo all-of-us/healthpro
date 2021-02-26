@@ -8,6 +8,7 @@ use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -31,6 +32,38 @@ class BiobankController extends AbstractController
         $this->participantSummaryService = $participantSummaryService;
         $this->orderService = $orderService;
         $this->loggerService = $loggerService;
+    }
+
+    /**
+     * @Route("/", name="biobank_home")
+     */
+    public function indexAction(): Response
+    {
+        return $this->render('biobank/index.html.twig');
+    }
+
+    /**
+     * @Route("/participants", name="biobank_participants")
+     */
+    public function participantsAction(Request $request)
+    {
+        return '';
+    }
+
+    /**
+     * @Route("/orders", name="biobank_orders")
+     */
+    public function ordersAction(Request $request)
+    {
+        return '';
+    }
+
+    /**
+     * @Route("/review/orders/today", name="biobank_orders_today")
+     */
+    public function ordersTodayAction(Request $request)
+    {
+        return '';
     }
 
     /**
