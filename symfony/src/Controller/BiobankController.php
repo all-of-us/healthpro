@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Order;
+use App\Form\ParticipantLookupBiobankIdType;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,17 +23,20 @@ class BiobankController extends AbstractController
     protected $participantSummaryService;
     protected $orderService;
     protected $loggerService;
+    protected $params;
 
     public function __construct(
         EntityManagerInterface $em,
         ParticipantSummaryService $participantSummaryService,
         OrderService $orderService,
-        LoggerService $loggerService
+        LoggerService $loggerService,
+        ParameterBagInterface $params
     ) {
         $this->em = $em;
         $this->participantSummaryService = $participantSummaryService;
         $this->orderService = $orderService;
         $this->loggerService = $loggerService;
+        $this->params = $params;
     }
 
     /**
@@ -45,9 +50,24 @@ class BiobankController extends AbstractController
     /**
      * @Route("/participants", name="biobank_participants")
      */
-    public function participantsAction(Request $request)
+    public function participantsAction(Request $request): Response
     {
-        return '';
+        $bioBankIdPrefix = $this->params->has('biobank_id_prefix') ? $this->params->get('biobank_id_prefix') : null;
+        $idForm = $this->createForm(ParticipantLookupBiobankIdType::class, null, ['bioBankIdPrefix' => $bioBankIdPrefix]);
+        $idForm->handleRequest($request);
+        if ($idForm->isSubmitted() && $idForm->isValid()) {
+            $searchParameters = $idForm->getData();
+            $searchResults = $this->participantSummaryService->search($searchParameters);
+            if (!empty($searchResults)) {
+                return $this->redirectToRoute('biobank_participant', [
+                    'biobankId' => $searchResults[0]->biobankId
+                ]);
+            }
+            $this->addFlash('error', 'Biobank ID not found');
+        }
+        return $this->render('biobank/participants.html.twig', [
+            'idForm' => $idForm->createView()
+        ]);
     }
 
     /**
