@@ -119,6 +119,23 @@ class OrderService
         return [];
     }
 
+    public function getOrders(array $query = []): array
+    {
+        try {
+            $response = $this->rdrApiService->get("rdr/v1/BiobankOrder", [
+                'query' => $query
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && is_array($result->data)) {
+                return $result->data;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return [];
+        }
+        return [];
+    }
+
     public function cancelRestoreOrder($type, $orderObject)
     {
         try {

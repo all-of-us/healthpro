@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Order;
+use App\Form\OrderLookupType;
 use App\Form\ParticipantLookupBiobankIdType;
 use App\Service\LoggerService;
 use App\Service\OrderService;
@@ -73,9 +74,51 @@ class BiobankController extends AbstractController
     /**
      * @Route("/orders", name="biobank_orders")
      */
-    public function ordersAction(Request $request)
+    public function ordersAction(Request $request): Response
     {
-        return '';
+        $idForm = $this->createForm(OrderLookupType::class, null);
+        $idForm->handleRequest($request);
+        if ($idForm->isSubmitted() && $idForm->isValid()) {
+            $id = $idForm->get('orderId')->getData();
+
+            // New barcodes include a 4-digit sample identifier appended to the 10 digit order id
+            // If the string matches this format, remove the sample identifier to get the order id
+            if (preg_match('/^\d{14}$/', $id)) {
+                $id = substr($id, 0, 10);
+            }
+            // Internal Order
+            $order = $this->em->getRepository(Order::class)->findOneBy([
+                'orderId' => $id
+            ]);
+            if ($order) {
+                return $this->redirectToRoute('biobank_order', [
+                    'biobankId' => $order->getBiobankId(),
+                    'orderId' => $order->getId()
+                ]);
+            }
+            // Quanum Orders
+            $order = new Order;
+            $this->orderService->loadSamplesSchema($order);
+            $quanumOrders = $this->orderService->getOrders([
+                'kitId' => $id,
+                'origin' => 'careevolution'
+            ]);
+            if (isset($quanumOrders[0])) {
+                $order = $this->orderService->loadFromJsonObject($quanumOrders[0]);
+                $participant = $this->participantSummaryService->getParticipantById($order->getParticipantId());
+                if ($participant->biobankId) {
+                    return $this->redirectToRoute('biobank_quanumOrder', [
+                        'biobankId' => $participant->biobankId,
+                        'orderId' => $order->getRdrId()
+                    ]);
+                }
+            }
+            $this->addFlash('error', 'Order ID not found');
+        }
+
+        return $this->render('biobank/orders.html.twig', [
+            'idForm' => $idForm->createView()
+        ]);
     }
 
     /**
