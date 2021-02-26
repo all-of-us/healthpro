@@ -26,6 +26,7 @@ class Order
     private $salivaSamplesInformation;
     private $salivaInstructions;
     private $currentVersion;
+    private $origin;
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL', '1SAL2'];
 
@@ -667,6 +668,19 @@ class Order
     public function setFinalizedSite(?string $finalizedSite): self
     {
         $this->finalizedSite = $finalizedSite;
+
+        return $this;
+    }
+
+    // Used to determine quanum orders
+    public function getOrigin(): ?string
+    {
+        return $this->origin;
+    }
+
+    public function setOrigin(?string $origin): self
+    {
+        $this->origin = $origin;
 
         return $this;
     }

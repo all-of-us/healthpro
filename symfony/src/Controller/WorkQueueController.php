@@ -2,10 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Measurement;
+use App\Entity\Order;
+use App\Entity\Problem;
 use App\Service\LoggerService;
+use App\Service\OrderService;
+use App\Service\ParticipantSummaryService;
 use App\Service\SiteService;
 use App\Service\WorkQueueService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -206,6 +213,68 @@ class WorkQueueController extends AbstractController
         return new StreamedResponse($stream, 200, [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+        ]);
+    }
+
+
+    /**
+     * @Route("/participant/{id}", name="workqueue_participant")
+     */
+    public function participantAction(
+        $id,
+        Request $request,
+        ParticipantSummaryService $participantSummaryService,
+        EntityManagerInterface $em,
+        OrderService $orderService,
+        ParameterBagInterface $params
+    ) {
+        $refresh = $request->query->get('refresh');
+        $participant = $participantSummaryService->getParticipantById($id, $refresh);
+        if ($refresh) {
+            return $this->redirectToRoute('workqueue_participant', [
+                'id' => $id
+            ]);
+        }
+        if (!$participant) {
+            $this->createNotFoundException();
+        }
+
+        if (!$this->isGranted('ROLE_AWARDEE_SCRIPPS')) {
+            $this->createAccessDeniedException();
+        }
+
+        // Deny access if participant awardee does not belong to the allowed awardees or not a salivary participant (awardee = UNSET and sampleStatus1SAL2 = RECEIVED)
+        if (!(in_array($participant->awardee,
+                $this->siteService->getSuperUserAwardees()) || (empty($participant->awardee) && $participant->sampleStatus1SAL2 === 'RECEIVED'))) {
+            $this->createAccessDeniedException();
+        }
+
+        $measurements = $em->getRepository(Measurement::class)->findBy(['participantId' => $id]);
+
+        // Internal Orders
+        $orders = $em->getRepository(Order::class)->findBy(['participantId' => $id]);
+
+        // Quanum Orders
+        $order = new Order;
+        $orderService->loadSamplesSchema($order);
+        $quanumOrders = $orderService->getOrdersByParticipant($participant->id);
+        foreach ($quanumOrders as $quanumOrder) {
+            if (in_array($quanumOrder->origin, ['careevolution'])) {
+                $orders[] = $orderService->loadFromJsonObject($quanumOrder);
+            }
+        }
+
+        $problems = $em->getRepository(Problem::class)->getProblemsWithCommentsCount($id);
+        $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
+        return $this->render('workqueue/participant.html.twig', [
+            'participant' => $participant,
+            'cacheEnabled' => $cacheEnabled,
+            'orders' => $orders,
+            'measurements' => $measurements,
+            'problems' => $problems,
+            'displayPatientStatusBlock' => false,
+            'readOnly' => true,
+            'biobankView' => true
         ]);
     }
 }

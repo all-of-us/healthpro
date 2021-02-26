@@ -30,6 +30,12 @@ class SiteService
         return $this->params->has('disable_test_access') && !empty($this->params->get('disable_test_access')) && $this->session->get('siteAwardeeId') === 'TEST';
     }
 
+
+    public function isDvType(): bool
+    {
+        return $this->session->get('siteType') === 'dv' ? true : false;
+    }
+
     public function getSiteId()
     {
         if ($site = $this->session->get('site')) {
@@ -38,6 +44,8 @@ class SiteService
         return null;
     }
 
+
+    //Super user ex: STSI
     public function getAwardeeId()
     {
         if ($awardee = $this->session->get('awardee')) {
@@ -64,6 +72,8 @@ class SiteService
         return $this->session->get('siteOrganization');
     }
 
+
+    //This is equivalent to getSiteOrganizationId method in HpoApplication Class
     public function getSiteOrganization()
     {
         return $this->session->get('siteOrganizationId');
@@ -164,5 +174,13 @@ class SiteService
             }
         }
         return $siteName;
+    }
+    
+    public function getSiteIdWithPrefix()
+    {
+        if ($this->getSiteId()) {
+            return \Pmi\Security\User::SITE_PREFIX . $this->getSiteId();
+        }
+        return null;
     }
 }

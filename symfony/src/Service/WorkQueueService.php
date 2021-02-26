@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use App\Helper\WorkQueue;
 use Pmi\Drc\CodeBook;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 
@@ -20,6 +21,7 @@ class WorkQueueService
     protected $siteService;
     protected $loggerService;
     protected $authorizationChecker;
+    protected $urlGenerator;
     protected $rdrError = false;
 
     public function __construct(
@@ -29,7 +31,8 @@ class WorkQueueService
         UserService $userService,
         SiteService $siteService,
         LoggerService $loggerService,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
+        UrlGeneratorInterface $urlGenerator
     ) {
         $this->participantSummaryService = $participantSummaryService;
         $this->params = $params;
@@ -38,6 +41,7 @@ class WorkQueueService
         $this->siteService = $siteService;
         $this->loggerService = $loggerService;
         $this->authorizationChecker = $authorizationChecker;
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function participantSummarySearch($organization, &$params, $type = null)
@@ -412,9 +416,9 @@ class WorkQueueService
     public function generateLink($id, $name)
     {
         if ($this->authorizationChecker->isGranted('ROLE_USER')) {
-            $url = "/participant/{$id}";
+            $url = $this->urlGenerator->generate('participant_details', ['id' => $id]);
         } else {
-            $url = "/workqueue/participant/{$id}";
+            $url = $this->urlGenerator->generate('workqueue_participant', ['id' => $id]);
         }
         $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 

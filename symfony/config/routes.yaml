@@ -18,8 +18,7 @@ orders:
 
 evaluation:
     path: /participant/{participantId}/measurements/{evalId}
-    defaults:
-      - evalId: null
+    defaults: { evalId: null }
 
 evaluation_modify:
     path: /participant/{participantId}/measurements/{evalId}/modify/{type}
@@ -44,3 +43,9 @@ hideTZWarning:
 
 participant:
     path: /participant/{id}
+
+biobank_order:
+    path: /biobank/{biobankId}/order/{orderId}
+
+biobank_quanumOrder:
+    path: /biobank/{biobankId}/quanum-order/{orderId}

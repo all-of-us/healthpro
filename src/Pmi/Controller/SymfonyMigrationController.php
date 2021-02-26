@@ -21,6 +21,8 @@ class SymfonyMigrationController extends AbstractController
         ['orderCheck', '/participant/{participantId}/order/check'],
         ['order', '/participant/{participantId}/order/{orderId}'],
         ['workqueue_index', '/workqueue', ['method' => 'GET|POST']],
+        ['workqueue_participant', '/workqueue/participant/{id}'],
+        ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['participants', '/participants']
     ];
 
@@ -124,6 +126,28 @@ class SymfonyMigrationController extends AbstractController
     public function workqueue_indexAction(Application $app)
     {
         return $app->redirect('/s/workqueue/');
+    }
+
+    /**
+     * @deprecated 2021-02-18
+     */
+    public function workqueue_participantAction($id, Application $app)
+    {
+        return $app->redirect(sprintf(
+            '/s/workqueue/participant/%s',
+            $id
+        ));
+    }
+
+    /**
+     * @deprecated 2021-02-18
+     */
+    public function participantAction($id, Application $app)
+    {
+        return $app->redirect(sprintf(
+            '/s/participant/%s',
+            $id
+        ));
     }
 
     /**
