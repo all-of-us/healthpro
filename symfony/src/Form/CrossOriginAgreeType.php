@@ -11,7 +11,7 @@ class CrossOriginAgreeType extends AbstractType
     {
         $builder
             ->add('Acknowledge', Type\SubmitType::class, [
-                'attr' => ['class' => 'btn btn-primary'],
+                'attr' => ['class' => 'btn btn-success'],
             ])
         ;
     }
