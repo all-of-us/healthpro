@@ -47,7 +47,8 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
         $userInfo = $this->userService->getUserInfo($googleUser);
         $sessionInfo = [
             'site' => $this->session->get('site'),
-            'awardee' => $this->session->get('awardee')
+            'awardee' => $this->session->get('awardee'),
+            'managegroups' => $this->session->get('managegroups')
         ];
         return new User($googleUser, $groups, $userInfo, null, $sessionInfo);
     }

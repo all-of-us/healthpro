@@ -46,6 +46,11 @@ class MockAppsClient
         
         return isset(self::$groups[$userEmail]) ? self::$groups[$userEmail] : [];
     }
+
+    public function getRole($userEmail, $groupEmail)
+    {
+        return 'MEMBER';
+    }
     
     public static function setGroups($userEmail, $groups)
     {

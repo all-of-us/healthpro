@@ -200,9 +200,9 @@ class HpoApplication extends AbstractApplication
         }
     }
 
-    public function setNewRoles($user)
+    protected function setNewRoles($user)
     {
-        $userRoles = UserService::getRoles($user->getAllRoles(), $this['session']->get('site'), $this['session']->get('awardee'));
+        $userRoles = UserService::getRoles($user->getAllRoles(), $this['session']->get('site'), $this['session']->get('awardee'), $this['session']->get('managegroups'));
         if ($user->getAllRoles() != $userRoles) {
             $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
             $this['security.token_storage']->setToken($token);

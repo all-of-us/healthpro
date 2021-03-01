@@ -102,3 +102,11 @@ reportKitUrl:
 
 # Set diversion pouch site name
 diversion_pouch_site: ECDC DV Diversion Pouch
+
+
+#
+# Feature flags
+#
+
+# Enables Google Groups role check for ROLE_MANAGE_USERS role
+# feature.manageusers: true
