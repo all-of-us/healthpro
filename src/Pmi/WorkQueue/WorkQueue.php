@@ -109,7 +109,8 @@ class WorkQueue
             'options' => [
                 'Participant' => 'INTERESTED',
                 'Participant + EHR Consent' => 'MEMBER',
-                'Core Participant' => 'FULL_PARTICIPANT'
+                'Core Participant' => 'FULL_PARTICIPANT',
+                'Core Participant Minus PM' => 'CORE_MINUS_PM'
             ]
         ],
         'patientStatus' => [
