@@ -122,6 +122,30 @@ class BiobankController extends AbstractController
     }
 
     /**
+     * @Route("/orders", name="biobank_quanum_order")
+     */
+    public function quanumOrderAction(string $biobankId, string $orderId): Response
+    {
+        $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);
+        if (!$participant) {
+            throw $this->createNotFoundException(404);
+        }
+        $participant = $participant[0];
+
+        $order = new Order;
+        $this->orderService->loadSamplesSchema($order);
+        $quanumOrder = $this->orderService->getOrder($participant->id, $orderId);
+        $order = $this->orderService->loadFromJsonObject($quanumOrder);
+
+        return $this->render('biobank/order-quanum.html.twig', [
+            'participant' => $participant,
+            'samplesInfoText' => $order->getSamplesInfo(),
+            'currentStep' => 'finalize',
+            'order' => $order
+        ]);
+    }
+
+    /**
      * @Route("/review/orders/today", name="biobank_orders_today")
      */
     public function ordersTodayAction(Request $request)
