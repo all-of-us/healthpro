@@ -43,6 +43,3 @@ participant:
 
 biobank_order:
     path: /biobank/{biobankId}/order/{orderId}
-
-biobank_quanumOrder:
-    path: /biobank/{biobankId}/quanum-order/{orderId}

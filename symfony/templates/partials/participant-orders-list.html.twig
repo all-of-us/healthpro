@@ -11,7 +11,7 @@
                     <div id="order-overflow">
                 {% endif %}
                 {% if order.origin is defined and order.origin == 'careevolution' %}
-                    <a href="{{ path('biobank_quanumOrder', { biobankId: participant.biobankId, orderId: order.rdrId }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
+                    <a href="{{ path('biobank_quanum_order', { biobankId: participant.biobankId, orderId: order.rdrId }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {% elseif biobankView is defined %}
                     <a href="{{ path('biobank_order', { biobankId: participant.biobankId, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {% else %}

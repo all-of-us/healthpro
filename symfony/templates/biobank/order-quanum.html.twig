@@ -74,13 +74,13 @@
         <br/>
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane" id="collect">
-                {% include 'partials/biobank-order-details.html.twig' with { type: 'collected' } %}
+                {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'collected' } %}
             </div>
             <div role="tabpanel" class="tab-pane" id="process">
-                {% include 'partials/biobank-order-details.html.twig' with { type: 'processed' } %}
+                {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'processed' } %}
             </div>
             <div role="tabpanel" class="tab-pane" id="finalize">
-                {% include 'partials/biobank-order-details.html.twig' with { type: 'finalized' } %}
+                {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'finalized' } %}
                 <div class="row">
                     <div class="col-sm-12">
                         <h3><i class="fa fa-truck" aria-hidden="true"></i> FedEx Tracking Number</h3>

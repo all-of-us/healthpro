@@ -738,7 +738,21 @@ class OrderService
         $this->order->setFinalizedNotes($finalizedNotes);
         $this->order->setFedexTracking(!empty($trackingNumber) ? $trackingNumber : null);
         $this->order->setOrigin($object->origin);
-        // TODO: Set site and user names for biobank order details view
+        if (!empty($object->collectedInfo)) {
+            $this->order->setQuanumCollectedUser($object->collectedInfo->author->value);
+        }
+        if (!empty($object->collectedInfo->address)) {
+            $this->order->setCollectedSiteAddress($object->collectedInfo->author->value);
+        }
+        $this->order->setCollectedSiteName('A Quest Site');
+        if (!empty($object->processedInfo)) {
+            $this->order->setQuanumProcessedUser($object->processedInfo->author->value);
+        }
+        $this->order->setProcessedSiteName('A Quest Site');
+        if (!empty($object->finalizedInfo)) {
+            $this->order->setQuanumFinalizedUser($object->finalizedInfo->author->value);
+        }
+        $this->order->setFinalizedSiteName('A Quest Site');
         return $this->order;
     }
 }

@@ -122,7 +122,7 @@ class BiobankController extends AbstractController
     }
 
     /**
-     * @Route("/orders", name="biobank_quanum_order")
+     * @Route("/{biobankId}/quanum-order/{orderId}", name="biobank_quanum_order")
      */
     public function quanumOrderAction(string $biobankId, string $orderId): Response
     {
@@ -136,10 +136,9 @@ class BiobankController extends AbstractController
         $this->orderService->loadSamplesSchema($order);
         $quanumOrder = $this->orderService->getOrder($participant->id, $orderId);
         $order = $this->orderService->loadFromJsonObject($quanumOrder);
-
         return $this->render('biobank/order-quanum.html.twig', [
             'participant' => $participant,
-            'samplesInfoText' => $order->getSamplesInfo(),
+            'samplesInfoText' => $this->orderService->getCustomSamplesInfo(),
             'currentStep' => 'finalize',
             'order' => $order
         ]);

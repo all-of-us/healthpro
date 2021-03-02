@@ -271,6 +271,22 @@ class Order
      */
     private $finalizedSite;
 
+    private $quanumCollectedUser;
+
+    private $quanumProcessedUser;
+
+    private $quanumFinalizedUser;
+
+    private $collectedSiteName;
+
+    private $processedSiteName;
+
+    private $finalizedSiteName;
+
+    private $collectedSiteAddress;
+
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -683,6 +699,91 @@ class Order
         $this->origin = $origin;
 
         return $this;
+    }
+
+    public function getQuanumCollectedUser(): ?string
+    {
+        return $this->quanumCollectedUser;
+    }
+
+    public function setQuanumCollectedUser(?string $quanumCollectedUser): self
+    {
+        $this->quanumCollectedUser = $quanumCollectedUser;
+
+        return $this;
+    }
+
+    public function getQuanumProcessedUser(): ?string
+    {
+        return $this->quanumProcessedUser;
+    }
+
+    public function setQuanumProcessedUser(?string $quanumProcessedUser): self
+    {
+        $this->quanumProcessedUser = $quanumProcessedUser;
+
+        return $this;
+    }
+
+    public function getQuanumFinalizedUser(): ?string
+    {
+        return $this->quanumFinalizedUser;
+    }
+
+    public function setQuanumFinalizedUser(?string $quanumFinalizedUser): self
+    {
+        $this->quanumFinalizedUser = $quanumFinalizedUser;
+
+        return $this;
+    }
+
+    public function setCollectedSiteName(?string $collectedSiteName): self
+    {
+        $this->collectedSiteName = $collectedSiteName;
+
+        return $this;
+    }
+
+    public function getCollectedSiteName(): ?string
+    {
+        return $this->collectedSiteName;
+    }
+
+    public function setProcessedSiteName(?string $processedSiteName): self
+    {
+        $this->processedSiteName = $processedSiteName;
+
+        return $this;
+    }
+
+    public function getProcessedSiteName(): ?string
+    {
+        return $this->processedSiteName;
+    }
+
+    public function setFinalizedSiteName(?string $finalizedSiteName): self
+    {
+        $this->finalizedSiteName = $finalizedSiteName;
+
+        return $this;
+    }
+
+    public function getFinalizedSiteName(): ?string
+    {
+        return $this->finalizedSiteName;
+    }
+
+
+    public function setCollectedSiteAddress(?string $collectedSiteAddress): self
+    {
+        $this->collectedSiteAddress = $collectedSiteAddress;
+
+        return $this;
+    }
+
+    public function getCollectedSiteAddress(): ?string
+    {
+        return $this->collectedSiteAddress;
     }
 
     public function getSamples()
