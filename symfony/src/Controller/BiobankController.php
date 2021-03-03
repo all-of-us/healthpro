@@ -307,7 +307,7 @@ class BiobankController extends AbstractController
         $participant = $participant[0];
 
         // Internal Orders
-        $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participant->id]);
+        $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participant->id], ['id' => 'desc']);
 
         // Quanum Orders
         $order = new Order;
