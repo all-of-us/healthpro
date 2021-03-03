@@ -1,0 +1,35 @@
+{% macro form_widget(form, showCheckAll, samplesInfo, version) %}
+<div class="row">
+    <div class="{% if app.request.get('_route') != 'orderCreate' %} col-sm-8 {% else %} col-sm-12 {% endif %}">
+        <table id="{{ form.vars.id }}" class="table table-condensed table-auto-width table-samples">
+            {% if showCheckAll or app.request.get('_route') == 'orderFinalize' %}
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="checkall" {% if showCheckAll is empty %} disabled="disabled" {% endif %}></th>
+                        <th colspan="4">Check all</th>
+                        {% if app.request.get('_route') == 'orderFinalize' %}
+                            <th><span class="header-collected">Collected</span></th>
+                            <th>Processed</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+            {% endif %}
+            <tbody>
+                {% for sample in form.children %}
+                    {% set sampleInfo = samplesInfo[sample.vars.value] %}
+                    <tr class="samples {% if sample.vars.attr.class is defined %} {{ sample.vars.attr.class }} {% endif %}">
+                        <td>{{ form_widget(sample, { 'label': false }) }}</td>
+                        <td><label class="label-normal" for="{{ sample.vars.id }}">({{ sampleInfo.number }})</label></td>
+                        <td><label class="label-normal" for="{{ sample.vars.id }}">{{ sampleInfo.label }}</label></td>
+                        <td><label class="label-normal" for="{{ sample.vars.id }}">[{{ sampleInfo.sampleId }}]</label></td>
+                        <td><label class="label-normal" for="{{ sample.vars.id }}">{{ sampleInfo.color }}</label></td>
+                        {% if app.request.get('_route') == 'orderProcess' %}
+                            <td><label class="label-normal">(Time into Centrifuge)</label></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endmacro %}

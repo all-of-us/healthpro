@@ -2,7 +2,7 @@
     {% if attribute(order, type~'Site') is not empty and attribute(order, type~'Ts') %}
         <div class="{% if order.rdrId is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
-            <strong {% if attribute(order, 'biobankFinalized') and attribute(order, type~'User') is empty %} class="text-danger" {% endif %}>{{ type|capitalize }} by {{ attribute(order, type~'User') is not empty ? attribute(order, type~'User').email|default('Unknown') : 'Biobank user' }} at {{ app.getSiteDisplayName(attribute(order, type~'Site')) }}</strong>
+            <strong {% if attribute(order, 'biobankFinalized') and attribute(order, type~'User') is empty %} class="text-danger" {% endif %}>{{ type|capitalize }} by {{ attribute(order, type~'User') is not empty ? attribute(order, type~'User').email|default('Unknown') : 'Biobank user' }} at {{ siteInfo.siteDisplayName(attribute(order, type~'Site')) }}</strong>
         </div>
     {% elseif order.origin is defined and order.origin == 'careevolution' and attribute(order, type~'User') is not empty %}
         <div class="alert alert-success well-sm">
@@ -17,8 +17,8 @@
         </div>
     {% endif %}
 </dl>
-{% if is_granted('ROLE_BIOBANK') and type == 'finalized' and attribute(order, 'finalizedTs') is empty and not order.disabled and order.origin is not defined %}
-    {% import 'order-samples.html.twig' as samples %}
+{% if is_granted('ROLE_BIOBANK') and type == 'finalized' and attribute(order, 'finalizedTs') is empty and not order.disabled and order.origin is empty %}
+    {% import 'biobank/partials/order-samples.html.twig' as samples %}
     {% if order.type != 'saliva' %}
         {% form_theme finalizeForm 'form/simple_checkbox.html.twig' %}
     {% endif %}
