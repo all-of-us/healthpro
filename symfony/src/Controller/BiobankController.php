@@ -7,6 +7,7 @@ use App\Entity\Site;
 use App\Form\BiobankOrderType;
 use App\Form\OrderLookupType;
 use App\Form\ParticipantLookupBiobankIdType;
+use App\Service\BiobankOrderFinalizeNotificationService;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
@@ -128,7 +129,7 @@ class BiobankController extends AbstractController
     /**
      * @Route("/{biobankId}/order/{orderId}", name="biobank_order")
      */
-    public function orderAction(string $biobankId, int $orderId, Request $request): Response
+    public function orderAction(string $biobankId, int $orderId, Request $request, BiobankOrderFinalizeNotificationService $biobankOrderFinalizeNotificationService): Response
     {
         $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);
         if (empty($participant)) {
@@ -213,15 +214,14 @@ class BiobankController extends AbstractController
                             $this->em->flush();
                             $this->loggerService->log(Log::ORDER_EDIT, $orderId);
 
-                            // TODO: Implement email notification
-
                             // Send email to site user
                             $info = [
                                 'participantId' => $participant->id,
                                 'biobankId' => $biobankId,
-                                'orderId' => $order->getOrderId(),
-                                'siteId' => $order->getSite()
+                                'orderId' => $order->getOrderId()
                             ];
+                            $emails = !empty($site) ? $site->getEmail() : null;
+                            $biobankOrderFinalizeNotificationService->sendEmails($info, $emails);
                         } else {
                             $this->addFlash('error', $result['errorMessage']);
                         }
