@@ -19,7 +19,7 @@
                     <small class="text-muted">
                         {% set historyType = measurement.history.type is defined ? measurement.history.type : '' %}
                         {% if historyType == 'cancel' %}
-                            <span class="label label-danger">Cancelled</span> {{ measurement.eh_createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-danger">Cancelled</span> {{ measurement.history.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
                         {% elseif measurement.rdrId is empty and measurement.parentId is empty %}
                             <span class="label label-default">Saved &amp; Unfinalized</span> {{ measurement.updatedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
                         {% elseif measurement.rdrId and measurement.parentId %}
