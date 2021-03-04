@@ -56,12 +56,12 @@ class MeasurementHistory
 
     public function getMeasurement(): ?Measurement
     {
-        return $this->measurement;
+        return $this->evaluation;
     }
 
     public function setMeasurement(Measurement $measurement): self
     {
-        $this->measurement = $measurement;
+        $this->evaluation = $measurement;
 
         return $this;
     }
