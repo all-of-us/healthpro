@@ -488,7 +488,7 @@ class WorkQueueService
             $time = $participant->enrollmentStatusCoreMinusPMTime;
         }
         if (!empty($time)) {
-            return '<br>' . self::dateFromString($time, $userTimezone);
+            return '<br>' . WorkQueue::dateFromString($time, $userTimezone);
         }
         return '';
     }
