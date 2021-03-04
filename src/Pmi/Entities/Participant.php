@@ -18,6 +18,7 @@ class Participant
     public $age;
     public $patientStatus;
     public $isCoreParticipant = false;
+    public $isCoreMinusPMParticipant = false;
     public $activityStatus;
     public $isSuspended = false;
     public $isWithdrawn = false;
@@ -197,6 +198,11 @@ class Participant
         // Determine core participant
         if (!empty($participant->enrollmentStatus) && $participant->enrollmentStatus === 'FULL_PARTICIPANT') {
             $this->isCoreParticipant = true;
+        }
+
+        // Determine core minus pm participant
+        if (!empty($participant->enrollmentStatus) && $participant->enrollmentStatus === 'CORE_MINUS_PM') {
+            $this->isCoreMinusPMParticipant = true;
         }
 
         // Set activity status

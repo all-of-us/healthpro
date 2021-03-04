@@ -267,7 +267,7 @@ class User implements UserInterface
 
     public function getRoles()
     {
-        return UserService::getRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee']);
+        return UserService::getRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee'], $this->sessionInfo['managegroups']);
     }
 
     public function getPassword()
