@@ -21,7 +21,7 @@ class MeasurementHistory
      * @ORM\OneToOne(targetEntity="App\Entity\Measurement", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
-    private $measurement;
+    private $evaluation;
 
     /**
      * @ORM\Column(type="integer")
