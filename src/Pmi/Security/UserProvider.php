@@ -28,6 +28,18 @@ class UserProvider implements UserProviderInterface
             try {
                 $groups = $this->app['pmi.drc.appsclient'] ? $this->app['pmi.drc.appsclient']->getGroups($googleUser->getEmail()) : [];
                 $this->app['session']->set('googlegroups', $groups);
+                $manageGroups = [];
+                if ($this->app->getConfig('feature.manageusers')) {
+                    foreach ($groups as $group) {
+                        if (strpos($group->getEmail(), User::SITE_PREFIX) === 0) {
+                            $role = $this->app['pmi.drc.appsclient']->getRole($googleUser->getEmail(), $group->getEmail());
+                            if (in_array($role, ['OWNER', 'MANAGER'])) {
+                                $manageGroups[] = $group->getEmail();
+                            }
+                        }
+                    }
+                }
+                $this->app['session']->set('managegroups', $manageGroups);
             } catch (\Exception $e) {
                 $this->app->logException($e);
                 throw new AuthenticationException('Failed to retrieve group permissions');
@@ -36,7 +48,8 @@ class UserProvider implements UserProviderInterface
         $userInfo = $this->getUserInfo($googleUser);
         $sessionInfo = [
             'site' => $this->app['session']->get('site'),
-            'awardee' => $this->app['session']->get('awardee')
+            'awardee' => $this->app['session']->get('awardee'),
+            'managegroups' => $this->app['session']->get('managegroups')
         ];
         return new User($googleUser, $groups, $userInfo, null, $sessionInfo);
     }

@@ -122,6 +122,7 @@ class CodeBook
         'INTERESTED' => 'Participant',
         'MEMBER' => 'Participant + EHR Consent',
         'FULL_PARTICIPANT' => 'Core Participant',
+        'CORE_MINUS_PM' => 'Core Participant Minus PM',
         'en' => 'English',
         'es' => 'Spanish',
         'vibrent' => 'PTSC Portal',

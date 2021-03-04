@@ -109,7 +109,8 @@ class WorkQueue
             'options' => [
                 'Participant' => 'INTERESTED',
                 'Participant + EHR Consent' => 'MEMBER',
-                'Core Participant' => 'FULL_PARTICIPANT'
+                'Core Participant' => 'FULL_PARTICIPANT',
+                'Core Participant Minus PM' => 'CORE_MINUS_PM'
             ]
         ],
         'patientStatus' => [
@@ -365,8 +366,7 @@ class WorkQueue
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
             $row['participantOrigin'] = $e($participant->participantOrigin);
-            $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . self::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $app->getUserTimezone()) : '';
-            $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
+            $row['participantStatus'] = $e($participant->enrollmentStatus) . $this->getEnrollementStatusTime($participant);
             $row['activityStatus'] = $this->getActivityStatus($participant);
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['consentCohort'] = $e($participant->consentCohortText);
@@ -684,5 +684,18 @@ class WorkQueue
             return self::HTML_SUCCESS . ' Yes';
         }
         return self::HTML_DANGER . ' No';
+    }
+
+    public function getEnrollementStatusTime($participant)
+    {
+        if ($participant->isCoreParticipant) {
+            $time = $participant->enrollmentStatusCoreStoredSampleTime;
+        } elseif ($participant->isCoreMinusPMParticipant) {
+            $time = $participant->enrollmentStatusCoreMinusPMTime;
+        }
+        if (!empty($time)) {
+            return '<br>' . self::dateFromString($time, $this->app->getUserTimezone());
+        }
+        return '';
     }
 }

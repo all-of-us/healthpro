@@ -175,7 +175,7 @@
         "version": "2.0.1"
     },
     "php": {
-        "version": "7.3.21"
+        "version": "7.4.14"
     },
     "phpdocumentor/reflection-common": {
         "version": "2.2.0"
