@@ -107,7 +107,8 @@ class WorkQueue
             'options' => [
                 'Participant' => 'INTERESTED',
                 'Participant + EHR Consent' => 'MEMBER',
-                'Core Participant' => 'FULL_PARTICIPANT'
+                'Core Participant' => 'FULL_PARTICIPANT',
+                'Core Participant Minus PM' => 'CORE_MINUS_PM'
             ]
         ],
         'patientStatus' => [
@@ -632,6 +633,7 @@ class WorkQueue
         $headers[] = 'Education';
         $headers[] = 'COPE Feb PPI Survey Complete';
         $headers[] = 'COPE Feb PPI Survey Completion Date';
+        $headers[] = 'Core Participant Minus PM Date';
         return $headers;
     }
 }

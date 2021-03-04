@@ -1,4 +1,4 @@
-runtime: php73
+runtime: php74
 
 # default is `public/index.php` or `index.php`
 entrypoint: serve web/index.php

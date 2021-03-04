@@ -226,9 +226,7 @@ class WorkQueueService
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
             $row['participantOrigin'] = $e($participant->participantOrigin);
-            $enrollmentStatusCoreSampleTime = $participant->isCoreParticipant ? '<br/>' . WorkQueue::dateFromString($participant->enrollmentStatusCoreStoredSampleTime,
-                    $userTimezone) : '';
-            $row['participantStatus'] = $e($participant->enrollmentStatus) . $enrollmentStatusCoreSampleTime;
+            $row['participantStatus'] = $e($participant->enrollmentStatus) . $this->getEnrollementStatusTime($participant, $userTimezone);
             $row['activityStatus'] = WorkQueue::getActivityStatus($participant, $userTimezone);
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['consentCohort'] = $e($participant->consentCohortText);
@@ -410,6 +408,7 @@ class WorkQueueService
         $row[] = $participant->education;
         $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeFeb);
         $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeFebAuthored, $userTimezone);
+        $row[] = WorkQueue::dateFromString($participant->enrollmentStatusCoreMinusPMTime, $userTimezone);
         return $row;
     }
 
@@ -479,5 +478,18 @@ class WorkQueueService
     public function getNextToken()
     {
         return $this->participantSummaryService->getNextToken();
+    }
+
+    public function getEnrollementStatusTime($participant, $userTimezone)
+    {
+        if ($participant->isCoreParticipant) {
+            $time = $participant->enrollmentStatusCoreStoredSampleTime;
+        } elseif ($participant->isCoreMinusPMParticipant) {
+            $time = $participant->enrollmentStatusCoreMinusPMTime;
+        }
+        if (!empty($time)) {
+            return '<br>' . WorkQueue::dateFromString($time, $userTimezone);
+        }
+        return '';
     }
 }
