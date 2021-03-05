@@ -20,7 +20,8 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
       && rm -rf /var/lib/apt/lists/*
 
 # Install GRPC module for PHP
-RUN pecl install grpc
+RUN MAKEFLAGS="-j $(nproc)" pecl install grpc \
+      && docker-php-ext-enable grpc
 
 # Google Cloud Tools
 WORKDIR /opt
