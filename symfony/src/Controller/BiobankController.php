@@ -8,9 +8,11 @@ use App\Form\BiobankOrderType;
 use App\Form\OrderLookupType;
 use App\Form\ParticipantLookupBiobankIdType;
 use App\Service\BiobankOrderFinalizeNotificationService;
+use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
+use App\Service\ReviewService;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -290,7 +292,54 @@ class BiobankController extends AbstractController
     /**
      * @Route("/review/orders/today", name="biobank_orders_today")
      */
-    public function ordersTodayAction(Request $request)
+    public function ordersTodayAction(Request $request, EnvironmentService $env, ReviewService $reviewService): Response
+    {
+        // Get beginning of today (at midnight) in user's timezone
+        $startString = 'today';
+        // Allow overriding start time to test in non-prod environments
+        if (!$env->isProd() && intval($request->query->get('days')) > 0) {
+            $startString = '-' . intval($request->query->get('days')) . ' days';
+        }
+        $startTime = new \DateTime($startString, new \DateTimeZone($this->getUser()->getInfo()['timezone']));
+        // Get MySQL date/time string in UTC
+        $startTime->setTimezone(new \DateTimezone('UTC'));
+        $today = $startTime->format('Y-m-d H:i:s');
+
+        $orders = $reviewService->getTodayOrders($today);
+
+        return $this->render('biobank/orders-today.html.twig', [
+            'orders' => $orders
+        ]);
+    }
+
+    /**
+     * @Route("/review/quanum-orders/today", name="biobank_quanum_orders_today")
+     */
+    public function quanumOrdersTodayAction(Request $request)
+    {
+        return '';
+    }
+
+    /**
+     * @Route("/review/orders/unfinalized", name="biobank_orders_unfinalized")
+     */
+    public function ordersUnfinalizedAction(Request $request)
+    {
+        return '';
+    }
+
+    /**
+     * @Route("/review/orders/unlocked", name="biobank_orders_unlocked")
+     */
+    public function ordersUnlockedAction(Request $request)
+    {
+        return '';
+    }
+
+    /**
+     * @Route("/review/orders/recent/modify", name="biobank_orders_recentModify")
+     */
+    public function biobankOrdersRecentModifyAction(Request $request)
     {
         return '';
     }
