@@ -29,4 +29,5 @@ security:
      - { path: ^/s/problem($|\/).*, roles: ROLE_DV_ADMIN }
      - { path: ^/s/settings($|\/), roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
      - { path: ^/s/help/.*, roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
+     - { path: ^/s/workqueue($|\/).*, roles: [ROLE_USER, ROLE_AWARDEE] }
      - { path: ^/.*$, roles: ROLE_USER }
