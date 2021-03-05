@@ -121,12 +121,13 @@ class PatientStatusService
      */
     public function hasAccess($participant)
     {
+        $disablePatientStatusMessage = $this->params->has('disable_patient_status_message') ? $this->params->get('disable_patient_status_message') : null;
         return
             !$this->siteService->isDVType() &&
             $participant->statusReason !== 'withdrawal' &&
             $participant->statusReason !== 'test-participant' &&
             !$this->siteService->isTestSite() &&
-            empty($this->params->get('disable_patient_status_message'));
+            empty($disablePatientStatusMessage);
     }
 
     /**
