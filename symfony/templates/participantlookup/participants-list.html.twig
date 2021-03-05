@@ -17,7 +17,7 @@
                 <th>Date of Birth</th>
                 <th>ZIP Code</th>
                 <th>Participant Paired Awardee</th>
-                {% if app.isDVType %}
+                {% if app.session.get('siteType') == 'dv' %}
                     <th>Participant Origination</th>
                 {% endif %}
                 <th>PM&amp;B Eligible?</th>
@@ -30,23 +30,23 @@
             <tbody>
                 {% for participant in participants %}
                     <tr>
-                        <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}</a></td>
-                        <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.firstName }}</a></td>
-                        <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.middleName }}</a></td>
-                        <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.dob ? participant.dob|date('n/j/Y') }}</a></td>
-                        <td><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.zipCode }}</a></td>
+                        <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.lastName }}</a></td>
+                        <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.firstName }}</a></td>
+                        <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.middleName }}</a></td>
+                        <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.dob ? participant.dob|date('n/j/Y') }}</a></td>
+                        <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.zipCode }}</a></td>
                         <td>
-                            {% if participant.hpoId %}
-                                {% if participant.hpoId != app.siteOrganization %}
+                            {% if participant.awardee %}
+                                {% if participant.awardee != siteInfo.siteAwardee %}
                                     <i class="fa fa-info-circle text-warning" title="Participant paired awardee is different from your awardee" data-toggle="tooltip"></i>
                                 {% endif %}
-                                {{ app.getAwardeeDisplayName(participant.hpoId) }}
+                                {{ siteInfo.awardeeDisplayName(participant.awardee) }}
                             {% else %}
                                 <i class="fa fa-info-circle text-warning" title="Participant is unpaired" data-toggle="tooltip"></i>
                                 <span class="text-muted">Unpaired</span>
                             {% endif %}
                         </td>
-                        {% if app.isDVType %}
+                        {% if app.session.get('siteType') == 'dv' %}
                             <td>{{ participant.participantOrigin }}</td>
                         {% endif %}
                         <td>
