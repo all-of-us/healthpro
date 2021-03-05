@@ -69,7 +69,9 @@ class AuthService
         if (empty($idToken) || empty($idToken['sub']) || empty($idToken['email'])) {
             throw new Exception('Could not verify token');
         }
+        $user = new GoogleUser($idToken['sub'], $idToken['email']);
+        $this->session->set('googleUser', $user);
 
-        return new GoogleUser($idToken['sub'], $idToken['email']);
+        return $user;
     }
 }
