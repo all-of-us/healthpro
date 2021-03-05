@@ -49,3 +49,6 @@ biobank_order:
 
 biobank_quanumOrder:
     path: /biobank/{biobankId}/quanum-order/{orderId}
+
+patientStatus:
+    path: /participant/{participantId}/patient/status/{patientStatusId}
