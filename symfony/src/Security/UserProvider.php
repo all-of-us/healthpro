@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Service\GoogleGroupsService;
 use App\Service\UserService;
 use Pmi\Security\User;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -17,11 +18,13 @@ class UserProvider implements UserProviderInterface
 {
     private $userService;
     private $session;
+    private $googleGroups;
 
-    public function __construct(UserService $userService, SessionInterface $session)
+    public function __construct(UserService $userService, SessionInterface $session, GoogleGroupsService $googleGroups)
     {
         $this->userService = $userService;
         $this->session = $session;
+        $this->googleGroups = $googleGroups;
     }
 
     public function loadUserByUsername($username)
@@ -34,13 +37,9 @@ class UserProvider implements UserProviderInterface
         if ($this->session->has('googlegroups')) {
             $groups = $this->session->get('googlegroups');
         } else {
-            // TODO: port apps client to Symfony
-            $groups = [
-                new Group(['email' => 'hpo-site-upmc@staging.pmi-ops.org', 'name' => 'UPMC ']),
-                new Group(['email' => 'hpo-site-a@staging.pmi-ops.org', 'name' => 'Test Site A']),
-                new Group(['email' => 'site-admin@staging.pmi-ops.org', 'name' => 'Admin'])
-            ];
-            $manageGroups = ['hpo-site-a@staging.pmi-ops.org'];
+            $groups = $this->googleGroups->getGroups($googleUser->getEmail());
+            // TODO: implement group management check
+            $manageGroups = [];
             $this->session->set('googlegroups', $groups);
             $this->session->set('managegroups', $manageGroups);
         }
