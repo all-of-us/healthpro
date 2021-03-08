@@ -345,9 +345,12 @@ class BiobankController extends AbstractController
     /**
      * @Route("/review/orders/recent/modify", name="biobank_orders_recentModify")
      */
-    public function biobankOrdersRecentModifyAction(Request $request)
+    public function biobankOrdersRecentModifyAction(): Response
     {
-        return '';
+        $recentModifyOrders = $this->em->getRepository(Order::class)->getRecentModifiedOrders();
+        return $this->render('biobank/orders-recent-modify.html.twig', [
+            'orders' => $recentModifyOrders
+        ]);
     }
 
     /**
