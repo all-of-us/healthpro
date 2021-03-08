@@ -178,4 +178,32 @@ class OrderRepository extends ServiceEntityRepository
         }
         return $orders;
     }
+
+    public function getUnlockedOrders(): array
+    {
+        $ordersQuery = "
+            SELECT o.*,
+                   oh.order_id AS oh_order_id,
+                   oh.user_id AS oh_user_id,
+                   oh.site AS oh_site,
+                   oh.type AS oh_type,
+                   oh.created_ts AS oh_created_ts,
+                   s.name as created_site_name,
+                   sc.name as collected_site_name,
+                   sp.name as processed_site_name,
+                   sf.name as finalized_site_name
+            FROM orders o
+            INNER JOIN orders_history oh ON o.history_id = oh.id
+            LEFT JOIN sites s ON s.site_id = o.site AND s.deleted = :deleted
+            LEFT JOIN sites sc ON sc.site_id = o.collected_site AND sc.deleted = :deleted
+            LEFT JOIN sites sp ON sp.site_id = o.processed_site AND sp.deleted = :deleted
+            LEFT JOIN sites sf ON sf.site_id = o.finalized_site AND sf.deleted = :deleted
+            WHERE oh.type = :type
+            ORDER BY o.created_ts DESC
+        ";
+        return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
+            'type' => Order::ORDER_UNLOCK,
+            'deleted' => 0
+        ]);
+    }
 }

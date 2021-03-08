@@ -334,9 +334,12 @@ class BiobankController extends AbstractController
     /**
      * @Route("/review/orders/unlocked", name="biobank_orders_unlocked")
      */
-    public function ordersUnlockedAction(Request $request)
+    public function ordersUnlockedAction(): Response
     {
-        return '';
+        $unlockedOrders = $this->em->getRepository(Order::class)->getUnlockedOrders();
+        return $this->render('biobank/orders-unlocked.html.twig', [
+            'orders' => $unlockedOrders
+        ]);
     }
 
     /**
