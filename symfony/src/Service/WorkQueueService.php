@@ -415,7 +415,7 @@ class WorkQueueService
     public function generateLink($id, $name)
     {
         if ($this->authorizationChecker->isGranted('ROLE_USER')) {
-            $url = $this->urlGenerator->generate('participant_details', ['id' => $id]);
+            $url = $this->urlGenerator->generate('participant', ['id' => $id]);
         } else {
             $url = $this->urlGenerator->generate('workqueue_participant', ['id' => $id]);
         }
