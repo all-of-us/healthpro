@@ -285,6 +285,10 @@ class Order
 
     private $collectedSiteAddress;
 
+    private $quanumFinalizedSamples;
+
+    private $quanumOrderStatus;
+
 
     public function getId(): ?int
     {
@@ -780,9 +784,33 @@ class Order
         return $this;
     }
 
+    public function getQuanumFinalizedSamples(): ?string
+    {
+        return $this->quanumFinalizedSamples;
+    }
+
+    public function setQuanumFinalizedSamples(?string $quanumFinalizedSamples): self
+    {
+        $this->quanumFinalizedSamples = $quanumFinalizedSamples;
+
+        return $this;
+    }
+
     public function getCollectedSiteAddress(): ?string
     {
         return $this->collectedSiteAddress;
+    }
+
+    public function setQuanumOrderStatus(?string $quanumOrderStatus): self
+    {
+        $this->quanumOrderStatus = $quanumOrderStatus;
+
+        return $this;
+    }
+
+    public function getQuanumOrderStatus(): ?string
+    {
+        return $this->quanumOrderStatus;
     }
 
     public function getSamples()

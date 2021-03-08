@@ -733,6 +733,7 @@ class OrderService
         $this->order->setProcessedSamples(json_encode(!empty($processedSamples) ? $processedSamples : []));
         $this->order->setProcessedSamplesTs(json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []));
         $this->order->setFinalizedSamples(json_encode(!empty($finalizedSamples) ? $finalizedSamples : []));
+        $this->order->setQuanumFinalizedSamples(!empty($finalizedSamples) ? join($finalizedSamples, ', ') : '');
         $this->order->setCollectedNotes($collectedNotes);
         $this->order->setProcessedNotes($processedNotes);
         $this->order->setFinalizedNotes($finalizedNotes);
@@ -753,6 +754,7 @@ class OrderService
             $this->order->setQuanumFinalizedUser($object->finalizedInfo->author->value);
         }
         $this->order->setFinalizedSiteName('A Quest Site');
+        $this->order->setQuanumOrderStatus('Finalized');
         return $this->order;
     }
 }
