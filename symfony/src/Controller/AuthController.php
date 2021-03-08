@@ -16,11 +16,17 @@ class AuthController extends AbstractController
     /**
      * @Route("/login", name="login")
      */
-    public function login(AuthService $auth)
+    public function login()
     {
-        return $this->render('login.html.twig', [
-            'url' => $auth->getAuthUrl()
-        ]);
+        return $this->render('login.html.twig');
+    }
+
+    /**
+     * @Route("/login/start", name="login_start")
+     */
+    public function loginStart(AuthService $auth)
+    {
+        return $this->redirect($auth->getAuthUrl());
     }
 
     /**
