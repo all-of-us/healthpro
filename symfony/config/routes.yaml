@@ -41,9 +41,6 @@ agreeUsage:
 hideTZWarning:
     path: /hide-tz-warning
 
-participant:
-    path: /participant/{id}
-
 biobank_order:
     path: /biobank/{biobankId}/order/{orderId}
 
