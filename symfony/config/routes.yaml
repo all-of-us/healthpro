@@ -38,9 +38,6 @@ agreeUsage:
 hideTZWarning:
     path: /hide-tz-warning
 
-participant:
-    path: /participant/{id}
-
 patientStatus:
     path: /participant/{participantId}/patient/status/{patientStatusId}
 
