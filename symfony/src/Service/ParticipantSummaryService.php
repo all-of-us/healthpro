@@ -2,8 +2,10 @@
 
 namespace App\Service;
 
+use App\Entity\Site;
 use App\Service\RdrApiService;
 use App\Helper\Participant;
+use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Drc\Exception\FailedRequestException;
 use Pmi\Drc\Exception\InvalidResponseException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -17,12 +19,14 @@ class ParticipantSummaryService
     protected $nextToken;
     protected $total;
     protected $params;
+    protected $em;
     protected $disableTestAccess;
 
-    public function __construct(RdrApiService $api, ParameterBagInterface $params)
+    public function __construct(RdrApiService $api, ParameterBagInterface $params, EntityManagerInterface $em)
     {
         $this->api = $api;
         $this->params = $params;
+        $this->em = $em;
     }
 
     public function getParticipantById($participantId, $refresh = null)
@@ -50,6 +54,13 @@ class ParticipantSummaryService
             try {
                 $response = $this->api->get(sprintf('rdr/v1/Participant/%s/Summary', $participantId));
                 $participant = json_decode($response->getBody()->getContents());
+                $disableTestAccess = $this->params->has('disable_test_access') ? $this->params->get('disable_test_access') : '';
+                $cohortOneLaunchTime = $this->params->has('cohort_one_launch_time') ? $this->params->get('cohort_one_launch_time') : '';
+                $participant->options = [
+                    'disableTestAccess' => $disableTestAccess,
+                    'siteType' => $this->getSiteType($participant->awardee),
+                    'cohortOneLaunchTime' => $cohortOneLaunchTime
+                ];
             } catch (\Exception $e) {
                 error_log($e->getMessage());
                 return false;
@@ -186,5 +197,14 @@ class ParticipantSummaryService
         }
 
         return $results;
+    }
+
+    public function getSiteType($awardeeId)
+    {
+        $site = $this->em->getRepository(Site::class)->findOneBy(['awardeeId' => $awardeeId]);
+        if (!empty($site)) {
+            return strtolower($site->getType()) === 'dv' ? 'dv' : 'hpo';
+        }
+        return null;
     }
 }
