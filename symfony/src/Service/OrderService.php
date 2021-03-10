@@ -104,6 +104,21 @@ class OrderService
         return false;
     }
 
+    public function getOrdersByParticipant($participantId)
+    {
+        try {
+            $response = $this->rdrApiService->get("rdr/v1/Participant/{$participantId}/BiobankOrder");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->data)) {
+                return $result->data;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return [];
+        }
+        return [];
+    }
+
     public function cancelRestoreOrder($type, $orderObject)
     {
         try {
@@ -629,5 +644,84 @@ class OrderService
     {
         // Allow cohort 1 and 2 participants to edit existing orders even if status is false
         return !$this->participant->status && !empty($this->order->getId()) ? $this->participant->editExistingOnly : $this->participant->status;
+    }
+
+    public function loadFromJsonObject($object)
+    {
+        if (!empty($object->samples)) {
+            foreach ($object->samples as $sample) {
+                $sampleCode = $sample->test;
+                if (!array_key_exists($sample->test, $this->order->getSamplesInformation()) && array_key_exists($sample->test, Order::$mapRdrSamples)) {
+                    $sampleCode = Order::$mapRdrSamples[$sample->test]['code'];
+                    $centrifugeType = Order::$mapRdrSamples[$sample->test]['centrifuge_type'];
+                }
+                if (!empty($sample->collected)) {
+                    $collectedSamples[] = $sampleCode;
+                    $collectedTs = $sample->collected;
+                }
+                if (!empty($sample->processed)) {
+                    $processedSamples[] = $sampleCode;
+                    $processedTs = $sample->processed;
+                    $processedSamplesTs[$sampleCode] = (new \DateTime($sample->processed))->getTimestamp();
+                }
+                if (!empty($sample->finalized)) {
+                    $finalizedSamples[] = $sampleCode;
+                    $finalizedTs = $sample->finalized;
+                }
+            }
+        }
+
+        // Update notes field
+        $collectedNotes = !empty($object->notes->collected) ? $object->notes->collected : null;
+        $processedNotes = !empty($object->notes->processed) ? $object->notes->processed : null;
+        $finalizedNotes = !empty($object->notes->finalized) ? $object->notes->finalized : null;
+
+        if (!empty($object->identifier)) {
+            foreach ($object->identifier as $identifier) {
+                if (preg_match('/tracking-number/i', $identifier->system)) {
+                    $trackingNumber = $identifier->value;
+                }
+                if (preg_match('/kit-id/i', $identifier->system)) {
+                    $kitId = $identifier->value;
+                }
+            }
+        }
+
+        // Extract participantId
+        preg_match('/^Patient\/(P\d+)$/i', $object->subject, $subject_matches);
+        $participantId = $subject_matches[1];
+
+        $this->order->setParticipantId($participantId);
+        $this->order->setOrderId($kitId);
+        // Can be used as order Id
+        $this->order->setRdrId($object->id);
+        if (property_exists($object, 'biobankId')) {
+            $this->order->setBiobankId($object->biobankId);
+        }
+        $this->order->setType('kit');
+        if (!empty($object->created)) {
+            $this->order->setCreatedTs(new \DateTime($object->created));
+        }
+        if (!empty($processedTs)) {
+            $this->order->setProcessedTs(new \DateTime($processedTs));
+        }
+        if (!empty($collectedTs)) {
+            $this->order->setCollectedTs(new \DateTime($collectedTs));
+        }
+        if (!empty($finalizedTs)) {
+            $this->order->setFinalizedTs(new \DateTime($finalizedTs));
+        }
+        $this->order->setProcessedCentrifugeType((!empty($centrifugeType)) ? $centrifugeType : null);
+        $this->order->setCollectedSamples(json_encode(!empty($collectedSamples) ? $collectedSamples : []));
+        $this->order->setProcessedSamples(json_encode(!empty($processedSamples) ? $processedSamples : []));
+        $this->order->setProcessedSamplesTs(json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []));
+        $this->order->setFinalizedSamples(json_encode(!empty($finalizedSamples) ? $finalizedSamples : []));
+        $this->order->setCollectedNotes($collectedNotes);
+        $this->order->setProcessedNotes($processedNotes);
+        $this->order->setFinalizedNotes($finalizedNotes);
+        $this->order->setFedexTracking(!empty($trackingNumber) ? $trackingNumber : null);
+        $this->order->setOrigin($object->origin);
+        // TODO: Set site and user names for biobank order details view
+        return $this->order;
     }
 }

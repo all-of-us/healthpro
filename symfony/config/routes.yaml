@@ -13,22 +13,15 @@ logout:
 selectSite:
     path: /site/select
 
-participants:
-    path: /participants
-
 orders:
     path: /orders
 
 evaluation:
     path: /participant/{participantId}/measurements/{evalId}
-    defaults:
-      - evalId: null
+    defaults: { evalId: null }
 
 evaluation_modify:
     path: /participant/{participantId}/measurements/{evalId}/modify/{type}
-
-workqueue_index:
-    path: /workqueue
 
 dashboard_home:
     path: /dashboard
@@ -48,5 +41,11 @@ agreeUsage:
 hideTZWarning:
     path: /hide-tz-warning
 
-participant:
-    path: /participant/{id}
+biobank_order:
+    path: /biobank/{biobankId}/order/{orderId}
+
+biobank_quanumOrder:
+    path: /biobank/{biobankId}/quanum-order/{orderId}
+
+patientStatus:
+    path: /participant/{participantId}/patient/status/{patientStatusId}
