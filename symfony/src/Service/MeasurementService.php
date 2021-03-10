@@ -12,13 +12,21 @@ class MeasurementService
     protected $session;
     protected $userService;
     protected $rdrApiService;
+    protected $siteService;
 
-    public function __construct(EntityManagerInterface $em, SessionInterface $session, UserService $userService, RdrApiService $rdrApiService)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        SessionInterface $session,
+        UserService $userService,
+        RdrApiService $rdrApiService,
+        SiteService $siteService
+    ) {
         $this->em = $em;
         $this->session = $session;
         $this->userService = $userService;
         $this->rdrApiService = $rdrApiService;
+        $this->siteService = $siteService;
+
     }
 
     public function loadFromAObject($measurement)
@@ -47,5 +55,10 @@ class MeasurementService
             return false;
         }
         return false;
+    }
+
+    public function requireBloodDonorCheck()
+    {
+        return $this->session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite();
     }
 }
