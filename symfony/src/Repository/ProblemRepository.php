@@ -20,16 +20,18 @@ class ProblemRepository extends ServiceEntityRepository
         parent::__construct($registry, Problem::class);
     }
 
-    public function getProblemsWithCommentsCount()
+    public function getProblemsWithCommentsCount($participantId = null)
     {
-        return $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.problemComments', 'pc')
             ->addSelect('IFNULL(MAX(pc.createdTs), p.updatedTs) AS lastUpdateTs')
             ->addSelect('COUNT(pc.comment) AS commentCount')
             ->groupBy('p.id')
-            ->orderBy('IFNULL(MAX(pc.createdTs), p.updatedTs)', 'DESC')
-            ->getQuery()
-            ->getResult()
-        ;
+            ->orderBy('IFNULL(MAX(pc.createdTs), p.updatedTs)', 'DESC');
+        if ($participantId) {
+            $qb->where('p.participantId = :participantId');
+            $qb->setParameter('participantId', $participantId);
+        }
+        return $qb->getQuery()->getResult();
     }
 }
