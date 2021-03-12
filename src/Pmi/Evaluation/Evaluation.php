@@ -724,6 +724,19 @@ class Evaluation
         return $this->app->isDVType() && $this->app->isDiversionPouchSite();
     }
 
+    public function requireEhrModificationProtocol()
+    {
+        $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
+            'deleted' => 0,
+            'ehr_modification_protocol' => 1,
+            'google_group' => $this->app->getSiteId()
+        ]);
+        if (!empty($sites)) {
+            return true;
+        }
+        return false;
+    }
+
     public function isDiversionPouchForm()
     {
         return strpos($this->version, self::DIVERSION_POUCH) !== false;

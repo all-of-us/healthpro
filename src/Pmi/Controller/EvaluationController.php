@@ -343,7 +343,8 @@ class EvaluationController extends AbstractController
             'conversions' => $evaluationService->getConversions(),
             'latestVersion' => $evaluationService->isDiversionPouchForm() ? $evaluationService::DIVERSION_POUCH_CURRENT_VERSION : $evaluationService::CURRENT_VERSION,
             'showAutoModification' => $showAutoModification,
-            'revertForm' => $evaluationService->getEvaluationRevertForm()->createView()
+            'revertForm' => $evaluationService->getEvaluationRevertForm()->createView(),
+            'requireEhrModificationProtocol' => $evaluationService->requireEhrModificationProtocol()
         ]);
     }
 
