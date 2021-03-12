@@ -133,6 +133,15 @@ class SiteType extends AbstractType
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
                 ]
+            ])
+            ->add('ehr_modification_protocol', Type\ChoiceType::class, [
+                'label' => 'EHR modification protocol',
+                'required' => false,
+                'choices' => [
+                    'Yes'=> 1,
+                    'No' => 0
+                ],
+                'multiple' => false
             ]);
     }
 
