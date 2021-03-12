@@ -59,7 +59,7 @@ class Evaluation
     public function __construct($app = null, $type = null)
     {
         $this->app = $app;
-        $this->version = $type === self::DIVERSION_POUCH ? self::DIVERSION_POUCH_CURRENT_VERSION : self::CURRENT_VERSION;
+        $this->version = $type === self::DIVERSION_POUCH && $this->requireBloodDonorCheck() ? self::DIVERSION_POUCH_CURRENT_VERSION : self::CURRENT_VERSION;
         $this->data = new \StdClass();
         $this->loadSchema();
         $this->normalizeData();
