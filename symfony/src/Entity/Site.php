@@ -90,6 +90,11 @@ class Site
     /**
      * @ORM\Column(type="boolean")
      */
+    private $ehrModificationProtocol = false;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
     private $deleted = false;
 
     /**
@@ -266,6 +271,18 @@ class Site
     public function setWorkqueueDownload(string $workqueueDownload): self
     {
         $this->workqueueDownload = $workqueueDownload;
+
+        return $this;
+    }
+
+    public function getEhrModificationProtocol(): ?bool
+    {
+        return $this->ehrModificationProtocol;
+    }
+
+    public function setEhrModificationProtocol(int $ehrModificationProtocol): self
+    {
+        $this->ehrModificationProtocol = $ehrModificationProtocol;
 
         return $this;
     }
