@@ -28,7 +28,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ParticipantDetailsController extends AbstractController
 {
     /**
-     * @Route("/participant/{id}", name="participant_details")
+     * @Route("/participant/{id}", name="participant")
      */
     public function participantDetailsAction(
         $id,

@@ -281,8 +281,8 @@ class WorkQueueService
             //In-Person Enrollment
             $row['pairedSite'] = $this->siteService->getSiteDisplayName($e($participant->siteSuffix));
             $row['pairedOrganization'] = $this->siteService->getOrganizationDisplayName($e($participant->organization));
-            $row['physicalMeasurementsStatus'] = WorkQueue::displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED',
-                $participant->physicalMeasurementsFinalizedTime, $userTimezone, false);
+            $row['physicalMeasurementsStatus'] = WorkQueue::displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $userTimezone,
+                $participant->physicalMeasurementsFinalizedTime, false);
             $row['evaluationFinalizedSite'] = $this->siteService->getSiteDisplayName($e($participant->evaluationFinalizedSite));
             $row['biobankDnaStatus'] = WorkQueue::displayStatus($participant->samplesToIsolateDNA, 'RECEIVED', $userTimezone);
             if ($participant->numBaselineSamplesArrived >= 7) {
@@ -415,7 +415,7 @@ class WorkQueueService
     public function generateLink($id, $name)
     {
         if ($this->authorizationChecker->isGranted('ROLE_USER')) {
-            $url = $this->urlGenerator->generate('participant_details', ['id' => $id]);
+            $url = $this->urlGenerator->generate('participant', ['id' => $id]);
         } else {
             $url = $this->urlGenerator->generate('workqueue_participant', ['id' => $id]);
         }

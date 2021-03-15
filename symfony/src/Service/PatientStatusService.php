@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-
 use App\Entity\PatientStatus;
 use App\Entity\PatientStatusHistory;
 use App\Entity\PatientStatusImport;
@@ -12,29 +11,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PatientStatusService
 {
-    /**
-     * @var RdrApiService
-     */
     protected $rdrApiService;
-    /**
-     * @var SiteService
-     */
     protected $siteService;
-    /**
-     * @var UserService
-     */
     protected $userService;
-    /**
-     * @var ParameterBagInterface
-     */
     protected $params;
-    /**
-     * @var EntityManagerInterface
-     */
     protected $em;
-    /**
-     * @var LoggerService
-     */
     protected $loggerService;
 
     protected $participantId;
@@ -50,15 +31,6 @@ class PatientStatusService
     protected $createdTs;
     protected $importId;
 
-    /**
-     * PatientStatusService constructor.
-     * @param RdrApiService $rdrApiService
-     * @param SiteService $siteService
-     * @param UserService $userService
-     * @param ParameterBagInterface $params
-     * @param EntityManagerInterface $em
-     * @param LoggerService $loggerService
-     */
     public function __construct(
         RdrApiService $rdrApiService,
         SiteService $siteService,
@@ -75,11 +47,6 @@ class PatientStatusService
         $this->loggerService = $loggerService;
     }
 
-    /**
-     * @param $participantId
-     * @param $organizationId
-     * @return bool|mixed
-     */
     public function getPatientStatus($participantId, $organizationId)
     {
         try {
@@ -95,11 +62,6 @@ class PatientStatusService
         return false;
     }
 
-    /**
-     * @param $participantId
-     * @param $organizationId
-     * @return bool|mixed
-     */
     public function getPatientStatusHistory($participantId, $organizationId)
     {
         try {
@@ -115,25 +77,17 @@ class PatientStatusService
         return false;
     }
 
-    /**
-     * @param $participant
-     * @return bool
-     */
     public function hasAccess($participant)
     {
+        $disablePatientStatusMessage = $this->params->has('disable_patient_status_message') ? $this->params->get('disable_patient_status_message') : null;
         return
             !$this->siteService->isDVType() &&
             $participant->statusReason !== 'withdrawal' &&
             $participant->statusReason !== 'test-participant' &&
             !$this->siteService->isTestSite() &&
-            empty($this->params->get('disable_patient_status_message'));
+            empty($disablePatientStatusMessage);
     }
 
-    /**
-     * @param $participantId
-     * @param $patientStatusId
-     * @param $formData
-     */
     public function loadData($participantId, $patientStatusId, $formData)
     {
         $this->participantId = $participantId;
@@ -149,9 +103,6 @@ class PatientStatusService
         $this->createdTs = new \DateTime();
     }
 
-    /**
-     * @return \StdClass
-     */
     public function getRdrObject()
     {
         $obj = new \StdClass();
@@ -166,9 +117,6 @@ class PatientStatusService
         return $obj;
     }
 
-    /**
-     * @return bool
-     */
     public function sendToRdr()
     {
         $postData = $this->getRdrObject();
@@ -185,9 +133,6 @@ class PatientStatusService
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function saveData()
     {
         $status = false;
