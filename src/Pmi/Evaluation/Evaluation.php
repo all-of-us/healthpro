@@ -18,7 +18,7 @@ class Evaluation
 {
     const CURRENT_VERSION = '0.3.3';
     const DIVERSION_POUCH_CURRENT_VERSION = '0.3.3-diversion-pouch';
-    const EHR_CURRENT_VERSION = '0.3.3-EHR';
+    const EHR_CURRENT_VERSION = '0.3.3-ehr';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_ACTIVE = 'active';
@@ -283,6 +283,10 @@ class Evaluation
 
             $options['constraints'] = $constraints;
             $options['attr'] = $attributes;
+
+            if ($type === 'radio') {
+                $options['expanded'] = true;
+            }
 
             if (isset($field->replicates)) {
                 $collectionOptions = [
