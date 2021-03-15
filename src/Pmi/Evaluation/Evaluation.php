@@ -18,6 +18,7 @@ class Evaluation
 {
     const CURRENT_VERSION = '0.3.3';
     const DIVERSION_POUCH_CURRENT_VERSION = '0.3.3-diversion-pouch';
+    const EHR_CURRENT_VERSION = '0.3.3-EHR';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_ACTIVE = 'active';
@@ -59,10 +60,21 @@ class Evaluation
     public function __construct($app = null, $type = null)
     {
         $this->app = $app;
-        $this->version = $type === self::DIVERSION_POUCH && $this->requireBloodDonorCheck() ? self::DIVERSION_POUCH_CURRENT_VERSION : self::CURRENT_VERSION;
+        $this->version = $this->getCurrentVersion($type);
         $this->data = new \StdClass();
         $this->loadSchema();
         $this->normalizeData();
+    }
+
+    private function getCurrentVersion($type)
+    {
+        if ($type === self::DIVERSION_POUCH && $this->requireBloodDonorCheck()) {
+            return self::DIVERSION_POUCH_CURRENT_VERSION;
+        }
+        if ($this->requireEhrModificationProtocol()) {
+            return self::EHR_CURRENT_VERSION;
+        }
+        return self::CURRENT_VERSION;
     }
 
     public function loadFromArray($array)
