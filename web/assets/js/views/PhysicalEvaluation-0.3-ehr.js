@@ -8,6 +8,7 @@ const _ = require('underscore');
 
 PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
     events: {
+        "click input, radio" : "toggleEhrDate",
         "click .toggle-help-image": "displayHelpModal",
         "change .replicate input": "updateMean",
         "keyup .replicate input": "updateMean",
@@ -31,6 +32,17 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         "click .alt-units-field a": "cancelAltUnits",
         "keyup .alt-units-field input": "convertAltUnits",
         "change .alt-units-field input": "convertAltUnits"
+    },
+    toggleEhrDate: function (e) {
+        var val = $(e.currentTarget).val();
+        var field = $(e.currentTarget).closest('.field').data('field');
+        var ehrDateField = field + '-ehr-date';
+        if (val === 'ehr') {
+            this.$('.' + ehrDateField).show();
+        } else {
+            this.$('.' + ehrDateField).hide();
+            this.$('#form_' + ehrDateField).val('');
+        }
     },
     inputChange: function(e) {
         this.clearServerErrors(e);

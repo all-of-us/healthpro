@@ -29,6 +29,9 @@
                                 <div class="modification-affected">
                                     {% if i == 0 %}
                                         {{ metrics.form_row(evaluationForm, schema.fields['blood-pressure-source']) }}
+                                        <div class="blood-pressure-source-ehr-date" style="display: none;">
+                                            {{ metrics.form_row(evaluationForm, schema.fields['blood-pressure-source-ehr-date']) }}
+                                        </div>
                                     {% endif %}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-systolic'], i) }}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-diastolic'], i) }}
@@ -107,6 +110,9 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         {{ metrics.form_row(evaluationForm, schema.fields['height-source']) }}
+                        <div class="height-source-ehr-date" style="display: none;">
+                            {{ metrics.form_row(evaluationForm, schema.fields['height-source-ehr-date']) }}
+                        </div>
                         {{ metrics.form_row(evaluationForm, schema.fields['height']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['height-protocol-modification']) }}
                         <div class="modification-notes" style="display:none">
@@ -119,6 +125,9 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-source']) }}
+                        <div class="weight-source-ehr-date" style="display: none;">
+                            {{ metrics.form_row(evaluationForm, schema.fields['weight-source-ehr-date']) }}
+                        </div>
                         {{ metrics.form_row(evaluationForm, schema.fields['weight']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-prepregnancy']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-protocol-modification']) }}
@@ -176,6 +185,9 @@
                                 <div class="modification-affected">
                                     {% if i == 0 %}
                                         {{ metrics.form_row(evaluationForm, schema.fields['waist-source']) }}
+                                        <div class="waist-source-ehr-date" style="display: none;">
+                                            {{ metrics.form_row(evaluationForm, schema.fields['waist-source-ehr-date']) }}
+                                        </div>
                                     {% endif %}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference'], i) }}
                                     {% if i == 2 %}
@@ -209,6 +221,9 @@
                                 <div class="modification-affected">
                                     {% if i == 0 %}
                                         {{ metrics.form_row(evaluationForm, schema.fields['hip-source']) }}
+                                        <div class="hip-source-ehr-date" style="display: none;">
+                                            {{ metrics.form_row(evaluationForm, schema.fields['hip-source-ehr-date']) }}
+                                        </div>
                                     {% endif %}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference'], i) }}
                                     {% if i == 2 %}
