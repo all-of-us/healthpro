@@ -68,11 +68,13 @@ class Evaluation
 
     private function getCurrentVersion($type)
     {
-        if ($type === self::DIVERSION_POUCH && $this->requireBloodDonorCheck()) {
-            return self::DIVERSION_POUCH_CURRENT_VERSION;
-        }
-        if ($this->requireEhrModificationProtocol()) {
-            return self::EHR_CURRENT_VERSION;
+        if ($this->app) {
+            if ($type === self::DIVERSION_POUCH && $this->requireBloodDonorCheck()) {
+                return self::DIVERSION_POUCH_CURRENT_VERSION;
+            }
+            if ($this->requireEhrModificationProtocol()) {
+                return self::EHR_CURRENT_VERSION;
+            }
         }
         return self::CURRENT_VERSION;
     }
