@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
@@ -278,6 +279,23 @@ class Evaluation
                 $attributes['data-parsley-maxlength'] = self::LIMIT_TEXT_SHORT;
                 $constraints[] = new Constraints\Length(['max' => self::LIMIT_TEXT_SHORT]);
                 $constraints[] = new Constraints\Type('string');
+            } elseif ($type === 'datetime') {
+                unset($options['scale']);
+                $class = DateTimeType::class;
+                $constraints[] = new Constraints\LessThanOrEqual([
+                    'value' => new \DateTime('+5 minutes'),
+                    'message' => 'Timestamp cannot be in the future'
+                ]);
+                $dateOptions = [
+                    'widget' => 'single_text',
+                    'format' => 'M/d/yyyy h:mm a',
+                    'required' => false,
+                    'view_timezone' => $this->app->getUserTimezone(),
+                    'model_timezone' => 'UTC',
+                    'constraints' => $constraints
+                ];
+                $options = array_merge($options, $dateOptions);
+                $attributes['class'] = 'ehr-date';
             } else {
                 $class = NumberType::class;
                 $constraints[] = new Constraints\Type('numeric');
