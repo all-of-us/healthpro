@@ -41,7 +41,6 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             this.$('.' + ehrDateField).show();
         } else {
             this.$('.' + ehrDateField).hide();
-            this.$('#form_' + ehrDateField).val('');
         }
     },
     inputChange: function(e) {

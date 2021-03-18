@@ -58,6 +58,14 @@ class Evaluation
         'heart-rate'
     ];
 
+    public static $ehrProtocolDateFields = [
+        'blood-pressure-source-ehr-date',
+        'height-source-ehr-date',
+        'weight-source-ehr-date',
+        'waist-source-ehr-date',
+        'hip-source-ehr-date'
+    ];
+
     public function __construct($app = null, $type = null)
     {
         $this->app = $app;
@@ -93,6 +101,7 @@ class Evaluation
                 $this->data = json_decode($array['data']);
             }
         }
+        $this->formatEhrProtocolDateFields();
         if (!empty($array['finalized_ts'])) {
             $this->locked = true;
         }
@@ -123,6 +132,18 @@ class Evaluation
         }
         $this->loadSchema();
         $this->normalizeData();
+    }
+
+    protected function formatEhrProtocolDateFields()
+    {
+        foreach (self::$ehrProtocolDateFields as $ehrProtocolDateField) {
+            if (!empty($this->data->{$ehrProtocolDateField})) {
+                $dateTime = new \DateTime;
+                $dateTime->setTimestamp($this->data->{$ehrProtocolDateField});
+                $dateTime->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
+                $this->data->{$ehrProtocolDateField} = $dateTime;
+            }
+        }
     }
 
     public function toArray($serializeData = true)
@@ -233,7 +254,7 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } elseif (!isset($field->options) && !in_array($type, ['checkbox', 'text', 'textarea'])) {
+            } elseif (!isset($field->options) && !in_array($type, ['checkbox', 'text', 'textarea', 'datetime'])) {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
@@ -349,14 +370,17 @@ class Evaluation
     public function setData($data)
     {
         $this->data = $data;
-        $this->normalizeData();
+        $this->normalizeData('save');
     }
 
-    protected function normalizeData()
+    protected function normalizeData($type = null)
     {
         foreach ($this->data as $key => $value) {
             if ($value === 0) {
                 $this->data->$key = null;
+            }
+            if ($type === 'save' && !is_null($this->data->$key) && in_array($key, self::$ehrProtocolDateFields)) {
+                $this->data->$key = $this->data->$key->getTimestamp();
             }
         }
         foreach ($this->schema->fields as $field) {
