@@ -178,6 +178,21 @@ class Evaluation
                     'message' => 'Please select an option'
                 ])
             ])
+            ->add('bloodDonorType', ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => false,
+                'required' => true,
+                'label' => 'Select the type of blood donation',
+                'choices' => [
+                    'Apheresis' => 'apheresis',
+                    'Whole Blood' => 'whole-blood',
+                ],
+                'constraints' => new Constraints\Callback(function ($value, $context) {
+                    if ($context->getRoot()['bloodDonor']->getData() !== 'no' && empty($value)) {
+                        $context->buildViolation('Please select an option')->addViolation();
+                    }
+                })
+            ])
             ->add('Continue', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-primary'],
             ]);

@@ -145,7 +145,8 @@ class EvaluationController extends AbstractController
             if ($bloodDonorCheckForm['bloodDonor']->getData() === 'yes') {
                 return $app->redirectToRoute('evaluation', [
                     'participantId' => $participant->id,
-                    'type' => $evaluationService::DIVERSION_POUCH
+                    'type' => $evaluationService::DIVERSION_POUCH,
+                    'wholeblood' => $bloodDonorCheckForm['bloodDonorType']->getData() === 'whole-blood' ? 1 : 0
                 ]);
             } else {
                 return $app->redirectToRoute('evaluation', [

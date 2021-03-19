@@ -22,23 +22,44 @@
             <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
         </dl>
 
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">
-                            <i class="fa fa-check-circle" aria-hidden="true"></i>
-                            Blood Donor Check
-                        </h3>
-                    </div>
-                    <div class="panel-body">
-                        {{ form_start(bloodDonorCheckForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
-                        {{ form_errors(bloodDonorCheckForm) }}
-                        {{ form_rest(bloodDonorCheckForm) }}
-                        {{ form_end(bloodDonorCheckForm) }}
-                    </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                    Blood Donor Check
+                </h3>
+            </div>
+            <div class="panel-body">
+                {{ form_start(bloodDonorCheckForm, { attr: {
+                    class: 'disable-enter prevent-resubmit',
+                    novalidate: 'novalidate'
+                } }) }}
+                {{ form_errors(bloodDonorCheckForm) }}
+
+                {{ form_row(bloodDonorCheckForm.bloodDonor) }}
+
+                <div id="blood-donor-type" class="hidden">
+                    {{ form_row(bloodDonorCheckForm.bloodDonorType) }}
                 </div>
+
+                {{ form_rest(bloodDonorCheckForm) }}
+                {{ form_end(bloodDonorCheckForm) }}
             </div>
         </div>
     </div>
+{% endblock %}
+{% block pagejs %}
+    <script>
+        $(document).ready(function() {
+            var toggleDonorType = function() {
+                if ($('input[name="form[bloodDonor]"]:checked').val() !== 'yes') {
+                    $('#blood-donor-type').addClass('hidden');
+                } else {
+                    $('#blood-donor-type').removeClass('hidden');
+                }
+            };
+            toggleDonorType();
+            $('input[name="form[bloodDonor]"]').on('change', toggleDonorType);
+        });
+    </script>
 {% endblock %}
