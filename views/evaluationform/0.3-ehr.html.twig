@@ -26,7 +26,14 @@
                 <div class="col-sm-4 blood-pressure-source-{{ i }}">
                     <div class="panel panel-default">
                         <div class="panel-body">
-                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                            <p class="text-right">
+                                <em>Reading #{{ i + 1 }}</em>
+                                {% if i == 0 %}
+                                    <span class="toggle-help-image" data-id="measurementSourceModal">
+                                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                                    </span>
+                                {% endif %}
+                            </p>
                             <div class="modification-block">
                                 <div class="modification-affected">
                                     {% if i == 0 %}
@@ -112,6 +119,9 @@
             <div class="col-sm-4">
                 <div class="panel panel-default">
                     <div class="panel-body">
+                        <div class="toggle-help-image pull-right" data-id="measurementSourceModal">
+                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                        </div>
                         {{ metrics.form_row(evaluationForm, schema.fields['height-source']) }}
                         <div class="height-source ehr-date" style="display: none;">
                             {{ metrics.form_row(evaluationForm, schema.fields['height-source-ehr-date']) }}
@@ -128,6 +138,9 @@
             <div class="col-sm-4">
                 <div class="panel panel-default">
                     <div class="panel-body">
+                        <span class="toggle-help-image pull-right" data-id="measurementSourceModal">
+                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                        </span>
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-source']) }}
                         <div class="weight-source ehr-date" style="display: none;">
                             {{ metrics.form_row(evaluationForm, schema.fields['weight-source-ehr-date']) }}
@@ -185,7 +198,14 @@
                 <div class="col-sm-4 waist-source-{{ i }}">
                     <div class="panel panel-default panel-waist-circumference-{{ i + 1 }}">
                         <div class="panel-body">
-                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                            <p class="text-right">
+                                <em>Reading #{{ i + 1 }}</em>
+                                {% if i == 0 %}
+                                    <span class="toggle-help-image" data-id="measurementSourceModal">
+                                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                                    </span>
+                                {% endif %}
+                            </p>
                             <div class="modification-block">
                                 <div class="modification-affected">
                                     {% if i == 0 %}
@@ -222,7 +242,14 @@
                 <div class="col-sm-4 hip-source-{{ i }}">
                     <div class="panel panel-default panel-hip-circumference-{{ i + 1 }}">
                         <div class="panel-body">
-                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                            <p class="text-right">
+                                <em>Reading #{{ i + 1 }}</em>
+                                {% if i == 0 %}
+                                    <span class="toggle-help-image" data-id="measurementSourceModal">
+                                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                                    </span>
+                                {% endif %}
+                            </p>
                             <div class="modification-block">
                                 <div class="modification-affected">
                                     {% if i == 0 %}
@@ -290,6 +317,14 @@
         <li>Take measurements three times, one minute apart.</li>
     </ul>
     <i>See SOP for special considerations.</i>
+</div>
+
+<div id="measurementSourceModal" style="display:none">
+    <p>If you are not able to collect in-person physical measurements due to pandemic reactivation protocols, you may select the option to input physical measurements from the participant’s Electronic Health Record (EHR).</p>
+    <ul>
+        <li>Select <strong>EHR Measurement</strong> and provide the <strong>EHR Date of Service (DOS)</strong> from when the physical measurement was taken prior to this visit.</li>
+        <li>Next, enter the corresponding EHR measurement into the box below.</li>
+    </ul>
 </div>
 
 <div id="heightWeightModal" style="display:none">
