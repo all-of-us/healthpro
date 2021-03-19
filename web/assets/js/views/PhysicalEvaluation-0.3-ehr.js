@@ -43,6 +43,14 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             this.$('.' + ehrDateField).hide();
         }
     },
+    displayEhrDate: function () {
+        var sourceFields = ['blood-pressure-source', 'height-source', 'weight-source', 'waist-source', 'hip-source'];
+        $.each(sourceFields, function (i, field) {
+            if ($("[name='form[" + field + "]']:checked").val() === 'ehr') {
+                $('.' + field + '-ehr-date').show();
+            }
+        });
+    },
     inputChange: function(e) {
         this.clearServerErrors(e);
         this.displayWarning(e);
@@ -681,6 +689,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             this.$('.modification-toggle').hide();
         }
         this.triggerEqualize();
+        this.displayEhrDate();
         this.rendered = true;
         return this;
     }
