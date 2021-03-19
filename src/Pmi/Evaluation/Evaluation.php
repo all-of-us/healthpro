@@ -27,6 +27,7 @@ class Evaluation
     const EVALUATION_RESTORE = 'restore';
     const DIVERSION_POUCH = 'diversion-pouch';
     const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'whole-blood-donor';
+    const EHR_PROTOCOL_MODIFICATION = 'ehr';
 
     protected $app;
     protected $version;
@@ -56,6 +57,14 @@ class Evaluation
         'blood-pressure-systolic',
         'blood-pressure-diastolic',
         'heart-rate'
+    ];
+
+    public static $measurementSourceFields = [
+        'blood-pressure-source',
+        'height-source',
+        'weight-source',
+        'waist-source',
+        'hip-source'
     ];
 
     public static $ehrProtocolDateFields = [
@@ -807,6 +816,34 @@ class Evaluation
         $this->addBloodDonorProtocolModificationForWaistandHip();
         $this->addBloodDonorProtocolModificationForBloodPressure(2);
         $this->addBloodDonorProtocolModificationForHeight();
+    }
+
+    public function addEhrProtocolModifications()
+    {
+        if ($this->data->{'blood-pressure-source'} === 'ehr') {
+            $this->data->{'blood-pressure-protocol-modification'}[0] = self::EHR_PROTOCOL_MODIFICATION;
+            for ($reading = 1; $reading <= 2; $reading++) {
+                foreach (self::$bloodPressureFields as $field) {
+                    $this->data->{$field}[$reading] = null;
+                }
+                foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
+                    $this->data->{$field}[$reading] = false;
+                }
+                $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::EHR_PROTOCOL_MODIFICATION;
+            }
+        }
+        if ($this->data->{'height-source'} === 'ehr') {
+            $this->data->{"height-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        }
+        if ($this->data->{'weight-source'} === 'ehr') {
+            $this->data->{"weight-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        }
+        if ($this->data->{'waist-source'} === 'ehr') {
+            $this->data->{'waist-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        }
+        if ($this->data->{'hip-source'} === 'ehr') {
+            $this->data->{'hip-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        }
     }
 
     public function addBloodDonorProtocolModificationForWaistandHip()

@@ -200,6 +200,9 @@ class EvaluationController extends AbstractController
                             $evaluationService->addBloodDonorProtocolModificationForBloodPressure(1);
                         }
                     }
+                    if ($evaluationService->requireEhrModificationProtocol()) {
+                        $evaluationService->addEhrProtocolModifications();
+                    }
                     $evaluationService->setData($evaluationForm->getData());
                     $dbArray = $evaluationService->toArray();
                     $now = new \DateTime();
