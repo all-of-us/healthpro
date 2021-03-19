@@ -37,18 +37,35 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         var val = $(e.currentTarget).val();
         var field = $(e.currentTarget).closest('.field').data('field');
         var ehrDateField = field + '-ehr-date';
+        var disabled = false;
         if (val === 'ehr') {
             this.$('.' + ehrDateField).show();
+            disabled = true;
         } else {
             this.$('.' + ehrDateField).hide();
         }
+        this.disableSecondThirdReadings(field, 1, disabled);
+        if (field === 'blood-pressure-source') {
+            this.disableSecondThirdReadings(field, 2, disabled);
+        }
+
     },
     displayEhrDate: function () {
+        var self = this;
         var sourceFields = ['blood-pressure-source', 'height-source', 'weight-source', 'waist-source', 'hip-source'];
         $.each(sourceFields, function (i, field) {
             if ($("[name='form[" + field + "]']:checked").val() === 'ehr') {
                 $('.' + field + '-ehr-date').show();
+                self.disableSecondThirdReadings(field, 1, true);
+                if (field === 'blood-pressure-source') {
+                    self.disableSecondThirdReadings(field, 2, true);
+                }
             }
+        });
+    },
+    disableSecondThirdReadings: function (field, reading, disabled) {
+        $('.' + field + '-' + reading).find('input, select, input:checkbox').each(function () {
+            $(this).attr('disabled', disabled);
         });
     },
     inputChange: function(e) {

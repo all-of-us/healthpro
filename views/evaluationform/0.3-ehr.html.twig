@@ -21,7 +21,7 @@
         {% endif %}
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
-                <div class="col-sm-4">
+                <div class="col-sm-4 blood-pressure-source-{{ i }}">
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
@@ -177,7 +177,7 @@
         </div>
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
-                <div class="col-sm-4">
+                <div class="col-sm-4 waist-source-{{ i }}">
                     <div class="panel panel-default panel-waist-circumference-{{ i + 1 }}">
                         <div class="panel-body">
                             <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
@@ -213,7 +213,7 @@
         <h4>Hip</h4>
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
-                <div class="col-sm-4">
+                <div class="col-sm-4 hip-source-{{ i }}">
                     <div class="panel panel-default panel-hip-circumference-{{ i + 1 }}">
                         <div class="panel-body">
                             <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
