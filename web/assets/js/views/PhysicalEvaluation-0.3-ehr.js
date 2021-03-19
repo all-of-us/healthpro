@@ -40,9 +40,11 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         var disabled = false;
         if (val === 'ehr') {
             this.$('.' + ehrDateField).show();
+            this.$('#form_' + ehrDateField).attr('disabled', false);
             disabled = true;
         } else {
             this.$('.' + ehrDateField).hide();
+            this.$('#form_' + ehrDateField).attr('disabled', true);
         }
         this.disableSecondThirdReadings(field, 1, disabled);
         if (field === 'blood-pressure-source') {
