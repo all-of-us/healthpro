@@ -182,6 +182,11 @@ class EvaluationController extends AbstractController
             $evaluation['reasonDisplayText'] = $evaluationService->getReasonDisplayText();
         } else {
             $evaluation = null;
+            if ($evaluationService->isDiversionPouchForm() && $request->query->get('wholeblood')) {
+                $evaluationService->setData((object)[
+                    'weight-protocol-modification' => 'whole-blood-donor'
+                ]);
+            }
         }
         $showAutoModification = false;
 

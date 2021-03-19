@@ -341,13 +341,18 @@ class Evaluation
         foreach ($this->schema->fields as $field) {
             if (isset($field->replicates)) {
                 $key = $field->name;
-                if (is_null($this->data->$key)) {
+                if (!isset($this->data->$key) || is_null($this->data->$key)) {
                     $dataArray = array_fill(0, $field->replicates, null);
                     $this->data->$key = $dataArray;
                 } elseif (!is_null($this->data->$key) && !is_array($this->data->$key)) {
                     $dataArray = array_fill(0, $field->replicates, null);
                     $dataArray[0] = $this->data->$key;
                     $this->data->$key = $dataArray;
+                }
+            } else {
+                $key = $field->name;
+                if (!isset($this->data->$key)) {
+                    $this->data->$key = null;
                 }
             }
         }
