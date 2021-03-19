@@ -17,11 +17,14 @@ use Pmi\Audit\Log;
 class Evaluation
 {
     const CURRENT_VERSION = '0.3.3';
+    const DIVERSION_POUCH_CURRENT_VERSION = '0.3.3-diversion-pouch';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_ACTIVE = 'active';
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
+    const DIVERSION_POUCH = 'diversion-pouch';
+    const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'whole-blood-donor';
 
     protected $app;
     protected $version;
@@ -47,10 +50,16 @@ class Evaluation
         'Other' => 'OTHER'
     ];
 
-    public function __construct($app = null)
+    public static $bloodPressureFields = [
+        'blood-pressure-systolic',
+        'blood-pressure-diastolic',
+        'heart-rate'
+    ];
+
+    public function __construct($app = null, $type = null)
     {
         $this->app = $app;
-        $this->version = self::CURRENT_VERSION;
+        $this->version = $type === self::DIVERSION_POUCH && $this->requireBloodDonorCheck() ? self::DIVERSION_POUCH_CURRENT_VERSION : self::CURRENT_VERSION;
         $this->data = new \StdClass();
         $this->loadSchema();
         $this->normalizeData();
@@ -152,10 +161,36 @@ class Evaluation
         return $conversions;
     }
 
+    public function getBloodDonorCheckForm(FormFactory $formFactory)
+    {
+        $formBuilder = $formFactory->createBuilder(FormType::class);
+        $formBuilder
+            ->add('bloodDonor', ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => false,
+                'required' => true,
+                'label' => 'Is the participant on site for a blood donation or apheresis?',
+                'choices' => [
+                    'Yes' => 'yes',
+                    'No' => 'no',
+                ],
+                'constraints' => new Constraints\NotBlank([
+                    'message' => 'Please select an option'
+                ])
+            ])
+            ->add('Continue', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-primary'],
+            ]);
+        return $formBuilder->getForm();
+    }
+
     public function getForm(FormFactory $formFactory)
     {
         $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
         foreach ($this->schema->fields as $field) {
+            if (isset($field->formField) && !$field->formField) {
+                continue;
+            }
             if (isset($field->type)) {
                 $type = $field->type;
             } else {
@@ -244,8 +279,11 @@ class Evaluation
                     'required' => false,
                     'label' => isset($options['label']) ? $options['label'] : null
                 ];
+                if ($this->isDiversionPouchForm() && in_array($field->name, self::$bloodPressureFields)) {
+                    $collectionOptions['constraints'] = $this->addDiversionPouchSecondBloodPressureConstraint($form, $field);
+                }
                 if (isset($field->compare)) {
-                    $collectionOptions['constraints'] = $this->addCompareConstraint($form, $field);
+                    $collectionOptions['constraints'] = $this->addDiastolicBloodPressureConstraint($form, $field);
                 }
                 $formBuilder->add($field->name, CollectionType::class, $collectionOptions);
             } else {
@@ -332,9 +370,12 @@ class Evaluation
             return $errors;
         }
 
-        foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
+        foreach (self::$bloodPressureFields as $field) {
             foreach ($this->data->$field as $k => $value) {
-                if (!$this->data->{'blood-pressure-protocol-modification'}[$k] && !$value) {
+                // For Diversion Pouch form display error if 2nd reading is empty and
+                // 1st reading is out of range even though it has a protocol modification
+                $displayError = $this->isDiversionPouchForm() && $k === 1 && $this->isDiversionPouchPressureOutOfRange(0);
+                if ((!$this->data->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
                     $errors[] = [$field, $k];
                 }
             }
@@ -387,19 +428,20 @@ class Evaluation
 
     protected function calculateMean($field)
     {
-        $secondThirdFields = [
-            'blood-pressure-systolic',
-            'blood-pressure-diastolic',
-            'heart-rate'
-        ];
+        // Do not calculate mean for blood pressure fields in Diversion Pouch form
+        if ($this->isDiversionPouchForm() && in_array($field, self::$bloodPressureFields)) {
+            return null;
+        }
+        $secondThirdFields = self::$bloodPressureFields;
         $twoClosestFields = [
             'hip-circumference',
             'waist-circumference'
         ];
+        $data = $this->data->{$field};
         if (in_array($field, $secondThirdFields)) {
-            $values = [$this->data->{$field}[1], $this->data->{$field}[2]];
+            $values = [$data[1], $data[2]];
         } else {
-            $values = $this->data->{$field};
+            $values = $data;
         }
         $values = array_filter($values);
         if (count($values) > 0) {
@@ -615,7 +657,7 @@ class Evaluation
 
     public function isEvaluationCancelled()
     {
-        return $this->evaluation['eh_type'] === self::EVALUATION_CANCEL;
+        return isset($this->evaluation['eh_type']) ? $this->evaluation['eh_type'] === self::EVALUATION_CANCEL : false;
     }
 
     public function isEvaluationUnlocked()
@@ -677,7 +719,90 @@ class Evaluation
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 
-    private function addCompareConstraint($form, $field)
+    public function requireBloodDonorCheck()
+    {
+        return $this->app->isDVType() && $this->app->isDiversionPouchSite();
+    }
+
+    public function isDiversionPouchForm()
+    {
+        return strpos($this->version, self::DIVERSION_POUCH) !== false;
+    }
+
+    public function addBloodDonorProtocolModificationForRemovedFields()
+    {
+        $this->addBloodDonorProtocolModificationForWaistandHip();
+        $this->addBloodDonorProtocolModificationForBloodPressure(2);
+        $this->addBloodDonorProtocolModificationForHeight();
+    }
+
+    public function addBloodDonorProtocolModificationForWaistandHip()
+    {
+        foreach (['waist-circumference-protocol-modification', 'hip-circumference-protocol-modification'] as $field) {
+            $this->data->{$field} = array_fill(0, 2, self::BLOOD_DONOR_PROTOCOL_MODIFICATION);
+        }
+    }
+
+    public function addBloodDonorProtocolModificationForBloodPressure($reading)
+    {
+        // Do not set default reading #2 values if reading #1 is out of range
+        if ($reading === 1 && empty($this->data->{'blood-pressure-protocol-modification'}[0]) && $this->isDiversionPouchPressureOutOfRange(0)) {
+            return false;
+        }
+        // Default reading #2 values are only set when finalized
+        foreach (self::$bloodPressureFields as $field) {
+            $this->data->{$field}[$reading] = null;
+        }
+        foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
+            $this->data->{$field}[$reading] = false;
+        }
+        $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+    }
+
+    public function addBloodDonorProtocolModificationForHeight()
+    {
+        $this->data->{"height-protocol-modification"} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+    }
+
+    public function isDiversionPouchPressureOutOfRange($key)
+    {
+        $limits = $this->getSecondBloodPressureLimits();
+        list($systolic, $diastolic, $heartRate) = self::$bloodPressureFields;
+        if ($this->data->{$systolic}[$key] < $limits[$systolic]['secondMin'] ||
+            $this->data->{$systolic}[$key] > $limits[$systolic]['secondMax'] ||
+            $this->data->{$diastolic}[$key] < $limits[$diastolic]['secondMin'] ||
+            $this->data->{$diastolic}[$key] > $limits[$diastolic]['secondMax'] ||
+            $this->data->{$heartRate}[$key] < $limits[$heartRate]['secondMin'] ||
+            $this->data->{$heartRate}[$key] > $limits[$heartRate]['secondMax']
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    private function addDiversionPouchSecondBloodPressureConstraint($form, $field)
+    {
+        $secondMaxVal = $field->secondMax;
+        $secondMinVal = $field->secondMin;
+        $callback = function ($value, $context, $replicate) use ($form, $secondMaxVal, $secondMinVal) {
+            if ($replicate !== 1 || empty($value)) {
+                return;
+            }
+            if ($value > $secondMaxVal) {
+                $context->buildViolation("This value should be less than {$secondMaxVal}")->addViolation();
+            } elseif ($value < $secondMinVal) {
+                $context->buildViolation("This value should be greater than {$secondMinVal}")->addViolation();
+            }
+        };
+        $collectionConstraintFields = [];
+        for ($i = 0; $i < $field->replicates; $i++) {
+            $collectionConstraintFields[] = new Constraints\Callback(['callback' => $callback, 'payload' => $i]);
+        }
+        $compareConstraint = new Constraints\Collection($collectionConstraintFields);
+        return [$compareConstraint];
+    }
+
+    private function addDiastolicBloodPressureConstraint($form, $field)
     {
         $compareType = $field->compare->type;
         $compareField = $field->compare->field;
@@ -701,9 +826,28 @@ class Evaluation
         return [$compareConstraint];
     }
 
+    private function getSecondBloodPressureLimits()
+    {
+        $limits = [];
+        foreach ($this->schema->fields as $field) {
+            if (in_array($field->name, self::$bloodPressureFields)) {
+                $limits[$field->name]['secondMax'] = $field->secondMax;
+                $limits[$field->name]['secondMin'] = $field->secondMin;
+            }
+        }
+        return $limits;
+    }
+
+    public function getFormFieldErrorMessage($field = null, $replicate = null)
+    {
+        return !empty($field) && $this->isDiversionPouchForm() && in_array($field,
+            self::$bloodPressureFields) && $replicate === 1 ? 'Please complete.' : 'Please complete or add protocol modification.';
+    }
+
     public function canEdit($evalId, $participant)
     {
         // Allow cohort 1 and 2 participants to edit existing PMs even if status is false
         return !$participant->status && !empty($evalId) ? $participant->editExistingOnly : $participant->status;
+
     }
 }

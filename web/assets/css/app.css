@@ -224,6 +224,9 @@ label.label-normal {
     margin-top: 16px;
     font-weight: normal;
 }
+#physicalEvaluation .blood-pressure-second-reading-warning .alert {
+    height: auto !important;
+}
 .help-header-text {
     color: #337ab7;
     margin-top: 0;

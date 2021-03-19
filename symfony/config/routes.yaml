@@ -23,6 +23,9 @@ evaluation:
 evaluation_modify:
     path: /participant/{participantId}/measurements/{evalId}/modify/{type}
 
+evaluationBloodDonorCheck:
+    path: /participant/{participantId}/measurements/blood/donor/check
+
 dashboard_home:
     path: /dashboard
 
