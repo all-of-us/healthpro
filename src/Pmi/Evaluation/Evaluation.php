@@ -89,8 +89,7 @@ class Evaluation
         if ($this->app) {
             if ($type === self::DIVERSION_POUCH && $this->requireBloodDonorCheck()) {
                 return self::DIVERSION_POUCH_CURRENT_VERSION;
-            }
-            if ($this->requireEhrModificationProtocol()) {
+            } elseif ($this->requireEhrModificationProtocol()) {
                 return self::EHR_CURRENT_VERSION;
             }
         }
