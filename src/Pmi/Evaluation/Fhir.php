@@ -220,8 +220,11 @@ class Fhir
         return $composition;
     }
 
-    protected function simpleMetric($metric, $value, $display, $unit, $codes)
+    protected function simpleMetric($metric, $value, $display, $unit, $codes, $effectiveDateTime = null)
     {
+        if (empty($effectiveDateTime)) {
+            $effectiveDateTime = $this->date;
+        }
         $entry = [
             'fullUrl' => $this->metricUrns[$metric],
             'resource' => [
@@ -229,7 +232,7 @@ class Fhir
                     'coding' => $codes,
                     'text' => $display
                 ],
-                'effectiveDateTime' => $this->date,
+                'effectiveDateTime' => $effectiveDateTime,
                 'resourceType' => 'Observation',
                 'status' => 'final',
                 'subject' => [
@@ -434,7 +437,8 @@ class Fhir
                     'display' => 'Height',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('height-source')
         );
     }
 
@@ -456,7 +460,8 @@ class Fhir
                     'display' => 'Weight',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
         );
     }
 
@@ -670,7 +675,8 @@ class Fhir
                     'display' => self::ordinalLabel('hip circumference', $replicate),
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('hip-source')
         );
     }
 
@@ -692,7 +698,8 @@ class Fhir
                     'display' => self::ordinalLabel('waist circumference', $replicate),
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('waist-source')
         );
         if (isset($this->data->{'waist-circumference-location'})) {
             $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
