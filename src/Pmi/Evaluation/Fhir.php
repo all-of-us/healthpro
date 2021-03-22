@@ -839,7 +839,7 @@ class Fhir
                     'text' => self::ordinalLabel('blood pressure systolic and diastolic', $replicate)
                 ],
                 'component' => $components,
-                'effectiveDateTime' => $this->date,
+                'effectiveDateTime' => $this->getEffectiveDateTime('blood-pressure-source', $replicate),
                 'resourceType' => 'Observation',
                 'status' => 'final',
                 'subject' => [
@@ -1144,5 +1144,13 @@ class Fhir
         }
         array_unshift($fhir->entry, $this->getComposition());
         return $fhir;
+    }
+
+    protected function getEffectiveDateTime($field, $replicate = 1)
+    {
+        if ($this->data->{$field} === 'ehr' && !empty($this->data->{$field . '-ehr-date'}) && $replicate == 1) {
+            return $this->data->{$field . '-ehr-date'}->format('Y-m-d');
+        }
+        return $this->date;
     }
 }
