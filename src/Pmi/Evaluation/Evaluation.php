@@ -432,6 +432,15 @@ class Evaluation
             return $errors;
         }
 
+        foreach (self::$measurementSourceFields as $sourceField) {
+            if (empty($this->data->{$sourceField})) {
+                $errors[] = $sourceField;
+            }
+            if ($this->data->{$sourceField} === 'ehr' && empty($this->data->{$sourceField . '-ehr-date'})) {
+                $errors[] = $sourceField . '-ehr-date';
+            }
+        }
+
         foreach (self::$bloodPressureFields as $field) {
             foreach ($this->data->$field as $k => $value) {
                 // For Diversion Pouch form display error if 2nd reading is empty and
@@ -948,8 +957,12 @@ class Evaluation
 
     public function getFormFieldErrorMessage($field = null, $replicate = null)
     {
-        return !empty($field) && $this->isDiversionPouchForm() && in_array($field,
-            self::$bloodPressureFields) && $replicate === 1 ? 'Please complete.' : 'Please complete or add protocol modification.';
+        if (($this->isDiversionPouchForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
+            ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields)))
+        ) {
+            return 'Please complete';
+        }
+        return 'Please complete or add protocol modification.';
     }
 
     public function canEdit($evalId, $participant)

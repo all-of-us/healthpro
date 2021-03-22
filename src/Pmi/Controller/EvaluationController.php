@@ -199,7 +199,7 @@ class EvaluationController extends AbstractController
                         if ($request->request->has('finalize') && (!$evaluation || empty($evaluation['rdr_id']))) {
                             $evaluationService->addBloodDonorProtocolModificationForBloodPressure(1);
                         }
-                    } elseif ($evaluationService->requireEhrModificationProtocol()) {
+                    } elseif ($evaluationService->isEhrProtocolForm()) {
                         $evaluationService->addEhrProtocolModifications();
                     }
                     $evaluationService->setData($evaluationForm->getData());
@@ -243,7 +243,7 @@ class EvaluationController extends AbstractController
                                     list($field, $replicate) = $field;
                                     $evaluationForm->get($field)->get($replicate)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field, $replicate)));
                                 } else {
-                                    $evaluationForm->get($field)->addError(new FormError($evaluationService->getFormFieldErrorMessage()));
+                                    $evaluationForm->get($field)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field)));
                                 }
                             }
                             $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
@@ -327,7 +327,7 @@ class EvaluationController extends AbstractController
                         list($field, $replicate) = $field;
                         $evaluationForm->get($field)->get($replicate)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field, $replicate)));
                     } else {
-                        $evaluationForm->get($field)->addError(new FormError($evaluationService->getFormFieldErrorMessage()));
+                        $evaluationForm->get($field)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field)));
                     }
                 }
                 $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
