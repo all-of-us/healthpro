@@ -142,7 +142,7 @@ class Evaluation
         $this->normalizeData();
     }
 
-    protected function formatEhrProtocolDateFields()
+    public function formatEhrProtocolDateFields()
     {
         foreach (self::$ehrProtocolDateFields as $ehrProtocolDateField) {
             if (!empty($this->data->{$ehrProtocolDateField})) {

@@ -204,6 +204,7 @@ class EvaluationController extends AbstractController
                     }
                     $evaluationService->setData($evaluationForm->getData());
                     $dbArray = $evaluationService->toArray();
+                    $evaluationService->formatEhrProtocolDateFields();
                     $now = new \DateTime();
                     $dbArray['updated_ts'] = $now;
                     if ($request->request->has('finalize') && (!$evaluation || empty($evaluation['rdr_id']))) {
