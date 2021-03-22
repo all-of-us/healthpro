@@ -341,9 +341,11 @@ class Fhir
             $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1]) ? $this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1] : '';
         }
         $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
-        // Add display text for whole-blood-donor
+        // Add display text for whole-blood-donor and ehr
         if ($conceptCode === 'whole-blood-donor') {
             $conceptDisplay = 'Whole Blood Donor';
+        } elseif ($conceptCode === 'ehr') {
+            $conceptDisplay = 'Previous observation obtained from EHR';
         } else {
             $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
         }
