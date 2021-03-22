@@ -543,7 +543,7 @@
     {
       "name": "blood-pressure-source-ehr-date",
       "label": "EHR Date",
-      "type": "datetime"
+      "type": "date"
     },
     {
       "name": "height-source",
@@ -557,7 +557,7 @@
     {
       "name": "height-source-ehr-date",
       "label": "EHR Date",
-      "type": "datetime"
+      "type": "date"
     },
     {
       "name": "weight-source",
@@ -571,7 +571,7 @@
     {
       "name": "weight-source-ehr-date",
       "label": "EHR Date",
-      "type": "datetime"
+      "type": "date"
     },
     {
       "name": "waist-source",
@@ -585,7 +585,7 @@
     {
       "name": "waist-source-ehr-date",
       "label": "EHR Date",
-      "type": "datetime"
+      "type": "date"
     },
     {
       "name": "hip-source",
@@ -599,7 +599,7 @@
     {
       "name": "hip-source-ehr-date",
       "label": "EHR Date",
-      "type": "datetime"
+      "type": "date"
     }
   ]
 }

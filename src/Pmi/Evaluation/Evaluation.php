@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
@@ -146,10 +146,7 @@ class Evaluation
     {
         foreach (self::$ehrProtocolDateFields as $ehrProtocolDateField) {
             if (!empty($this->data->{$ehrProtocolDateField})) {
-                $dateTime = new \DateTime;
-                $dateTime->setTimestamp($this->data->{$ehrProtocolDateField});
-                $dateTime->setTimezone(new \DateTimeZone($this->app->getUserTimezone()));
-                $this->data->{$ehrProtocolDateField} = $dateTime;
+                $this->data->{$ehrProtocolDateField}  = new \DateTime($this->data->{$ehrProtocolDateField});
             }
         }
     }
@@ -262,7 +259,7 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } elseif (!isset($field->options) && !in_array($type, ['checkbox', 'text', 'textarea', 'datetime'])) {
+            } elseif (!isset($field->options) && !in_array($type, ['checkbox', 'text', 'textarea', 'date'])) {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
@@ -308,20 +305,17 @@ class Evaluation
                 $attributes['data-parsley-maxlength'] = self::LIMIT_TEXT_SHORT;
                 $constraints[] = new Constraints\Length(['max' => self::LIMIT_TEXT_SHORT]);
                 $constraints[] = new Constraints\Type('string');
-            } elseif ($type === 'datetime') {
+            } elseif ($type === 'date') {
                 unset($options['scale']);
-                $class = DateTimeType::class;
+                $class = DateType::class;
                 $constraints[] = new Constraints\LessThanOrEqual([
-                    'value' => new \DateTime('+5 minutes'),
+                    'value' => new \DateTime('today'),
                     'message' => 'Timestamp cannot be in the future'
                 ]);
                 $dateOptions = [
                     'widget' => 'single_text',
-                    'format' => 'M/d/yyyy h:mm a',
-                    'required' => false,
-                    'view_timezone' => $this->app->getUserTimezone(),
-                    'model_timezone' => 'UTC',
-                    'constraints' => $constraints
+                    'format' => 'M/d/yyyy',
+                    'required' => false
                 ];
                 $options = array_merge($options, $dateOptions);
                 $attributes['class'] = 'ehr-date';
@@ -388,7 +382,7 @@ class Evaluation
                 $this->data->$key = null;
             }
             if ($type === 'save' && !is_null($this->data->$key) && in_array($key, self::$ehrProtocolDateFields)) {
-                $this->data->$key = $this->data->$key->getTimestamp();
+                $this->data->$key = $this->data->$key->format('Y-m-d');
             }
         }
         foreach ($this->schema->fields as $field) {
