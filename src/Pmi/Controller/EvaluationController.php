@@ -344,7 +344,7 @@ class EvaluationController extends AbstractController
             'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
-            'latestVersion' => $evaluationService->isDiversionPouchForm() ? $evaluationService::DIVERSION_POUCH_CURRENT_VERSION : $evaluationService::CURRENT_VERSION,
+            'latestVersion' => $evaluationService->getLatestVersion(),
             'showAutoModification' => $showAutoModification,
             'revertForm' => $evaluationService->getEvaluationRevertForm()->createView(),
             'requireEhrModificationProtocol' => $evaluationService->requireEhrModificationProtocol(),

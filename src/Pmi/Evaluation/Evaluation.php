@@ -810,6 +810,11 @@ class Evaluation
         return strpos($this->version, self::DIVERSION_POUCH) !== false;
     }
 
+    public function isEhrProtocolForm()
+    {
+        return strpos($this->version, self::EHR_PROTOCOL_MODIFICATION) !== false;
+    }
+
     public function addBloodDonorProtocolModificationForRemovedFields()
     {
         $this->addBloodDonorProtocolModificationForWaistandHip();
@@ -958,5 +963,15 @@ class Evaluation
         // Allow cohort 1 and 2 participants to edit existing PMs even if status is false
         return !$participant->status && !empty($evalId) ? $participant->editExistingOnly : $participant->status;
 
+    }
+
+    public function getLatestVersion()
+    {
+        if ($this->isDiversionPouchForm()) {
+            return self::DIVERSION_POUCH_CURRENT_VERSION;
+        } elseif ($this->isEhrProtocolForm()) {
+            return self::EHR_CURRENT_VERSION;
+        }
+        return self::CURRENT_VERSION;
     }
 }
