@@ -330,6 +330,9 @@ class Evaluation
 
             if ($type === 'radio') {
                 $options['expanded'] = true;
+                if (empty($this->data->{$field->name})) {
+                    $options['data'] = 'in-person';
+                }
             }
 
             if (isset($field->replicates)) {
