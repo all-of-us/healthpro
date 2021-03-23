@@ -50,7 +50,6 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         if (field === 'blood-pressure-source') {
             this.disableSecondThirdReadings(field, 2, disabled);
         }
-
     },
     displayEhrDate: function () {
         var self = this;
@@ -66,6 +65,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         });
     },
     disableSecondThirdReadings: function (field, reading, disabled) {
+        $('.' + field + '-' + 0).find('select').attr('disabled', disabled);
         $('.' + field + '-' + reading).find('input, select, input:checkbox').each(function () {
             $(this).attr('disabled', disabled);
         });
