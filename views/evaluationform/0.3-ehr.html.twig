@@ -117,11 +117,11 @@
     <div class="panel-body">
         <div class="row row-equal-height">
             <div class="col-sm-4 height-source-0">
+                <div class="toggle-help-image pull-right" data-id="measurementSourceModal">
+                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                </div>
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        <div class="toggle-help-image pull-right" data-id="measurementSourceModal">
-                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                        </div>
                         {{ metrics.form_row(evaluationForm, schema.fields['height-source']) }}
                         <div class="height-source ehr-date" style="display: none;">
                             {{ metrics.form_row(evaluationForm, schema.fields['height-source-ehr-date']) }}
@@ -137,10 +137,10 @@
             </div>
             <div class="col-sm-4 weight-source-0">
                 <div class="panel panel-default">
+                    <div class="toggle-help-image pull-right" data-id="measurementSourceModal">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                    </div>
                     <div class="panel-body">
-                        <span class="toggle-help-image pull-right" data-id="measurementSourceModal">
-                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                        </span>
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-source']) }}
                         <div class="weight-source ehr-date" style="display: none;">
                             {{ metrics.form_row(evaluationForm, schema.fields['weight-source-ehr-date']) }}

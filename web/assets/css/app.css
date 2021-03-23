@@ -241,6 +241,10 @@ label.label-normal {
 .ehr-date .form-group {
     margin-bottom: 2px;
 }
+.toggle-help-image.pull-right {
+    padding-top: 18px;
+    padding-right: 4px;
+}
 #biobank-summary {
     margin: 20px auto;
     max-width: 600px;
