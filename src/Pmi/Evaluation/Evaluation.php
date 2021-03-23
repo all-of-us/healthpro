@@ -89,7 +89,8 @@ class Evaluation
         if ($this->app) {
             if ($type === self::DIVERSION_POUCH && $this->requireBloodDonorCheck()) {
                 return self::DIVERSION_POUCH_CURRENT_VERSION;
-            } elseif ($this->requireEhrModificationProtocol()) {
+            }
+            if ($this->requireEhrModificationProtocol()) {
                 return self::EHR_CURRENT_VERSION;
             }
         }
@@ -972,13 +973,29 @@ class Evaluation
 
     }
 
-    public function getLatestVersion()
+    public function getLatestFormVersion()
     {
         if ($this->isDiversionPouchForm()) {
             return self::DIVERSION_POUCH_CURRENT_VERSION;
-        } elseif ($this->isEhrProtocolForm()) {
+        }
+        if ($this->isEhrProtocolForm()) {
             return self::EHR_CURRENT_VERSION;
         }
         return self::CURRENT_VERSION;
+    }
+
+    public function canAutoModify()
+    {
+        if ($this->isDiversionPouchForm()) {
+            return false;
+        }
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $field) {
+                if ($this->data->{$field} === 'ehr') {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

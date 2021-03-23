@@ -247,9 +247,7 @@ class EvaluationController extends AbstractController
                                 }
                             }
                             $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                            if (!$evaluationService->isDiversionPouchForm()) {
-                                $showAutoModification = true;
-                            }
+                            $showAutoModification = $evaluationService->canAutoModify();
                         }
                     }
                     if (!$evaluation || $request->request->has('copy')) {
@@ -331,9 +329,7 @@ class EvaluationController extends AbstractController
                     }
                 }
                 $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                if (!$evaluationService->isDiversionPouchForm()) {
-                    $showAutoModification = true;
-                }
+                $showAutoModification = $evaluationService->canAutoModify();
             }
         }
 
@@ -344,7 +340,7 @@ class EvaluationController extends AbstractController
             'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
-            'latestVersion' => $evaluationService->getLatestVersion(),
+            'latestVersion' => $evaluationService->getLatestFormVersion(),
             'showAutoModification' => $showAutoModification,
             'revertForm' => $evaluationService->getEvaluationRevertForm()->createView(),
             'requireEhrModificationProtocol' => $evaluationService->requireEhrModificationProtocol(),
