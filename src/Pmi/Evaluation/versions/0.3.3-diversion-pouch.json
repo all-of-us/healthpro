@@ -124,6 +124,7 @@
         "None": "",
         "Refusal": "refusal",
         "Urgent/emergent event": "emergency",
+        "Pandemic": "pandemic",
         "Other": "other"
       },
       "warnings": [
@@ -133,6 +134,10 @@
         },
         {
           "val": "emergency",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "pandemic",
           "message": "Deviation successfully captured."
         },
         {
@@ -236,6 +241,7 @@
         "Unable to stand in a straight position": "unable-to-stand-straight",
         "Refusal": "refusal",
         "Urgent/emergent event": "emergency",
+        "Pandemic": "pandemic",
         "Whole Blood Donor": "whole-blood-donor",
         "Other": "other"
       },
@@ -265,6 +271,10 @@
         },
         {
           "val": "emergency",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "pandemic",
           "message": "Deviation successfully captured."
         },
         {
@@ -334,6 +344,7 @@
         "Pregnancy": "pregnancy",
         "Refusal": "refusal",
         "Urgent/emergent event": "emergency",
+        "Pandemic": "pandemic",
         "Whole Blood Donor": "whole-blood-donor",
         "Other": "other"
       },
@@ -363,6 +374,10 @@
         },
         {
           "val": "emergency",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "pandemic",
           "message": "Deviation successfully captured."
         },
         {
@@ -407,6 +422,7 @@
         "Hip circumference is more than measuring device range": "hip-circumference-out-of-range",
         "Refusal": "refusal",
         "Urgent/emergent event": "emergency",
+        "Pandemic": "pandemic",
         "Other": "other"
       },
       "warnings": [
@@ -420,6 +436,10 @@
         },
         {
           "val": "emergency",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "pandemic",
           "message": "Deviation successfully captured."
         },
         {
@@ -479,6 +499,7 @@
         "Colostomy bag": "colostomy-bag",
         "Refusal": "refusal",
         "Urgent/emergent event": "emergency",
+        "Pandemic": "pandemic",
         "Other": "other"
       },
       "help": {
@@ -499,6 +520,10 @@
         },
         {
           "val": "emergency",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "pandemic",
           "message": "Deviation successfully captured."
         },
         {
