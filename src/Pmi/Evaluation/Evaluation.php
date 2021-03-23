@@ -436,27 +436,43 @@ class Evaluation
             return $errors;
         }
 
-        foreach (self::$measurementSourceFields as $sourceField) {
-            if (empty($this->data->{$sourceField})) {
-                $errors[] = $sourceField;
-            }
-            if ($this->data->{$sourceField} === 'ehr' && empty($this->data->{$sourceField . '-ehr-date'})) {
-                $errors[] = $sourceField . '-ehr-date';
+        // EHR protocol form
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $sourceField) {
+                if (empty($this->data->{$sourceField})) {
+                    $errors[] = $sourceField;
+                }
+                if ($this->data->{$sourceField} === self::EHR_PROTOCOL_MODIFICATION && empty($this->data->{$sourceField . '-ehr-date'})) {
+                    $errors[] = $sourceField . '-ehr-date';
+                }
             }
         }
 
         foreach (self::$bloodPressureFields as $field) {
             foreach ($this->data->$field as $k => $value) {
+                $displayError = false;
                 // For Diversion Pouch form display error if 2nd reading is empty and
                 // 1st reading is out of range even though it has a protocol modification
-                $displayError = $this->isDiversionPouchForm() && $k === 1 && $this->isDiversionPouchPressureOutOfRange(0);
+                if ($this->isDiversionPouchForm()) {
+                    $displayError = $k === 1 && $this->isDiversionPouchPressureOutOfRange(0);
+                }
+                // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                if ($this->isEhrProtocolForm()) {
+                    $displayError = $k === 0 && $this->data->{'blood-pressure-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                }
+
                 if ((!$this->data->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
                     $errors[] = [$field, $k];
                 }
             }
         }
         foreach (['height', 'weight'] as $field) {
-            if (!$this->data->{$field . '-protocol-modification'} && !$this->data->$field) {
+            $displayError = false;
+            // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+            if ($this->isEhrProtocolForm()) {
+                $displayError = $this->data->{$field . '-protocol-modification'} === self::EHR_PROTOCOL_MODIFICATION;
+            }
+            if ((!$this->data->{$field . '-protocol-modification'} || $displayError) && !$this->data->$field) {
                 $errors[] = $field;
             }
         }
@@ -473,7 +489,12 @@ class Evaluation
                             break;
                         }
                     }
-                    if (!$this->data->{$field . '-protocol-modification'}[$k] && !$value) {
+                    $displayError = false;
+                    // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                    if ($this->isEhrProtocolForm()) {
+                        $displayError = $k === 0 && $this->data->{$field . '-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                    }
+                    if ((!$this->data->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
                         $errors[] = [$field, $k];
                     }
                 }
