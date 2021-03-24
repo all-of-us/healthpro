@@ -1158,6 +1158,10 @@ class Fhir
     protected function getEffectiveDateTime($field, $replicate = 1)
     {
         if (isset($this->data->{$field}) && $this->data->{$field} === 'ehr' && !empty($this->data->{$field . '-ehr-date'}) && $replicate == 1) {
+            if (is_string($this->data->{$field . '-ehr-date'})) {
+                $date = new \DateTime($this->data->{$field . '-ehr-date'});
+                return $date->format('Y-m-d\TH:i:s\Z');
+            }
             return $this->data->{$field . '-ehr-date'}->format('Y-m-d\TH:i:s\Z');
         }
         return $this->date;

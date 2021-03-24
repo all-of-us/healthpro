@@ -154,13 +154,9 @@ class Evaluation
 
     public function toArray($serializeData = true)
     {
-        $data = $serializeData ? json_encode($this->data) : $this->data;
-        if ($this->isDiversionPouchForm()) {
-            $this->formatEhrProtocolDateFields();
-        }
         return [
             'version' => $this->version,
-            'data' => $data
+            'data' => $serializeData ? json_encode($this->data) : $this->data
         ];
     }
 
