@@ -201,7 +201,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             this.$('#form_weight-prepregnancy').valChange('');
             this.$('.field-weight-prepregnancy').hide();
             this.$('.field-weight-prepregnancy').next('.alt-units-block').hide();
-            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'pregnancy') {
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() === 'pregnancy') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
@@ -212,10 +212,10 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             }
         }
         if (!isWheelchairBound) {
-            if (this.rendered && this.$('#form_height-protocol-modification').val() == 'wheelchair-bound') {
+            if (this.rendered && this.$('#form_height-protocol-modification').val() === 'wheelchair-bound') {
                 this.$('#form_height-protocol-modification').valChange('');
             }
-            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-bound') {
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() === 'wheelchair-bound') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
@@ -592,7 +592,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         var block = $(e.currentTarget).closest('.alt-units-field');
         var type = block.find('label').attr('for');
         var val;
-        if (type == 'alt-units-height') {
+        if (type === 'alt-units-height') {
             var inches = 0;
             if (parseFloat($('#alt-units-height-ft').val())) {
                 inches += 12*parseFloat($('#alt-units-height-ft').val());
@@ -604,9 +604,9 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         } else {
             var unit = block.find('.input-group-addon').text();
             val = block.find('input').val();
-            if (unit == 'in') {
+            if (unit === 'in') {
                 val = this.inToCm(val);
-            } else if (unit == 'lb') {
+            } else if (unit === 'lb') {
                 val = this.lbToKg(val);
             }
         }
@@ -615,7 +615,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         }
         var input = block.parent().prev().find('input');
         input.val(val);
-        if (e.type == 'change') {
+        if (e.type === 'change') {
             block.parent().prev().find('input').trigger('change'); // trigger change even if not different
             block.parent().prev().find('input').parsley().validate(); // trigger parsley validation
         }
