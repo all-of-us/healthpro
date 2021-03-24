@@ -342,7 +342,7 @@ class EvaluationController extends AbstractController
             'latestVersion' => $evaluationService->getLatestFormVersion(),
             'showAutoModification' => $showAutoModification,
             'revertForm' => $evaluationService->getEvaluationRevertForm()->createView(),
-            'requireEhrModificationProtocol' => $evaluationService->requireEhrModificationProtocol(),
+            'displayEhrBannerMessage' => $evaluationService->requireEhrModificationProtocol() || $evaluationService->isEhrProtocolForm(),
             'ehrProtocolBannerMessage' => $app->getConfig('ehr_protocol_banner_message')
         ]);
     }
