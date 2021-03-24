@@ -402,6 +402,9 @@ class Evaluation
                 }
             }
         }
+        if ($this->isEhrProtocolForm()) {
+            $this->addEhrProtocolModifications();
+        }
     }
 
     public function getFhir($datetime, $parentRdr = null)
