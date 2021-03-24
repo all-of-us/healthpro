@@ -154,9 +154,13 @@ class Evaluation
 
     public function toArray($serializeData = true)
     {
+        $data = $serializeData ? json_encode($this->data) : $this->data;
+        if ($this->isDiversionPouchForm()) {
+            $this->formatEhrProtocolDateFields();
+        }
         return [
             'version' => $this->version,
-            'data' => $serializeData ? json_encode($this->data) : $this->data
+            'data' => $data
         ];
     }
 
@@ -311,7 +315,7 @@ class Evaluation
                 $class = DateType::class;
                 $constraints[] = new Constraints\LessThanOrEqual([
                     'value' => new \DateTime('today'),
-                    'message' => 'Timestamp cannot be in the future'
+                    'message' => 'Date cannot be in the future'
                 ]);
                 $dateOptions = [
                     'widget' => 'single_text',
