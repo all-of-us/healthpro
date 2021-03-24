@@ -320,6 +320,7 @@ class Evaluation
                 ];
                 $options = array_merge($options, $dateOptions);
                 $attributes['class'] = 'ehr-date';
+                $attributes['autocomplete'] = 'off';
             } else {
                 $class = NumberType::class;
                 $constraints[] = new Constraints\Type('numeric');
