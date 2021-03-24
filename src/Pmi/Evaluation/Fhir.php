@@ -345,7 +345,7 @@ class Fhir
         if ($conceptCode === 'whole-blood-donor') {
             $conceptDisplay = 'Whole Blood Donor';
         } elseif ($conceptCode === 'ehr') {
-            $conceptDisplay = 'Previous observation obtained from EHR';
+            $conceptDisplay = 'Observation obtained from EHR';
         } else {
             $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
         }
