@@ -331,9 +331,6 @@ class Evaluation
 
             if ($type === 'radio') {
                 $options['expanded'] = true;
-                if (empty($this->data->{$field->name})) {
-                    $options['data'] = 'in-person';
-                }
             }
 
             if (isset($field->replicates)) {
@@ -443,9 +440,6 @@ class Evaluation
         // EHR protocol form
         if ($this->isEhrProtocolForm()) {
             foreach (self::$measurementSourceFields as $sourceField) {
-                if (empty($this->data->{$sourceField})) {
-                    $errors[] = $sourceField;
-                }
                 if ($this->data->{$sourceField} === self::EHR_PROTOCOL_MODIFICATION && empty($this->data->{$sourceField . '-ehr-date'})) {
                     $errors[] = $sourceField . '-ehr-date';
                 }

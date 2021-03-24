@@ -561,7 +561,7 @@
       "label": "Please select source of the measurement",
       "type": "radio",
       "options": {
-        "In-person Measurement": "in-person",
+        "In-person Measurement": "",
         "EHR Measurement": "ehr"
       }
     },
@@ -575,7 +575,7 @@
       "label": "Please select source of the measurement",
       "type": "radio",
       "options": {
-        "In-person Measurement": "in-person",
+        "In-person Measurement": "",
         "EHR Measurement": "ehr"
       }
     },
@@ -589,7 +589,7 @@
       "label": "Please select source of the measurement",
       "type": "radio",
       "options": {
-        "In-person Measurement": "in-person",
+        "In-person Measurement": "",
         "EHR Measurement": "ehr"
       }
     },
@@ -603,7 +603,7 @@
       "label": "Please select source of the measurement",
       "type": "radio",
       "options": {
-        "In-person Measurement": "in-person",
+        "In-person Measurement": "",
         "EHR Measurement": "ehr"
       }
     },
@@ -617,7 +617,7 @@
       "label": "Please select source of the measurement",
       "type": "radio",
       "options": {
-        "In-person Measurement": "in-person",
+        "In-person Measurement": "",
         "EHR Measurement": "ehr"
       }
     },
