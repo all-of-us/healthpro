@@ -1,7 +1,5 @@
 {% import 'evaluationform/metrics.html.twig' as metrics %}
 
-{% set ehrHelpText = 'Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit.' %}
-
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
@@ -40,7 +38,6 @@
                                         {{ metrics.form_row(evaluationForm, schema.fields['blood-pressure-source']) }}
                                         <div class="blood-pressure-source ehr-date" style="display: none;">
                                             {{ metrics.form_row(evaluationForm, schema.fields['blood-pressure-source-ehr-date']) }}
-                                            <small class="text-info">{{ ehrHelpText }}</small>
                                         </div>
                                     {% endif %}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-systolic'], i) }}
@@ -125,7 +122,6 @@
                         {{ metrics.form_row(evaluationForm, schema.fields['height-source']) }}
                         <div class="height-source ehr-date" style="display: none;">
                             {{ metrics.form_row(evaluationForm, schema.fields['height-source-ehr-date']) }}
-                            <small class="text-info">{{ ehrHelpText }}</small>
                         </div>
                         {{ metrics.form_row(evaluationForm, schema.fields['height']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['height-protocol-modification']) }}
@@ -144,7 +140,6 @@
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-source']) }}
                         <div class="weight-source ehr-date" style="display: none;">
                             {{ metrics.form_row(evaluationForm, schema.fields['weight-source-ehr-date']) }}
-                            <small class="text-info">{{ ehrHelpText }}</small>
                         </div>
                         {{ metrics.form_row(evaluationForm, schema.fields['weight']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-prepregnancy']) }}
@@ -212,7 +207,6 @@
                                         {{ metrics.form_row(evaluationForm, schema.fields['waist-source']) }}
                                         <div class="waist-source ehr-date" style="display: none;">
                                             {{ metrics.form_row(evaluationForm, schema.fields['waist-source-ehr-date']) }}
-                                            <small class="text-info">{{ ehrHelpText }}</small>
                                         </div>
                                     {% endif %}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference'], i) }}
@@ -256,7 +250,6 @@
                                         {{ metrics.form_row(evaluationForm, schema.fields['hip-source']) }}
                                         <div class="hip-source ehr-date" style="display: none;">
                                             {{ metrics.form_row(evaluationForm, schema.fields['hip-source-ehr-date']) }}
-                                            <small class="text-info">{{ ehrHelpText }}</small>
                                         </div>
                                     {% endif %}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference'], i) }}

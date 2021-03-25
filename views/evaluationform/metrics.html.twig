@@ -3,6 +3,10 @@
     {% set name = definition.name %}
     <div data-field="{{ name }}" class="field field-{{ name }} form-group{% if not form[name].vars.valid or form[name].vars.errors|length > 0 %} has-error{% endif %}">
         {{ form_label(form[name]) }}
+        {% set ehrDateFields = ['blood-pressure-source-ehr-date', 'height-source-ehr-date', 'weight-source-ehr-date', 'hip-source-ehr-date', 'waist-source-ehr-date'] %}
+        {% if name in ehrDateFields %}
+            <br><small class="text-info">Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit.</small>
+        {% endif %}
         {% if definition.convert is defined %}
             <span id="convert-{{ name }}" class="pull-right convert"></span>
         {% endif %}
