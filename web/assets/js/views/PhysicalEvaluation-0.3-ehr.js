@@ -51,6 +51,11 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             this.disableSecondThirdReadings(field, 2, disabled);
         }
         this.calculateBmi();
+        var dataField = field.replace('-source', '');
+        if (dataField === 'blood-pressure') {
+            dataField = 'blood-pressure-systolic';
+        }
+        this.calculateMean(dataField);
     },
     displayEhrDate: function () {
         var self = this;
@@ -69,6 +74,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         $('.' + field + '-' + 0).find('select').attr('disabled', disabled);
         $('.' + field + '-' + reading).find('input, select, input:checkbox').each(function () {
             $(this).attr('disabled', disabled);
+            $(this).val('');
         });
     },
     inputChange: function(e) {
@@ -99,13 +105,12 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             $(window).trigger('pmi.equalize');
         }, 50);
     },
+    clearMean: function (field) {
+        this.$('#mean-' + field).text('--');
+        this.$('#convert-' + field).text('');
+    },
     calculateMean: function(field) {
-        //TODO: Optimize mean calculation check
-        if ((field === 'hip-circumference' && $("[name='form[hip-circumference-source]']:checked").val() === 'ehr') || (field === 'waist-circumference' && $("[name='form[waist-circumference-source]']:checked").val() === 'ehr')) {
-            this.$('#mean-' + field).text('--');
-            this.$('#convert-' + field).text('');
-            return;
-        }
+        var self = this;
         var fieldSelector = '.field-' + field;
         var secondThirdFields = [
             'blood-pressure-systolic',
@@ -116,6 +121,19 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             'hip-circumference',
             'waist-circumference'
         ];
+        if ($.inArray(field, twoClosestFields) !== -1 && $("[name='form[" + field + "-source]']:checked").val() === 'ehr') {
+            this.clearMean(field);
+            return;
+        }
+        if ($.inArray(field, secondThirdFields) !== -1 && $("[name='form[blood-pressure-source]']:checked").val() === 'ehr') {
+            $.each(secondThirdFields, function (i, bloodPressureField) {
+                self.clearMean(bloodPressureField);
+                //Clear warning text
+                $('#' + bloodPressureField + '-warning').html('');
+            });
+            $('#irregular-heart-rate-warning').html('');
+            return;
+        }
         if ($.inArray(field, secondThirdFields) !== -1) {
             fieldSelector = '.field-' + field + '[data-replicate=2], .field-' + field + '[data-replicate=3]';
         }
