@@ -47,19 +47,19 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             this.$('#form_' + ehrDateField).attr('disabled', true);
         }
         this.disableSecondThirdReadings(field, 1, disabled);
-        if ($.inArray(field, ['blood-pressure-source', 'waist-source', 'hip-source']) !== -1) {
+        if ($.inArray(field, ['blood-pressure-source', 'waist-circumference-source', 'hip-circumference-source']) !== -1) {
             this.disableSecondThirdReadings(field, 2, disabled);
         }
         this.calculateBmi();
     },
     displayEhrDate: function () {
         var self = this;
-        var sourceFields = ['blood-pressure-source', 'height-source', 'weight-source', 'waist-source', 'hip-source'];
+        var sourceFields = ['blood-pressure-source', 'height-source', 'weight-source', 'waist-circumference-source', 'hip-circumference-source'];
         $.each(sourceFields, function (i, field) {
             if ($("[name='form[" + field + "]']:checked").val() === 'ehr') {
                 $('.' + field + '.ehr-date').show();
                 self.disableSecondThirdReadings(field, 1, true);
-                if ($.inArray(field, ['blood-pressure-source', 'waist-source', 'hip-source']) !== -1) {
+                if ($.inArray(field, ['blood-pressure-source', 'waist-circumference-source', 'hip-circumference-source']) !== -1) {
                     self.disableSecondThirdReadings(field, 2, true);
                 }
             }
@@ -101,7 +101,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
     },
     calculateMean: function(field) {
         //TODO: Optimize mean calculation check
-        if ((field === 'hip-circumference' && $("[name='form[hip-source]']:checked").val() === 'ehr') || (field === 'waist-circumference' && $("[name='form[waist-source]']:checked").val() === 'ehr')) {
+        if ((field === 'hip-circumference' && $("[name='form[hip-circumference-source]']:checked").val() === 'ehr') || (field === 'waist-circumference' && $("[name='form[waist-circumference-source]']:checked").val() === 'ehr')) {
             this.$('#mean-' + field).text('--');
             this.$('#convert-' + field).text('');
             return;

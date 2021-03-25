@@ -179,7 +179,7 @@
         </div>
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
-                <div class="col-sm-4 waist-source-{{ i }}">
+                <div class="col-sm-4 waist-circumference-source-{{ i }}">
                     <div class="panel panel-default panel-waist-circumference-{{ i + 1 }}">
                         <div class="panel-body">
                             <p class="text-right">
@@ -188,9 +188,9 @@
                             <div class="modification-block">
                                 <div class="modification-affected">
                                     {% if i == 0 %}
-                                        {{ metrics.form_row(evaluationForm, schema.fields['waist-source']) }}
-                                        <div class="waist-source ehr-date" style="display: none;">
-                                            {{ metrics.form_row(evaluationForm, schema.fields['waist-source-ehr-date']) }}
+                                        {{ metrics.form_row(evaluationForm, schema.fields['waist-circumference-source']) }}
+                                        <div class="waist-circumference-source ehr-date" style="display: none;">
+                                            {{ metrics.form_row(evaluationForm, schema.fields['waist-circumference-source-ehr-date']) }}
                                         </div>
                                     {% endif %}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference'], i) }}
@@ -217,7 +217,7 @@
         <h4>Hip</h4>
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
-                <div class="col-sm-4 hip-source-{{ i }}">
+                <div class="col-sm-4 hip-circumference-source-{{ i }}">
                     <div class="panel panel-default panel-hip-circumference-{{ i + 1 }}">
                         <div class="panel-body">
                             <p class="text-right">
@@ -226,9 +226,9 @@
                             <div class="modification-block">
                                 <div class="modification-affected">
                                     {% if i == 0 %}
-                                        {{ metrics.form_row(evaluationForm, schema.fields['hip-source']) }}
-                                        <div class="hip-source ehr-date" style="display: none;">
-                                            {{ metrics.form_row(evaluationForm, schema.fields['hip-source-ehr-date']) }}
+                                        {{ metrics.form_row(evaluationForm, schema.fields['hip-circumference-source']) }}
+                                        <div class="hip-circumference-source ehr-date" style="display: none;">
+                                            {{ metrics.form_row(evaluationForm, schema.fields['hip-circumference-source-ehr-date']) }}
                                         </div>
                                     {% endif %}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference'], i) }}
