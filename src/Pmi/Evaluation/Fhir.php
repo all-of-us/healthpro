@@ -220,8 +220,11 @@ class Fhir
         return $composition;
     }
 
-    protected function simpleMetric($metric, $value, $display, $unit, $codes)
+    protected function simpleMetric($metric, $value, $display, $unit, $codes, $effectiveDateTime = null)
     {
+        if (empty($effectiveDateTime)) {
+            $effectiveDateTime = $this->date;
+        }
         $entry = [
             'fullUrl' => $this->metricUrns[$metric],
             'resource' => [
@@ -229,7 +232,7 @@ class Fhir
                     'coding' => $codes,
                     'text' => $display
                 ],
-                'effectiveDateTime' => $this->date,
+                'effectiveDateTime' => $effectiveDateTime,
                 'resourceType' => 'Observation',
                 'status' => 'final',
                 'subject' => [
@@ -338,9 +341,11 @@ class Fhir
             $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1]) ? $this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1] : '';
         }
         $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
-        // Add display text for whole-blood-donor
+        // Add display text for whole-blood-donor and ehr
         if ($conceptCode === 'whole-blood-donor') {
             $conceptDisplay = 'Whole Blood Donor';
+        } elseif ($conceptCode === 'ehr') {
+            $conceptDisplay = 'Observation obtained from EHR';
         } else {
             $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
         }
@@ -434,7 +439,8 @@ class Fhir
                     'display' => 'Height',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('height-source')
         );
     }
 
@@ -456,7 +462,8 @@ class Fhir
                     'display' => 'Weight',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
         );
     }
 
@@ -670,7 +677,8 @@ class Fhir
                     'display' => self::ordinalLabel('hip circumference', $replicate),
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('hip-source')
         );
     }
 
@@ -692,7 +700,8 @@ class Fhir
                     'display' => self::ordinalLabel('waist circumference', $replicate),
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('waist-source')
         );
         if (isset($this->data->{'waist-circumference-location'})) {
             $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
@@ -839,7 +848,7 @@ class Fhir
                     'text' => self::ordinalLabel('blood pressure systolic and diastolic', $replicate)
                 ],
                 'component' => $components,
-                'effectiveDateTime' => $this->date,
+                'effectiveDateTime' => $this->getEffectiveDateTime('blood-pressure-source', $replicate),
                 'resourceType' => 'Observation',
                 'status' => 'final',
                 'subject' => [
@@ -1144,5 +1153,17 @@ class Fhir
         }
         array_unshift($fhir->entry, $this->getComposition());
         return $fhir;
+    }
+
+    protected function getEffectiveDateTime($field, $replicate = 1)
+    {
+        if (isset($this->data->{$field}) && $this->data->{$field} === 'ehr' && !empty($this->data->{$field . '-ehr-date'}) && $replicate == 1) {
+            if (is_string($this->data->{$field . '-ehr-date'})) {
+                $date = new \DateTime($this->data->{$field . '-ehr-date'});
+                return $date->format('Y-m-d\TH:i:s\Z');
+            }
+            return $this->data->{$field . '-ehr-date'}->format('Y-m-d\TH:i:s\Z');
+        }
+        return $this->date;
     }
 }

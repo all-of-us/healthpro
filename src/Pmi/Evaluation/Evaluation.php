@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
@@ -18,6 +19,7 @@ class Evaluation
 {
     const CURRENT_VERSION = '0.3.3';
     const DIVERSION_POUCH_CURRENT_VERSION = '0.3.3-diversion-pouch';
+    const EHR_CURRENT_VERSION = '0.3.3-ehr';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_ACTIVE = 'active';
@@ -25,6 +27,7 @@ class Evaluation
     const EVALUATION_RESTORE = 'restore';
     const DIVERSION_POUCH = 'diversion-pouch';
     const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'whole-blood-donor';
+    const EHR_PROTOCOL_MODIFICATION = 'ehr';
 
     protected $app;
     protected $version;
@@ -56,13 +59,42 @@ class Evaluation
         'heart-rate'
     ];
 
+    public static $measurementSourceFields = [
+        'blood-pressure-source',
+        'height-source',
+        'weight-source',
+        'waist-source',
+        'hip-source'
+    ];
+
+    public static $ehrProtocolDateFields = [
+        'blood-pressure-source-ehr-date',
+        'height-source-ehr-date',
+        'weight-source-ehr-date',
+        'waist-source-ehr-date',
+        'hip-source-ehr-date'
+    ];
+
     public function __construct($app = null, $type = null)
     {
         $this->app = $app;
-        $this->version = $type === self::DIVERSION_POUCH && $this->requireBloodDonorCheck() ? self::DIVERSION_POUCH_CURRENT_VERSION : self::CURRENT_VERSION;
+        $this->version = $this->getCurrentVersion($type);
         $this->data = new \StdClass();
         $this->loadSchema();
         $this->normalizeData();
+    }
+
+    private function getCurrentVersion($type)
+    {
+        if ($this->app) {
+            if ($type === self::DIVERSION_POUCH && $this->requireBloodDonorCheck()) {
+                return self::DIVERSION_POUCH_CURRENT_VERSION;
+            }
+            if ($this->requireEhrModificationProtocol()) {
+                return self::EHR_CURRENT_VERSION;
+            }
+        }
+        return self::CURRENT_VERSION;
     }
 
     public function loadFromArray($array)
@@ -78,6 +110,7 @@ class Evaluation
                 $this->data = json_decode($array['data']);
             }
         }
+        $this->formatEhrProtocolDateFields();
         if (!empty($array['finalized_ts'])) {
             $this->locked = true;
         }
@@ -108,6 +141,15 @@ class Evaluation
         }
         $this->loadSchema();
         $this->normalizeData();
+    }
+
+    public function formatEhrProtocolDateFields()
+    {
+        foreach (self::$ehrProtocolDateFields as $ehrProtocolDateField) {
+            if (!empty($this->data->{$ehrProtocolDateField})) {
+                $this->data->{$ehrProtocolDateField}  = new \DateTime($this->data->{$ehrProtocolDateField});
+            }
+        }
     }
 
     public function toArray($serializeData = true)
@@ -218,7 +260,7 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } elseif (!isset($field->options) && !in_array($type, ['checkbox', 'text', 'textarea'])) {
+            } elseif (!isset($field->options) && !in_array($type, ['checkbox', 'text', 'textarea', 'date'])) {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
@@ -264,6 +306,21 @@ class Evaluation
                 $attributes['data-parsley-maxlength'] = self::LIMIT_TEXT_SHORT;
                 $constraints[] = new Constraints\Length(['max' => self::LIMIT_TEXT_SHORT]);
                 $constraints[] = new Constraints\Type('string');
+            } elseif ($type === 'date') {
+                unset($options['scale']);
+                $class = DateType::class;
+                $constraints[] = new Constraints\LessThanOrEqual([
+                    'value' => new \DateTime('today'),
+                    'message' => 'Date cannot be in the future'
+                ]);
+                $dateOptions = [
+                    'widget' => 'single_text',
+                    'format' => 'M/d/yyyy',
+                    'required' => false
+                ];
+                $options = array_merge($options, $dateOptions);
+                $attributes['class'] = 'ehr-date';
+                $attributes['autocomplete'] = 'off';
             } else {
                 $class = NumberType::class;
                 $constraints[] = new Constraints\Type('numeric');
@@ -271,6 +328,10 @@ class Evaluation
 
             $options['constraints'] = $constraints;
             $options['attr'] = $attributes;
+
+            if ($type === 'radio') {
+                $options['expanded'] = true;
+            }
 
             if (isset($field->replicates)) {
                 $collectionOptions = [
@@ -313,14 +374,17 @@ class Evaluation
     public function setData($data)
     {
         $this->data = $data;
-        $this->normalizeData();
+        $this->normalizeData('save');
     }
 
-    protected function normalizeData()
+    protected function normalizeData($type = null)
     {
         foreach ($this->data as $key => $value) {
             if ($value === 0) {
                 $this->data->$key = null;
+            }
+            if ($type === 'save' && !is_null($this->data->$key) && in_array($key, self::$ehrProtocolDateFields)) {
+                $this->data->$key = $this->data->$key->format('Y-m-d');
             }
         }
         foreach ($this->schema->fields as $field) {
@@ -335,6 +399,9 @@ class Evaluation
                     $this->data->$key = $dataArray;
                 }
             }
+        }
+        if ($this->isEhrProtocolForm()) {
+            $this->addEhrProtocolModifications();
         }
     }
 
@@ -370,18 +437,40 @@ class Evaluation
             return $errors;
         }
 
+        // EHR protocol form
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $sourceField) {
+                if ($this->data->{$sourceField} === self::EHR_PROTOCOL_MODIFICATION && empty($this->data->{$sourceField . '-ehr-date'})) {
+                    $errors[] = $sourceField . '-ehr-date';
+                }
+            }
+        }
+
         foreach (self::$bloodPressureFields as $field) {
             foreach ($this->data->$field as $k => $value) {
+                $displayError = false;
                 // For Diversion Pouch form display error if 2nd reading is empty and
                 // 1st reading is out of range even though it has a protocol modification
-                $displayError = $this->isDiversionPouchForm() && $k === 1 && $this->isDiversionPouchPressureOutOfRange(0);
+                if ($this->isDiversionPouchForm()) {
+                    $displayError = $k === 1 && $this->isDiversionPouchPressureOutOfRange(0);
+                }
+                // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                if ($this->isEhrProtocolForm()) {
+                    $displayError = $k === 0 && $this->data->{'blood-pressure-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                }
+
                 if ((!$this->data->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
                     $errors[] = [$field, $k];
                 }
             }
         }
         foreach (['height', 'weight'] as $field) {
-            if (!$this->data->{$field . '-protocol-modification'} && !$this->data->$field) {
+            $displayError = false;
+            // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+            if ($this->isEhrProtocolForm()) {
+                $displayError = $this->data->{$field . '-protocol-modification'} === self::EHR_PROTOCOL_MODIFICATION;
+            }
+            if ((!$this->data->{$field . '-protocol-modification'} || $displayError) && !$this->data->$field) {
                 $errors[] = $field;
             }
         }
@@ -398,7 +487,12 @@ class Evaluation
                             break;
                         }
                     }
-                    if (!$this->data->{$field . '-protocol-modification'}[$k] && !$value) {
+                    $displayError = false;
+                    // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                    if ($this->isEhrProtocolForm()) {
+                        $displayError = $k === 0 && $this->data->{$field . '-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                    }
+                    if ((!$this->data->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
                         $errors[] = [$field, $k];
                     }
                 }
@@ -724,9 +818,27 @@ class Evaluation
         return $this->app->isDVType() && $this->app->isDiversionPouchSite();
     }
 
+    public function requireEhrModificationProtocol()
+    {
+        $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
+            'deleted' => 0,
+            'ehr_modification_protocol' => 1,
+            'google_group' => $this->app->getSiteId()
+        ]);
+        if (!empty($sites)) {
+            return true;
+        }
+        return false;
+    }
+
     public function isDiversionPouchForm()
     {
         return strpos($this->version, self::DIVERSION_POUCH) !== false;
+    }
+
+    public function isEhrProtocolForm()
+    {
+        return strpos($this->version, self::EHR_PROTOCOL_MODIFICATION) !== false;
     }
 
     public function addBloodDonorProtocolModificationForRemovedFields()
@@ -734,6 +846,34 @@ class Evaluation
         $this->addBloodDonorProtocolModificationForWaistandHip();
         $this->addBloodDonorProtocolModificationForBloodPressure(2);
         $this->addBloodDonorProtocolModificationForHeight();
+    }
+
+    public function addEhrProtocolModifications()
+    {
+        if ($this->data->{'blood-pressure-source'} === 'ehr') {
+            $this->data->{'blood-pressure-protocol-modification'}[0] = self::EHR_PROTOCOL_MODIFICATION;
+            for ($reading = 1; $reading <= 2; $reading++) {
+                foreach (self::$bloodPressureFields as $field) {
+                    $this->data->{$field}[$reading] = null;
+                }
+                foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
+                    $this->data->{$field}[$reading] = false;
+                }
+                $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::EHR_PROTOCOL_MODIFICATION;
+            }
+        }
+        if ($this->data->{'height-source'} === 'ehr') {
+            $this->data->{"height-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        }
+        if ($this->data->{'weight-source'} === 'ehr') {
+            $this->data->{"weight-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        }
+        if ($this->data->{'waist-source'} === 'ehr') {
+            $this->data->{'waist-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        }
+        if ($this->data->{'hip-source'} === 'ehr') {
+            $this->data->{'hip-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        }
     }
 
     public function addBloodDonorProtocolModificationForWaistandHip()
@@ -840,8 +980,12 @@ class Evaluation
 
     public function getFormFieldErrorMessage($field = null, $replicate = null)
     {
-        return !empty($field) && $this->isDiversionPouchForm() && in_array($field,
-            self::$bloodPressureFields) && $replicate === 1 ? 'Please complete.' : 'Please complete or add protocol modification.';
+        if (($this->isDiversionPouchForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
+            ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields)))
+        ) {
+            return 'Please complete';
+        }
+        return 'Please complete or add protocol modification.';
     }
 
     public function canEdit($evalId, $participant)
@@ -849,5 +993,31 @@ class Evaluation
         // Allow cohort 1 and 2 participants to edit existing PMs even if status is false
         return !$participant->status && !empty($evalId) ? $participant->editExistingOnly : $participant->status;
 
+    }
+
+    public function getLatestFormVersion()
+    {
+        if ($this->isDiversionPouchForm()) {
+            return self::DIVERSION_POUCH_CURRENT_VERSION;
+        }
+        if ($this->isEhrProtocolForm()) {
+            return self::EHR_CURRENT_VERSION;
+        }
+        return self::CURRENT_VERSION;
+    }
+
+    public function canAutoModify()
+    {
+        if ($this->isDiversionPouchForm()) {
+            return false;
+        }
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $field) {
+                if ($this->data->{$field} === 'ehr') {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

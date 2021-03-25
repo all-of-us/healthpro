@@ -2,6 +2,9 @@
 {% block title %}Physical Measurements - {% endblock %}
 {% block body %}
     <div id="physicalEvaluation">
+        {% if displayEhrBannerMessage and ehrProtocolBannerMessage is not empty %}
+            <div class="alert alert-warning">{{ ehrProtocolBannerMessage }}</div>
+        {% endif %}
         <div class="page-header">
             <h2>
                 <i class="fa fa-clipboard" aria-hidden="true"></i>
