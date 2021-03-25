@@ -22,12 +22,12 @@ class EvaluationController extends AbstractController
         ['evaluationBloodDonorCheck', '/participant/{participantId}/measurements/blood/donor/check', ['method' => 'GET|POST']],
     ];
 
-    /* For debugging generated FHIR bundle - only allowed in dev */
+    /* For debugging generated FHIR bundle - only allowed for admins or in local dev */
     public function evaluationFhirAction($participantId, $evalId, Application $app, Request $request)
     {
         $isTest = $request->query->has('test');
-        if (!$app->isLocal()) {
-            $app->abort(404);
+        if (!$app->hasRole('ROLE_ADMIN') && !$app->isLocal()) {
+            $app->abort(403);
         }
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
@@ -72,11 +72,11 @@ class EvaluationController extends AbstractController
         }
     }
 
-    /* For debugging evaluation object pushed to RDR - only allowed in dev */
+    /* For debugging evaluation object pushed to RDR - only allowed for admins or in local dev */
     public function evaluationRdrAction($participantId, $evalId, Application $app)
     {
-        if (!$app->isLocal()) {
-            $app->abort(404);
+        if (!$app->hasRole('ROLE_ADMIN') && !$app->isLocal()) {
+            $app->abort(403);
         }
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
@@ -106,7 +106,7 @@ class EvaluationController extends AbstractController
         if (!$evaluationService->canEdit($evalId, $participant) || $app->isTestSite()) {
             $app->abort(403);
         }
-        
+
         $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
             'id' => $evalId,
             'participant_id' => $participantId
