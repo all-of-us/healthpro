@@ -20,7 +20,8 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
       && rm -rf /var/lib/apt/lists/*
 
 # Install GRPC module for PHP
-RUN pecl install grpc
+RUN MAKEFLAGS="-j $(nproc)" pecl install grpc \
+      && docker-php-ext-enable grpc
 
 # Google Cloud Tools
 WORKDIR /opt
@@ -32,7 +33,7 @@ RUN export CLOUDSDK_PYTHON=/usr/bin/python \
       && /opt/google-cloud-sdk/bin/gcloud config set project pmi-hpo-dev
 
 # Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Symfony CLI
 RUN curl -sSL https://get.symfony.com/cli/installer | bash - \
