@@ -51,6 +51,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             this.disableSecondThirdReadings(field, 2, disabled);
         }
         this.calculateBmi();
+        this.displayWarnings();
         var dataField = field.replace('-source', '');
         if (dataField === 'blood-pressure') {
             dataField = 'blood-pressure-systolic';
