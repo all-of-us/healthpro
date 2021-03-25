@@ -99,6 +99,12 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         }, 50);
     },
     calculateMean: function(field) {
+        //TODO: Optimize mean calculation check
+        if ((field === 'hip-circumference' && $("[name='form[hip-source]']:checked").val() === 'ehr') || (field === 'waist-circumference' && $("[name='form[waist-source]']:checked").val() === 'ehr')) {
+            this.$('#mean-' + field).text('--');
+            this.$('#convert-' + field).text('');
+            return;
+        }
         var fieldSelector = '.field-' + field;
         var secondThirdFields = [
             'blood-pressure-systolic',
