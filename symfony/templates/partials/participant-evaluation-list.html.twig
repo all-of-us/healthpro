@@ -26,7 +26,7 @@
                             <span class="label label-success">Edited &amp; Finalized</span> {{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
                         {% elseif measurement.rdrId %}
                             <span class="label label-success">Finalized</span> {{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
-                        {% elseif measurement.parent_id and measurement.rdrId is empty %}
+                        {% elseif measurement.parentId and measurement.rdrId is empty %}
                             <span class="label label-warning">Edited &amp; Unfinalized</span> {{ measurement.updatedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
                         {% endif %}
                     </small>
