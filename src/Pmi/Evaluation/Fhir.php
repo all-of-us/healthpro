@@ -542,7 +542,7 @@ class Fhir
 
     protected function bmi()
     {
-        if (!$this->data->height || !$this->data->weight) {
+        if ($this->data->{'height-protocol-modification'} === 'ehr' || $this->data->{'weight-protocol-modification'} === 'ehr' || !$this->data->height || !$this->data->weight) {
             return;
         }
         $cm = $this->data->height / 100;

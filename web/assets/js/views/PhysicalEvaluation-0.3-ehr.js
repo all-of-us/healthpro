@@ -50,6 +50,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         if ($.inArray(field, ['blood-pressure-source', 'waist-source', 'hip-source']) !== -1) {
             this.disableSecondThirdReadings(field, 2, disabled);
         }
+        this.calculateBmi();
     },
     displayEhrDate: function () {
         var self = this;
@@ -150,6 +151,10 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         }
     },
     calculateBmi: function() {
+        if ($("[name='form[height-source]']:checked").val() === 'ehr' || $("[name='form[weight-source]']:checked").val() === 'ehr') {
+            this.$('#bmi').text('--');
+            return;
+        }
         var height = parseFloat(this.$('#form_height').val());
         var weight = parseFloat(this.$('#form_weight').val());
         this.$('#bmi-warning').text('');
