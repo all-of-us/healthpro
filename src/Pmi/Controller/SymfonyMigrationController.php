@@ -24,7 +24,7 @@ class SymfonyMigrationController extends AbstractController
         ['workqueue_participant', '/workqueue/participant/{id}'],
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['participants', '/participants'],
-        ['biobank', '/biobank']
+        ['biobank_home', '/biobank']
     ];
 
     public function deceased_reports_indexAction(Application $app)
@@ -162,7 +162,7 @@ class SymfonyMigrationController extends AbstractController
     /**
      * @deprecated 2021-03-09
      */
-    public function biobankAction(Application $app)
+    public function biobank_homeAction(Application $app)
     {
         return $app->redirect('/s/biobank/');
     }
