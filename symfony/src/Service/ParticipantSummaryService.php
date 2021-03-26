@@ -8,6 +8,7 @@ use App\Helper\Participant;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Drc\Exception\FailedRequestException;
 use Pmi\Drc\Exception\InvalidResponseException;
+use Pmi\Drc\Exception\InvalidDobException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ParticipantSummaryService
@@ -169,9 +170,10 @@ class ParticipantSummaryService
 
     public function search($params)
     {
+        $query = $this->paramsToQuery($params);
         try {
             $response = $this->api->get('rdr/v1/ParticipantSummary', [
-                'query' => $params
+                'query' => $query
             ]);
         } catch (\Exception $e) {
             throw new FailedRequestException();
@@ -206,5 +208,43 @@ class ParticipantSummaryService
             return strtolower($site->getType()) === 'dv' ? 'dv' : 'hpo';
         }
         return null;
+    }
+
+    protected function paramsToQuery($params)
+    {
+        $query = [];
+        if (isset($params['lastName'])) {
+            $query['lastName'] = $params['lastName'];
+        }
+        if (isset($params['firstName'])) {
+            $query['firstName'] = $params['firstName'];
+        }
+        if (isset($params['dob'])) {
+            try {
+                $date = new \DateTime($params['dob']);
+                $query['dateOfBirth'] = $date->format('Y-m-d');
+            } catch (\Exception $e) {
+                throw new InvalidDobException();
+            }
+            if (strpos($params['dob'], $date->format('Y')) === false) {
+                throw new InvalidDobException('Please enter a four digit year');
+            } elseif ($date > new \DateTime('today')) {
+                throw new InvalidDobException('Date of birth cannot be a future date');
+            }
+        }
+        if (isset($params['phone'])) {
+            $query['phoneNumber'] = $params['phone'];
+        }
+        if (isset($params['loginPhone'])) {
+            $query['loginPhoneNumber'] = $params['loginPhone'];
+        }
+        if (isset($params['email'])) {
+            $query['email'] = strtolower($params['email']);
+        }
+        if (isset($params['biobankId'])) {
+            $query['biobankId'] = $params['biobankId'];
+        }
+
+        return $query;
     }
 }

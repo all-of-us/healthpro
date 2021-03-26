@@ -480,10 +480,10 @@ class OrderService
         if (!$rdrId) {
             // Check for rdr id conflict error code
             if ($this->rdrApiService->getLastErrorCode() === 409) {
-                $rdrOrder = $this->getOrder($this->order->getParticipantId(), $this->getMayoId());
+                $rdrOrder = $this->getOrder($this->order->getParticipantId(), $this->order->getMayoId());
                 // Check if order exists in RDR
-                if (!empty($rdrOrder) && $rdrOrder->id === $this->order['mayo_id']) {
-                    $rdrId = $this->getMayoId();
+                if (!empty($rdrOrder) && $rdrOrder->id === $this->order->getMayoId()) {
+                    $rdrId = $this->order->getMayoId();
                 }
             }
         }

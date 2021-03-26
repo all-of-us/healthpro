@@ -673,12 +673,12 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/json-response", name="order_json")
-     * For debugging generated JSON representation - only allowed in local dev
+     * For debugging generated JSON representation - only allowed for admins or in local dev
      */
     public function orderJsonAction($participantId, $orderId, Request $request, EnvironmentService $env)
     {
-        if (!$env->isLocal()) {
-            throw $this->createNotFoundException();
+        if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
+            throw $this->createAccessDeniedException();
         }
         $order = $this->loadOrder($participantId, $orderId);
         if ($request->query->has('rdr')) {
