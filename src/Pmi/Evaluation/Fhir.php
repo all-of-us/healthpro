@@ -542,7 +542,7 @@ class Fhir
 
     protected function bmi()
     {
-        if ($this->data->{'height-protocol-modification'} === 'ehr' || $this->data->{'weight-protocol-modification'} === 'ehr' || !$this->data->height || !$this->data->weight) {
+        if (!$this->data->height || !$this->data->weight) {
             return;
         }
         $cm = $this->data->height / 100;
@@ -563,7 +563,8 @@ class Fhir
                     'display' => 'Computed body mass index',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
         );
         $related = [];
         foreach (['height-protocol-modification', 'weight-protocol-modification'] as $metric) {

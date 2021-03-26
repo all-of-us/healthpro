@@ -576,7 +576,7 @@ class Evaluation
                 'lb' => self::kgToLb($this->data->weight)
             ];
         }
-        if ($this->data->{'weight-protocol-modification'} !== 'ehr' && $this->data->{'height-protocol-modification'} !== 'ehr' && $this->data->weight && $this->data->height) {
+        if ($this->data->weight && $this->data->height) {
             $summary['bmi'] = self::calculateBmi($this->data->height, $this->data->weight);
         }
         if ($hip = $this->calculateMean('hip-circumference')) {
