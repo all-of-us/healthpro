@@ -114,6 +114,9 @@
               },
               {
                 "reference": "uuid:29"
+              },
+              {
+                "reference": "uuid:30"
               }
             ]
           }
@@ -1195,6 +1198,52 @@
         "code": {
           "coding": [
             {
+              "code": "39156-5",
+              "display": "Body mass index",
+              "system": "http:\/\/loinc.org"
+            },
+            {
+              "code": "bmi",
+              "display": "Computed body mass index",
+              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+            }
+          ],
+          "text": "Computed body mass index"
+        },
+        "effectiveDateTime": "2017-01-01T00:00:00Z",
+        "resourceType": "Observation",
+        "status": "final",
+        "subject": {
+          "reference": "Patient\/P10000001"
+        },
+        "valueQuantity": {
+          "code": "kg\/m2",
+          "system": "http:\/\/unitsofmeasure.org",
+          "unit": "kg\/m2",
+          "value": 20.1
+        },
+        "related": [
+          {
+            "type": "qualified-by",
+            "target": {
+              "reference": "uuid:11"
+            }
+          },
+          {
+            "type": "qualified-by",
+            "target": {
+              "reference": "uuid:13"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "uuid:27",
+      "resource": {
+        "code": {
+          "coding": [
+            {
               "code": "55284-4",
               "display": "Blood pressure systolic and diastolic",
               "system": "http:\/\/loinc.org"
@@ -1246,7 +1295,7 @@
       }
     },
     {
-      "fullUrl": "uuid:27",
+      "fullUrl": "uuid:28",
       "resource": {
         "code": {
           "coding": [
@@ -1310,7 +1359,7 @@
       }
     },
     {
-      "fullUrl": "uuid:28",
+      "fullUrl": "uuid:29",
       "resource": {
         "code": {
           "coding": [
@@ -1362,7 +1411,7 @@
       }
     },
     {
-      "fullUrl": "uuid:29",
+      "fullUrl": "uuid:30",
       "resource": {
         "code": {
           "coding": [
