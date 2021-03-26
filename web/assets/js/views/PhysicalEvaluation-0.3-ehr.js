@@ -67,6 +67,8 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
                 if ($.inArray(field, ['blood-pressure-source', 'waist-circumference-source', 'hip-circumference-source']) !== -1) {
                     self.disableSecondThirdReadings(field, 2, true);
                 }
+            } else {
+                $('.' + field + '.ehr-date').hide();
             }
         });
     },
@@ -213,9 +215,10 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         var isWheelchairBound = (this.$('#form_wheelchair').val() == 1);
         var self = this;
         if (isPregnant || isWheelchairBound) {
-            this.$('#panel-hip-waist input').each(function() {
+            this.$('#panel-hip-waist input').not('input:radio').each(function() {
                 $(this).valChange('');
             });
+            $('#form_waist-circumference-source_0, #form_hip-circumference-source_0').prop("checked",true);
             this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
                 $(this).attr('disabled', true);
             });
@@ -263,6 +266,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             this.$('#hip-waist-skip').text('');
             this.$('#panel-hip-waist>.panel-body').show();
         }
+        this.displayEhrDate();
     },
     handleHeightProtocol: function() {
         var selected = this.$('#form_height-protocol-modification').val();
