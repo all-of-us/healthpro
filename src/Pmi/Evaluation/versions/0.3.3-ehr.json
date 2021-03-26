@@ -563,12 +563,14 @@
       "options": {
         "In-person Measurement": "",
         "EHR Measurement": "ehr"
-      }
+      },
+      "showHelpModel": true
     },
     {
       "name": "blood-pressure-source-ehr-date",
       "label": "EHR Date",
-      "type": "date"
+      "type": "date",
+      "helpText": "Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit."
     },
     {
       "name": "height-source",
@@ -577,12 +579,14 @@
       "options": {
         "In-person Measurement": "",
         "EHR Measurement": "ehr"
-      }
+      },
+      "showHelpModel": true
     },
     {
       "name": "height-source-ehr-date",
       "label": "EHR Date",
-      "type": "date"
+      "type": "date",
+      "helpText": "Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit."
     },
     {
       "name": "weight-source",
@@ -591,40 +595,46 @@
       "options": {
         "In-person Measurement": "",
         "EHR Measurement": "ehr"
-      }
+      },
+      "showHelpModel": true
     },
     {
       "name": "weight-source-ehr-date",
       "label": "EHR Date",
-      "type": "date"
+      "type": "date",
+      "helpText": "Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit."
     },
     {
-      "name": "waist-source",
+      "name": "waist-circumference-source",
       "label": "Please select source of the measurement",
       "type": "radio",
       "options": {
         "In-person Measurement": "",
         "EHR Measurement": "ehr"
-      }
+      },
+      "showHelpModel": true
     },
     {
-      "name": "waist-source-ehr-date",
+      "name": "waist-circumference-source-ehr-date",
       "label": "EHR Date",
-      "type": "date"
+      "type": "date",
+      "helpText": "Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit."
     },
     {
-      "name": "hip-source",
+      "name": "hip-circumference-source",
       "label": "Please select source of the measurement",
       "type": "radio",
       "options": {
         "In-person Measurement": "",
         "EHR Measurement": "ehr"
-      }
+      },
+      "showHelpModel": true
     },
     {
-      "name": "hip-source-ehr-date",
+      "name": "hip-circumference-source-ehr-date",
       "label": "EHR Date",
-      "type": "date"
+      "type": "date",
+      "helpText": "Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit."
     }
   ]
 }

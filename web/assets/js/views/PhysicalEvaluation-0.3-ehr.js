@@ -47,27 +47,41 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             this.$('#form_' + ehrDateField).attr('disabled', true);
         }
         this.disableSecondThirdReadings(field, 1, disabled);
-        if ($.inArray(field, ['blood-pressure-source', 'waist-source', 'hip-source']) !== -1) {
+        if ($.inArray(field, ['blood-pressure-source', 'waist-circumference-source', 'hip-circumference-source']) !== -1) {
             this.disableSecondThirdReadings(field, 2, disabled);
         }
+        this.displayWarnings();
+        var dataField = field.replace('-source', '');
+        if (dataField === 'blood-pressure') {
+            dataField = 'blood-pressure-systolic';
+        }
+        this.calculateMean(dataField);
     },
     displayEhrDate: function () {
         var self = this;
-        var sourceFields = ['blood-pressure-source', 'height-source', 'weight-source', 'waist-source', 'hip-source'];
+        var sourceFields = ['blood-pressure-source', 'height-source', 'weight-source', 'waist-circumference-source', 'hip-circumference-source'];
         $.each(sourceFields, function (i, field) {
             if ($("[name='form[" + field + "]']:checked").val() === 'ehr') {
                 $('.' + field + '.ehr-date').show();
                 self.disableSecondThirdReadings(field, 1, true);
-                if ($.inArray(field, ['blood-pressure-source', 'waist-source', 'hip-source']) !== -1) {
+                if ($.inArray(field, ['blood-pressure-source', 'waist-circumference-source', 'hip-circumference-source']) !== -1) {
                     self.disableSecondThirdReadings(field, 2, true);
                 }
             }
         });
     },
     disableSecondThirdReadings: function (field, reading, disabled) {
-        $('.' + field + '-' + 0).find('select').attr('disabled', disabled);
+        var firstReading = $('.' + field + '-0');
+        // Disable first reading protocol modification field
+        firstReading.find('select').attr('disabled', disabled);
+        firstReading.find('select').val('');
+        // Enable first reading fields except protocol modification field and EHR date field
+        firstReading.find('input, input:checkbox').not('#form_' + field + '-ehr-date').each(function () {
+            $(this).attr('disabled', false);
+        });
         $('.' + field + '-' + reading).find('input, select, input:checkbox').each(function () {
             $(this).attr('disabled', disabled);
+            $(this).val('');
         });
     },
     inputChange: function(e) {
@@ -98,13 +112,12 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             $(window).trigger('pmi.equalize');
         }, 50);
     },
+    clearMean: function (field) {
+        this.$('#mean-' + field).text('--');
+        this.$('#convert-' + field).text('');
+    },
     calculateMean: function(field) {
-        //TODO: Optimize mean calculation check
-        if ((field === 'hip-circumference' && $("[name='form[hip-source]']:checked").val() === 'ehr') || (field === 'waist-circumference' && $("[name='form[waist-source]']:checked").val() === 'ehr')) {
-            this.$('#mean-' + field).text('--');
-            this.$('#convert-' + field).text('');
-            return;
-        }
+        var self = this;
         var fieldSelector = '.field-' + field;
         var secondThirdFields = [
             'blood-pressure-systolic',
@@ -115,6 +128,19 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             'hip-circumference',
             'waist-circumference'
         ];
+        if ($.inArray(field, twoClosestFields) !== -1 && $("[name='form[" + field + "-source]']:checked").val() === 'ehr') {
+            this.clearMean(field);
+            return;
+        }
+        if ($.inArray(field, secondThirdFields) !== -1 && $("[name='form[blood-pressure-source]']:checked").val() === 'ehr') {
+            $.each(secondThirdFields, function (i, bloodPressureField) {
+                self.clearMean(bloodPressureField);
+                //Clear warning text
+                $('#' + bloodPressureField + '-warning').html('');
+            });
+            $('#irregular-heart-rate-warning').html('');
+            return;
+        }
         if ($.inArray(field, secondThirdFields) !== -1) {
             fieldSelector = '.field-' + field + '[data-replicate=2], .field-' + field + '[data-replicate=3]';
         }
@@ -682,7 +708,8 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         this.rendered = false;
         this.render();
         $('.ehr-date').pmiDateTimePicker({
-            'format': 'MM/DD/YYYY'
+            'format': 'MM/DD/YYYY',
+            'useCurrent': false
         });
     },
     render: function() {

@@ -1,7 +1,5 @@
 {% import 'evaluationform/metrics.html.twig' as metrics %}
 
-{% set ehrHelpText = 'Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit.' %}
-
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
@@ -28,11 +26,6 @@
                         <div class="panel-body">
                             <p class="text-right">
                                 <em>Reading #{{ i + 1 }}</em>
-                                {% if i == 0 %}
-                                    <span class="toggle-help-image" data-id="measurementSourceModal">
-                                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                                    </span>
-                                {% endif %}
                             </p>
                             <div class="modification-block">
                                 <div class="modification-affected">
@@ -40,7 +33,6 @@
                                         {{ metrics.form_row(evaluationForm, schema.fields['blood-pressure-source']) }}
                                         <div class="blood-pressure-source ehr-date" style="display: none;">
                                             {{ metrics.form_row(evaluationForm, schema.fields['blood-pressure-source-ehr-date']) }}
-                                            <small class="text-info">{{ ehrHelpText }}</small>
                                         </div>
                                     {% endif %}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-systolic'], i) }}
@@ -118,14 +110,10 @@
         <div class="row row-equal-height">
             <div class="col-sm-4 height-source-0">
                 <div class="panel panel-default">
-                    <div class="toggle-help-image pull-right" data-id="measurementSourceModal">
-                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                    </div>
                     <div class="panel-body">
                         {{ metrics.form_row(evaluationForm, schema.fields['height-source']) }}
                         <div class="height-source ehr-date" style="display: none;">
                             {{ metrics.form_row(evaluationForm, schema.fields['height-source-ehr-date']) }}
-                            <small class="text-info">{{ ehrHelpText }}</small>
                         </div>
                         {{ metrics.form_row(evaluationForm, schema.fields['height']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['height-protocol-modification']) }}
@@ -137,14 +125,10 @@
             </div>
             <div class="col-sm-4 weight-source-0">
                 <div class="panel panel-default">
-                    <div class="toggle-help-image pull-right" data-id="measurementSourceModal">
-                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                    </div>
                     <div class="panel-body">
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-source']) }}
                         <div class="weight-source ehr-date" style="display: none;">
                             {{ metrics.form_row(evaluationForm, schema.fields['weight-source-ehr-date']) }}
-                            <small class="text-info">{{ ehrHelpText }}</small>
                         </div>
                         {{ metrics.form_row(evaluationForm, schema.fields['weight']) }}
                         {{ metrics.form_row(evaluationForm, schema.fields['weight-prepregnancy']) }}
@@ -195,24 +179,18 @@
         </div>
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
-                <div class="col-sm-4 waist-source-{{ i }}">
+                <div class="col-sm-4 waist-circumference-source-{{ i }}">
                     <div class="panel panel-default panel-waist-circumference-{{ i + 1 }}">
                         <div class="panel-body">
                             <p class="text-right">
                                 <em>Reading #{{ i + 1 }}</em>
-                                {% if i == 0 %}
-                                    <span class="toggle-help-image" data-id="measurementSourceModal">
-                                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                                    </span>
-                                {% endif %}
                             </p>
                             <div class="modification-block">
                                 <div class="modification-affected">
                                     {% if i == 0 %}
-                                        {{ metrics.form_row(evaluationForm, schema.fields['waist-source']) }}
-                                        <div class="waist-source ehr-date" style="display: none;">
-                                            {{ metrics.form_row(evaluationForm, schema.fields['waist-source-ehr-date']) }}
-                                            <small class="text-info">{{ ehrHelpText }}</small>
+                                        {{ metrics.form_row(evaluationForm, schema.fields['waist-circumference-source']) }}
+                                        <div class="waist-circumference-source ehr-date" style="display: none;">
+                                            {{ metrics.form_row(evaluationForm, schema.fields['waist-circumference-source-ehr-date']) }}
                                         </div>
                                     {% endif %}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference'], i) }}
@@ -239,24 +217,18 @@
         <h4>Hip</h4>
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
-                <div class="col-sm-4 hip-source-{{ i }}">
+                <div class="col-sm-4 hip-circumference-source-{{ i }}">
                     <div class="panel panel-default panel-hip-circumference-{{ i + 1 }}">
                         <div class="panel-body">
                             <p class="text-right">
                                 <em>Reading #{{ i + 1 }}</em>
-                                {% if i == 0 %}
-                                    <span class="toggle-help-image" data-id="measurementSourceModal">
-                                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                                    </span>
-                                {% endif %}
                             </p>
                             <div class="modification-block">
                                 <div class="modification-affected">
                                     {% if i == 0 %}
-                                        {{ metrics.form_row(evaluationForm, schema.fields['hip-source']) }}
-                                        <div class="hip-source ehr-date" style="display: none;">
-                                            {{ metrics.form_row(evaluationForm, schema.fields['hip-source-ehr-date']) }}
-                                            <small class="text-info">{{ ehrHelpText }}</small>
+                                        {{ metrics.form_row(evaluationForm, schema.fields['hip-circumference-source']) }}
+                                        <div class="hip-circumference-source ehr-date" style="display: none;">
+                                            {{ metrics.form_row(evaluationForm, schema.fields['hip-circumference-source-ehr-date']) }}
                                         </div>
                                     {% endif %}
                                     {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference'], i) }}

@@ -563,7 +563,8 @@ class Fhir
                     'display' => 'Computed body mass index',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
         );
         $related = [];
         foreach (['height-protocol-modification', 'weight-protocol-modification'] as $metric) {
@@ -678,7 +679,7 @@ class Fhir
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
-            $this->getEffectiveDateTime('hip-source')
+            $this->getEffectiveDateTime('hip-circumference-source')
         );
     }
 
@@ -701,7 +702,7 @@ class Fhir
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
-            $this->getEffectiveDateTime('waist-source')
+            $this->getEffectiveDateTime('waist-circumference-source')
         );
         if (isset($this->data->{'waist-circumference-location'})) {
             $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();

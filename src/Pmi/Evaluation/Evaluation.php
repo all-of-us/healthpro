@@ -63,16 +63,16 @@ class Evaluation
         'blood-pressure-source',
         'height-source',
         'weight-source',
-        'waist-source',
-        'hip-source'
+        'waist-circumference-source',
+        'hip-circumference-source'
     ];
 
     public static $ehrProtocolDateFields = [
         'blood-pressure-source-ehr-date',
         'height-source-ehr-date',
         'weight-source-ehr-date',
-        'waist-source-ehr-date',
-        'hip-source-ehr-date'
+        'waist-circumference-source-ehr-date',
+        'hip-circumference-source-ehr-date'
     ];
 
     public function __construct($app = null, $type = null)
@@ -868,10 +868,10 @@ class Evaluation
         if ($this->data->{'weight-source'} === 'ehr') {
             $this->data->{"weight-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
         }
-        if ($this->data->{'waist-source'} === 'ehr') {
+        if ($this->data->{'waist-circumference-source'} === 'ehr') {
             $this->data->{'waist-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
         }
-        if ($this->data->{'hip-source'} === 'ehr') {
+        if ($this->data->{'hip-circumference-source'} === 'ehr') {
             $this->data->{'hip-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
         }
     }
