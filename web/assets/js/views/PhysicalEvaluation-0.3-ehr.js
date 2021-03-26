@@ -75,8 +75,8 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         // Disable first reading protocol modification field
         firstReading.find('select').attr('disabled', disabled);
         firstReading.find('select').val('');
-        // Enable first reading fields except protocol modification field
-        firstReading.find('input, input:checkbox').each(function () {
+        // Enable first reading fields except protocol modification field and EHR date field
+        firstReading.find('input, input:checkbox').not('#form_' + field + '-ehr-date').each(function () {
             $(this).attr('disabled', false);
         });
         $('.' + field + '-' + reading).find('input, select, input:checkbox').each(function () {
