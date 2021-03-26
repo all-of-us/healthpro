@@ -72,7 +72,14 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         });
     },
     disableSecondThirdReadings: function (field, reading, disabled) {
-        $('.' + field + '-' + 0).find('select').attr('disabled', disabled);
+        var firstReading = $('.' + field + '-0');
+        // Disable first reading protocol modification field
+        firstReading.find('select').attr('disabled', disabled);
+        firstReading.find('select').val('');
+        // Enable first reading fields except protocol modification field
+        firstReading.find('input, input:checkbox').each(function () {
+            $(this).attr('disabled', false);
+        });
         $('.' + field + '-' + reading).find('input, select, input:checkbox').each(function () {
             $(this).attr('disabled', disabled);
             $(this).val('');
