@@ -333,7 +333,7 @@
         "Pregnancy": "pregnancy",
         "Refusal": "refusal",
         "Urgent/emergent event": "emergency",
-        "Whole Blood Donor": "whole-blood-donor",
+        "Whole blood donor": "whole-blood-donor",
         "Other": "other"
       },
       "help": {

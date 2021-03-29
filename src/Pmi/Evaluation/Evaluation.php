@@ -24,7 +24,8 @@ class Evaluation
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
     const DIVERSION_POUCH = 'diversion-pouch';
-    const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'whole-blood-donor';
+    const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'blood-bank-donor';
+    const BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL = 'Blood bank donor';
 
     protected $app;
     protected $version;

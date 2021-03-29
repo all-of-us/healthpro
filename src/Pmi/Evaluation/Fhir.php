@@ -338,9 +338,10 @@ class Fhir
             $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1]) ? $this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1] : '';
         }
         $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
-        // Add display text for whole-blood-donor
-        if ($conceptCode === 'whole-blood-donor') {
-            $conceptDisplay = 'Whole Blood Donor';
+
+        // Add display text for system blood bank donor modification
+        if ($conceptCode === Evaluation::BLOOD_DONOR_PROTOCOL_MODIFICATION) {
+            $conceptDisplay = Evaluation::BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL;
         } else {
             $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
         }
