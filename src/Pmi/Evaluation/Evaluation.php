@@ -59,6 +59,14 @@ class Evaluation
         'heart-rate'
     ];
 
+    public static $protocolModificationNotesFields = [
+        'blood-pressure-protocol-modification-notes',
+        'height-protocol-modification-notes',
+        'weight-protocol-modification-notes',
+        'hip-circumference-protocol-modification-notes',
+        'waist-circumference-protocol-modification-notes'
+    ];
+
     public static $measurementSourceFields = [
         'blood-pressure-source',
         'height-source',
@@ -992,7 +1000,8 @@ class Evaluation
     public function getFormFieldErrorMessage($field = null, $replicate = null)
     {
         if (($this->isDiversionPouchForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
-            ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields)))
+            ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields))) ||
+            (in_array($field, self::$protocolModificationNotesFields))
         ) {
             return 'Please complete';
         }
