@@ -85,11 +85,11 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
         }
         if (isWheelchairBound) {
             if (this.rendered) {
-                this.$('#form_weight-protocol-modification').valChange('wheelchair-bound');
+                this.$('#form_weight-protocol-modification').valChange('wheelchair-user');
             }
         }
         if (!isWheelchairBound) {
-            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-bound') {
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-user') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }

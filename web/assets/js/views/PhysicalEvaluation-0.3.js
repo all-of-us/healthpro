@@ -169,15 +169,15 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         }
         if (isWheelchairBound) {
             if (this.rendered) {
-                this.$('#form_height-protocol-modification').valChange('wheelchair-bound');
-                this.$('#form_weight-protocol-modification').valChange('wheelchair-bound');
+                this.$('#form_height-protocol-modification').valChange('wheelchair-user');
+                this.$('#form_weight-protocol-modification').valChange('wheelchair-user');
             }
         }
         if (!isWheelchairBound) {
-            if (this.rendered && this.$('#form_height-protocol-modification').val() == 'wheelchair-bound') {
+            if (this.rendered && this.$('#form_height-protocol-modification').val() == 'wheelchair-user') {
                 this.$('#form_height-protocol-modification').valChange('');
             }
-            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-bound') {
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-user') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
