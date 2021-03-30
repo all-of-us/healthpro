@@ -464,6 +464,11 @@ class Evaluation
                 }
             }
         }
+        foreach ($this->data->{'blood-pressure-protocol-modification'} as $k => $value) {
+            if ($value === 'other' && empty($this->data->{'blood-pressure-protocol-modification-notes'}[$k])) {
+                $errors[] = ['blood-pressure-protocol-modification-notes', $k];
+            }
+        }
         foreach (['height', 'weight'] as $field) {
             $displayError = false;
             // For EHR protocol form display error if first reading is empty and has ehr protocol modification
@@ -472,6 +477,9 @@ class Evaluation
             }
             if ((!$this->data->{$field . '-protocol-modification'} || $displayError) && !$this->data->$field) {
                 $errors[] = $field;
+            }
+            if ($this->data->{$field . '-protocol-modification'} === 'other' && empty($this->data->{$field . '-protocol-modification-notes'})) {
+                $errors[] = $field . '-protocol-modification-notes';
             }
         }
         if (!$this->data->pregnant && !$this->data->wheelchair) {
@@ -494,6 +502,9 @@ class Evaluation
                     }
                     if ((!$this->data->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
                         $errors[] = [$field, $k];
+                    }
+                    if ($this->data->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->data->{$field . 'protocol-modification-notes'}[$k])) {
+                        $errors[] = [$field . '-protocol-modification-notes', $k];
                     }
                 }
             }
