@@ -1,8 +1,0 @@
-{% set current_route = app.request_stack.currentRequest.attributes.get('_route') %}
-<ul class="nav nav-tabs">
-    <li role="presentation" {% if current_route == 'biobank_ordersToday' %}class="active"{% endif %}><a href="{{ path('biobank_ordersToday') }}">Today's Biobank Orders</a></li>
-    <li role="presentation" {% if current_route == 'biobank_quanumOrdersToday' %}class="active"{% endif %}><a href="{{ path('biobank_quanumOrdersToday') }}">Today's Quest Biobank Orders</a></li>
-    <li role="presentation" {% if current_route == 'biobank_ordersUnfinalized' %}class="active"{% endif %}><a href="{{ path('biobank_ordersUnfinalized') }}">Unfinalized Biobank Orders</a></li>
-    <li role="presentation" {% if current_route == 'biobank_ordersUnlocked' %}class="active"{% endif %}><a href="{{ path('biobank_ordersUnlocked') }}">Unlocked Biobank Orders</a></li>
-    <li role="presentation" {% if current_route == 'biobank_ordersRecentModify' %}class="active"{% endif %}><a href="{{ path('biobank_ordersRecentModify') }}">Recently Modified Biobank Orders</a></li>
-</ul>

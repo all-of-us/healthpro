@@ -1,0 +1,117 @@
+<dl class="dl-horizontal">
+    {% if attribute(order, type~'Site') is not empty and attribute(order, type~'Ts') %}
+        <div class="{% if order.rdrId is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong {% if attribute(order, 'biobankFinalized') and attribute(order, type~'User') is empty %} class="text-danger" {% endif %}>{{ type|capitalize }} by {{ attribute(order, type~'User') is not empty ? attribute(order, type~'User').email|default('Unknown') : 'Biobank user' }} at {{ siteInfo.siteDisplayName(attribute(order, type~'Site')) }}</strong>
+        </div>
+    {% elseif order.origin is defined and order.origin == 'careevolution' and attribute(order, type~'User') is not empty %}
+        <div class="alert alert-success well-sm">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>{{ type|capitalize }} by Quest User at a Quest Site</strong>
+        </div>
+    {% endif %}
+    {% if type == 'finalized' and order.failedToReachRDR %}
+        <div class="alert alert-danger well-sm">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>An error occurred while finalizing this order.</strong>
+        </div>
+    {% endif %}
+</dl>
+{% if is_granted('ROLE_BIOBANK') and type == 'finalized' and attribute(order, 'finalizedTs') is empty and not order.disabled and order.origin is empty %}
+    {% import 'biobank/partials/order-samples.html.twig' as samples %}
+    {% if order.type != 'saliva' %}
+        {% form_theme finalizeForm 'form/simple_checkbox.html.twig' %}
+    {% endif %}
+    <div class="row col-sm-12">
+        {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit finalize-form' } }) }}
+        {{ form_errors(finalizeForm) }}
+
+        <div class="form-group{% if not finalizeForm.finalizedSamples.vars.valid %} has-error{% endif %}">
+            {{ form_label(finalizeForm.finalizedSamples) }}
+            <span class="toggle-help-image" data-caption="Finalized samples help text placeholder.">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
+            {% if order.type == 'saliva' %}
+                {{ form_widget(finalizeForm.finalizedSamples) }}
+            {% else %}
+                {{ samples.form_widget(finalizeForm.finalizedSamples, order.disabled ? false : true, samplesInfo, version) }}
+            {% endif %}
+            {{ form_errors(finalizeForm.finalizedSamples) }}
+        </div>
+
+        {% if finalizeForm.processedCentrifugeType is defined %}
+            <div class="form-group{% if not finalizeForm.processedCentrifugeType.vars.valid %} has-error{% endif %}">
+                {{ form_label(finalizeForm.processedCentrifugeType) }}
+                <span class="toggle-help-image" data-caption="Centrifuge type help text placeholder.">
+                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                </span>
+                {{ form_widget(finalizeForm.processedCentrifugeType) }}
+                {{ form_errors(finalizeForm.processedCentrifugeType) }}
+            </div>
+        {% endif %}
+
+        <div class="form-group{% if not finalizeForm.finalizedNotes.vars.valid %} has-error{% endif %}">
+            {{ form_label(finalizeForm.finalizedNotes) }}
+            <span class="toggle-help-image" data-caption="Finalized notes help text placeholder.">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
+            {{ form_widget(finalizeForm.finalizedNotes) }}
+            <small class="text-warning">Comments entered in this field must be transmitted to the Biobank via reconciliation reporting. You may not enter any participant identifying information here.</small>
+            {{ form_errors(finalizeForm.finalizedNotes) }}
+        </div>
+
+        {{ form_rest(finalizeForm) }}
+        <p>
+            <button type="submit" class="btn btn-primary">
+                Save and mark as finalized
+            </button>
+        </p>
+        {{ form_end(finalizeForm) }}
+    </div>
+{% else %}
+    <div class="row col-sm-6">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col" colspan="2">Samples</th>
+                <th scope="col">
+                    {{ type|capitalize }}
+                    {% if type != 'processed' and attribute(order, type~'Ts') is not empty %}
+                        <br> {{ attribute(order, type~'Ts')|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                    {% endif %}
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for sample in samplesInfoText %}
+                {% if (type == 'processed' and sample.process is defined) or (type != 'processed') %}
+                    <tr>
+                        <td>{{ sample.code }}</td>
+                        <td>{{ sample.color }}</td>
+                        <td>
+                            {% if attribute(order, type~'Ts') %}
+                                {% if attribute(sample, type~'_checked') is defined and attribute(sample, type~'_ts') is defined and attribute(sample, type~'_ts') is not empty %}
+                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                    {{ type == 'processed' ? attribute(sample, type~'_ts')|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                                {% else %}
+                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                {% endif %}
+                            {% else %}
+                                {% if attribute(sample, type~'_checked') is defined %}
+                                    <i class="fa fa-check text-default" aria-hidden="true"></i>
+                                {% else %}
+                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="row col-sm-12">
+        <b>Notes</b>
+        <br>{{ attribute(order, type~'Notes')|default('--') }}
+    </div>
+{% endif %}

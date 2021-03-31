@@ -271,6 +271,25 @@ class Order
      */
     private $finalizedSite;
 
+    private $quanumCollectedUser;
+
+    private $quanumProcessedUser;
+
+    private $quanumFinalizedUser;
+
+    private $collectedSiteName;
+
+    private $processedSiteName;
+
+    private $finalizedSiteName;
+
+    private $collectedSiteAddress;
+
+    private $quanumFinalizedSamples;
+
+    private $quanumOrderStatus;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -685,6 +704,115 @@ class Order
         return $this;
     }
 
+    public function getQuanumCollectedUser(): ?string
+    {
+        return $this->quanumCollectedUser;
+    }
+
+    public function setQuanumCollectedUser(?string $quanumCollectedUser): self
+    {
+        $this->quanumCollectedUser = $quanumCollectedUser;
+
+        return $this;
+    }
+
+    public function getQuanumProcessedUser(): ?string
+    {
+        return $this->quanumProcessedUser;
+    }
+
+    public function setQuanumProcessedUser(?string $quanumProcessedUser): self
+    {
+        $this->quanumProcessedUser = $quanumProcessedUser;
+
+        return $this;
+    }
+
+    public function getQuanumFinalizedUser(): ?string
+    {
+        return $this->quanumFinalizedUser;
+    }
+
+    public function setQuanumFinalizedUser(?string $quanumFinalizedUser): self
+    {
+        $this->quanumFinalizedUser = $quanumFinalizedUser;
+
+        return $this;
+    }
+
+    public function setCollectedSiteName(?string $collectedSiteName): self
+    {
+        $this->collectedSiteName = $collectedSiteName;
+
+        return $this;
+    }
+
+    public function getCollectedSiteName(): ?string
+    {
+        return $this->collectedSiteName;
+    }
+
+    public function setProcessedSiteName(?string $processedSiteName): self
+    {
+        $this->processedSiteName = $processedSiteName;
+
+        return $this;
+    }
+
+    public function getProcessedSiteName(): ?string
+    {
+        return $this->processedSiteName;
+    }
+
+    public function setFinalizedSiteName(?string $finalizedSiteName): self
+    {
+        $this->finalizedSiteName = $finalizedSiteName;
+
+        return $this;
+    }
+
+    public function getFinalizedSiteName(): ?string
+    {
+        return $this->finalizedSiteName;
+    }
+
+
+    public function setCollectedSiteAddress(?string $collectedSiteAddress): self
+    {
+        $this->collectedSiteAddress = $collectedSiteAddress;
+
+        return $this;
+    }
+
+    public function getQuanumFinalizedSamples(): ?string
+    {
+        return $this->quanumFinalizedSamples;
+    }
+
+    public function setQuanumFinalizedSamples(?string $quanumFinalizedSamples): self
+    {
+        $this->quanumFinalizedSamples = $quanumFinalizedSamples;
+
+        return $this;
+    }
+
+    public function getCollectedSiteAddress(): ?string
+    {
+        return $this->collectedSiteAddress;
+    }
+
+    public function setQuanumOrderStatus(?string $quanumOrderStatus): self
+    {
+        $this->quanumOrderStatus = $quanumOrderStatus;
+
+        return $this;
+    }
+
+    public function getQuanumOrderStatus(): ?string
+    {
+        return $this->quanumOrderStatus;
+    }
+
     public function getSamples()
     {
         return $this->samples;
@@ -960,7 +1088,7 @@ class Order
     // Finalized form is only disabled when rdr_id is set
     public function isDisabled()
     {
-        return ($this->getRdrId() || $this->isExpired()|| $this->isCancelled()) && $this->getStatus() !== 'unlock';
+        return ($this->getRdrId() || $this->isExpired() || $this->isCancelled()) && $this->getStatus() !== 'unlock';
     }
 
     // Except finalize form all forms are disabled when finalized_ts is set
@@ -976,7 +1104,7 @@ class Order
 
     public function isUnlocked()
     {
-        return $this->getStatus()=== self::ORDER_UNLOCK;
+        return $this->getStatus() === self::ORDER_UNLOCK;
     }
 
     public function isFailedToReachRdr()
@@ -1245,5 +1373,90 @@ class Order
         }
 
         return $biobankChanges;
+    }
+
+    public function getFinalizedProcessSamples($samples)
+    {
+        $processSamples = [];
+        foreach ($samples as $sample) {
+            if (in_array($sample, self::$samplesRequiringProcessing)) {
+                array_push($processSamples, $sample);
+            }
+        }
+        return $processSamples;
+    }
+
+    public function checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, $finalizedNotes, $centrifugeType)
+    {
+        $biobankChanges = [];
+        $collectedSamples = !empty($this->getCollectedSamples()) ? json_decode($this->getCollectedSamples(), true) : [];
+        $processedSamples = !empty($this->getProcessedSamples()) ? json_decode($this->getProcessedSamples(), true) : [];
+        $processedSamplesTs = !empty($this->getProcessedSamplesTs()) ? json_decode($this->getProcessedSamplesTs(), true) : [];
+        $collectedSamplesDiff = array_values(array_diff($finalizedSamples, $collectedSamples));
+        $finalizedProcessSamples = $this->getFinalizedProcessSamples($finalizedSamples);
+        $processedSamplesDiff = array_values(array_diff($finalizedProcessSamples, $processedSamples));
+        if (empty($collectedTs)) {
+            // Collected ts should already been set
+            $this->setCollectedUser(null);
+            $biobankChanges['collected'] = [
+                'time' => $finalizedTs->getTimestamp(),
+                'user' => null
+            ];
+        }
+        if (empty($collectedSamples) || !empty($collectedSamplesDiff)) {
+            $this->setCollectedSite($this->getSite());
+            $this->setCollectedSamples(json_encode(array_merge($collectedSamples, $collectedSamplesDiff)));
+            $biobankChanges['collected']['site'] = $this->getSite();
+            $biobankChanges['collected']['samples'] = $collectedSamplesDiff;
+        }
+        if (empty($processedSamplesTs)) {
+            $this->setProcessedTs($finalizedTs);
+            $this->setProcessedUser(null);
+            $biobankChanges['processed'] = [
+                'time' => $finalizedTs->getTimestamp(),
+                'user' => null
+            ];
+            $finalizedProcessSamplesTs = [];
+            foreach ($finalizedProcessSamples as $sample) {
+                $finalizedProcessSamplesTs[$sample] = $finalizedTs->getTimestamp();
+            }
+            $this->setProcessedSite($this->getSite());
+            $this->setProcessedSamples(json_encode($finalizedProcessSamples));
+            $this->setProcessedSamplesTs(json_encode($finalizedProcessSamplesTs));
+            $biobankChanges['processed']['site'] = $this->getSite();
+            $biobankChanges['processed']['samples'] = $finalizedProcessSamples;
+            $biobankChanges['processed']['samples_ts'] = $finalizedProcessSamplesTs;
+        }
+        if (!empty($processedSamplesTs) && !empty($processedSamplesDiff)) {
+            $totalProcessedSamples = array_merge($processedSamples, $processedSamplesDiff);
+            $newProcessedSampleTs = [];
+            foreach ($processedSamplesDiff as $sample) {
+                $newProcessedSampleTs[$sample] = $finalizedTs->getTimestamp();
+            }
+            $this->setProcessedSite($this->getSite());
+            $this->setProcessedSamples(json_encode($totalProcessedSamples));
+            $this->setProcessedSamplesTs(json_encode(array_merge($newProcessedSampleTs, $processedSamplesTs)));
+            $biobankChanges['processed']['site'] = $this->getSite();
+            $biobankChanges['processed']['samples'] = $processedSamplesDiff;
+            $biobankChanges['processed']['samples_ts'] = $newProcessedSampleTs;
+        }
+        if (!empty($centrifugeType)) {
+            $this->setProcessedCentrifugeType($centrifugeType);
+            $biobankChanges['processed']['centrifuge_type'] = $centrifugeType;
+        }
+        $this->setFinalizedTs($finalizedTs);
+        $this->setFinalizedSite($this->getSite());
+        $this->setFinalizedUser(null);
+        $this->setFinalizedNotes($finalizedNotes);
+        $this->setFinalizedSamples(json_encode($finalizedSamples));
+        $biobankChanges['finalized'] = [
+            'time' => $finalizedTs->getTimestamp(),
+            'site' => $this->getSite(),
+            'user' => null,
+            'notes' => $finalizedNotes,
+            'samples' => $finalizedSamples
+        ];
+        $this->setBiobankFinalized(1);
+        $this->setBiobankChanges(json_encode($biobankChanges));
     }
 }
