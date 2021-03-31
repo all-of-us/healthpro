@@ -59,6 +59,14 @@ class Evaluation
         'heart-rate'
     ];
 
+    public static $protocolModificationNotesFields = [
+        'blood-pressure-protocol-modification-notes',
+        'height-protocol-modification-notes',
+        'weight-protocol-modification-notes',
+        'hip-circumference-protocol-modification-notes',
+        'waist-circumference-protocol-modification-notes'
+    ];
+
     public static $measurementSourceFields = [
         'blood-pressure-source',
         'height-source',
@@ -464,6 +472,11 @@ class Evaluation
                 }
             }
         }
+        foreach ($this->data->{'blood-pressure-protocol-modification'} as $k => $value) {
+            if ($value === 'other' && empty($this->data->{'blood-pressure-protocol-modification-notes'}[$k])) {
+                $errors[] = ['blood-pressure-protocol-modification-notes', $k];
+            }
+        }
         foreach (['height', 'weight'] as $field) {
             $displayError = false;
             // For EHR protocol form display error if first reading is empty and has ehr protocol modification
@@ -472,6 +485,9 @@ class Evaluation
             }
             if ((!$this->data->{$field . '-protocol-modification'} || $displayError) && !$this->data->$field) {
                 $errors[] = $field;
+            }
+            if ($this->data->{$field . '-protocol-modification'} === 'other' && empty($this->data->{$field . '-protocol-modification-notes'})) {
+                $errors[] = $field . '-protocol-modification-notes';
             }
         }
         if (!$this->data->pregnant && !$this->data->wheelchair) {
@@ -494,6 +510,9 @@ class Evaluation
                     }
                     if ((!$this->data->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
                         $errors[] = [$field, $k];
+                    }
+                    if ($this->data->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->data->{$field . 'protocol-modification-notes'}[$k])) {
+                        $errors[] = [$field . '-protocol-modification-notes', $k];
                     }
                 }
             }
@@ -981,7 +1000,8 @@ class Evaluation
     public function getFormFieldErrorMessage($field = null, $replicate = null)
     {
         if (($this->isDiversionPouchForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
-            ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields)))
+            ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields))) ||
+            (in_array($field, self::$protocolModificationNotesFields))
         ) {
             return 'Please complete';
         }
