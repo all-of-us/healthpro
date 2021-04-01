@@ -6,7 +6,7 @@ const _ = require('underscore');
 
 /* eslint security/detect-object-injection: "off" */
 
-PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
+PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
     events: {
         "click .toggle-help-image": "displayHelpModal",
         "change input, select": "inputChange",

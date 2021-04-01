@@ -99,12 +99,12 @@
         "type": {
           "coding": [
             {
-              "code": "intake-exam-v0.3.3-diversion-pouch",
-              "display": "All of Us Intake Evaluation v0.3.3-diversion-pouch",
+              "code": "intake-exam-v0.3.3-blood-donor",
+              "display": "All of Us Intake Evaluation v0.3.3-blood-donor",
               "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/document-type"
             }
           ],
-          "text": "All of Us Intake Evaluation v0.3.3-diversion-pouch"
+          "text": "All of Us Intake Evaluation v0.3.3-blood-donor"
         },
         "extension": [
           {

@@ -41,7 +41,7 @@
         {{ form_label(form[name][i]) }}
         {% if definition.unit is defined %}
             <div class="input-group">
-                {#Set max and min limits for Diversion Pouch 2nd blood pressure reading#}
+                {#Set max and min limits for Blood Donor 2nd blood pressure reading#}
                 {% if definition.secondMax is defined and i == 1 %}
                     {{ form_widget(form[name][i], {'attr': {'data-parsley-max': definition.secondMax, 'data-parsley-min': definition.secondMin}}) }}
                 {% else %}

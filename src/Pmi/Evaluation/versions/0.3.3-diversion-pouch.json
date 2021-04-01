@@ -1,6 +1,6 @@
 {
-  "version": "0.3.3-diversion-pouch",
-  "template": "0.3-diversion-pouch",
+  "version": "0.3.3-blood-donor",
+  "template": "0.3-blood-donor",
   "fields": [
     {
       "name": "blood-pressure-location",

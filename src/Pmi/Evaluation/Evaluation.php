@@ -18,14 +18,14 @@ use Pmi\Audit\Log;
 class Evaluation
 {
     const CURRENT_VERSION = '0.3.3';
-    const DIVERSION_POUCH_CURRENT_VERSION = '0.3.3-diversion-pouch';
+    const BLOOD_DONOR_CURRENT_VERSION = '0.3.3-blood-donor';
     const EHR_CURRENT_VERSION = '0.3.3-ehr';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_ACTIVE = 'active';
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
-    const DIVERSION_POUCH = 'diversion-pouch';
+    const BLOOD_DONOR = 'blood-donor';
     const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'blood-bank-donor';
     const BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL = 'Blood bank donor';
     const EHR_PROTOCOL_MODIFICATION = 'ehr';
@@ -97,8 +97,8 @@ class Evaluation
     private function getCurrentVersion($type)
     {
         if ($this->app) {
-            if ($type === self::DIVERSION_POUCH && $this->requireBloodDonorCheck()) {
-                return self::DIVERSION_POUCH_CURRENT_VERSION;
+            if ($type === self::BLOOD_DONOR && $this->requireBloodDonorCheck()) {
+                return self::BLOOD_DONOR_CURRENT_VERSION;
             }
             if ($this->requireEhrModificationProtocol()) {
                 return self::EHR_CURRENT_VERSION;
@@ -365,8 +365,8 @@ class Evaluation
                     'required' => false,
                     'label' => isset($options['label']) ? $options['label'] : null
                 ];
-                if ($this->isDiversionPouchForm() && in_array($field->name, self::$bloodPressureFields)) {
-                    $collectionOptions['constraints'] = $this->addDiversionPouchSecondBloodPressureConstraint($form, $field);
+                if ($this->isBloodDonorForm() && in_array($field->name, self::$bloodPressureFields)) {
+                    $collectionOptions['constraints'] = $this->addBloodDonorSecondBloodPressureConstraint($form, $field);
                 }
                 if (isset($field->compare)) {
                     $collectionOptions['constraints'] = $this->addDiastolicBloodPressureConstraint($form, $field);
@@ -479,10 +479,10 @@ class Evaluation
         foreach (self::$bloodPressureFields as $field) {
             foreach ($this->data->$field as $k => $value) {
                 $displayError = false;
-                // For Diversion Pouch form display error if 2nd reading is empty and
+                // For Blood Donor form display error if 2nd reading is empty and
                 // 1st reading is out of range even though it has a protocol modification
-                if ($this->isDiversionPouchForm()) {
-                    $displayError = $k === 1 && $this->isDiversionPouchPressureOutOfRange(0);
+                if ($this->isBloodDonorForm()) {
+                    $displayError = $k === 1 && $this->isBloodDonorPressureOutOfRange(0);
                 }
                 // For EHR protocol form display error if first reading is empty and has ehr protocol modification
                 if ($this->isEhrProtocolForm()) {
@@ -563,8 +563,8 @@ class Evaluation
 
     protected function calculateMean($field)
     {
-        // Do not calculate mean for blood pressure fields in Diversion Pouch form
-        if ($this->isDiversionPouchForm() && in_array($field, self::$bloodPressureFields)) {
+        // Do not calculate mean for blood pressure fields in Blood Donor form
+        if ($this->isBloodDonorForm() && in_array($field, self::$bloodPressureFields)) {
             return null;
         }
         $secondThirdFields = self::$bloodPressureFields;
@@ -872,9 +872,9 @@ class Evaluation
         return false;
     }
 
-    public function isDiversionPouchForm()
+    public function isBloodDonorForm()
     {
-        return strpos($this->version, self::DIVERSION_POUCH) !== false;
+        return strpos($this->version, self::BLOOD_DONOR) !== false;
     }
 
     public function isEhrProtocolForm()
@@ -927,7 +927,7 @@ class Evaluation
     public function addBloodDonorProtocolModificationForBloodPressure($reading)
     {
         // Do not set default reading #2 values if reading #1 is out of range
-        if ($reading === 1 && empty($this->data->{'blood-pressure-protocol-modification'}[0]) && $this->isDiversionPouchPressureOutOfRange(0)) {
+        if ($reading === 1 && empty($this->data->{'blood-pressure-protocol-modification'}[0]) && $this->isBloodDonorPressureOutOfRange(0)) {
             return false;
         }
         // Default reading #2 values are only set when finalized
@@ -945,7 +945,7 @@ class Evaluation
         $this->data->{"height-protocol-modification"} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
     }
 
-    public function isDiversionPouchPressureOutOfRange($key)
+    public function isBloodDonorPressureOutOfRange($key)
     {
         $limits = $this->getSecondBloodPressureLimits();
         list($systolic, $diastolic, $heartRate) = self::$bloodPressureFields;
@@ -961,7 +961,7 @@ class Evaluation
         return false;
     }
 
-    private function addDiversionPouchSecondBloodPressureConstraint($form, $field)
+    private function addBloodDonorSecondBloodPressureConstraint($form, $field)
     {
         $secondMaxVal = $field->secondMax;
         $secondMinVal = $field->secondMin;
@@ -1021,7 +1021,7 @@ class Evaluation
 
     public function getFormFieldErrorMessage($field = null, $replicate = null)
     {
-        if (($this->isDiversionPouchForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
+        if (($this->isBloodDonorForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
             ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields))) ||
             (in_array($field, self::$protocolModificationNotesFields))
         ) {
@@ -1039,8 +1039,8 @@ class Evaluation
 
     public function getLatestFormVersion()
     {
-        if ($this->isDiversionPouchForm()) {
-            return self::DIVERSION_POUCH_CURRENT_VERSION;
+        if ($this->isBloodDonorForm()) {
+            return self::BLOOD_DONOR_CURRENT_VERSION;
         }
         if ($this->isEhrProtocolForm()) {
             return self::EHR_CURRENT_VERSION;
@@ -1050,7 +1050,7 @@ class Evaluation
 
     public function canAutoModify()
     {
-        if ($this->isDiversionPouchForm()) {
+        if ($this->isBloodDonorForm()) {
             return false;
         }
         if ($this->isEhrProtocolForm()) {
