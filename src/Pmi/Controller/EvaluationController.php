@@ -22,12 +22,12 @@ class EvaluationController extends AbstractController
         ['evaluationBloodDonorCheck', '/participant/{participantId}/measurements/blood/donor/check', ['method' => 'GET|POST']],
     ];
 
-    /* For debugging generated FHIR bundle - only allowed in dev */
+    /* For debugging generated FHIR bundle - only allowed for admins or in local dev */
     public function evaluationFhirAction($participantId, $evalId, Application $app, Request $request)
     {
         $isTest = $request->query->has('test');
-        if (!$app->isLocal()) {
-            $app->abort(404);
+        if (!$app->hasRole('ROLE_ADMIN') && !$app->isLocal()) {
+            $app->abort(403);
         }
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
@@ -72,11 +72,11 @@ class EvaluationController extends AbstractController
         }
     }
 
-    /* For debugging evaluation object pushed to RDR - only allowed in dev */
+    /* For debugging evaluation object pushed to RDR - only allowed for admins or in local dev */
     public function evaluationRdrAction($participantId, $evalId, Application $app)
     {
-        if (!$app->isLocal()) {
-            $app->abort(404);
+        if (!$app->hasRole('ROLE_ADMIN') && !$app->isLocal()) {
+            $app->abort(403);
         }
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
@@ -106,7 +106,7 @@ class EvaluationController extends AbstractController
         if (!$evaluationService->canEdit($evalId, $participant) || $app->isTestSite()) {
             $app->abort(403);
         }
-        
+
         $evaluation = $app['em']->getRepository('evaluations')->fetchOneBy([
             'id' => $evalId,
             'participant_id' => $participantId
@@ -246,13 +246,11 @@ class EvaluationController extends AbstractController
                                     list($field, $replicate) = $field;
                                     $evaluationForm->get($field)->get($replicate)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field, $replicate)));
                                 } else {
-                                    $evaluationForm->get($field)->addError(new FormError($evaluationService->getFormFieldErrorMessage()));
+                                    $evaluationForm->get($field)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field)));
                                 }
                             }
                             $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                            if (!$evaluationService->isDiversionPouchForm()) {
-                                $showAutoModification = true;
-                            }
+                            $showAutoModification = $evaluationService->canAutoModify();
                         }
                     }
                     if (!$evaluation || $request->request->has('copy')) {
@@ -330,13 +328,11 @@ class EvaluationController extends AbstractController
                         list($field, $replicate) = $field;
                         $evaluationForm->get($field)->get($replicate)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field, $replicate)));
                     } else {
-                        $evaluationForm->get($field)->addError(new FormError($evaluationService->getFormFieldErrorMessage()));
+                        $evaluationForm->get($field)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field)));
                     }
                 }
                 $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                if (!$evaluationService->isDiversionPouchForm()) {
-                    $showAutoModification = true;
-                }
+                $showAutoModification = $evaluationService->canAutoModify();
             }
         }
 
@@ -347,9 +343,11 @@ class EvaluationController extends AbstractController
             'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
-            'latestVersion' => $evaluationService->isDiversionPouchForm() ? $evaluationService::DIVERSION_POUCH_CURRENT_VERSION : $evaluationService::CURRENT_VERSION,
+            'latestVersion' => $evaluationService->getLatestFormVersion(),
             'showAutoModification' => $showAutoModification,
-            'revertForm' => $evaluationService->getEvaluationRevertForm()->createView()
+            'revertForm' => $evaluationService->getEvaluationRevertForm()->createView(),
+            'displayEhrBannerMessage' => $evaluationService->requireEhrModificationProtocol() || $evaluationService->isEhrProtocolForm(),
+            'ehrProtocolBannerMessage' => $app->getConfig('ehr_protocol_banner_message')
         ]);
     }
 

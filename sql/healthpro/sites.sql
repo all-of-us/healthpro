@@ -15,6 +15,7 @@ CREATE TABLE `sites` (
   `email` varchar(512) DEFAULT NULL,
   `centrifuge_type` varchar(50) NULL DEFAULT NULL,
   `workqueue_download` varchar(50) NOT NULL,
+  `ehr_modification_protocol` tinyint(1) NOT NULL DEFAULT 0,
   `deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `site_id` (`site_id`)

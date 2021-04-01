@@ -40,6 +40,13 @@ class EvaluationTest extends AbstractWebTestCase
         ];
     }
 
+    public function ehrSourceMeasurementsProvider()
+    {
+        return [
+            ['ehr-measurement-source-fhir.json', '{"blood-pressure-location":"Right arm","blood-pressure-source":"ehr","blood-pressure-source-ehr-date":"2017-01-01","blood-pressure-systolic":[100,null,null],"blood-pressure-diastolic":[80,null,null],"heart-rate":[85,null,null],"irregular-heart-rate":[false,false,false],"blood-pressure-protocol-modification":["","",""],"manual-blood-pressure":[false,false,false],"manual-heart-rate":[false,false,false],"blood-pressure-protocol-modification-notes":[null,null,null],"pregnant":false,"wheelchair":false,"height-source":"ehr","height-source-ehr-date":"2017-01-01","height":180,"height-protocol-modification":"","height-protocol-modification-notes":null,"weight-source":"ehr","weight-source-ehr-date":"2017-01-01","weight":65,"weight-prepregnancy":null,"weight-protocol-modification":"","weight-protocol-modification-notes":null,"hip-circumference-source":"ehr","hip-circumference-source-ehr-date":"2017-01-01","hip-circumference":[90,null,null],"hip-circumference-protocol-modification":["","",""],"hip-circumference-protocol-modification-notes":[null,null,null],"waist-circumference-source":"ehr","waist-circumference-source-ehr-date":"2017-01-01","waist-circumference":[85,null,null],"waist-circumference-location":"smallest-part-of-trunk","waist-circumference-protocol-modification":["","",""],"waist-circumference-protocol-modification-notes":[null,null,null],"notes":null}']
+        ];
+    }
+
     public function testSchema()
     {
         $evaluation = new Evaluation();
@@ -102,6 +109,28 @@ class EvaluationTest extends AbstractWebTestCase
             'version' => '0.3.3-diversion-pouch'
         ]);
         $evaluation->addBloodDonorProtocolModificationForRemovedFields();
+        $fhir = self::getNormalizedFhir($evaluation->getFhir($finalized));
+        $json = json_encode($fhir, JSON_PRETTY_PRINT);
+        // using string to string method so that diff is output (file to string just shows entire object)
+        $this->assertJsonStringEqualsJsonString(file_get_contents(__DIR__ . '/' . $filename), $json);
+    }
+
+    /**
+     * @dataProvider ehrSourceMeasurementsProvider
+     */
+    public function testEHRMeasurementSourceFhir($filename, $jsonData)
+    {
+        $finalized = new \DateTime('2017-01-01', new \DateTimeZone('UTC'));
+        $evaluation = new Evaluation();
+        $evaluation->loadFromArray([
+            'data' => json_decode($jsonData),
+            'participant_id' => 'P10000001',
+            'created_user' => 'test@example.com',
+            'finalized_user' => 'test@example.com',
+            'created_site' => 'test-site1',
+            'finalized_site' => 'test-site2',
+            'version' => '0.3.3-ehr'
+        ]);
         $fhir = self::getNormalizedFhir($evaluation->getFhir($finalized));
         $json = json_encode($fhir, JSON_PRETTY_PRINT);
         // using string to string method so that diff is output (file to string just shows entire object)
