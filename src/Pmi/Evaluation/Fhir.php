@@ -345,8 +345,8 @@ class Fhir
         // Add display text for blood bank donor and EHR modifications
         if ($conceptCode === Evaluation::BLOOD_DONOR_PROTOCOL_MODIFICATION) {
             $conceptDisplay = Evaluation::BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL;
-        } elseif ($conceptCode === 'ehr') {
-            $conceptDisplay = 'Observation obtained from EHR';
+        } elseif ($conceptCode === Evaluation::EHR_PROTOCOL_MODIFICATION) {
+            $conceptDisplay = Evaluation::EHR_PROTOCOL_MODIFICATION_LABEL;
         } else {
             $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
         }

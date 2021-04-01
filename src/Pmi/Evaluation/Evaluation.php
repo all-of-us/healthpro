@@ -29,6 +29,7 @@ class Evaluation
     const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'blood-bank-donor';
     const BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL = 'Blood bank donor';
     const EHR_PROTOCOL_MODIFICATION = 'ehr';
+    const EHR_PROTOCOL_MODIFICATION_LABEL = 'Observation obtained from EHR';
 
     protected $app;
     protected $version;
