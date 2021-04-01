@@ -66,7 +66,7 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
     },
     handlePregnantOrWheelchair: function() {
         var isPregnant = (this.$('#form_pregnant').val() == 1);
-        var isWheelchairBound = (this.$('#form_wheelchair').val() == 1);
+        var isWheelchairUser = (this.$('#form_wheelchair').val() == 1);
         var self = this;
         if (isPregnant) {
             this.$('.field-weight-prepregnancy').show();
@@ -83,13 +83,13 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
-        if (isWheelchairBound) {
+        if (isWheelchairUser) {
             if (this.rendered) {
-                this.$('#form_weight-protocol-modification').valChange('wheelchair-bound');
+                this.$('#form_weight-protocol-modification').valChange('wheelchair-user');
             }
         }
-        if (!isWheelchairBound) {
-            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-bound') {
+        if (!isWheelchairUser) {
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-user') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
