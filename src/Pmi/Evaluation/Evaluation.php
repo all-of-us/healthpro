@@ -856,7 +856,7 @@ class Evaluation
 
     public function requireBloodDonorCheck()
     {
-        return $this->app->isDVType() && $this->app->isDiversionPouchSite();
+        return $this->app->getConfig('feature.blooddonorpm') && $this->app->isDVType() && $this->app->isDiversionPouchSite();
     }
 
     public function requireEhrModificationProtocol()
