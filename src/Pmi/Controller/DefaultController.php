@@ -207,7 +207,7 @@ class DefaultController extends AbstractController
             'recentOrders' => $recentOrders
         ]);
     }
-    
+
     public function patientStatusAction($participantId, $patientStatusId, Application $app)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);
