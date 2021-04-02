@@ -33,10 +33,10 @@ class EvaluationTest extends AbstractWebTestCase
         ];
     }
 
-    public function diversionPouchMeasurementsProvider()
+    public function bloodDonorMeasurementsProvider()
     {
         return [
-            ['diversion-pouch-fhir.json', '{"blood-pressure-location":"Right arm","blood-pressure-systolic":[100,null,null],"blood-pressure-diastolic":[80,null,null],"heart-rate":[85,null,null],"irregular-heart-rate":[false,false,false],"blood-pressure-protocol-modification":["","",""],"manual-blood-pressure":[false,false,false],"manual-heart-rate":[false,false,false],"blood-pressure-protocol-modification-notes":[null,null,null],"pregnant":false,"wheelchair":false,"height":null,"height-protocol-modification":"","height-protocol-modification-notes":null,"weight":65,"weight-prepregnancy":null,"weight-protocol-modification":"","weight-protocol-modification-notes":null,"hip-circumference":[null,null,null],"hip-circumference-protocol-modification":["","",""],"hip-circumference-protocol-modification-notes":[null,null,null],"waist-circumference":[null,null,null],"waist-circumference-protocol-modification":["","",""],"waist-circumference-protocol-modification-notes":[null,null,null],"notes":null}']
+            ['blood-donor-fhir.json', '{"blood-pressure-location":"Right arm","blood-pressure-systolic":[100,null,null],"blood-pressure-diastolic":[80,null,null],"heart-rate":[85,null,null],"irregular-heart-rate":[false,false,false],"blood-pressure-protocol-modification":["","",""],"manual-blood-pressure":[false,false,false],"manual-heart-rate":[false,false,false],"blood-pressure-protocol-modification-notes":[null,null,null],"pregnant":false,"wheelchair":false,"height":null,"height-protocol-modification":"","height-protocol-modification-notes":null,"weight":65,"weight-prepregnancy":null,"weight-protocol-modification":"","weight-protocol-modification-notes":null,"hip-circumference":[null,null,null],"hip-circumference-protocol-modification":["","",""],"hip-circumference-protocol-modification-notes":[null,null,null],"waist-circumference":[null,null,null],"waist-circumference-protocol-modification":["","",""],"waist-circumference-protocol-modification-notes":[null,null,null],"notes":null}']
         ];
     }
 
@@ -93,9 +93,9 @@ class EvaluationTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider diversionPouchMeasurementsProvider
+     * @dataProvider bloodDonorMeasurementsProvider
      */
-    public function testDiversionPouchFhir($filename, $jsonData)
+    public function testBloodDonorFhir($filename, $jsonData)
     {
         $finalized = new \DateTime('2017-01-01', new \DateTimeZone('UTC'));
         $evaluation = new Evaluation();
@@ -106,7 +106,7 @@ class EvaluationTest extends AbstractWebTestCase
             'finalized_user' => 'test@example.com',
             'created_site' => 'test-site1',
             'finalized_site' => 'test-site2',
-            'version' => '0.3.3-diversion-pouch'
+            'version' => '0.3.3-blood-donor'
         ]);
         $evaluation->addBloodDonorProtocolModificationForRemovedFields();
         $fhir = self::getNormalizedFhir($evaluation->getFhir($finalized));

@@ -145,7 +145,8 @@ class EvaluationController extends AbstractController
             if ($bloodDonorCheckForm['bloodDonor']->getData() === 'yes') {
                 return $app->redirectToRoute('evaluation', [
                     'participantId' => $participant->id,
-                    'type' => $evaluationService::DIVERSION_POUCH
+                    'type' => $evaluationService::BLOOD_DONOR,
+                    'wholeblood' => $bloodDonorCheckForm['bloodDonorType']->getData() === 'whole-blood' ? 1 : 0
                 ]);
             } else {
                 return $app->redirectToRoute('evaluation', [
@@ -181,6 +182,11 @@ class EvaluationController extends AbstractController
             $evaluation['reasonDisplayText'] = $evaluationService->getReasonDisplayText();
         } else {
             $evaluation = null;
+            if ($evaluationService->isBloodDonorForm() && $request->query->get('wholeblood')) {
+                $evaluationService->setData((object)[
+                    'weight-protocol-modification' => 'whole-blood-donor'
+                ]);
+            }
         }
         $showAutoModification = false;
 
@@ -194,7 +200,7 @@ class EvaluationController extends AbstractController
             // Check if finalized_ts is set and rdr_id is empty
             if (!$evaluationService->isEvaluationFailedToReachRDR()) {
                 if ($evaluationForm->isValid()) {
-                    if ($evaluationService->isDiversionPouchForm()) {
+                    if ($evaluationService->isBloodDonorForm()) {
                         $evaluationService->addBloodDonorProtocolModificationForRemovedFields();
                         if ($request->request->has('finalize') && (!$evaluation || empty($evaluation['rdr_id']))) {
                             $evaluationService->addBloodDonorProtocolModificationForBloodPressure(1);

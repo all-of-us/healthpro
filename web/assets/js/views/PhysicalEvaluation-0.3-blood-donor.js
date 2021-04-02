@@ -6,7 +6,7 @@ const _ = require('underscore');
 
 /* eslint security/detect-object-injection: "off" */
 
-PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
+PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
     events: {
         "click .toggle-help-image": "displayHelpModal",
         "change input, select": "inputChange",
@@ -486,6 +486,13 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
         }
         return false;
     },
+    hideWholeBloodModification: function() {
+        // Whole blood donor modification is only available if set initially
+        // from donor check. So if it isn't selected, hide the option
+        if (this.$('#form_weight-protocol-modification').val() !== 'whole-blood-donor') {
+            this.$('#form_weight-protocol-modification option[value="whole-blood-donor"]').hide();
+        }
+    },
     initialize: function(obj) {
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
@@ -516,6 +523,7 @@ PMI.views['PhysicalEvaluation-0.3-diversion-pouch'] = Backbone.View.extend({
         this.handlePregnantOrWheelchair();
         this.handleWeightProtocol();
         this.toggleSecondBloodPressure();
+        this.hideWholeBloodModification();
         if (this.finalized) {
             this.$('.modification-toggle').hide();
         }

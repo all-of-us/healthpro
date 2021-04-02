@@ -99,12 +99,12 @@
         "type": {
           "coding": [
             {
-              "code": "intake-exam-v0.3.3-diversion-pouch",
-              "display": "All of Us Intake Evaluation v0.3.3-diversion-pouch",
+              "code": "intake-exam-v0.3.3-blood-donor",
+              "display": "All of Us Intake Evaluation v0.3.3-blood-donor",
               "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/document-type"
             }
           ],
-          "text": "All of Us Intake Evaluation v0.3.3-diversion-pouch"
+          "text": "All of Us Intake Evaluation v0.3.3-blood-donor"
         },
         "extension": [
           {
@@ -393,12 +393,12 @@
         "valueCodeableConcept": {
           "coding": [
             {
-              "code": "whole-blood-donor",
-              "display": "Whole Blood Donor",
+              "code": "blood-bank-donor",
+              "display": "Blood bank donor",
               "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-blood-pressure"
             }
           ],
-          "text": "Whole Blood Donor"
+          "text": "Blood bank donor"
         }
       }
     },
@@ -458,12 +458,12 @@
         "valueCodeableConcept": {
           "coding": [
             {
-              "code": "whole-blood-donor",
-              "display": "Whole Blood Donor",
+              "code": "blood-bank-donor",
+              "display": "Blood bank donor",
               "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-height"
             }
           ],
-          "text": "Whole Blood Donor"
+          "text": "Blood bank donor"
         }
       }
     },
@@ -589,12 +589,12 @@
         "valueCodeableConcept": {
           "coding": [
             {
-              "code": "whole-blood-donor",
-              "display": "Whole Blood Donor",
+              "code": "blood-bank-donor",
+              "display": "Blood bank donor",
               "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-hip-circumference"
             }
           ],
-          "text": "Whole Blood Donor"
+          "text": "Blood bank donor"
         }
       }
     },
@@ -620,12 +620,12 @@
         "valueCodeableConcept": {
           "coding": [
             {
-              "code": "whole-blood-donor",
-              "display": "Whole Blood Donor",
+              "code": "blood-bank-donor",
+              "display": "Blood bank donor",
               "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-hip-circumference"
             }
           ],
-          "text": "Whole Blood Donor"
+          "text": "Blood bank donor"
         }
       }
     },
@@ -719,12 +719,12 @@
         "valueCodeableConcept": {
           "coding": [
             {
-              "code": "whole-blood-donor",
-              "display": "Whole Blood Donor",
+              "code": "blood-bank-donor",
+              "display": "Blood bank donor",
               "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-waist-circumference"
             }
           ],
-          "text": "Whole Blood Donor"
+          "text": "Blood bank donor"
         }
       }
     },
@@ -750,12 +750,12 @@
         "valueCodeableConcept": {
           "coding": [
             {
-              "code": "whole-blood-donor",
-              "display": "Whole Blood Donor",
+              "code": "blood-bank-donor",
+              "display": "Blood bank donor",
               "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-waist-circumference"
             }
           ],
-          "text": "Whole Blood Donor"
+          "text": "Blood bank donor"
         }
       }
     },

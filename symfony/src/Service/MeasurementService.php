@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class MeasurementService
@@ -13,19 +14,22 @@ class MeasurementService
     protected $userService;
     protected $rdrApiService;
     protected $siteService;
+    protected $params;
 
     public function __construct(
         EntityManagerInterface $em,
         SessionInterface $session,
         UserService $userService,
         RdrApiService $rdrApiService,
-        SiteService $siteService
+        SiteService $siteService,
+        ParameterBagInterface $params
     ) {
         $this->em = $em;
         $this->session = $session;
         $this->userService = $userService;
         $this->rdrApiService = $rdrApiService;
         $this->siteService = $siteService;
+        $this->params = $params;
 
     }
 
@@ -59,6 +63,6 @@ class MeasurementService
 
     public function requireBloodDonorCheck()
     {
-        return $this->session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite();
+        return $this->params->has('feature.blooddonorpm') && $this->params->get('feature.blooddonorpm') && $this->session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite();
     }
 }

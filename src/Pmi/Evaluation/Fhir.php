@@ -341,11 +341,12 @@ class Fhir
             $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1]) ? $this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1] : '';
         }
         $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
-        // Add display text for whole-blood-donor and ehr
-        if ($conceptCode === 'whole-blood-donor') {
-            $conceptDisplay = 'Whole Blood Donor';
-        } elseif ($conceptCode === 'ehr') {
-            $conceptDisplay = 'Observation obtained from EHR';
+
+        // Add display text for blood bank donor and EHR modifications
+        if ($conceptCode === Evaluation::BLOOD_DONOR_PROTOCOL_MODIFICATION) {
+            $conceptDisplay = Evaluation::BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL;
+        } elseif ($conceptCode === Evaluation::EHR_PROTOCOL_MODIFICATION) {
+            $conceptDisplay = Evaluation::EHR_PROTOCOL_MODIFICATION_LABEL;
         } else {
             $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
         }
@@ -707,7 +708,7 @@ class Fhir
         if (isset($this->data->{'waist-circumference-location'})) {
             $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
         }
-        return $entry;  
+        return $entry;
     }
 
     protected function getBpBodySite($location)
@@ -1100,7 +1101,7 @@ class Fhir
         if ($related = $this->meanProtocolModifications([1,2,3], 'waist-circumference-protocol-modification-')) {
             $entry['resource']['related'] = $related;
         }
-        return $entry;  
+        return $entry;
     }
 
     protected function notes()
