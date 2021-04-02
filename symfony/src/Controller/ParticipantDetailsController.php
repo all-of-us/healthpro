@@ -10,6 +10,7 @@ use App\Form\CrossOriginAgreeType;
 use App\Form\PatientStatusType;
 use App\Helper\WorkQueue;
 use App\Service\LoggerService;
+use App\Service\MeasurementService;
 use App\Service\ParticipantSummaryService;
 use App\Service\PatientStatusService;
 use App\Service\SiteService;
@@ -39,7 +40,8 @@ class ParticipantDetailsController extends AbstractController
         ParticipantSummaryService $participantSummaryService,
         SiteService $siteService,
         ParameterBagInterface $params,
-        PatientStatusService $patientStatusService
+        PatientStatusService $patientStatusService,
+        MeasurementService $measurementService
     ) {
         $refresh = $request->query->get('refresh');
         $participant = $participantSummaryService->getParticipantById($id, $refresh);
@@ -165,6 +167,8 @@ class ParticipantDetailsController extends AbstractController
 
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
+        // Generate url for blood donor check form
+        $evaluationUrl = $measurementService->requireBloodDonorCheck() ? 'evaluationBloodDonorCheck' : 'evaluation';
         return $this->render('/participant/details.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
@@ -186,7 +190,8 @@ class ParticipantDetailsController extends AbstractController
             'canViewPatientStatus' => $canViewPatientStatus,
             'displayPatientStatusBlock' => !$isDVType,
             'canEdit' => $participant->status || $participant->editExistingOnly,
-            'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null
+            'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null,
+            'evaluationUrl' => $evaluationUrl
         ]);
     }
 }

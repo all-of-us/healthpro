@@ -10,7 +10,7 @@ CREATE TABLE `evaluations` (
   `finalized_user_id` int(11) DEFAULT NULL,
   `finalized_site` varchar(50) DEFAULT NULL,
   `finalized_ts` TIMESTAMP NULL DEFAULT NULL,
-  `version` varchar(10) NOT NULL,
+  `version` varchar(50) NOT NULL,
   `fhir_version` int(11) NULL DEFAULT NULL,
   `data` text NOT NULL,
   `history_id` int DEFAULT NULL,

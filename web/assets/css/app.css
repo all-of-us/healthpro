@@ -224,6 +224,9 @@ label.label-normal {
     margin-top: 16px;
     font-weight: normal;
 }
+#physicalEvaluation .blood-pressure-second-reading-warning .alert {
+    height: auto !important;
+}
 .help-header-text {
     color: #337ab7;
     margin-top: 0;
@@ -231,6 +234,12 @@ label.label-normal {
 #evaluation-summary {
     margin: 20px auto;
     max-width: 500px;
+}
+.ehr-date {
+    margin-bottom: 10px;
+}
+.ehr-date .form-group {
+    margin-bottom: 2px;
 }
 #biobank-summary {
     margin: 20px auto;

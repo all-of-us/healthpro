@@ -6,8 +6,9 @@ const _ = require('underscore');
 
 /* eslint security/detect-object-injection: "off" */
 
-PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
+PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
     events: {
+        "click input, radio" : "toggleEhrDate",
         "click .toggle-help-image": "displayHelpModal",
         "change .replicate input": "updateMean",
         "keyup .replicate input": "updateMean",
@@ -31,6 +32,59 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         "click .alt-units-field a": "cancelAltUnits",
         "keyup .alt-units-field input": "convertAltUnits",
         "change .alt-units-field input": "convertAltUnits"
+    },
+    toggleEhrDate: function (e) {
+        var val = $(e.currentTarget).val();
+        var field = $(e.currentTarget).closest('.field').data('field');
+        var ehrDateField = field + '-ehr-date';
+        var disabled = false;
+        if (val === 'ehr') {
+            this.$('.' + field + '.ehr-date').show();
+            this.$('#form_' + ehrDateField).attr('disabled', false);
+            disabled = true;
+        } else {
+            this.$('.' + field + '.ehr-date').hide();
+            this.$('#form_' + ehrDateField).attr('disabled', true);
+        }
+        this.disableSecondThirdReadings(field, 1, disabled);
+        if ($.inArray(field, ['blood-pressure-source', 'waist-circumference-source', 'hip-circumference-source']) !== -1) {
+            this.disableSecondThirdReadings(field, 2, disabled);
+        }
+        this.displayWarnings();
+        var dataField = field.replace('-source', '');
+        if (dataField === 'blood-pressure') {
+            dataField = 'blood-pressure-systolic';
+        }
+        this.calculateMean(dataField);
+    },
+    displayEhrDate: function () {
+        var self = this;
+        var sourceFields = ['blood-pressure-source', 'height-source', 'weight-source', 'waist-circumference-source', 'hip-circumference-source'];
+        $.each(sourceFields, function (i, field) {
+            if ($("[name='form[" + field + "]']:checked").val() === 'ehr') {
+                $('.' + field + '.ehr-date').show();
+                self.disableSecondThirdReadings(field, 1, true);
+                if ($.inArray(field, ['blood-pressure-source', 'waist-circumference-source', 'hip-circumference-source']) !== -1) {
+                    self.disableSecondThirdReadings(field, 2, true);
+                }
+            } else {
+                $('.' + field + '.ehr-date').hide();
+            }
+        });
+    },
+    disableSecondThirdReadings: function (field, reading, disabled) {
+        var firstReading = $('.' + field + '-0');
+        // Disable first reading protocol modification field
+        firstReading.find('select').attr('disabled', disabled);
+        firstReading.find('select').val('');
+        // Enable first reading fields except protocol modification field and EHR date field
+        firstReading.find('input, input:checkbox').not('#form_' + field + '-ehr-date').each(function () {
+            $(this).attr('disabled', false);
+        });
+        $('.' + field + '-' + reading).find('input, select, input:checkbox').each(function () {
+            $(this).attr('disabled', disabled);
+            $(this).val('');
+        });
     },
     inputChange: function(e) {
         this.clearServerErrors(e);
@@ -60,7 +114,12 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             $(window).trigger('pmi.equalize');
         }, 50);
     },
+    clearMean: function (field) {
+        this.$('#mean-' + field).text('--');
+        this.$('#convert-' + field).text('');
+    },
     calculateMean: function(field) {
+        var self = this;
         var fieldSelector = '.field-' + field;
         var secondThirdFields = [
             'blood-pressure-systolic',
@@ -71,6 +130,19 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             'hip-circumference',
             'waist-circumference'
         ];
+        if ($.inArray(field, twoClosestFields) !== -1 && $("[name='form[" + field + "-source]']:checked").val() === 'ehr') {
+            this.clearMean(field);
+            return;
+        }
+        if ($.inArray(field, secondThirdFields) !== -1 && $("[name='form[blood-pressure-source]']:checked").val() === 'ehr') {
+            $.each(secondThirdFields, function (i, bloodPressureField) {
+                self.clearMean(bloodPressureField);
+                //Clear warning text
+                $('#' + bloodPressureField + '-warning').html('');
+            });
+            $('#irregular-heart-rate-warning').html('');
+            return;
+        }
         if ($.inArray(field, secondThirdFields) !== -1) {
             fieldSelector = '.field-' + field + '[data-replicate=2], .field-' + field + '[data-replicate=3]';
         }
@@ -143,9 +215,10 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         var isWheelchairUser = (this.$('#form_wheelchair').val() == 1);
         var self = this;
         if (isPregnant || isWheelchairUser) {
-            this.$('#panel-hip-waist input').each(function() {
+            this.$('#panel-hip-waist input').not('input:radio').each(function() {
                 $(this).valChange('');
             });
+            $('#form_waist-circumference-source_0, #form_hip-circumference-source_0').prop("checked",true);
             this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
                 $(this).attr('disabled', true);
             });
@@ -163,7 +236,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             this.$('#form_weight-prepregnancy').valChange('');
             this.$('.field-weight-prepregnancy').hide();
             this.$('.field-weight-prepregnancy').next('.alt-units-block').hide();
-            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'pregnancy') {
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() === 'pregnancy') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
@@ -174,10 +247,10 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             }
         }
         if (!isWheelchairUser) {
-            if (this.rendered && this.$('#form_height-protocol-modification').val() == 'wheelchair-user') {
+            if (this.rendered && this.$('#form_height-protocol-modification').val() === 'wheelchair-user') {
                 this.$('#form_height-protocol-modification').valChange('');
             }
-            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-user') {
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() === 'wheelchair-user') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
@@ -193,6 +266,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             this.$('#hip-waist-skip').text('');
             this.$('#panel-hip-waist>.panel-body').show();
         }
+        this.displayEhrDate();
     },
     handleHeightProtocol: function() {
         var selected = this.$('#form_height-protocol-modification').val();
@@ -476,11 +550,11 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             block.find('.modification-select').show();
         }
         if (modification === 'refusal' || modification === 'colostomy-bag') {
-            block.find('.modification-affected input, .modification-affected select, .modification-manual input:checkbox').each(function() {
+            block.find('.modification-affected input:text, .modification-affected select, .modification-manual input:checkbox').each(function() {
                 $(this).attr('disabled', true);
             });
         } else {
-            block.find('.modification-affected input, .modification-affected select, .modification-manual input:checkbox').each(function() {
+            block.find('.modification-affected input:text, .modification-affected select, .modification-manual input:checkbox').each(function() {
                 if (!self.finalized) {
                     $(this).attr('disabled', false);
                 }
@@ -554,7 +628,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         var block = $(e.currentTarget).closest('.alt-units-field');
         var type = block.find('label').attr('for');
         var val;
-        if (type == 'alt-units-height') {
+        if (type === 'alt-units-height') {
             var inches = 0;
             if (parseFloat($('#alt-units-height-ft').val())) {
                 inches += 12*parseFloat($('#alt-units-height-ft').val());
@@ -566,9 +640,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         } else {
             var unit = block.find('.input-group-addon').text();
             val = block.find('input').val();
-            if (unit == 'in') {
+            if (unit === 'in') {
                 val = this.inToCm(val);
-            } else if (unit == 'lb') {
+            } else if (unit === 'lb') {
                 val = this.lbToKg(val);
             }
         }
@@ -577,7 +651,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         }
         var input = block.parent().prev().find('input');
         input.val(val);
-        if (e.type == 'change') {
+        if (e.type === 'change') {
             block.parent().prev().find('input').trigger('change'); // trigger change even if not different
             block.parent().prev().find('input').parsley().validate(); // trigger parsley validation
         }
@@ -637,6 +711,10 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         this.finalized = obj.finalized;
         this.rendered = false;
         this.render();
+        $('.ehr-date').pmiDateTimePicker({
+            'format': 'MM/DD/YYYY',
+            'useCurrent': false
+        });
     },
     render: function() {
         var self = this;
@@ -669,6 +747,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             this.$('.modification-toggle').hide();
         }
         this.triggerEqualize();
+        this.displayEhrDate();
         this.rendered = true;
         return this;
     }

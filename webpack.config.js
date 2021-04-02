@@ -29,6 +29,8 @@ Encore
     .addEntry('physical-measurements-0.1', './web/assets/js/views/PhysicalEvaluation-0.1.js')
     .addEntry('physical-measurements-0.2', './web/assets/js/views/PhysicalEvaluation-0.2.js')
     .addEntry('physical-measurements-0.3', './web/assets/js/views/PhysicalEvaluation-0.3.js')
+    .addEntry('physical-measurements-0.3-blood-donor', './web/assets/js/views/PhysicalEvaluation-0.3-blood-donor.js')
+    .addEntry('physical-measurements-0.3-ehr', './web/assets/js/views/PhysicalEvaluation-0.3-ehr.js')
     .addEntry('today', './web/assets/js/views/today.js')
     .addEntry('video', './web/assets/js/views/video.js')
     .addEntry('dashboard', './web/assets/js/dashboard.webpack.js')

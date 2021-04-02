@@ -110,3 +110,9 @@ diversion_pouch_site: ECDC DV Diversion Pouch
 
 # Enables Google Groups role check for ROLE_MANAGE_USERS role
 # feature.manageusers: true
+
+# EHR protocol modification banner message
+ehr_protocol_banner_message:
+
+# Enables physical measurements blood donor protocol modification workflow for diversion pouch sites
+# feature.blooddonorpm: false
