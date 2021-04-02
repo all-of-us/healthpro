@@ -108,7 +108,7 @@
             $(".nav-tabs a[href='#" + currentStep + "']").tab('show');
 
             $('#checkall').on('change', function() {
-                $('#form_finalized_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
+                $('#biobank_order_finalizedSamples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
             });
 
             $('#form_finalized_ts').pmiDateTimePicker();
