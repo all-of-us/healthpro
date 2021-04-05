@@ -1,1113 +1,1113 @@
 {
-  "entry": [
-    {
-      "fullUrl": "uuid:composition",
-      "resource": {
-        "author": [
-          {
-            "reference": "Practitioner\/test@example.com",
-            "extension": [
-              {
-                "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/authoring-step",
-                "valueCode": "created"
-              }
-            ]
-          },
-          {
-            "reference": "Practitioner\/test@example.com",
-            "extension": [
-              {
-                "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/authoring-step",
-                "valueCode": "finalized"
-              }
-            ]
-          }
-        ],
-        "date": "2017-01-01T00:00:00Z",
-        "resourceType": "Composition",
-        "section": [
-          {
-            "entry": [
-              {
-                "reference": "uuid:1"
-              },
-              {
-                "reference": "uuid:2"
-              },
-              {
-                "reference": "uuid:3"
-              },
-              {
-                "reference": "uuid:4"
-              },
-              {
-                "reference": "uuid:5"
-              },
-              {
-                "reference": "uuid:6"
-              },
-              {
-                "reference": "uuid:7"
-              },
-              {
-                "reference": "uuid:8"
-              },
-              {
-                "reference": "uuid:9"
-              },
-              {
-                "reference": "uuid:10"
-              },
-              {
-                "reference": "uuid:11"
-              },
-              {
-                "reference": "uuid:12"
-              },
-              {
-                "reference": "uuid:13"
-              },
-              {
-                "reference": "uuid:14"
-              },
-              {
-                "reference": "uuid:15"
-              },
-              {
-                "reference": "uuid:16"
-              },
-              {
-                "reference": "uuid:17"
-              },
-              {
-                "reference": "uuid:18"
-              },
-              {
-                "reference": "uuid:19"
-              },
-              {
-                "reference": "uuid:20"
-              },
-              {
-                "reference": "uuid:21"
-              },
-              {
-                "reference": "uuid:22"
-              },
-              {
-                "reference": "uuid:23"
-              }
-            ]
-          }
-        ],
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "title": "All of Us Intake Evaluation",
-        "type": {
-          "coding": [
-            {
-              "code": "intake-exam-v0.3.3-blood-donor",
-              "display": "All of Us Intake Evaluation v0.3.3-blood-donor",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/document-type"
-            }
-          ],
-          "text": "All of Us Intake Evaluation v0.3.3-blood-donor"
-        },
-        "extension": [
-          {
-            "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/authored-location",
-            "valueString": "Location\/hpo-site-test-site1"
-          },
-          {
-            "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/finalized-location",
-            "valueString": "Location\/hpo-site-test-site2"
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:1",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "55284-4",
-              "display": "Blood pressure systolic and diastolic",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "blood-pressure-1",
-              "display": "First blood pressure systolic and diastolic",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "First blood pressure systolic and diastolic"
-        },
-        "component": [
-          {
-            "code": {
-              "coding": [
-                {
-                  "code": "8480-6",
-                  "display": "Systolic blood pressure",
-                  "system": "http:\/\/loinc.org"
+    "entry": [
+        {
+            "fullUrl": "uuid:composition",
+            "resource": {
+                "author": [
+                    {
+                        "reference": "Practitioner\/test@example.com",
+                        "extension": [
+                            {
+                                "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/authoring-step",
+                                "valueCode": "created"
+                            }
+                        ]
+                    },
+                    {
+                        "reference": "Practitioner\/test@example.com",
+                        "extension": [
+                            {
+                                "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/authoring-step",
+                                "valueCode": "finalized"
+                            }
+                        ]
+                    }
+                ],
+                "date": "2017-01-01T00:00:00Z",
+                "resourceType": "Composition",
+                "section": [
+                    {
+                        "entry": [
+                            {
+                                "reference": "uuid:1"
+                            },
+                            {
+                                "reference": "uuid:2"
+                            },
+                            {
+                                "reference": "uuid:3"
+                            },
+                            {
+                                "reference": "uuid:4"
+                            },
+                            {
+                                "reference": "uuid:5"
+                            },
+                            {
+                                "reference": "uuid:6"
+                            },
+                            {
+                                "reference": "uuid:7"
+                            },
+                            {
+                                "reference": "uuid:8"
+                            },
+                            {
+                                "reference": "uuid:9"
+                            },
+                            {
+                                "reference": "uuid:10"
+                            },
+                            {
+                                "reference": "uuid:11"
+                            },
+                            {
+                                "reference": "uuid:12"
+                            },
+                            {
+                                "reference": "uuid:13"
+                            },
+                            {
+                                "reference": "uuid:14"
+                            },
+                            {
+                                "reference": "uuid:15"
+                            },
+                            {
+                                "reference": "uuid:16"
+                            },
+                            {
+                                "reference": "uuid:17"
+                            },
+                            {
+                                "reference": "uuid:18"
+                            },
+                            {
+                                "reference": "uuid:19"
+                            },
+                            {
+                                "reference": "uuid:20"
+                            },
+                            {
+                                "reference": "uuid:21"
+                            },
+                            {
+                                "reference": "uuid:22"
+                            },
+                            {
+                                "reference": "uuid:23"
+                            }
+                        ]
+                    }
+                ],
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
                 },
-                {
-                  "code": "blood-pressure-systolic-1",
-                  "display": "First systolic blood pressure",
-                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-                }
-              ],
-              "text": "First systolic blood pressure"
-            },
-            "valueQuantity": {
-              "code": "mm[Hg]",
-              "system": "http:\/\/unitsofmeasure.org",
-              "unit": "mmHg",
-              "value": 100
-            }
-          },
-          {
-            "code": {
-              "coding": [
-                {
-                  "code": "8462-4",
-                  "display": "Diastolic blood pressure",
-                  "system": "http:\/\/loinc.org"
+                "title": "All of Us Intake Evaluation",
+                "type": {
+                    "coding": [
+                        {
+                            "code": "intake-exam-v0.3.3-blood-donor",
+                            "display": "All of Us Intake Evaluation v0.3.3-blood-donor",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/document-type"
+                        }
+                    ],
+                    "text": "All of Us Intake Evaluation v0.3.3-blood-donor"
                 },
-                {
-                  "code": "blood-pressure-diastolic-1",
-                  "display": "First diastolic blood pressure",
-                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                "extension": [
+                    {
+                        "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/authored-location",
+                        "valueString": "Location\/hpo-site-test-site1"
+                    },
+                    {
+                        "url": "http:\/\/terminology.pmi-ops.org\/StructureDefinition\/finalized-location",
+                        "valueString": "Location\/hpo-site-test-site2"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "uuid:1",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "55284-4",
+                            "display": "Blood pressure systolic and diastolic",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "blood-pressure-1",
+                            "display": "First blood pressure systolic and diastolic",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "First blood pressure systolic and diastolic"
+                },
+                "component": [
+                    {
+                        "code": {
+                            "coding": [
+                                {
+                                    "code": "8480-6",
+                                    "display": "Systolic blood pressure",
+                                    "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-systolic-1",
+                                    "display": "First systolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                                }
+                            ],
+                            "text": "First systolic blood pressure"
+                        },
+                        "valueQuantity": {
+                            "code": "mm[Hg]",
+                            "system": "http:\/\/unitsofmeasure.org",
+                            "unit": "mmHg",
+                            "value": 100
+                        }
+                    },
+                    {
+                        "code": {
+                            "coding": [
+                                {
+                                    "code": "8462-4",
+                                    "display": "Diastolic blood pressure",
+                                    "system": "http:\/\/loinc.org"
+                                },
+                                {
+                                    "code": "blood-pressure-diastolic-1",
+                                    "display": "First diastolic blood pressure",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                                }
+                            ],
+                            "text": "First diastolic blood pressure"
+                        },
+                        "valueQuantity": {
+                            "code": "mm[Hg]",
+                            "system": "http:\/\/unitsofmeasure.org",
+                            "unit": "mmHg",
+                            "value": 80
+                        }
+                    }
+                ],
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "bodySite": {
+                    "coding": [
+                        {
+                            "code": "368209003",
+                            "display": "Right arm",
+                            "system": "http:\/\/snomed.info\/sct"
+                        },
+                        {
+                            "code": "right-arm",
+                            "display": "Right arm",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
+                        }
+                    ],
+                    "text": "Right arm"
                 }
-              ],
-              "text": "First diastolic blood pressure"
-            },
-            "valueQuantity": {
-              "code": "mm[Hg]",
-              "system": "http:\/\/unitsofmeasure.org",
-              "unit": "mmHg",
-              "value": 80
             }
-          }
-        ],
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
         },
-        "bodySite": {
-          "coding": [
-            {
-              "code": "368209003",
-              "display": "Right arm",
-              "system": "http:\/\/snomed.info\/sct"
-            },
-            {
-              "code": "right-arm",
-              "display": "Right arm",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
+        {
+            "fullUrl": "uuid:2",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "55284-4",
+                            "display": "Blood pressure systolic and diastolic",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "blood-pressure-2",
+                            "display": "Second blood pressure systolic and diastolic",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Second blood pressure systolic and diastolic"
+                },
+                "component": [],
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "bodySite": {
+                    "coding": [
+                        {
+                            "code": "368209003",
+                            "display": "Right arm",
+                            "system": "http:\/\/snomed.info\/sct"
+                        },
+                        {
+                            "code": "right-arm",
+                            "display": "Right arm",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
+                        }
+                    ],
+                    "text": "Right arm"
+                },
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:7"
+                        }
+                    }
+                ]
             }
-          ],
-          "text": "Right arm"
-        }
-      }
-    },
-    {
-      "fullUrl": "uuid:2",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "55284-4",
-              "display": "Blood pressure systolic and diastolic",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "blood-pressure-2",
-              "display": "Second blood pressure systolic and diastolic",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+        },
+        {
+            "fullUrl": "uuid:3",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "55284-4",
+                            "display": "Blood pressure systolic and diastolic",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "blood-pressure-3",
+                            "display": "Third blood pressure systolic and diastolic",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Third blood pressure systolic and diastolic"
+                },
+                "component": [],
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "bodySite": {
+                    "coding": [
+                        {
+                            "code": "368209003",
+                            "display": "Right arm",
+                            "system": "http:\/\/snomed.info\/sct"
+                        },
+                        {
+                            "code": "right-arm",
+                            "display": "Right arm",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
+                        }
+                    ],
+                    "text": "Right arm"
+                },
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:8"
+                        }
+                    }
+                ]
             }
-          ],
-          "text": "Second blood pressure systolic and diastolic"
         },
-        "component": [],
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "bodySite": {
-          "coding": [
-            {
-              "code": "368209003",
-              "display": "Right arm",
-              "system": "http:\/\/snomed.info\/sct"
-            },
-            {
-              "code": "right-arm",
-              "display": "Right arm",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
+        {
+            "fullUrl": "uuid:4",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "8867-4",
+                            "display": "Heart rate",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "heart-rate-1",
+                            "display": "First heart rate",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "First heart rate"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueQuantity": {
+                    "code": "\/min",
+                    "system": "http:\/\/unitsofmeasure.org",
+                    "unit": "\/min",
+                    "value": 85
+                },
+                "component": [
+                    {
+                        "code": {
+                            "coding": [
+                                {
+                                    "code": "heart-rhythm-status",
+                                    "display": "Heart rhythm status",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                                }
+                            ],
+                            "text": "Heart rhythm status"
+                        },
+                        "valueCodeableConcept": {
+                            "coding": [
+                                {
+                                    "code": "no-irregularity-detected",
+                                    "display": "No irregularity detected",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/heart-rhythm-status"
+                                }
+                            ],
+                            "text": "No irregularity detected"
+                        }
+                    }
+                ]
             }
-          ],
-          "text": "Right arm"
         },
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:7"
+        {
+            "fullUrl": "uuid:5",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "8867-4",
+                            "display": "Heart rate",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "heart-rate-2",
+                            "display": "Second heart rate",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Second heart rate"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "component": [
+                    {
+                        "code": {
+                            "coding": [
+                                {
+                                    "code": "heart-rhythm-status",
+                                    "display": "Heart rhythm status",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                                }
+                            ],
+                            "text": "Heart rhythm status"
+                        },
+                        "valueCodeableConcept": {
+                            "coding": [
+                                {
+                                    "code": "no-irregularity-detected",
+                                    "display": "No irregularity detected",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/heart-rhythm-status"
+                                }
+                            ],
+                            "text": "No irregularity detected"
+                        }
+                    }
+                ],
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:7"
+                        }
+                    }
+                ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:3",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "55284-4",
-              "display": "Blood pressure systolic and diastolic",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "blood-pressure-3",
-              "display": "Third blood pressure systolic and diastolic",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+        },
+        {
+            "fullUrl": "uuid:6",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "8867-4",
+                            "display": "Heart rate",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "heart-rate-3",
+                            "display": "Third heart rate",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Third heart rate"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "component": [
+                    {
+                        "code": {
+                            "coding": [
+                                {
+                                    "code": "heart-rhythm-status",
+                                    "display": "Heart rhythm status",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                                }
+                            ],
+                            "text": "Heart rhythm status"
+                        },
+                        "valueCodeableConcept": {
+                            "coding": [
+                                {
+                                    "code": "no-irregularity-detected",
+                                    "display": "No irregularity detected",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/heart-rhythm-status"
+                                }
+                            ],
+                            "text": "No irregularity detected"
+                        }
+                    }
+                ],
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:8"
+                        }
+                    }
+                ]
             }
-          ],
-          "text": "Third blood pressure systolic and diastolic"
         },
-        "component": [],
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "bodySite": {
-          "coding": [
-            {
-              "code": "368209003",
-              "display": "Right arm",
-              "system": "http:\/\/snomed.info\/sct"
-            },
-            {
-              "code": "right-arm",
-              "display": "Right arm",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
-            }
-          ],
-          "text": "Right arm"
-        },
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:8"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:4",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "8867-4",
-              "display": "Heart rate",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "heart-rate-1",
-              "display": "First heart rate",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "First heart rate"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "valueQuantity": {
-          "code": "\/min",
-          "system": "http:\/\/unitsofmeasure.org",
-          "unit": "\/min",
-          "value": 85
-        },
-        "component": [
-          {
-            "code": {
-              "coding": [
-                {
-                  "code": "heart-rhythm-status",
-                  "display": "Heart rhythm status",
-                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+        {
+            "fullUrl": "uuid:7",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "protocol-modifications-blood-pressure",
+                            "display": "Blood pressure protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Blood pressure protocol modifications"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueCodeableConcept": {
+                    "coding": [
+                        {
+                            "code": "blood-bank-donor",
+                            "display": "Blood bank donor",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-blood-pressure"
+                        }
+                    ],
+                    "text": "Blood bank donor"
                 }
-              ],
-              "text": "Heart rhythm status"
-            },
-            "valueCodeableConcept": {
-              "coding": [
-                {
-                  "code": "no-irregularity-detected",
-                  "display": "No irregularity detected",
-                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/heart-rhythm-status"
+            }
+        },
+        {
+            "fullUrl": "uuid:8",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "protocol-modifications-blood-pressure",
+                            "display": "Blood pressure protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Blood pressure protocol modifications"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueCodeableConcept": {
+                    "coding": [
+                        {
+                            "code": "blood-bank-donor",
+                            "display": "Blood bank donor",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-blood-pressure"
+                        }
+                    ],
+                    "text": "Blood bank donor"
                 }
-              ],
-              "text": "No irregularity detected"
             }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:5",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "8867-4",
-              "display": "Heart rate",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "heart-rate-2",
-              "display": "Second heart rate",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+        },
+        {
+            "fullUrl": "uuid:9",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "8302-2",
+                            "display": "Body height",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "height",
+                            "display": "Height",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Height"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:10"
+                        }
+                    }
+                ]
             }
-          ],
-          "text": "Second heart rate"
         },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "component": [
-          {
-            "code": {
-              "coding": [
-                {
-                  "code": "heart-rhythm-status",
-                  "display": "Heart rhythm status",
-                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+        {
+            "fullUrl": "uuid:10",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "protocol-modifications-height",
+                            "display": "Height protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Height protocol modifications"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueCodeableConcept": {
+                    "coding": [
+                        {
+                            "code": "blood-bank-donor",
+                            "display": "Blood bank donor",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-height"
+                        }
+                    ],
+                    "text": "Blood bank donor"
                 }
-              ],
-              "text": "Heart rhythm status"
-            },
-            "valueCodeableConcept": {
-              "coding": [
-                {
-                  "code": "no-irregularity-detected",
-                  "display": "No irregularity detected",
-                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/heart-rhythm-status"
+            }
+        },
+        {
+            "fullUrl": "uuid:11",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "29463-7",
+                            "display": "Body weight",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "weight",
+                            "display": "Weight",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Weight"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueQuantity": {
+                    "code": "kg",
+                    "system": "http:\/\/unitsofmeasure.org",
+                    "unit": "kg",
+                    "value": 65
                 }
-              ],
-              "text": "No irregularity detected"
             }
-          }
-        ],
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:7"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:6",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "8867-4",
-              "display": "Heart rate",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "heart-rate-3",
-              "display": "Third heart rate",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Third heart rate"
         },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
+        {
+            "fullUrl": "uuid:12",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "62409-8",
+                            "display": "Hip circumference",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "hip-circumference-1",
+                            "display": "First hip circumference",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "First hip circumference"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:14"
+                        }
+                    }
+                ]
+            }
         },
-        "component": [
-          {
-            "code": {
-              "coding": [
-                {
-                  "code": "heart-rhythm-status",
-                  "display": "Heart rhythm status",
-                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+        {
+            "fullUrl": "uuid:13",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "62409-8",
+                            "display": "Hip circumference",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "hip-circumference-2",
+                            "display": "Second hip circumference",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Second hip circumference"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:15"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "uuid:14",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "protocol-modifications-hip-circumference",
+                            "display": "Hip circumference protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Hip circumference protocol modifications"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueCodeableConcept": {
+                    "coding": [
+                        {
+                            "code": "blood-bank-donor",
+                            "display": "Blood bank donor",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-hip-circumference"
+                        }
+                    ],
+                    "text": "Blood bank donor"
                 }
-              ],
-              "text": "Heart rhythm status"
-            },
-            "valueCodeableConcept": {
-              "coding": [
-                {
-                  "code": "no-irregularity-detected",
-                  "display": "No irregularity detected",
-                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/heart-rhythm-status"
+            }
+        },
+        {
+            "fullUrl": "uuid:15",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "protocol-modifications-hip-circumference",
+                            "display": "Hip circumference protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Hip circumference protocol modifications"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueCodeableConcept": {
+                    "coding": [
+                        {
+                            "code": "blood-bank-donor",
+                            "display": "Blood bank donor",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-hip-circumference"
+                        }
+                    ],
+                    "text": "Blood bank donor"
                 }
-              ],
-              "text": "No irregularity detected"
             }
-          }
-        ],
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:8"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:7",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "protocol-modifications-blood-pressure",
-              "display": "Blood pressure protocol modifications",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Blood pressure protocol modifications"
         },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "valueCodeableConcept": {
-          "coding": [
-            {
-              "code": "blood-bank-donor",
-              "display": "Blood bank donor",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-blood-pressure"
+        {
+            "fullUrl": "uuid:16",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "56086-2",
+                            "display": "Waist circumference",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "waist-circumference-1",
+                            "display": "First waist circumference",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "First waist circumference"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:18"
+                        }
+                    }
+                ]
             }
-          ],
-          "text": "Blood bank donor"
-        }
-      }
-    },
-    {
-      "fullUrl": "uuid:8",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "protocol-modifications-blood-pressure",
-              "display": "Blood pressure protocol modifications",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+        },
+        {
+            "fullUrl": "uuid:17",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "56086-2",
+                            "display": "Waist circumference",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "waist-circumference-2",
+                            "display": "Second waist circumference",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Second waist circumference"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:19"
+                        }
+                    }
+                ]
             }
-          ],
-          "text": "Blood pressure protocol modifications"
         },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "valueCodeableConcept": {
-          "coding": [
-            {
-              "code": "blood-bank-donor",
-              "display": "Blood bank donor",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-blood-pressure"
-            }
-          ],
-          "text": "Blood bank donor"
-        }
-      }
-    },
-    {
-      "fullUrl": "uuid:9",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "8302-2",
-              "display": "Body height",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "height",
-              "display": "Height",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Height"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:10"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:10",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "protocol-modifications-height",
-              "display": "Height protocol modifications",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Height protocol modifications"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "valueCodeableConcept": {
-          "coding": [
-            {
-              "code": "blood-bank-donor",
-              "display": "Blood bank donor",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-height"
-            }
-          ],
-          "text": "Blood bank donor"
-        }
-      }
-    },
-    {
-      "fullUrl": "uuid:11",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "29463-7",
-              "display": "Body weight",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "weight",
-              "display": "Weight",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Weight"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "valueQuantity": {
-          "code": "kg",
-          "system": "http:\/\/unitsofmeasure.org",
-          "unit": "kg",
-          "value": 65
-        }
-      }
-    },
-    {
-      "fullUrl": "uuid:12",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "62409-8",
-              "display": "Hip circumference",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "hip-circumference-1",
-              "display": "First hip circumference",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "First hip circumference"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:14"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:13",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "62409-8",
-              "display": "Hip circumference",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "hip-circumference-2",
-              "display": "Second hip circumference",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Second hip circumference"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:15"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:14",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "protocol-modifications-hip-circumference",
-              "display": "Hip circumference protocol modifications",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Hip circumference protocol modifications"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "valueCodeableConcept": {
-          "coding": [
-            {
-              "code": "blood-bank-donor",
-              "display": "Blood bank donor",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-hip-circumference"
-            }
-          ],
-          "text": "Blood bank donor"
-        }
-      }
-    },
-    {
-      "fullUrl": "uuid:15",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "protocol-modifications-hip-circumference",
-              "display": "Hip circumference protocol modifications",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Hip circumference protocol modifications"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "valueCodeableConcept": {
-          "coding": [
-            {
-              "code": "blood-bank-donor",
-              "display": "Blood bank donor",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-hip-circumference"
-            }
-          ],
-          "text": "Blood bank donor"
-        }
-      }
-    },
-    {
-      "fullUrl": "uuid:16",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "56086-2",
-              "display": "Waist circumference",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "waist-circumference-1",
-              "display": "First waist circumference",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "First waist circumference"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:18"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:17",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "56086-2",
-              "display": "Waist circumference",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "waist-circumference-2",
-              "display": "Second waist circumference",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Second waist circumference"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:19"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:18",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "protocol-modifications-waist-circumference",
-              "display": "Waist circumference protocol modifications",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Waist circumference protocol modifications"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "valueCodeableConcept": {
-          "coding": [
-            {
-              "code": "blood-bank-donor",
-              "display": "Blood bank donor",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-waist-circumference"
-            }
-          ],
-          "text": "Blood bank donor"
-        }
-      }
-    },
-    {
-      "fullUrl": "uuid:19",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "protocol-modifications-waist-circumference",
-              "display": "Waist circumference protocol modifications",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Waist circumference protocol modifications"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "valueCodeableConcept": {
-          "coding": [
-            {
-              "code": "blood-bank-donor",
-              "display": "Blood bank donor",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-waist-circumference"
-            }
-          ],
-          "text": "Blood bank donor"
-        }
-      }
-    },
-    {
-      "fullUrl": "uuid:20",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "55284-4",
-              "display": "Blood pressure systolic and diastolic",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "blood-pressure-mean",
-              "display": "Computed blood pressure systolic and diastolic, mean of 2nd and 3rd measures",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Computed blood pressure systolic and diastolic, mean of 2nd and 3rd measures"
-        },
-        "component": [],
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "bodySite": {
-          "coding": [
-            {
-              "code": "368209003",
-              "display": "Right arm",
-              "system": "http:\/\/snomed.info\/sct"
-            },
-            {
-              "code": "right-arm",
-              "display": "Right arm",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
-            }
-          ],
-          "text": "Right arm"
-        },
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:7"
-            }
-          },
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:8"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:21",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "8867-4",
-              "display": "Heart rate",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "heart-rate-mean",
-              "display": "Computed heart rate, mean of 2nd and 3rd measures",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Computed heart rate, mean of 2nd and 3rd measures"
-        },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
-        },
-        "component": [
-          {
-            "code": {
-              "coding": [
-                {
-                  "code": "heart-rhythm-status",
-                  "display": "Heart rhythm status",
-                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+        {
+            "fullUrl": "uuid:18",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "protocol-modifications-waist-circumference",
+                            "display": "Waist circumference protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Waist circumference protocol modifications"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueCodeableConcept": {
+                    "coding": [
+                        {
+                            "code": "blood-bank-donor",
+                            "display": "Blood bank donor",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-waist-circumference"
+                        }
+                    ],
+                    "text": "Blood bank donor"
                 }
-              ],
-              "text": "Heart rhythm status"
-            },
-            "valueCodeableConcept": {
-              "coding": [
-                {
-                  "code": "no-irregularity-detected",
-                  "display": "No irregularity detected",
-                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/heart-rhythm-status"
+            }
+        },
+        {
+            "fullUrl": "uuid:19",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "protocol-modifications-waist-circumference",
+                            "display": "Waist circumference protocol modifications",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Waist circumference protocol modifications"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "valueCodeableConcept": {
+                    "coding": [
+                        {
+                            "code": "blood-bank-donor",
+                            "display": "Blood bank donor",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-waist-circumference"
+                        }
+                    ],
+                    "text": "Blood bank donor"
                 }
-              ],
-              "text": "No irregularity detected"
             }
-          }
-        ],
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:7"
-            }
-          },
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:8"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:22",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "62409-8",
-              "display": "Hip circumference",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "hip-circumference-mean",
-              "display": "Computed hip circumference, mean of closest two measures",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Computed hip circumference, mean of closest two measures"
         },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
+        {
+            "fullUrl": "uuid:20",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "55284-4",
+                            "display": "Blood pressure systolic and diastolic",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "blood-pressure-mean",
+                            "display": "Computed blood pressure systolic and diastolic, mean of 2nd and 3rd measures",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Computed blood pressure systolic and diastolic, mean of 2nd and 3rd measures"
+                },
+                "component": [],
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "bodySite": {
+                    "coding": [
+                        {
+                            "code": "368209003",
+                            "display": "Right arm",
+                            "system": "http:\/\/snomed.info\/sct"
+                        },
+                        {
+                            "code": "right-arm",
+                            "display": "Right arm",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
+                        }
+                    ],
+                    "text": "Right arm"
+                },
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:7"
+                        }
+                    },
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:8"
+                        }
+                    }
+                ]
+            }
         },
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:14"
+        {
+            "fullUrl": "uuid:21",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "8867-4",
+                            "display": "Heart rate",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "heart-rate-mean",
+                            "display": "Computed heart rate, mean of 2nd and 3rd measures",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Computed heart rate, mean of 2nd and 3rd measures"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "component": [
+                    {
+                        "code": {
+                            "coding": [
+                                {
+                                    "code": "heart-rhythm-status",
+                                    "display": "Heart rhythm status",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                                }
+                            ],
+                            "text": "Heart rhythm status"
+                        },
+                        "valueCodeableConcept": {
+                            "coding": [
+                                {
+                                    "code": "no-irregularity-detected",
+                                    "display": "No irregularity detected",
+                                    "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/heart-rhythm-status"
+                                }
+                            ],
+                            "text": "No irregularity detected"
+                        }
+                    }
+                ],
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:7"
+                        }
+                    },
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:8"
+                        }
+                    }
+                ]
             }
-          },
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:15"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "uuid:23",
-      "resource": {
-        "code": {
-          "coding": [
-            {
-              "code": "56086-2",
-              "display": "Waist circumference",
-              "system": "http:\/\/loinc.org"
-            },
-            {
-              "code": "waist-circumference-mean",
-              "display": "Computed waist circumference, mean of closest two measures",
-              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
-            }
-          ],
-          "text": "Computed waist circumference, mean of closest two measures"
         },
-        "effectiveDateTime": "2017-01-01T00:00:00Z",
-        "resourceType": "Observation",
-        "status": "final",
-        "subject": {
-          "reference": "Patient\/P10000001"
+        {
+            "fullUrl": "uuid:22",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "62409-8",
+                            "display": "Hip circumference",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "hip-circumference-mean",
+                            "display": "Computed hip circumference, mean of closest two measures",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Computed hip circumference, mean of closest two measures"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:14"
+                        }
+                    },
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:15"
+                        }
+                    }
+                ]
+            }
         },
-        "related": [
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:18"
+        {
+            "fullUrl": "uuid:23",
+            "resource": {
+                "code": {
+                    "coding": [
+                        {
+                            "code": "56086-2",
+                            "display": "Waist circumference",
+                            "system": "http:\/\/loinc.org"
+                        },
+                        {
+                            "code": "waist-circumference-mean",
+                            "display": "Computed waist circumference, mean of closest two measures",
+                            "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                        }
+                    ],
+                    "text": "Computed waist circumference, mean of closest two measures"
+                },
+                "effectiveDateTime": "2017-01-01T00:00:00Z",
+                "resourceType": "Observation",
+                "status": "final",
+                "subject": {
+                    "reference": "Patient\/P10000001"
+                },
+                "related": [
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:18"
+                        }
+                    },
+                    {
+                        "type": "qualified-by",
+                        "target": {
+                            "reference": "uuid:19"
+                        }
+                    }
+                ]
             }
-          },
-          {
-            "type": "qualified-by",
-            "target": {
-              "reference": "uuid:19"
-            }
-          }
-        ]
-      }
-    }
-  ],
-  "resourceType": "Bundle",
-  "type": "document"
+        }
+    ],
+    "resourceType": "Bundle",
+    "type": "document"
 }
