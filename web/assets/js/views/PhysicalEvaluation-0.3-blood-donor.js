@@ -11,7 +11,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
         "click .toggle-help-image": "displayHelpModal",
         "change input, select": "inputChange",
         "keyup input": "inputKeyup",
-        "change .blood-pressure input": "toggleSecondBloodPressure",
         "change #form_blood-pressure-arm-circumference": "calculateCuff",
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
         "change .field-irregular-heart-rate input": "calculateIrregularHeartRate",
@@ -111,33 +110,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
             this.$('.field-weight-protocol-modification-notes').parent().hide();
             this.$('#form_weight-protocol-modification-notes').val('');
         }
-    },
-    toggleSecondReading: function () {
-        var firstSystolic = parseFloat(this.$('#form_blood-pressure-systolic_0').val());
-        var firstDiastolic = parseFloat(this.$('#form_blood-pressure-diastolic_0').val());
-        var firstHeartRate = parseFloat(this.$('#form_heart-rate_0').val());
-        var firstProtocolModification = this.$('#form_blood-pressure-protocol-modification_0').val();
-        if (firstProtocolModification === 'refusal' || firstSystolic < 90 || firstSystolic > 180 || firstDiastolic < 50 || firstDiastolic > 100 || firstHeartRate < 50 || firstHeartRate > 100) {
-            this.$('#blood-pressure_1').show();
-            this.$('.blood-pressure-second-reading-warning').show();
-        } else {
-            this.clearSecondReading();
-            this.$('#blood-pressure_1').hide();
-            this.$('.blood-pressure-second-reading-warning').hide();
-        }
-    },
-    toggleSecondBloodPressure: function() {
-        this.toggleSecondReading();
-    },
-    clearSecondReading: function () {
-        var input = this.$('#blood-pressure_1');
-        input.find('input:text, select').val('');
-        input.find('input[type=checkbox]').prop('checked', false);
-        input.find('.metric-warnings').remove();
-        input.find('input:text').each(function () {
-            $(this).parsley().validate();
-        });
-        input.find('.help-block').remove();
     },
     calculateIrregularHeartRate: function() {
         var allIrregular = true;
@@ -389,7 +361,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
             block.find('.modification-notes input').val('');
         }
         this.triggerEqualize();
-        this.toggleSecondReading();
     },
     showModificationBlock: function(block) {
         block.find('.modification-toggle').hide();
@@ -522,7 +493,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
         this.calculateIrregularHeartRate();
         this.handlePregnantOrWheelchair();
         this.handleWeightProtocol();
-        this.toggleSecondBloodPressure();
         this.hideWholeBloodModification();
         if (this.finalized) {
             this.$('.modification-toggle').hide();
