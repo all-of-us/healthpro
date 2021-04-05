@@ -87,6 +87,15 @@
               },
               {
                 "reference": "uuid:20"
+              },
+              {
+                "reference": "uuid:21"
+              },
+              {
+                "reference": "uuid:22"
+              },
+              {
+                "reference": "uuid:23"
               }
             ]
           }
@@ -218,6 +227,56 @@
               "system": "http:\/\/loinc.org"
             },
             {
+              "code": "blood-pressure-2",
+              "display": "Second blood pressure systolic and diastolic",
+              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+            }
+          ],
+          "text": "Second blood pressure systolic and diastolic"
+        },
+        "component": [],
+        "effectiveDateTime": "2017-01-01T00:00:00Z",
+        "resourceType": "Observation",
+        "status": "final",
+        "subject": {
+          "reference": "Patient\/P10000001"
+        },
+        "bodySite": {
+          "coding": [
+            {
+              "code": "368209003",
+              "display": "Right arm",
+              "system": "http:\/\/snomed.info\/sct"
+            },
+            {
+              "code": "right-arm",
+              "display": "Right arm",
+              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/blood-pressure-location"
+            }
+          ],
+          "text": "Right arm"
+        },
+        "related": [
+          {
+            "type": "qualified-by",
+            "target": {
+              "reference": "uuid:7"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "uuid:3",
+      "resource": {
+        "code": {
+          "coding": [
+            {
+              "code": "55284-4",
+              "display": "Blood pressure systolic and diastolic",
+              "system": "http:\/\/loinc.org"
+            },
+            {
               "code": "blood-pressure-3",
               "display": "Third blood pressure systolic and diastolic",
               "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
@@ -251,14 +310,14 @@
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:5"
+              "reference": "uuid:8"
             }
           }
         ]
       }
     },
     {
-      "fullUrl": "uuid:3",
+      "fullUrl": "uuid:4",
       "resource": {
         "code": {
           "coding": [
@@ -314,7 +373,65 @@
       }
     },
     {
-      "fullUrl": "uuid:4",
+      "fullUrl": "uuid:5",
+      "resource": {
+        "code": {
+          "coding": [
+            {
+              "code": "8867-4",
+              "display": "Heart rate",
+              "system": "http:\/\/loinc.org"
+            },
+            {
+              "code": "heart-rate-2",
+              "display": "Second heart rate",
+              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+            }
+          ],
+          "text": "Second heart rate"
+        },
+        "effectiveDateTime": "2017-01-01T00:00:00Z",
+        "resourceType": "Observation",
+        "status": "final",
+        "subject": {
+          "reference": "Patient\/P10000001"
+        },
+        "component": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "code": "heart-rhythm-status",
+                  "display": "Heart rhythm status",
+                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+                }
+              ],
+              "text": "Heart rhythm status"
+            },
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "code": "no-irregularity-detected",
+                  "display": "No irregularity detected",
+                  "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/heart-rhythm-status"
+                }
+              ],
+              "text": "No irregularity detected"
+            }
+          }
+        ],
+        "related": [
+          {
+            "type": "qualified-by",
+            "target": {
+              "reference": "uuid:7"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "uuid:6",
       "resource": {
         "code": {
           "coding": [
@@ -365,14 +482,14 @@
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:5"
+              "reference": "uuid:8"
             }
           }
         ]
       }
     },
     {
-      "fullUrl": "uuid:5",
+      "fullUrl": "uuid:7",
       "resource": {
         "code": {
           "coding": [
@@ -403,7 +520,38 @@
       }
     },
     {
-      "fullUrl": "uuid:6",
+      "fullUrl": "uuid:8",
+      "resource": {
+        "code": {
+          "coding": [
+            {
+              "code": "protocol-modifications-blood-pressure",
+              "display": "Blood pressure protocol modifications",
+              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/physical-measurements"
+            }
+          ],
+          "text": "Blood pressure protocol modifications"
+        },
+        "effectiveDateTime": "2017-01-01T00:00:00Z",
+        "resourceType": "Observation",
+        "status": "final",
+        "subject": {
+          "reference": "Patient\/P10000001"
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "code": "blood-bank-donor",
+              "display": "Blood bank donor",
+              "system": "http:\/\/terminology.pmi-ops.org\/CodeSystem\/protocol-modifications-blood-pressure"
+            }
+          ],
+          "text": "Blood bank donor"
+        }
+      }
+    },
+    {
+      "fullUrl": "uuid:9",
       "resource": {
         "code": {
           "coding": [
@@ -430,14 +578,14 @@
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:7"
+              "reference": "uuid:10"
             }
           }
         ]
       }
     },
     {
-      "fullUrl": "uuid:7",
+      "fullUrl": "uuid:10",
       "resource": {
         "code": {
           "coding": [
@@ -468,7 +616,7 @@
       }
     },
     {
-      "fullUrl": "uuid:8",
+      "fullUrl": "uuid:11",
       "resource": {
         "code": {
           "coding": [
@@ -500,7 +648,7 @@
       }
     },
     {
-      "fullUrl": "uuid:9",
+      "fullUrl": "uuid:12",
       "resource": {
         "code": {
           "coding": [
@@ -527,14 +675,14 @@
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:11"
+              "reference": "uuid:14"
             }
           }
         ]
       }
     },
     {
-      "fullUrl": "uuid:10",
+      "fullUrl": "uuid:13",
       "resource": {
         "code": {
           "coding": [
@@ -561,14 +709,14 @@
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:12"
+              "reference": "uuid:15"
             }
           }
         ]
       }
     },
     {
-      "fullUrl": "uuid:11",
+      "fullUrl": "uuid:14",
       "resource": {
         "code": {
           "coding": [
@@ -599,7 +747,7 @@
       }
     },
     {
-      "fullUrl": "uuid:12",
+      "fullUrl": "uuid:15",
       "resource": {
         "code": {
           "coding": [
@@ -630,7 +778,7 @@
       }
     },
     {
-      "fullUrl": "uuid:13",
+      "fullUrl": "uuid:16",
       "resource": {
         "code": {
           "coding": [
@@ -657,14 +805,14 @@
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:15"
+              "reference": "uuid:18"
             }
           }
         ]
       }
     },
     {
-      "fullUrl": "uuid:14",
+      "fullUrl": "uuid:17",
       "resource": {
         "code": {
           "coding": [
@@ -691,14 +839,14 @@
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:16"
+              "reference": "uuid:19"
             }
           }
         ]
       }
     },
     {
-      "fullUrl": "uuid:15",
+      "fullUrl": "uuid:18",
       "resource": {
         "code": {
           "coding": [
@@ -729,7 +877,7 @@
       }
     },
     {
-      "fullUrl": "uuid:16",
+      "fullUrl": "uuid:19",
       "resource": {
         "code": {
           "coding": [
@@ -760,7 +908,7 @@
       }
     },
     {
-      "fullUrl": "uuid:17",
+      "fullUrl": "uuid:20",
       "resource": {
         "code": {
           "coding": [
@@ -803,14 +951,20 @@
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:5"
+              "reference": "uuid:7"
+            }
+          },
+          {
+            "type": "qualified-by",
+            "target": {
+              "reference": "uuid:8"
             }
           }
         ]
       }
     },
     {
-      "fullUrl": "uuid:18",
+      "fullUrl": "uuid:21",
       "resource": {
         "code": {
           "coding": [
@@ -861,14 +1015,20 @@
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:5"
+              "reference": "uuid:7"
+            }
+          },
+          {
+            "type": "qualified-by",
+            "target": {
+              "reference": "uuid:8"
             }
           }
         ]
       }
     },
     {
-      "fullUrl": "uuid:19",
+      "fullUrl": "uuid:22",
       "resource": {
         "code": {
           "coding": [
@@ -895,20 +1055,20 @@
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:11"
+              "reference": "uuid:14"
             }
           },
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:12"
+              "reference": "uuid:15"
             }
           }
         ]
       }
     },
     {
-      "fullUrl": "uuid:20",
+      "fullUrl": "uuid:23",
       "resource": {
         "code": {
           "coding": [
@@ -935,13 +1095,13 @@
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:15"
+              "reference": "uuid:18"
             }
           },
           {
             "type": "qualified-by",
             "target": {
-              "reference": "uuid:16"
+              "reference": "uuid:19"
             }
           }
         ]
