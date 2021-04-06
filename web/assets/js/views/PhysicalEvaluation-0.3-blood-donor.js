@@ -29,10 +29,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
         this.clearServerErrors(e);
         this.displayWarning(e);
         this.updateConversion(e);
-
-        var field = $(e.currentTarget).closest('.field').data('field');
-        this.displayConsecutiveWarning(field, e);
-
         this.triggerEqualize();
     },
     inputKeyup: function(e) {
@@ -235,66 +231,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
             });
         });
     },
-    displayConsecutiveWarning: function(field, e) {
-        var self = this;
-        if (this.$('.field-' + field).closest('.replicate').length === 0) {
-            // ignore non-replicate fields
-            return;
-        }
-        if (!this.warnings[field]) {
-            // ignore if no warnings on this field
-            return;
-        }
-        // clear out previous warning
-        this.$('#' + field + '-warning').text('');
-
-        // get all replicate field values
-        var values = [];
-        this.$('.field-' + field + ' input').each(function() {
-            values.push($(this).val());
-        });
-        var warned = false;
-        $.each(this.warnings[field], function(key, warning) {
-            if (!warning.consecutive) {
-                return false;
-            }
-            var consecutiveConditionsMet = 0;
-            var isConsecutive = false;
-            $.each(values, function(k, val) {
-                if (self.warningConditionMet(warning, val)) {
-                    consecutiveConditionsMet++;
-                    if (consecutiveConditionsMet >= 2) {
-                        isConsecutive = true;
-                    }
-                } else {
-                    consecutiveConditionsMet = 0;
-                }
-            });
-            if (isConsecutive) {
-                if (e && self.rendered) {
-                    var input = $(e.currentTarget);
-                    var showOk = true;
-                    if (self.isBloodPressureOutOfRange(field, input)) {
-                        showOk = false;
-                    }
-                    new PmiConfirmModal({
-                        msg: warning.message,
-                        isHTML: true,
-                        onFalse: function() {
-                            input.val('');
-                            input.focus();
-                            input.trigger('change');
-                        },
-                        btnTextTrue: 'Confirm value and take action',
-                        btnTextFalse: 'Clear value and reenter',
-                        showOk: showOk
-                    });
-                }
-                self.$('#' + field + '-warning').html('<div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> ' + warning.message + '</div>');
-                return false; // only show first (highest priority) warning
-            }
-        });
-    },
     displayWarning: function(e) {
         var self = this;
         var input = $(e.currentTarget);
@@ -479,7 +415,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
         this.$('.replicate .field').each(function() {
             var field = $(this).data('field');
             if (!processedReplicates[field]) {
-                self.displayConsecutiveWarning(field);
                 processedReplicates[field] = true;
             }
         });
