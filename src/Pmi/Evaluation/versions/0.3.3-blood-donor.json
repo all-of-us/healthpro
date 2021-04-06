@@ -18,16 +18,8 @@
             "max": 300,
             "warnings": [
                 {
-                    "max": 180,
-                    "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
-                    "alert": true,
-                    "consecutive": 2
-                },
-                {
-                    "min": 100,
-                    "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-                    "alert": true,
-                    "consecutive": 2
+                    "max": 200,
+                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
                 },
                 {
                     "max": 180,
@@ -55,10 +47,12 @@
             },
             "warnings": [
                 {
-                    "min": 60,
-                    "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-                    "alert": true,
-                    "consecutive": 2
+                    "max": 120,
+                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                },
+                {
+                    "max": 110,
+                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
                 },
                 {
                     "min": 60,
@@ -76,18 +70,6 @@
             "replicates": 3,
             "max": 300,
             "warnings": [
-                {
-                    "max": 100,
-                    "message": "Participant could be at risk for hypertensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-                    "alert": true,
-                    "consecutive": 2
-                },
-                {
-                    "min": 60,
-                    "message": "Participant could be at risk for hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-                    "alert": true,
-                    "consecutive": 2
-                },
                 {
                     "max": 100,
                     "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
