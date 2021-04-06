@@ -62,7 +62,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
     handlePregnantOrWheelchair: function() {
         var isPregnant = (this.$('#form_pregnant').val() == 1);
         var isWheelchairUser = (this.$('#form_wheelchair').val() == 1);
-        var self = this;
         if (isPregnant) {
             this.$('.field-weight-prepregnancy').show();
             this.$('.field-weight-prepregnancy').next('.alt-units-block').show();
@@ -154,9 +153,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
     lbToKg: function(lb) {
         return (parseFloat(lb) / 2.2046).toFixed(1);
     },
-    inToCm: function(inches) {
-        return (parseFloat(inches) / 0.3937).toFixed(1);
-    },
     convert: function(type, val) {
         switch (type) {
             case 'in':
@@ -242,22 +238,8 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
         }
         var val = input.val();
         if (this.warnings[field]) {
-            var warned = false;
             $.each(this.warnings[field], function(key, warning) {
                 if (!warning.consecutive && self.warningConditionMet(warning, val)) {
-                    if (warning.alert) {
-                        new PmiConfirmModal({
-                            isHTML: true,
-                            msg: warning.message,
-                            onFalse: function() {
-                                input.val('');
-                                input.focus();
-                                input.trigger('change');
-                            },
-                            btnTextTrue: 'Confirm value and take action',
-                            btnTextFalse: 'Clear value and reenter'
-                        });
-                    }
                     container.append($('<div class="metric-warnings text-warning">').text(warning.message));
                     return false; // only show first (highest priority) warning
                 }
@@ -353,7 +335,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
     },
     convertAltUnits: function(e) {
         var block = $(e.currentTarget).closest('.alt-units-field');
-        var type = block.find('label').attr('for');
         var val;
         var unit = block.find('.input-group-addon').text();
         val = block.find('input').val();
@@ -385,13 +366,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
             errorTemplate: '<div></div>',
             trigger: "keyup change"
         });
-    },
-    isBloodPressureOutOfRange: function (field, input) {
-        if (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'].includes(field)) {
-            var bloodPressure = parseFloat(input.val());
-            return bloodPressure < input.data('parsley-min') || bloodPressure > input.data('parsley-max');
-        }
-        return false;
     },
     hideWholeBloodModification: function() {
         // Whole blood donor modification is only available if set initially
