@@ -19,15 +19,15 @@
             "warnings": [
                 {
                     "max": 200,
-                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
                 },
                 {
                     "max": 180,
-                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
                 },
                 {
                     "min": 100,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+                    "message": "This value may indicate a hypotensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, refer to your site's SOP for an urget referral."
                 }
             ],
             "help": {
@@ -48,15 +48,15 @@
             "warnings": [
                 {
                     "max": 120,
-                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
                 },
                 {
                     "max": 110,
-                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
                 },
                 {
                     "min": 60,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+                    "message": "This value may indicate a hypotensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, refer to your site's SOP for an urget referral."
                 }
             ],
             "help": {
@@ -72,12 +72,11 @@
             "warnings": [
                 {
                     "max": 100,
-                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, refer to your site's SOP for an urget referral."
                 },
                 {
                     "min": 60,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability or if the participant's systolic blood pressure is < 90 mmHg."
-                }
+                    "message": "This value may indicate a hypotensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, or if the participant's systolic blood pressure is < 90 mmHg, refer to your site's SOP for an urgent referral."
             ],
             "help": {
                 "caption": "Help text placeholder."
