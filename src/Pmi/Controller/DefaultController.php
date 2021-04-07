@@ -1,20 +1,15 @@
 <?php
 namespace Pmi\Controller;
 
-use Pmi\Evaluation\Evaluation;
 use Pmi\PatientStatus\PatientStatus;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
-use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
-use Pmi\Order\Order;
 use Pmi\Security\User;
 
 class DefaultController extends AbstractController
