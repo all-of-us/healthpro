@@ -90,7 +90,7 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
     },
     handleWeightProtocol: function() {
         var selected = this.$('#form_weight-protocol-modification').val();
-        if (selected === 'cannot-balance-on-scale' || selected === 'refusal') {
+        if (selected === 'cannot-balance-on-scale' || selected === 'refusal' || selected === 'pandemic') {
             this.$('#form_weight').valChange('').attr('disabled', true);
             this.$('.field-weight').next('.alt-units-block').hide();
         } else {
@@ -261,7 +261,7 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
             block.find('.modification-toggle').hide();
             block.find('.modification-select').show();
         }
-        if (modification === 'refusal' || modification === 'colostomy-bag') {
+        if (modification === 'refusal' || modification === 'pandemic' || modification === 'colostomy-bag') {
             block.find('.modification-affected input, .modification-affected select, .modification-manual input:checkbox').each(function() {
                 $(this).attr('disabled', true);
             });
