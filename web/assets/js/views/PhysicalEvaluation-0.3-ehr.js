@@ -90,7 +90,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             firstReading.find('select').val('');
         }
         // If the form is not locked enable first reading fields except protocol modification field and EHR date field
-        if (!parseInt($('form').attr('data-locked'))) {
+        if (!parseInt(this.$('form').data('locked'))) {
             firstReading.find('input, input:checkbox').not('#form_' + field + '-ehr-date').each(function () {
                 $(this).attr('disabled', false);
             });
