@@ -253,7 +253,7 @@ class Evaluation
 
     public function getForm(FormFactory $formFactory)
     {
-        $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
+        $formBuilder = $formFactory->createBuilder(FormType::class, $this->data, ['attr' => ['data-locked' => $this->locked ? 1 : 0]]);
         foreach ($this->schema->fields as $field) {
             if (isset($field->formField) && !$field->formField) {
                 continue;
