@@ -89,10 +89,12 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         } else {
             firstReading.find('select').val('');
         }
-        // Enable first reading fields except protocol modification field and EHR date field
-        firstReading.find('input, input:checkbox').not('#form_' + field + '-ehr-date').each(function () {
-            $(this).attr('disabled', false);
-        });
+        // If the form is not locked enable first reading fields except protocol modification field and EHR date field
+        if (!parseInt(this.$('form').data('locked'))) {
+            firstReading.find('input, input:checkbox').not('#form_' + field + '-ehr-date').each(function () {
+                $(this).attr('disabled', false);
+            });
+        }
         $('.' + field + '-' + reading).find('input, select, input:checkbox').each(function () {
             $(this).attr('disabled', disabled);
             $(this).val('');
