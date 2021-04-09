@@ -533,7 +533,7 @@ class Evaluation
                     if ((!$this->data->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
                         $errors[] = [$field, $k];
                     }
-                    if ($this->data->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->data->{$field . 'protocol-modification-notes'}[$k])) {
+                    if ($this->data->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->data->{$field . '-protocol-modification-notes'}[$k])) {
                         $errors[] = [$field . '-protocol-modification-notes', $k];
                     }
                 }
