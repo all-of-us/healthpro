@@ -18,7 +18,8 @@ class EvaluationController extends AbstractController
         ['evaluationFhir', '/participant/{participantId}/measurements/{evalId}/fhir.json'],
         ['evaluationRdr', '/participant/{participantId}/measurements/{evalId}/rdr.json'],
         ['evaluationModify', '/participant/{participantId}/measurements/{evalId}/modify/{type}', ['method' => 'GET|POST']],
-        ['evaluationRevert', '/participant/{participantId}/evaluation/{evalId}/revert', ['method' => 'POST']]
+        ['evaluationRevert', '/participant/{participantId}/evaluation/{evalId}/revert', ['method' => 'POST']],
+        ['evaluationBloodDonorCheck', '/participant/{participantId}/measurements/blood/donor/check', ['method' => 'GET|POST']],
     ];
 
     /* For debugging generated FHIR bundle - only allowed for admins or in local dev */
@@ -125,13 +126,48 @@ class EvaluationController extends AbstractController
         ]);
     }
 
+    public function evaluationBloodDonorCheckAction($participantId, Application $app, Request $request)
+    {
+        $evaluationService = new Evaluation($app);
+        if (!$evaluationService->requireBloodDonorCheck()) {
+            $app->abort(403);
+        }
+        $participant = $app['pmi.drc.participants']->getById($participantId);
+        if (!$participant) {
+            $app->abort(404);
+        }
+        if (!$participant->status || $app->isTestSite() || ($participant->activityStatus === 'deactivated')) {
+            $app->abort(403);
+        }
+        $bloodDonorCheckForm = $evaluationService->getBloodDonorCheckForm($app['form.factory']);
+        $bloodDonorCheckForm->handleRequest($request);
+        if ($bloodDonorCheckForm->isSubmitted() && $bloodDonorCheckForm->isValid()) {
+            if ($bloodDonorCheckForm['bloodDonor']->getData() === 'yes') {
+                return $app->redirectToRoute('evaluation', [
+                    'participantId' => $participant->id,
+                    'type' => $evaluationService::BLOOD_DONOR,
+                    'wholeblood' => $bloodDonorCheckForm['bloodDonorType']->getData() === 'whole-blood' ? 1 : 0
+                ]);
+            } else {
+                return $app->redirectToRoute('evaluation', [
+                    'participantId' => $participant->id
+                ]);
+            }
+        }
+        return $app['twig']->render('evaluation-blood-donor-check.html.twig', [
+            'participant' => $participant,
+            'bloodDonorCheckForm' => $bloodDonorCheckForm->createView()
+        ]);
+    }
+
     public function evaluationAction($participantId, $evalId, Application $app, Request $request)
     {
         $participant = $app['pmi.drc.participants']->getById($participantId);
         if (!$participant) {
             $app->abort(404);
         }
-        $evaluationService = new Evaluation($app);
+        $type = $request->query->get('type');
+        $evaluationService = new Evaluation($app, $type);
         if (!$evaluationService->canEdit($evalId, $participant) || $app->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($evalId))) {
             $app->abort(403);
         }
@@ -146,6 +182,11 @@ class EvaluationController extends AbstractController
             $evaluation['reasonDisplayText'] = $evaluationService->getReasonDisplayText();
         } else {
             $evaluation = null;
+            if ($evaluationService->isBloodDonorForm() && $request->query->get('wholeblood')) {
+                $evaluationService->setData((object)[
+                    'weight-protocol-modification' => 'whole-blood-donor'
+                ]);
+            }
         }
         $showAutoModification = false;
 
@@ -159,6 +200,12 @@ class EvaluationController extends AbstractController
             // Check if finalized_ts is set and rdr_id is empty
             if (!$evaluationService->isEvaluationFailedToReachRDR()) {
                 if ($evaluationForm->isValid()) {
+                    if ($evaluationService->isBloodDonorForm()) {
+                        $evaluationService->addBloodDonorProtocolModificationForRemovedFields();
+                        if ($request->request->has('finalize') && (!$evaluation || empty($evaluation['rdr_id']))) {
+                            $evaluationService->addBloodDonorProtocolModificationForBloodPressure(1);
+                        }
+                    }
                     $evaluationService->setData($evaluationForm->getData());
                     $dbArray = $evaluationService->toArray();
                     $now = new \DateTime();
@@ -197,13 +244,13 @@ class EvaluationController extends AbstractController
                             foreach ($errors as $field) {
                                 if (is_array($field)) {
                                     list($field, $replicate) = $field;
-                                    $evaluationForm->get($field)->get($replicate)->addError(new FormError('Please complete or add protocol modification.'));
+                                    $evaluationForm->get($field)->get($replicate)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field, $replicate)));
                                 } else {
-                                    $evaluationForm->get($field)->addError(new FormError('Please complete or add protocol modification.'));
+                                    $evaluationForm->get($field)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field)));
                                 }
                             }
                             $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                            $showAutoModification = true;
+                            $showAutoModification = $evaluationService->canAutoModify();
                         }
                     }
                     if (!$evaluation || $request->request->has('copy')) {
@@ -279,13 +326,13 @@ class EvaluationController extends AbstractController
                 foreach ($errors as $field) {
                     if (is_array($field)) {
                         list($field, $replicate) = $field;
-                        $evaluationForm->get($field)->get($replicate)->addError(new FormError('Please complete or add protocol modification.'));
+                        $evaluationForm->get($field)->get($replicate)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field, $replicate)));
                     } else {
-                        $evaluationForm->get($field)->addError(new FormError('Please complete or add protocol modification.'));
+                        $evaluationForm->get($field)->addError(new FormError($evaluationService->getFormFieldErrorMessage($field)));
                     }
                 }
                 $evaluationForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                $showAutoModification = true;
+                $showAutoModification = $evaluationService->canAutoModify();
             }
         }
 
@@ -296,9 +343,11 @@ class EvaluationController extends AbstractController
             'schema' => $evaluationService->getAssociativeSchema(),
             'warnings' => $evaluationService->getWarnings(),
             'conversions' => $evaluationService->getConversions(),
-            'latestVersion' => $evaluationService::CURRENT_VERSION,
+            'latestVersion' => $evaluationService->getLatestFormVersion(),
             'showAutoModification' => $showAutoModification,
-            'revertForm' => $evaluationService->getEvaluationRevertForm()->createView()
+            'revertForm' => $evaluationService->getEvaluationRevertForm()->createView(),
+            'displayEhrBannerMessage' => $evaluationService->requireEhrModificationProtocol() || $evaluationService->isEhrProtocolForm(),
+            'ehrProtocolBannerMessage' => $app->getConfig('ehr_protocol_banner_message')
         ]);
     }
 

@@ -20,18 +20,18 @@
                     {% endif %}
                 </dd>
                 <dt>Paired Awardee</dt>
-                <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
+                <dd>{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
                 <dt>Paired Site</dt>
-                <dd>{{ participant.site ? app.getSiteDisplayName(participant.siteSuffix) : '(not paired)' }}</dd>
+                <dd>{{ participant.site ? siteInfo.siteDisplayName(participant.siteSuffix) : '(not paired)' }}</dd>
             </dl>
         </div>
         <div class="col-sm-6">
             <p class="lead">
-                Order ID: <strong>{{ order.order_id }}</strong>
+                Order ID: <strong>{{ order.orderId }}</strong>
             </p>
             <h3>
                 <i class="fa fa-medkit" aria-hidden="true"></i>
-                {{ order.created_ts|date('n/j/Y', app.userTimezone) }}
+                {{ order.createdTs|date('n/j/Y', app.user.getInfo.timezone) }}
             </h3>
         </div>
     </div>
@@ -40,14 +40,14 @@
         <div class="alert alert-warning well-sm">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong>
-                Unlocked for editing by {{ app.getUserEmailById(order.oh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.oh_site) }} on {{ order.oh_created_ts|date('F j, Y g:ia', app.userTimezone) }}
+                Unlocked for editing by {{ order.history.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.getInfo.timezone) }}
             </strong>
         </div>
     {% elseif order.status == 'cancel' %}
         <div class="alert alert-danger well-sm">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong>
-                Cancelled by {{ app.getUserEmailById(order.oh_user_id)|default('Unknown') }} at {{ app.getSiteDisplayName(order.oh_site) }} on {{ order.oh_created_ts|date('F j, Y g:ia', app.userTimezone) }}
+                Cancelled by {{ order.history.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.getInfo.timezone) }}
             </strong>
             {% if order.reasonDisplayText is not empty %}
                 <br/><strong>Reason:</strong> {{ order.reasonDisplayText }}
@@ -59,7 +59,7 @@
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation">
                 <a href="#collect" aria-controls="collect" role="tab" data-toggle="tab">
-                    {% if order.collected_ts is not empty %}
+                    {% if order.collectedTs is not empty %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                     {% endif %}
                     Collect
@@ -67,7 +67,7 @@
             </li>
             <li role="presentation">
                 <a href="#process" aria-controls="process" role="tab" data-toggle="tab">
-                    {% if order.collected_ts is not empty and order.processed_ts is not empty %}
+                    {% if order.collectedTs is not empty and order.processedTs is not empty %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                     {% endif %}
                     Process
@@ -75,7 +75,7 @@
             </li>
             <li role="presentation">
                 <a href="#finalize" aria-controls="finalize" role="tab" data-toggle="tab">
-                    {% if order.finalized_ts is not empty %}
+                    {% if order.finalizedTs is not empty %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                     {% endif %}
                     Finalize
@@ -85,19 +85,19 @@
         <br />
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane" id="collect">
-                {% include 'partials/biobank-order-details.html.twig' with { type: 'collected' } %}
+                {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'collected' } %}
             </div>
             <div role="tabpanel" class="tab-pane" id="process">
-                {% include 'partials/biobank-order-details.html.twig' with { type: 'processed' } %}
+                {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'processed' } %}
             </div>
             <div role="tabpanel" class="tab-pane" id="finalize">
-                {% include 'partials/biobank-order-details.html.twig' with { type: 'finalized' } %}
+                {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'finalized' } %}
             </div>
         </div>
     </div>
 {% endblock %}
 {% block pagejs %}
-    {{ webpack_entry('order-sub', 'js') }}
+    {{ encore_entry_script_tags('order-sub') }}
     <script>
         $(document).ready(function() {
             var currentStep = {{ currentStep|json_encode|raw }};
@@ -108,7 +108,7 @@
             $(".nav-tabs a[href='#" + currentStep + "']").tab('show');
 
             $('#checkall').on('change', function() {
-                $('#form_finalized_samples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
+                $('#biobank_order_finalizedSamples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
             });
 
             $('#form_finalized_ts').pmiDateTimePicker();

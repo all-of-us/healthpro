@@ -42,7 +42,8 @@
                 </a>
             {% endif %}
             {% if type is not defined and readOnly is not defined and participant.activityStatus != 'deactivated' and participant.status %}
-                <a href="{{ path('evaluation', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
+                {% set evaluationUrl = evaluationUrl is defined ? evaluationUrl : 'evaluation' %}
+                <a href="{{ path(evaluationUrl, { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i>
                     {% if evaluations|length > 0 %}
                         New

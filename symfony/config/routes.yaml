@@ -23,11 +23,11 @@ evaluation:
 evaluation_modify:
     path: /participant/{participantId}/measurements/{evalId}/modify/{type}
 
+evaluationBloodDonorCheck:
+    path: /participant/{participantId}/measurements/blood/donor/check
+
 dashboard_home:
     path: /dashboard
-
-biobank_home:
-    path: /biobank
 
 clientTimeout:
     path: /client-timeout
@@ -41,11 +41,6 @@ agreeUsage:
 hideTZWarning:
     path: /hide-tz-warning
 
-biobank_order:
-    path: /biobank/{biobankId}/order/{orderId}
-
-biobank_quanumOrder:
-    path: /biobank/{biobankId}/quanum-order/{orderId}
-
 patientStatus:
     path: /participant/{participantId}/patient/status/{patientStatusId}
+

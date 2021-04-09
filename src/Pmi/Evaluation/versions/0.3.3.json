@@ -148,6 +148,7 @@
                 "None": "",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
                 "Other": "other"
             },
             "warnings": [
@@ -157,6 +158,10 @@
                 },
                 {
                     "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -258,6 +263,7 @@
                 "Unable to stand in a straight position": "unable-to-stand-straight",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
                 "Other": "other"
             },
             "help": {
@@ -286,6 +292,10 @@
                 },
                 {
                     "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -354,6 +364,7 @@
                 "Pregnancy": "pregnancy",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
                 "Other": "other"
             },
             "help": {
@@ -374,7 +385,7 @@
                 },
                 {
                     "val": "pregnancy",
-                    "message": "Deviation successfully captured. Proceeed with weight measurement."
+                    "message": "Deviation successfully captured. Proceed with weight measurement."
                 },
                 {
                     "val": "refusal",
@@ -382,6 +393,10 @@
                 },
                 {
                     "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -424,6 +439,7 @@
                 "Hip circumference is more than measuring device range": "hip-circumference-out-of-range",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
                 "Other": "other"
             },
             "warnings": [
@@ -437,6 +453,10 @@
                 },
                 {
                     "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -492,6 +512,7 @@
                 "Colostomy bag": "colostomy-bag",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
                 "Other": "other"
             },
             "help": {
@@ -512,6 +533,10 @@
                 },
                 {
                     "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
                     "message": "Deviation successfully captured."
                 },
                 {

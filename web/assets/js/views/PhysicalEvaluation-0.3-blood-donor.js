@@ -6,23 +6,17 @@ const _ = require('underscore');
 
 /* eslint security/detect-object-injection: "off" */
 
-PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
+PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
     events: {
         "click .toggle-help-image": "displayHelpModal",
-        "change .replicate input": "updateMean",
-        "keyup .replicate input": "updateMean",
         "change input, select": "inputChange",
         "keyup input": "inputKeyup",
-        "keyup #form_height, #form_weight": "calculateBmi",
-        "change #form_height, #form_weight": "calculateBmi",
+        "change .blood-pressure input": "toggleSecondBloodPressure",
         "change #form_blood-pressure-arm-circumference": "calculateCuff",
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
         "change .field-irregular-heart-rate input": "calculateIrregularHeartRate",
         "change #form_pregnant, #form_wheelchair": "handlePregnantOrWheelchair",
-        "change #form_height-protocol-modification": "handleHeightProtocol",
         "change #form_weight-protocol-modification": "handleWeightProtocol",
-        "change .field-hip-circumference input": "toggleThirdHipCircumference",
-        "change .field-waist-circumference input": "toggleThirdWaistCircumference",
         "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic",
         "click .modification-toggle a": "showModification",
         "change .modification-select select": "handleProtocolModification",
@@ -51,78 +45,10 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         $('#helpModal .modal-body').html(html);
         $('#helpModal').modal();
     },
-    updateMean: function(e) {
-        var field = $(e.currentTarget).closest('.field').data('field');
-        this.calculateMean(field);
-    },
     triggerEqualize: function() {
         window.setTimeout(function() {
             $(window).trigger('pmi.equalize');
         }, 50);
-    },
-    calculateMean: function(field) {
-        var fieldSelector = '.field-' + field;
-        var secondThirdFields = [
-            'blood-pressure-systolic',
-            'blood-pressure-diastolic',
-            'heart-rate'
-        ];
-        var twoClosestFields = [
-            'hip-circumference',
-            'waist-circumference'
-        ];
-        if ($.inArray(field, secondThirdFields) !== -1) {
-            fieldSelector = '.field-' + field + '[data-replicate=2], .field-' + field + '[data-replicate=3]';
-        }
-        var values = [];
-        this.$(fieldSelector).find('input').each(function() {
-            if (parseFloat($(this).val())) {
-                values.push(parseFloat($(this).val()));
-            }
-        });
-        if (values.length > 0) {
-            if (values.length == 3 && $.inArray(field, twoClosestFields) !== -1) {
-                values.sort(function(a, b) { return a - b; });
-                if (values[1] - values[0] < values[2] - values[1]) {
-                    values.pop();
-                } else if (values[2] - values[1] < values[1] - values[0]) {
-                    values.shift();
-                }
-            }
-            var sum = _.reduce(values, function(a, b) { return a + b; }, 0);
-            var mean = (sum / values.length).toFixed(1);
-            this.$('#mean-' + field).html('<strong>' + mean + '</strong>');
-            if (this.conversions[field]) {
-                var converted = this.convert(this.conversions[field], mean);
-                this.$('#convert-' + field).html('('+converted+')');
-            }
-            if ($.inArray(field, twoClosestFields) !== -1) {
-                var label = values.length == 3 ? '(average of three measures)' : '(average of two closest measures)';
-                this.$('#convert-' + field).next().html(label);
-            }
-        } else {
-            this.$('#mean-' + field).text('--');
-            this.$('#convert-' + field).text();
-        }
-    },
-    calculateBmi: function() {
-        var height = parseFloat(this.$('#form_height').val());
-        var weight = parseFloat(this.$('#form_weight').val());
-        this.$('#bmi-warning').text('');
-        if (this.rendered || (height && weight)) {
-            this.$('#form_height').parsley().validate();
-            this.$('#form_weight').parsley().validate();
-        }
-        if (height && weight) {
-            var bmi = weight / ((height/100) * (height/100));
-            bmi = bmi.toFixed(1);
-            this.$('#bmi').html('<strong>' + bmi + '</strong>');
-            if (bmi < 15 || bmi > 50) {
-                this.$('#bmi-warning').text('Please verify that the height and weight are correct');
-            }
-        } else {
-            this.$('#bmi').text('--');
-        }
     },
     calculateCuff: function() {
         var circumference = parseFloat(this.$('#form_blood-pressure-arm-circumference').val());
@@ -142,16 +68,6 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         var isPregnant = (this.$('#form_pregnant').val() == 1);
         var isWheelchairUser = (this.$('#form_wheelchair').val() == 1);
         var self = this;
-        if (isPregnant || isWheelchairUser) {
-            this.$('#panel-hip-waist input').each(function() {
-                $(this).valChange('');
-            });
-            this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
-                $(this).attr('disabled', true);
-            });
-            this.$('#hip-waist-skip').html('<span class="label label-danger">Skip</span>');
-            this.$('#panel-hip-waist>.panel-body').hide();
-        }
         if (isPregnant) {
             this.$('.field-weight-prepregnancy').show();
             this.$('.field-weight-prepregnancy').next('.alt-units-block').show();
@@ -169,52 +85,18 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         }
         if (isWheelchairUser) {
             if (this.rendered) {
-                this.$('#form_height-protocol-modification').valChange('wheelchair-user');
                 this.$('#form_weight-protocol-modification').valChange('wheelchair-user');
             }
         }
         if (!isWheelchairUser) {
-            if (this.rendered && this.$('#form_height-protocol-modification').val() == 'wheelchair-user') {
-                this.$('#form_height-protocol-modification').valChange('');
-            }
             if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-user') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
-        if (!isPregnant && !isWheelchairUser) {
-            this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
-                if (!self.finalized) {
-                    $(this).attr('disabled', false);
-                }
-                if ($(this).closest('.modification-block').length > 0) {
-                    self.handleProtocolModificationBlock($(this).closest('.modification-block'));
-                }
-            });
-            this.$('#hip-waist-skip').text('');
-            this.$('#panel-hip-waist>.panel-body').show();
-        }
-    },
-    handleHeightProtocol: function() {
-        var selected = this.$('#form_height-protocol-modification').val();
-        if (selected === 'refusal' || selected === 'pandemic') {
-            this.$('#form_height').valChange('').attr('disabled', true);
-            this.$('.field-height').next('.alt-units-block').hide();
-        } else {
-            if (!this.finalized) {
-                this.$('#form_height').attr('disabled', false);
-                this.$('.field-height').next('.alt-units-block').show();
-            }
-        }
-        if (selected === 'other') {
-            this.$('.field-height-protocol-modification-notes').parent().show();
-        } else {
-            this.$('.field-height-protocol-modification-notes').parent().hide();
-            this.$('#form_height-protocol-modification-notes').val('');
-        }
     },
     handleWeightProtocol: function() {
         var selected = this.$('#form_weight-protocol-modification').val();
-        if (selected === 'cannot-balance-on-scale' || selected === 'refusal' || selected === 'pandemic') {
+        if (selected === 'cannot-balance-on-scale' || selected === 'refusal') {
             this.$('#form_weight').valChange('').attr('disabled', true);
             this.$('.field-weight').next('.alt-units-block').hide();
         } else {
@@ -230,23 +112,32 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             this.$('#form_weight-protocol-modification-notes').val('');
         }
     },
-    toggleThirdReading: function(field) {
-        var first = parseFloat(this.$('#form_' + field + '_0').val());
-        var second = parseFloat(this.$('#form_' + field + '_1').val());
-        if (first > 0 && second > 0 && Math.abs(first - second) > 1) {
-            this.$('.panel-' + field + '-3').show();
+    toggleSecondReading: function () {
+        var firstSystolic = parseFloat(this.$('#form_blood-pressure-systolic_0').val());
+        var firstDiastolic = parseFloat(this.$('#form_blood-pressure-diastolic_0').val());
+        var firstHeartRate = parseFloat(this.$('#form_heart-rate_0').val());
+        var firstProtocolModification = this.$('#form_blood-pressure-protocol-modification_0').val();
+        if (firstProtocolModification === 'refusal' || firstSystolic < 90 || firstSystolic > 180 || firstDiastolic < 50 || firstDiastolic > 100 || firstHeartRate < 50 || firstHeartRate > 100) {
+            this.$('#blood-pressure_1').show();
+            this.$('.blood-pressure-second-reading-warning').show();
         } else {
-            this.$('.panel-' + field + '-3').hide();
-            this.$('.panel-' + field + '-3 input, .panel-' + field + '-3 select').each(function() {
-                $(this).valChange('');
-            });
+            this.clearSecondReading();
+            this.$('#blood-pressure_1').hide();
+            this.$('.blood-pressure-second-reading-warning').hide();
         }
     },
-    toggleThirdHipCircumference: function() {
-        this.toggleThirdReading('hip-circumference');
+    toggleSecondBloodPressure: function() {
+        this.toggleSecondReading();
     },
-    toggleThirdWaistCircumference: function() {
-        this.toggleThirdReading('waist-circumference');
+    clearSecondReading: function () {
+        var input = this.$('#blood-pressure_1');
+        input.find('input:text, select').val('');
+        input.find('input[type=checkbox]').prop('checked', false);
+        input.find('.metric-warnings').remove();
+        input.find('input:text').each(function () {
+            $(this).parsley().validate();
+        });
+        input.find('.help-block').remove();
     },
     calculateIrregularHeartRate: function() {
         var allIrregular = true;
@@ -410,6 +301,10 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             if (isConsecutive) {
                 if (e && self.rendered) {
                     var input = $(e.currentTarget);
+                    var showOk = true;
+                    if (self.isBloodPressureOutOfRange(field, input)) {
+                        showOk = false;
+                    }
                     new PmiConfirmModal({
                         msg: warning.message,
                         isHTML: true,
@@ -419,7 +314,8 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                             input.trigger('change');
                         },
                         btnTextTrue: 'Confirm value and take action',
-                        btnTextFalse: 'Clear value and reenter'
+                        btnTextFalse: 'Clear value and reenter',
+                        showOk: showOk
                     });
                 }
                 self.$('#' + field + '-warning').html('<div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> ' + warning.message + '</div>');
@@ -475,7 +371,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             block.find('.modification-toggle').hide();
             block.find('.modification-select').show();
         }
-        if (modification === 'refusal' || modification === 'pandemic' || modification === 'colostomy-bag') {
+        if (modification === 'refusal' || modification === 'colostomy-bag') {
             block.find('.modification-affected input, .modification-affected select, .modification-manual input:checkbox').each(function() {
                 $(this).attr('disabled', true);
             });
@@ -493,6 +389,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             block.find('.modification-notes input').val('');
         }
         this.triggerEqualize();
+        this.toggleSecondReading();
     },
     showModificationBlock: function(block) {
         block.find('.modification-toggle').hide();
@@ -527,12 +424,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 }
             }
         });
-        _.each(['height', 'weight'], function(field) {
-            if (!$('#form_' + field).val() && !$('#form_' + field + '-protocol-modification').val()) {
-                $('#form_' + field + '-protocol-modification').val(reason);
-            }
-        });
-        self.handleHeightProtocol();
+        if (!$('#form_weight').val() && !$('#form_weight-protocol-modification').val()) {
+            $('#form_weight-protocol-modification').val(reason);
+        }
         self.handleWeightProtocol();
     },
     enableAltUnits: function(e) {
@@ -554,23 +448,10 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         var block = $(e.currentTarget).closest('.alt-units-field');
         var type = block.find('label').attr('for');
         var val;
-        if (type == 'alt-units-height') {
-            var inches = 0;
-            if (parseFloat($('#alt-units-height-ft').val())) {
-                inches += 12*parseFloat($('#alt-units-height-ft').val());
-            }
-            if (parseFloat($('#alt-units-height-in').val())) {
-                inches += parseFloat($('#alt-units-height-in').val());
-            }
-            val = this.inToCm(inches);
-        } else {
-            var unit = block.find('.input-group-addon').text();
-            val = block.find('input').val();
-            if (unit == 'in') {
-                val = this.inToCm(val);
-            } else if (unit == 'lb') {
-                val = this.lbToKg(val);
-            }
+        var unit = block.find('.input-group-addon').text();
+        val = block.find('input').val();
+        if (unit == 'lb') {
+            val = this.lbToKg(val);
         }
         if (isNaN(val)) {
             val = '';
@@ -582,42 +463,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             block.parent().prev().find('input').parsley().validate(); // trigger parsley validation
         }
     },
-    // for parsley validator
-    validateHeightWeight: function(height, weight) {
-        if (height && weight) {
-            var bmi = weight / ((height/100) * (height/100));
-            bmi = bmi.toFixed(1);
-            if (bmi < 5 || bmi > 125) {
-                return false;
-            }
-        }
-        return true;
-    },
     initParsley: function() {
         self = this;
-        window.Parsley.addValidator('bmiHeight', {
-            validateString: function (value, weightSelector) {
-                var height = parseFloat(value);
-                var weight = parseRequirement(weightSelector);
-                return self.validateHeightWeight(height, weight);
-            },
-            messages: {
-                en: 'This height/weight combination has yielded an invalid BMI'
-            },
-            priority: 32
-        });
-        window.Parsley.addValidator('bmiWeight', {
-            validateString: function (value, heightSelector) {
-                var weight = parseFloat(value);
-                var height = parseRequirement(heightSelector);
-                return self.validateHeightWeight(height, weight);
-            },
-            messages: {
-                en: 'This height/weight combination has yielded an invalid BMI'
-            },
-            priority: 32
-        });
-        
+
         this.$('form').parsley({
             errorClass: "has-error",
             classHandler: function(el) {
@@ -630,6 +478,20 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             errorTemplate: '<div></div>',
             trigger: "keyup change"
         });
+    },
+    isBloodPressureOutOfRange: function (field, input) {
+        if (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'].includes(field)) {
+            var bloodPressure = parseFloat(input.val());
+            return bloodPressure < input.data('parsley-min') || bloodPressure > input.data('parsley-max');
+        }
+        return false;
+    },
+    hideWholeBloodModification: function() {
+        // Whole blood donor modification is only available if set initially
+        // from donor check. So if it isn't selected, hide the option
+        if (this.$('#form_weight-protocol-modification').val() !== 'whole-blood-donor') {
+            this.$('#form_weight-protocol-modification option[value="whole-blood-donor"]').hide();
+        }
     },
     initialize: function(obj) {
         this.warnings = obj.warnings;
@@ -646,7 +508,6 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         this.$('.replicate .field').each(function() {
             var field = $(this).data('field');
             if (!processedReplicates[field]) {
-                self.calculateMean(field);
                 self.displayConsecutiveWarning(field);
                 processedReplicates[field] = true;
             }
@@ -657,14 +518,12 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         });
         this.showModifications();
         this.displayWarnings();
-        this.calculateBmi();
         this.calculateCuff();
         this.calculateIrregularHeartRate();
         this.handlePregnantOrWheelchair();
-        this.handleHeightProtocol();
         this.handleWeightProtocol();
-        this.toggleThirdHipCircumference();
-        this.toggleThirdWaistCircumference();
+        this.toggleSecondBloodPressure();
+        this.hideWholeBloodModification();
         if (this.finalized) {
             this.$('.modification-toggle').hide();
         }

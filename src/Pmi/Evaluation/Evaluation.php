@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Validator\Constraints;
 use Pmi\Util;
@@ -17,11 +18,18 @@ use Pmi\Audit\Log;
 class Evaluation
 {
     const CURRENT_VERSION = '0.3.3';
+    const BLOOD_DONOR_CURRENT_VERSION = '0.3.3-blood-donor';
+    const EHR_CURRENT_VERSION = '0.3.3-ehr';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_ACTIVE = 'active';
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
+    const BLOOD_DONOR = 'blood-donor';
+    const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'blood-bank-donor';
+    const BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL = 'Blood bank donor';
+    const EHR_PROTOCOL_MODIFICATION = 'ehr';
+    const EHR_PROTOCOL_MODIFICATION_LABEL = 'Observation obtained from EHR';
 
     protected $app;
     protected $version;
@@ -47,13 +55,56 @@ class Evaluation
         'Other' => 'OTHER'
     ];
 
-    public function __construct($app = null)
+    public static $bloodPressureFields = [
+        'blood-pressure-systolic',
+        'blood-pressure-diastolic',
+        'heart-rate'
+    ];
+
+    public static $protocolModificationNotesFields = [
+        'blood-pressure-protocol-modification-notes',
+        'height-protocol-modification-notes',
+        'weight-protocol-modification-notes',
+        'hip-circumference-protocol-modification-notes',
+        'waist-circumference-protocol-modification-notes'
+    ];
+
+    public static $measurementSourceFields = [
+        'blood-pressure-source',
+        'height-source',
+        'weight-source',
+        'waist-circumference-source',
+        'hip-circumference-source'
+    ];
+
+    public static $ehrProtocolDateFields = [
+        'blood-pressure-source-ehr-date',
+        'height-source-ehr-date',
+        'weight-source-ehr-date',
+        'waist-circumference-source-ehr-date',
+        'hip-circumference-source-ehr-date'
+    ];
+
+    public function __construct($app = null, $type = null)
     {
         $this->app = $app;
-        $this->version = self::CURRENT_VERSION;
+        $this->version = $this->getCurrentVersion($type);
         $this->data = new \StdClass();
         $this->loadSchema();
         $this->normalizeData();
+    }
+
+    private function getCurrentVersion($type)
+    {
+        if ($this->app) {
+            if ($type === self::BLOOD_DONOR && $this->requireBloodDonorCheck()) {
+                return self::BLOOD_DONOR_CURRENT_VERSION;
+            }
+            if ($this->requireEhrModificationProtocol()) {
+                return self::EHR_CURRENT_VERSION;
+            }
+        }
+        return self::CURRENT_VERSION;
     }
 
     public function loadFromArray($array)
@@ -69,6 +120,7 @@ class Evaluation
                 $this->data = json_decode($array['data']);
             }
         }
+        $this->formatEhrProtocolDateFields();
         if (!empty($array['finalized_ts'])) {
             $this->locked = true;
         }
@@ -99,6 +151,15 @@ class Evaluation
         }
         $this->loadSchema();
         $this->normalizeData();
+    }
+
+    public function formatEhrProtocolDateFields()
+    {
+        foreach (self::$ehrProtocolDateFields as $ehrProtocolDateField) {
+            if (!empty($this->data->{$ehrProtocolDateField})) {
+                $this->data->{$ehrProtocolDateField}  = new \DateTime($this->data->{$ehrProtocolDateField});
+            }
+        }
     }
 
     public function toArray($serializeData = true)
@@ -152,10 +213,51 @@ class Evaluation
         return $conversions;
     }
 
+    public function getBloodDonorCheckForm(FormFactory $formFactory)
+    {
+        $formBuilder = $formFactory->createBuilder(FormType::class);
+        $formBuilder
+            ->add('bloodDonor', ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => false,
+                'required' => true,
+                'label' => 'Is the participant on site for a blood donation or apheresis?',
+                'choices' => [
+                    'Yes' => 'yes',
+                    'No' => 'no',
+                ],
+                'constraints' => new Constraints\NotBlank([
+                    'message' => 'Please select an option'
+                ])
+            ])
+            ->add('bloodDonorType', ChoiceType::class, [
+                'expanded' => true,
+                'multiple' => false,
+                'required' => true,
+                'label' => 'Select the type of blood donation',
+                'choices' => [
+                    'Apheresis' => 'apheresis',
+                    'Whole Blood' => 'whole-blood',
+                ],
+                'constraints' => new Constraints\Callback(function ($value, $context) {
+                    if ($context->getRoot()['bloodDonor']->getData() !== 'no' && empty($value)) {
+                        $context->buildViolation('Please select an option')->addViolation();
+                    }
+                })
+            ])
+            ->add('Continue', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-primary'],
+            ]);
+        return $formBuilder->getForm();
+    }
+
     public function getForm(FormFactory $formFactory)
     {
-        $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
+        $formBuilder = $formFactory->createBuilder(FormType::class, $this->data, ['attr' => ['data-locked' => $this->locked ? 1 : 0]]);
         foreach ($this->schema->fields as $field) {
+            if (isset($field->formField) && !$field->formField) {
+                continue;
+            }
             if (isset($field->type)) {
                 $type = $field->type;
             } else {
@@ -183,7 +285,7 @@ class Evaluation
             if (isset($field->min)) {
                 $constraints[] = new Constraints\GreaterThanEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
-            } elseif (!isset($field->options) && !in_array($type, ['checkbox', 'text', 'textarea'])) {
+            } elseif (!isset($field->options) && !in_array($type, ['checkbox', 'text', 'textarea', 'date'])) {
                 $constraints[] = new Constraints\GreaterThan(0);
                 $attributes['data-parsley-gt'] = 0;
             }
@@ -229,6 +331,21 @@ class Evaluation
                 $attributes['data-parsley-maxlength'] = self::LIMIT_TEXT_SHORT;
                 $constraints[] = new Constraints\Length(['max' => self::LIMIT_TEXT_SHORT]);
                 $constraints[] = new Constraints\Type('string');
+            } elseif ($type === 'date') {
+                unset($options['scale']);
+                $class = DateType::class;
+                $constraints[] = new Constraints\LessThanOrEqual([
+                    'value' => new \DateTime('today'),
+                    'message' => 'Date cannot be in the future'
+                ]);
+                $dateOptions = [
+                    'widget' => 'single_text',
+                    'format' => 'M/d/yyyy',
+                    'required' => false
+                ];
+                $options = array_merge($options, $dateOptions);
+                $attributes['class'] = 'ehr-date';
+                $attributes['autocomplete'] = 'off';
             } else {
                 $class = NumberType::class;
                 $constraints[] = new Constraints\Type('numeric');
@@ -237,6 +354,10 @@ class Evaluation
             $options['constraints'] = $constraints;
             $options['attr'] = $attributes;
 
+            if ($type === 'radio') {
+                $options['expanded'] = true;
+            }
+
             if (isset($field->replicates)) {
                 $collectionOptions = [
                     'entry_type' => $class,
@@ -244,8 +365,11 @@ class Evaluation
                     'required' => false,
                     'label' => isset($options['label']) ? $options['label'] : null
                 ];
+                if ($this->isBloodDonorForm() && in_array($field->name, self::$bloodPressureFields)) {
+                    $collectionOptions['constraints'] = $this->addBloodDonorSecondBloodPressureConstraint($form, $field);
+                }
                 if (isset($field->compare)) {
-                    $collectionOptions['constraints'] = $this->addCompareConstraint($form, $field);
+                    $collectionOptions['constraints'] = $this->addDiastolicBloodPressureConstraint($form, $field);
                 }
                 $formBuilder->add($field->name, CollectionType::class, $collectionOptions);
             } else {
@@ -275,20 +399,23 @@ class Evaluation
     public function setData($data)
     {
         $this->data = $data;
-        $this->normalizeData();
+        $this->normalizeData('save');
     }
 
-    protected function normalizeData()
+    protected function normalizeData($type = null)
     {
         foreach ($this->data as $key => $value) {
             if ($value === 0) {
                 $this->data->$key = null;
             }
+            if ($type === 'save' && !is_null($this->data->$key) && in_array($key, self::$ehrProtocolDateFields)) {
+                $this->data->$key = $this->data->$key->format('Y-m-d');
+            }
         }
         foreach ($this->schema->fields as $field) {
             if (isset($field->replicates)) {
                 $key = $field->name;
-                if (is_null($this->data->$key)) {
+                if (!isset($this->data->$key) || is_null($this->data->$key)) {
                     $dataArray = array_fill(0, $field->replicates, null);
                     $this->data->$key = $dataArray;
                 } elseif (!is_null($this->data->$key) && !is_array($this->data->$key)) {
@@ -296,7 +423,15 @@ class Evaluation
                     $dataArray[0] = $this->data->$key;
                     $this->data->$key = $dataArray;
                 }
+            } else {
+                $key = $field->name;
+                if (!isset($this->data->$key)) {
+                    $this->data->$key = null;
+                }
             }
+        }
+        if ($this->isEhrProtocolForm()) {
+            $this->addEhrProtocolModifications();
         }
     }
 
@@ -332,16 +467,49 @@ class Evaluation
             return $errors;
         }
 
-        foreach (['blood-pressure-systolic', 'blood-pressure-diastolic', 'heart-rate'] as $field) {
+        // EHR protocol form
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $sourceField) {
+                if ($this->data->{$sourceField} === self::EHR_PROTOCOL_MODIFICATION && empty($this->data->{$sourceField . '-ehr-date'})) {
+                    $errors[] = $sourceField . '-ehr-date';
+                }
+            }
+        }
+
+        foreach (self::$bloodPressureFields as $field) {
             foreach ($this->data->$field as $k => $value) {
-                if (!$this->data->{'blood-pressure-protocol-modification'}[$k] && !$value) {
+                $displayError = false;
+                // For Blood Donor form display error if 2nd reading is empty and
+                // 1st reading is out of range even though it has a protocol modification
+                if ($this->isBloodDonorForm()) {
+                    $displayError = $k === 1 && $this->isBloodDonorPressureOutOfRange(0);
+                }
+                // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                if ($this->isEhrProtocolForm()) {
+                    $displayError = $k === 0 && $this->data->{'blood-pressure-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                }
+
+                if ((!$this->data->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
                     $errors[] = [$field, $k];
                 }
             }
         }
+        foreach ($this->data->{'blood-pressure-protocol-modification'} as $k => $value) {
+            if ($value === 'other' && empty($this->data->{'blood-pressure-protocol-modification-notes'}[$k])) {
+                $errors[] = ['blood-pressure-protocol-modification-notes', $k];
+            }
+        }
         foreach (['height', 'weight'] as $field) {
-            if (!$this->data->{$field . '-protocol-modification'} && !$this->data->$field) {
+            $displayError = false;
+            // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+            if ($this->isEhrProtocolForm()) {
+                $displayError = $this->data->{$field . '-protocol-modification'} === self::EHR_PROTOCOL_MODIFICATION;
+            }
+            if ((!$this->data->{$field . '-protocol-modification'} || $displayError) && !$this->data->$field) {
                 $errors[] = $field;
+            }
+            if ($this->data->{$field . '-protocol-modification'} === 'other' && empty($this->data->{$field . '-protocol-modification-notes'})) {
+                $errors[] = $field . '-protocol-modification-notes';
             }
         }
         if (!$this->data->pregnant && !$this->data->wheelchair) {
@@ -357,8 +525,16 @@ class Evaluation
                             break;
                         }
                     }
-                    if (!$this->data->{$field . '-protocol-modification'}[$k] && !$value) {
+                    $displayError = false;
+                    // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                    if ($this->isEhrProtocolForm()) {
+                        $displayError = $k === 0 && $this->data->{$field . '-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                    }
+                    if ((!$this->data->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
                         $errors[] = [$field, $k];
+                    }
+                    if ($this->data->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->data->{$field . 'protocol-modification-notes'}[$k])) {
+                        $errors[] = [$field . '-protocol-modification-notes', $k];
                     }
                 }
             }
@@ -387,19 +563,20 @@ class Evaluation
 
     protected function calculateMean($field)
     {
-        $secondThirdFields = [
-            'blood-pressure-systolic',
-            'blood-pressure-diastolic',
-            'heart-rate'
-        ];
+        // Do not calculate mean for blood pressure fields in Blood Donor form
+        if ($this->isBloodDonorForm() && in_array($field, self::$bloodPressureFields)) {
+            return null;
+        }
+        $secondThirdFields = self::$bloodPressureFields;
         $twoClosestFields = [
             'hip-circumference',
             'waist-circumference'
         ];
+        $data = $this->data->{$field};
         if (in_array($field, $secondThirdFields)) {
-            $values = [$this->data->{$field}[1], $this->data->{$field}[2]];
+            $values = [$data[1], $data[2]];
         } else {
-            $values = $this->data->{$field};
+            $values = $data;
         }
         $values = array_filter($values);
         if (count($values) > 0) {
@@ -615,7 +792,7 @@ class Evaluation
 
     public function isEvaluationCancelled()
     {
-        return $this->evaluation['eh_type'] === self::EVALUATION_CANCEL;
+        return isset($this->evaluation['eh_type']) ? $this->evaluation['eh_type'] === self::EVALUATION_CANCEL : false;
     }
 
     public function isEvaluationUnlocked()
@@ -677,7 +854,136 @@ class Evaluation
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 
-    private function addCompareConstraint($form, $field)
+    public function requireBloodDonorCheck()
+    {
+        return $this->app->getConfig('feature.blooddonorpm') && $this->app->isDVType() && $this->app->isDiversionPouchSite();
+    }
+
+    public function requireEhrModificationProtocol()
+    {
+        $sites = $this->app['em']->getRepository('sites')->fetchOneBy([
+            'deleted' => 0,
+            'ehr_modification_protocol' => 1,
+            'google_group' => $this->app->getSiteId()
+        ]);
+        if (!empty($sites)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function isBloodDonorForm()
+    {
+        return strpos($this->version, self::BLOOD_DONOR) !== false;
+    }
+
+    public function isEhrProtocolForm()
+    {
+        return strpos($this->version, self::EHR_PROTOCOL_MODIFICATION) !== false;
+    }
+
+    public function addBloodDonorProtocolModificationForRemovedFields()
+    {
+        $this->addBloodDonorProtocolModificationForWaistandHip();
+        $this->addBloodDonorProtocolModificationForBloodPressure(2);
+        $this->addBloodDonorProtocolModificationForHeight();
+    }
+
+    public function addEhrProtocolModifications()
+    {
+        if ($this->data->{'blood-pressure-source'} === 'ehr') {
+            $this->data->{'blood-pressure-protocol-modification'}[0] = self::EHR_PROTOCOL_MODIFICATION;
+            for ($reading = 1; $reading <= 2; $reading++) {
+                foreach (self::$bloodPressureFields as $field) {
+                    $this->data->{$field}[$reading] = null;
+                }
+                foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
+                    $this->data->{$field}[$reading] = false;
+                }
+                $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::EHR_PROTOCOL_MODIFICATION;
+            }
+        }
+        if ($this->data->{'height-source'} === 'ehr') {
+            $this->data->{"height-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        }
+        if ($this->data->{'weight-source'} === 'ehr') {
+            $this->data->{"weight-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        }
+        if ($this->data->{'waist-circumference-source'} === 'ehr') {
+            $this->data->{'waist-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        }
+        if ($this->data->{'hip-circumference-source'} === 'ehr') {
+            $this->data->{'hip-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        }
+    }
+
+    public function addBloodDonorProtocolModificationForWaistandHip()
+    {
+        foreach (['waist-circumference-protocol-modification', 'hip-circumference-protocol-modification'] as $field) {
+            $this->data->{$field} = array_fill(0, 2, self::BLOOD_DONOR_PROTOCOL_MODIFICATION);
+        }
+    }
+
+    public function addBloodDonorProtocolModificationForBloodPressure($reading)
+    {
+        // Do not set default reading #2 values if reading #1 is out of range
+        if ($reading === 1 && empty($this->data->{'blood-pressure-protocol-modification'}[0]) && $this->isBloodDonorPressureOutOfRange(0)) {
+            return false;
+        }
+        // Default reading #2 values are only set when finalized
+        foreach (self::$bloodPressureFields as $field) {
+            $this->data->{$field}[$reading] = null;
+        }
+        foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
+            $this->data->{$field}[$reading] = false;
+        }
+        $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+    }
+
+    public function addBloodDonorProtocolModificationForHeight()
+    {
+        $this->data->{"height-protocol-modification"} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+    }
+
+    public function isBloodDonorPressureOutOfRange($key)
+    {
+        $limits = $this->getSecondBloodPressureLimits();
+        list($systolic, $diastolic, $heartRate) = self::$bloodPressureFields;
+        if ($this->data->{$systolic}[$key] < $limits[$systolic]['secondMin'] ||
+            $this->data->{$systolic}[$key] > $limits[$systolic]['secondMax'] ||
+            $this->data->{$diastolic}[$key] < $limits[$diastolic]['secondMin'] ||
+            $this->data->{$diastolic}[$key] > $limits[$diastolic]['secondMax'] ||
+            $this->data->{$heartRate}[$key] < $limits[$heartRate]['secondMin'] ||
+            $this->data->{$heartRate}[$key] > $limits[$heartRate]['secondMax']
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    private function addBloodDonorSecondBloodPressureConstraint($form, $field)
+    {
+        $secondMaxVal = $field->secondMax;
+        $secondMinVal = $field->secondMin;
+        $callback = function ($value, $context, $replicate) use ($form, $secondMaxVal, $secondMinVal) {
+            if ($replicate !== 1 || empty($value)) {
+                return;
+            }
+            if ($value > $secondMaxVal) {
+                $context->buildViolation("This value should be less than {$secondMaxVal}")->addViolation();
+            } elseif ($value < $secondMinVal) {
+                $context->buildViolation("This value should be greater than {$secondMinVal}")->addViolation();
+            }
+        };
+        $collectionConstraintFields = [];
+        for ($i = 0; $i < $field->replicates; $i++) {
+            $collectionConstraintFields[] = new Constraints\Callback(['callback' => $callback, 'payload' => $i]);
+        }
+        $compareConstraint = new Constraints\Collection($collectionConstraintFields);
+        return [$compareConstraint];
+    }
+
+    private function addDiastolicBloodPressureConstraint($form, $field)
     {
         $compareType = $field->compare->type;
         $compareField = $field->compare->field;
@@ -701,9 +1007,59 @@ class Evaluation
         return [$compareConstraint];
     }
 
+    private function getSecondBloodPressureLimits()
+    {
+        $limits = [];
+        foreach ($this->schema->fields as $field) {
+            if (in_array($field->name, self::$bloodPressureFields)) {
+                $limits[$field->name]['secondMax'] = $field->secondMax;
+                $limits[$field->name]['secondMin'] = $field->secondMin;
+            }
+        }
+        return $limits;
+    }
+
+    public function getFormFieldErrorMessage($field = null, $replicate = null)
+    {
+        if (($this->isBloodDonorForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
+            ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields))) ||
+            (in_array($field, self::$protocolModificationNotesFields))
+        ) {
+            return 'Please complete';
+        }
+        return 'Please complete or add protocol modification.';
+    }
+
     public function canEdit($evalId, $participant)
     {
         // Allow cohort 1 and 2 participants to edit existing PMs even if status is false
         return !$participant->status && !empty($evalId) ? $participant->editExistingOnly : $participant->status;
+
+    }
+
+    public function getLatestFormVersion()
+    {
+        if ($this->isBloodDonorForm()) {
+            return self::BLOOD_DONOR_CURRENT_VERSION;
+        }
+        if ($this->isEhrProtocolForm()) {
+            return self::EHR_CURRENT_VERSION;
+        }
+        return self::CURRENT_VERSION;
+    }
+
+    public function canAutoModify()
+    {
+        if ($this->isBloodDonorForm()) {
+            return false;
+        }
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $field) {
+                if ($this->data->{$field} === 'ehr') {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

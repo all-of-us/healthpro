@@ -119,6 +119,23 @@ class OrderService
         return [];
     }
 
+    public function getOrders(array $query = []): array
+    {
+        try {
+            $response = $this->rdrApiService->get("rdr/v1/BiobankOrder", [
+                'query' => $query
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && is_array($result->data)) {
+                return $result->data;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return [];
+        }
+        return [];
+    }
+
     public function cancelRestoreOrder($type, $orderObject)
     {
         try {
@@ -716,12 +733,28 @@ class OrderService
         $this->order->setProcessedSamples(json_encode(!empty($processedSamples) ? $processedSamples : []));
         $this->order->setProcessedSamplesTs(json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []));
         $this->order->setFinalizedSamples(json_encode(!empty($finalizedSamples) ? $finalizedSamples : []));
+        $this->order->setQuanumFinalizedSamples(!empty($finalizedSamples) ? join($finalizedSamples, ', ') : '');
         $this->order->setCollectedNotes($collectedNotes);
         $this->order->setProcessedNotes($processedNotes);
         $this->order->setFinalizedNotes($finalizedNotes);
         $this->order->setFedexTracking(!empty($trackingNumber) ? $trackingNumber : null);
         $this->order->setOrigin($object->origin);
-        // TODO: Set site and user names for biobank order details view
+        if (!empty($object->collectedInfo)) {
+            $this->order->setQuanumCollectedUser($object->collectedInfo->author->value);
+        }
+        if (!empty($object->collectedInfo->address)) {
+            $this->order->setCollectedSiteAddress($object->collectedInfo->author->value);
+        }
+        $this->order->setCollectedSiteName('A Quest Site');
+        if (!empty($object->processedInfo)) {
+            $this->order->setQuanumProcessedUser($object->processedInfo->author->value);
+        }
+        $this->order->setProcessedSiteName('A Quest Site');
+        if (!empty($object->finalizedInfo)) {
+            $this->order->setQuanumFinalizedUser($object->finalizedInfo->author->value);
+        }
+        $this->order->setFinalizedSiteName('A Quest Site');
+        $this->order->setQuanumOrderStatus('Finalized');
         return $this->order;
     }
 }

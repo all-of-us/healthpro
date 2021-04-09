@@ -220,8 +220,11 @@ class Fhir
         return $composition;
     }
 
-    protected function simpleMetric($metric, $value, $display, $unit, $codes)
+    protected function simpleMetric($metric, $value, $display, $unit, $codes, $effectiveDateTime = null)
     {
+        if (empty($effectiveDateTime)) {
+            $effectiveDateTime = $this->date;
+        }
         $entry = [
             'fullUrl' => $this->metricUrns[$metric],
             'resource' => [
@@ -229,7 +232,7 @@ class Fhir
                     'coding' => $codes,
                     'text' => $display
                 ],
-                'effectiveDateTime' => $this->date,
+                'effectiveDateTime' => $effectiveDateTime,
                 'resourceType' => 'Observation',
                 'status' => 'final',
                 'subject' => [
@@ -338,7 +341,15 @@ class Fhir
             $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1]) ? $this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1] : '';
         }
         $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
-        $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
+
+        // Add display text for blood bank donor and EHR modifications
+        if ($conceptCode === Evaluation::BLOOD_DONOR_PROTOCOL_MODIFICATION) {
+            $conceptDisplay = Evaluation::BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL;
+        } elseif ($conceptCode === Evaluation::EHR_PROTOCOL_MODIFICATION) {
+            $conceptDisplay = Evaluation::EHR_PROTOCOL_MODIFICATION_LABEL;
+        } else {
+            $conceptDisplay = isset($options[$conceptCode]) ? $options[$conceptCode] : '';
+        }
         // Change wheelchair concept code
         if ($conceptCode === 'wheelchair-bound') {
             $conceptCode = 'wheelchair-user';
@@ -429,7 +440,8 @@ class Fhir
                     'display' => 'Height',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('height-source')
         );
     }
 
@@ -451,7 +463,8 @@ class Fhir
                     'display' => 'Weight',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
         );
     }
 
@@ -551,7 +564,8 @@ class Fhir
                     'display' => 'Computed body mass index',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
         );
         $related = [];
         foreach (['height-protocol-modification', 'weight-protocol-modification'] as $metric) {
@@ -665,7 +679,8 @@ class Fhir
                     'display' => self::ordinalLabel('hip circumference', $replicate),
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('hip-circumference-source')
         );
     }
 
@@ -687,12 +702,13 @@ class Fhir
                     'display' => self::ordinalLabel('waist circumference', $replicate),
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('waist-circumference-source')
         );
         if (isset($this->data->{'waist-circumference-location'})) {
             $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
         }
-        return $entry;  
+        return $entry;
     }
 
     protected function getBpBodySite($location)
@@ -834,7 +850,7 @@ class Fhir
                     'text' => self::ordinalLabel('blood pressure systolic and diastolic', $replicate)
                 ],
                 'component' => $components,
-                'effectiveDateTime' => $this->date,
+                'effectiveDateTime' => $this->getEffectiveDateTime('blood-pressure-source', $replicate),
                 'resourceType' => 'Observation',
                 'status' => 'final',
                 'subject' => [
@@ -1085,7 +1101,7 @@ class Fhir
         if ($related = $this->meanProtocolModifications([1,2,3], 'waist-circumference-protocol-modification-')) {
             $entry['resource']['related'] = $related;
         }
-        return $entry;  
+        return $entry;
     }
 
     protected function notes()
@@ -1139,5 +1155,17 @@ class Fhir
         }
         array_unshift($fhir->entry, $this->getComposition());
         return $fhir;
+    }
+
+    protected function getEffectiveDateTime($field, $replicate = 1)
+    {
+        if (isset($this->data->{$field}) && $this->data->{$field} === 'ehr' && !empty($this->data->{$field . '-ehr-date'}) && $replicate == 1) {
+            if (is_string($this->data->{$field . '-ehr-date'})) {
+                $date = new \DateTime($this->data->{$field . '-ehr-date'});
+                return $date->format('Y-m-d\TH:i:s\Z');
+            }
+            return $this->data->{$field . '-ehr-date'}->format('Y-m-d\TH:i:s\Z');
+        }
+        return $this->date;
     }
 }

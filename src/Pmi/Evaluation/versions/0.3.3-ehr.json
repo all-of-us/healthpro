@@ -1,7 +1,15 @@
 {
-    "version": "0.3.1",
-    "template": "0.3",
+    "version": "0.3.3-ehr",
+    "template": "0.3-ehr",
     "fields": [
+        {
+            "name": "blood-pressure-location",
+            "label": "Location",
+            "options": ["Right arm", "Left arm"],
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
         {
             "name": "blood-pressure-systolic",
             "label": "Systolic",
@@ -140,6 +148,7 @@
                 "None": "",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
                 "Other": "other"
             },
             "warnings": [
@@ -149,6 +158,10 @@
                 },
                 {
                     "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -205,7 +218,7 @@
             "warnings": [
                 {
                     "val": true,
-                    "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields. Do not measure the hip and waist of wheelchair bound participants."
+                    "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields. Do not measure the hip and waist of wheelchair user participants."
                 }
             ]
         },
@@ -246,10 +259,11 @@
                 "None": "",
                 "Height is more than measuring device range": "height-out-of-range",
                 "Hairstyle/headgear": "hair-style",
-                "Wheelchair user": "wheelchair-bound",
+                "Wheelchair user": "wheelchair-user",
                 "Unable to stand in a straight position": "unable-to-stand-straight",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
                 "Other": "other"
             },
             "help": {
@@ -265,7 +279,7 @@
                     "message": "Deviation successfully captured. Height measurement may be innacurate due to hairstyle/headgear."
                 },
                 {
-                    "val": "wheelchair-bound",
+                    "val": "wheelchair-user",
                     "message": "Deviation successfully captured. Please record estimated participant height in the \"Height\" field. "
                 },
                 {
@@ -278,6 +292,10 @@
                 },
                 {
                     "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -342,10 +360,11 @@
                 "None": "",
                 "Weight is more than weight measuring range": "weight-out-of-range",
                 "Can't balance on scale": "cannot-balance-on-scale",
-                "Wheelchair user": "wheelchair-bound",
+                "Wheelchair user": "wheelchair-user",
                 "Pregnancy": "pregnancy",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
                 "Other": "other"
             },
             "help": {
@@ -361,7 +380,7 @@
                     "message": "Deviation successfully captured."
                 },
                 {
-                    "val": "wheelchair-bound",
+                    "val": "wheelchair-user",
                     "message": "Deviation successfully captured. Please record estimated participant weight in the \"Weight\" field. "
                 },
                 {
@@ -374,6 +393,10 @@
                 },
                 {
                     "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -416,19 +439,24 @@
                 "Hip circumference is more than measuring device range": "hip-circumference-out-of-range",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
                 "Other": "other"
             },
             "warnings": [
                 {
                     "val": "hip-circumference-out-of-range",
                     "message": "Deviation successfully captured. Please record the length of the tape measure in centimeters in the \"Hip Circumference\" field."
-                },   
+                },
                 {
                     "val": "refusal",
                     "message": "Deviation successfully captured."
                 },
                 {
                     "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
                     "message": "Deviation successfully captured."
                 },
                 {
@@ -484,6 +512,7 @@
                 "Colostomy bag": "colostomy-bag",
                 "Refusal": "refusal",
                 "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
                 "Other": "other"
             },
             "help": {
@@ -507,6 +536,10 @@
                     "message": "Deviation successfully captured."
                 },
                 {
+                    "val": "pandemic",
+                    "message": "Deviation successfully captured."
+                },
+                {
                     "val": "other",
                     "message": "Please specify reason for protocol deviation."
                 }
@@ -522,6 +555,86 @@
             "name": "notes",
             "label": "Additional Notes",
             "type": "textarea"
+        },
+        {
+            "name": "blood-pressure-source",
+            "label": "Please select source of the measurement",
+            "type": "radio",
+            "options": {
+                "In-person Measurement": "",
+                "EHR Measurement": "ehr"
+            },
+            "showHelpModel": true
+        },
+        {
+            "name": "blood-pressure-source-ehr-date",
+            "label": "EHR Date",
+            "type": "date",
+            "helpText": "Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit."
+        },
+        {
+            "name": "height-source",
+            "label": "Please select source of the measurement",
+            "type": "radio",
+            "options": {
+                "In-person Measurement": "",
+                "EHR Measurement": "ehr"
+            },
+            "showHelpModel": true
+        },
+        {
+            "name": "height-source-ehr-date",
+            "label": "EHR Date",
+            "type": "date",
+            "helpText": "Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit."
+        },
+        {
+            "name": "weight-source",
+            "label": "Please select source of the measurement",
+            "type": "radio",
+            "options": {
+                "In-person Measurement": "",
+                "EHR Measurement": "ehr"
+            },
+            "showHelpModel": true
+        },
+        {
+            "name": "weight-source-ehr-date",
+            "label": "EHR Date",
+            "type": "date",
+            "helpText": "Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit."
+        },
+        {
+            "name": "waist-circumference-source",
+            "label": "Please select source of the measurement",
+            "type": "radio",
+            "options": {
+                "In-person Measurement": "",
+                "EHR Measurement": "ehr"
+            },
+            "showHelpModel": true
+        },
+        {
+            "name": "waist-circumference-source-ehr-date",
+            "label": "EHR Date",
+            "type": "date",
+            "helpText": "Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit."
+        },
+        {
+            "name": "hip-circumference-source",
+            "label": "Please select source of the measurement",
+            "type": "radio",
+            "options": {
+                "In-person Measurement": "",
+                "EHR Measurement": "ehr"
+            },
+            "showHelpModel": true
+        },
+        {
+            "name": "hip-circumference-source-ehr-date",
+            "label": "EHR Date",
+            "type": "date",
+            "helpText": "Please select the EHR DOS when the participant’s physical measurements were taken prior to this visit."
         }
     ]
 }

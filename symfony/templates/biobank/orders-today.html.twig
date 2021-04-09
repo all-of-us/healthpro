@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+{% block title %}Today - Participant Review - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
+{% set missingName = '' %}
+
+{% import 'macros/display-text.html.twig' as macros %}
+
+{% block body %}
+    <div class="page-header">
+        <h2><i class="fa fa-list" aria-hidden="true"></i> Participant Review</h2>
+    </div>
+    {% include 'biobank/partials/participant-review-tabs.html.twig' %}
+    <br/>
+    <table class="table table-striped table-bordered table-small" id="table-today">
+        <thead>
+        <tr>
+            {% if is_granted('ROLE_SCRIPPS') %}
+                <th>Participant ID</th>
+            {% endif %}
+            <th>Order ID</th>
+            <th>Biobank ID</th>
+            <th>Status</th>
+            <th class="col-created">Created</th>
+            <th>Created Site</th>
+            <th>Collected</th>
+            <th>Collected Site</th>
+            <th>Processed</th>
+            <th>Processed Site</th>
+            <th>Finalized</th>
+            <th>Finalized Site</th>
+            <th>Finalized Samples</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for id, order in orders %}
+            <tr>
+                {% if is_granted('ROLE_SCRIPPS') %}
+                    <td>
+                        <a href="{{ path('biobank_participant', { biobankId: order.biobank_id }) }}">{{ order.participant_id }}</a>
+                    </td>
+                {% endif %}
+                <td>
+                    <a href="{{ path('biobank_order', { biobankId: order.biobank_id, orderId: order.id }) }}">{{ order.order_id }}</a>
+                </td>
+                <td>
+                    <a href="{{ path('biobank_participant', { biobankId: order.biobank_id }) }}">{{ order.biobank_id }}</a>
+                </td>
+                <td>
+                    <nobr>{{ order.orderStatus }}</nobr>
+                </td>
+                <td data-order="{{ order.created_ts }}">
+                    {{ macros.displayDate(order, 'created_ts') }}
+                </td>
+                <td>
+                    {{ macros.displaySite(order.created_site_name, order.site) }}
+                </td>
+                <td data-order="{{ order.collected_ts }}">
+                    {{ macros.displayDate(order, 'collected_ts') }}
+                </td>
+                <td>
+                    {{ macros.displaySite(order.collected_site_name, order.collected_site) }}
+                </td>
+                <td data-order="{{ order.processed_ts }}">
+                    {{ macros.displayDate(order, 'processed_ts') }}
+                </td>
+                <td>
+                    {{ macros.displaySite(order.processed_site_name, order.processed_site) }}
+                </td>
+                <td data-order="{{ order.finalized_ts is defined }}">
+                    {% set showOrderFinalizedTs = order.finalized_ts and order.h_type != 'unlock' and not (order.finalized_ts and order.rdr_id is empty) %}
+                    {% if showOrderFinalizedTs %}
+                        {{ macros.displayDate(order, 'finalized_ts') }}
+                    {% else %}
+                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if showOrderFinalizedTs %}
+                        {{ macros.displaySite(order.finalized_site_name, order.finalized_site) }}
+                    {% else %}
+                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if showOrderFinalizedTs and order.finalizedSamples is defined %}
+                        {{ order.finalizedSamples }}
+                    {% else %}
+                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %} 
+
+{% block pagejs %}
+    <script>
+        $(document).ready(function () {
+            $('table').DataTable({
+                order: [[$('.col-created').index(), 'desc']],
+                pageLength: 25
+            });
+        });
+    </script>
+{% endblock %}

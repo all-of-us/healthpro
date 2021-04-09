@@ -26,7 +26,6 @@ $app
     ->mount('/_dev', new Controller\DevController())
     ->mount('/cron', new Controller\CronController())
     ->mount('/dashboard', new Controller\DashboardController())
-    ->mount('/biobank', new Controller\BiobankController())
     ->mount('/_ah', new Controller\AppEngineController())
 ;
 
