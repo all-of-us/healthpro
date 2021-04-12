@@ -40,7 +40,7 @@ class SiteRepository extends ServiceEntityRepository
     public function getAwardees()
     {
         return $this->createQueryBuilder('s')
-            ->select('s.awardeeId, GROUP_CONCAT(s.email) AS emails')
+            ->select('s.awardeeId, s.awardeeId as hpoId, GROUP_CONCAT(s.email) AS emails')
             ->where('s.awardeeId IS NOT NULL')
             ->andWhere('s.status = 1')
             ->groupBy('s.awardeeId')

@@ -33,4 +33,17 @@ class WithdrawalLogRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    /**
+     * @return WithdrawalLog[] Returns an array of WithdrawalLog objects
+     */
+    public function getLatestAwardees()
+    {
+        return $this->createQueryBuilder('w')
+            ->select('w.hpoId as awardeeId, max(w.withdrawalTs) as ts')
+            ->groupBy('w.hpoId')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

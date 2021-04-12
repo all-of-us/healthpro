@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
 use App\Service\SiteSyncService;
+use App\Service\WithdrawalNotificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -55,6 +56,15 @@ class CronController extends AbstractController
     public function ehrWithdrawal(EhrWithdrawalNotificationService $ehrWithdrawalNotificationService)
     {
         $ehrWithdrawalNotificationService->sendEmails();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/withdrawal", name="cron_withdrawal")
+     */
+    public function withdrawalAction(WithdrawalNotificationService $withdrawalNotificationService)
+    {
+        $withdrawalNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }
 }
