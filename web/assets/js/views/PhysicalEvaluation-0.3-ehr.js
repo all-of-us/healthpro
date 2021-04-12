@@ -76,11 +76,25 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         var firstReading = $('.' + field + '-0');
         // Disable first reading protocol modification field
         firstReading.find('select').attr('disabled', disabled);
-        firstReading.find('select').val('');
-        // Enable first reading fields except protocol modification field and EHR date field
-        firstReading.find('input, input:checkbox').not('#form_' + field + '-ehr-date').each(function () {
-            $(this).attr('disabled', false);
-        });
+        // For height/weight protocol modification select wheelchair/pregnant protocol modification
+        // if applicable when toggling back to in-person measurement source
+        var isPregnant = parseInt($('#form_pregnant').val());
+        var isWheelChairUser = parseInt($('#form_wheelchair').val());
+        if (!disabled) {
+            if ((field === 'height-source' || field === 'weight-source') && isWheelChairUser) {
+                firstReading.find('select').val('wheelchair-user');
+            } else if (field === 'weight-source' && isPregnant) {
+                firstReading.find('select').val('pregnancy');
+            }
+        } else {
+            firstReading.find('select').val('');
+        }
+        // If the form is not locked enable first reading fields except protocol modification field and EHR date field
+        if (!parseInt(this.$('form').data('locked'))) {
+            firstReading.find('input, input:checkbox').not('#form_' + field + '-ehr-date').each(function () {
+                $(this).attr('disabled', false);
+            });
+        }
         $('.' + field + '-' + reading).find('input, select, input:checkbox').each(function () {
             $(this).attr('disabled', disabled);
             $(this).val('');
@@ -270,7 +284,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
     },
     handleHeightProtocol: function() {
         var selected = this.$('#form_height-protocol-modification').val();
-        if (selected === 'refusal') {
+        if (selected === 'refusal' || selected === 'pandemic') {
             this.$('#form_height').valChange('').attr('disabled', true);
             this.$('.field-height').next('.alt-units-block').hide();
         } else {
@@ -288,7 +302,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
     },
     handleWeightProtocol: function() {
         var selected = this.$('#form_weight-protocol-modification').val();
-        if (selected === 'cannot-balance-on-scale' || selected === 'refusal') {
+        if (selected === 'cannot-balance-on-scale' || selected === 'refusal' || selected === 'pandemic') {
             this.$('#form_weight').valChange('').attr('disabled', true);
             this.$('.field-weight').next('.alt-units-block').hide();
         } else {
@@ -549,7 +563,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             block.find('.modification-toggle').hide();
             block.find('.modification-select').show();
         }
-        if (modification === 'refusal' || modification === 'colostomy-bag') {
+        if (modification === 'refusal' || modification === 'pandemic' || modification === 'colostomy-bag') {
             block.find('.modification-affected input:text, .modification-affected select, .modification-manual input:checkbox').each(function() {
                 $(this).attr('disabled', true);
             });

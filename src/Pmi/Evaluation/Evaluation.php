@@ -253,7 +253,7 @@ class Evaluation
 
     public function getForm(FormFactory $formFactory)
     {
-        $formBuilder = $formFactory->createBuilder(FormType::class, $this->data);
+        $formBuilder = $formFactory->createBuilder(FormType::class, $this->data, ['attr' => ['data-locked' => $this->locked ? 1 : 0]]);
         foreach ($this->schema->fields as $field) {
             if (isset($field->formField) && !$field->formField) {
                 continue;
@@ -525,7 +525,7 @@ class Evaluation
                     if ((!$this->data->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
                         $errors[] = [$field, $k];
                     }
-                    if ($this->data->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->data->{$field . 'protocol-modification-notes'}[$k])) {
+                    if ($this->data->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->data->{$field . '-protocol-modification-notes'}[$k])) {
                         $errors[] = [$field . '-protocol-modification-notes', $k];
                     }
                 }
