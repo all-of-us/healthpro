@@ -201,7 +201,7 @@ class WorkQueueService
             return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         };
         $rows = [];
-        $userTimezone = $this->userService->getUser()->getInfo()['timezone'];
+        $userTimezone = $this->userService->getUser()->getTimezone();
         foreach ($participants as $participant) {
             $row = [];
             //Identifiers and status
@@ -319,7 +319,7 @@ class WorkQueueService
 
     public function generateExportRow($participant)
     {
-        $userTimezone = $this->userService->getUser()->getInfo()['timezone'];
+        $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [
             $participant->lastName,
             $participant->firstName,

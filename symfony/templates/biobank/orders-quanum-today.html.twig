@@ -4,7 +4,7 @@
 
 {% macro displayDate(dateTime) %}
     {% if dateTime %}
-        {{ dateTime|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+        {{ dateTime|date('n/j/Y g:ia', app.user.getTimezone) }}
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
     {% endif %}

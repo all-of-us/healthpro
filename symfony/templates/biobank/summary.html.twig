@@ -15,7 +15,7 @@
         </div>
         <div class="panel-body">
             {% if biobankChanges.collected.sample_details is defined %}
-                <h4>Collected {{ biobankChanges.collected.time is defined ? biobankChanges.collected.time|date('n/j/Y g:ia', app.user.getInfo.timezone) : '' }}</h4>
+                <h4>Collected {{ biobankChanges.collected.time is defined ? biobankChanges.collected.time|date('n/j/Y g:ia', app.user.getTimezone) : '' }}</h4>
                 <table class="table">
                     {% for sampleDetail in biobankChanges.collected.sample_details %}
                         <tr>
@@ -34,7 +34,7 @@
                             <td>{{ sampleDetail.code }}</td>
                             <td>{{ sampleDetail.color }}</td>
                             {% if sampleDetail.time is defined %}
-                                <td>{{ sampleDetail.time|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</td>
+                                <td>{{ sampleDetail.time|date('n/j/Y g:ia', app.user.getTimezone) }}</td>
                             {% endif %}
                         </tr>
                     {% endfor %}
@@ -48,7 +48,7 @@
             {% endif %}
 
             {% if biobankChanges.finalized.sample_details is defined %}
-                <h4>Finalized {{ biobankChanges.finalized.time|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</h4>
+                <h4>Finalized {{ biobankChanges.finalized.time|date('n/j/Y g:ia', app.user.getTimezone) }}</h4>
                 <table class="table">
                     {% for sampleDetail in biobankChanges.finalized.sample_details %}
                         <tr>

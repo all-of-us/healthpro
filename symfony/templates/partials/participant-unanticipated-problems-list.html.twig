@@ -16,19 +16,19 @@
                 {% else %}
                     <a href="{{ path('problem_form', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
                 {% endif %}
-                    {{ problem.updatedTs|date('D n/j/Y', app.user.getInfo.timezone) }}
+                    {{ problem.updatedTs|date('D n/j/Y', app.user.getTimezone) }}
                     <br />
                     <small class="text-muted">
                         {% if problem.finalizedTs %}
                             <span class="label label-success">Finalized</span>
-                            {{ problem.finalizedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            {{ problem.finalizedTs|date('n/j/Y g:ia', app.user.getTimezone) }}
                             <br />
                             {% if problemRow.commentCount > 0 %}
-                                <span class="label label-default">{{ problemRow.commentCount }} comment{{ problemRow.commentCount > 1 ? 's' }}</span> {{ problemRow.lastUpdateTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                                <span class="label label-default">{{ problemRow.commentCount }} comment{{ problemRow.commentCount > 1 ? 's' }}</span> {{ problemRow.lastUpdateTs|date('n/j/Y g:ia', app.user.getTimezone) }}
                             {% endif %}
                         {% else %}
                             <span class="label label-danger">Draft</span>
-                            {{ problem.updatedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            {{ problem.updatedTs|date('n/j/Y g:ia', app.user.getTimezone) }}
                         {% endif %}
                     </small>
                 {% if readOnly is defined %}

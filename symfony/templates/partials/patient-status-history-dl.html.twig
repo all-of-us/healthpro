@@ -7,7 +7,7 @@
         <dt>Site</dt>
         <dd>{{ field.site_name }}</dd>
         <dt>Date</dt>
-        <dd>{{ field.created_ts|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</dd>
+        <dd>{{ field.created_ts|date('n/j/Y g:ia', app.user.getTimezone) }}</dd>
         <dt>Comments</dt>
         <dd>{{ field.comments }}</dd>
     </dl>

@@ -1,9 +1,9 @@
 {% if participant.statusReason == 'withdrawal' %}
     {% if participant.withdrawalAuthored is not empty %}
-        <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalAuthored|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</p>
+        <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalAuthored|date('n/j/Y g:ia', app.user.getTimezone) }}</p>
     {% else %}
         <p>Please be advised that prior to August 23rd, 2019, the "withdrawal time" captured and displayed for participants represents the date/time at which the DRC received notification of withdrawal. While in most cases this should be not long after the date/time at which the participant withdrew (the "authored withdrawal time"), due to occasional sync errors or service disruptions, this time can be up to several days after the authored withdrawal time. For participants who withdrew on or after August 23rd, the authored withdrawal time is displayed.</p>
-        <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalTime|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</p>
+        <p><strong>Withdrawal Time:</strong> {{ participant.withdrawalTime|date('n/j/Y g:ia', app.user.getTimezone) }}</p>
     {% endif %}
     {% if participant.withdrawalReason is not empty %}
         <p>

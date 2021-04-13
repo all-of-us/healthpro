@@ -12,9 +12,9 @@
     <dt>Participant Status</dt>
     <dd>{{ participant.enrollmentStatus|default('--') }}
         {% if participant.isCoreParticipant and  participant.enrollmentStatusCoreStoredSampleTime is not empty %}
-            ({{ participant.enrollmentStatusCoreStoredSampleTime|date('n/j/Y', app.user.getInfo.timezone) }})
+            ({{ participant.enrollmentStatusCoreStoredSampleTime|date('n/j/Y', app.user.getTimezone) }})
         {% elseif participant.isCoreMinusPMParticipant and  participant.enrollmentStatusCoreMinusPMTime is not empty %}
-            ({{ participant.enrollmentStatusCoreMinusPMTime|date('n/j/Y', app.user.getInfo.timezone) }})
+            ({{ participant.enrollmentStatusCoreMinusPMTime|date('n/j/Y', app.user.getTimezone) }})
         {% endif %}
     </dd>
     {% if app.session.get('siteType') == 'dv' or is_granted('ROLE_AWARDEE_SCRIPPS') %}

@@ -20,7 +20,7 @@
         <div class="row">
             <div class="col-sm-12 text-center">
                 <small>
-                    Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.getInfo.timezone) }}
+                    Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.getTimezone) }}
                     <a href="{{ path('workqueue_participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px"><i class="fa fa-refresh" aria-hidden="true"></i> refresh</a>
                 </small>
             </div>

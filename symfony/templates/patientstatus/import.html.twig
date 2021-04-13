@@ -69,7 +69,7 @@
                             <tr>
                                 <td>{{ import.fileName }}</td>
                                 <td>{{ import.organization.name }} ({{ import.organization.id }})</td>
-                                <td>{{ import.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone)  }}</td>
+                                <td>{{ import.createdTs|date('n/j/Y g:ia', app.user.getTimezone)  }}</td>
                                 <td>
                                     {% if import.importStatus == 1 %}
                                         <i class="fa fa-check text-success" aria-hidden="true"></i> Complete
