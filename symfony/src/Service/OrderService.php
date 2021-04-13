@@ -177,7 +177,7 @@ class OrderService
         }
         $result = ['status' => 'fail'];
         // Set collected time to created date at midnight local time
-        $collectedAt = new \DateTime($this->order->getCreatedTs()->format('Y-m-d'), new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+        $collectedAt = new \DateTime($this->order->getCreatedTs()->format('Y-m-d'), new \DateTimeZone($this->userService->getUser()->getTimezone()));
         if ($site = $this->em->getRepository(Site::class)->findOneBy(['deleted' => 0, 'googleGroup' => $this->siteService->getSiteId()])) {
             $mayoClientId = $site->getMayolinkAccount();
         }
@@ -402,7 +402,7 @@ class OrderService
                     try {
                         $sampleTs = new \DateTime();
                         $sampleTs->setTimestamp($processedSampleTimes[$sample]);
-                        $sampleTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+                        $sampleTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getTimezone()));
                         $formData['processedSamplesTs'][$sample] = $sampleTs;
                     } catch (\Exception $e) {
                         $formData['processedSamplesTs'][$sample] = null;
@@ -429,7 +429,7 @@ class OrderService
         }
         $result = ['status' => 'fail'];
         // Set collected time to user local time
-        $collectedAt = new \DateTime($this->order->getCollectedTs()->format('Y-m-d H:i:s'), new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+        $collectedAt = new \DateTime($this->order->getCollectedTs()->format('Y-m-d H:i:s'), new \DateTimeZone($this->userService->getUser()->getTimezone()));
         // Check if mayo account number exists
         if (!empty($mayoClientId)) {
             $birthDate = $this->params->has('ml_real_dob') ? $this->participant->dob : $this->participant->getMayolinkDob();
@@ -539,7 +539,7 @@ class OrderService
                 if (!empty($processedSamplesTs[$value])) {
                     $processedTs = new \DateTime();
                     $processedTs->setTimestamp($processedSamplesTs[$value]);
-                    $processedTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+                    $processedTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getTimezone()));
                     $sample['processed_ts'] = $processedTs;
                 }
             }

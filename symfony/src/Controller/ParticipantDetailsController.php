@@ -107,7 +107,7 @@ class ParticipantDetailsController extends AbstractController
             if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
                 $processedTs = new \DateTime();
                 $processedTs->setTimestamp(max($processedSamplesTs));
-                $processedTs->setTimezone(new \DateTimeZone($this->getUser()->getInfo()['timezone']));
+                $processedTs->setTimezone(new \DateTimeZone($this->getUser()->getTimezone()));
                 $order->setProcessedTs($processedTs);
             }
         }

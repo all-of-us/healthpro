@@ -38,7 +38,7 @@
             <div class="row">
                 <div class="col-sm-12 text-center">
                     <small>
-                        Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.getInfo.timezone) }}
+                        Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}
                         <a href="{{ path('participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px"><i class="fa fa-refresh" aria-hidden="true"></i> refresh</a>
                     </small>
                 </div>
@@ -146,7 +146,7 @@
                                             <dd>
                                                 {{ macros.displayFirstConsentPanelStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored, participant.consentForElectronicHealthRecordsFirstYesAuthored, 'ehr') }}
                                                 {% if participant.ehrConsentExpireStatus == 'EXPIRED' %}
-                                                    (Expired on {{ participant.ehrConsentExpireAuthored ? participant.ehrConsentExpireAuthored|date('n/j/Y g:ia', app.user.getInfo.timezone) : '--' }})
+                                                    (Expired on {{ participant.ehrConsentExpireAuthored ? participant.ehrConsentExpireAuthored|date('n/j/Y g:ia', app.user.timezone) : '--' }})
                                                 {% elseif participant.consentForElectronicHealthRecords == 'SUBMITTED' and participant.ehrConsentExpireStatus is empty %}
                                                     (Active)
                                                 {% endif %}
@@ -283,7 +283,7 @@
                                                 {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
                                                     <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                     {% if participant.physicalMeasurementsFinalizedTime %}
-                                                        <small>{{ participant.physicalMeasurementsFinalizedTime|date('m/d/Y', app.user.getInfo.timezone) }}</small>
+                                                        <small>{{ participant.physicalMeasurementsFinalizedTime|date('m/d/Y', app.user.timezone) }}</small>
                                                     {% endif %}
                                                 {% else %}
                                                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
@@ -348,7 +348,7 @@
                                                         <i class="fa fa-times text-danger" aria-hidden="true"></i>
                                                     {% endif %}
                                                     <small>
-                                                        {{ attribute(participant, 'questionnaireOn' ~ field ~ 'Authored') ? attribute(participant, 'questionnaireOn' ~ field ~ 'Authored')|date('n/j/Y g:ia', app.user.getInfo.timezone) : '(not completed)' }}
+                                                        {{ attribute(participant, 'questionnaireOn' ~ field ~ 'Authored') ? attribute(participant, 'questionnaireOn' ~ field ~ 'Authored')|date('n/j/Y g:ia', app.user.timezone) : '(not completed)' }}
                                                     </small>
                                                 </div>
                                             {% endfor %}
@@ -377,7 +377,7 @@
                                             <dt>Most Recent EHR Receipt</dt>
                                             <dd>
                                                 {% if participant.latestEhrReceiptTime %}
-                                                    {{ participant.latestEhrReceiptTime|date('m/d/Y', app.user.getInfo.timezone) }}
+                                                    {{ participant.latestEhrReceiptTime|date('m/d/Y', app.user.timezone) }}
                                                 {% endif %}
                                             </dd>
                                         </dl>
@@ -397,7 +397,7 @@
                                                 {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
                                                     <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                     {% if participant.physicalMeasurementsFinalizedTime %}
-                                                        <small>{{ participant.physicalMeasurementsFinalizedTime|date('m/d/Y', app.user.getInfo.timezone) }}</small>
+                                                        <small>{{ participant.physicalMeasurementsFinalizedTime|date('m/d/Y', app.user.timezone) }}</small>
                                                     {% endif %}
                                                 {% else %}
                                                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
@@ -441,7 +441,7 @@
                                                     {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
                                                         <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                         {% if attribute(participant, 'sampleStatus' ~ field ~ 'Time') %}
-                                                            <small>{{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y', app.user.getInfo.timezone) }}</small>
+                                                            <small>{{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y', app.user.timezone) }}</small>
                                                             {% if (field == '1SAL' or field == '1SAL2') and attribute(participant, 'sample1SAL2CollectionMethod') %}
                                                                 <br><small>{{ attribute(participant, 'sample1SAL2CollectionMethod') }}</small>
                                                             {% endif %}
@@ -552,7 +552,7 @@
                                                             <td>{{ field.display_status }}</td>
                                                             <td>{{ field.user_email }}</td>
                                                             <td>{{ field.site_name|default(field.site) }}</td>
-                                                            <td>{{ field.created_ts|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</td>
+                                                            <td>{{ field.created_ts|date('n/j/Y g:ia', app.user.timezone) }}</td>
                                                             <td>
                                                                 <small>
                                                                     <a data-href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
