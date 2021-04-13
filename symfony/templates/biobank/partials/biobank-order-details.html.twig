@@ -77,7 +77,7 @@
                 <th scope="col">
                     {{ type|capitalize }}
                     {% if type != 'processed' and attribute(order, type~'Ts') is not empty %}
-                        <br> {{ attribute(order, type~'Ts')|date('n/j/Y g:ia', app.user.getTimezone) }}
+                        <br> {{ attribute(order, type~'Ts')|date('n/j/Y g:ia', app.user.timezone) }}
                     {% endif %}
                 </th>
             </tr>
@@ -92,7 +92,7 @@
                             {% if attribute(order, type~'Ts') %}
                                 {% if attribute(sample, type~'_checked') is defined and attribute(sample, type~'_ts') is defined and attribute(sample, type~'_ts') is not empty %}
                                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                    {{ type == 'processed' ? attribute(sample, type~'_ts')|date('n/j/Y g:ia', app.user.getTimezone) }}
+                                    {{ type == 'processed' ? attribute(sample, type~'_ts')|date('n/j/Y g:ia', app.user.timezone) }}
                                 {% else %}
                                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
                                 {% endif %}

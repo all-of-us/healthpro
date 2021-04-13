@@ -31,7 +31,7 @@
             </p>
             <h3>
                 <i class="fa fa-medkit" aria-hidden="true"></i>
-                {{ order.createdTs|date('n/j/Y', app.user.getTimezone) }}
+                {{ order.createdTs|date('n/j/Y', app.user.timezone) }}
             </h3>
         </div>
     </div>
@@ -40,14 +40,14 @@
         <div class="alert alert-warning well-sm">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong>
-                Unlocked for editing by {{ order.history.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.getTimezone) }}
+                Unlocked for editing by {{ order.history.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.timezone) }}
             </strong>
         </div>
     {% elseif order.status == 'cancel' %}
         <div class="alert alert-danger well-sm">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong>
-                Cancelled by {{ order.history.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.getTimezone) }}
+                Cancelled by {{ order.history.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.timezone) }}
             </strong>
             {% if order.reasonDisplayText is not empty %}
                 <br/><strong>Reason:</strong> {{ order.reasonDisplayText }}

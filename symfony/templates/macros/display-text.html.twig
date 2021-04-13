@@ -1,6 +1,6 @@
 {% macro displayDate(order, dateType) %}
     {% if order[dateType] %}
-        {{ order[dateType]|date('n/j/Y g:ia', app.user.getTimezone) }}
+        {{ order[dateType]|date('n/j/Y g:ia', app.user.timezone) }}
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
     {% endif %}
@@ -15,11 +15,11 @@
 {% endmacro %}
 
 {% macro displayConsentStatus(value, time, ehrExpireStatus = '', ehrExpireDate = '') %}
-    {% set time = time ? time|date('n/j/Y', app.user.getTimezone) %}
+    {% set time = time ? time|date('n/j/Y', app.user.timezone) %}
     {% if ehrExpireStatus == 'EXPIRED' %}
         <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
         {{ time }} <br/>
-        (Expired on {{ ehrExpireDate ? ehrExpireDate|date('n/j/Y', app.user.getTimezone) }})
+        (Expired on {{ ehrExpireDate ? ehrExpireDate|date('n/j/Y', app.user.timezone) }})
     {% elseif value == 'SUBMITTED' %}
         <i class="fa fa-check text-success" aria-hidden="true"></i>
         {{ time }} <br/>
@@ -43,7 +43,7 @@
 {% endmacro %}
 
 {% macro displayGenomicsConsentStatus(value, time) %}
-    {% set time = time ? time|date('n/j/Y', app.user.getTimezone) %}
+    {% set time = time ? time|date('n/j/Y', app.user.timezone) %}
     {% if value == 'SUBMITTED' %}
         <i class="fa fa-check text-success" aria-hidden="true"></i>
         {{ time }} <br/>
@@ -69,7 +69,7 @@
 {% macro displayConsentPanelStatus(value, time) %}
     {% set consentValues = ['SUBMITTED', 'SUBMITTED_NO_CONSENT', 'SUBMITTED_NOT_SURE', 'SUBMITTED_INVALID'] %}
     {% if value in consentValues %}
-        {{ time ? time|date('n/j/Y g:ia', app.user.getTimezone) : '--' }}
+        {{ time ? time|date('n/j/Y g:ia', app.user.timezone) : '--' }}
     {% else %}
         (not completed)
     {% endif %}
@@ -80,7 +80,7 @@
         (Not Applicable)
     {% elseif programUpdate == 'SUBMITTED' %}
         <i class="fa fa-check text-success" aria-hidden="true"></i>
-        {{ time ? time|date('n/j/Y g:ia', app.user.getTimezone) : '--' }}
+        {{ time ? time|date('n/j/Y g:ia', app.user.timezone) : '--' }}
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
         (review not completed)
@@ -91,14 +91,14 @@
     {% set consentValues = ['SUBMITTED', 'SUBMITTED_NO_CONSENT', 'SUBMITTED_NOT_SURE', 'SUBMITTED_INVALID'] %}
     {% if value in consentValues %}
         {% if firstTime %}
-            {{ firstTime|date('n/j/Y g:ia', app.user.getTimezone) }} {{ type == 'primary' ? '(first agreed to participate)' : '(first agreed to share EHR)' }} <br>
+            {{ firstTime|date('n/j/Y g:ia', app.user.timezone) }} {{ type == 'primary' ? '(first agreed to participate)' : '(first agreed to share EHR)' }} <br>
         {% endif %}
         {% if value == 'SUBMITTED' %}
             <i class="fa fa-check text-success" aria-hidden="true"></i>
         {% else %}
             <i class="fa fa-times text-danger" aria-hidden="true"></i>
         {% endif %}
-        {{ time ? time|date('n/j/Y g:ia', app.user.getTimezone) ~ ' (current status)' : '--' }}
+        {{ time ? time|date('n/j/Y g:ia', app.user.timezone) ~ ' (current status)' : '--' }}
     {% else %}
         (not completed)
     {% endif %}
@@ -107,7 +107,7 @@
 {% macro displayRetentionEligibleStatus(value, time) %}
     {% if value == 'ELIGIBLE' %}
         <i class="fa fa-check text-success" aria-hidden="true"></i> (Yes)
-        {{ time ? '(' ~ time|date('m/d/Y', app.user.getTimezone) ~ ')' }}
+        {{ time ? '(' ~ time|date('m/d/Y', app.user.timezone) ~ ')' }}
     {% elseif value == 'NOT_ELIGIBLE' %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i> (No)
     {% else %}
