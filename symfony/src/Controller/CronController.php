@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
 use App\Service\SiteSyncService;
@@ -65,6 +66,15 @@ class CronController extends AbstractController
     public function withdrawalAction(WithdrawalNotificationService $withdrawalNotificationService)
     {
         $withdrawalNotificationService->sendEmails();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/deactivate", name="cron_deactivate")
+     */
+    public function deactivateAction(DeactivateNotificationService $deactivateNotificationService)
+    {
+        $deactivateNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }
 }

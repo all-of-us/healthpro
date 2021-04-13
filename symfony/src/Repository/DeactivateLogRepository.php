@@ -32,4 +32,17 @@ class DeactivateLogRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    /**
+     * @return DeactivateLog[] Returns an array of DeactivateLog objects
+     */
+    public function getLatestAwardees()
+    {
+        return $this->createQueryBuilder('d')
+            ->select('d.hpoId as awardeeId, max(d.deactivateTs) as ts')
+            ->groupBy('d.hpoId')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }
