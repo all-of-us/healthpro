@@ -114,7 +114,7 @@ class BiobankController extends AbstractController
                 $order = $this->orderService->loadFromJsonObject($quanumOrders[0]);
                 $participant = $this->participantSummaryService->getParticipantById($order->getParticipantId());
                 if ($participant->biobankId) {
-                    return $this->redirectToRoute('biobank_quanumOrder', [
+                    return $this->redirectToRoute('biobank_quanum_order', [
                         'biobankId' => $participant->biobankId,
                         'orderId' => $order->getRdrId()
                     ]);
