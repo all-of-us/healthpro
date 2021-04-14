@@ -39,7 +39,7 @@ class DefaultController extends AbstractController
 
     public function homeAction(Application $app)
     {
-        $checkTimeZone = $app->hasRole('ROLE_USER') || $app->hasRole('ROLE_ADMIN') || $app->hasRole('ROLE_AWARDEE') || $app->hasRole('ROLE_DV_ADMIN');
+        $checkTimeZone = $app->hasRole('ROLE_USER') || $app->hasRole('ROLE_ADMIN') || $app->hasRole('ROLE_AWARDEE') || $app->hasRole('ROLE_DV_ADMIN') || $app->hasRole('ROLE_BIOBANK') || $app->hasRole('ROLE_SCRIPPS') || $app->hasRole('ROLE_AWARDEE_SCRIPPS') ;
         if ($checkTimeZone && !$app->getUserTimezone(false)) {
             $app->addFlashNotice('Please select your current time zone');
             return $app->redirectToRoute('settings');

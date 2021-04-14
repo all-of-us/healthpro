@@ -114,7 +114,7 @@ class BiobankController extends AbstractController
                 $order = $this->orderService->loadFromJsonObject($quanumOrders[0]);
                 $participant = $this->participantSummaryService->getParticipantById($order->getParticipantId());
                 if ($participant->biobankId) {
-                    return $this->redirectToRoute('biobank_quanumOrder', [
+                    return $this->redirectToRoute('biobank_quanum_order', [
                         'biobankId' => $participant->biobankId,
                         'orderId' => $order->getRdrId()
                     ]);
@@ -200,7 +200,7 @@ class BiobankController extends AbstractController
                         // Set collected ts and finalized samples that are needed to send order to mayo
                         $collectedTs = $order->getCollectedTs();
                         if (empty($collectedTs)) {
-                            $order->setCollectedTs($finalizedTs->setTimezone(new \DateTimeZone($this->getUser()->getInfo()['timezone'])));
+                            $order->setCollectedTs($finalizedTs->setTimezone(new \DateTimeZone($this->getUser()->getTimezone())));
                         }
                         $order->setFinalizedSamples(json_encode($samples));
 
@@ -300,7 +300,7 @@ class BiobankController extends AbstractController
         if (!$env->isProd() && intval($request->query->get('days')) > 0) {
             $startString = '-' . intval($request->query->get('days')) . ' days';
         }
-        $startTime = new \DateTime($startString, new \DateTimeZone($this->getUser()->getInfo()['timezone']));
+        $startTime = new \DateTime($startString, new \DateTimeZone($this->getUser()->getTimezone()));
         // Get MySQL date/time string in UTC
         $startTime->setTimezone(new \DateTimezone('UTC'));
         $today = $startTime->format('Y-m-d H:i:s');
@@ -323,7 +323,7 @@ class BiobankController extends AbstractController
         if (!$env->isProd() && intval($request->query->get('days')) > 0) {
             $startString = '-' . intval($request->query->get('days')) . ' days';
         }
-        $startTime = new \DateTime($startString, new \DateTimeZone($this->getUser()->getInfo()['timezone']));
+        $startTime = new \DateTime($startString, new \DateTimeZone($this->getUser()->getTimezone()));
         $today = $startTime->format('Y-m-d');
         $endDate = (new \DateTime('today', new \DateTimezone('UTC')))->format('Y-m-d');
 

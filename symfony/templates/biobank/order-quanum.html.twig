@@ -23,9 +23,9 @@
                     {% endif %}
                 </dd>
                 <dt>Paired Awardee</dt>
-                <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
+                <dd>{{ participant.awardee ? siteInfo.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
                 <dt>Paired Site</dt>
-                <dd>{{ participant.site ? app.getSiteDisplayName(participant.siteSuffix) : '(not paired)' }}</dd>
+                <dd>{{ participant.site ? siteInfo.getSiteDisplayName(participant.siteSuffix) : '(not paired)' }}</dd>
                 {% if order.collectedSiteAddress %}
                     <dt>Quest Collection Site
                     <dt>
@@ -39,7 +39,7 @@
             </p>
             <h3>
                 <i class="fa fa-medkit" aria-hidden="true"></i>
-                {{ order.createdTs|date('n/j/Y', app.user.getInfo.timezone) }}
+                {{ order.createdTs|date('n/j/Y', app.user.timezone) }}
             </h3>
         </div>
     </div>

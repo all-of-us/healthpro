@@ -15,19 +15,19 @@
                 {% else %}
                     <a href="{{ path('evaluation', { participantId: participant.id, evalId: measurement.id }) }}" class="btn btn-block btn-lg {% if evalId is defined and measurement.id == evalId %} btn-warning {% else %} btn-default {% endif %}">
                 {% endif %}
-                    {{ measurement.createdTs|date('D n/j/Y', app.user.getInfo.timezone) }}<br />
+                    {{ measurement.createdTs|date('D n/j/Y', app.user.timezone) }}<br />
                     <small class="text-muted">
                         {% set historyType = measurement.history.type is defined ? measurement.history.type : '' %}
                         {% if historyType == 'cancel' %}
-                            <span class="label label-danger">Cancelled</span> {{ measurement.history.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-danger">Cancelled</span> {{ measurement.history.createdTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% elseif measurement.rdrId is empty and measurement.parentId is empty %}
-                            <span class="label label-default">Saved &amp; Unfinalized</span> {{ measurement.updatedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-default">Saved &amp; Unfinalized</span> {{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% elseif measurement.rdrId and measurement.parentId %}
-                            <span class="label label-success">Edited &amp; Finalized</span> {{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-success">Edited &amp; Finalized</span> {{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% elseif measurement.rdrId %}
-                            <span class="label label-success">Finalized</span> {{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-success">Finalized</span> {{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% elseif measurement.parentId and measurement.rdrId is empty %}
-                            <span class="label label-warning">Edited &amp; Unfinalized</span> {{ measurement.updatedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-warning">Edited &amp; Unfinalized</span> {{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% endif %}
                     </small>
                 {% if readOnly is defined %}
