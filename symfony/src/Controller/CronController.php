@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
+use App\Service\MissingMeasurementsAndOrdersNotificationService;
 use App\Service\SiteSyncService;
 use App\Service\WithdrawalNotificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -75,6 +76,16 @@ class CronController extends AbstractController
     public function deactivateAction(DeactivateNotificationService $deactivateNotificationService)
     {
         $deactivateNotificationService->sendEmails();
+        return $this->json(['success' => true]);
+    }
+
+
+    /**
+     * @Route("/missing-measurements-orders", name="cron_missing_measurements_orders")
+     */
+    public function missingMeasurementsOrdersAction(MissingMeasurementsAndOrdersNotificationService $missingMeasurementsAndOrdersNotificationService)
+    {
+        $missingMeasurementsAndOrdersNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }
 }

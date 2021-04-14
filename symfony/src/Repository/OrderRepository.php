@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\MissingNotificationLog;
 use App\Entity\Order;
 use App\Service\ReviewService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -235,6 +236,14 @@ class OrderRepository extends ServiceEntityRepository
             'type1' => Order::ORDER_ACTIVE,
             'type2' => Order::ORDER_RESTORE,
             'deleted' => 0
+        ]);
+    }
+
+    public function getUnloggedMissingOrders(): array
+    {
+        $ordersQuery = "SELECT id FROM orders WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND mayo_id IS NOT NULL AND rdr_id IS NULL";
+        return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
+            'type' => MissingNotificationLog::ORDER_TYPE
         ]);
     }
 }

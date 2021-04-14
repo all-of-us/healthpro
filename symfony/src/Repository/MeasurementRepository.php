@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Measurement;
+use App\Entity\MissingNotificationLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -89,6 +90,14 @@ class MeasurementRepository extends ServiceEntityRepository
         return $this->getEntityManager()->getConnection()->fetchAll($evaluationsQuery, [
             'site' => $siteId,
             'type' => Measurement::EVALUATION_CANCEL
+        ]);
+    }
+
+    public function getUnloggedMissingMeasurements(): array
+    {
+        $evaluationsQuery = "SELECT id FROM evaluations WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND rdr_id IS NULL";
+        return $this->getEntityManager()->getConnection()->fetchAll($evaluationsQuery, [
+            'type' => MissingNotificationLog::MEASUREMENT_TYPE
         ]);
     }
 }
