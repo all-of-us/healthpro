@@ -6,12 +6,6 @@ use App\Entity\WithdrawalLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @method WithdrawalLog|null find($id, $lockMode = null, $lockVersion = null)
- * @method WithdrawalLog|null findOneBy(array $criteria, array $orderBy = null)
- * @method WithdrawalLog[]    findAll()
- * @method WithdrawalLog[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class WithdrawalLogRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -19,11 +13,7 @@ class WithdrawalLogRepository extends ServiceEntityRepository
         parent::__construct($registry, WithdrawalLog::class);
     }
 
-    /**
-     * @return WithdrawalLog[] Returns an array of WithdrawalLog objects
-     */
-
-    public function getWithdrawalNotifications()
+    public function getWithdrawalNotifications() :array
     {
         return $this->createQueryBuilder('w')
             ->select('count(w.id) as count, w.insertTs, w.hpoId, w.emailNotified as email')
@@ -34,10 +24,7 @@ class WithdrawalLogRepository extends ServiceEntityRepository
         ;
     }
 
-    /**
-     * @return WithdrawalLog[] Returns an array of WithdrawalLog objects
-     */
-    public function getLatestAwardees()
+    public function getLatestAwardees() :array
     {
         return $this->createQueryBuilder('w')
             ->select('w.hpoId as awardeeId, max(w.withdrawalTs) as ts')

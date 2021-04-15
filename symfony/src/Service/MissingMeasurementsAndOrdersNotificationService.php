@@ -35,7 +35,7 @@ class MissingMeasurementsAndOrdersNotificationService
         $this->twig = $twig;
     }
 
-    public function sendEmails()
+    public function sendEmails() : void
     {
         $missingEvaluations = $this->em->getRepository(Measurement::class)->getUnloggedMissingMeasurements();
         foreach ($missingEvaluations as $evaluation) {
@@ -62,9 +62,9 @@ class MissingMeasurementsAndOrdersNotificationService
         }
     }
 
-    public function insertRecords($id, $type)
+    public function insertRecords($id, $type) : void
     {
-        $missingNotificationLog = new MissingNotificationLog();
+        $missingNotificationLog = new MissingNotificationLog;
         $missingNotificationLog->setType($type);
         $missingNotificationLog->setRecordId($id);
         $this->em->persist($missingNotificationLog);
