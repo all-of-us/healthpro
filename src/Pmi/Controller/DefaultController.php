@@ -1,20 +1,15 @@
 <?php
 namespace Pmi\Controller;
 
-use Pmi\Evaluation\Evaluation;
 use Pmi\PatientStatus\PatientStatus;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
-use Pmi\Drc\Exception\ParticipantSearchExceptionInterface;
-use Pmi\Order\Order;
 use Pmi\Security\User;
 
 class DefaultController extends AbstractController
@@ -31,7 +26,6 @@ class DefaultController extends AbstractController
         ['agreeUsage', '/agree', ['method' => 'POST']],
         ['groups', '/groups'],
         ['selectSite', '/site/select', ['method' => 'GET|POST']],
-        ['orders', '/orders', ['method' => 'GET|POST']],
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
         ['patientStatus', '/participant/{participantId}/patient/status/{patientStatusId}', ['method' => 'GET']],
         ['mockLogin', '/mock-login', ['method' => 'GET|POST']]
@@ -156,56 +150,6 @@ class DefaultController extends AbstractController
             }
         }
         return $app['twig']->render('site-select.html.twig');
-    }
-
-    public function ordersAction(Application $app, Request $request)
-    {
-        $idForm = $app['form.factory']->createNamedBuilder('id', FormType::class)
-            ->add('orderId', TextType::class, [
-                'label' => 'Order ID',
-                'attr' => ['placeholder' => 'Scan barcode or enter order ID'],
-                'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Type('string')
-                ]
-            ])
-            ->getForm();
-
-        $idForm->handleRequest($request);
-
-        if ($idForm->isSubmitted() && $idForm->isValid()) {
-            $id = $idForm->get('orderId')->getData();
-
-            // New barcodes include a 4-digit sample identifier appended to the 10 digit order id
-            // If the string matches this format, remove the sample identifier to get the order id
-            if (preg_match('/^\d{14}$/', $id)) {
-                $id = substr($id, 0, 10);
-            }
-
-            $order = $app['em']->getRepository('orders')->fetchOneBy([
-                'order_id' => $id
-            ]);
-            if ($order) {
-                return $app->redirectToRoute('order', [
-                    'participantId' => $order['participant_id'],
-                    'orderId' => $order['id']
-                ]);
-            }
-            $app->addFlashError('Order ID not found');
-        }
-
-        $recentOrders = $app['em']->getRepository('orders')->fetchBySql(
-            'site = ? AND created_ts >= ?',
-            [$app->getSiteId(), (new \DateTime('-1 day'))->format('Y-m-d H:i:s')],
-            ['created_ts' => 'DESC', 'id' => 'DESC']
-        );
-        foreach ($recentOrders as &$order) {
-            $order['participant'] = $app['pmi.drc.participants']->getById($order['participant_id']);
-        }
-        return $app['twig']->render('orders.html.twig', [
-            'idForm' => $idForm->createView(),
-            'recentOrders' => $recentOrders
-        ]);
     }
 
     public function patientStatusAction($participantId, $patientStatusId, Application $app)

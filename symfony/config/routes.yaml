@@ -13,9 +13,6 @@ logout:
 selectSite:
     path: /site/select
 
-orders:
-    path: /orders
-
 evaluation:
     path: /participant/{participantId}/measurements/{evalId}
     defaults: { evalId: null }
