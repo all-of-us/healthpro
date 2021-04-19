@@ -28,7 +28,7 @@ class FirewallCommand extends Command
     {
         $this->output = $output;
         $output->setFormatter(new OutputFormatter(true)); // color output
-        $dbFile = "{$this->appDir}/bin/GeoLite2-Country.mmdb";
+        $dbFile = "{$this->appDir}/symfony/bin/GeoLite2-Country.mmdb";
         if (!file_exists($dbFile)) {
             $output->writeln("Downloading GeoIP2 country database...");
             $db = file_get_contents('https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz');
