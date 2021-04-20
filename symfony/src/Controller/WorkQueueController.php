@@ -236,17 +236,17 @@ class WorkQueueController extends AbstractController
             ]);
         }
         if (!$participant) {
-            $this->createNotFoundException();
+            throw $this->createNotFoundException();
         }
 
         if (!$this->isGranted('ROLE_AWARDEE_SCRIPPS')) {
-            $this->createAccessDeniedException();
+            throw $this->createAccessDeniedException();
         }
 
         // Deny access if participant awardee does not belong to the allowed awardees or not a salivary participant (awardee = UNSET and sampleStatus1SAL2 = RECEIVED)
         if (!(in_array($participant->awardee,
                 $this->siteService->getSuperUserAwardees()) || (empty($participant->awardee) && $participant->sampleStatus1SAL2 === 'RECEIVED'))) {
-            $this->createAccessDeniedException();
+            throw $this->createAccessDeniedException();
         }
 
         $measurements = $em->getRepository(Measurement::class)->findBy(['participantId' => $id]);
