@@ -239,11 +239,25 @@ class OrderRepository extends ServiceEntityRepository
         ]);
     }
 
+
     public function getUnloggedMissingOrders(): array
     {
         $ordersQuery = "SELECT id FROM orders WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND mayo_id IS NOT NULL AND rdr_id IS NULL";
         return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
             'type' => MissingNotificationLog::ORDER_TYPE
         ]);
+    }
+
+    public function getSiteRecentOrders($site): array
+    {
+        return $this->createQueryBuilder('o')
+            ->where('o.site = :site')
+            ->andWhere('o.createdTs >= :createdTs')
+            ->setParameters(['site' => $site, 'createdTs' => (new \DateTime('-1 day'))->format('Y-m-d H:i:s')])
+            ->orderBy('o.createdTs', 'DESC')
+            ->addOrderBy('o.id', 'DESC')
+            ->getQuery()
+            ->getResult()
+            ;
     }
 }

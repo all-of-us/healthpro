@@ -365,9 +365,6 @@ class Evaluation
                     'required' => false,
                     'label' => isset($options['label']) ? $options['label'] : null
                 ];
-                if ($this->isBloodDonorForm() && in_array($field->name, self::$bloodPressureFields)) {
-                    $collectionOptions['constraints'] = $this->addBloodDonorSecondBloodPressureConstraint($form, $field);
-                }
                 if (isset($field->compare)) {
                     $collectionOptions['constraints'] = $this->addDiastolicBloodPressureConstraint($form, $field);
                 }
@@ -479,11 +476,6 @@ class Evaluation
         foreach (self::$bloodPressureFields as $field) {
             foreach ($this->data->$field as $k => $value) {
                 $displayError = false;
-                // For Blood Donor form display error if 2nd reading is empty and
-                // 1st reading is out of range even though it has a protocol modification
-                if ($this->isBloodDonorForm()) {
-                    $displayError = $k === 1 && $this->isBloodDonorPressureOutOfRange(0);
-                }
                 // For EHR protocol form display error if first reading is empty and has ehr protocol modification
                 if ($this->isEhrProtocolForm()) {
                     $displayError = $k === 0 && $this->data->{'blood-pressure-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
@@ -533,7 +525,7 @@ class Evaluation
                     if ((!$this->data->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
                         $errors[] = [$field, $k];
                     }
-                    if ($this->data->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->data->{$field . 'protocol-modification-notes'}[$k])) {
+                    if ($this->data->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->data->{$field . '-protocol-modification-notes'}[$k])) {
                         $errors[] = [$field . '-protocol-modification-notes', $k];
                     }
                 }
@@ -885,7 +877,7 @@ class Evaluation
     public function addBloodDonorProtocolModificationForRemovedFields()
     {
         $this->addBloodDonorProtocolModificationForWaistandHip();
-        $this->addBloodDonorProtocolModificationForBloodPressure(2);
+        $this->addBloodDonorProtocolModificationForBloodPressure();
         $this->addBloodDonorProtocolModificationForHeight();
     }
 
@@ -924,63 +916,22 @@ class Evaluation
         }
     }
 
-    public function addBloodDonorProtocolModificationForBloodPressure($reading)
+    public function addBloodDonorProtocolModificationForBloodPressure()
     {
-        // Do not set default reading #2 values if reading #1 is out of range
-        if ($reading === 1 && empty($this->data->{'blood-pressure-protocol-modification'}[0]) && $this->isBloodDonorPressureOutOfRange(0)) {
-            return false;
+        for ($reading = 1; $reading <= 2; $reading++) {
+            foreach (self::$bloodPressureFields as $field) {
+                $this->data->{$field}[$reading] = null;
+            }
+            foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
+                $this->data->{$field}[$reading] = false;
+            }
+            $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
         }
-        // Default reading #2 values are only set when finalized
-        foreach (self::$bloodPressureFields as $field) {
-            $this->data->{$field}[$reading] = null;
-        }
-        foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
-            $this->data->{$field}[$reading] = false;
-        }
-        $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
     }
 
     public function addBloodDonorProtocolModificationForHeight()
     {
         $this->data->{"height-protocol-modification"} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
-    }
-
-    public function isBloodDonorPressureOutOfRange($key)
-    {
-        $limits = $this->getSecondBloodPressureLimits();
-        list($systolic, $diastolic, $heartRate) = self::$bloodPressureFields;
-        if ($this->data->{$systolic}[$key] < $limits[$systolic]['secondMin'] ||
-            $this->data->{$systolic}[$key] > $limits[$systolic]['secondMax'] ||
-            $this->data->{$diastolic}[$key] < $limits[$diastolic]['secondMin'] ||
-            $this->data->{$diastolic}[$key] > $limits[$diastolic]['secondMax'] ||
-            $this->data->{$heartRate}[$key] < $limits[$heartRate]['secondMin'] ||
-            $this->data->{$heartRate}[$key] > $limits[$heartRate]['secondMax']
-        ) {
-            return true;
-        }
-        return false;
-    }
-
-    private function addBloodDonorSecondBloodPressureConstraint($form, $field)
-    {
-        $secondMaxVal = $field->secondMax;
-        $secondMinVal = $field->secondMin;
-        $callback = function ($value, $context, $replicate) use ($form, $secondMaxVal, $secondMinVal) {
-            if ($replicate !== 1 || empty($value)) {
-                return;
-            }
-            if ($value > $secondMaxVal) {
-                $context->buildViolation("This value should be less than {$secondMaxVal}")->addViolation();
-            } elseif ($value < $secondMinVal) {
-                $context->buildViolation("This value should be greater than {$secondMinVal}")->addViolation();
-            }
-        };
-        $collectionConstraintFields = [];
-        for ($i = 0; $i < $field->replicates; $i++) {
-            $collectionConstraintFields[] = new Constraints\Callback(['callback' => $callback, 'payload' => $i]);
-        }
-        $compareConstraint = new Constraints\Collection($collectionConstraintFields);
-        return [$compareConstraint];
     }
 
     private function addDiastolicBloodPressureConstraint($form, $field)
@@ -1005,18 +956,6 @@ class Evaluation
         }
         $compareConstraint = new Constraints\Collection($collectionConstraintFields);
         return [$compareConstraint];
-    }
-
-    private function getSecondBloodPressureLimits()
-    {
-        $limits = [];
-        foreach ($this->schema->fields as $field) {
-            if (in_array($field->name, self::$bloodPressureFields)) {
-                $limits[$field->name]['secondMax'] = $field->secondMax;
-                $limits[$field->name]['secondMin'] = $field->secondMin;
-            }
-        }
-        return $limits;
     }
 
     public function getFormFieldErrorMessage($field = null, $replicate = null)

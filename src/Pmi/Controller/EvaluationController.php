@@ -203,7 +203,7 @@ class EvaluationController extends AbstractController
                     if ($evaluationService->isBloodDonorForm()) {
                         $evaluationService->addBloodDonorProtocolModificationForRemovedFields();
                         if ($request->request->has('finalize') && (!$evaluation || empty($evaluation['rdr_id']))) {
-                            $evaluationService->addBloodDonorProtocolModificationForBloodPressure(1);
+                            $evaluationService->addBloodDonorProtocolModificationForBloodPressure();
                         }
                     }
                     $evaluationService->setData($evaluationForm->getData());

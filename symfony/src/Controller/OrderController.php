@@ -264,7 +264,7 @@ class OrderController extends AbstractController
             'step' => 'collected',
             'order' => $order,
             'em' => $this->em,
-            'timeZone' => $this->getUser()->getInfo()['timezone'],
+            'timeZone' => $this->getUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId()
         ]);
         $collectForm->handleRequest($request);
@@ -324,7 +324,7 @@ class OrderController extends AbstractController
             'step' => 'processed',
             'order' => $order,
             'em' => $this->em,
-            'timeZone' => $this->getUser()->getInfo()['timezone'],
+            'timeZone' => $this->getUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId()
         ]);
         $processForm->handleRequest($request);
@@ -413,7 +413,7 @@ class OrderController extends AbstractController
             'step' => 'finalized',
             'order' => $order,
             'em' => $this->em,
-            'timeZone' => $this->getUser()->getInfo()['timezone'],
+            'timeZone' => $this->getUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId()
         ]);
         $finalizeForm->handleRequest($request);
@@ -721,7 +721,7 @@ class OrderController extends AbstractController
     {
         $order = $this->loadOrder($participantId, $orderId);
         return $this->render('biobank/summary.html.twig', [
-            'biobankChanges' => $order->getBiobankChangesDetails($this->getUser()->getInfo()['timezone'])
+            'biobankChanges' => $order->getBiobankChangesDetails($this->getUser()->getTimezone())
         ]);
     }
 }
