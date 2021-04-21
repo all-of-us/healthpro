@@ -4,15 +4,15 @@ cron:
   schedule: 29 of feb 00:00
   timezone: America/Chicago
 - description: "Withdrawal notification"
-  url: /cron/withdrawal
+  url: /s/cron/withdrawal
   schedule: every day 07:00
   timezone: America/Chicago
 - description: "Deactivate notification"
-  url: /cron/deactivate
+  url: /s/cron/deactivate
   schedule: every day 07:01
   timezone: America/Chicago
 - description: "Missing measurements/orders notification"
-  url: /cron/missing-measurements-orders
+  url: /s/cron/missing-measurements-orders
   schedule: every day 08:00
   timezone: America/Chicago
 - description: "Delete datastore cache keys"
