@@ -237,4 +237,20 @@ class OrderRepository extends ServiceEntityRepository
             'deleted' => 0
         ]);
     }
+
+    /**
+     * @return Order[] Returns an array of Order objects
+     */
+    public function getSiteRecentOrders($site)
+    {
+        return $this->createQueryBuilder('o')
+            ->where('o.site = :site')
+            ->andWhere('o.createdTs >= :createdTs')
+            ->setParameters(['site' => $site, 'createdTs' => (new \DateTime('-1 day'))->format('Y-m-d H:i:s')])
+            ->orderBy('o.createdTs', 'DESC')
+            ->addOrderBy('o.id', 'DESC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

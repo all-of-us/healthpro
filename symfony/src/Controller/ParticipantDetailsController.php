@@ -52,7 +52,7 @@ class ParticipantDetailsController extends AbstractController
             ]);
         }
         if (!$participant) {
-            $this->createNotFoundException();
+            throw $this->createNotFoundException();
         }
         $agreeForm = $this->createForm(CrossOriginAgreeType::class, null);
         $agreeForm->handleRequest($request);

@@ -16,28 +16,18 @@
             "unit": "mmHg",
             "replicates": 3,
             "max": 300,
-            "secondMax": 180,
-            "secondMin": 90,
             "warnings": [
                 {
-                    "max": 180,
-                    "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
-                    "alert": true,
-                    "consecutive": 2
-                },
-                {
-                    "min": 100,
-                    "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-                    "alert": true,
-                    "consecutive": 2
+                    "max": 200,
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
                 },
                 {
                     "max": 180,
-                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
                 },
                 {
                     "min": 100,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+                    "message": "This value may indicate a hypotensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, refer to your site's SOP for an urgent referral."
                 }
             ],
             "help": {
@@ -50,8 +40,6 @@
             "unit": "mmHg",
             "replicates": 3,
             "max": 300,
-            "secondMax": 100,
-            "secondMin": 50,
             "compare": {
                 "type": "less-than",
                 "field": "blood-pressure-systolic",
@@ -59,14 +47,16 @@
             },
             "warnings": [
                 {
-                    "min": 60,
-                    "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-                    "alert": true,
-                    "consecutive": 2
+                    "max": 120,
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
+                },
+                {
+                    "max": 110,
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
                 },
                 {
                     "min": 60,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+                    "message": "This value may indicate a hypotensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, refer to your site's SOP for an urgent referral."
                 }
             ],
             "help": {
@@ -79,28 +69,14 @@
             "unit": "bpm",
             "replicates": 3,
             "max": 300,
-            "secondMax": 100,
-            "secondMin": 50,
             "warnings": [
                 {
                     "max": 100,
-                    "message": "Participant could be at risk for hypertensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-                    "alert": true,
-                    "consecutive": 2
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, refer to your site's SOP for an urgent referral."
                 },
                 {
                     "min": 60,
-                    "message": "Participant could be at risk for hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-                    "alert": true,
-                    "consecutive": 2
-                },
-                {
-                    "max": 100,
-                    "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
-                },
-                {
-                    "min": 60,
-                    "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability or if the participant's systolic blood pressure is < 90 mmHg."
+                    "message": "This value may indicate a hypotensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, or if the participant's systolic blood pressure is < 90 mmHg, refer to your site's SOP for an urgent referral."
                 }
             ],
             "help": {
@@ -177,7 +153,7 @@
             "warnings": [
                 {
                     "val": true,
-                    "message": "Pregnant women should be measured for both height and weight."
+                    "message": "Pregnant women should be measured for weight."
                 }
             ]
         },
@@ -194,7 +170,7 @@
             "warnings": [
                 {
                     "val": true,
-                    "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields."
+                    "message": "Please record estimated participant weight in the \"Weight\" field."
                 }
             ]
         },
