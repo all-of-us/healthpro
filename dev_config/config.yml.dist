@@ -61,7 +61,7 @@ enforce2fa: 0
 
 # Mandrill configuration for sending emails
 # mail_method: mandrill
-# mandrill_key: 
+# mandrill_key:
 
 # enable site sync using RDR Organization API
 sites_use_rdr: true
@@ -103,6 +103,10 @@ reportKitUrl:
 # Set diversion pouch site name
 diversion_pouch_site: ECDC DV Diversion Pouch
 
+# JIRA API credentials for release ticket creation
+# See https://id.atlassian.com/manage-profile/security/api-tokens
+jira_api_user:
+jira_api_token:
 
 #
 # Feature flags

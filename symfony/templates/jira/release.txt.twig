@@ -1,0 +1,36 @@
+h2. Change Request Form
+
+h3. DESCRIPTION
+
+System: HealthPro
+Developers:
+Needed By Date/Event:
+Production: {{ releaseDate|date('n/j/Y') }}
+Priority: Medium
+Configuration/Change Manager:
+
+h4. This release contains the following JIRA tickets
+
+{% for issue in issues %}
+h5. [{{ issue.id }}] - {{ issue.title }}
+Security impact: None
+
+{% endfor %}
+
+h3. ANTICIPATED IMPACTS
+Software Impact: Improvements to HealthPro
+Training Impact: None
+Data Impact: None
+Security Impact: None
+Related Changes: N/A
+
+h3. TESTING
+Tester:
+Date Test Was Completed: {{ completeDate|date('n/j/Y') }}
+Implementation/Deployment Date: Ongoing, incremental testing for each individual story
+
+h2. Security Impact Analysis
+Business Impact: None
+Operational Impact: Improvements to support DRC and All of Us operations
+System Components Affected: HealthPro
+Security Controls Affected: N/A
