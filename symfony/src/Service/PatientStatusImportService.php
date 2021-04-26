@@ -62,7 +62,7 @@ class PatientStatusImportService
             $row = [];
             $row['participantId'] = $patientStatusImportRow->getParticipantId();
             $row['patientStatus'] = $patientStatusImportRow->getStatus();
-            $row['comments'] = htmlspecialchars($patientStatusImportRow->getComments(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $row['comments'] = $patientStatusImportRow->getComments();
             $row['organizationName'] = $patientStatusImport->getOrganization()->getName() . " ({$patientStatusImport->getOrganization()->getId()})";
             $createdTs = $patientStatusImport->getCreatedTs();
             $row['createdTs'] = $createdTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getTimezone()))->format('n/j/Y g:ia');
