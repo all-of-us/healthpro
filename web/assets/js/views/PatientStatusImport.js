@@ -6,11 +6,11 @@ $(document).ready(function () {
 
     var tableColumns = [];
     tableColumns.push(
-        {name: 'participantId', data: 'participantId', render: $.fn.dataTable.render.text()},
-        {name: 'patientStatus', data: 'patientStatus', render: $.fn.dataTable.render.text()},
-        {name: 'comments', data: 'comments', render: $.fn.dataTable.render.text()},
-        {name: 'organizationName', data: 'organizationName', render: $.fn.dataTable.render.text()},
-        {name: 'createdTs', data: 'createdTs', render: $.fn.dataTable.render.text()},
+        {name: 'participantId', data: 'participantId'},
+        {name: 'patientStatus', data: 'patientStatus'},
+        {name: 'comments', data: 'comments'},
+        {name: 'organizationName', data: 'organizationName'},
+        {name: 'createdTs', data: 'createdTs'},
         {name: 'status', data: 'status'}
     );
     var url = window.location.href;
@@ -41,6 +41,10 @@ $(document).ready(function () {
                         }
                     }
                 }
+            },
+            {
+                targets: '_all',
+                render: $.fn.dataTable.render.text()
             }
         ]
     });
