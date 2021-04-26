@@ -15,11 +15,18 @@ class Measurement
 {
 
     const CURRENT_VERSION = '0.3.3';
+    const BLOOD_DONOR_CURRENT_VERSION = '0.3.3-blood-donor';
+    const EHR_CURRENT_VERSION = '0.3.3-ehr';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_ACTIVE = 'active';
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
+    const BLOOD_DONOR = 'blood-donor';
+    const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'blood-bank-donor';
+    const BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL = 'Blood bank donor';
+    const EHR_PROTOCOL_MODIFICATION = 'ehr';
+    const EHR_PROTOCOL_MODIFICATION_LABEL = 'Observation obtained from EHR';
 
     private $currentVersion;
 
@@ -30,6 +37,47 @@ class Measurement
     protected $finalizedUserEmail;
 
     protected $finalizedSiteInfo;
+
+    public static $cancelReasons = [
+        'Data entered for wrong participant' => 'PM_CANCEL_WRONG_PARTICIPANT',
+        'Other' => 'OTHER'
+    ];
+
+    public static $restoreReasons = [
+        'Physical Measurements cancelled for wrong participant' => 'PM_RESTORE_WRONG_PARTICIPANT',
+        'Physical Measurements can be amended instead of cancelled' => 'PM_RESTORE_AMEND',
+        'Other' => 'OTHER'
+    ];
+
+    public static $bloodPressureFields = [
+        'blood-pressure-systolic',
+        'blood-pressure-diastolic',
+        'heart-rate'
+    ];
+
+    public static $protocolModificationNotesFields = [
+        'blood-pressure-protocol-modification-notes',
+        'height-protocol-modification-notes',
+        'weight-protocol-modification-notes',
+        'hip-circumference-protocol-modification-notes',
+        'waist-circumference-protocol-modification-notes'
+    ];
+
+    public static $measurementSourceFields = [
+        'blood-pressure-source',
+        'height-source',
+        'weight-source',
+        'waist-circumference-source',
+        'hip-circumference-source'
+    ];
+
+    public static $ehrProtocolDateFields = [
+        'blood-pressure-source-ehr-date',
+        'height-source-ehr-date',
+        'weight-source-ehr-date',
+        'waist-circumference-source-ehr-date',
+        'hip-circumference-source-ehr-date'
+    ];
 
     /**
      * @ORM\Id()
@@ -281,6 +329,13 @@ class Measurement
         return $this;
     }
 
+    public function setCurrentVersion(string $currentVersion): self
+    {
+        $this->currentVersion = $currentVersion;
+
+        return $this;
+    }
+
     public function loadFromAObject($finalizedUserEmail = null, $finalizedSite = null)
     {
         if (!empty($this->getVersion())) {
@@ -293,10 +348,20 @@ class Measurement
         } else {
             $this->fieldData = json_decode($this->getData());
         }
+        $this->formatEhrProtocolDateFields();
         $this->finalizedUserEmail = $finalizedUserEmail;
         $this->finalizedSiteInfo = $finalizedSite;
         $this->loadSchema();
         $this->normalizeData();
+    }
+
+    public function formatEhrProtocolDateFields()
+    {
+        foreach (self::$ehrProtocolDateFields as $ehrProtocolDateField) {
+            if (!empty($this->data->{$ehrProtocolDateField})) {
+                $this->data->{$ehrProtocolDateField}  = new \DateTime($this->data->{$ehrProtocolDateField});
+            }
+        }
     }
 
     public function getSchema()
@@ -332,11 +397,14 @@ class Measurement
         }
     }
 
-    protected function normalizeData()
+    protected function normalizeData($type = null)
     {
         foreach ($this->fieldData as $key => $value) {
             if ($value === 0) {
                 $this->fieldData->$key = null;
+            }
+            if ($type === 'save' && !is_null($this->fieldData->$key) && in_array($key, self::$ehrProtocolDateFields)) {
+                $this->fieldData->$key = $this->fieldData->$key->format('Y-m-d');
             }
         }
         foreach ($this->schema->fields as $field) {
@@ -351,6 +419,9 @@ class Measurement
                     $this->fieldData->$key = $dataArray;
                 }
             }
+        }
+        if ($this->isEhrProtocolForm()) {
+            $this->addEhrProtocolModifications();
         }
     }
 
@@ -472,5 +543,57 @@ class Measurement
             $summary['heartrate'] = $heartrate;
         }
         return $summary;
+    }
+
+    public function canCancel()
+    {
+        return $this->getHistoryType() !== self::EVALUATION_CANCEL
+            && !$this->isEvaluationUnlocked()
+            && !$this->isEvaluationFailedToReachRDR();
+    }
+
+    public function canRestore()
+    {
+        return $this->getHistoryType() === self::EVALUATION_CANCEL
+            && !$this->isEvaluationUnlocked()
+            && !$this->isEvaluationFailedToReachRDR();
+    }
+
+    public function getHistoryType()
+    {
+        if (!empty($this->getHistory())) {
+            return $this->getHistory()->getType();
+        }
+        return null;
+    }
+
+    public function isEvaluationCancelled()
+    {
+        return $this->getHistoryType() === self::EVALUATION_CANCEL ? true : false;
+    }
+
+    public function isEvaluationUnlocked()
+    {
+        return !empty($this->getParticipantId()) && empty($this->getFinalizedTs());
+    }
+
+    public function isEvaluationFailedToReachRDR()
+    {
+        return !empty($this->getFinalizedTs()) && empty($this->getRdrId());
+    }
+
+    public function getReasonDisplayText()
+    {
+        if (empty($this->getHistory())) {
+            return null;
+        }
+        // Check only cancel reasons
+        $reasonDisplayText = array_search($this->getHistory()->getReason(), self::$cancelReasons);
+        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
+    }
+
+    public function setFieldData($fieldData) {
+        $this->fieldData = $fieldData;
+        $this->normalizeData('save');
     }
 }

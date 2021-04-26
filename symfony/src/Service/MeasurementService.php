@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Measurement;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -15,6 +16,7 @@ class MeasurementService
     protected $rdrApiService;
     protected $siteService;
     protected $params;
+    protected $measurement;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -33,8 +35,17 @@ class MeasurementService
 
     }
 
+    public function load($measurement, $type)
+    {
+        $this->measurement = $measurement;
+        $version = $this->getCurrentVersion($type);
+        $measurement->setCurrentVersion($version);
+        $this->loadFromAObject($measurement);
+    }
+
     public function loadFromAObject($measurement)
     {
+        $this->measurement = $measurement;
         if (empty($measurement->getFinalizedUser())) {
             $finalizedUserId = $measurement->getFinalizedTs() ? $measurement->getUserId() : $this->userService->getUser()->getId();
             $finalizedUserEmail = $this->em->getRepository(User::class)->findOneBy(['id' => $finalizedUserId]);
@@ -64,5 +75,28 @@ class MeasurementService
     public function requireBloodDonorCheck()
     {
         return $this->params->has('feature.blooddonorpm') && $this->params->get('feature.blooddonorpm') && $this->session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite();
+    }
+
+    public function isBloodDonorForm()
+    {
+        return strpos($this->measurement->getVersion(), Measurement::BLOOD_DONOR) !== false;
+    }
+
+    private function getCurrentVersion($type)
+    {
+        if ($type === Measurement::BLOOD_DONOR && $this->requireBloodDonorCheck()) {
+            return Measurement::BLOOD_DONOR_CURRENT_VERSION;
+        }
+        if ($this->requireEhrModificationProtocol()) {
+            return Measurement::EHR_CURRENT_VERSION;
+        }
+        return Measurement::CURRENT_VERSION;
+    }
+
+    public function canEdit($evalId, $participant)
+    {
+        // Allow cohort 1 and 2 participants to edit existing PMs even if status is false
+        return !$participant->status && !empty($evalId) ? $participant->editExistingOnly : $participant->status;
+
     }
 }
