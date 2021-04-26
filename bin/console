@@ -1,22 +1,10 @@
-#!/usr/bin/env php
-<?php
-/**
- * Executes the specificed Console Command (ex: ./console.php pmi:deploy --help)
- */
+#!/bin/bash
+#
+# Executes the Symfony console which is currently inside the symfony directory
+# while we run Silex and Symfony side-by-side
+#
 
-require __DIR__ . '/../vendor/autoload.php';
+APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
+SYMFONY_DIR="${APP_DIR}/symfony"
 
-use Symfony\Component\Console\Application;
-
-$application = new Application();
-
-// Add all command classes found in src/Pmi/Console/Command
-$commandDirectory = realpath(__DIR__ . '/../src/Pmi/Console/Command/');
-$commands = glob("{$commandDirectory}/*Command.php");
-foreach ($commands as $command) {
-    if (preg_match('/\/(\w+)\.php$/', $command, $m)) {
-        $commandClass = "Pmi\\Console\\Command\\{$m[1]}";
-        $application->add(new $commandClass());
-    }
-}
-$application->run();
+$SYMFONY_DIR/bin/console "$@"
