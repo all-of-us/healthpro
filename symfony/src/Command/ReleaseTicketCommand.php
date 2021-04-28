@@ -78,6 +78,28 @@ class ReleaseTicketCommand extends Command
         return $issues;
     }
 
+    private function createTicket(string $version, array $issues): ?string
+    {
+        $description = $this->templating->render('jira/release.txt.twig', [
+            'issues' => $issues,
+            'releaseDate' => new \DateTime('+2 days'), // TODO: from user input or version release date
+            'completeDate' => new \DateTime()
+        ]);
+
+        $createResult = $this->jira->createReleaseTicket("HealthPro Release {$version}", $description);
+        if ($createResult) {
+            $this->io->success(sprintf(
+                'Created release ticket: %s/browse/%s',
+                JiraService::INSTANCE_URL,
+                $createResult
+            ));
+            return 0;
+        } else {
+            $this->io->error('Failed to create release ticket');
+            return 1;
+        }
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
@@ -103,14 +125,6 @@ class ReleaseTicketCommand extends Command
             return 1;
         }
 
-        $description = $this->templating->render('jira/release.txt.twig', [
-            'issues' => $issues,
-            'releaseDate' => new \DateTime('+2 days'), // TODO: from user input or version release date
-            'completeDate' => new \DateTime()
-        ]);
-        $this->io->block($description);
-        $this->io->success('Done');
-
-        return 0;
+        return $this->createTicket($version, $issues);
     }
 }
