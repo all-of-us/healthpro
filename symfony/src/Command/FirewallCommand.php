@@ -1,5 +1,6 @@
 <?php
-namespace Pmi\Console\Command;
+
+namespace App\Command;
 
 use GeoIp2\Database\Reader;
 use GuzzleHttp\Client;
@@ -9,34 +10,32 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Yaml\Dumper;
 
 class FirewallCommand extends Command
 {
     private $appDir;
     private $output;
-    
-    protected function configure()
+
+    protected function configure(): void
     {
-        $this->appDir = realpath(__DIR__ . '/../../../..');
+        $this->appDir = realpath(__DIR__ . '/../../..');
         $this
             ->setName('pmi:firewall')
-            ->setDescription('Generate rules for the GAE firewall')
-        ;
+            ->setDescription('Generate rules for the GAE firewall');
     }
-    
-    protected function execute(InputInterface $input, OutputInterface $output)
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->output = $output;
         $output->setFormatter(new OutputFormatter(true)); // color output
-        
-        $output->writeln("Downloading GeoIP2 country database...");
-        $db = file_get_contents('https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz');
-        $dbFile = "{$this->appDir}/bin/GeoLite2-Country.mmdb";
-        file_put_contents($dbFile, gzdecode($db));
-        $output->writeln("... database downloaded to {$dbFile}");
-        $output->writeln('');
-        
+        $dbFile = "{$this->appDir}/symfony/bin/GeoLite2-Country.mmdb";
+        if (!file_exists($dbFile)) {
+            $output->writeln("Downloading GeoIP2 country database...");
+            $db = file_get_contents('https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz');
+            file_put_contents($dbFile, gzdecode($db));
+            $output->writeln("... database downloaded to {$dbFile}");
+            $output->writeln('');
+        }
         $output->writeln("Querying IPs...");
         $client = new Client([
             'base_uri' => 'https://my.incapsula.com'
@@ -44,10 +43,10 @@ class FirewallCommand extends Command
         $response = $client->request('POST', '/api/integration/v1/ips', [
             'query' => ['content' => 'json']
         ]);
-        $networks = json_decode((string) $response->getBody());
+        $networks = json_decode((string)$response->getBody());
         $output->writeln('... IPv4 addrs: ' . count($networks->ipRanges) . ', IPv6 addrs: ' . count($networks->ipv6Ranges));
         $output->writeln('');
-        
+
         $output->writeln("Checking country codes...");
         $reader = new Reader($dbFile);
         $rules = [
@@ -81,15 +80,16 @@ class FirewallCommand extends Command
         foreach ($rules as $rule) {
             $output->writeln("gcloud app firewall-rules create {$rule[0]} --action {$rule[1]} --source-range \"{$rule[2]}\" --description \"{$rule[3]}\"");
         }
+        return 0;
     }
-    
+
     /** Runs a shell command, displaying output as it is generated. */
-    private function exec($cmd, $mustRun = true, $silent = false)
+    private function exec($cmd, $mustRun = true, $silent = false): Process
     {
-        $process = new Process($cmd);
+        $process = Process::fromShellCommandline($cmd);
         $process->setTimeout(null);
         $run = $mustRun ? 'mustRun' : 'run';
-        $process->$run(function($type, $buffer) use ($silent) {
+        $process->$run(function ($type, $buffer) use ($silent) {
             if (!$silent) {
                 $this->output->write($buffer);
             }

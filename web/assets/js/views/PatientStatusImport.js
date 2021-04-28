@@ -41,6 +41,10 @@ $(document).ready(function () {
                         }
                     }
                 }
+            },
+            {
+                targets: '_all',
+                render: $.fn.dataTable.render.text()
             }
         ]
     });
