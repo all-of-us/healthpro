@@ -167,4 +167,12 @@ class MeasurementType extends AbstractType
         $compareConstraint = new Constraints\Collection($collectionConstraintFields);
         return [$compareConstraint];
     }
+
+    protected static function calculateBmi($height, $weight)
+    {
+        if ($height && $weight) {
+            return $weight / (($height / 100) * ($height / 100));
+        }
+        return false;
+    }
 }

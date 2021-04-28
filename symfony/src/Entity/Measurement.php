@@ -644,4 +644,144 @@ class Measurement
         }
         return self::CURRENT_VERSION;
     }
+
+    public function addBloodDonorProtocolModificationForRemovedFields()
+    {
+        $this->addBloodDonorProtocolModificationForWaistandHip();
+        $this->addBloodDonorProtocolModificationForBloodPressure();
+        $this->addBloodDonorProtocolModificationForHeight();
+    }
+
+    public function addEhrProtocolModifications()
+    {
+        if ($this->data->{'blood-pressure-source'} === 'ehr') {
+            $this->data->{'blood-pressure-protocol-modification'}[0] = self::EHR_PROTOCOL_MODIFICATION;
+            for ($reading = 1; $reading <= 2; $reading++) {
+                foreach (self::$bloodPressureFields as $field) {
+                    $this->data->{$field}[$reading] = null;
+                }
+                foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
+                    $this->data->{$field}[$reading] = false;
+                }
+                $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::EHR_PROTOCOL_MODIFICATION;
+            }
+        }
+        if ($this->data->{'height-source'} === 'ehr') {
+            $this->data->{"height-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        }
+        if ($this->data->{'weight-source'} === 'ehr') {
+            $this->data->{"weight-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        }
+        if ($this->data->{'waist-circumference-source'} === 'ehr') {
+            $this->data->{'waist-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        }
+        if ($this->data->{'hip-circumference-source'} === 'ehr') {
+            $this->data->{'hip-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        }
+    }
+
+    public function addBloodDonorProtocolModificationForWaistandHip()
+    {
+        foreach (['waist-circumference-protocol-modification', 'hip-circumference-protocol-modification'] as $field) {
+            $this->data->{$field} = array_fill(0, 2, self::BLOOD_DONOR_PROTOCOL_MODIFICATION);
+        }
+    }
+
+    public function addBloodDonorProtocolModificationForBloodPressure()
+    {
+        for ($reading = 1; $reading <= 2; $reading++) {
+            foreach (self::$bloodPressureFields as $field) {
+                $this->data->{$field}[$reading] = null;
+            }
+            foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
+                $this->data->{$field}[$reading] = false;
+            }
+            $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+        }
+    }
+
+    public function addBloodDonorProtocolModificationForHeight()
+    {
+        $this->data->{"height-protocol-modification"} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+    }
+
+    public function getFinalizeErrors()
+    {
+        $errors = [];
+
+        if (!$this->isMinVersion('0.3.0')) {
+            // prior to version 0.3.0, any state is valid
+            return $errors;
+        }
+
+        // EHR protocol form
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $sourceField) {
+                if ($this->data->{$sourceField} === self::EHR_PROTOCOL_MODIFICATION && empty($this->data->{$sourceField . '-ehr-date'})) {
+                    $errors[] = $sourceField . '-ehr-date';
+                }
+            }
+        }
+
+        foreach (self::$bloodPressureFields as $field) {
+            foreach ($this->data->$field as $k => $value) {
+                $displayError = false;
+                // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                if ($this->isEhrProtocolForm()) {
+                    $displayError = $k === 0 && $this->data->{'blood-pressure-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                }
+
+                if ((!$this->data->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
+                    $errors[] = [$field, $k];
+                }
+            }
+        }
+        foreach ($this->data->{'blood-pressure-protocol-modification'} as $k => $value) {
+            if ($value === 'other' && empty($this->data->{'blood-pressure-protocol-modification-notes'}[$k])) {
+                $errors[] = ['blood-pressure-protocol-modification-notes', $k];
+            }
+        }
+        foreach (['height', 'weight'] as $field) {
+            $displayError = false;
+            // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+            if ($this->isEhrProtocolForm()) {
+                $displayError = $this->data->{$field . '-protocol-modification'} === self::EHR_PROTOCOL_MODIFICATION;
+            }
+            if ((!$this->data->{$field . '-protocol-modification'} || $displayError) && !$this->data->$field) {
+                $errors[] = $field;
+            }
+            if ($this->data->{$field . '-protocol-modification'} === 'other' && empty($this->data->{$field . '-protocol-modification-notes'})) {
+                $errors[] = $field . '-protocol-modification-notes';
+            }
+        }
+        if (!$this->data->pregnant && !$this->data->wheelchair) {
+            foreach (['hip-circumference', 'waist-circumference'] as $field) {
+                foreach ($this->data->$field as $k => $value) {
+                    if ($k == 2) {
+                        // not an error on the third measurement if first two aren't completed
+                        // or first two measurements are within 1 cm
+                        if (!$this->data->{$field}[0] || !$this->data->{$field}[1]) {
+                            break;
+                        }
+                        if (abs($this->data->{$field}[0] - $this->data->{$field}[1]) <= 1) {
+                            break;
+                        }
+                    }
+                    $displayError = false;
+                    // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                    if ($this->isEhrProtocolForm()) {
+                        $displayError = $k === 0 && $this->data->{$field . '-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                    }
+                    if ((!$this->data->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
+                        $errors[] = [$field, $k];
+                    }
+                    if ($this->data->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->data->{$field . '-protocol-modification-notes'}[$k])) {
+                        $errors[] = [$field . '-protocol-modification-notes', $k];
+                    }
+                }
+            }
+        }
+
+        return $errors;
+    }
 }

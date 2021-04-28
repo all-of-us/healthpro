@@ -94,24 +94,25 @@ class MeasurementsController extends AbstractController
         $measurementsForm->handleRequest($request);
         if ($measurementsForm->isSubmitted()) {
             // Check if PMs are cancelled
-            if ($this->measurementService->isEvaluationCancelled()) {
+            if ($measurement->isEvaluationCancelled()) {
                 throw $this->createAccessDeniedException();
             }
             // Check if finalized_ts is set and rdr_id is empty
-            if (!$this->measurementService->isEvaluationFailedToReachRDR()) {
+            if (!$measurement->isEvaluationFailedToReachRDR()) {
                 if ($measurementsForm->isValid()) {
                     if ($measurement->isBloodDonorForm()) {
-                        $this->measurementService->addBloodDonorProtocolModificationForRemovedFields();
+                        $measurement->addBloodDonorProtocolModificationForRemovedFields();
                         if ($request->request->has('finalize') && (!$measurement || empty($measurement->getRdrId()))) {
-                            $this->measurementService->addBloodDonorProtocolModificationForBloodPressure();
+                            $measurement->addBloodDonorProtocolModificationForBloodPressure();
                         }
                     }
-                    $this->measurementService->setData($measurementsForm->getData());
-                    $dbArray = $this->measurementService->toArray();
+                    $measurement->setFieldData($measurementsForm->getData());
+                    $measurement->setVersion($this->measurementService->getCurrentVersion($type));
+                    $measurement->setData(json_encode($measurement->getFieldData()));
                     $now = new \DateTime();
-                    $dbArray['updated_ts'] = $now;
+                    $measurement->setUpdatedTs($now);
                     if ($request->request->has('finalize') && (!$measurement || empty($measurement->getRdrId()))) {
-                        $errors = $this->measurementService->getFinalizeErrors();
+                        $errors = $measurement->getFinalizeErrors();
                         if (count($errors) === 0) {
                             $measurement->setFinalizedTs($now);
                             if (!$measurement) {
@@ -126,14 +127,11 @@ class MeasurementsController extends AbstractController
                                 $parentEvaluation = $this->em->getRepository(Evaluation::class)->findOneBy([
                                     'id' => $measurement->getParentId()
                                 ]);
-                                $fhir = $this->measurementService->getFhir($now, $parentEvaluation->getRdrId());
+                                $fhir = $measurement->getFhir($now, $parentEvaluation->getRdrId());
                             } else {
-                                if (!$measurement) {
-                                    $this->measurementService->loadFromArray($dbArray);
-                                }
-                                $fhir = $this->measurementService->getFhir($now);
+                                $fhir = $measurement->getFhir($now);
                             }
-                            if ($rdrEvalId = $this->measurementService->createEvaluation($participant->id, $fhir)) {
+                            if ($rdrEvalId = $this->measurementService->createMeasurement($participant->id, $fhir)) {
                                 $measurement->setRdrId($rdrEvalId);
                                 $measurement->setFhirVersion(\Pmi\Evaluation\Fhir::CURRENT_VERSION);
                             } else {
@@ -154,14 +152,15 @@ class MeasurementsController extends AbstractController
                             $showAutoModification = $this->measurementService->canAutoModify();
                         }
                     }
-                    if (!$measurement || $request->request->has('copy')) {
-                        $measurement->setUser($this->getUser()->getId());
+                    if (!$measurementId || $request->request->has('copy')) {
+                        $userRepository = $this->em->getRepository(User::class);
+                        $measurement->setUser($userRepository->find($this->getUser()->getId()));
                         $measurement->setSite($this->siteService->getSiteId());
                         $measurement->setParticipantId($participant->id);
-                        $measurement->setCreatedTs($dbArray['updated_ts']);
+                        $measurement->setCreatedTs($now);
                         if ($request->request->has('copy')) {
                             $measurement->setParentId($measurement->getId());
-                            $measurement->setCreatedTs = $measurement->getCreatedTs();
+                            $measurement->setCreatedTs($measurement->getCreatedTs());
                         }
                         $this->em->persist($measurement);
                         $this->em->flush();
@@ -176,13 +175,13 @@ class MeasurementsController extends AbstractController
                             // If finalization failed, new physical measurements are created, but
                             // show errors and auto-modification options on subsequent display
                             if (!$measurementsForm->isValid()) {
-                                return $this->redirectToRoute('evaluation', [
+                                return $this->redirectToRoute('measurement', [
                                     'participantId' => $participant->id,
                                     'evalId' => $measurementId,
                                     'showAutoModification' => 1
                                 ]);
                             } else {
-                                return $this->redirectToRoute('evaluation', [
+                                return $this->redirectToRoute('measurement', [
                                     'participantId' => $participant->id,
                                     'evalId' => $measurementId
                                 ]);
@@ -201,7 +200,7 @@ class MeasurementsController extends AbstractController
                         // If finalization failed, values are still saved, but do not redirect
                         // so that errors can be displayed
                         if ($measurementsForm->isValid()) {
-                            return $this->redirectToRoute('evaluation', [
+                            return $this->redirectToRoute('measurement', [
                                 'participantId' => $participant->id,
                                 'evalId' => $measurementId
                             ]);
