@@ -27,7 +27,8 @@ class JiraService
         $response = $this->client->request('GET', 'project/HPRO/version', [
             'query' => [
                 'orderBy' => '-releaseDate',
-                'maxResults' => $count
+                'maxResults' => $count,
+                'expand' => 'issuesstatus'
             ]
         ]);
         $responseObject = json_decode($response->getBody()->getContents());

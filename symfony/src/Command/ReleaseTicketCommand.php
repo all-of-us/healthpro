@@ -35,14 +35,21 @@ class ReleaseTicketCommand extends Command
         if (isset($versions[0]) && !$versions[0]->released) {
             $defaultVersion = $versions[0]->name;
         }
-        $tableHeaders = ['Version', 'Released?', 'Release Date', 'URL'];
+        $tableHeaders = ['Version', 'Released?', 'Release Date', 'Tickets (Done / Total)'];
         $tableRows = [];
         foreach ($versions as $version) {
+            $totalIssues = $completedIssues = 0;
+            foreach ($version->issuesStatusForFixVersion as $type => $count) {
+                if ($type === 'done') {
+                    $completedIssues += $count;
+                }
+                $totalIssues += $count;
+            }
             $tableRows[] = [
                 $version->name,
                 $version->released ? '✓' : '',
                 $version->releaseDate ?? '',
-                sprintf('https://precisionmedicineinitiative.atlassian.net/projects/HPRO/versions/%s', $version->id)
+                sprintf('%d / %d', $completedIssues, $totalIssues)
             ];
         }
         $this->io->table($tableHeaders, $tableRows);
