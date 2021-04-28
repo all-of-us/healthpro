@@ -29,8 +29,15 @@ class ReleaseTicketCommand extends Command
             ->setDescription('Create JIRA release ticket');
     }
 
-    private function selectVersion(array $versions): ?string
+    private function selectVersion(): ?string
     {
+        $this->io->section('Unreleased and recent versions');
+
+        $versions = $this->jira->getVersions(5);
+        if (empty($versions)) {
+            $this->io->warning('Could not retrieve versions');
+        }
+
         $defaultVersion = null;
         if (isset($versions[0]) && !$versions[0]->released) {
             $defaultVersion = $versions[0]->name;
@@ -57,8 +64,10 @@ class ReleaseTicketCommand extends Command
         return $this->io->ask('Which version are you releasing?', $defaultVersion);
     }
 
-    private function getIssues(string $version): array
+    private function getIssues(string $version): ?array
     {
+        $this->io->section(sprintf('Tickets for release %s', $version));
+
         $jiraIssues = $this->jira->getIssuesByVersion($version);
         $tableHeaders = ['ID', 'Title', 'Type', 'Status'];
         $tableRows = [];
@@ -75,7 +84,11 @@ class ReleaseTicketCommand extends Command
         }
         $this->io->table($tableHeaders, $tableRows);
 
-        return $issues;
+        if ($this->io->confirm('Does this look right?')) {
+            return $issues;
+        } else {
+            return null;
+        }
     }
 
     private function createTicket(string $version, array $issues): ?string
@@ -104,23 +117,14 @@ class ReleaseTicketCommand extends Command
     {
         $this->io = new SymfonyStyle($input, $output);
 
-        $this->io->section('Unreleased and recent versions');
-        $versions = $this->jira->getVersions(5);
-        if (empty($versions)) {
-            $this->io->warning('Could not retrieve versions');
-        }
-
-        $version = $this->selectVersion($versions);
+        $version = $this->selectVersion();
         if ($version === null) {
             $this->io->warning('No version selected.');
             return 1;
         }
 
-        $this->io->section(sprintf('Tickets for release %s', $version));
-
         $issues = $this->getIssues($version);
-
-        if (!$this->io->confirm('Does this look right?')) {
+        if ($issues === null) {
             $this->io->comment('Exiting.');
             return 1;
         }
