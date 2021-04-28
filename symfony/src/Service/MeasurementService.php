@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Measurement;
+use App\Entity\Site;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -77,11 +78,6 @@ class MeasurementService
         return $this->params->has('feature.blooddonorpm') && $this->params->get('feature.blooddonorpm') && $this->session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite();
     }
 
-    public function isBloodDonorForm()
-    {
-        return strpos($this->measurement->getVersion(), Measurement::BLOOD_DONOR) !== false;
-    }
-
     private function getCurrentVersion($type)
     {
         if ($type === Measurement::BLOOD_DONOR && $this->requireBloodDonorCheck()) {
@@ -91,6 +87,19 @@ class MeasurementService
             return Measurement::EHR_CURRENT_VERSION;
         }
         return Measurement::CURRENT_VERSION;
+    }
+
+    public function requireEhrModificationProtocol()
+    {
+        $sites = $this->em->getRepository(Site::class)->findOneBy([
+            'deleted' => 0,
+            'ehrModificationProtocol' => 1,
+            'googleGroup' => $this->siteService->getSiteId()
+        ]);
+        if (!empty($sites)) {
+            return true;
+        }
+        return false;
     }
 
     public function canEdit($evalId, $participant)

@@ -343,10 +343,11 @@ class Measurement
         } else {
             $this->currentVersion = self::CURRENT_VERSION;
         }
-        if (is_object($this->getData())) {
-            $this->fieldData = $this->getData();
+        $data = empty($this->getData()) ? new \StdClass() : $this->getData();
+        if (is_object($data)) {
+            $this->fieldData = $data;
         } else {
-            $this->fieldData = json_decode($this->getData());
+            $this->fieldData = json_decode($data);
         }
         $this->formatEhrProtocolDateFields();
         $this->finalizedUserEmail = $finalizedUserEmail;
@@ -595,5 +596,52 @@ class Measurement
     public function setFieldData($fieldData) {
         $this->fieldData = $fieldData;
         $this->normalizeData('save');
+    }
+
+    public function getFieldData() {
+        return $this->fieldData;
+    }
+
+    public function isBloodDonorForm()
+    {
+        return strpos($this->getVersion(), self::BLOOD_DONOR) !== false;
+    }
+
+    public function isEhrProtocolForm()
+    {
+        return strpos($this->version, self::EHR_PROTOCOL_MODIFICATION) !== false;
+    }
+
+    public function getWarnings()
+    {
+        $warnings = [];
+        foreach ($this->schema->fields as $metric) {
+            if (!empty($metric->warnings) && is_array($metric->warnings)) {
+                $warnings[$metric->name] = $metric->warnings;
+            }
+        }
+        return $warnings;
+    }
+
+    public function getConversions()
+    {
+        $conversions = [];
+        foreach ($this->schema->fields as $metric) {
+            if (!empty($metric->convert)) {
+                $conversions[$metric->name] = $metric->convert;
+            }
+        }
+        return $conversions;
+    }
+
+    public function getLatestFormVersion()
+    {
+        if ($this->isBloodDonorForm()) {
+            return self::BLOOD_DONOR_CURRENT_VERSION;
+        }
+        if ($this->isEhrProtocolForm()) {
+            return self::EHR_CURRENT_VERSION;
+        }
+        return self::CURRENT_VERSION;
     }
 }

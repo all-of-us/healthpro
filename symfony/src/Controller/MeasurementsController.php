@@ -36,23 +36,26 @@ class MeasurementsController extends AbstractController
     protected $participantSummaryService;
     protected $loggerService;
     protected $siteService;
+    protected $params;
 
     public function __construct(
         EntityManagerInterface $em,
         MeasurementService $measurementService,
         ParticipantSummaryService $participantSummaryService,
         LoggerService $loggerService,
-        SiteService $siteService
+        SiteService $siteService,
+        ParameterBagInterface $params
     ) {
         $this->em = $em;
         $this->measurementService = $measurementService;
         $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;
         $this->siteService = $siteService;
+        $this->params = $params;
     }
 
     /**
-     * @Route("/participant/{participantId}/measurement/{measurementId}", name="measurement", defaults={"measurementId": null})
+     * @Route("/participant/{participantId}/measurements/{measurementId}", name="measurement", defaults={"measurementId": null})
      */
     public function measurementsAction($participantId, $measurementId, Request $request)
     {
@@ -75,16 +78,16 @@ class MeasurementsController extends AbstractController
             $measurement->canRestore = $measurement->canRestore();
             $measurement->reasonDisplayText = $measurement->getReasonDisplayText();
         } else {
-            $measurement = null;
-            if ($this->measurementService->isBloodDonorForm() && $request->query->get('wholeblood')) {
+            $measurement = new Measurement;
+            $this->measurementService->load($measurement, $type);
+            if ($measurement->isBloodDonorForm() && $request->query->get('wholeblood')) {
                 $measurement->setData((object)[
                     'weight-protocol-modification' => 'whole-blood-donor'
                 ]);
             }
         }
         $showAutoModification = false;
-
-        $measurementsForm = $this->createForm(MeasurementType::class, null, [
+        $measurementsForm = $this->createForm(MeasurementType::class, $measurement->getFieldData(), [
             'schema' => $measurement->getSchema(),
             'locked' => $measurement->getFinalizedTs() ? true : false
         ]);
@@ -97,7 +100,7 @@ class MeasurementsController extends AbstractController
             // Check if finalized_ts is set and rdr_id is empty
             if (!$this->measurementService->isEvaluationFailedToReachRDR()) {
                 if ($measurementsForm->isValid()) {
-                    if ($this->measurementService->isBloodDonorForm()) {
+                    if ($measurement->isBloodDonorForm()) {
                         $this->measurementService->addBloodDonorProtocolModificationForRemovedFields();
                         if ($request->request->has('finalize') && (!$measurement || empty($measurement->getRdrId()))) {
                             $this->measurementService->addBloodDonorProtocolModificationForBloodPressure();
@@ -236,19 +239,26 @@ class MeasurementsController extends AbstractController
                 $showAutoModification = $this->measurementService->canAutoModify();
             }
         }
-
-        return $app['twig']->render('evaluation.html.twig', [
+        return $this->render('measurement/index.html.twig', [
             'participant' => $participant,
             'measurement' => $measurement,
             'measurementForm' => $measurementsForm->createView(),
-            'schema' => $this->measurementService->getAssociativeSchema(),
-            'warnings' => $this->measurementService->getWarnings(),
-            'conversions' => $this->measurementService->getConversions(),
-            'latestVersion' => $this->measurementService->getLatestFormVersion(),
+            'schema' => $measurement->getAssociativeSchema(),
+            'warnings' => $measurement->getWarnings(),
+            'conversions' => $measurement->getConversions(),
+            'latestVersion' => $measurement->getLatestFormVersion(),
             'showAutoModification' => $showAutoModification,
-            'revertForm' => $this->measurementService->getEvaluationRevertForm()->createView(),
-            'displayEhrBannerMessage' => $this->measurementService->requireEhrModificationProtocol() || $this->measurementService->isEhrProtocolForm(),
-            'ehrProtocolBannerMessage' => $app->getConfig('ehr_protocol_banner_message')
+            'revertForm' => '',
+            'displayEhrBannerMessage' => $this->measurementService->requireEhrModificationProtocol() || $measurement->isEhrProtocolForm(),
+            'ehrProtocolBannerMessage' => $this->params->has('ehr_protocol_banner_message') ? $this->params->get('ehr_protocol_banner_message') : ''
         ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/measurements/{measurementId}/modify/{type}", name="measurementModify", defaults={"measurementId": null})
+     */
+    public function measurementsModifyAction($participantId, $measurementId, $type, Request $request)
+    {
+        return '';
     }
 }
