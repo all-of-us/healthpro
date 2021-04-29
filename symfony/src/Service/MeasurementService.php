@@ -49,7 +49,8 @@ class MeasurementService
         $this->measurement = $measurement;
         if (empty($measurement->getFinalizedUser())) {
             $finalizedUserId = $measurement->getFinalizedTs() ? $measurement->getUserId() : $this->userService->getUser()->getId();
-            $finalizedUserEmail = $this->em->getRepository(User::class)->findOneBy(['id' => $finalizedUserId]);
+            $finalizedUser = $this->em->getRepository(User::class)->findOneBy(['id' => $finalizedUserId]);
+            $finalizedUserEmail = $finalizedUser->getEmail();
             $finalizedSite = $measurement->getFinalizedTs() ? $measurement->getSite() : $this->session->get('site')->id;
         } else {
             $finalizedUserEmail = $measurement->getFinalizedUser()->getEmail();

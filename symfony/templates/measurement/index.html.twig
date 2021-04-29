@@ -57,15 +57,15 @@
         {% if measurement and measurement.parentId is not empty and measurement.rdrId is empty %}
             <div class="alert alert-warning">
                 <i class="fa fa-check-circle" aria-hidden="true"></i>
-                <strong>Unlocked for editing by {{ app.getUserEmailById(measurement.userId)|default('Unknown') }} at {{ app.getSiteDisplayName(measurement.site) }} on {{ measurement.createdTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
+                <strong>Unlocked for editing by {{ app.getUserEmailById(measurement.userId)|default('Unknown') }} at {{ siteInfo.siteDisplayName(measurement.site) }} on {{ measurement.createdTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
             </div>
         {% endif %}
         {% if measurement %}
             {% if measurement.rdrId %}
                 <div class="alert alert-success">
                     <i class="fa fa-check-circle" aria-hidden="true"></i>
-                    <strong>Finalized by {{ app.getUserEmailById(measurement.finalizedUserId)|default('Unknown') }} at {{ app.getSiteDisplayName(measurement.finalizedSite) }} on {{ measurement.finalizedTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
-                    <a class="btn btn-success btn-xs pull-right" href="{{ path('evaluationSummary', { participantId: participant.id, measurementId: measurement.id }) }}" target="_blank">Summary</a>
+                    <strong>Finalized by {{ measurement.finalizedUser.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(measurement.finalizedSite) }} on {{ measurement.finalizedTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
+                    <a class="btn btn-success btn-xs pull-right" href="{{ path('measurementsSummary', { participantId: participant.id, measurementId: measurement.id }) }}" target="_blank">Summary</a>
                 </div>
             {% elseif measurement.finalizedTs and measurement.rdrId is empty %}
                 <div class="alert alert-danger well-sm">
@@ -128,7 +128,7 @@
         {% if measurement and measurement.rdrId %}
             <p>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
-                {% if measurement.eh_type != 'cancel' %}
+                {% if measurement.history is empty or measurement.history.type != 'cancel' %}
                     <button type="submit" class="btn btn-warning" name="copy" onclick="return confirm('Are you sure you want to copy these physical measurements?');">Copy</button>
                 {% endif %}
             </p>

@@ -93,6 +93,10 @@ class MeasurementsController extends AbstractController
         ]);
         $measurementsForm->handleRequest($request);
         if ($measurementsForm->isSubmitted()) {
+            // Get current logged in user entity
+            $userRepository = $this->em->getRepository(User::class);
+            $currentUser = $userRepository->find($this->getUser()->getId());
+
             // Check if PMs are cancelled
             if ($measurement->isEvaluationCancelled()) {
                 throw $this->createAccessDeniedException();
@@ -117,10 +121,10 @@ class MeasurementsController extends AbstractController
                             $measurement->setFinalizedTs($now);
                             if (!$measurement) {
                                 $measurement->setParticipantId($participant->id);
-                                $measurement->setUserId($this->getUser()->getId());
+                                $measurement->setUser($currentUser);
                                 $measurement->setSite($this->siteService->getSiteId());
                             }
-                            $measurement->setFinalizedUserId($this->getUser()->getId());
+                            $measurement->setFinalizedUser($currentUser);
                             $measurement->setFinalizedSite($this->siteService->getSiteId());
                             // Send final evaluation to RDR and store resulting id
                             if ($measurement != null && $measurement->getParentId() != null) {
@@ -153,8 +157,7 @@ class MeasurementsController extends AbstractController
                         }
                     }
                     if (!$measurementId || $request->request->has('copy')) {
-                        $userRepository = $this->em->getRepository(User::class);
-                        $measurement->setUser($userRepository->find($this->getUser()->getId()));
+                        $measurement->setUser($currentUser);
                         $measurement->setSite($this->siteService->getSiteId());
                         $measurement->setParticipantId($participant->id);
                         $measurement->setCreatedTs($now);
@@ -177,13 +180,13 @@ class MeasurementsController extends AbstractController
                             if (!$measurementsForm->isValid()) {
                                 return $this->redirectToRoute('measurement', [
                                     'participantId' => $participant->id,
-                                    'evalId' => $measurementId,
+                                    'measurementId' => $measurementId,
                                     'showAutoModification' => 1
                                 ]);
                             } else {
                                 return $this->redirectToRoute('measurement', [
                                     'participantId' => $participant->id,
-                                    'evalId' => $measurementId
+                                    'measurementId' => $measurementId
                                 ]);
                             }
                         } else {
@@ -202,7 +205,7 @@ class MeasurementsController extends AbstractController
                         if ($measurementsForm->isValid()) {
                             return $this->redirectToRoute('measurement', [
                                 'participantId' => $participant->id,
-                                'evalId' => $measurementId
+                                'measurementId' => $measurementId
                             ]);
                         }
                     }
@@ -257,6 +260,14 @@ class MeasurementsController extends AbstractController
      * @Route("/participant/{participantId}/measurements/{measurementId}/modify/{type}", name="measurementModify", defaults={"measurementId": null})
      */
     public function measurementsModifyAction($participantId, $measurementId, $type, Request $request)
+    {
+        return '';
+    }
+
+    /**
+     * @Route("/participant/{participantId}/measurements/{measurementId}/summary", name="measurementsSummary", defaults={"measurementId": null})
+     */
+    public function measurementsSummaryAction($participantId, $measurementId, $type, Request $request)
     {
         return '';
     }
