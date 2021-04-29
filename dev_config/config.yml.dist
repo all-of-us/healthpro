@@ -46,8 +46,6 @@ gaBypassGroups:
     name: Monroeville
   - email: hpo-site-upmc@staging.pmi-ops.org
     name: UPMC
-  - email: admin-dashboard@staging.pmi-ops.org
-    name: Admin Dashboard
   - email: site-admin@staging.pmi-ops.org
     name: Site Management
 # Or, configure Google Apps auth

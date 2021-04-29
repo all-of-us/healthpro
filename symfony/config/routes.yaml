@@ -23,9 +23,6 @@ evaluation_modify:
 evaluationBloodDonorCheck:
     path: /participant/{participantId}/measurements/blood/donor/check
 
-dashboard_home:
-    path: /dashboard
-
 clientTimeout:
     path: /client-timeout
 
@@ -40,4 +37,3 @@ hideTZWarning:
 
 patientStatus:
     path: /participant/{participantId}/patient/status/{patientStatusId}
-

@@ -25,7 +25,6 @@ $app
     ->mount('/', new Controller\SymfonyMigrationController())
     ->mount('/_dev', new Controller\DevController())
     ->mount('/cron', new Controller\CronController())
-    ->mount('/dashboard', new Controller\DashboardController())
     ->mount('/_ah', new Controller\AppEngineController())
 ;
 

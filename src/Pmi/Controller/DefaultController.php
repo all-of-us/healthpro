@@ -16,7 +16,6 @@ class DefaultController extends AbstractController
 {
     protected static $routes = [
         ['home', '/'],
-        ['dashSplash', '/splash'],
         ['logout', '/logout'],
         ['login', '/login'],
         ['loginReturn', '/login-return'],
@@ -46,18 +45,11 @@ class DefaultController extends AbstractController
             return $app->redirectToRoute('problem_reports');
         } elseif ($app->hasRole('ROLE_ADMIN')) {
             return $app->redirectToRoute('admin_home');
-        } elseif ($app->hasRole('ROLE_DASHBOARD')) {
-            return $app->redirectToRoute('dashboard_home');
         } elseif ($app->hasRole('ROLE_BIOBANK') || $app->hasRole('ROLE_SCRIPPS')) {
             return $app->redirectToRoute('biobank_home');
         } else {
             return $app->abort(403);
         }
-    }
-
-    public function dashSplashAction(Application $app)
-    {
-        return $app['twig']->render('dash-splash.html.twig');
     }
 
     public function logoutAction(Application $app, Request $request)

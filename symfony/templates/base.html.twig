@@ -56,9 +56,6 @@
                 {% if is_granted('ROLE_ADMIN') %}
                     <li><a href="{{ path('admin_home') }}">Admin</a></li>
                 {% endif %}
-                {% if is_granted('ROLE_DASHBOARD') %}
-                    <li><a href="{{ path('dashboard_home') }}">Dashboard</a></li>
-                {% endif %}
                 {% if is_granted('ROLE_SCRIPPS') %}
                     <li><a href="{{ path('biobank_home') }}">Scripps</a></li>
                 {% elseif is_granted('ROLE_BIOBANK')  %}
