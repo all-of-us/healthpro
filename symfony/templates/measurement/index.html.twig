@@ -57,7 +57,7 @@
         {% if measurement and measurement.parentId is not empty and measurement.rdrId is empty %}
             <div class="alert alert-warning">
                 <i class="fa fa-check-circle" aria-hidden="true"></i>
-                <strong>Unlocked for editing by {{ app.getUserEmailById(measurement.userId)|default('Unknown') }} at {{ siteInfo.siteDisplayName(measurement.site) }} on {{ measurement.createdTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
+                <strong>Unlocked for editing by {{ measurement.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(measurement.site) }} on {{ measurement.createdTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
             </div>
         {% endif %}
         {% if measurement %}

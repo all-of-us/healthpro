@@ -109,4 +109,13 @@ class MeasurementService
         return !$participant->status && !empty($evalId) ? $participant->editExistingOnly : $participant->status;
 
     }
+
+    public function copyMeasurements($newMeasurement)
+    {
+        $newMeasurement->setParentId($this->measurement->getId());
+        $newMeasurement->setFinalizedUser(null);
+        $newMeasurement->setFinalizedSite(null);
+        $newMeasurement->setFinalizedTs(null);
+        $newMeasurement->setRdrId(null);
+    }
 }

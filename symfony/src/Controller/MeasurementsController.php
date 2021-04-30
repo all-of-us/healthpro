@@ -162,12 +162,16 @@ class MeasurementsController extends AbstractController
                         $measurement->setParticipantId($participant->id);
                         $measurement->setCreatedTs($now);
                         if ($request->request->has('copy')) {
-                            $measurement->setParentId($measurement->getId());
-                            $measurement->setCreatedTs($measurement->getCreatedTs());
+                            $newMeasurement = clone $measurement;
+                            $this->measurementService->copyMeasurements($newMeasurement);
+                            $this->em->persist($newMeasurement);
+                            $this->em->flush();
+                            $measurementId = $newMeasurement->getId();
+                        } else {
+                            $this->em->persist($measurement);
+                            $this->em->flush();
+                            $measurementId = $measurement->getId();
                         }
-                        $this->em->persist($measurement);
-                        $this->em->flush();
-                        $measurementId = $measurement->getId();
                         if ($measurementId) {
                             $this->loggerService->log(Log::EVALUATION_CREATE, $measurementId);
                             if (empty($rdrError)) {
