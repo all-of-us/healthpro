@@ -34,7 +34,7 @@ class ReleaseTicketCommand extends Command
     {
         $this
             ->setName('pmi:jira')
-            ->setDescription('Create JIRA release ticket');
+            ->setDescription('Create Jira release ticket');
     }
 
     private function selectVersion(): ?string

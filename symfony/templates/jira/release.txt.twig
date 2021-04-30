@@ -12,7 +12,7 @@ Production: {{ releaseDate|date('n/j/Y') }}
 Priority: Medium
 Configuration/Change Manager: {{ _self.mentionAccounts(changeManagers) }}
 
-h4. This release contains the following JIRA tickets
+h4. This release contains the following Jira tickets
 
 {% for issue in issues %}
 h5. [{{ issue.id }}] - {{ issue.title }}
