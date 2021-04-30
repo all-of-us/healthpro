@@ -15,6 +15,8 @@ class ReleaseTicketCommand extends Command
     private $io;
     private $templating;
 
+    private $targetReleaseDate;
+
     public function __construct(JiraService $jira, Templating $templating)
     {
         $this->jira = $jira;
@@ -37,13 +39,14 @@ class ReleaseTicketCommand extends Command
         if (empty($versions)) {
             $this->io->warning('Could not retrieve versions');
         }
-
         $defaultVersion = null;
+        // Set default version to first version if unreleased
         if (isset($versions[0]) && !$versions[0]->released) {
             $defaultVersion = $versions[0]->name;
         }
         $tableHeaders = ['Version', 'Released?', 'Release Date', 'Tickets (Done / Total)'];
         $tableRows = [];
+        $releaseDateMap = [];
         foreach ($versions as $version) {
             $totalIssues = $completedIssues = 0;
             foreach ($version->issuesStatusForFixVersion as $type => $count) {
@@ -58,10 +61,23 @@ class ReleaseTicketCommand extends Command
                 $version->releaseDate ?? '',
                 sprintf('%d / %d', $completedIssues, $totalIssues)
             ];
+            // If there are unreleased versions with release dates set, we want the last one
+            if (!$version->released && isset($version->releaseDate)) {
+                $defaultVersion = $version->name;
+            }
+
+            if (isset($version->releaseDate)) {
+                $releaseDateMap[$version->name] = $version->releaseDate;
+            }
         }
         $this->io->table($tableHeaders, $tableRows);
 
-        return $this->io->ask('Which version are you releasing?', $defaultVersion);
+        $version = $this->io->ask('Which version are you releasing?', $defaultVersion);
+        if ($version && isset($releaseDateMap[$version])) {
+            $this->targetReleaseDate = new \DateTime($releaseDateMap[$version]);
+        }
+
+        return $version;
     }
 
     private function getIssues(string $version): ?array
@@ -93,9 +109,15 @@ class ReleaseTicketCommand extends Command
 
     private function createTicket(string $version, array $issues): ?string
     {
+        if (!$this->targetReleaseDate) {
+            $this->io->text('No release date has been specified for this release.');
+            $this->io->text(sprintf('Specify the date that should be used for the production "Needed By Date/Event" section in the release ticket. Whatever you enter will be passed to the DateTime constructor. (Today is: %s)', date('D n/j/Y')));
+            $this->targetReleaseDate = new \DateTime($this->io->ask('Target release date:', '+2 days'));
+        }
+
         $description = $this->templating->render('jira/release.txt.twig', [
             'issues' => $issues,
-            'releaseDate' => new \DateTime('+2 days'), // TODO: from user input or version release date
+            'releaseDate' => $this->targetReleaseDate,
             'completeDate' => new \DateTime()
         ]);
 
