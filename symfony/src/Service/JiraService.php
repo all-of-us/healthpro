@@ -22,7 +22,7 @@ class JiraService
             return;
         }
         $this->client = new Client([
-            'base_uri' => self::INSTANCE_URL . '/rest/api/latest/',
+            'base_uri' => self::INSTANCE_URL . '/rest/api/3/',
             'auth' => [$params->get('jira_api_user'), $params->get('jira_api_token')]
         ]);
     }
