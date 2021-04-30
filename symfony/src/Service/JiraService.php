@@ -18,7 +18,7 @@ class JiraService
     public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
     {
         if (!$params->has('jira_api_user') || !$params->has('jira_api_token')) {
-            $logger->warning('Missing JIRA API configuration. See config.yml.dist for details.');
+            $logger->warning('Missing Jira API configuration. See config.yml.dist for details.');
             return;
         }
         $this->client = new Client([
