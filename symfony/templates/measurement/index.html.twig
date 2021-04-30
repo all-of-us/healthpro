@@ -32,7 +32,7 @@
             <dd>{{ participant.dob ? participant.dob|date('n/j/Y') }}</dd>
             <dt>Gender Identity</dt>
             <dd>{{ participant.genderIdentity }}</dd>
-            {% if measurement %}
+            {% if measurement.id %}
                 <dt>Updated</dt>
                 <dd>{{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</dd>
                 {% if measurement.version != latestVersion %}

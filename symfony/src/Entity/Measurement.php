@@ -786,6 +786,32 @@ class Measurement
         return $errors;
     }
 
+    public function getFormFieldErrorMessage($field = null, $replicate = null)
+    {
+        if (($this->isBloodDonorForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
+            ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields))) ||
+            (in_array($field, self::$protocolModificationNotesFields))
+        ) {
+            return 'Please complete';
+        }
+        return 'Please complete or add protocol modification.';
+    }
+
+    public function canAutoModify()
+    {
+        if ($this->isBloodDonorForm()) {
+            return false;
+        }
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $field) {
+                if ($this->fieldData->{$field} === 'ehr') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     protected function isMinVersion($minVersion)
     {
         return Util::versionIsAtLeast($this->version, $minVersion);

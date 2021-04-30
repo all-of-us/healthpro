@@ -87,7 +87,7 @@ class MeasurementsController extends AbstractController
             }
         }
         $showAutoModification = false;
-        $measurementsForm = $this->createForm(MeasurementType::class, $measurement->getFieldData(), [
+        $measurementsForm = $this->get('form.factory')->createNamed('form', MeasurementType::class, $measurement->getFieldData(), [
             'schema' => $measurement->getSchema(),
             'locked' => $measurement->getFinalizedTs() ? true : false
         ]);
@@ -146,14 +146,14 @@ class MeasurementsController extends AbstractController
                             foreach ($errors as $field) {
                                 if (is_array($field)) {
                                     list($field, $replicate) = $field;
-                                    $measurementsForm->get($field)->get($replicate)->addError(new FormError($this->measurementService->getFormFieldErrorMessage($field,
+                                    $measurementsForm->get($field)->get($replicate)->addError(new FormError($measurement->getFormFieldErrorMessage($field,
                                         $replicate)));
                                 } else {
-                                    $measurementsForm->get($field)->addError(new FormError($this->measurementService->getFormFieldErrorMessage($field)));
+                                    $measurementsForm->get($field)->addError(new FormError($measurement->getFormFieldErrorMessage($field)));
                                 }
                             }
                             $measurementsForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                            $showAutoModification = $this->measurementService->canAutoModify();
+                            $showAutoModification = $measurement->canAutoModify();
                         }
                     }
                     if (!$measurementId || $request->request->has('copy')) {
@@ -226,19 +226,19 @@ class MeasurementsController extends AbstractController
             }
         } elseif ($request->query->get('showAutoModification')) {
             // if new physical measurements were created and failed to finalize, generate errors post-redirect
-            $errors = $this->measurementService->getFinalizeErrors();
+            $errors = $measurement->getFinalizeErrors();
             if (count($errors) > 0) {
                 foreach ($errors as $field) {
                     if (is_array($field)) {
                         list($field, $replicate) = $field;
-                        $measurementsForm->get($field)->get($replicate)->addError(new FormError($this->measurementService->getFormFieldErrorMessage($field,
+                        $measurementsForm->get($field)->get($replicate)->addError(new FormError($measurement->getFormFieldErrorMessage($field,
                             $replicate)));
                     } else {
-                        $measurementsForm->get($field)->addError(new FormError($this->measurementService->getFormFieldErrorMessage($field)));
+                        $measurementsForm->get($field)->addError(new FormError($measurement->getFormFieldErrorMessage($field)));
                     }
                 }
                 $measurementsForm->addError(new FormError('Physical measurements are incomplete and cannot be finalized. Please complete the missing values below or specify a protocol modification if applicable.'));
-                $showAutoModification = $this->measurementService->canAutoModify();
+                $showAutoModification = $measurement->canAutoModify();
             }
         }
         return $this->render('measurement/index.html.twig', [
