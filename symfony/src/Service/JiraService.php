@@ -48,7 +48,7 @@ class JiraService
         $response = $this->client->request('GET', 'search', [
             'query' => [
                 'jql' => $jql,
-                'fields' => 'issuetype,status,summary'
+                'fields' => 'issuetype,status,summary,assignee'
             ]
         ]);
         $responseObject = json_decode($response->getBody()->getContents());

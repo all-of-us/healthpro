@@ -1,13 +1,16 @@
+{% macro mentionAccounts(ids) %}
+    {%- for id in ids %}[~accountid:{{ id }}]{% if not loop.last %}, {% endif %}{% endfor %}
+{% endmacro %}
 h2. Change Request Form
 
 h3. DESCRIPTION
 
 System: HealthPro
-Developers:
+Developers: {{ _self.mentionAccounts(developers) }}
 Needed By Date/Event:
 Production: {{ releaseDate|date('n/j/Y') }}
 Priority: Medium
-Configuration/Change Manager:
+Configuration/Change Manager: {{ _self.mentionAccounts(changeManagers) }}
 
 h4. This release contains the following JIRA tickets
 
@@ -25,7 +28,7 @@ Security Impact: None
 Related Changes: N/A
 
 h3. TESTING
-Tester:
+Tester: {{ _self.mentionAccounts(testers) }}
 Date Test Was Completed: {{ completeDate|date('n/j/Y') }}
 Implementation/Deployment Date: Ongoing, incremental testing for each individual story
 

@@ -42,14 +42,14 @@ ml_mock_order: pmitest
 gaBypass: 1
 # Google Groups to use when bypassing Google Apps auth
 gaBypassGroups:
-  - email: hpo-site-monroeville@staging.pmi-ops.org
-    name: Monroeville
-  - email: hpo-site-upmc@staging.pmi-ops.org
-    name: UPMC
-  - email: admin-dashboard@staging.pmi-ops.org
-    name: Admin Dashboard
-  - email: site-admin@staging.pmi-ops.org
-    name: Site Management
+    -   email: hpo-site-monroeville@staging.pmi-ops.org
+        name: Monroeville
+    -   email: hpo-site-upmc@staging.pmi-ops.org
+        name: UPMC
+    -   email: admin-dashboard@staging.pmi-ops.org
+        name: Admin Dashboard
+    -   email: site-admin@staging.pmi-ops.org
+        name: Site Management
 # Or, configure Google Apps auth
 #   Note: Store service account key in googleapps_key.json
 gaApplicationName: PMI DRC HPO
@@ -105,8 +105,20 @@ diversion_pouch_site: ECDC DV Diversion Pouch
 
 # JIRA API credentials for release ticket creation
 # See https://id.atlassian.com/manage-profile/security/api-tokens
-jira_api_user:
-jira_api_token:
+# jira_api_user:
+# jira_api_token:
+
+# Account ids to mention specific people in release ticket
+# jira_account_ids:
+#     dev:
+#         - 1001
+#         - 1002
+#         - 1003
+#     qa:
+#         - 1011
+#     change:
+#         - 1021
+#         - 1022
 
 #
 # Feature flags

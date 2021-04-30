@@ -7,6 +7,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment as Templating;
 
 class ReleaseTicketCommand extends Command
@@ -16,11 +17,16 @@ class ReleaseTicketCommand extends Command
     private $templating;
 
     private $targetReleaseDate;
+    private $defaultAccountIds = []; // defined by jira_account_ids config
+    private $developerAccountIds = []; // all assignees of tickets
 
-    public function __construct(JiraService $jira, Templating $templating)
+    public function __construct(JiraService $jira, Templating $templating, ParameterBagInterface $params)
     {
         $this->jira = $jira;
         $this->templating = $templating;
+        if ($params->has('jira_account_ids')) {
+            $this->defaultAccountIds = $params->get('jira_account_ids');
+        }
         parent::__construct();
     }
 
@@ -85,19 +91,30 @@ class ReleaseTicketCommand extends Command
         $this->io->section(sprintf('Tickets for release %s', $version));
 
         $jiraIssues = $this->jira->getIssuesByVersion($version);
-        $tableHeaders = ['ID', 'Title', 'Type', 'Status'];
+        $tableHeaders = ['ID', 'Title', 'Type', 'Status', 'Assignee'];
         $tableRows = [];
         $issues = [];
         foreach ($jiraIssues as $jiraIssue) {
             $issue = (object)[
                 'id' => $jiraIssue->key,
-                'title' => $jiraIssue->fields->summary,
-                'type' => $jiraIssue->fields->issuetype->name,
-                'status' => $jiraIssue->fields->status->name,
+                'title' => $jiraIssue->fields->summary ?? '',
+                'type' => $jiraIssue->fields->issuetype->name ?? '',
+                'status' => $jiraIssue->fields->status->name ?? '',
+                'assignee' => $jiraIssue->fields->assignee->displayName ?? ''
             ];
-            $tableRows[] = [$issue->id, $issue->title, $issue->type, $issue->status];
+            $tableRows[] = [
+                $issue->id,
+                strlen($issue->title) > 50 ? (substr($issue->title, 0, 47) . '...') : $issue->title,
+                $issue->type,
+                $issue->status,
+                $issue->assignee
+            ];
             $issues[] = $issue;
+            if (isset($jiraIssue->fields->assignee->accountId)) {
+                $this->developerAccountIds[] = $jiraIssue->fields->assignee->accountId;
+            }
         }
+        $this->developerAccountIds = array_unique($this->developerAccountIds);
         $this->io->table($tableHeaders, $tableRows);
 
         if ($this->io->confirm('Does this look right?')) {
@@ -115,10 +132,19 @@ class ReleaseTicketCommand extends Command
             $this->targetReleaseDate = new \DateTime($this->io->ask('Target release date:', '+2 days'));
         }
 
+        $developerIds = $this->developerAccountIds;
+        $changeManagerIds = $this->defaultAccountIds['change'] ?? [];
+        $testerIds = array_unique(array_merge(
+            $this->defaultAccountIds['qa'] ?? [],
+            $this->defaultAccountIds['dev'] ?? []
+        ));
         $description = $this->templating->render('jira/release.txt.twig', [
             'issues' => $issues,
             'releaseDate' => $this->targetReleaseDate,
-            'completeDate' => new \DateTime()
+            'completeDate' => new \DateTime(),
+            'developers' => $developerIds,
+            'changeManagers' => $changeManagerIds,
+            'testers' => $testerIds
         ]);
 
         $createResult = $this->jira->createReleaseTicket("HealthPro Release {$version}", $description);
