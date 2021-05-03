@@ -3,9 +3,11 @@
 namespace App\Service;
 
 use App\Entity\Measurement;
+use App\Entity\MeasurementHistory;
 use App\Entity\Site;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Pmi\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -18,6 +20,7 @@ class MeasurementService
     protected $siteService;
     protected $params;
     protected $measurement;
+    protected $loggerService;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -25,7 +28,8 @@ class MeasurementService
         UserService $userService,
         RdrApiService $rdrApiService,
         SiteService $siteService,
-        ParameterBagInterface $params
+        ParameterBagInterface $params,
+        LoggerService $loggerService
     ) {
         $this->em = $em;
         $this->session = $session;
@@ -33,10 +37,11 @@ class MeasurementService
         $this->rdrApiService = $rdrApiService;
         $this->siteService = $siteService;
         $this->params = $params;
+        $this->loggerService = $loggerService;
 
     }
 
-    public function load($measurement, $type)
+    public function load($measurement, $type = null)
     {
         $this->measurement = $measurement;
         $version = $this->getCurrentVersion($type);
@@ -118,4 +123,91 @@ class MeasurementService
         $newMeasurement->setFinalizedTs(null);
         $newMeasurement->setRdrId(null);
     }
+
+    public function cancelRestoreRdrMeasurement($type, $reason)
+    {
+        $measurementRdrObject = $this->getCancelRestoreRdrObject($type, $reason);
+        return $this->cancelRestoreMeasurement($type, $this->measurement->getParticipantId(), $this->measurement->getRdrId(), $measurementRdrObject);
+    }
+
+    public function getCancelRestoreRdrObject($type, $reason)
+    {
+        $obj = new \StdClass();
+        $statusType = $type === Measurement::EVALUATION_CANCEL ? 'cancelled' : 'restored';
+        $obj->status = $statusType;
+        $obj->reason = $reason;
+        $user = $this->userService->getUser()->getUsername();
+        $site = $this->siteService->getSiteIdWithPrefix();
+        $obj->{$statusType . 'Info'} = $this->getMeasurementUserSiteData($user, $site);
+        return $obj;
+    }
+
+    protected function getMeasurementUserSiteData($user, $site)
+    {
+        return [
+            'author' => [
+                'system' => 'https://www.pmi-ops.org/healthpro-username',
+                'value' => $user
+            ],
+            'site' => [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => $site
+            ]
+        ];
+    }
+
+    public function cancelRestoreMeasurement($type, $participantId, $measurementId, $measurementJson)
+    {
+        try {
+            $response = $this->rdrApiService->patch("rdr/v1/Participant/{$participantId}/PhysicalMeasurements/{$measurementId}", $measurementJson);
+            $result = json_decode($response->getBody()->getContents());
+
+            // Check RDR response
+            $rdrStatus = $type === Measurement::EVALUATION_CANCEL ? Measurement::EVALUATION_CANCEL_STATUS : Measurement::EVALUATION_RESTORE_STATUS;
+            if (is_object($result) && is_array($result->entry)) {
+                foreach ($result->entry as $entries) {
+                    if (strtolower($entries->resource->resourceType) === 'composition') {
+                        return $entries->resource->status === $rdrStatus ? true : false;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function createMeasurementHistory($type, $measurementId, $reason = '')
+    {
+        $status = false;
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $measurementHistory = new MeasurementHistory();
+            $measurementHistory->setReason($reason);
+            $measurementHistory->setMeasurement($this->measurement);
+            $userRepository = $this->em->getRepository(User::class);
+            $measurementHistory->setUser($userRepository->find($this->userService->getUser()->getId()));
+            $measurementHistory->setSite($this->siteService->getSiteId());
+            $measurementHistory->setType($type);
+            $measurementHistory->setCreatedTs(new \DateTime());
+            $this->em->persist($measurementHistory);
+            $this->em->flush();
+            $this->loggerService->log(Log::EVALUATION_HISTORY_CREATE,
+                ['id' => $measurementHistory->getId(), 'type' => $measurementHistory->getType()]);
+
+            // Update history id in measurement entity
+            $this->measurement->setHistory($measurementHistory);
+            $this->em->persist($this->measurement);
+            $this->em->flush();
+            $this->loggerService->log(Log::EVALUATION_EDIT, $this->measurement->getId());
+            $connection->commit();
+            $status = true;
+        } catch (\Exception $e) {
+            $connection->rollback();
+        }
+        return $status;
+    }
+
 }

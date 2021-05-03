@@ -45,10 +45,10 @@
             <dt>Paired Awardee</dt>
             <dd>{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
         </dl>
-        {% if measurement.id and measurement.history and measurment.history.type == 'cancel' %}
+        {% if measurement.id and measurement.history and measurement.history.type == 'cancel' %}
             <div class="alert alert-danger">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
-                <strong>Cancelled by {{ app.getUserEmailById(measurement.history.userId)|default('Unknown') }} at {{ siteInfo.siteDisplayName(measurement.eh_site) }} on {{ measurement.history.createdTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
+                <strong>Cancelled by {{ measurement.history.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(measurement.history.site) }} on {{ measurement.history.createdTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
                 {% if measurement.reasonDisplayText is not empty %}
                     <br/><strong>Reason:</strong> {{ measurement.reasonDisplayText }}
                 {% endif %}

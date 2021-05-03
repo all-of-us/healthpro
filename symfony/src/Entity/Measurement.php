@@ -28,6 +28,8 @@ class Measurement
     const BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL = 'Blood bank donor';
     const EHR_PROTOCOL_MODIFICATION = 'ehr';
     const EHR_PROTOCOL_MODIFICATION_LABEL = 'Observation obtained from EHR';
+    const EVALUATION_CANCEL_STATUS = 'entered-in-error';
+    const EVALUATION_RESTORE_STATUS = 'final';
 
     private $currentVersion;
 
@@ -323,7 +325,7 @@ class Measurement
         return $this->history;
     }
 
-    public function setHistoryId(?MeasurementHistory $history): self
+    public function setHistory(?MeasurementHistory $history): self
     {
         $this->history = $history;
 

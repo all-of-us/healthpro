@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Measurement;
 use App\Entity\Site;
 use App\Entity\User;
+use App\Form\MeasurementModifyType;
 use App\Form\MeasurementType;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
@@ -265,7 +266,73 @@ class MeasurementsController extends AbstractController
      */
     public function measurementsModifyAction($participantId, $measurementId, $type, Request $request)
     {
-        return '';
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if (!$this->measurementService->canEdit($measurementId, $participant) || $this->siteService->isTestSite()) {
+            throw $this->createAccessDeniedException();
+        }
+        $measurement = $this->em->getRepository(Measurement::class)->find($measurementId);
+        if (!$measurement) {
+            throw $this->createNotFoundException('Physical Measurement not found.');
+        }
+        $this->measurementService->load($measurement);
+        // Allow cancel for active and restored measurements
+        // Allow restore for only cancelled measurements
+        if (!in_array($type, [$measurement::EVALUATION_CANCEL, $measurement::EVALUATION_RESTORE])) {
+            throw $this->createNotFoundException();
+        }
+        if (($type === $measurement::EVALUATION_CANCEL && !$measurement->canCancel())
+            || ($type === $measurement::EVALUATION_RESTORE && !$measurement->canRestore())) {
+            throw $this->createAccessDeniedException();
+        }
+        $measurementModifyForm = $this->get('form.factory')->createNamed('form', MeasurementModifyType::class, null, [
+            'type' => $type
+        ]);
+        $measurementModifyForm->handleRequest($request);
+        if ($measurementModifyForm->isSubmitted()) {
+            $measurementModifyData = $measurementModifyForm->getData();
+            if ($measurementModifyData['reason'] === 'OTHER' && empty($measurementModifyData['other_text'])) {
+                $measurementModifyForm['other_text']->addError(new FormError('Please enter a reason'));
+            }
+            if ($type === $measurement::EVALUATION_CANCEL && strtolower($measurementModifyData['confirm']) !== $measurement::EVALUATION_CANCEL) {
+                $measurementModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
+            }
+            if ($measurementModifyForm->isValid()) {
+                if ($measurementModifyData['reason'] === 'OTHER') {
+                    $measurementModifyData['reason'] = $measurementModifyData['other_text'];
+                }
+                $status = true;
+                // Cancel/Restore evaluation in RDR if exists
+                if (!empty($measurement->getRdrId())) {
+                    $status = $this->measurementService->cancelRestoreRdrMeasurement($type, $measurementModifyData['reason']);
+                }
+                // Create evaluation history
+                if ($status && $this->measurementService->createMeasurementHistory($type, $measurementId, $measurementModifyData['reason'])) {
+                    $successText = $type === $measurement::EVALUATION_CANCEL ? 'cancelled' : 'restored';
+                    $this->addFlash('success', "Physical measurements {$successText}");
+                    return $this->redirectToRoute('participant', [
+                        'id' => $participantId
+                    ]);
+                } else {
+                    $this->addFlash('error', "Failed to {$type} physical measurements. Please try again.");
+                }
+            } else {
+                $this->addFlash('error', 'Please correct the errors below');
+            }
+        }
+        $measurements = $this->em->getRepository(Measurement::class)->findBy(['participantId' => $participantId]);
+        return $this->render('measurement/modify.html.twig', [
+            'participant' => $participant,
+            'measurement' => $measurement,
+            'measurements' => $measurements,
+            'summary' => $measurement->getSummary(),
+            'latestVersion' => $measurement::CURRENT_VERSION,
+            'measurementModifyForm' => $measurementModifyForm->createView(),
+            'type' => $type,
+            'measurementId' => $measurementId
+        ]);
     }
 
     /**
