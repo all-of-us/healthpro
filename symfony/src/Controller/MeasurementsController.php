@@ -370,8 +370,29 @@ class MeasurementsController extends AbstractController
     /**
      * @Route("/participant/{participantId}/measurements/{measurementId}/summary", name="measurementsSummary")
      */
-    public function measurementsSummaryAction($participantId, $measurementId, Request $request)
+    public function measurementsSummaryAction($participantId, $measurementId)
     {
-        return '';
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if (!$this->measurementService->canEdit($measurementId, $participant) || $this->siteService->isTestSite()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $measurement = $this->em->getRepository(Measurement::class)->find($measurementId);
+        if (!$measurement) {
+            throw $this->createNotFoundException();
+        }
+
+        if (!$measurement->getFinalizedTs()) {
+            throw $this->createAccessDeniedException();
+        }
+        $this->measurementService->load($measurement);
+        return $this->render('measurement/summary.html.twig', [
+            'participant' => $participant,
+            'measurement' => $measurement,
+            'summary' => $measurement->getSummary()
+        ]);
     }
 }
