@@ -100,4 +100,24 @@ class MeasurementRepository extends ServiceEntityRepository
             'type' => MissingNotificationLog::MEASUREMENT_TYPE
         ]);
     }
+
+    public function getMeasurement($measurementId, $participantId)
+    {
+        $parentIds = $this->createQueryBuilder('m')
+            ->select('m.parentId')
+            ->where('m.parentId is not null')
+            ->getQuery()
+            ->getResult()
+        ;
+        $queryBuilder = $this->createQueryBuilder('m');
+        $measurement = $queryBuilder
+            ->where($queryBuilder->expr()->notIn('m.id', ':parentIds'))
+            ->andWhere('m.id = :measurementId')
+            ->andWhere('m.participantId = :participantId')
+            ->setParameters(['parentIds' => $parentIds, 'measurementId' => $measurementId, 'participantId' => $participantId])
+            ->getQuery()
+            ->getResult()
+        ;
+        return !empty($measurement) ? $measurement[0] : null;
+    }
 }

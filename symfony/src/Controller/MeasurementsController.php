@@ -71,7 +71,7 @@ class MeasurementsController extends AbstractController
             throw $this->createAccessDeniedException();
         }
         if ($measurementId) {
-            $measurement = $this->em->getRepository(Measurement::class)->find($measurementId);
+            $measurement = $this->em->getRepository(Measurement::class)->getMeasurement($measurementId, $participantId);
             if (!$measurement) {
                 throw $this->createNotFoundException('Physical Measurement not found.');
             }
@@ -274,7 +274,7 @@ class MeasurementsController extends AbstractController
         if (!$this->measurementService->canEdit($measurementId, $participant) || $this->siteService->isTestSite()) {
             throw $this->createAccessDeniedException();
         }
-        $measurement = $this->em->getRepository(Measurement::class)->find($measurementId);
+        $measurement = $this->em->getRepository(Measurement::class)->getMeasurement($measurementId, $participantId);
         if (!$measurement) {
             throw $this->createNotFoundException('Physical Measurement not found.');
         }
@@ -348,7 +348,7 @@ class MeasurementsController extends AbstractController
         if (!$this->measurementService->canEdit($measurementId, $participant) || $this->siteService->isTestSite()) {
             throw $this->createAccessDeniedException();
         }
-        $measurement = $this->em->getRepository(Measurement::class)->find($measurementId);
+        $measurement = $this->em->getRepository(Measurement::class)->getMeasurement($measurementId, $participantId);
         if (!$measurement) {
             throw $this->createNotFoundException('Physical Measurement not found.');
         }
