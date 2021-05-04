@@ -6,6 +6,7 @@ use App\Entity\Measurement;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Form\MeasurementModifyType;
+use App\Form\MeasurementRevertType;
 use App\Form\MeasurementType;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
@@ -255,7 +256,7 @@ class MeasurementsController extends AbstractController
             'conversions' => $measurement->getConversions(),
             'latestVersion' => $measurement->getLatestFormVersion(),
             'showAutoModification' => $showAutoModification,
-            'revertForm' => '',
+            'revertForm' => $this->createForm(MeasurementRevertType::class, null)->createView(),
             'displayEhrBannerMessage' => $this->measurementService->requireEhrModificationProtocol() || $measurement->isEhrProtocolForm(),
             'ehrProtocolBannerMessage' => $this->params->has('ehr_protocol_banner_message') ? $this->params->get('ehr_protocol_banner_message') : ''
         ]);
@@ -336,9 +337,40 @@ class MeasurementsController extends AbstractController
     }
 
     /**
-     * @Route("/participant/{participantId}/measurements/{measurementId}/summary", name="measurementsSummary", defaults={"measurementId": null})
+     * @Route("/participant/{participantId}/measurements/{measurementId}/revert", name="measurementRevert")
      */
-    public function measurementsSummaryAction($participantId, $measurementId, $type, Request $request)
+    public function measurementRevertAction($participantId, $measurementId, Request $request)
+    {
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if (!$this->measurementService->canEdit($measurementId, $participant) || $this->siteService->isTestSite()) {
+            throw $this->createAccessDeniedException();
+        }
+        $measurement = $this->em->getRepository(Measurement::class)->find($measurementId);
+        if (!$measurement) {
+            throw $this->createNotFoundException('Physical Measurement not found.');
+        }
+        $measurementRevertForm = $this->createForm(MeasurementRevertType::class);
+        $measurementRevertForm->handleRequest($request);
+        if ($measurementRevertForm->isSubmitted() && $measurementRevertForm->isValid()) {
+            // Revert Measurement
+            if ($this->measurementService->revertMeasurement($measurement)) {
+                $this->addFlash('success', 'Physical measurements reverted');
+            } else {
+                $this->addFlash('error', 'Failed to revert physical measurements. Please try again.');
+            }
+        }
+        return $this->redirectToRoute('participant', [
+            'id' => $participantId
+        ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/measurements/{measurementId}/summary", name="measurementsSummary")
+     */
+    public function measurementsSummaryAction($participantId, $measurementId, Request $request)
     {
         return '';
     }

@@ -142,6 +142,11 @@
             </p>
         {% endif %}
         {{ form_end(measurementForm) }}
+        {% if measurement.id and measurement.parentId and measurement.finalizedTs is empty %}
+            {{ form_start(revertForm, { 'action': path('measurementRevert', { participantId: participant.id, measurementId: measurement.id }), 'method': 'POST', attr: { class: 'eval-revert-form disable-enter prevent-resubmit' }}) }}
+            {{ form_errors(revertForm) }}
+            {{ form_end(revertForm) }}
+        {% endif %}
     </div>
 {% endblock %}
 

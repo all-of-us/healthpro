@@ -90,7 +90,7 @@ class Measurement
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\User")
      */
     private $user;
 
@@ -125,7 +125,7 @@ class Measurement
     private $updatedTs;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\User")
      */
     private $finalizedUser;
 

@@ -108,11 +108,10 @@ class MeasurementService
         return false;
     }
 
-    public function canEdit($evalId, $participant)
+    public function canEdit($measurementId, $participant)
     {
         // Allow cohort 1 and 2 participants to edit existing PMs even if status is false
-        return !$participant->status && !empty($evalId) ? $participant->editExistingOnly : $participant->status;
-
+        return !$participant->status && !empty($measurementId) ? $participant->editExistingOnly : $participant->status;
     }
 
     public function copyMeasurements($newMeasurement)
@@ -208,6 +207,19 @@ class MeasurementService
             $connection->rollback();
         }
         return $status;
+    }
+
+    public function revertMeasurement($measurement)
+    {
+        try {
+            $measurementId = $measurement->getId();
+            $this->em->remove($measurement);
+            $this->em->flush();
+            $this->loggerService->log(Log::EVALUATION_DELETE, $measurementId);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
 }
