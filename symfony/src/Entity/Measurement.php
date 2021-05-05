@@ -431,7 +431,7 @@ class Measurement
             'data' => $this->fieldData,
             'schema' => $this->getAssociativeSchema(),
             'patient' => $this->getParticipantId(),
-            'version' => $this->currentVersion,
+            'version' => $this->getFormVersion(),
             'datetime' => $datetime,
             'parent_rdr' => $parentRdr,
             'created_user' => $this->getUser()->getEmail(),
@@ -815,5 +815,10 @@ class Measurement
     protected function isMinVersion($minVersion)
     {
         return Util::versionIsAtLeast($this->version, $minVersion);
+    }
+
+    public function getFormVersion()
+    {
+        return empty($this->version) ? $this->currentVersion : $this->version;
     }
 }

@@ -222,4 +222,27 @@ class MeasurementService
         }
     }
 
+    public function sendToRdr()
+    {
+        // Check if parent_id exists
+        $parentRdrId = null;
+        if ($this->measurement->getParentId()) {
+            $parentMeasurement = $this->em->getRepository(Measurement::class)->findOneBy([
+                'id' => $this->measurement->getParentId()
+            ]);
+            if (!empty($parentMeasurement)) {
+                $parentRdrId = $parentMeasurement->getRdrId();
+            }
+        }
+        $fhir = $this->measurement->getFhir($this->measurement->getFinalizedTs(), $parentRdrId);
+        $rdrId = $this->createMeasurement($this->measurement->getParticipantId(), $fhir);
+        if (!empty($rdrId)) {
+            $this->measurement->setRdrId($rdrId);
+            $this->em->persist($this->measurement);
+            $this->em->flush();
+            return true;
+        }
+        return false;
+    }
+
 }

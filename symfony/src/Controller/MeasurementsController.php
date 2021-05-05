@@ -122,7 +122,7 @@ class MeasurementsController extends AbstractController
                         $errors = $measurement->getFinalizeErrors();
                         if (count($errors) === 0) {
                             $measurement->setFinalizedTs($now);
-                            if (!$measurement) {
+                            if (!$measurementId) {
                                 $measurement->setParticipantId($participant->id);
                                 $measurement->setUser($currentUser);
                                 $measurement->setSite($this->siteService->getSiteId());
