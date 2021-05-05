@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Measurement;
 use App\Entity\Site;
 use App\Entity\User;
+use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
 use App\Form\MeasurementRevertType;
 use App\Form\MeasurementType;
@@ -393,6 +394,42 @@ class MeasurementsController extends AbstractController
             'participant' => $participant,
             'measurement' => $measurement,
             'summary' => $measurement->getSummary()
+        ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/measurements/blood/donor/check", name="measurementBloodDonorCheck")
+     */
+    public function measurementBloodDonorCheckAction($participantId, Request $request)
+    {
+        if (!$this->measurementService->requireBloodDonorCheck()) {
+            throw $this->createAccessDeniedException();
+        }
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if (!$participant->status || $this->siteService->isTestSite() || ($participant->activityStatus === 'deactivated')) {
+            throw $this->createAccessDeniedException();
+        }
+        $bloodDonorCheckForm = $this->get('form.factory')->createNamed('form', MeasurementBloodDonorCheckType::class);
+        $bloodDonorCheckForm->handleRequest($request);
+        if ($bloodDonorCheckForm->isSubmitted() && $bloodDonorCheckForm->isValid()) {
+            if ($bloodDonorCheckForm['bloodDonor']->getData() === 'yes') {
+                return $this->redirectToRoute('measurement', [
+                    'participantId' => $participant->id,
+                    'type' => Measurement::BLOOD_DONOR,
+                    'wholeblood' => $bloodDonorCheckForm['bloodDonorType']->getData() === 'whole-blood' ? 1 : 0
+                ]);
+            } else {
+                return $this->redirectToRoute('measurement', [
+                    'participantId' => $participant->id
+                ]);
+            }
+        }
+        return $this->render('measurement/blood-donor-check.html.twig', [
+            'participant' => $participant,
+            'bloodDonorCheckForm' => $bloodDonorCheckForm->createView()
         ]);
     }
 }

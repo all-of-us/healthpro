@@ -168,7 +168,7 @@ class ParticipantDetailsController extends AbstractController
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
         // Generate url for blood donor check form
-        $evaluationUrl = $measurementService->requireBloodDonorCheck() ? 'evaluationBloodDonorCheck' : 'evaluation';
+        $evaluationUrl = $measurementService->requireBloodDonorCheck() ? 'measurementBloodDonorCheck' : 'measurement';
         return $this->render('/participant/details.html.twig', [
             'participant' => $participant,
             'orders' => $orders,

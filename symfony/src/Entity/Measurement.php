@@ -341,11 +341,6 @@ class Measurement
 
     public function loadFromAObject($finalizedUserEmail = null, $finalizedSite = null)
     {
-        if (!empty($this->getVersion())) {
-            $this->currentVersion = $this->getVersion();
-        } else {
-            $this->currentVersion = self::CURRENT_VERSION;
-        }
         $data = empty($this->getData()) ? new \StdClass() : $this->getData();
         if (is_object($data)) {
             $this->fieldData = $data;
@@ -386,7 +381,8 @@ class Measurement
 
     public function loadSchema()
     {
-        $file = __DIR__ . "/../../../src/Pmi/Evaluation/versions/{$this->currentVersion}.json";
+        $version = empty($this->version) ? $this->currentVersion : $this->version;
+        $file = __DIR__ . "/../../../src/Pmi/Evaluation/versions/{$version}.json";
         if (!file_exists($file)) {
             throw new MissingSchemaException();
         }
@@ -607,12 +603,14 @@ class Measurement
 
     public function isBloodDonorForm()
     {
-        return strpos($this->getVersion(), self::BLOOD_DONOR) !== false;
+        $version = empty($this->version) ? $this->currentVersion : $this->version;
+        return strpos($version, self::BLOOD_DONOR) !== false;
     }
 
     public function isEhrProtocolForm()
     {
-        return strpos($this->version, self::EHR_PROTOCOL_MODIFICATION) !== false;
+        $version = empty($this->version) ? $this->currentVersion : $this->version;
+        return strpos($version, self::EHR_PROTOCOL_MODIFICATION) !== false;
     }
 
     public function getWarnings()
@@ -686,7 +684,7 @@ class Measurement
     public function addBloodDonorProtocolModificationForWaistandHip()
     {
         foreach (['waist-circumference-protocol-modification', 'hip-circumference-protocol-modification'] as $field) {
-            $this->data->{$field} = array_fill(0, 2, self::BLOOD_DONOR_PROTOCOL_MODIFICATION);
+            $this->fieldData->{$field} = array_fill(0, 2, self::BLOOD_DONOR_PROTOCOL_MODIFICATION);
         }
     }
 
@@ -694,18 +692,18 @@ class Measurement
     {
         for ($reading = 1; $reading <= 2; $reading++) {
             foreach (self::$bloodPressureFields as $field) {
-                $this->data->{$field}[$reading] = null;
+                $this->fieldData->{$field}[$reading] = null;
             }
             foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
-                $this->data->{$field}[$reading] = false;
+                $this->fieldData->{$field}[$reading] = false;
             }
-            $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+            $this->fieldData->{'blood-pressure-protocol-modification'}[$reading] = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
         }
     }
 
     public function addBloodDonorProtocolModificationForHeight()
     {
-        $this->data->{"height-protocol-modification"} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+        $this->fieldData->{"height-protocol-modification"} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
     }
 
     public function getFinalizeErrors()
