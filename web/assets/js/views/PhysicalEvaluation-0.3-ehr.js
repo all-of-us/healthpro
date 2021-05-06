@@ -564,8 +564,11 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             block.find('.modification-select').show();
         }
         if (modification === 'refusal' || modification === 'pandemic' || modification === 'colostomy-bag') {
-            block.find('.modification-affected input:text, .modification-affected select, .modification-manual input:checkbox').each(function() {
-                $(this).attr('disabled', true);
+            block.find('.modification-affected input:text, .modification-affected select').each(function () {
+                $(this).valChange('').attr('disabled', true);
+            });
+            block.find('.modification-manual input:checkbox').each(function () {
+                $(this).prop('checked', false).attr('disabled', true);
             });
         } else {
             block.find('.modification-affected input:text, .modification-affected select, .modification-manual input:checkbox').each(function() {

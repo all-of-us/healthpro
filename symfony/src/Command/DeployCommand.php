@@ -1,9 +1,8 @@
 <?php
-namespace Pmi\Console\Command;
+namespace App\Command;
 
-use Pmi\Application\AbstractApplication;
+use App\Service\EnvironmentService;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -57,7 +56,7 @@ class DeployCommand extends Command {
 
     protected function configure()
     {
-        $appDir = realpath(__DIR__ . '/../../../..');
+        $appDir = realpath(__DIR__ . '/../../..');
         $this
             ->setName('pmi:deploy')
             ->setDescription('PMI Build and Deploy')
@@ -190,20 +189,21 @@ class DeployCommand extends Command {
             $output->writeln('');
             $output->writeln('Fine then, be that way 😾'); // emoji :pouting_cat:
         }
+        return 0;
     }
 
     /** Determines the environment we are deploying to. */
     public function determineEnv() {
         if ($this->local) {
-            return AbstractApplication::ENV_LOCAL;
+            return EnvironmentService::ENV_LOCAL;
         } elseif ($this->isDev()) {
-            return AbstractApplication::ENV_DEV;
+            return EnvironmentService::ENV_DEV;
         } elseif ($this->isStable()) {
-            return AbstractApplication::ENV_STABLE;
+            return EnvironmentService::ENV_STABLE;
         } elseif ($this->isStaging()) {
-            return AbstractApplication::ENV_STAGING;
+            return EnvironmentService::ENV_STAGING;
         } elseif ($this->isProd()) {
-            return AbstractApplication::ENV_PROD;
+            return EnvironmentService::ENV_PROD;
         } else {
             throw new \Exception('Unable to determine environment!');
         }
@@ -387,7 +387,7 @@ class DeployCommand extends Command {
     private function runSecurityCheck()
     {
         $this->out->writeln("Running Symfony Security Check...");
-        $process = new Process('symfony security:check --disable-exit-code --format=json --dir=' . escapeshellarg($this->appDir));
+        $process = Process::fromShellCommandline('symfony security:check --disable-exit-code --format=json --dir=' . escapeshellarg($this->appDir));
         $process->mustRun();
         $vulnerabilities = json_decode($process->getOutput(), true);
         if (!is_array($vulnerabilities)) {
@@ -438,7 +438,7 @@ class DeployCommand extends Command {
      */
     private function exec($cmd, $mustRun = true, $raw = false)
     {
-        $process = new Process($cmd);
+        $process = Process::fromShellCommandline($cmd);
         $process->setTimeout(null);
         $run = $mustRun ? 'mustRun' : 'run';
         $process->$run(function($type, $buffer) use ($raw) {

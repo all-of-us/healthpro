@@ -4,10 +4,7 @@ namespace Pmi\Controller;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Pmi\Service\WithdrawalService;
-use Pmi\Service\DeactivateService;
 use Pmi\Service\EvaluationsQueueService;
-use Pmi\Service\NotifyMissingMeasurementsAndOrdersService;
 use Pmi\Service\PatientStatusService;
 use Pmi\Service\SessionService;
 
@@ -17,10 +14,7 @@ class CronController extends AbstractController
 
     protected static $routes = [
         ['pingTest', '/ping-test'],
-        ['withdrawal', '/withdrawal'],
-        ['deactivate', '/deactivate'],
         ['resendEvaluationsToRdr', '/resend-evaluations-rdr'],
-        ['missingMeasurementsOrders', '/missing-measurements-orders'],
         ['sendPatientStatusToRdr', '/send-patient-status-rdr'],
         ['deleteCacheKeys', '/delete-cache-keys'],
         ['deleteSessionKeys', '/delete-session-keys'],
@@ -36,31 +30,6 @@ class CronController extends AbstractController
     {
         return new JsonResponse(['success' => false, 'error' => 'Access denied'], 403);
     }
-
-    public function withdrawalAction(Application $app, Request $request)
-    {
-        if (!$this->isAllowed($app, $request)) {
-            return $this->getAccessDeniedResponse();
-        }
-
-        $withdrawal = new WithdrawalService($app);
-        $withdrawal->sendEmails();
-
-        return new JsonResponse(['success' => true]);
-    }
-
-    public function deactivateAction(Application $app, Request $request)
-    {
-        if (!$this->isAllowed($app, $request)) {
-            return $this->getAccessDeniedResponse();
-        }
-
-        $withdrawal = new DeactivateService($app);
-        $withdrawal->sendEmails();
-
-        return new JsonResponse(['success' => true]);
-    }
-
 
     public function pingTestAction(Application $app, Request $request)
     {
@@ -79,18 +48,6 @@ class CronController extends AbstractController
 
         $withdrawal = new EvaluationsQueueService($app);
         $withdrawal->resendEvaluationsToRdr();
-        return new JsonResponse(['success' => true]);
-    }
-
-    public function missingMeasurementsOrdersAction(Application $app, Request $request)
-    {
-        if (!$this->isAllowed($app, $request)) {
-            return $this->getAccessDeniedResponse();
-        }
-
-        $notifyMissing = new NotifyMissingMeasurementsAndOrdersService($app);
-        $notifyMissing->sendEmails();
-
         return new JsonResponse(['success' => true]);
     }
 
