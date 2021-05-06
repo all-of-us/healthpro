@@ -23,7 +23,7 @@
         "jquery": "^3.5.0",
         "jsbarcode": "^3.11.0",
         "parsleyjs": "^2.9.0",
-        "underscore": "^1.11.0"
+        "underscore": "^1.12.1"
     },
     "devDependencies": {
         "@symfony/webpack-encore": "^1.1.2"
