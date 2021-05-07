@@ -114,7 +114,9 @@ class MeasurementsController extends AbstractController
                         }
                     }
                     $measurement->setFieldData($measurementsForm->getData());
-                    $measurement->setVersion($this->measurementService->getCurrentVersion($type));
+                    if (empty($measurement->getVersion())) {
+                        $measurement->setVersion($this->measurementService->getCurrentVersion($type));
+                    }
                     $measurement->setData(json_encode($measurement->getFieldData()));
                     $now = new \DateTime();
                     $measurement->setUpdatedTs($now);

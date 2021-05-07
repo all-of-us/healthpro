@@ -381,8 +381,7 @@ class Measurement
 
     public function loadSchema()
     {
-        $version = empty($this->version) ? $this->currentVersion : $this->version;
-        $file = __DIR__ . "/../../../src/Pmi/Evaluation/versions/{$version}.json";
+        $file = __DIR__ . "/../../../src/Pmi/Evaluation/versions/{$this->getFormVersion()}.json";
         if (!file_exists($file)) {
             throw new MissingSchemaException();
         }
@@ -608,14 +607,12 @@ class Measurement
 
     public function isBloodDonorForm()
     {
-        $version = empty($this->version) ? $this->currentVersion : $this->version;
-        return strpos($version, self::BLOOD_DONOR) !== false;
+        return strpos($this->getFormVersion(), self::BLOOD_DONOR) !== false;
     }
 
     public function isEhrProtocolForm()
     {
-        $version = empty($this->version) ? $this->currentVersion : $this->version;
-        return strpos($version, self::EHR_PROTOCOL_MODIFICATION) !== false;
+        return strpos($this->getFormVersion(), self::EHR_PROTOCOL_MODIFICATION) !== false;
     }
 
     public function getWarnings()
