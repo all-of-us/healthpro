@@ -357,8 +357,8 @@ class Measurement
     public function formatEhrProtocolDateFields()
     {
         foreach (self::$ehrProtocolDateFields as $ehrProtocolDateField) {
-            if (!empty($this->data->{$ehrProtocolDateField})) {
-                $this->data->{$ehrProtocolDateField}  = new \DateTime($this->data->{$ehrProtocolDateField});
+            if (!empty($this->fieldData->{$ehrProtocolDateField})) {
+                $this->fieldData->{$ehrProtocolDateField}  = new \DateTime($this->fieldData->{$ehrProtocolDateField});
             }
         }
     }
@@ -657,29 +657,29 @@ class Measurement
 
     public function addEhrProtocolModifications()
     {
-        if ($this->data->{'blood-pressure-source'} === 'ehr') {
-            $this->data->{'blood-pressure-protocol-modification'}[0] = self::EHR_PROTOCOL_MODIFICATION;
+        if ($this->fieldData->{'blood-pressure-source'} === 'ehr') {
+            $this->fieldData->{'blood-pressure-protocol-modification'}[0] = self::EHR_PROTOCOL_MODIFICATION;
             for ($reading = 1; $reading <= 2; $reading++) {
                 foreach (self::$bloodPressureFields as $field) {
-                    $this->data->{$field}[$reading] = null;
+                    $this->fieldData->{$field}[$reading] = null;
                 }
                 foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
-                    $this->data->{$field}[$reading] = false;
+                    $this->fieldData->{$field}[$reading] = false;
                 }
-                $this->data->{'blood-pressure-protocol-modification'}[$reading] = self::EHR_PROTOCOL_MODIFICATION;
+                $this->fieldData->{'blood-pressure-protocol-modification'}[$reading] = self::EHR_PROTOCOL_MODIFICATION;
             }
         }
-        if ($this->data->{'height-source'} === 'ehr') {
-            $this->data->{"height-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        if ($this->fieldData->{'height-source'} === 'ehr') {
+            $this->fieldData->{"height-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
         }
-        if ($this->data->{'weight-source'} === 'ehr') {
-            $this->data->{"weight-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        if ($this->fieldData->{'weight-source'} === 'ehr') {
+            $this->fieldData->{"weight-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
         }
-        if ($this->data->{'waist-circumference-source'} === 'ehr') {
-            $this->data->{'waist-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        if ($this->fieldData->{'waist-circumference-source'} === 'ehr') {
+            $this->fieldData->{'waist-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
         }
-        if ($this->data->{'hip-circumference-source'} === 'ehr') {
-            $this->data->{'hip-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        if ($this->fieldData->{'hip-circumference-source'} === 'ehr') {
+            $this->fieldData->{'hip-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
         }
     }
 
@@ -740,7 +740,7 @@ class Measurement
             }
         }
         foreach ($this->fieldData->{'blood-pressure-protocol-modification'} as $k => $value) {
-            if ($value === 'other' && empty($this->data->{'blood-pressure-protocol-modification-notes'}[$k])) {
+            if ($value === 'other' && empty($this->fieldData->{'blood-pressure-protocol-modification-notes'}[$k])) {
                 $errors[] = ['blood-pressure-protocol-modification-notes', $k];
             }
         }
