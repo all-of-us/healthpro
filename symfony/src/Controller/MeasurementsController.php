@@ -84,7 +84,7 @@ class MeasurementsController extends AbstractController
             $measurement = new Measurement;
             $this->measurementService->load($measurement, $type);
             if ($measurement->isBloodDonorForm() && $request->query->get('wholeblood')) {
-                $measurement->setData((object)[
+                $measurement->setFieldData((object)[
                     'weight-protocol-modification' => 'whole-blood-donor'
                 ]);
             }

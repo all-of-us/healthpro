@@ -410,13 +410,18 @@ class Measurement
         foreach ($this->schema->fields as $field) {
             if (isset($field->replicates)) {
                 $key = $field->name;
-                if (is_null($this->fieldData->$key)) {
+                if (!isset($this->fieldData->$key) || is_null($this->fieldData->$key)) {
                     $dataArray = array_fill(0, $field->replicates, null);
                     $this->fieldData->$key = $dataArray;
                 } elseif (!is_null($this->fieldData->$key) && !is_array($this->fieldData->$key)) {
                     $dataArray = array_fill(0, $field->replicates, null);
                     $dataArray[0] = $this->fieldData->$key;
                     $this->fieldData->$key = $dataArray;
+                }
+            } else {
+                $key = $field->name;
+                if (!isset($this->fieldData->$key)) {
+                    $this->fieldData->$key = null;
                 }
             }
         }
