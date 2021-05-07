@@ -79,6 +79,21 @@ class MeasurementService
         return false;
     }
 
+    public function getMeasurmeent($participantId, $measurementId)
+    {
+        try {
+            $response = $this->rdrApiService->get("rdr/v1/Participant/{$participantId}/PhysicalMeasurements/{$measurementId}");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->id)) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
     public function requireBloodDonorCheck()
     {
         return $this->params->has('feature.blooddonorpm') && $this->params->get('feature.blooddonorpm') && $this->session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite();

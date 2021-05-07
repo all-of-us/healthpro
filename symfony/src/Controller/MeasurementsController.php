@@ -484,4 +484,30 @@ class MeasurementsController extends AbstractController
         }
         return $response;
     }
+
+    /**
+     * @Route("/participant/{participantId}/measurements/{measurementId}/rdr", name="measurement_rdr")
+     * For debugging evaluation object pushed to RDR - only allowed for admins or in local dev
+     */
+    public function measurementRdrAction($participantId, $measurementId)
+    {
+        if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
+            throw $this->createAccessDeniedException();
+        }
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $measurement = $this->em->getRepository(Measurement::class)->find($measurementId);
+        if (!$measurement) {
+            throw $this->createNotFoundException();
+        }
+        if (!$measurement->getRdrId()) {
+            throw $this->createAccessDeniedException('rdr_id is not set');
+        }
+        $rdrMeasurement = $this->measurementService->getMeasurmeent($participantId, $measurement->getRdrId());
+        $response = new JsonResponse($rdrMeasurement);
+        $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
+        return $response;
+    }
 }
