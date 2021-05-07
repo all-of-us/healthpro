@@ -434,4 +434,54 @@ class MeasurementsController extends AbstractController
             'bloodDonorCheckForm' => $bloodDonorCheckForm->createView()
         ]);
     }
+
+    /**
+     * @Route("/participant/{participantId}/measurements/{measurementId}/fhir", name="measurement_fhir")
+     * For debugging generated FHIR bundle - only allowed for admins or in local dev
+     */
+    public function measurementFhirAction($participantId, $measurementId, Request $request, EnvironmentService $env)
+    {
+        $isTest = $request->query->has('test');
+        if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
+            throw $this->createAccessDeniedException();
+        }
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $measurement = $this->em->getRepository(Measurement::class)->find($measurementId);
+        if (!$measurement) {
+            throw $this->createNotFoundException();
+        }
+        if ($isTest) {
+            $measurement->setSite('test-site1');
+            $measurement->setFinalizedSite('test-site2');
+            $measurement->setParticipantId('P10000001');
+            $measurement->setFinalizedTs(new \DateTime('2017-01-01', new \DateTimeZone('UTC')));
+            $measurement->setFinalizedUser($measurement->getUser());
+        }
+        $this->measurementService->load($measurement);
+        if ($measurement->getFinalizedTs()) {
+            $date = $measurement->getFinalizedTs();
+        } else {
+            $date = new \DateTime();
+        }
+        $parentRdrId = null;
+        if ($measurement->getParentId()) {
+            $parentMeasurement = $this->em->getRepository(Measurement::class)->find($measurement->getParentId());
+            if ($parentMeasurement) {
+                $parentRdrId = $parentMeasurement->getRdrId();
+            }
+        }
+        $fhir = $measurement->getFhir($date, $parentRdrId);
+        if ($isTest) {
+            $fhir = \Tests\Pmi\Evaluation\EvaluationTest::getNormalizedFhir($fhir);
+            $response = new JsonResponse($fhir);
+            $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
+        } else {
+            $response = new JsonResponse($fhir);
+            $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
+        }
+        return $response;
+    }
 }
