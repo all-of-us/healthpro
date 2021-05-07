@@ -27,6 +27,7 @@ class MeasurementTest extends TestCase
         $measurement->setFinalizedSite($params['finalizedSite'] ?? $params['site']);
         $measurement->setFinalizedTs($params['finalizedTs'] ?? $params['ts']);
         $measurement->setData($params['data']);
+        $measurement->setVersion($params['version']);
         return $measurement;
     }
 
@@ -72,7 +73,8 @@ class MeasurementTest extends TestCase
             'ts' => new \DateTime('2017-01-01', new \DateTimeZone('UTC')),
             'participantId' => 'P10000001',
             'finalizedSite' => 'test-site2',
-            'data' => $jsonData
+            'data' => $jsonData,
+            'version' => '0.3.3'
         ];
         $measurement = $this->createMeasurement($measurementArray);
         $measurement->loadFromAObject($this->getUser()->getEmail(), $measurementArray['finalizedSite']);
