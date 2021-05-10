@@ -4,6 +4,7 @@ namespace App\Test\Service;
 
 use App\Entity\Measurement;
 use App\Entity\User;
+use App\Exception\MissingSchemaException;
 use PHPUnit\Framework\TestCase;
 
 class MeasurementTest extends TestCase
@@ -62,6 +63,26 @@ class MeasurementTest extends TestCase
         ];
     }
 
+    public function bloodDonorMeasurementsProvider()
+    {
+        return [
+            [
+                'blood-donor-fhir.json',
+                '{"blood-pressure-location":"Right arm","blood-pressure-systolic":[100,null,null],"blood-pressure-diastolic":[80,null,null],"heart-rate":[85,null,null],"irregular-heart-rate":[false,false,false],"blood-pressure-protocol-modification":["","",""],"manual-blood-pressure":[false,false,false],"manual-heart-rate":[false,false,false],"blood-pressure-protocol-modification-notes":[null,null,null],"pregnant":false,"wheelchair":false,"height":null,"height-protocol-modification":"","height-protocol-modification-notes":null,"weight":65,"weight-prepregnancy":null,"weight-protocol-modification":"","weight-protocol-modification-notes":null,"hip-circumference":[null,null,null],"hip-circumference-protocol-modification":["","",""],"hip-circumference-protocol-modification-notes":[null,null,null],"waist-circumference":[null,null,null],"waist-circumference-protocol-modification":["","",""],"waist-circumference-protocol-modification-notes":[null,null,null],"notes":null}'
+            ]
+        ];
+    }
+
+    public function ehrSourceMeasurementsProvider()
+    {
+        return [
+            [
+                'ehr-measurement-source-fhir.json',
+                '{"blood-pressure-location":"Right arm","blood-pressure-source":"ehr","blood-pressure-source-ehr-date":"2017-01-01","blood-pressure-systolic":[100,null,null],"blood-pressure-diastolic":[80,null,null],"heart-rate":[85,null,null],"irregular-heart-rate":[false,false,false],"blood-pressure-protocol-modification":["","",""],"manual-blood-pressure":[false,false,false],"manual-heart-rate":[false,false,false],"blood-pressure-protocol-modification-notes":[null,null,null],"pregnant":false,"wheelchair":false,"height-source":"ehr","height-source-ehr-date":"2017-01-01","height":180,"height-protocol-modification":"","height-protocol-modification-notes":null,"weight-source":"ehr","weight-source-ehr-date":"2017-01-01","weight":65,"weight-prepregnancy":null,"weight-protocol-modification":"","weight-protocol-modification-notes":null,"hip-circumference-source":"ehr","hip-circumference-source-ehr-date":"2017-01-01","hip-circumference":[90,null,null],"hip-circumference-protocol-modification":["","",""],"hip-circumference-protocol-modification-notes":[null,null,null],"waist-circumference-source":"ehr","waist-circumference-source-ehr-date":"2017-01-01","waist-circumference":[85,null,null],"waist-circumference-location":"smallest-part-of-trunk","waist-circumference-protocol-modification":["","",""],"waist-circumference-protocol-modification-notes":[null,null,null],"notes":null}'
+            ]
+        ];
+    }
+
     public function testSchema()
     {
         $measurement = new Measurement;
@@ -69,6 +90,16 @@ class MeasurementTest extends TestCase
         $schema = $measurement->getSchema();
         $this->assertEquals(Measurement::CURRENT_VERSION, $schema->version);
         $this->assertTrue(is_array($schema->fields));
+    }
+
+    public function testMissingSchema()
+    {
+        $this->expectException(MissingSchemaException::class);
+        $measurement = new Measurement;
+        $measurement->setParticipantId('test');
+        $measurement->setVersion('0.0a');
+        $measurement->loadFromAObject();
+        $measurement->getSchema();
     }
 
     /**
@@ -91,6 +122,52 @@ class MeasurementTest extends TestCase
         $fhir = self::getNormalizedFhir($measurement->getFhir($measurementArray['ts']));
         $json = json_encode($fhir, JSON_PRETTY_PRINT);
 
+        // using string to string method so that diff is output (file to string just shows entire object)
+        $this->assertJsonStringEqualsJsonString(file_get_contents(__DIR__ . '/../' . $filename), $json);
+    }
+
+
+    /**
+     * @dataProvider bloodDonorMeasurementsProvider
+     */
+    public function testBloodDonorFhir($filename, $jsonData)
+    {
+        $measurementArray = [
+            'user' => $this->getUser(),
+            'site' => 'test-site1',
+            'ts' => new \DateTime('2017-01-01', new \DateTimeZone('UTC')),
+            'participantId' => 'P10000001',
+            'finalizedSite' => 'test-site2',
+            'data' => $jsonData,
+            'version' => '0.3.3-blood-donor'
+        ];
+        $measurement = $this->createMeasurement($measurementArray);
+        $measurement->loadFromAObject($this->getUser()->getEmail(), $measurementArray['finalizedSite']);
+        $measurement->addBloodDonorProtocolModificationForRemovedFields();
+        $fhir = self::getNormalizedFhir($measurement->getFhir($measurementArray['ts']));
+        $json = json_encode($fhir, JSON_PRETTY_PRINT);
+        // using string to string method so that diff is output (file to string just shows entire object)
+        $this->assertJsonStringEqualsJsonString(file_get_contents(__DIR__ . '/../' . $filename), $json);
+    }
+
+    /**
+     * @dataProvider ehrSourceMeasurementsProvider
+     */
+    public function testEHRMeasurementSourceFhir($filename, $jsonData)
+    {
+        $measurementArray = [
+            'user' => $this->getUser(),
+            'site' => 'test-site1',
+            'ts' => new \DateTime('2017-01-01', new \DateTimeZone('UTC')),
+            'participantId' => 'P10000001',
+            'finalizedSite' => 'test-site2',
+            'data' => $jsonData,
+            'version' => '0.3.3-ehr'
+        ];
+        $measurement = $this->createMeasurement($measurementArray);
+        $measurement->loadFromAObject($this->getUser()->getEmail(), $measurementArray['finalizedSite']);
+        $fhir = self::getNormalizedFhir($measurement->getFhir($measurementArray['ts']));
+        $json = json_encode($fhir, JSON_PRETTY_PRINT);
         // using string to string method so that diff is output (file to string just shows entire object)
         $this->assertJsonStringEqualsJsonString(file_get_contents(__DIR__ . '/../' . $filename), $json);
     }
