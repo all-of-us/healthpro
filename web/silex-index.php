@@ -21,7 +21,6 @@ if ($app->isLocal()) {
 $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
-    ->mount('/', new Controller\EvaluationController())
     ->mount('/', new Controller\SymfonyMigrationController())
     ->mount('/_dev', new Controller\DevController())
     ->mount('/cron', new Controller\CronController())
