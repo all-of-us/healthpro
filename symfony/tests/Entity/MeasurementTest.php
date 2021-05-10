@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\Service;
+namespace App\Test\Entity;
 
 use App\Entity\Measurement;
 use App\Entity\User;
