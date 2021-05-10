@@ -1,0 +1,523 @@
+{
+    "version": "0.3.3-blood-donor",
+    "template": "0.3-blood-donor",
+    "fields": [
+        {
+            "name": "blood-pressure-location",
+            "label": "Location",
+            "options": ["Right arm", "Left arm"],
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "blood-pressure-systolic",
+            "label": "Systolic",
+            "unit": "mmHg",
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "max": 200,
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
+                },
+                {
+                    "max": 180,
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
+                },
+                {
+                    "min": 100,
+                    "message": "This value may indicate a hypotensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, refer to your site's SOP for an urgent referral."
+                }
+            ],
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "blood-pressure-diastolic",
+            "label": "Diastolic",
+            "unit": "mmHg",
+            "replicates": 3,
+            "max": 300,
+            "compare": {
+                "type": "less-than",
+                "field": "blood-pressure-systolic",
+                "message": "Diastolic pressure must be less than systolic pressure"
+            },
+            "warnings": [
+                {
+                    "max": 120,
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
+                },
+                {
+                    "max": 110,
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. Refer to your site's SOP for an urgent referral if necessary."
+                },
+                {
+                    "min": 60,
+                    "message": "This value may indicate a hypotensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, refer to your site's SOP for an urgent referral."
+                }
+            ],
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "heart-rate",
+            "label": "Heart Rate",
+            "unit": "bpm",
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "max": 100,
+                    "message": "This value may indicate a hypertensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, refer to your site's SOP for an urgent referral."
+                },
+                {
+                    "min": 60,
+                    "message": "This value may indicate a hypotensive crisis. Please confirm this measurement is correct. If the participant is experiencing any symptoms of hemodynamic instability, or if the participant's systolic blood pressure is < 90 mmHg, refer to your site's SOP for an urgent referral."
+                }
+            ],
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "irregular-heart-rate",
+            "label": "Irregular Heart Rate",
+            "type": "checkbox",
+            "replicates": 3,
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "blood-pressure-protocol-modification",
+            "label": "Modification to Protocol",
+            "replicates": 3,
+            "options": {
+                "None": "",
+                "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
+                "Other": "other"
+            },
+            "warnings": [
+                {
+                    "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "other",
+                    "message": "Please specify reason for protocol deviation."
+                }
+            ]
+        },
+        {
+            "name": "manual-blood-pressure",
+            "label": "Blood pressure measured manually",
+            "type": "checkbox",
+            "replicates": 3
+        },
+        {
+            "name": "manual-heart-rate",
+            "label": "Heart rate measured manually",
+            "type": "checkbox",
+            "replicates": 3
+        },
+        {
+            "name": "blood-pressure-protocol-modification-notes",
+            "label": "Reason",
+            "replicates": 3,
+            "type": "text"
+        },
+        {
+            "name": "pregnant",
+            "label": "Is participant pregnant?",
+            "options": {
+                "No": false,
+                "Yes": true
+            },
+            "help": {
+                "caption": "Help text placeholder."
+            },
+            "warnings": [
+                {
+                    "val": true,
+                    "message": "Pregnant women should be measured for weight."
+                }
+            ]
+        },
+        {
+            "name": "wheelchair",
+            "label": "Is participant a wheelchair user?",
+            "options": {
+                "No": false,
+                "Yes": true
+            },
+            "help": {
+                "caption": "Help text placeholder."
+            },
+            "warnings": [
+                {
+                    "val": true,
+                    "message": "Please record estimated participant weight in the \"Weight\" field."
+                }
+            ]
+        },
+        {
+            "name": "height",
+            "label": "Height",
+            "formField": false,
+            "unit": "cm",
+            "decimals": 1,
+            "max": 300,
+            "convert": "ftin",
+            "alternateunits": true,
+            "help": {
+                "image": "height.png"
+            },
+            "warnings": [
+                {
+                    "min": 2.3,
+                    "message": "Please verify that this height has been entered in centimeters, and not meters (1m = 100cm)"
+                },
+                {
+                    "between": [3, 7.5],
+                    "message": "Please verify that this height has been entered in centimeters, and not feet (1ft = 30.48cm)"
+                },
+                {
+                    "between": [36, 89.9],
+                    "message": "Please verify that this height has been entered in centimeters, and not inches (1in = 2.54cm)"
+                },
+                {
+                    "max": 228,
+                    "message": "Please verify that this height is correct."
+                }
+            ]
+        },
+        {
+            "name": "height-protocol-modification",
+            "label": "Modification to Height Protocol",
+            "formField": false,
+            "options": {
+                "None": "",
+                "Height is more than measuring device range": "height-out-of-range",
+                "Hairstyle/headgear": "hair-style",
+                "Wheelchair user": "wheelchair-user",
+                "Unable to stand in a straight position": "unable-to-stand-straight",
+                "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
+                "Other": "other"
+            },
+            "help": {
+                "caption": "Help text placeholder."
+            },
+            "warnings": [
+                {
+                    "val": "height-out-of-range",
+                    "message": "Deviation successfully captured. Please record the maximum value on the stadiometer in centimeters in the \"Height\" field."
+                },
+                {
+                    "val": "hair-style",
+                    "message": "Deviation successfully captured. Height measurement may be innacurate due to hairstyle/headgear."
+                },
+                {
+                    "val": "wheelchair-user",
+                    "message": "Deviation successfully captured. Please record estimated participant height in the \"Height\" field. "
+                },
+                {
+                    "val": "unable-to-stand-straight",
+                    "message": "Deviation successfully captured. Height measurement may be innacurate because the participant is unable to stand in a straight position."
+                },
+                {
+                    "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "other",
+                    "message": "Please specify reason for protocol deviation."
+                }
+            ]
+        },
+        {
+            "name": "height-protocol-modification-notes",
+            "label": "Reason",
+            "formField": false,
+            "type": "text"
+        },
+        {
+            "name": "weight",
+            "label": "Weight",
+            "unit": "kg",
+            "decimals": 1,
+            "max": 1000,
+            "warnings": [
+                {
+                    "min": 30,
+                    "message": "Please verify that this weight is correct"
+                },
+                {
+                    "max": 199.5,
+                    "message": "Please verify that this weight is correct. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol."
+                }
+            ],
+            "convert": "lb",
+            "alternateunits": true,
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "weight-prepregnancy",
+            "label": "Approx. Pre-pregnancy Weight",
+            "unit": "kg",
+            "decimals": 1,
+            "max": 1000,
+            "warnings": [
+                {
+                    "min": 30,
+                    "message": "Please verify that this weight is correct"
+                },
+                {
+                    "max": 199.5,
+                    "message": "Please verify that this weight is correct."
+                }
+            ],
+            "convert": "lb",
+            "alternateunits": true,
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "weight-protocol-modification",
+            "label": "Modification to Weight Protocol",
+            "options": {
+                "None": "",
+                "Weight is more than weight measuring range": "weight-out-of-range",
+                "Can't balance on scale": "cannot-balance-on-scale",
+                "Wheelchair user": "wheelchair-user",
+                "Pregnancy": "pregnancy",
+                "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
+                "Whole blood donor": "whole-blood-donor",
+                "Other": "other"
+            },
+            "help": {
+                "caption": "Help text placeholder."
+            },
+            "warnings": [
+                {
+                    "val": "weight-out-of-range",
+                    "message": "Deviation successfully captured. Please record the maximum value on the scale in the \"Weight\" field."
+                },
+                {
+                    "val": "cannot-balance-on-scale",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "wheelchair-user",
+                    "message": "Deviation successfully captured. Please record estimated participant weight in the \"Weight\" field. "
+                },
+                {
+                    "val": "pregnancy",
+                    "message": "Deviation successfully captured. Proceed with weight measurement."
+                },
+                {
+                    "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "other",
+                    "message": "Please specify reason for protocol deviation."
+                }
+            ]
+        },
+        {
+            "name": "weight-protocol-modification-notes",
+            "label": "Reason",
+            "type": "text"
+        },
+        {
+            "name": "hip-circumference",
+            "label": "Hip Circumference",
+            "formField": false,
+            "unit": "cm",
+            "alternateunits": true,
+            "decimals": 1,
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "min": 50,
+                    "max": 150,
+                    "message": "Please verify that this circumference is correct"
+                }
+            ],
+            "convert": "in",
+            "help": {
+                "image": "hip.png"
+            }
+        },
+        {
+            "name": "hip-circumference-protocol-modification",
+            "label": "Modification to Hip Circumference Protocol",
+            "formField": false,
+            "replicates": 2,
+            "options": {
+                "None": "",
+                "Hip circumference is more than measuring device range": "hip-circumference-out-of-range",
+                "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
+                "Other": "other"
+            },
+            "warnings": [
+                {
+                    "val": "hip-circumference-out-of-range",
+                    "message": "Deviation successfully captured. Please record the length of the tape measure in centimeters in the \"Hip Circumference\" field."
+                },
+                {
+                    "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "other",
+                    "message": "Please specify reason for protocol deviation."
+                }
+            ]
+        },
+        {
+            "name": "hip-circumference-protocol-modification-notes",
+            "label": "Reason",
+            "formField": false,
+            "replicates": 3,
+            "type": "text"
+        },
+        {
+            "name": "waist-circumference",
+            "label": "Waist Circumference",
+            "formField": false,
+            "unit": "cm",
+            "alternateunits": true,
+            "decimals": 1,
+            "replicates": 2,
+            "max": 300,
+            "warnings": [
+                {
+                    "min": 50,
+                    "max": 150,
+                    "message": "Please verify that this circumference is correct"
+                }
+            ],
+            "convert": "in",
+            "help": {
+                "image": "waist.png"
+            }
+        },
+        {
+            "name": "waist-circumference-location",
+            "label": "Waist Circumference Location",
+            "formField": false,
+            "options": {
+                "Smallest part (Natural indent) of the trunk": "smallest-part-of-trunk",
+                "Umbilicus": "umbilicus"
+            },
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "waist-circumference-protocol-modification",
+            "label": "Modification to Waist Circumference Protocol",
+            "formField": false,
+            "replicates": 2,
+            "options": {
+                "None": "",
+                "Waist circumference is more than measuring device range": "waist-circumference-out-of-range",
+                "Colostomy bag": "colostomy-bag",
+                "Refusal": "refusal",
+                "Urgent/emergent event": "emergency",
+                "Pandemic": "pandemic",
+                "Other": "other"
+            },
+            "help": {
+                "caption": "Help text placeholder."
+            },
+            "warnings": [
+                {
+                    "val": "waist-circumference-out-of-range",
+                    "message": "Deviation successfully captured. Please record the length of the tape measure in centimeters in the \"Waist Circumference\" field."
+                },
+                {
+                    "val": "colostomy-bag",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "refusal",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "emergency",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "pandemic",
+                    "message": "Deviation successfully captured."
+                },
+                {
+                    "val": "other",
+                    "message": "Please specify reason for protocol deviation."
+                }
+            ]
+        },
+        {
+            "name": "waist-circumference-protocol-modification-notes",
+            "label": "Reason",
+            "formField": false,
+            "replicates": 2,
+            "type": "text"
+        },
+        {
+            "name": "notes",
+            "label": "Additional Notes",
+            "type": "textarea"
+        }
+    ]
+}

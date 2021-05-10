@@ -62,6 +62,15 @@ class MeasurementTest extends TestCase
         ];
     }
 
+    public function testSchema()
+    {
+        $measurement = new Measurement;
+        $measurement->loadFromAObject();
+        $schema = $measurement->getSchema();
+        $this->assertEquals(Measurement::CURRENT_VERSION, $schema->version);
+        $this->assertTrue(is_array($schema->fields));
+    }
+
     /**
      * @dataProvider measurementsProvider
      */

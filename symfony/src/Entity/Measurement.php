@@ -3,10 +3,10 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Pmi\Evaluation\Fhir;
-use Pmi\Evaluation\InvalidSchemaException;
-use Pmi\Evaluation\MissingSchemaException;
-use Pmi\Util;
+use App\Model\Measurement\Fhir;
+use App\Exception\InvalidSchemaException;
+use App\Exception\MissingSchemaException;
+use App\Helper\Util;
 
 /**
  * @ORM\Table(name="evaluations")
@@ -341,6 +341,9 @@ class Measurement
 
     public function loadFromAObject($finalizedUserEmail = null, $finalizedSite = null)
     {
+        if (empty($this->currentVersion) && empty($this->version)) {
+            $this->currentVersion = self::CURRENT_VERSION;
+        }
         $data = empty($this->getData()) ? new \StdClass() : $this->getData();
         if (is_object($data)) {
             $this->fieldData = $data;
@@ -381,7 +384,7 @@ class Measurement
 
     public function loadSchema()
     {
-        $file = __DIR__ . "/../../../src/Pmi/Evaluation/versions/{$this->getFormVersion()}.json";
+        $file = __DIR__ . "/../Model/Measurement/versions/{$this->getFormVersion()}.json";
         if (!file_exists($file)) {
             throw new MissingSchemaException();
         }
