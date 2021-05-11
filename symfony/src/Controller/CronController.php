@@ -22,6 +22,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class CronController extends AbstractController
 {
     /**
+     * @Route("/ping-test", name="cron_ping_test")
+     */
+    public function pingTestAction()
+    {
+        return $this->json(['success' => true]);
+    }
+
+    /**
      * @Route("/deceased/{deceasedStatus}", name="cron_deceased")
      */
     public function index(DeceasedNotificationService $deceasedNotificationService, $deceasedStatus): Response
