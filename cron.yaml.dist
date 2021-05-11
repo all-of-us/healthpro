@@ -1,6 +1,6 @@
 cron:
 - description: "Used to verify cron functionality in test sites"
-  url: /cron/ping-test
+  url: /s/cron/ping-test
   schedule: 29 of feb 00:00
   timezone: America/Chicago
 - description: "Withdrawal notification"
@@ -16,7 +16,7 @@ cron:
   schedule: every day 08:00
   timezone: America/Chicago
 - description: "Delete datastore cache keys"
-  url: /cron/delete-cache-keys
+  url: /s/cron/delete-cache-keys
   schedule: every 1 hours
   timezone: America/Chicago
 - description: "Sync sites meta data"
@@ -28,7 +28,7 @@ cron:
   schedule: every day 20:01
   timezone: America/Chicago
 - description: "Delete datastore session keys"
-  url: /cron/delete-session-keys
+  url: /s/cron/delete-session-keys
   schedule: every 1 hours
   timezone: America/Chicago
 - description: "Send patient status to RDR"
@@ -36,7 +36,7 @@ cron:
   schedule: every 5 mins
   timezone: America/Chicago
 - description: "Delete patient status imports unconfirmed data"
-  url: /cron/delete-unconfirmed-patient-status-import-data
+  url: /s/cron/delete-unconfirmed-patient-status-import-data
   schedule: every day 02:00
   timezone: America/Chicago
 - description: "Deceased status pending"
