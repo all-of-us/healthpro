@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\PatientStatus;
 use App\Entity\PatientStatusHistory;
 use App\Entity\PatientStatusImport;
+use App\Entity\PatientStatusImportRow;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -193,5 +194,12 @@ class PatientStatusService
             $connection->rollback();
         }
         return $status;
+    }
+
+    public function deleteUnconfirmedImportData()
+    {
+        $date = (new \DateTime('UTC'))->modify('-1 hours');
+        $date = $date->format('Y-m-d H:i:s');
+        $this->em->getRepository(PatientStatusImportRow::class)->deleteUnconfirmedImportData($date);
     }
 }

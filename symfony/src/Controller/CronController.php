@@ -6,6 +6,7 @@ use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
 use App\Service\MissingMeasurementsAndOrdersNotificationService;
+use App\Service\PatientStatusService;
 use App\Service\SessionService;
 use App\Service\SiteSyncService;
 use App\Service\WithdrawalNotificationService;
@@ -107,6 +108,15 @@ class CronController extends AbstractController
     public function deleteSessionKeysAction(SessionService $sessionService)
     {
         $sessionService->deleteKeys();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/delete-unconfirmed-patient-status-import-data", name="cron_delete_unconfirmed_patient_status_import_data")
+     */
+    public function deleteUnconfimedPatientStatusImportDataAction(PatientStatusService $patientStatusService)
+    {
+        $patientStatusService->deleteUnconfirmedImportData();
         return $this->json(['success' => true]);
     }
 }
