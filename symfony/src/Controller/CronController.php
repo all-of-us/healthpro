@@ -127,4 +127,13 @@ class CronController extends AbstractController
         $patientStatusService->deleteUnconfirmedImportData();
         return $this->json(['success' => true]);
     }
+
+    /**
+     * @Route("/send-patient-status-rdr", name="cron_send_patient_status_rdr")
+     */
+    public function sendPatientStatusToRdrAction(PatientStatusService $patientStatusService)
+    {
+        $patientStatusService->sendPatientStatusToRdr();
+        return $this->json(['success' => true]);
+    }
 }
