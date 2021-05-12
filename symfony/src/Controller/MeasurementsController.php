@@ -489,7 +489,7 @@ class MeasurementsController extends AbstractController
      * @Route("/participant/{participantId}/measurements/{measurementId}/rdr", name="measurement_rdr")
      * For debugging evaluation object pushed to RDR - only allowed for admins or in local dev
      */
-    public function measurementRdrAction($participantId, $measurementId)
+    public function measurementRdrAction($participantId, $measurementId, EnvironmentService $env)
     {
         if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
             throw $this->createAccessDeniedException();
