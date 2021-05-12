@@ -58,7 +58,7 @@ class MeasurementsController extends AbstractController
     }
 
     /**
-     * @Route("/participant/{participantId}/measurement/{measurementId}", name="measurement", defaults={"measurementId": null})
+     * @Route("/participant/{participantId}/measurements/{measurementId}", name="measurement", defaults={"measurementId": null})
      */
     public function measurementsAction($participantId, $measurementId, Request $request)
     {
@@ -266,7 +266,7 @@ class MeasurementsController extends AbstractController
     }
 
     /**
-     * @Route("/participant/{participantId}/measurements/{measurementId}/modify/{type}", name="measurementModify", defaults={"measurementId": null})
+     * @Route("/participant/{participantId}/measurements/{measurementId}/modify/{type}", name="measurement_modify", defaults={"measurementId": null})
      */
     public function measurementsModifyAction($participantId, $measurementId, $type, Request $request)
     {
@@ -340,7 +340,7 @@ class MeasurementsController extends AbstractController
     }
 
     /**
-     * @Route("/participant/{participantId}/measurements/{measurementId}/revert", name="measurementRevert")
+     * @Route("/participant/{participantId}/measurements/{measurementId}/revert", name="measurement_revert")
      */
     public function measurementRevertAction($participantId, $measurementId, Request $request)
     {
@@ -371,7 +371,7 @@ class MeasurementsController extends AbstractController
     }
 
     /**
-     * @Route("/participant/{participantId}/measurements/{measurementId}/summary", name="measurementsSummary")
+     * @Route("/participant/{participantId}/measurements/{measurementId}/summary", name="measurement_summary")
      */
     public function measurementsSummaryAction($participantId, $measurementId)
     {
@@ -400,7 +400,7 @@ class MeasurementsController extends AbstractController
     }
 
     /**
-     * @Route("/participant/{participantId}/measurements/blood/donor/check", name="measurementBloodDonorCheck")
+     * @Route("/participant/{participantId}/measurements/blood/donor/check", name="measurement_blood_donor_check")
      */
     public function measurementBloodDonorCheckAction($participantId, Request $request)
     {

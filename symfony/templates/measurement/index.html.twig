@@ -16,9 +16,9 @@
                 <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
                 {% if measurement.id %}
                     {% if measurement.canCancel %}
-                        <a href="{{ path('measurementModify', { participantId: participant.id, measurementId: measurement.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel</a>
+                        <a href="{{ path('measurement_modify', { participantId: participant.id, measurementId: measurement.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel</a>
                     {% elseif measurement.canRestore %}
-                        <a href="{{ path('measurementModify', { participantId: participant.id, measurementId: measurement.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore</a>
+                        <a href="{{ path('measurement_modify', { participantId: participant.id, measurementId: measurement.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore</a>
                     {% endif %}
                 {% endif %}
             </h2>
@@ -65,7 +65,7 @@
                 <div class="alert alert-success">
                     <i class="fa fa-check-circle" aria-hidden="true"></i>
                     <strong>Finalized by {{ measurement.finalizedUser.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(measurement.finalizedSite) }} on {{ measurement.finalizedTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
-                    <a class="btn btn-success btn-xs pull-right" href="{{ path('measurementsSummary', { participantId: participant.id, measurementId: measurement.id }) }}" target="_blank">Summary</a>
+                    <a class="btn btn-success btn-xs pull-right" href="{{ path('measurement_summary', { participantId: participant.id, measurementId: measurement.id }) }}" target="_blank">Summary</a>
                 </div>
             {% elseif measurement.finalizedTs and measurement.rdrId is empty %}
                 <div class="alert alert-danger well-sm">
@@ -143,7 +143,7 @@
         {% endif %}
         {{ form_end(measurementForm) }}
         {% if measurement.id and measurement.parentId and measurement.finalizedTs is empty %}
-            {{ form_start(revertForm, { 'action': path('measurementRevert', { participantId: participant.id, measurementId: measurement.id }), 'method': 'POST', attr: { class: 'eval-revert-form disable-enter prevent-resubmit' }}) }}
+            {{ form_start(revertForm, { 'action': path('measurement_revert', { participantId: participant.id, measurementId: measurement.id }), 'method': 'POST', attr: { class: 'eval-revert-form disable-enter prevent-resubmit' }}) }}
             {{ form_errors(revertForm) }}
             {{ form_end(revertForm) }}
         {% endif %}

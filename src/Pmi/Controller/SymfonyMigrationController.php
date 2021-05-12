@@ -132,12 +132,12 @@ class SymfonyMigrationController extends AbstractController
     {
         if (!$evalId) {
             return $app->redirect(sprintf(
-                '/s/participant/%s/measurement',
+                '/s/participant/%s/measurements',
                 $participantId
             ));
         }
         return $app->redirect(sprintf(
-            '/s/participant/%s/measurement/%d',
+            '/s/participant/%s/measurements/%d',
             $participantId,
             $evalId
         ));
