@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block title %}Physical Measurements - {% endblock %}
 {% block body %}
-    <div id="physicalEvaluation">
+    <div id="physicalmeasurement">
         <div class="page-header">
             <h2 class="{% if type == 'cancel' %} text-danger {% elseif type == 'restore' %} text-success {% else %} text-primary {% endif %}">
                 <i class="fa fa-clipboard" aria-hidden="true"></i>
@@ -18,36 +18,38 @@
             <dd>{{ participant.dob ? participant.dob|date('n/j/Y') }}</dd>
             <dt>Gender Identity</dt>
             <dd>{{ participant.genderIdentity }}</dd>
-            {% if evaluation %}
+            {% if measurement %}
                 <dt>Updated</dt>
-                <dd>{{ evaluation.updated_ts|date('n/j/Y g:ia', app.userTimezone) }}</dd>
-                {% if evaluation.version != latestVersion %}
+                <dd>{{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</dd>
+                {% if measurement.version != latestVersion %}
                     <dt>Version</dt>
-                    <dd>{{ evaluation.version }} <small class="text-muted">(latest version is {{ latestVersion }})</small></dd>
+                    <dd>{{ measurement.version }}
+                        <small class="text-muted">(latest version is {{ latestVersion }})</small>
+                    </dd>
                 {% endif %}
             {% endif %}
             <dt>Paired Awardee</dt>
-            <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
+            <dd>{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
         </dl>
     </div>
     <div class="row">
         <div class="col-sm-8">
-            {% include 'partials/participant-evaluation-summary.html.twig' %}
+            {% include 'partials/participant-measurement-summary.html.twig' %}
         </div>
         <div class="col-sm-4">
-            {% include 'partials/participant-evaluation-list.html.twig' %}
+            {% include 'partials/participant-measurement-list.html.twig' %}
         </div>
     </div>
     <div class="row">
         <div class="col-sm-12">
-            {{ form_start(evaluationModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
-            {{ form_errors(evaluationModifyForm) }}
-            {{ form_rest(evaluationModifyForm) }}
+            {{ form_start(measurementModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(measurementModifyForm) }}
+            {{ form_rest(measurementModifyForm) }}
             <p>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
                 <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">{{ type|capitalize }} Physical Measurements</button>
             </p>
-            {{ form_end(evaluationModifyForm) }}
+            {{ form_end(measurementModifyForm) }}
         </div>
     </div>
 {% endblock %}

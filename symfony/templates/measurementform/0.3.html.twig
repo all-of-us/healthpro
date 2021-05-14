@@ -1,4 +1,4 @@
-{% import 'evaluationform/metrics.html.twig' as metrics %}
+{% import 'measurementform/metrics.html.twig' as metrics %}
 
 <div class="panel panel-default">
     <div class="panel-heading">
@@ -14,43 +14,43 @@
             <div class="well">
                 <div class="row">
                     <div class="col-sm-4">
-                        {{ metrics.form_row(evaluationForm, schema.fields['blood-pressure-location']) }}
+                        {{ metrics.form_row(measurementForm, schema.fields['blood-pressure-location']) }}
                     </div>
                 </div>
             </div>
         {% endif %}
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
-            <div class="col-sm-4">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
-                        <div class="modification-block">
-                            <div class="modification-affected">
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-systolic'], i) }}
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-diastolic'], i) }}
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['heart-rate'], i) }}
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['irregular-heart-rate'], i) }}
-                            </div>
-                            <div class="modification-toggle text-right">
-                                <a class="small">Add protocol modification</a>
-                            </div>
-                            <div class="modification-select" style="display:none">
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-protocol-modification'], i) }}
-                                <div class="modification-notes" style="display:none">
-                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['blood-pressure-protocol-modification-notes'], i) }}
+                <div class="col-sm-4">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                            <div class="modification-block">
+                                <div class="modification-affected">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-systolic'], i) }}
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-diastolic'], i) }}
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['heart-rate'], i) }}
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['irregular-heart-rate'], i) }}
                                 </div>
-                                {% if schema.fields['manual-blood-pressure'] is defined %}
-                                    <div class="modification-manual">
-                                        {{ metrics.form_row_replicate(evaluationForm, schema.fields['manual-blood-pressure'], i) }}
-                                        {{ metrics.form_row_replicate(evaluationForm, schema.fields['manual-heart-rate'], i) }}
+                                <div class="modification-toggle text-right">
+                                    <a class="small">Add protocol modification</a>
+                                </div>
+                                <div class="modification-select" style="display:none">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-protocol-modification'], i) }}
+                                    <div class="modification-notes" style="display:none">
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-protocol-modification-notes'], i) }}
                                     </div>
-                                {% endif %}
+                                    {% if schema.fields['manual-blood-pressure'] is defined %}
+                                        <div class="modification-manual">
+                                            {{ metrics.form_row_replicate(measurementForm, schema.fields['manual-blood-pressure'], i) }}
+                                            {{ metrics.form_row_replicate(measurementForm, schema.fields['manual-heart-rate'], i) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
             {% endfor %}
         </div>
         <div class="panel panel-primary">
@@ -65,7 +65,7 @@
                     <span id="mean-blood-pressure-diastolic"></span>
                     {{ schema.fields['blood-pressure-systolic'].unit }}
                     <small class="text-muted">(average of 2nd and 3rd measures)</small>
-                    <br />
+                    <br/>
 
                     Heart rate:
                     <span id="mean-heart-rate"></span>
@@ -84,8 +84,8 @@
 
 <div class="panel panel-default">
     <div class="panel-body">
-        {{ metrics.form_row(evaluationForm, schema.fields['pregnant']) }}
-        {{ metrics.form_row(evaluationForm, schema.fields['wheelchair']) }}
+        {{ metrics.form_row(measurementForm, schema.fields['pregnant']) }}
+        {{ metrics.form_row(measurementForm, schema.fields['wheelchair']) }}
     </div>
 </div>
 
@@ -103,10 +103,10 @@
             <div class="col-sm-4">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {{ metrics.form_row(evaluationForm, schema.fields['height']) }}
-                        {{ metrics.form_row(evaluationForm, schema.fields['height-protocol-modification']) }}
+                        {{ metrics.form_row(measurementForm, schema.fields['height']) }}
+                        {{ metrics.form_row(measurementForm, schema.fields['height-protocol-modification']) }}
                         <div class="modification-notes" style="display:none">
-                            {{ metrics.form_row(evaluationForm, schema.fields['height-protocol-modification-notes']) }}
+                            {{ metrics.form_row(measurementForm, schema.fields['height-protocol-modification-notes']) }}
                         </div>
                     </div>
                 </div>
@@ -114,11 +114,11 @@
             <div class="col-sm-4">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {{ metrics.form_row(evaluationForm, schema.fields['weight']) }}
-                        {{ metrics.form_row(evaluationForm, schema.fields['weight-prepregnancy']) }}
-                        {{ metrics.form_row(evaluationForm, schema.fields['weight-protocol-modification']) }}
+                        {{ metrics.form_row(measurementForm, schema.fields['weight']) }}
+                        {{ metrics.form_row(measurementForm, schema.fields['weight-prepregnancy']) }}
+                        {{ metrics.form_row(measurementForm, schema.fields['weight-protocol-modification']) }}
                         <div class="modification-notes" style="display:none">
-                            {{ metrics.form_row(evaluationForm, schema.fields['weight-protocol-modification-notes']) }}
+                            {{ metrics.form_row(measurementForm, schema.fields['weight-protocol-modification-notes']) }}
                         </div>
                     </div>
                 </div>
@@ -157,69 +157,69 @@
         <div class="well">
             <div class="row">
                 <div class="col-sm-4">
-                    {{ metrics.form_row(evaluationForm, schema.fields['waist-circumference-location']) }}
+                    {{ metrics.form_row(measurementForm, schema.fields['waist-circumference-location']) }}
                 </div>
             </div>
         </div>
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
-            <div class="col-sm-4">
-                <div class="panel panel-default panel-waist-circumference-{{ i + 1 }}">
-                    <div class="panel-body">
-                        <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
-                        <div class="modification-block">
-                            <div class="modification-affected">
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference'], i) }}
-                                {% if i == 2 %}
-                                    <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
-                                {% endif %}
-                            </div>
-                            <div class="modification-toggle text-right">
-                                <a class="small">Add protocol modification</a>
-                            </div>
-                            <div class="modification-select" style="display:none">
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference-protocol-modification'], i) }}
-                                <div class="modification-notes" style="display:none">
-                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['waist-circumference-protocol-modification-notes'], i) }}
+                <div class="col-sm-4">
+                    <div class="panel panel-default panel-waist-circumference-{{ i + 1 }}">
+                        <div class="panel-body">
+                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                            <div class="modification-block">
+                                <div class="modification-affected">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference'], i) }}
+                                    {% if i == 2 %}
+                                        <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
+                                    {% endif %}
+                                </div>
+                                <div class="modification-toggle text-right">
+                                    <a class="small">Add protocol modification</a>
+                                </div>
+                                <div class="modification-select" style="display:none">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference-protocol-modification'], i) }}
+                                    <div class="modification-notes" style="display:none">
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference-protocol-modification-notes'], i) }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
             {% endfor %}
         </div>
-        <hr />
+        <hr/>
         <h4>Hip</h4>
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
-            <div class="col-sm-4">
-                <div class="panel panel-default panel-hip-circumference-{{ i + 1 }}">
-                    <div class="panel-body">
-                        <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
-                        <div class="modification-block">
-                            <div class="modification-affected">
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference'], i) }}
-                                {% if i == 2 %}
-                                    <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
-                                {% endif %}
-                            </div>
-                            <div class="modification-toggle text-right">
-                                <a class="small">Add protocol modification</a>
-                            </div>
-                            <div class="modification-select" style="display:none">
-                                {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference-protocol-modification'], i) }}
-                                <div class="modification-notes" style="display:none">
-                                    {{ metrics.form_row_replicate(evaluationForm, schema.fields['hip-circumference-protocol-modification-notes'], i) }}
+                <div class="col-sm-4">
+                    <div class="panel panel-default panel-hip-circumference-{{ i + 1 }}">
+                        <div class="panel-body">
+                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                            <div class="modification-block">
+                                <div class="modification-affected">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['hip-circumference'], i) }}
+                                    {% if i == 2 %}
+                                        <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
+                                    {% endif %}
+                                </div>
+                                <div class="modification-toggle text-right">
+                                    <a class="small">Add protocol modification</a>
+                                </div>
+                                <div class="modification-select" style="display:none">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['hip-circumference-protocol-modification'], i) }}
+                                    <div class="modification-notes" style="display:none">
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['hip-circumference-protocol-modification-notes'], i) }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
             {% endfor %}
         </div>
-        <hr />
+        <hr/>
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h3 class="panel-title">Average</h3>
@@ -231,8 +231,8 @@
                     {{ schema.fields['waist-circumference'].unit }}
                     <span id="convert-waist-circumference"></span>
                     <small class="text-muted">(average of two closest measures)</small>
-                    <br />
-                    
+                    <br/>
+
                     Hip Circumference:
                     <span id="mean-hip-circumference"></span>
                     {{ schema.fields['hip-circumference'].unit }}
@@ -263,7 +263,7 @@
     <h4 class="help-header-text">Height &amp; Weight</h4>
     <div class="row">
         <div class="col-sm-4 col-md-3">
-            <img src="{{ asset('img/eval/height.png') }}" class="img-responsive" />
+            <img src="{{ asset('img/eval/height.png') }}" class="img-responsive"/>
         </div>
         <div class="col-sm-8 col-md-9">
             <h5>Height</h5>
@@ -286,7 +286,7 @@
     <h4 class="help-header-text">Waist &amp; Hip Measurements</h4>
     <div class="row">
         <div class="col-sm-4">
-            <img src="{{ asset('img/eval/waist.png') }}" class="img-responsive" />
+            <img src="{{ asset('img/eval/waist.png') }}" class="img-responsive"/>
         </div>
         <div class="col-sm-8">
             <ul>
@@ -306,19 +306,52 @@
     <h4 class="help-header-text">BMI</h4>
     <table class="table">
         <thead>
-            <tr><th>Weight Category</th><th>BMI (kg/m<sup>2</sup>)</th></tr>
+        <tr>
+            <th>Weight Category</th>
+            <th>BMI (kg/m<sup>2</sup>)</th>
+        </tr>
         </thead>
         <tbody>
-            <tr><td class="text-danger"><strong>Error</strong></td><td>&lt; 5</td></tr>
-            <tr><td class="text-warning"><strong>Warning</strong></td><td>&lt; 15</td></tr>
-            <tr><td>Underweight</td><td>&lt; 18.5</td></tr>
-            <tr><td>Healthy Weight</td><td>18.5 - 24.9</td></tr>
-            <tr><td>Overweight</td><td>25 - 29.9</td></tr>
-            <tr><td>Obese Class I</td><td>30 - 34.9</td></tr>
-            <tr><td>Obese Class II</td><td>35 - 39.9</td></tr>
-            <tr><td>Obese Class III</td><td>&gt; 40</td></tr>
-            <tr><td class="text-warning"><strong>Warning</strong></td><td>&gt; 50</td></tr>
-            <tr><td class="text-danger"><strong>Error</strong></td><td>&gt; 125</td></tr>
+        <tr>
+            <td class="text-danger"><strong>Error</strong></td>
+            <td>&lt; 5</td>
+        </tr>
+        <tr>
+            <td class="text-warning"><strong>Warning</strong></td>
+            <td>&lt; 15</td>
+        </tr>
+        <tr>
+            <td>Underweight</td>
+            <td>&lt; 18.5</td>
+        </tr>
+        <tr>
+            <td>Healthy Weight</td>
+            <td>18.5 - 24.9</td>
+        </tr>
+        <tr>
+            <td>Overweight</td>
+            <td>25 - 29.9</td>
+        </tr>
+        <tr>
+            <td>Obese Class I</td>
+            <td>30 - 34.9</td>
+        </tr>
+        <tr>
+            <td>Obese Class II</td>
+            <td>35 - 39.9</td>
+        </tr>
+        <tr>
+            <td>Obese Class III</td>
+            <td>&gt; 40</td>
+        </tr>
+        <tr>
+            <td class="text-warning"><strong>Warning</strong></td>
+            <td>&gt; 50</td>
+        </tr>
+        <tr>
+            <td class="text-danger"><strong>Error</strong></td>
+            <td>&gt; 125</td>
+        </tr>
         </tbody>
     </table>
 </div>

@@ -1,14 +1,14 @@
 {% for field in schema.fields %}
-    <div data-field="{{ field.name }}" class="field field-{{ field.name }} form-group{% if not evaluationForm[field.name].vars.valid and field.replicates is not defined %} has-error{% endif %}">
+    <div data-field="{{ field.name }}" class="field field-{{ field.name }} form-group{% if not measurementForm[field.name].vars.valid and field.replicates is not defined %} has-error{% endif %}">
         {% if field.replicates is defined %}
-            {{ form_label(evaluationForm[field.name]) }}
+            {{ form_label(measurementForm[field.name]) }}
             {% if field.help.image is defined or field.help.caption is defined %}
                 <span class="toggle-help-image"
                         {% if field.help.image is defined %}
                             data-img="{{ asset('img/eval/'~field.help.image) }}"
                         {% endif %}
                         {% if field.help.caption is defined %}
-                            data-caption="{{ field.help.caption }}"
+                    data-caption="{{ field.help.caption }}"
                         {% endif %}>
                             <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                         </span>
@@ -18,32 +18,32 @@
             {% endif %}
             <span id="mean-{{ field.name }}" class="pull-right mean"></span>
             <div class="row replicate">
-            {% for replicateField in evaluationForm[field.name] %}
-                <div class="col-sm-4{% if not replicateField.vars.valid %} has-error{% endif %}">
-                {% if field.unit is defined %}
-                    <div class="input-group">
-                {% endif %}
-                    {{ form_widget(replicateField) }}
-                {% if field.unit is defined %}
-                        <div class="input-group-addon">{{ field.unit }}</div>
+                {% for replicateField in measurementForm[field.name] %}
+                    <div class="col-sm-4{% if not replicateField.vars.valid %} has-error{% endif %}">
+                        {% if field.unit is defined %}
+                        <div class="input-group">
+                            {% endif %}
+                            {{ form_widget(replicateField) }}
+                            {% if field.unit is defined %}
+                            <div class="input-group-addon">{{ field.unit }}</div>
+                        </div>
+                        {% endif %}
+                        {{ form_errors(replicateField) }}
                     </div>
-                {% endif %}
-                {{ form_errors(replicateField) }}
-                </div>
-            {% endfor %}
+                {% endfor %}
             </div>
         {% else %}
             <div class="row">
                 <div class="col-sm-4">
-                    {{ form_label(evaluationForm[field.name]) }}
+                    {{ form_label(measurementForm[field.name]) }}
                     {% if field.help.image is defined or field.help.caption is defined %}
                         <span class="toggle-help-image"
-                              {% if field.help.image is defined %}
-                                data-img="{{ asset('img/eval/'~field.help.image) }}"
-                              {% endif %}
-                              {% if field.help.caption is defined %}
-                                data-caption="{{ field.help.caption }}"
-                              {% endif %}>
+                                {% if field.help.image is defined %}
+                                    data-img="{{ asset('img/eval/'~field.help.image) }}"
+                                {% endif %}
+                                {% if field.help.caption is defined %}
+                            data-caption="{{ field.help.caption }}"
+                                {% endif %}>
                             <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                         </span>
                     {% endif %}
@@ -51,14 +51,14 @@
                         <span id="convert-{{ field.name }}" class="pull-right convert"></span>
                     {% endif %}
                     {% if field.unit is defined %}
-                        <div class="input-group">
+                    <div class="input-group">
+                        {% endif %}
+                        {{ form_widget(measurementForm[field.name]) }}
+                        {% if field.unit is defined %}
+                        <div class="input-group-addon">{{ field.unit }}</div>
+                    </div>
                     {% endif %}
-                        {{ form_widget(evaluationForm[field.name]) }}
-                    {% if field.unit is defined %}
-                            <div class="input-group-addon">{{ field.unit }}</div>
-                        </div>
-                    {% endif %}
-                    {{ form_errors(evaluationForm[field.name]) }}
+                    {{ form_errors(measurementForm[field.name]) }}
                 </div>
                 {% if field.name == 'weight' %}
                     <div class="col-sm-4">
