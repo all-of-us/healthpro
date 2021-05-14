@@ -4,8 +4,8 @@ namespace App\Service;
 
 use App\Entity\Measurement;
 use App\Entity\MeasurementQueue;
+use App\Model\Measurement\Fhir;
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\Evaluation\Fhir;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Pmi\Audit\Log;
@@ -38,13 +38,12 @@ class MeasurementQueueService
         $measurementsQueue = $this->em->getRepository(MeasurementQueue::class)->findBy(['sentTs' => null, 'attemptedTs' => null], null, $limit);
         foreach ($measurementsQueue as $measurementQueue) {
             $measurementId = $measurementQueue->getEvaluationId();
-            //$this->em->setTimezone(date_default_timezone_get());
             $measurement = $this->em->getRepository(Measurement::class)->find($measurementId);
             if (!$measurement) {
                 continue;
             }
             $this->measurementService->load($measurement);
-            $fhir = $this->measurementService->getFhir($measurement->getFinalizedTs(), $measurementQueue->getOldRdrId());
+            $fhir = $measurement->getFhir($measurement->getFinalizedTs(), $measurementQueue->getOldRdrId());
             $now = new \DateTime();
             if ($rdrMeasurementId = $this->measurementService->createMeasurement($measurement->getParticipantId(), $fhir)) {
                 $measurement->setRdrId($rdrMeasurementId);
@@ -54,8 +53,8 @@ class MeasurementQueueService
 
                 $measurementQueue->setNewRdrId($rdrMeasurementId);
                 $measurementQueue->setFhirVersion(Fhir::CURRENT_VERSION);
-                $measurementQueue->sentTs($now);
-                $measurementQueue->attemptedTs($now);
+                $measurementQueue->setSentTs($now);
+                $measurementQueue->setAttemptedTs($now);
                 $this->em->persist($measurementQueue);
                 $this->em->flush();
 

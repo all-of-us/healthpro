@@ -260,4 +260,8 @@ class MeasurementService
         return false;
     }
 
+    public function getLastError()
+    {
+        return $this->rdrApiService->getLastError();
+    }
 }
