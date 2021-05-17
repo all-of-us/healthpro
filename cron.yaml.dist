@@ -32,7 +32,7 @@ cron:
   schedule: every 1 hours
   timezone: America/Chicago
 - description: "Send patient status to RDR"
-  url: /cron/s/send-patient-status-rdr
+  url: /s/cron/send-patient-status-rdr
   schedule: every 5 mins
   timezone: America/Chicago
 - description: "Delete patient status imports unconfirmed data"
