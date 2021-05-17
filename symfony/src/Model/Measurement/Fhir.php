@@ -64,10 +64,7 @@ class Fhir
                     continue;
                 }
             }
-            if (preg_match('/protocol-modification/', $field->name)) {
-                $isModification = true;
-            } else {
-                $isModification = false;
+            if (!preg_match('/protocol-modification/', $field->name)) {
                 switch ($field->name) {
                     case 'blood-pressure-systolic':
                     case 'heart-rate':
@@ -158,7 +155,7 @@ class Fhir
     protected function getComposition()
     {
         $references = [];
-        foreach ($this->metricUrns as $metric => $urn) {
+        foreach (array_values($this->metricUrns) as $urn) {
             $references[] = ['reference' => $urn];
         }
         $composition = [
@@ -1147,7 +1144,7 @@ class Fhir
         $fhir->entry = [];
         $fhir->resourceType = 'Bundle';
         $fhir->type = 'document';
-        foreach ($this->metricUrns as $metric => $uuid) {
+        foreach (array_keys($this->metricUrns) as $metric) {
             if ($entry = $this->getEntry($metric)) {
                 $fhir->entry[] = $entry;
             } else {
