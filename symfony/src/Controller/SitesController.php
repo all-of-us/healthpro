@@ -55,7 +55,7 @@ class SitesController extends AbstractController
         } else {
             if ($syncEnabled) {
                 // can't create new sites if syncing from rdr
-                throw $this->createNotFoundException('Site not found.');
+                throw $this->createNotFoundException('Sites cannot be created when the RDR Awardee API is enabled.');
             }
             $site = null;
         }
@@ -70,7 +70,7 @@ class SitesController extends AbstractController
                     $duplicateGoogleGroup = $siteRepository->getDuplicateGoogleGroup($form['google_group']->getData());
                 }
                 if ($duplicateGoogleGroup) {
-                    $form['google_group']->addError(new FormError('This google group has already been used for another site.'));
+                    $form['google_group']->addError(new FormError('This Google Group has already been used for another Site.'));
                 }
             }
             if ($form->isValid()) {
@@ -78,7 +78,7 @@ class SitesController extends AbstractController
                     $em->persist($site);
                     $em->flush();
                     $loggerService->log(Log::SITE_EDIT, $site->getId());
-                    $this->addFlash('success', 'Site added.');
+                    $this->addFlash('success', 'Site updated.');
                 } else {
                     $site = $form->getData();
                     $em->persist($site);
@@ -89,7 +89,7 @@ class SitesController extends AbstractController
                 return $this->redirectToRoute('admin_sites');
             } else {
                 if (count($form->getErrors()) == 0) {
-                    $form->addError(new FormError('Please correct the errors below'));
+                    $form->addError(new FormError('Please correct the errors below.'));
                 }
             }
         }
