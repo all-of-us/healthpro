@@ -42,20 +42,20 @@ class SitesController extends AbstractController
         if ($id) {
             $site = $siteRepository->find($id);
             if (!$site) {
-                throw $this->createNotFoundException('Page notice not found.');
+                throw $this->createNotFoundException('Site not found.');
             }
 
             if ($request->request->has('delete')) {
                 $em->remove($site);
                 $em->flush();
                 $loggerService->log(Log::SITE_DELETE, $site->getId());
-                $this->addFlash('success', 'Site removed');
+                $this->addFlash('success', 'Site removed.');
                 return $this->redirectToRoute('admin_sites');
             }
         } else {
             if ($syncEnabled) {
                 // can't create new sites if syncing from rdr
-                throw $this->createNotFoundException('Page notice not found.');
+                throw $this->createNotFoundException('Site not found.');
             }
             $site = null;
         }
@@ -78,13 +78,13 @@ class SitesController extends AbstractController
                     $em->persist($site);
                     $em->flush();
                     $loggerService->log(Log::SITE_EDIT, $site->getId());
-                    $this->addFlash('success', 'Notice added');
+                    $this->addFlash('success', 'Site added.');
                 } else {
                     $site = $form->getData();
                     $em->persist($site);
                     $em->flush();
                     $loggerService->log(Log::SITE_ADD, $site->getId());
-                    $this->addFlash('success', 'Notice added');
+                    $this->addFlash('success', 'Site added.');
                 }
                 return $this->redirectToRoute('admin_sites');
             } else {
