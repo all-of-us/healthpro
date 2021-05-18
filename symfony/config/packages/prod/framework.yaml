@@ -8,7 +8,7 @@ framework:
   session:
     handler_id: Pmi\Datastore\DatastoreSessionHandler
     cookie_secure: auto
-    cookie_samesite: lax
+    cookie_samesite: 'strict'
 
   #esi: true
   #fragments: true
