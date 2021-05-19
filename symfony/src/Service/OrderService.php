@@ -709,7 +709,9 @@ class OrderService
         $participantId = $subject_matches[1];
 
         $this->order->setParticipantId($participantId);
-        $this->order->setOrderId($kitId);
+        if (!empty($kitId)) {
+            $this->order->setOrderId($kitId);
+        }
         // Can be used as order Id
         $this->order->setRdrId($object->id);
         if (property_exists($object, 'biobankId')) {
@@ -755,6 +757,9 @@ class OrderService
         }
         $this->order->setFinalizedSiteName('A Quest Site');
         $this->order->setQuanumOrderStatus('Finalized');
+        if ($this->params->has('order_samples_version')) {
+            $this->order->setVersion($this->params->get('order_samples_version'));
+        }
         return $this->order;
     }
 }
