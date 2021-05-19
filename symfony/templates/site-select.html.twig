@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+{% block title %}Choose Site - {% endblock %}
+{% block body %}
+    {% if siteEmail is not defined %}
+        {% set siteEmail = app.session.get('site') ? app.session.get('site').email : '' %}
+    {% endif %}
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="alert alert-info">
+                <i class="fa fa-info-circle"></i>
+                Please select your current site in order to continue.
+            </div>
+            <form id="siteSelector" method="POST" action="{{ path('site_select') }}">
+                <div class="form-group">
+                    <label>Choose Site</label>
+                    <select class="form-control" name="site">
+                        {% for site in app.user.sites %}
+                            <option value="{{ site.email }}"{{ (siteEmail == site.email) ? ' selected' : '' }} >{{ attribute(app.session.get('userSiteDisplayNames'), site.id)|default(site.name) }}</option>
+                        {% endfor %}
+                        {% for awardee in app.user.awardees %}
+                            <option value="{{ awardee.email }}"{{ (siteEmail is not defined and app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : '' }} >{{ awardee.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token('siteSelect') }}"/>
+                <button type="submit" class="btn btn-primary">Continue</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

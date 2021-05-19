@@ -73,7 +73,7 @@ class RequestListener
 
     private function checkSiteSelect()
     {
-        if (!$this->session->has('site') && !preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue)($|\/).*/',
+        if (!$this->session->has('site') && !preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site)($|\/).*/',
                 $this->request->getPathInfo())) {
             return new RedirectResponse('/');
         }
