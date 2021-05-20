@@ -88,10 +88,12 @@ class Participant
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_3') {
             if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                 $this->status = false;
+                $this->editExistingOnly = true;
                 $this->statusReason = 'genomics';
             }
             if (isset($this->siteType) && isset($participant->consentForElectronicHealthRecords) && $this->siteType === 'hpo' && $participant->consentForElectronicHealthRecords !== 'SUBMITTED') {
                 $this->status = false;
+                $this->editExistingOnly = true;
                 $this->statusReason = 'ehr-consent';
             }
         }
