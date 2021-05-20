@@ -8,6 +8,7 @@ use App\Entity\Site;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
 class SiteService
@@ -17,17 +18,19 @@ class SiteService
     private $em;
     private $userService;
     private $env;
+    private $tokenStorage;
     protected $siteNameMapper = [];
     protected $organizationNameMapper = [];
     protected $awardeeNameMapper = [];
 
-    public function __construct(ParameterBagInterface $params, SessionInterface $session, EntityManagerInterface $em, UserService $userService, EnvironmentService $env)
+    public function __construct(ParameterBagInterface $params, SessionInterface $session, EntityManagerInterface $em, UserService $userService, EnvironmentService $env, TokenStorageInterface $tokenStorage)
     {
         $this->params = $params;
         $this->session = $session;
         $this->em = $em;
         $this->userService = $userService;
         $this->env = $env;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function isTestSite(): bool
@@ -238,7 +241,7 @@ class SiteService
         $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->session->get('site'), $this->session->get('awardee'), $this->session->get('managegroups'));
         if ($user->getAllRoles() != $userRoles) {
             $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
-            $this['security.token_storage']->setToken($token);
+            $this->tokenStorage->setToken($token);
         }
     }
 

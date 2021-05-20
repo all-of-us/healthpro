@@ -3,12 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Service\LoggerService;
 use App\Service\SiteService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Pmi\Audit\Log;
 
 /**
  * @Route("/s")
