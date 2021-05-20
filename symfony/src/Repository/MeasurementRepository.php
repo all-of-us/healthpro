@@ -109,12 +109,16 @@ class MeasurementRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
-        $queryBuilder = $this->createQueryBuilder('m');
+        $queryParams = ['measurementId' => $measurementId, 'participantId' => $participantId];
+        $queryBuilder = $this->createQueryBuilder('m')
+            ->where('m.id = :measurementId')
+            ->andWhere('m.participantId = :participantId');
+        if (!empty($parentIds)) {
+            $queryBuilder->andWhere($queryBuilder->expr()->notIn('m.id', ':parentIds'));
+            $queryParams['parentIds'] = $parentIds;
+        }
         $measurement = $queryBuilder
-            ->where($queryBuilder->expr()->notIn('m.id', ':parentIds'))
-            ->andWhere('m.id = :measurementId')
-            ->andWhere('m.participantId = :participantId')
-            ->setParameters(['parentIds' => $parentIds, 'measurementId' => $measurementId, 'participantId' => $participantId])
+            ->setParameters($queryParams)
             ->getQuery()
             ->getResult()
         ;
