@@ -18,7 +18,7 @@ class SessionService
 
     public function deleteKeys()
     {
-        $sessionTimeout = $this->env->getSessionTimeout();
+        $sessionTimeout = $this->env->values['sessionTimeOut'];
         $modified = new \DateTime("-{$sessionTimeout} seconds");
         $limit = $this->params->get('ds_clean_up_limit');
         $session = new Session();
