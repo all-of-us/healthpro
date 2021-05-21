@@ -18,4 +18,12 @@ class PatientStatusImportRowRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, PatientStatusImportRow::class);
     }
+
+    public function deleteUnconfirmedImportData($date)
+    {
+        $query = "DELETE psir FROM patient_status_import_rows psir inner join patient_status_import psi on psir.import_id = psi.id where psi.created_ts < :date and psi.confirm = :confirm";
+        $params = ['date' => $date, 'confirm' => 0];
+        $statement = $this->getEntityManager()->getConnection()->prepare($query);
+        $statement->execute($params);
+    }
 }
