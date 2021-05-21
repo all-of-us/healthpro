@@ -25,7 +25,8 @@ class SymfonyMigrationController extends AbstractController
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['participants', '/participants'],
         ['biobank_home', '/biobank'],
-        ['orders', '/orders']
+        ['orders', '/orders'],
+        ['selectSite', '/site/select', ['method' => 'GET|POST']]
     ];
 
     public function deceased_reports_indexAction(Application $app)
@@ -174,5 +175,13 @@ class SymfonyMigrationController extends AbstractController
     public function ordersAction(Application $app)
     {
         return $app->redirect('/s/orders/');
+    }
+
+    /**
+     * @deprecated 2021-05-21
+     */
+    public function selectSiteAction(Application $app)
+    {
+        return $app->redirect('/s/site/select');
     }
 }
