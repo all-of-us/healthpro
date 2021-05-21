@@ -171,4 +171,10 @@ class EnvironmentService
             $this->configuration[$key] = $val;
         }
     }
+
+    public function getSessionTimeout()
+    {
+        return $this->isLocal() ? 3600 * 24 : 30 * 60;
+    }
+
 }
