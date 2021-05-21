@@ -25,7 +25,6 @@ class DefaultController extends AbstractController
         ['clientTimeout', '/client-timeout', [ 'method' => 'GET' ]],
         ['agreeUsage', '/agree', ['method' => 'POST']],
         ['groups', '/groups'],
-        ['selectSite', '/site/select', ['method' => 'GET|POST']],
         ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
         ['patientStatus', '/participant/{participantId}/patient/status/{patientStatusId}', ['method' => 'GET']],
         ['mockLogin', '/mock-login', ['method' => 'GET|POST']]
@@ -130,26 +129,6 @@ class DefaultController extends AbstractController
         return $app['twig']->render('googlegroups.html.twig', [
             'groupNames' => $groupNames
         ]);
-    }
-
-    public function selectSiteAction(Application $app, Request $request)
-    {
-        if ($request->request->has('site')) {
-            if (!$app['csrf.token_manager']->isTokenValid(new CsrfToken('siteSelect', $request->request->get('csrf_token')))) {
-                return $app->abort(403);
-            }
-            $siteId = $request->request->get('site');
-            if (strpos($siteId, User::AWARDEE_PREFIX) !== 0 && !$app->isValidSite($siteId)) {
-                $app->addFlashError("Sorry, there is a problem with your site's configuration. Please contact your site administrator.");
-                return $app['twig']->render('site-select.html.twig', ['siteEmail' => $siteId]);
-            }
-            if ($app->switchSite($siteId)) {
-                return $app->redirectToRoute('home');
-            } else {
-                return $app->abort(403);
-            }
-        }
-        return $app['twig']->render('site-select.html.twig');
     }
 
     public function patientStatusAction($participantId, $patientStatusId, Application $app)
