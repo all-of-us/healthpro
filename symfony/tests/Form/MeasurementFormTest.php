@@ -1,13 +1,15 @@
 <?php
-namespace Tests\Pmi\Evaluation;
 
+namespace App\Test\Form;
+
+use App\Entity\Measurement;
+use App\Form\MeasurementType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Pmi\Evaluation\Evaluation;
 
-class EvaluationFormTest extends TypeTestCase
+class MeasurementFormTest extends TypeTestCase
 {
     protected function getExtensions()
     {
@@ -32,8 +34,12 @@ class EvaluationFormTest extends TypeTestCase
             'weight' => '70'
         ];
 
-        $evaluationService = new Evaluation();
-        $form = $evaluationService->getForm($this->factory);
+        $measurement = new Measurement;
+        $measurement->loadFromAObject();
+        $form = $this->factory->create(MeasurementType::class, $measurement->getFieldData(), [
+            'schema' => $measurement->getSchema(),
+            'locked' => $measurement->getFinalizedTs() ? true : false
+        ]);
         $form->submit($formData);
 
         $this->assertTrue($form->isSynchronized());
@@ -42,7 +48,7 @@ class EvaluationFormTest extends TypeTestCase
         $formData = $form->getData();
         $view = $form->createView();
 
-        $fields = array_keys($evaluationService->getAssociativeSchema()->fields);
+        $fields = array_keys($measurement->getAssociativeSchema()->fields);
         $this->assertSame($fields, array_keys($view->children));
         $this->assertSame($fields, array_keys((array)$formData));
     }

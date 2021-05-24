@@ -1,0 +1,173 @@
+{% extends 'base.html.twig' %}
+{% block title %}Physical Measurements - {% endblock %}
+{% block body %}
+    <div id="physicalEvaluation">
+        {% if displayEhrBannerMessage and ehrProtocolBannerMessage is not empty %}
+            <div class="alert alert-warning">{{ ehrProtocolBannerMessage }}</div>
+        {% endif %}
+        <div class="page-header">
+            <h2>
+                <i class="fa fa-clipboard" aria-hidden="true"></i>
+                {% if measurement.id %}
+                    {{ measurement.createdTs|date('n/j/Y', app.user.timezone) }}
+                {% else %}
+                    New Physical Measurements
+                {% endif %}
+                <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+                {% if measurement.id %}
+                    {% if measurement.canCancel %}
+                        <a href="{{ path('measurement_modify', { participantId: participant.id, measurementId: measurement.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel</a>
+                    {% elseif measurement.canRestore %}
+                        <a href="{{ path('measurement_modify', { participantId: participant.id, measurementId: measurement.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore</a>
+                    {% endif %}
+                {% endif %}
+            </h2>
+        </div>
+        <dl class="dl-horizontal">
+            <dt>Name</dt>
+            <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
+            <dt>Participant ID</dt>
+            <dd>{{ participant.id }}</dd>
+            <dt>DOB</dt>
+            <dd>{{ participant.dob ? participant.dob|date('n/j/Y') }}</dd>
+            <dt>Gender Identity</dt>
+            <dd>{{ participant.genderIdentity }}</dd>
+            {% if measurement.id %}
+                <dt>Updated</dt>
+                <dd>{{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</dd>
+                {% if measurement.version != latestVersion %}
+                    <dt>Version</dt>
+                    <dd>{{ measurement.version }}
+                        <small class="text-muted">(latest version is {{ latestVersion }})</small>
+                    </dd>
+                {% endif %}
+            {% endif %}
+            <dt>Paired Awardee</dt>
+            <dd>{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
+        </dl>
+        {% if measurement.id and measurement.history and measurement.history.type == 'cancel' %}
+            <div class="alert alert-danger">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <strong>Cancelled by {{ measurement.history.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(measurement.history.site) }} on {{ measurement.history.createdTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
+                {% if measurement.reasonDisplayText is not empty %}
+                    <br/><strong>Reason:</strong> {{ measurement.reasonDisplayText }}
+                {% endif %}
+            </div>
+        {% endif %}
+        {% if measurement and measurement.parentId is not empty and measurement.rdrId is empty %}
+            <div class="alert alert-warning">
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                <strong>Unlocked for editing by {{ measurement.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(measurement.site) }} on {{ measurement.createdTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
+            </div>
+        {% endif %}
+        {% if measurement %}
+            {% if measurement.rdrId %}
+                <div class="alert alert-success">
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                    <strong>Finalized by {{ measurement.finalizedUser.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(measurement.finalizedSite) }} on {{ measurement.finalizedTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
+                    <a class="btn btn-success btn-xs pull-right" href="{{ path('measurement_summary', { participantId: participant.id, measurementId: measurement.id }) }}" target="_blank">Summary</a>
+                </div>
+            {% elseif measurement.finalizedTs and measurement.rdrId is empty %}
+                <div class="alert alert-danger well-sm">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <strong>An error occurred while finalizing this physical measurements. Please try again.</strong>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {{ form_start(measurementForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+        {{ form_errors(measurementForm) }}
+        {% if showAutoModification %}
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3">
+                    <div class="panel panel-danger">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <i class="fa fa-forward" aria-hidden="true"></i>
+                                Or, auto-fill modifications and finalize
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>
+                                If physical measurements are incomplete due to refusal or a medical emergency, auto-fill missing fields with protocol modifications and finalize.
+                            </p>
+                            <p>
+                                <strong>Finalize physical measurements early due to:</strong>
+                            </p>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="refusal" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Refusal</button>
+                                </div>
+                                <div class="col-xs-6">
+                                    <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="emergency" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Urgent/Emergent Event</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if not measurement or not measurement.rdrId %}
+            <div id="evaluationAffixSave">
+                {% if not measurement or not measurement.finalizedTs %}
+                    <button type="submit" class="btn btn-primary btn-xs" name="save">Save</button>
+                {% endif %}
+                <button type="submit" class="btn btn-success btn-xs" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Save and Finalize</button>
+            </div>
+        {% endif %}
+
+        {% if schema.template is defined %}
+            {% include 'measurementform/' ~ schema.template ~ '.html.twig' %}
+        {% else %}
+            {% include 'measurementform/0.1.html.twig' %}
+        {% endif %}
+
+        {{ form_rest(measurementForm) }}
+
+        {% if measurement and measurement.rdrId %}
+            <p>
+                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
+                {% if measurement.history is empty or measurement.history.type != 'cancel' %}
+                    <button type="submit" class="btn btn-warning" name="copy" onclick="return confirm('Are you sure you want to copy these physical measurements?');">Copy</button>
+                {% endif %}
+            </p>
+        {% else %}
+            <p>
+                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+                {% if not measurement or not measurement.finalizedTs %}
+                    <button type="submit" class="btn btn-primary" name="save">Save</button>
+                {% endif %}
+                <button type="submit" class="btn btn-success pull-right" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Save and Finalize</button>
+            </p>
+        {% endif %}
+        {{ form_end(measurementForm) }}
+        {% if measurement.id and measurement.parentId and measurement.finalizedTs is empty %}
+            {{ form_start(revertForm, { 'action': path('measurement_revert', { participantId: participant.id, measurementId: measurement.id }), 'method': 'POST', attr: { class: 'eval-revert-form disable-enter prevent-resubmit' }}) }}
+            {{ form_errors(revertForm) }}
+            {{ form_end(revertForm) }}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('physical-measurements-' ~ (schema.template|default('-0.1'))) }}
+    <script>
+        $(document).ready(function () {
+            var evalView = new PMI.views['PhysicalEvaluation{% if schema.template is defined %}-{{ schema.template }}{% else %}-0.1{% endif %}']({
+                el: $("#physicalEvaluation"),
+                warnings: {{ warnings|json_encode|raw }},
+                conversions: {{ conversions|json_encode|raw }},
+                finalized: {{ (measurement and measurement.finalizedTs)|json_encode|raw }}
+            });
+            $('#evaluationAffixSave')
+                .affix({
+                    offset: {
+                        top: 100,
+                        bottom: $(window).height()
+                    }
+                })
+                .width($('#physicalEvaluation').width());
+        });
+    </script>
+{% endblock %}

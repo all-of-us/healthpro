@@ -19,7 +19,7 @@
             <dt>Gender Identity</dt>
             <dd>{{ participant.genderIdentity }}</dd>
             <dt>Paired Awardee</dt>
-            <dd>{{ participant.awardee ? app.getAwardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
+            <dd>{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
         </dl>
 
         <div class="panel panel-default">
