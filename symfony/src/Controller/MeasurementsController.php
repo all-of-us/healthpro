@@ -332,7 +332,7 @@ class MeasurementsController extends AbstractController
             'measurement' => $measurement,
             'measurements' => $measurements,
             'summary' => $measurement->getSummary(),
-            'latestVersion' => $measurement::CURRENT_VERSION,
+            'latestVersion' => $measurement->getLatestFormVersion(),
             'measurementModifyForm' => $measurementModifyForm->createView(),
             'type' => $type,
             'measurementId' => $measurementId

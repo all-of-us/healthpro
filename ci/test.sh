@@ -1,3 +1,5 @@
 #!/bin/bash
 
-./bin/phpunit -v
+mkdir -p /tmp/circleci-test-results
+
+./bin/phpunit -v --log-junit /tmp/circleci-test-results/junit.xml
