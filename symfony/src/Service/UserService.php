@@ -82,4 +82,14 @@ class UserService
         }
         return null;
     }
+
+    public function updateLastLogin(): void
+    {
+        $user = $this->getUser();
+        if ($user) {
+            $user->setLastLogin(new \DateTime());
+            $this->em->persist($user);
+            $this->em->flush();
+        }
+    }
 }
