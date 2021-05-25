@@ -2544,11 +2544,6 @@
                 "pseudorandom",
                 "random"
             ],
-            "support": {
-                "email": "info@paragonie.com",
-                "issues": "https://github.com/paragonie/random_compat/issues",
-                "source": "https://github.com/paragonie/random_compat"
-            },
             "time": "2018-07-02T15:55:56+00:00"
         },
         {
@@ -2754,9 +2749,6 @@
                 "psr",
                 "psr-6"
             ],
-            "support": {
-                "source": "https://github.com/php-fig/cache/tree/master"
-            },
             "time": "2016-08-06T20:24:11+00:00"
         },
         {
@@ -4263,23 +4255,6 @@
                 "interfaces",
                 "interoperability",
                 "standards"
-            ],
-            "support": {
-                "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v1.1.9"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
             ],
             "time": "2020-07-06T13:19:58+00:00"
         },
@@ -6366,16 +6341,16 @@
         },
         {
             "name": "symfony/security",
-            "version": "v4.4.23",
+            "version": "v4.4.24",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security.git",
-                "reference": "9c1ce3e26bd2e0ca91c2fcde4774b88b2837dc09"
+                "reference": "7e84d0186835854935ad4ed8a556eef7a5dc6fd8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security/zipball/9c1ce3e26bd2e0ca91c2fcde4774b88b2837dc09",
-                "reference": "9c1ce3e26bd2e0ca91c2fcde4774b88b2837dc09",
+                "url": "https://api.github.com/repos/symfony/security/zipball/7e84d0186835854935ad4ed8a556eef7a5dc6fd8",
+                "reference": "7e84d0186835854935ad4ed8a556eef7a5dc6fd8",
                 "shasum": ""
             },
             "require": {
@@ -6444,9 +6419,6 @@
             ],
             "description": "Provides a complete security system for your web application",
             "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/security/tree/v4.4.23"
-            },
             "funding": [
                 {
                     "url": "https://symfony.com/sponsor",
@@ -6461,7 +6433,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-05-12T12:42:28+00:00"
+            "time": "2021-05-19T12:06:31+00:00"
         },
         {
             "name": "symfony/security-bundle",
@@ -9535,5 +9507,5 @@
     "platform-overrides": {
         "php": "7.4.14"
     },
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "1.1.0"
 }
