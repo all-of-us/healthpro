@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
+use App\Service\MeasurementQueueService;
 use App\Service\MissingMeasurementsAndOrdersNotificationService;
 use App\Service\PatientStatusService;
 use App\Service\SessionService;
@@ -125,6 +126,24 @@ class CronController extends AbstractController
     public function deleteUnconfimedPatientStatusImportDataAction(PatientStatusService $patientStatusService)
     {
         $patientStatusService->deleteUnconfirmedImportData();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/send-patient-status-rdr", name="cron_send_patient_status_rdr")
+     */
+    public function sendPatientStatusToRdrAction(PatientStatusService $patientStatusService)
+    {
+        $patientStatusService->sendPatientStatusToRdr();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/resend-measurements-rdr", name="cron_resend_measurements_rdr")
+     */
+    public function resendMeasurementsToRdrAction(MeasurementQueueService $measurementQueueService)
+    {
+        $measurementQueueService->resendMeasurementsToRdr();
         return $this->json(['success' => true]);
     }
 }

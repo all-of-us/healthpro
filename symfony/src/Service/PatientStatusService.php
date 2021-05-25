@@ -8,6 +8,7 @@ use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusImportRow;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PatientStatusService
@@ -18,6 +19,7 @@ class PatientStatusService
     protected $params;
     protected $em;
     protected $loggerService;
+    protected $logger;
 
     protected $participantId;
     protected $patientStatusId;
@@ -38,7 +40,8 @@ class PatientStatusService
         UserService $userService,
         ParameterBagInterface $params,
         EntityManagerInterface $em,
-        LoggerService $loggerService
+        LoggerService $loggerService,
+        LoggerInterface $logger
     ) {
         $this->rdrApiService = $rdrApiService;
         $this->siteService = $siteService;
@@ -46,6 +49,7 @@ class PatientStatusService
         $this->params = $params;
         $this->em = $em;
         $this->loggerService = $loggerService;
+        $this->logger = $logger;
     }
 
     public function getPatientStatus($participantId, $organizationId)
@@ -201,5 +205,95 @@ class PatientStatusService
         $date = (new \DateTime('UTC'))->modify('-1 hours');
         $date = $date->format('Y-m-d H:i:s');
         $this->em->getRepository(PatientStatusImportRow::class)->deleteUnconfirmedImportData($date);
+    }
+
+    public function sendPatientStatusToRdr()
+    {
+        $limit = $this->params->has('patient_status_queue_limit') ? intval($this->params->get('patient_status_queue_limit')) : 0;
+        $patientStatuses = $this->em->getRepository(PatientStatusImportRow::class)->getPatientStatusImportRows($limit);
+        $importIds = [];
+        foreach ($patientStatuses as $patientStatus) {
+            if (!in_array($patientStatus['import_id'], $importIds)) {
+                $importIds[] = $patientStatus['import_id'];
+            }
+            $this->loadDataFromImport($patientStatus);
+            $patientStatusImportRow = $this->em->getRepository(PatientStatusImportRow::class)->find($patientStatus['id']);
+            if (!empty($patientStatusImportRow)) {
+                if ($this->sendToRdr()) {
+                    if ($this->saveData()) {
+                        $patientStatusImportRow->setRdrStatus(PatientStatusHistory::STATUS_SUCCESS);
+                        $this->em->persist($patientStatusImportRow);
+                        $this->em->flush();
+                    }
+                } else {
+                    $this->logger->error("#{$patientStatus['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
+                    $rdrStatus = PatientStatusHistory::STATUS_OTHER_RDR_ERRORS;
+                    if ($this->rdrApiService->getLastErrorCode() === 400) {
+                        $rdrStatus = PatientStatusHistory::STATUS_INVALID_PARTICIPANT_ID;
+                    } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
+                        $rdrStatus = PatientStatusHistory::STATUS_RDR_INTERNAL_SERVER_ERROR;
+                    }
+                    $patientStatusImportRow->setRdrStatus($rdrStatus);
+                    $this->em->persist($patientStatusImportRow);
+                    $this->em->flush();
+                }
+            }
+        }
+        // Update import status
+        $this->updateImportStatus($importIds);
+    }
+
+    // Used to send imported patient statuses to rdr
+    public function loadDataFromImport($patientStatusHistory)
+    {
+        $this->participantId = $patientStatusHistory['participant_id'];
+        $this->organizationId = $patientStatusHistory['organization'];
+        $this->awardeeId = $patientStatusHistory['awardee'];
+        $this->userEmail = $patientStatusHistory['user_email'];
+        $this->siteWithPrefix = \Pmi\Security\User::SITE_PREFIX . $patientStatusHistory['site'];
+        $this->comments = $patientStatusHistory['comments'];
+        $this->status = $patientStatusHistory['status'];
+        $this->createdTs = new \DateTime($patientStatusHistory['authored']);
+        $this->siteId = $patientStatusHistory['site'];
+        $this->userId = $patientStatusHistory['user_id'];
+        $patientStatusId = $patientStatusHistory['patient_status_id'];
+        if (empty($patientStatusId)) {
+            $patientStatus = $this->em->getRepository(PatientStatus::class)->findBy([
+                'participantId' => $patientStatusHistory['participant_id'],
+                'organization' => $patientStatusHistory['organization']
+            ]);
+            if (!empty($patientStatus)) {
+                $patientStatusId = $patientStatus->getId();
+            }
+        }
+        $this->patientStatusId = $patientStatusId;
+        $this->importId = $patientStatusHistory['import_id'];
+    }
+
+    private function updateImportStatus($importIds)
+    {
+        foreach ($importIds as $importId) {
+            $patientStatusImport = $this->em->getRepository(PatientStatusImport::class)->find($importId);
+            if (!empty($patientStatusImport)) {
+                $patientStatusImportRows = $this->em->getRepository(PatientStatusImportRow::class)->findBy([
+                    'import' => $patientStatusImport,
+                    'rdrStatus' => 0
+                ]);
+                if (empty($patientStatusImportRows)) {
+                    $patientStatusImportRows = $this->em->getRepository(PatientStatusImportRow::class)->findBy([
+                        'import' => $patientStatusImport,
+                        'rdrStatus' => [2, 3, 4]
+                    ]);
+                    if (!empty($patientStatusImportRows)) {
+                        $patientStatusImport->setImportStatus(PatientStatusImport::COMPLETE_WITH_ERRORS);
+                    } else {
+                        $patientStatusImport->setImportStatus(PatientStatusImport::COMPLETE);
+                    }
+                    $this->em->persist($patientStatusImport);
+                    $this->em->flush();
+                    $this->loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $importId);
+                }
+            }
+        }
     }
 }
