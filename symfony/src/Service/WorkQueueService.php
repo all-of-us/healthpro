@@ -431,16 +431,19 @@ class WorkQueueService
             return '';
         }
         $organizations = [];
-        foreach ($participant->patientStatus as $patientStatus) {
-            if ($patientStatus->status === $value) {
-                if ($type === 'export') {
-                    $organizations[] = $patientStatus->organization;
-                } else {
-                    $organizations[] = $this->siteService->getOrganizationDisplayName($patientStatus->organization);
+        if (is_array($participant->patientStatus)) {
+            foreach ($participant->patientStatus as $patientStatus) {
+                if ($patientStatus->status === $value) {
+                    if ($type === 'export') {
+                        $organizations[] = $patientStatus->organization;
+                    } else {
+                        $organizations[] = $this->siteService->getOrganizationDisplayName($patientStatus->organization);
+                    }
                 }
             }
+            return implode('; ', $organizations);
         }
-        return implode('; ', $organizations);
+        return '';
     }
 
 
