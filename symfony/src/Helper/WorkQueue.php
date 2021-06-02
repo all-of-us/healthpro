@@ -636,8 +636,8 @@ class WorkQueue
         $headers[] = 'COPE Feb PPI Survey Complete';
         $headers[] = 'COPE Feb PPI Survey Completion Date';
         $headers[] = 'Core Participant Minus PM Date';
-        $headers[] = 'Summer Minute Survey Complete';
-        $headers[] = 'Summer Minute Survey Completion Date';
+        $headers[] = 'Summer Minute PPI Survey Complete';
+        $headers[] = 'Summer Minute PPI Survey Completion Date';
         return $headers;
     }
 }
