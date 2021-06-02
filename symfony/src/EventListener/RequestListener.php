@@ -16,6 +16,7 @@ class RequestListener
     private $logger;
     private $em;
     private $twig;
+    private $session;
 
     private $request;
 

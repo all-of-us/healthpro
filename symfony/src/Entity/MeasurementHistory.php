@@ -24,9 +24,9 @@ class MeasurementHistory
     private $evaluation;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
      */
-    private $userId;
+    private $user;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -66,14 +66,14 @@ class MeasurementHistory
         return $this;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(int $userId): self
+    public function setUser(?User $user): self
     {
-        $this->userId = $userId;
+        $this->user = $user;
 
         return $this;
     }

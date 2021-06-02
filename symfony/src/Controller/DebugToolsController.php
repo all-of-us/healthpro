@@ -80,7 +80,7 @@ class DebugToolsController extends AbstractController
                     if (!$measurement) {
                         continue;
                     }
-                    $measurementsService->loadFromAObject($measurement);
+                    $measurementsService->load($measurement);
                     $parentRdrId = null;
                     if ($measurement->getParentId()) {
                         $parentEvaluation = $repository->findOneBy(['id' => $measurement->getParentId()]);

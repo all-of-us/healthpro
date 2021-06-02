@@ -1,0 +1,67 @@
+{
+    "version": "0.1",
+    "fields": [
+        {
+            "name": "height",
+            "label": "Height",
+            "unit": "cm",
+            "decimals": 1,
+            "max": 300,
+            "help": {
+                "image": "height.png"
+            }
+        },
+        {
+            "name": "weight",
+            "label": "Weight",
+            "unit": "kg",
+            "decimals": 1,
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "blood_pressure_systolic",
+            "label": "Blood Pressure: systolic",
+            "unit": "mmHg",
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "blood_pressure_diastolic",
+            "label": "Blood Pressure: diastolic",
+            "unit": "mmHg",
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "heart_rate",
+            "label": "Heart Rate",
+            "unit": "bpm",
+            "min": 20,
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "hip_circumference",
+            "label": "Hip Circumference",
+            "unit": "cm",
+            "decimals": 1,
+            "help": {
+                "image": "hip.png"
+            }
+        },
+        {
+            "name": "waist_circumference",
+            "label": "Waist Circumference",
+            "unit": "cm",
+            "decimals": 1,
+            "help": {
+                "image": "waist.png"
+            }
+        }
+    ]
+}

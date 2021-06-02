@@ -20,6 +20,10 @@ class SymfonyMigrationController extends AbstractController
         ['review_today', '/review'],
         ['orderCheck', '/participant/{participantId}/order/check'],
         ['order', '/participant/{participantId}/order/{orderId}'],
+        ['evaluation', '/participant/{participantId}/measurements/{evalId}', [
+            'method' => 'GET|POST',
+            'defaults' => ['evalId' => null]
+        ]],
         ['workqueue_index', '/workqueue', ['method' => 'GET|POST']],
         ['workqueue_participant', '/workqueue/participant/{id}'],
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
@@ -119,6 +123,24 @@ class SymfonyMigrationController extends AbstractController
             '/s/participant/%s/order/%d',
             $participantId,
             $orderId
+        ));
+    }
+
+    /**
+     * @deprecated 2021-05-10
+     */
+    public function evaluationAction($participantId, $evalId, Application $app)
+    {
+        if (!$evalId) {
+            return $app->redirect(sprintf(
+                '/s/participant/%s/measurements',
+                $participantId
+            ));
+        }
+        return $app->redirect(sprintf(
+            '/s/participant/%s/measurements/%d',
+            $participantId,
+            $evalId
         ));
     }
 

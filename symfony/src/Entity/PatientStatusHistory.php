@@ -44,7 +44,7 @@ class PatientStatusHistory
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $rdr_ts;
+    private $rdrTs;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\PatientStatus", inversedBy="patientStatusHistories")
@@ -134,12 +134,12 @@ class PatientStatusHistory
 
     public function getRdrTs(): ?\DateTimeInterface
     {
-        return $this->rdr_ts;
+        return $this->rdrTs;
     }
 
-    public function setRdrTs(?\DateTimeInterface $rdr_ts): self
+    public function setRdrTs(?\DateTimeInterface $rdrTs): self
     {
-        $this->rdr_ts = $rdr_ts;
+        $this->rdrTs = $rdrTs;
 
         return $this;
     }
