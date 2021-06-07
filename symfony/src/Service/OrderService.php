@@ -104,6 +104,38 @@ class OrderService
         return false;
     }
 
+    public function getOrdersByParticipant($participantId)
+    {
+        try {
+            $response = $this->rdrApiService->get("rdr/v1/Participant/{$participantId}/BiobankOrder");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->data)) {
+                return $result->data;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return [];
+        }
+        return [];
+    }
+
+    public function getOrders(array $query = []): array
+    {
+        try {
+            $response = $this->rdrApiService->get("rdr/v1/BiobankOrder", [
+                'query' => $query
+            ]);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && is_array($result->data)) {
+                return $result->data;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return [];
+        }
+        return [];
+    }
+
     public function cancelRestoreOrder($type, $orderObject)
     {
         try {
@@ -145,7 +177,7 @@ class OrderService
         }
         $result = ['status' => 'fail'];
         // Set collected time to created date at midnight local time
-        $collectedAt = new \DateTime($this->order->getCreatedTs()->format('Y-m-d'), new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+        $collectedAt = new \DateTime($this->order->getCreatedTs()->format('Y-m-d'), new \DateTimeZone($this->userService->getUser()->getTimezone()));
         if ($site = $this->em->getRepository(Site::class)->findOneBy(['deleted' => 0, 'googleGroup' => $this->siteService->getSiteId()])) {
             $mayoClientId = $site->getMayolinkAccount();
         }
@@ -370,7 +402,7 @@ class OrderService
                     try {
                         $sampleTs = new \DateTime();
                         $sampleTs->setTimestamp($processedSampleTimes[$sample]);
-                        $sampleTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+                        $sampleTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getTimezone()));
                         $formData['processedSamplesTs'][$sample] = $sampleTs;
                     } catch (\Exception $e) {
                         $formData['processedSamplesTs'][$sample] = null;
@@ -397,7 +429,7 @@ class OrderService
         }
         $result = ['status' => 'fail'];
         // Set collected time to user local time
-        $collectedAt = new \DateTime($this->order->getCollectedTs()->format('Y-m-d H:i:s'), new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+        $collectedAt = new \DateTime($this->order->getCollectedTs()->format('Y-m-d H:i:s'), new \DateTimeZone($this->userService->getUser()->getTimezone()));
         // Check if mayo account number exists
         if (!empty($mayoClientId)) {
             $birthDate = $this->params->has('ml_real_dob') ? $this->participant->dob : $this->participant->getMayolinkDob();
@@ -448,10 +480,10 @@ class OrderService
         if (!$rdrId) {
             // Check for rdr id conflict error code
             if ($this->rdrApiService->getLastErrorCode() === 409) {
-                $rdrOrder = $this->getOrder($this->order->getParticipantId(), $this->getMayoId());
+                $rdrOrder = $this->getOrder($this->order->getParticipantId(), $this->order->getMayoId());
                 // Check if order exists in RDR
-                if (!empty($rdrOrder) && $rdrOrder->id === $this->order['mayo_id']) {
-                    $rdrId = $this->getMayoId();
+                if (!empty($rdrOrder) && $rdrOrder->id === $this->order->getMayoId()) {
+                    $rdrId = $this->order->getMayoId();
                 }
             }
         }
@@ -507,7 +539,7 @@ class OrderService
                 if (!empty($processedSamplesTs[$value])) {
                     $processedTs = new \DateTime();
                     $processedTs->setTimestamp($processedSamplesTs[$value]);
-                    $processedTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getInfo()['timezone']));
+                    $processedTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getTimezone()));
                     $sample['processed_ts'] = $processedTs;
                 }
             }
@@ -629,5 +661,105 @@ class OrderService
     {
         // Allow cohort 1 and 2 participants to edit existing orders even if status is false
         return !$this->participant->status && !empty($this->order->getId()) ? $this->participant->editExistingOnly : $this->participant->status;
+    }
+
+    public function loadFromJsonObject($object)
+    {
+        if (!empty($object->samples)) {
+            foreach ($object->samples as $sample) {
+                $sampleCode = $sample->test;
+                if (!array_key_exists($sample->test, $this->order->getSamplesInformation()) && array_key_exists($sample->test, Order::$mapRdrSamples)) {
+                    $sampleCode = Order::$mapRdrSamples[$sample->test]['code'];
+                    $centrifugeType = Order::$mapRdrSamples[$sample->test]['centrifuge_type'];
+                }
+                if (!empty($sample->collected)) {
+                    $collectedSamples[] = $sampleCode;
+                    $collectedTs = $sample->collected;
+                }
+                if (!empty($sample->processed)) {
+                    $processedSamples[] = $sampleCode;
+                    $processedTs = $sample->processed;
+                    $processedSamplesTs[$sampleCode] = (new \DateTime($sample->processed))->getTimestamp();
+                }
+                if (!empty($sample->finalized)) {
+                    $finalizedSamples[] = $sampleCode;
+                    $finalizedTs = $sample->finalized;
+                }
+            }
+        }
+
+        // Update notes field
+        $collectedNotes = !empty($object->notes->collected) ? $object->notes->collected : null;
+        $processedNotes = !empty($object->notes->processed) ? $object->notes->processed : null;
+        $finalizedNotes = !empty($object->notes->finalized) ? $object->notes->finalized : null;
+
+        if (!empty($object->identifier)) {
+            foreach ($object->identifier as $identifier) {
+                if (preg_match('/tracking-number/i', $identifier->system)) {
+                    $trackingNumber = $identifier->value;
+                }
+                if (preg_match('/kit-id/i', $identifier->system)) {
+                    $kitId = $identifier->value;
+                }
+            }
+        }
+
+        // Extract participantId
+        preg_match('/^Patient\/(P\d+)$/i', $object->subject, $subject_matches);
+        $participantId = $subject_matches[1];
+
+        $this->order->setParticipantId($participantId);
+        if (!empty($kitId)) {
+            $this->order->setOrderId($kitId);
+        }
+        // Can be used as order Id
+        $this->order->setRdrId($object->id);
+        if (property_exists($object, 'biobankId')) {
+            $this->order->setBiobankId($object->biobankId);
+        }
+        $this->order->setType('kit');
+        if (!empty($object->created)) {
+            $this->order->setCreatedTs(new \DateTime($object->created));
+        }
+        if (!empty($processedTs)) {
+            $this->order->setProcessedTs(new \DateTime($processedTs));
+        }
+        if (!empty($collectedTs)) {
+            $this->order->setCollectedTs(new \DateTime($collectedTs));
+        }
+        if (!empty($finalizedTs)) {
+            $this->order->setFinalizedTs(new \DateTime($finalizedTs));
+        }
+        $this->order->setProcessedCentrifugeType((!empty($centrifugeType)) ? $centrifugeType : null);
+        $this->order->setCollectedSamples(json_encode(!empty($collectedSamples) ? $collectedSamples : []));
+        $this->order->setProcessedSamples(json_encode(!empty($processedSamples) ? $processedSamples : []));
+        $this->order->setProcessedSamplesTs(json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []));
+        $this->order->setFinalizedSamples(json_encode(!empty($finalizedSamples) ? $finalizedSamples : []));
+        $this->order->setQuanumFinalizedSamples(!empty($finalizedSamples) ? join($finalizedSamples, ', ') : '');
+        $this->order->setCollectedNotes($collectedNotes);
+        $this->order->setProcessedNotes($processedNotes);
+        $this->order->setFinalizedNotes($finalizedNotes);
+        $this->order->setFedexTracking(!empty($trackingNumber) ? $trackingNumber : null);
+        $this->order->setOrigin($object->origin);
+        if (!empty($object->collectedInfo)) {
+            $this->order->setQuanumCollectedUser($object->collectedInfo->author->value);
+        }
+        if (!empty($object->collectedInfo->address)) {
+            $this->order->setCollectedSiteAddress($object->collectedInfo->author->value);
+        }
+        $this->order->setCollectedSiteName('A Quest Site');
+        if (!empty($object->processedInfo)) {
+            $this->order->setQuanumProcessedUser($object->processedInfo->author->value);
+        }
+        $this->order->setProcessedSiteName('A Quest Site');
+        if (!empty($object->finalizedInfo)) {
+            $this->order->setQuanumFinalizedUser($object->finalizedInfo->author->value);
+        }
+        $this->order->setFinalizedSiteName('A Quest Site');
+        $this->order->setQuanumOrderStatus('Finalized');
+        if ($this->params->has('order_samples_version')) {
+            $this->order->setVersion($this->params->get('order_samples_version'));
+        }
+        return $this->order;
     }
 }

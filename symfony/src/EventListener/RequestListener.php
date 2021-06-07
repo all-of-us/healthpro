@@ -16,6 +16,7 @@ class RequestListener
     private $logger;
     private $em;
     private $twig;
+    private $session;
 
     private $request;
 
@@ -73,7 +74,8 @@ class RequestListener
 
     private function checkSiteSelect()
     {
-        if (!$this->session->has('site') && !preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|login)($|\/).*/', $this->request->getPathInfo())) {
+        if (!$this->session->has('site') && !preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|login)($|\/).*/',
+                $this->request->getPathInfo())) {
             return new RedirectResponse('/');
         }
     }

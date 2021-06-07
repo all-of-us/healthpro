@@ -10,7 +10,7 @@ $container->loadFromExtension('twig', [
         'isStable' => $env->isStable(),
         'reportKitUrl' => $env->configuration['reportKitUrl'] ?? '',
         'assetVer' => $env->values['assetVer'],
-        'awardeeOrganization' => '',
+        'siteInfo' => '@App\Service\SiteService',
         'google_analytics_property' => $env->configuration['google_analytics_property'] ?? '',
         'sessionTimeout' => $env->values['sessionTimeOut'],
         'sessionWarning' => $env->values['sessionWarning'],

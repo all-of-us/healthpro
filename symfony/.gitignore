@@ -13,3 +13,5 @@
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
+/bin/GeoLite2-Country.mmdb

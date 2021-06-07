@@ -140,9 +140,9 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     },
     handlePregnantOrWheelchair: function() {
         var isPregnant = (this.$('#form_pregnant').val() == 1);
-        var isWheelchairBound = (this.$('#form_wheelchair').val() == 1);
+        var isWheelchairUser = (this.$('#form_wheelchair').val() == 1);
         var self = this;
-        if (isPregnant || isWheelchairBound) {
+        if (isPregnant || isWheelchairUser) {
             this.$('#panel-hip-waist input').each(function() {
                 $(this).valChange('');
             });
@@ -167,21 +167,21 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
-        if (isWheelchairBound) {
+        if (isWheelchairUser) {
             if (this.rendered) {
-                this.$('#form_height-protocol-modification').valChange('wheelchair-bound');
-                this.$('#form_weight-protocol-modification').valChange('wheelchair-bound');
+                this.$('#form_height-protocol-modification').valChange('wheelchair-user');
+                this.$('#form_weight-protocol-modification').valChange('wheelchair-user');
             }
         }
-        if (!isWheelchairBound) {
-            if (this.rendered && this.$('#form_height-protocol-modification').val() == 'wheelchair-bound') {
+        if (!isWheelchairUser) {
+            if (this.rendered && this.$('#form_height-protocol-modification').val() == 'wheelchair-user') {
                 this.$('#form_height-protocol-modification').valChange('');
             }
-            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-bound') {
+            if (this.rendered && this.$('#form_weight-protocol-modification').val() == 'wheelchair-user') {
                 this.$('#form_weight-protocol-modification').valChange('');
             }
         }
-        if (!isPregnant && !isWheelchairBound) {
+        if (!isPregnant && !isWheelchairUser) {
             this.$('#panel-hip-waist input, #panel-hip-waist select').each(function() {
                 if (!self.finalized) {
                     $(this).attr('disabled', false);
@@ -196,7 +196,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     },
     handleHeightProtocol: function() {
         var selected = this.$('#form_height-protocol-modification').val();
-        if (selected === 'refusal') {
+        if (selected === 'refusal' || selected === 'pandemic') {
             this.$('#form_height').valChange('').attr('disabled', true);
             this.$('.field-height').next('.alt-units-block').hide();
         } else {
@@ -214,7 +214,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     },
     handleWeightProtocol: function() {
         var selected = this.$('#form_weight-protocol-modification').val();
-        if (selected === 'cannot-balance-on-scale' || selected === 'refusal') {
+        if (selected === 'cannot-balance-on-scale' || selected === 'refusal' || selected === 'pandemic') {
             this.$('#form_weight').valChange('').attr('disabled', true);
             this.$('.field-weight').next('.alt-units-block').hide();
         } else {
@@ -475,9 +475,12 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
             block.find('.modification-toggle').hide();
             block.find('.modification-select').show();
         }
-        if (modification === 'refusal' || modification === 'colostomy-bag') {
-            block.find('.modification-affected input, .modification-affected select, .modification-manual input:checkbox').each(function() {
-                $(this).attr('disabled', true);
+        if (modification === 'refusal' || modification === 'pandemic' || modification === 'colostomy-bag') {
+            block.find('.modification-affected input:text, .modification-affected select').each(function () {
+                $(this).valChange('').attr('disabled', true);
+            });
+            block.find('.modification-manual input:checkbox').each(function () {
+                $(this).prop('checked', false).attr('disabled', true);
             });
         } else {
             block.find('.modification-affected input, .modification-affected select, .modification-manual input:checkbox').each(function() {

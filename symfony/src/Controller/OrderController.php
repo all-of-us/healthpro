@@ -264,7 +264,7 @@ class OrderController extends AbstractController
             'step' => 'collected',
             'order' => $order,
             'em' => $this->em,
-            'timeZone' => $this->getUser()->getInfo()['timezone'],
+            'timeZone' => $this->getUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId()
         ]);
         $collectForm->handleRequest($request);
@@ -324,7 +324,7 @@ class OrderController extends AbstractController
             'step' => 'processed',
             'order' => $order,
             'em' => $this->em,
-            'timeZone' => $this->getUser()->getInfo()['timezone'],
+            'timeZone' => $this->getUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId()
         ]);
         $processForm->handleRequest($request);
@@ -413,7 +413,7 @@ class OrderController extends AbstractController
             'step' => 'finalized',
             'order' => $order,
             'em' => $this->em,
-            'timeZone' => $this->getUser()->getInfo()['timezone'],
+            'timeZone' => $this->getUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId()
         ]);
         $finalizeForm->handleRequest($request);
@@ -673,12 +673,12 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/json-response", name="order_json")
-     * For debugging generated JSON representation - only allowed in local dev
+     * For debugging generated JSON representation - only allowed for admins or in local dev
      */
     public function orderJsonAction($participantId, $orderId, Request $request, EnvironmentService $env)
     {
-        if (!$env->isLocal()) {
-            throw $this->createNotFoundException();
+        if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
+            throw $this->createAccessDeniedException();
         }
         $order = $this->loadOrder($participantId, $orderId);
         if ($request->query->has('rdr')) {
@@ -721,7 +721,7 @@ class OrderController extends AbstractController
     {
         $order = $this->loadOrder($participantId, $orderId);
         return $this->render('biobank/summary.html.twig', [
-            'biobankChanges' => $order->getBiobankChangesDetails($this->getUser()->getInfo()['timezone'])
+            'biobankChanges' => $order->getBiobankChangesDetails($this->getUser()->getTimezone())
         ]);
     }
 }

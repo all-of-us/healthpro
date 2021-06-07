@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Measurement;
+use App\Entity\MissingNotificationLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -90,5 +91,37 @@ class MeasurementRepository extends ServiceEntityRepository
             'site' => $siteId,
             'type' => Measurement::EVALUATION_CANCEL
         ]);
+    }
+
+    public function getUnloggedMissingMeasurements(): array
+    {
+        $evaluationsQuery = "SELECT id FROM evaluations WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND rdr_id IS NULL";
+        return $this->getEntityManager()->getConnection()->fetchAll($evaluationsQuery, [
+            'type' => MissingNotificationLog::MEASUREMENT_TYPE
+        ]);
+    }
+
+    public function getMeasurement($measurementId, $participantId)
+    {
+        $parentIds = $this->createQueryBuilder('m')
+            ->select('m.parentId')
+            ->where('m.parentId is not null')
+            ->getQuery()
+            ->getResult()
+        ;
+        $queryParams = ['measurementId' => $measurementId, 'participantId' => $participantId];
+        $queryBuilder = $this->createQueryBuilder('m')
+            ->where('m.id = :measurementId')
+            ->andWhere('m.participantId = :participantId');
+        if (!empty($parentIds)) {
+            $queryBuilder->andWhere($queryBuilder->expr()->notIn('m.id', ':parentIds'));
+            $queryParams['parentIds'] = $parentIds;
+        }
+        $measurement = $queryBuilder
+            ->setParameters($queryParams)
+            ->getQuery()
+            ->getResult()
+        ;
+        return !empty($measurement) ? $measurement[0] : null;
     }
 }

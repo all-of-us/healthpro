@@ -1,0 +1,21 @@
+<div class="alert alert-warning">
+  <div class="row">
+    <div class="col-sm-9">
+      {% if participant.deceasedStatus == 'PENDING' %}
+      <strong>Deceased Participant:</strong> This participant was reported as deceased on <strong>{{ participant.deceasedAuthored|date('n/j/Y g:ia', app.user.timezone) }}</strong>. This status still needs to be accepted. Data can continue to be sent for this participant, but no new data should be collected. If entered in error, please review the submission under the "Review > Deceased Participants" tab and deny it to proceed with PM&B order creation.
+      {% endif %}
+      {% if participant.deceasedStatus == 'APPROVED' %}
+      <strong>Deceased Participant:</strong> This participant was accepted as deceased. Data can continue to be sent for this participant, but no new data should be collected.
+      <ul>
+        <li><strong>Date of death:</strong> {{ participant.dateOfDeath ? participant.dateOfDeath|date('n/j/Y') : 'Date not available.' }}</li>
+        <li><strong>Accepted on:</strong> {{ participant.deceasedAuthored|date('n/j/Y g:ia', app.user.timezone) }}</li>
+      </ul>
+      {% endif %}
+    </div>
+    <div class="col-sm-3">
+      <div style="margin-top: 1em; margin-bottom: 1em;">
+        <a class="btn btn-sm btn-block btn-primary" href="{{ path('deceased_report_history', {participantId: participant.participantId}) }}">View Report(s)</a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -27,6 +27,7 @@ class User implements UserInterface
     private $adminAccess;
     private $info;
     private $timezone;
+    private $lastLogin;
     private $sessionInfo;
     private $adminDvAccess;
     private $biobankAccess;
@@ -306,6 +307,16 @@ class User implements UserInterface
     public function setTimezone($timezone)
     {
         $this->timezone = $timezone;
+    }
+
+    public function getLastlogin(): ?\DateTimeInterface
+    {
+        return $this->lastLogin;
+    }
+
+    public function setLastLogin(?\DateTimeInterface $lastLogin)
+    {
+        $this->lastLogin = $lastLogin;
     }
 
     public function getId()

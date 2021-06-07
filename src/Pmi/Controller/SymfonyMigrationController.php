@@ -19,7 +19,17 @@ class SymfonyMigrationController extends AbstractController
         ['admin_home', '/admin'],
         ['review_today', '/review'],
         ['orderCheck', '/participant/{participantId}/order/check'],
-        ['order', '/participant/{participantId}/order/{orderId}']
+        ['order', '/participant/{participantId}/order/{orderId}'],
+        ['evaluation', '/participant/{participantId}/measurements/{evalId}', [
+            'method' => 'GET|POST',
+            'defaults' => ['evalId' => null]
+        ]],
+        ['workqueue_index', '/workqueue', ['method' => 'GET|POST']],
+        ['workqueue_participant', '/workqueue/participant/{id}'],
+        ['participant', '/participant/{id}', ['method' => 'GET|POST']],
+        ['participants', '/participants'],
+        ['biobank_home', '/biobank'],
+        ['orders', '/orders']
     ];
 
     public function deceased_reports_indexAction(Application $app)
@@ -113,5 +123,78 @@ class SymfonyMigrationController extends AbstractController
             $participantId,
             $orderId
         ));
+    }
+
+    /**
+     * @deprecated 2021-05-10
+     */
+    public function evaluationAction($participantId, $evalId, Application $app)
+    {
+        if (!$evalId) {
+            return $app->redirect(sprintf(
+                '/s/participant/%s/measurements',
+                $participantId
+            ));
+        }
+        return $app->redirect(sprintf(
+            '/s/participant/%s/measurements/%d',
+            $participantId,
+            $evalId
+        ));
+    }
+
+
+    /**
+     * @deprecated 2021-02-08
+     */
+    public function workqueue_indexAction(Application $app)
+    {
+        return $app->redirect('/s/workqueue/');
+    }
+
+    /**
+     * @deprecated 2021-02-18
+     */
+    public function workqueue_participantAction($id, Application $app)
+    {
+        return $app->redirect(sprintf(
+            '/s/workqueue/participant/%s',
+            $id
+        ));
+    }
+
+    /**
+     * @deprecated 2021-02-18
+     */
+    public function participantAction($id, Application $app)
+    {
+        return $app->redirect(sprintf(
+            '/s/participant/%s',
+            $id
+        ));
+    }
+
+    /**
+     * @deprecated 2021-02-15
+     */
+    public function participantsAction(Application $app)
+    {
+       return $app->redirect('/s/participants/');
+    }
+
+    /**
+     * @deprecated 2021-03-09
+     */
+    public function biobank_homeAction(Application $app)
+    {
+        return $app->redirect('/s/biobank/');
+    }
+
+    /**
+     * @deprecated 2021-04-07
+     */
+    public function ordersAction(Application $app)
+    {
+        return $app->redirect('/s/orders/');
     }
 }

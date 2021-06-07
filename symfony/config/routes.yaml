@@ -13,28 +13,18 @@ logout:
 selectSite:
     path: /site/select
 
-participants:
-    path: /participants
-
-orders:
-    path: /orders
-
 evaluation:
     path: /participant/{participantId}/measurements/{evalId}
-    defaults:
-      - evalId: null
+    defaults: { evalId: null }
 
 evaluation_modify:
     path: /participant/{participantId}/measurements/{evalId}/modify/{type}
 
-workqueue_index:
-    path: /workqueue
+evaluationBloodDonorCheck:
+    path: /participant/{participantId}/measurements/blood/donor/check
 
 dashboard_home:
     path: /dashboard
-
-biobank_home:
-    path: /biobank
 
 clientTimeout:
     path: /client-timeout
@@ -48,5 +38,6 @@ agreeUsage:
 hideTZWarning:
     path: /hide-tz-warning
 
-participant:
-    path: /participant/{id}
+patientStatus:
+    path: /participant/{participantId}/patient/status/{patientStatusId}
+

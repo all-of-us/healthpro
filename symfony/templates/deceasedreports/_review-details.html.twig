@@ -12,7 +12,7 @@
       <dt>Gender Identity</dt>
       <dd>{{ codebook_display(participant.genderIdentity)|default('--') }}</dd>
       <dt>Paired Awardee</dt>
-      <dd>{{ awardee_display(participant.awardee) }}</dd>
+      <dd>{{ siteInfo.awardeeDisplayName(participant.awardee) }}</dd>
     </dl>
   </div>
 </div>

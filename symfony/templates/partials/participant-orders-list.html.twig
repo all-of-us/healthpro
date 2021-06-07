@@ -11,36 +11,36 @@
                     <div id="order-overflow">
                 {% endif %}
                 {% if order.origin is defined and order.origin == 'careevolution' %}
-                    <a href="{{ path('biobank_quanumOrder', { biobankId: participant.biobankId, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
+                    <a href="{{ path('biobank_quanum_order', { biobankId: participant.biobankId, orderId: order.rdrId }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {% elseif biobankView is defined %}
                     <a href="{{ path('biobank_order', { biobankId: participant.biobankId, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {% else %}
                     <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {% endif %}
-                    {{ order.createdTs|date('D n/j/Y', app.user.getInfo.timezone) }}
+                    {{ order.createdTs|date('D n/j/Y', app.user.timezone) }}
                     <small class="text-muted"><strong>{{ order.orderId }}</strong></small>
                     <br/>
                     <small class="text-muted">
                         {% set historyType = order.history.type is defined ? order.history.type : '' %}
                         {% if historyType == 'cancel' %}
-                            <span class="label label-danger">Cancelled</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-danger">Cancelled</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% elseif not order.finalizedTs and not order.version %}
                             <span class="label label-danger">Expired</span>
                         {% elseif historyType == 'unlock' %}
-                            <span class="label label-primary">Unlocked for editing</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-primary">Unlocked for editing</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% elseif historyType == 'edit' %}
-                            <span class="label label-success">Edited &amp; Finalized</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-success">Edited &amp; Finalized</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% elseif order.finalizedTs and order.rdrId %}
                             {% if order.biobankFinalized %}
                                 <span class="label label-warning">Biobank Finalized</span>
                             {% else %}
                                 <span class="label label-success">Finalized</span>
                             {% endif %}
-                            {{ order.finalizedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            {{ order.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% elseif order.processedTs %}
-                            <span class="label label-info">Processed</span> {{ order.processedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-info">Processed</span> {{ order.processedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% elseif order.collectedTs %}
-                            <span class="label label-default">Collected</span> {{ order.collectedTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}
+                            <span class="label label-default">Collected</span> {{ order.collectedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% endif %}
                     </small>
                     </a>
@@ -52,7 +52,7 @@
                 </a>
             {% endif %}
             {% if type is not defined  and readOnly is not defined and biobankView is not defined and not participant.isSuspended and participant.status %}
-                <a href="{{ path('orderCheck', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
+                <a href="{{ path('order_check', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
             {% endif %}
         {% endif %}
     </div>

@@ -80,6 +80,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
+        $this->userService->updateLastLogin();
         return $this->redirectToRoute('symfony_home');
     }
 

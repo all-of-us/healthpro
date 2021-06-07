@@ -1,0 +1,4 @@
+<div class="alert alert-warning">
+    <p><b>Deactivated Participant:</b> This participant has deactivated from the All of Us Research Program. No new data can be collected or sent for this participant.</p>
+    <p><b>Deactivation Time:</b> {{ participant.suspensionTime ? participant.suspensionTime|date('n/j/Y g:ia', app.user.timezone) : '--' }}</p>
+</div>

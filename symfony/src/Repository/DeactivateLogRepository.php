@@ -6,12 +6,7 @@ use App\Entity\DeactivateLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @method DeactivateLog|null find($id, $lockMode = null, $lockVersion = null)
- * @method DeactivateLog|null findOneBy(array $criteria, array $orderBy = null)
- * @method DeactivateLog[]    findAll()
- * @method DeactivateLog[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
+
 class DeactivateLogRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -19,10 +14,7 @@ class DeactivateLogRepository extends ServiceEntityRepository
         parent::__construct($registry, DeactivateLog::class);
     }
 
-    /**
-     * @return DeactivateLog[] Returns an array of DeactivateLog objects
-     */
-    public function getDeactivatedNotifications()
+    public function getDeactivatedNotifications() :array
     {
         return $this->createQueryBuilder('d')
             ->select('count(d.id) as count, d.insertTs, d.hpoId, d.emailNotified as email')
@@ -31,5 +23,15 @@ class DeactivateLogRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+    }
+
+    public function getLatestAwardees() :array
+    {
+        return $this->createQueryBuilder('d')
+            ->select('d.hpoId as awardeeId, max(d.deactivateTs) as ts')
+            ->groupBy('d.hpoId')
+            ->getQuery()
+            ->getResult()
+            ;
     }
 }

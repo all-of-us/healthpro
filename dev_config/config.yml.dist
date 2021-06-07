@@ -42,14 +42,14 @@ ml_mock_order: pmitest
 gaBypass: 1
 # Google Groups to use when bypassing Google Apps auth
 gaBypassGroups:
-  - email: hpo-site-monroeville@staging.pmi-ops.org
-    name: Monroeville
-  - email: hpo-site-upmc@staging.pmi-ops.org
-    name: UPMC
-  - email: admin-dashboard@staging.pmi-ops.org
-    name: Admin Dashboard
-  - email: site-admin@staging.pmi-ops.org
-    name: Site Management
+    -   email: hpo-site-monroeville@staging.pmi-ops.org
+        name: Monroeville
+    -   email: hpo-site-upmc@staging.pmi-ops.org
+        name: UPMC
+    -   email: admin-dashboard@staging.pmi-ops.org
+        name: Admin Dashboard
+    -   email: site-admin@staging.pmi-ops.org
+        name: Site Management
 # Or, configure Google Apps auth
 #   Note: Store service account key in googleapps_key.json
 gaApplicationName: PMI DRC HPO
@@ -61,7 +61,7 @@ enforce2fa: 0
 
 # Mandrill configuration for sending emails
 # mail_method: mandrill
-# mandrill_key: 
+# mandrill_key:
 
 # enable site sync using RDR Organization API
 sites_use_rdr: true
@@ -103,6 +103,22 @@ reportKitUrl:
 # Set diversion pouch site name
 diversion_pouch_site: ECDC DV Diversion Pouch
 
+# Jira API credentials for release ticket creation
+# See https://id.atlassian.com/manage-profile/security/api-tokens
+# jira_api_user:
+# jira_api_token:
+
+# Account ids to mention specific people in release ticket
+# jira_account_ids:
+#     dev:
+#         - 1001
+#         - 1002
+#         - 1003
+#     qa:
+#         - 1011
+#     change:
+#         - 1021
+#         - 1022
 
 #
 # Feature flags
@@ -110,3 +126,9 @@ diversion_pouch_site: ECDC DV Diversion Pouch
 
 # Enables Google Groups role check for ROLE_MANAGE_USERS role
 # feature.manageusers: true
+
+# EHR protocol modification banner message
+ehr_protocol_banner_message:
+
+# Enables physical measurements blood donor protocol modification workflow for diversion pouch sites
+# feature.blooddonorpm: false

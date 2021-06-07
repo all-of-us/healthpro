@@ -21,12 +21,12 @@ class MeasurementHistory
      * @ORM\OneToOne(targetEntity="App\Entity\Measurement", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
-    private $measurement;
+    private $evaluation;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
      */
-    private $userId;
+    private $user;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -56,24 +56,24 @@ class MeasurementHistory
 
     public function getMeasurement(): ?Measurement
     {
-        return $this->measurement;
+        return $this->evaluation;
     }
 
     public function setMeasurement(Measurement $measurement): self
     {
-        $this->measurement = $measurement;
+        $this->evaluation = $measurement;
 
         return $this;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(int $userId): self
+    public function setUser(?User $user): self
     {
-        $this->userId = $userId;
+        $this->user = $user;
 
         return $this;
     }

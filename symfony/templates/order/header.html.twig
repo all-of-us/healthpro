@@ -27,14 +27,14 @@
     <div class="alert alert-warning well-sm">
         <i class="fa fa-info-circle" aria-hidden="true"></i>
         <strong>
-            Unlocked for editing by {{ order.history.user.email|default('Unknown') }} at {{ site_display(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.getInfo.timezone) }}
+            Unlocked for editing by {{ order.history.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.timezone) }}
         </strong>
     </div>
 {% elseif order.status == 'cancel' %}
     <div class="alert alert-danger well-sm">
         <i class="fa fa-info-circle" aria-hidden="true"></i>
         <strong>
-            Cancelled by {{ order.history.user.email|default('Unknown') }} at {{ site_display(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.getInfo.timezone) }}
+            Cancelled by {{ order.history.user.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(order.history.site) }} on {{ order.history.createdTs|date('F j, Y g:ia', app.user.timezone) }}
         </strong>
         {% if order.history.reasonDisplayText is not empty %}
             <br/><strong>Reason:</strong> {{ order.history.reasonDisplayText }}
@@ -75,7 +75,7 @@
         {% else %}
             <div class="{% if order.rdrId is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
-                <strong {% if attribute(order, 'biobankFinalized') and attribute(order, activeStep~'User') is empty %} class="text-danger" {% endif %}>{{ activeStep|capitalize }} by {{ attribute(order, activeStep~'User').id is defined and attribute(order, activeStep~'User').id is not empty ? attribute(order, activeStep~'User').email|default('Unknown') : 'Biobank user' }} at {{ site_display(attribute(order, activeStep~'Site')) }}</strong>
+                <strong {% if attribute(order, 'biobankFinalized') and attribute(order, activeStep~'User') is empty %} class="text-danger" {% endif %}>{{ activeStep|capitalize }} by {{ attribute(order, activeStep~'User').id is defined and attribute(order, activeStep~'User').id is not empty ? attribute(order, activeStep~'User').email|default('Unknown') : 'Biobank user' }} at {{ siteInfo.siteDisplayName(attribute(order, activeStep~'Site')) }}</strong>
                 {% if order.biobankFinalized and attribute(order, activeStep~'User') is empty %}
                     <a class="btn btn-success btn-xs pull-right" href="{{ path('biobank_summary', { participantId: participant.id, orderId: order.id }) }}" target="_blank">Summary</a>
                 {% endif %}

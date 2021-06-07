@@ -44,7 +44,7 @@
                         <li><a href="{{ path('workqueue_index') }}">Work Queue</a></li>
                     {% endif %}
                 {% endif %}
-                {% if is_granted('ROLE_AWARDEE') and app.session.get('awardee') and awardeeOrganization %}
+                {% if is_granted('ROLE_AWARDEE') and app.session.get('awardee') and siteInfo.superUserAwardees %}
                     <li><a href="{{ path('workqueue_index') }}">Work Queue</a></li>
                 {% endif %}
                 {% if is_granted('ROLE_DV_ADMIN') %}

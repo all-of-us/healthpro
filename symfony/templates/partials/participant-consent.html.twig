@@ -1,0 +1,52 @@
+{% import 'macros/display-text.html.twig' as macros %}
+
+<div id="participant-consent-status">
+    <div class="status-block">
+        <strong>Primary Consent</strong>
+        {{ macros.displayConsentStatus(participant.consentForStudyEnrollment, participant.consentForStudyEnrollmentAuthored) }}
+        <br/>
+    </div>
+    <div class="status-block">
+        <strong>EHR Consent</strong>
+        {{ macros.displayConsentStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored, participant.ehrConsentExpireStatus, participant.ehrConsentExpireAuthored) }}
+        <br/>
+    </div>
+    <div class="status-block">
+        <strong>gRoR Consent</strong>
+        {{ macros.displayGenomicsConsentStatus(participant.consentForGenomicsROR, participant.consentForGenomicsRORAuthored) }}
+        <br/>
+    </div>
+    <div class="status-block">
+        <strong>DV-only EHR Sharing</strong> <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip"><span class="sr-only">What is DV EHR Sharing</span><i class="fa fa-question-circle text-info"></i></span>
+        {{ macros.displayConsentStatus(participant.consentForDvElectronicHealthRecordsSharing, participant.consentForDvElectronicHealthRecordsSharingAuthored) }}
+        <br/>
+    </div>
+    <div class="status-block">
+        <strong>CABoR Consent</strong> <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
+        {{ macros.displayConsentStatus(participant.consentForCABoR, participant.consentForCABoRAuthored) }}
+        <br/>
+    </div>
+    {% if displayPatientStatusBlock %}
+        <div class="status-block patient-status-block">
+            <strong>Patient Status</strong>
+            {% if orgPatientStatusData is not empty %}
+                {% set displayStatus = orgPatientStatusData.display_status|split(':') %}
+                {% if orgPatientStatusData.status == 'YES' %}
+                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                    {{ displayStatus|first }}
+                {% elseif orgPatientStatusData.status == 'UNKNOWN' or orgPatientStatusData.status == 'NO_ACCESS' %}
+                    <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
+                    {{ displayStatus|first }}
+                {% else %}
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    {{ displayStatus|first }}
+                {% endif %}
+            {% else %}
+                <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
+                (not complete)
+            {% endif %}
+            <br/>
+            <br/>
+        </div>
+    {% endif %}
+</div>

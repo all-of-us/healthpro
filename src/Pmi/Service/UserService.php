@@ -6,7 +6,6 @@ use Pmi\Security\User;
 
 class UserService
 {
-
     public static function getRoles($roles, $site, $awardee, $managegroups)
     {
         if (!empty($site)) {
@@ -36,5 +35,17 @@ class UserService
             }
         }
         return $roles;
+    }
+
+    public static function updateLastLogin($app): void
+    {
+        $user = $app->getUser();
+        if (!$user) {
+            return;
+        }
+        $app['em']->getRepository('users')->update(
+            $user->getId(),
+            ['last_login' => new \DateTime()]
+        );
     }
 }

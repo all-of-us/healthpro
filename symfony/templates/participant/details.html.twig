@@ -1,0 +1,684 @@
+{% extends 'base.html.twig' %}
+{% block title %}Participant {{ participant.id }} - {% endblock %}
+{% block body %}
+    {% import 'macros/display-text.html.twig' as macros %}
+    {% if hasNoParticipantAccess %}
+        <div class="row">
+            <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa" aria-hidden="true"></i>Warning</h3>
+                    </div>
+                    <div class="panel-body">
+                        The participant you have selected is either unpaired or paired with another enrollment site. Please verify that this is the correct participant. By continuing, you acknowledge that you have a valid need to access this record. Access to this record will be audited and is subject to review. Unauthorized access to records may result in loss of access to HealthPro.
+                    </div>
+                    <div class="modal-footer text-right">
+                        {{ form_start(agreeForm) }}
+                        {{ form_widget(agreeForm.Acknowledge) }}
+                        <a href="{{ path(cancelRoute) }}" class="btn btn-default">Cancel</a>
+                        {{ form_end(agreeForm) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="page-header">
+            <h2>{{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }} <small>{{ participant.shortId }}</small></h2>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                {% include 'partials/participant-dl.html.twig' %}
+            </div>
+            <div class="col-sm-6 text-center">
+                <svg id="participant-barcode"></svg>
+            </div>
+        </div>
+        {% if cacheEnabled %}
+            <div class="row">
+                <div class="col-sm-12 text-center">
+                    <small>
+                        Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}
+                        <a href="{{ path('participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px"><i class="fa fa-refresh" aria-hidden="true"></i> refresh</a>
+                    </small>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if participant.status or canViewDetails %}
+            {% include 'partials/participant-consent.html.twig' %}
+        {% endif %}
+
+        {% if participant.activityStatus == 'deactivated' %}
+            {% include 'partials/participant-deactivated-status-notice.html.twig' %}
+        {% endif %}
+
+        {% if participant.deceasedStatus == 'PENDING' or participant.deceasedStatus == 'APPROVED' %}
+            {% include 'partials/deceased-participant-notice.html.twig' %}
+        {% endif %}
+
+        {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-cog"></i><span class="sr-only">Additional Options</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{{ path('deceased_report_new', {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a></li>
+                </ul>
+            </div>
+        {% endif %}
+
+        <div role="tabpanel">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#inperson" aria-controls="inperson" role="tab" data-toggle="tab">In-Person Enrollment</a>
+                </li>
+                {% if canViewDetails %}
+                    <li role="presentation">
+                        <a href="#overview" aria-controls="tab" role="tab" data-toggle="tab">Participant Overview</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#activities" aria-controls="tab" role="tab" data-toggle="tab">Participant Activities</a>
+                    </li>
+                {% else %}
+                    {% for tab in ['Participant Overview', 'Participant Activities'] %}
+                        <li role="presentation" class="disabled">
+                            <a href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-toggle="tooltip" data-placement="bottom">{{ tab }}</a>
+                        </li>
+                    {% endfor %}
+                {% endif %}
+                {% if not isDVType %}
+                    <li role="presentation">
+                        <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">Patient Status</a>
+                    </li>
+                {% endif %}
+            </ul>
+            <br />
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="inperson">
+                    {% if canEdit and not siteInfo.isTestSite %}
+                        <div class="row">
+                            {% if participant.editExistingOnly %}
+                                <div class="col-sm-12">
+                                    {% include 'partials/participant-notice.html.twig' %}
+                                </div>
+                            {% endif %}
+                            <div class="col-sm-6 {{ isDVType ? 'col-lg-4' : 'col-lg-6' }}">
+                                {% include 'partials/participant-measurement-list.html.twig' %}
+                            </div>
+
+                            <div class="col-sm-6 {{ isDVType ? 'col-lg-4' : 'col-lg-6' }}">
+                                {% include 'partials/participant-orders-list.html.twig' %}
+                            </div>
+                            {% if isDVType %}
+                                <div class="col-sm-6 col-lg-4">
+                                    {% include 'partials/participant-unanticipated-problems-list.html.twig' %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                                {% include 'partials/participant-notice.html.twig' %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if canViewDetails %}
+                    <div role="tabpanel" class="tab-pane" id="overview">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Consent</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <dl class="dl-vertical">
+                                            <dt>Consent Cohort</dt>
+                                            <dd>{{ participant.consentCohortText }}</dd>
+                                            <dt>Language of Primary Consent</dt>
+                                            <dd>{{ participant.primaryLanguage|default('--') }}</dd>
+                                            <dt>Primary Consent</dt>
+                                            <dd>{{ macros.displayFirstConsentPanelStatus(participant.consentForStudyEnrollment, participant.consentForStudyEnrollmentAuthored, participant.consentForStudyEnrollmentFirstYesAuthored) }}</dd>
+                                            <dt>Program Update</dt>
+                                            <dd>{{ macros.displayProgramUpdate(participant.consentCohort, participant.questionnaireOnDnaProgram, participant.questionnaireOnDnaProgramAuthored) }}</dd>
+                                            <dt>EHR Consent</dt>
+                                            <dd>
+                                                {{ macros.displayFirstConsentPanelStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored, participant.consentForElectronicHealthRecordsFirstYesAuthored, 'ehr') }}
+                                                {% if participant.ehrConsentExpireStatus == 'EXPIRED' %}
+                                                    (Expired on {{ participant.ehrConsentExpireAuthored ? participant.ehrConsentExpireAuthored|date('n/j/Y g:ia', app.user.timezone) : '--' }})
+                                                {% elseif participant.consentForElectronicHealthRecords == 'SUBMITTED' and participant.ehrConsentExpireStatus is empty %}
+                                                    (Active)
+                                                {% endif %}
+                                            </dd>
+                                            <dt>gRoR Consent</dt>
+                                            <dd>{{ macros.displayConsentPanelStatus(participant.consentForGenomicsROR, participant.consentForGenomicsRORAuthored) }}</dd>
+                                            <dt>DV-only EHR Sharing</dt>
+                                            <dd>{{ macros.displayConsentPanelStatus(participant.consentForDvElectronicHealthRecordsSharing, participant.consentForDvElectronicHealthRecordsSharingAuthored) }}</dd>
+                                            <dt>CABoR Consent</dt>
+                                            <dd>{{ macros.displayConsentPanelStatus(participant.consentForCABoR, participant.consentForCABoRAuthored) }}</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Demographics</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <dl class="dl-vertical">
+                                            <dt>Age</dt>
+                                            <dd>{{ participant.getAge()|default('--') }}</dd>
+                                            <dt>Sex</dt>
+                                            <dd>{{ participant.sex|default('--') }}</dd>
+                                            <dt>Gender Identity</dt>
+                                            <dd>{{ participant.genderIdentity|default('--') }}</dd>
+                                            <dt>Race/Ethnicity</dt>
+                                            <dd>{{ participant.race|default('--') }}</dd>
+                                            <dt>Education</dt>
+                                            <dd>{{ participant.education|default('--') }}</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Contact</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <dl class="dl-vertical">
+                                            <dt>Contact Method</dt>
+                                            <dd>{{ participant.recontactMethod|default('--') }}</dd>
+                                            <dt>Address</dt>
+                                            <dd>{{ participant.getAddress(true)|default('--')|nl2br }}</dd>
+                                            <dt>Email <span title="This is either the registration email or the email provided after consent if the participant registered with a phone number" data-toggle="tooltip"><span class="sr-only">What is Email?</span><i class="fa fa-question-circle text-info"></i></span></dt>
+                                            <dd>{{ participant.email|default('--') }}</dd>
+                                            <dt>Login Phone <span title="This is the verified SMS number used during registration" data-toggle="tooltip"><span class="sr-only">What is Login Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
+                                            <dd>{{ participant.loginPhoneNumber|default('--') }}</dd>
+                                            <dt>Contact Phone <span title="This is the phone number provided after consent" data-toggle="tooltip"><span class="sr-only">What is Contact Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
+                                            <dd>{{ participant.phoneNumber|default('--') }}</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">PPI Survey Completion</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <dl class="dl-horizontal">
+                                            <dt>Required Complete?</dt>
+                                            <dd>
+                                                {% if participant.numCompletedBaselinePPIModules == 3 %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                {% endif %}
+                                            </dd>
+                                            <dt>Number Complete</dt>
+                                            <dd>{{ participant.numCompletedPPIModules }}</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">In-Person Enrollment</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="text-center">
+                                            <div class="participant-detail-status">
+                                                <strong>Paired Awardee</strong>
+                                                {% if participant.awardee %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                    <small>(not paired)</small>
+                                                {% endif %}
+                                            </div>
+                                            <br/>
+                                            {% if participant.awardee %}
+                                                <samp>{{ siteInfo.getAwardeeDisplayName(participant.awardee) }}</samp>
+                                            {% endif %}
+                                        </div>
+                                        <hr />
+                                        <div class="text-center">
+                                            <div class="participant-detail-status">
+                                                <strong>Paired Organization</strong>
+                                                {% if participant.organization %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                    <small>(not paired)</small>
+                                                {% endif %}
+                                            </div>
+                                            <br/>
+                                            {% if participant.organization %}
+                                                <samp>{{ siteInfo.getOrganizationDisplayName(participant.organization) }}</samp>
+                                            {% endif %}
+                                        </div>
+                                        <hr />
+                                        <div class="text-center">
+                                            <div class="participant-detail-status">
+                                                <strong>Paired Site</strong>
+                                                {% if participant.siteSuffix %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                    <small>(not paired)</small>
+                                                {% endif %}
+                                            </div>
+                                            <br/>
+                                            {% if participant.siteSuffix %}
+                                                Location: <samp>{{ siteInfo.getSiteDisplayName(participant.siteSuffix) }}</samp>
+                                            {% endif %}
+                                        </div>
+                                        <hr />
+                                        <div class="text-center">
+                                            <div class="participant-detail-status">
+                                                <strong>Physical Measurements</strong>
+                                                {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                    {% if participant.physicalMeasurementsFinalizedTime %}
+                                                        <small>{{ participant.physicalMeasurementsFinalizedTime|date('m/d/Y', app.user.timezone) }}</small>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                    <small>(not completed)</small>
+                                                {% endif %}
+                                            </div>
+                                            <br />
+                                            {% if participant.evaluationFinalizedSite %}
+                                                Location: <samp>{{ siteInfo.getSiteDisplayName(participant.evaluationFinalizedSite) }}</samp>
+                                            {% endif %}
+                                        </div>
+                                        <hr />
+                                        <dl class="dl-horizontal dl-horizontal-lg samples-received">
+                                            <dt>Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                            <dd>
+                                                {% if participant.numBaselineSamplesArrived >= 7 %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% endif %}
+                                                {{ participant.numBaselineSamplesArrived }}
+                                            </dd>
+                                            <dt>Samples to Isolate DNA? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                            <dd>
+                                                {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                {% endif %}
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="activities">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">PPI Survey Completion</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <dl class="dl-horizontal">
+                                            <dt>Required Complete?</dt>
+                                            <dd>
+                                                {% if participant.numCompletedBaselinePPIModules == 3 %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                {% endif %}
+                                            </dd>
+                                            <dt>Number Complete</dt>
+                                            <dd>{{ participant.numCompletedPPIModules }}</dd>
+                                        </dl>
+                                        <div class="text-center">
+                                            {% for field, label in surveys %}
+                                                <div class="participant-detail-status">
+                                                    <strong>{{ label }}</strong>
+                                                    {% if attribute(participant, 'questionnaireOn' ~ field) == 'SUBMITTED' %}
+                                                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                    {% else %}
+                                                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                    {% endif %}
+                                                    <small>
+                                                        {{ attribute(participant, 'questionnaireOn' ~ field ~ 'Authored') ? attribute(participant, 'questionnaireOn' ~ field ~ 'Authored')|date('n/j/Y g:ia', app.user.timezone) : '(not completed)' }}
+                                                    </small>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Retention and EHR Metrics</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <dl class="dl-horizontal dl-horizontal-lg">
+                                            <dt>Retention Eligible</dt>
+                                            <dd>
+                                                {{ macros.displayRetentionEligibleStatus(participant.retentionEligibleStatus, participant.retentionEligibleTime) }}
+                                            </dd>
+                                            <dt>Retention Status</dt>
+                                            <dd>
+                                                {{ macros.displayRetentionType(participant.retentionType) }}
+                                            </dd>
+                                            <dt>EHR Transfer Status</dt>
+                                            <dd>
+                                                {{ macros.displayEhrTransferStatus(participant.isEhrDataAvailable) }}
+                                            </dd>
+                                            <dt>Most Recent EHR Receipt</dt>
+                                            <dd>
+                                                {% if participant.latestEhrReceiptTime %}
+                                                    {{ participant.latestEhrReceiptTime|date('m/d/Y', app.user.timezone) }}
+                                                {% endif %}
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Physical Measurements and Biospecimens</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="text-center">
+                                            <div class="participant-detail-status">
+                                                <strong>Physical Measurements</strong>
+                                                {% if participant.physicalMeasurementsStatus == 'COMPLETED' %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                    {% if participant.physicalMeasurementsFinalizedTime %}
+                                                        <small>{{ participant.physicalMeasurementsFinalizedTime|date('m/d/Y', app.user.timezone) }}</small>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                    <small>(not completed)</small>
+                                                {% endif %}
+                                            </div>
+                                            <br />
+                                            {% if participant.evaluationFinalizedSite %}
+                                                Location: <samp>{{ siteInfo.getSiteDisplayName(participant.evaluationFinalizedSite) }}</samp>
+                                            {% endif %}
+                                        </div>
+                                        <hr />
+                                        <dl class="dl-horizontal dl-horizontal-lg samples-received">
+                                            <dt>Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                            <dd>
+                                                {% if participant.numBaselineSamplesArrived >= 7 %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% endif %}
+                                                {{ participant.numBaselineSamplesArrived }}
+                                            </dd>
+                                            <dt>Samples to Isolate DNA? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                            <dd>
+                                                {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                {% endif %}
+                                            </dd>
+                                        </dl>
+                                        <div class="text-center">
+                                            {% for field, label in samples %}
+                                                {% set break = false %}
+                                                {% for sampleAlias in samplesAlias if not break %}
+                                                    {% if attribute(sampleAlias, field) is defined  and attribute(participant, 'sampleStatus' ~ attribute(sampleAlias, field)) == 'RECEIVED' %}
+                                                        {% set field = attribute(sampleAlias, field) %}
+                                                        {% set break = true %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <div class="participant-detail-status">
+                                                    <strong>{{ label }}</strong>
+                                                    {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
+                                                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                        {% if attribute(participant, 'sampleStatus' ~ field ~ 'Time') %}
+                                                            <small>{{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y', app.user.timezone) }}</small>
+                                                            {% if (field == '1SAL' or field == '1SAL2') and attribute(participant, 'sample1SAL2CollectionMethod') %}
+                                                                <br><small>{{ attribute(participant, 'sample1SAL2CollectionMethod') }}</small>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                        <small>(not received)</small>
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                            <br />
+                                            {% if participant.orderCreatedSite %}
+                                                Location: <samp>{{ siteInfo.getSiteDisplayName(participant.orderCreatedSite) }}</samp>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if not isDVType %}
+                    <div role="tabpanel" class="tab-pane" id="patientstatus">
+                        {% if canViewPatientStatus %}
+                            {% if orgPatientStatusData is empty %}
+                                <div class="alert alert-warning">
+                                    Please complete the patient status information for your organization. User should have access to EHR system information for verification.
+                                </div>
+                            {% endif %}
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">Patient Status: {{ app.session.get('siteOrganizationDisplayName') }}</h3>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div id="patient-status-data-box">
+                                                {% if orgPatientStatusData is not empty %}
+                                                    <div>
+                                                        <dl class="dl-horizontal">
+                                                            <dt>Status</dt>
+                                                            <dd>{{ orgPatientStatusData.display_status }}</dd>
+                                                            <dt>Comments</dt>
+                                                            <dd>{{ orgPatientStatusData.comments }}</dd>
+                                                        </dl>
+                                                    </div>
+                                                    <div align="center">
+                                                        <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div id="patient-status-form-box">
+                                                {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
+                                                {{ form_errors(patientStatusForm) }}
+                                                {{ form_rest(patientStatusForm) }}
+                                                {{ form_widget(patientStatusForm.comments) }}
+                                                {% if orgPatientStatusData is not empty %}
+                                                    <small class="text-warning">User must enter a reason for updating previous organization status.</small>
+                                                    <br><br>
+                                                {% endif %}
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                {% if orgPatientStatusData is not empty %}
+                                                    <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
+                                                {% endif %}
+                                                {{ form_end(patientStatusForm) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if orgPatientStatusHistoryData is not empty %}
+                                    <div class="col-md-7">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Patient Status History: {{ app.session.get('siteOrganizationDisplayName') }}</h3>
+                                            </div>
+                                            <div class="panel-body">
+                                                {% include 'partials/patient-status-history-dl.html.twig' %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% if awardeePatientStatusData is not empty %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Patient Status Details: Other Organizations</h3>
+                                            </div>
+                                            <div class="panel-body">
+                                                <table class="table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Awardee</th>
+                                                        <th>Organization</th>
+                                                        <th>Status</th>
+                                                        <th>User</th>
+                                                        <th>Site</th>
+                                                        <th>Date</th>
+                                                        <th></th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for field in awardeePatientStatusData %}
+                                                        <tr>
+                                                            <td>{{ field.awardee_name|default(field.awardee) }}</td>
+                                                            <td>{{ field.organization_name|default(field.organization) }}</td>
+                                                            <td>{{ field.display_status }}</td>
+                                                            <td>{{ field.user_email }}</td>
+                                                            <td>{{ field.site_name|default(field.site) }}</td>
+                                                            <td>{{ field.created_ts|date('n/j/Y g:ia', app.user.timezone) }}</td>
+                                                            <td>
+                                                                <small>
+                                                                    <a data-href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
+                                                                </small>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                                    {% if disablePatientStatusMessage is not empty %}
+                                        <div class="alert alert-warning">
+                                            {{ disablePatientStatusMessage }}
+                                        </div>
+                                    {% else %}
+                                        {% include 'partials/participant-notice.html.twig' %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% if canViewPatientStatus %}
+            {# Patient status history modal window #}
+            <div id="patient-status-details-modal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block pagejs %}
+    <script>
+        $(document).ready(function() {
+            $('#order-overflow-show').on('click', function(e) {
+                $(this).hide();
+                $('#order-overflow').show();
+                e.preventDefault();
+            });
+            $('#evaluation-overflow-show').on('click', function(e) {
+                $(this).hide();
+                $('#evaluation-overflow').show();
+                e.preventDefault();
+            });
+            $('#problem-overflow-show').on('click', function(e) {
+                $(this).hide();
+                $('#problem-overflow').show();
+                e.preventDefault();
+            });
+            if ($("#participant-barcode").length === 1) {
+                JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
+                    width: 2,
+                    height: 50,
+                    displayValue: true
+                });
+            }
+        });
+    </script>
+    {# Paient status tab #}
+    {% if canViewPatientStatus %}
+        <script>
+            $(document).ready(function() {
+                var orgPatientStatusData = {{ orgPatientStatusData|json_encode|raw }};
+
+                // Switch to default tab if empty
+                if (!orgPatientStatusData) {
+                    $('[href="#patientstatus"]').tab('show');
+                }
+
+                // Switch to patient status tab if there is a form error
+                if ($('.patient-status-form').find('div').hasClass('alert-danger')) {
+                    $('[href="#patientstatus"]').tab('show');
+                    // Display form
+                    setTimeout(function () {
+                        $('.btn-patient-status-update').trigger('click');
+                    }, 100);
+                }
+
+                $('.patient-status-block').on('click', function () {
+                    $('[href="#patientstatus"]').tab('show');
+                });
+
+                // Hide form by default if not empty
+                if (orgPatientStatusData) {
+                    $('#patient-status-data-box').show();
+                    $('#patient-status-form-box').hide();
+                }
+
+                $('.btn-patient-status-update').on('click', function () {
+                    $('#patient-status-data-box').hide();
+                    $('#patient-status-form-box').show();
+                });
+
+                $('.btn-patient-status-cancel').on('click', function () {
+                    $('#patient-status-data-box').show();
+                    $('#patient-status-form-box').hide();
+                });
+
+                // Display history in modal window
+                var psDetailsModal = $('#patient-status-details-modal');
+                $(".patient-status-details").on('click', function (e) {
+                    e.preventDefault();
+                    $(psDetailsModal).removeData('bs.modal');
+                    // Load data from url
+                    $("#patient-status-details-modal .modal-content").load(
+                        $(this).attr('data-href')
+                    );
+                    $(psDetailsModal).modal('show');
+                });
+
+                $(psDetailsModal).on('hidden.bs.modal', function () {
+                    $("#patient-status-details-modal .modal-body").html('');
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}

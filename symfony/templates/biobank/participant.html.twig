@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+{% block title %}Participant {{ participant.biobankId }} - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2><i class="fa fa-user" aria-hidden="true"></i> Participant Details</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <dl class="dl-horizontal">
+                {% if is_granted('ROLE_SCRIPPS') %}
+                    <dt>Participant ID</dt>
+                    <dd>{{ participant.id }}</dd>
+                {% endif %}
+                <dt>Biobank ID</dt>
+                <dd>{{ participant.biobankId }}</dd>
+                <dt>Paired Awardee</dt>
+                <dd>{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
+                <dt>Paired Site</dt>
+                <dd>{{ participant.site ? siteInfo.siteDisplayName(participant.siteSuffix) : '(not paired)' }}</dd>
+            </dl>
+        </div>
+    </div>
+    <div role="tabpanel">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#inperson" aria-controls="inperson" role="tab" data-toggle="tab">In-Person Enrollment</a>
+            </li>
+        </ul>
+        <br>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="inperson">
+                {% if canViewOrders %}
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            {% include 'partials/participant-orders-list.html.twig' %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                            {% include 'partials/participant-notice.html.twig' %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+    <script>
+        $(document).ready(function () {
+            $('#order-overflow-show').on('click', function (e) {
+                $(this).hide();
+                $('#order-overflow').show();
+                e.preventDefault();
+            });
+        });
+    </script>
+{% endblock %}

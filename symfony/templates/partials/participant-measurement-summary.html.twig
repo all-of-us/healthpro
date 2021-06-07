@@ -1,0 +1,78 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <i class="fa fa-id-card-o" aria-hidden="true"></i>
+            Physical Measurements Summary
+        </h3>
+    </div>
+    <div class="panel-body">
+        <p class="lead text-center">Date of Visit: <strong>{{ measurement.finalizedTs|date('n/j/Y') }}</strong></p>
+        <table class="table table-bordered">
+            <tr>
+                <th>Height</th>
+                {% if summary.height is defined %}
+                    <td>{{ summary.height.cm|number_format(1) }} cm</td>
+                    <td>{{ summary.height.ftin }}</td>
+                {% else %}
+                    <td colspan="2">--</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Weight</th>
+                {% if summary.weight is defined %}
+                    <td>{{ summary.weight.kg|number_format(1) }} kg</td>
+                    <td>{{ summary.weight.lb|number_format(1) }} lb</td>
+                {% else %}
+                    <td colspan="2">--</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>BMI</th>
+                <td colspan="2">{{ summary.bmi is defined ? summary.bmi|number_format(1) : '--' }}</td>
+            </tr>
+            <tr>
+                <th>Hip Circumference</th>
+                {% if summary.hip is defined %}
+                    <td>{{ summary.hip.cm|number_format(1) }} cm</td>
+                    <td>{{ summary.hip.in|number_format(1) }} in</td>
+                {% else %}
+                    <td colspan="2">--</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Waist Circumference</th>
+                {% if summary.waist is defined %}
+                    <td>{{ summary.waist.cm|number_format(1) }} cm</td>
+                    <td>{{ summary.waist.in|number_format(1) }} in</td>
+                {% else %}
+                    <td colspan="2">--</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>
+                    Blood Pressure
+                    <small style="font-weight: normal">(systolic / diastolic)</small>
+                </th>
+                <td colspan="2">
+                    {% if summary.bloodpressure is defined %}
+                        {{ summary.bloodpressure.systolic|round }} /
+                        {{ summary.bloodpressure.diastolic|round }}
+                        mmHg
+                    {% else %}
+                        --
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Heart Rate</th>
+                <td colspan="2">
+                    {% if summary.heartrate is defined %}
+                        {{ summary.heartrate|round }} bpm
+                    {% else %}
+                        --
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

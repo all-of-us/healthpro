@@ -42,20 +42,20 @@ class SitesController extends AbstractController
         if ($id) {
             $site = $siteRepository->find($id);
             if (!$site) {
-                throw $this->createNotFoundException('Page notice not found.');
+                throw $this->createNotFoundException('Site not found.');
             }
 
             if ($request->request->has('delete')) {
                 $em->remove($site);
                 $em->flush();
                 $loggerService->log(Log::SITE_DELETE, $site->getId());
-                $this->addFlash('success', 'Site removed');
+                $this->addFlash('success', 'Site removed.');
                 return $this->redirectToRoute('admin_sites');
             }
         } else {
             if ($syncEnabled) {
                 // can't create new sites if syncing from rdr
-                throw $this->createNotFoundException('Page notice not found.');
+                throw $this->createNotFoundException('Sites cannot be created when the RDR Awardee API is enabled.');
             }
             $site = null;
         }
@@ -70,7 +70,7 @@ class SitesController extends AbstractController
                     $duplicateGoogleGroup = $siteRepository->getDuplicateGoogleGroup($form['google_group']->getData());
                 }
                 if ($duplicateGoogleGroup) {
-                    $form['google_group']->addError(new FormError('This google group has already been used for another site.'));
+                    $form['google_group']->addError(new FormError('This Google Group has already been used for another Site.'));
                 }
             }
             if ($form->isValid()) {
@@ -78,18 +78,18 @@ class SitesController extends AbstractController
                     $em->persist($site);
                     $em->flush();
                     $loggerService->log(Log::SITE_EDIT, $site->getId());
-                    $this->addFlash('success', 'Notice added');
+                    $this->addFlash('success', 'Site updated.');
                 } else {
                     $site = $form->getData();
                     $em->persist($site);
                     $em->flush();
                     $loggerService->log(Log::SITE_ADD, $site->getId());
-                    $this->addFlash('success', 'Notice added');
+                    $this->addFlash('success', 'Site added.');
                 }
                 return $this->redirectToRoute('admin_sites');
             } else {
                 if (count($form->getErrors()) == 0) {
-                    $form->addError(new FormError('Please correct the errors below'));
+                    $form->addError(new FormError('Please correct the errors below.'));
                 }
             }
         }

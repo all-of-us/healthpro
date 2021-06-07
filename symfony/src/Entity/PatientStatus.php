@@ -11,6 +11,14 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class PatientStatus
 {
+
+    public static $patientStatus = [
+        'Yes: Confirmed in EHR system' => 'YES',
+        'No: Not found in EHR system' => 'NO',
+        'No Access: Unable to check EHR system' => 'NO_ACCESS',
+        'Unknown: Inconclusive search results' => 'UNKNOWN'
+    ];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

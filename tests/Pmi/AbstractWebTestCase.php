@@ -85,7 +85,6 @@ abstract class AbstractWebTestCase extends TestCase
         $app->mount('/', new Controller\DefaultController());
         $app->mount('/', new Controller\SymfonyMigrationController());
         $app->mount('/dashboard', new Controller\DashboardController());
-        $app->mount('/workqueue', new Controller\WorkQueueController());
 
         return $app;
     }

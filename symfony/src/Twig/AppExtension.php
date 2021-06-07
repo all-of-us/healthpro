@@ -8,6 +8,7 @@ use App\Entity\Site;
 use App\Service\TimezoneService;
 use Pmi\Drc\CodeBook;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
@@ -18,13 +19,15 @@ class AppExtension extends AbstractExtension
     private $doctrine;
     private $requestStack;
     private $router;
+    private $params;
     private $cache = [];
 
-    public function __construct(ManagerRegistry $doctrine, RouterInterface $router, RequestStack $requestStack)
+    public function __construct(ManagerRegistry $doctrine, RouterInterface $router, RequestStack $requestStack, ParameterBagInterface $params)
     {
         $this->doctrine = $doctrine;
         $this->requestStack = $requestStack;
         $this->router = $router;
+        $this->params = $params;
     }
 
     public function getFunctions()
@@ -35,9 +38,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('slugify', [$this, 'slugify']),
             new TwigFunction('timezone_display', [$this, 'timezoneDisplay']),
             new TwigFunction('codebook_display', [$this, 'getCodeBookDisplay']),
-            new TwigFunction('organization_display', [$this, 'getAwardeeDisplay']),
-            new TwigFunction('awardee_display', [$this, 'getAwardeeDisplay']),
-            new TwigFunction('site_display', [$this, 'getSiteDisplay'])
+            new TwigFunction('display_message', [$this, 'displayMessage'])
         ];
     }
 
@@ -78,48 +79,26 @@ class AppExtension extends AbstractExtension
         return CodeBook::display($code);
     }
 
-    public function getAwardeeDisplay(string $awardee): string
+    public function displayMessage($name, $type = false, $options = [])
     {
-        $cacheKey = 'awardees.' . $awardee;
-        if (isset($this->cache[$cacheKey]) && $this->cache[$cacheKey]) {
-            return $this->cache[$cacheKey];
+        $configPrefix = 'messaging_';
+        $message = $this->params->has($configPrefix . $name) ? $this->params->get($configPrefix . $name) : '';
+        if (empty($message)) {
+            return '';
         }
-        $repository = $this->doctrine->getRepository(Awardee::class);
-        $record = $repository->find($awardee);
-        if ($record) {
-            $this->cache[$cacheKey] = $record->getName();
-            return $record->getName();
+        switch ($type) {
+            case 'alert':
+                if (isset($options['closeButton']) && $options['closeButton']) {
+                    $message .= ' <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                }
+                return '<div class="alert alert-info">' . $message . '</div>';
+                break;
+            case 'tooltip':
+                $tooltipText = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                return '<span title="' . $tooltipText . '" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span>';
+                break;
+            default:
+                return $message;
         }
-        return $awardee;
-    }
-
-    public function getOrganizationDisplay(string $organization): string
-    {
-        $cacheKey = 'organizations.' . $organization;
-        if (isset($this->cache[$cacheKey]) && $this->cache[$cacheKey]) {
-            return $this->cache[$cacheKey];
-        }
-        $repository = $this->doctrine->getRepository(Organization::class);
-        $record = $repository->find($organization);
-        if ($record) {
-            $this->cache[$cacheKey] = $record->getName();
-            return $record->getName();
-        }
-        return $organization;
-    }
-
-    public function getSiteDisplay(string $site): string
-    {
-        $cacheKey = 'sites.' . $site;
-        if (isset($this->cache[$cacheKey]) && $this->cache[$cacheKey]) {
-            return $this->cache[$cacheKey];
-        }
-        $repository = $this->doctrine->getRepository(Site::class);
-        $record = $repository->findOneBy(['siteId' => $site]);
-        if ($record) {
-            $this->cache[$cacheKey] = $record->getName();
-            return $record->getName();
-        }
-        return $site;
     }
 }

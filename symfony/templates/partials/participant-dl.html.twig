@@ -12,9 +12,9 @@
     <dt>Participant Status</dt>
     <dd>{{ participant.enrollmentStatus|default('--') }}
         {% if participant.isCoreParticipant and  participant.enrollmentStatusCoreStoredSampleTime is not empty %}
-            ({{ participant.enrollmentStatusCoreStoredSampleTime|date('n/j/Y', app.user.getInfo.timezone) }})
+            ({{ participant.enrollmentStatusCoreStoredSampleTime|date('n/j/Y', app.user.timezone) }})
         {% elseif participant.isCoreMinusPMParticipant and  participant.enrollmentStatusCoreMinusPMTime is not empty %}
-            ({{ participant.enrollmentStatusCoreMinusPMTime|date('n/j/Y', app.user.getInfo.timezone) }})
+            ({{ participant.enrollmentStatusCoreMinusPMTime|date('n/j/Y', app.user.timezone) }})
         {% endif %}
     </dd>
     {% if app.session.get('siteType') == 'dv' or is_granted('ROLE_AWARDEE_SCRIPPS') %}
@@ -22,5 +22,5 @@
         <dd>{{ participant.participantOrigin|default('--') }}</dd>
     {% endif %}
     <dt>Paired Awardee</dt>
-    <dd>{{ participant.awardee ? awardee_display(participant.awardee) : '(not paired)' }}</dd>
+    <dd>{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
 </dl>

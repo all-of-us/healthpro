@@ -1,0 +1,54 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% if readOnly is not defined %} Document {% endif %} Unanticipated Problems</h3>
+    </div>
+    <div class="panel-body">
+        {% if readOnly is defined and problems|length == 0 %}
+            <small class="text-warning">No Records Found</small>
+        {% else %}
+            {% for problemRow in problems %}
+                {% set problem = problemRow[0] %}
+                {% if loop.index == 6 %}
+                    <div id="problem-overflow">
+                {% endif %}
+                {% if readOnly is defined %}
+                    <div class="btn btn-block btn-lg btn-default btn-readonly">
+                {% else %}
+                    <a href="{{ path('problem_form', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg btn-default">
+                {% endif %}
+                    {{ problem.updatedTs|date('D n/j/Y', app.user.timezone) }}
+                    <br />
+                    <small class="text-muted">
+                        {% if problem.finalizedTs %}
+                            <span class="label label-success">Finalized</span>
+                            {{ problem.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                            <br />
+                            {% if problemRow.commentCount > 0 %}
+                                <span class="label label-default">{{ problemRow.commentCount }} comment{{ problemRow.commentCount > 1 ? 's' }}</span> {{ problemRow.lastUpdateTs|date('n/j/Y g:ia', app.user.timezone) }}
+                            {% endif %}
+                        {% else %}
+                            <span class="label label-danger">Draft</span>
+                            {{ problem.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                        {% endif %}
+                    </small>
+                {% if readOnly is defined %}
+                    </div> {# close .btn-readonly div above #}
+                {% else %}
+                    </a>
+                {% endif %}
+            {% endfor %}
+            {% if problems|length > 5 %}
+                </div>
+                <a href="#" class="btn btn-block btn-lg btn-default" id="problem-overflow-show">
+                    <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
+                </a>
+            {% endif %}
+            {% if readOnly is not defined %}
+                <a href="{{ path('problem_form', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    New Unanticipated Problem
+                </a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
