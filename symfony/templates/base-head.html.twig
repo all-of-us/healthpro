@@ -31,7 +31,7 @@
         "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }},
         "views": {},
         "timeZones": {{ timeZones|json_encode|raw }},
-        "userTimeZone": {{ (app.user ? app.user.getInfo.timezone : null )|json_encode|raw }},
+        "userTimeZone": {{ (app.user ? app.user.timezone : null )|json_encode|raw }},
         "userSite": {{ app.session.get('site')|json_encode|raw }},
         "currentRoute": {{ app.request.attributes.get('_route')|json_encode|raw }},
         "hideTZWarning": {{ app.session.get('hideTZWarning')|json_encode|raw }}
