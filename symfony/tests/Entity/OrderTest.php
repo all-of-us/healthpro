@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\Service;
+namespace App\Test\Entity;
 
 use App\Entity\Order;
 use App\Entity\OrderHistory;

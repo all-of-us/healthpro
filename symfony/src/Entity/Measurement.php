@@ -3,9 +3,10 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Pmi\Evaluation\Fhir;
-use Pmi\Evaluation\InvalidSchemaException;
-use Pmi\Evaluation\MissingSchemaException;
+use App\Model\Measurement\Fhir;
+use App\Exception\InvalidSchemaException;
+use App\Exception\MissingSchemaException;
+use App\Helper\Util;
 
 /**
  * @ORM\Table(name="evaluations")
@@ -15,11 +16,20 @@ class Measurement
 {
 
     const CURRENT_VERSION = '0.3.3';
+    const BLOOD_DONOR_CURRENT_VERSION = '0.3.3-blood-donor';
+    const EHR_CURRENT_VERSION = '0.3.3-ehr';
     const LIMIT_TEXT_SHORT = 1000;
     const LIMIT_TEXT_LONG = 10000;
     const EVALUATION_ACTIVE = 'active';
     const EVALUATION_CANCEL = 'cancel';
     const EVALUATION_RESTORE = 'restore';
+    const BLOOD_DONOR = 'blood-donor';
+    const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'blood-bank-donor';
+    const BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL = 'Blood bank donor';
+    const EHR_PROTOCOL_MODIFICATION = 'ehr';
+    const EHR_PROTOCOL_MODIFICATION_LABEL = 'Observation obtained from EHR';
+    const EVALUATION_CANCEL_STATUS = 'entered-in-error';
+    const EVALUATION_RESTORE_STATUS = 'final';
 
     private $currentVersion;
 
@@ -31,6 +41,47 @@ class Measurement
 
     protected $finalizedSiteInfo;
 
+    public static $cancelReasons = [
+        'Data entered for wrong participant' => 'PM_CANCEL_WRONG_PARTICIPANT',
+        'Other' => 'OTHER'
+    ];
+
+    public static $restoreReasons = [
+        'Physical Measurements cancelled for wrong participant' => 'PM_RESTORE_WRONG_PARTICIPANT',
+        'Physical Measurements can be amended instead of cancelled' => 'PM_RESTORE_AMEND',
+        'Other' => 'OTHER'
+    ];
+
+    public static $bloodPressureFields = [
+        'blood-pressure-systolic',
+        'blood-pressure-diastolic',
+        'heart-rate'
+    ];
+
+    public static $protocolModificationNotesFields = [
+        'blood-pressure-protocol-modification-notes',
+        'height-protocol-modification-notes',
+        'weight-protocol-modification-notes',
+        'hip-circumference-protocol-modification-notes',
+        'waist-circumference-protocol-modification-notes'
+    ];
+
+    public static $measurementSourceFields = [
+        'blood-pressure-source',
+        'height-source',
+        'weight-source',
+        'waist-circumference-source',
+        'hip-circumference-source'
+    ];
+
+    public static $ehrProtocolDateFields = [
+        'blood-pressure-source-ehr-date',
+        'height-source-ehr-date',
+        'weight-source-ehr-date',
+        'waist-circumference-source-ehr-date',
+        'hip-circumference-source-ehr-date'
+    ];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -39,7 +90,7 @@ class Measurement
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\User")
      */
     private $user;
 
@@ -74,7 +125,7 @@ class Measurement
     private $updatedTs;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\User")
      */
     private $finalizedUser;
 
@@ -274,29 +325,45 @@ class Measurement
         return $this->history;
     }
 
-    public function setHistoryId(?MeasurementHistory $history): self
+    public function setHistory(?MeasurementHistory $history): self
     {
         $this->history = $history;
 
         return $this;
     }
 
+    public function setCurrentVersion(string $currentVersion): self
+    {
+        $this->currentVersion = $currentVersion;
+
+        return $this;
+    }
+
     public function loadFromAObject($finalizedUserEmail = null, $finalizedSite = null)
     {
-        if (!empty($this->getVersion())) {
-            $this->currentVersion = $this->getVersion();
-        } else {
+        if (empty($this->currentVersion) && empty($this->version)) {
             $this->currentVersion = self::CURRENT_VERSION;
         }
-        if (is_object($this->getData())) {
-            $this->fieldData = $this->getData();
+        $data = empty($this->getData()) ? new \StdClass() : $this->getData();
+        if (is_object($data)) {
+            $this->fieldData = $data;
         } else {
-            $this->fieldData = json_decode($this->getData());
+            $this->fieldData = json_decode($data);
         }
+        $this->formatEhrProtocolDateFields();
         $this->finalizedUserEmail = $finalizedUserEmail;
         $this->finalizedSiteInfo = $finalizedSite;
         $this->loadSchema();
         $this->normalizeData();
+    }
+
+    public function formatEhrProtocolDateFields()
+    {
+        foreach (self::$ehrProtocolDateFields as $ehrProtocolDateField) {
+            if (!empty($this->fieldData->{$ehrProtocolDateField})) {
+                $this->fieldData->{$ehrProtocolDateField}  = new \DateTime($this->fieldData->{$ehrProtocolDateField});
+            }
+        }
     }
 
     public function getSchema()
@@ -317,7 +384,7 @@ class Measurement
 
     public function loadSchema()
     {
-        $file = __DIR__ . "/../../../src/Pmi/Evaluation/versions/{$this->currentVersion}.json";
+        $file = __DIR__ . "/../Model/Measurement/versions/{$this->getFormVersion()}.json";
         if (!file_exists($file)) {
             throw new MissingSchemaException();
         }
@@ -332,17 +399,20 @@ class Measurement
         }
     }
 
-    protected function normalizeData()
+    protected function normalizeData($type = null)
     {
         foreach ($this->fieldData as $key => $value) {
             if ($value === 0) {
                 $this->fieldData->$key = null;
             }
+            if ($type === 'save' && !is_null($this->fieldData->$key) && in_array($key, self::$ehrProtocolDateFields)) {
+                $this->fieldData->$key = $this->fieldData->$key->format('Y-m-d');
+            }
         }
         foreach ($this->schema->fields as $field) {
             if (isset($field->replicates)) {
                 $key = $field->name;
-                if (is_null($this->fieldData->$key)) {
+                if (!isset($this->fieldData->$key) || is_null($this->fieldData->$key)) {
                     $dataArray = array_fill(0, $field->replicates, null);
                     $this->fieldData->$key = $dataArray;
                 } elseif (!is_null($this->fieldData->$key) && !is_array($this->fieldData->$key)) {
@@ -350,7 +420,15 @@ class Measurement
                     $dataArray[0] = $this->fieldData->$key;
                     $this->fieldData->$key = $dataArray;
                 }
+            } else {
+                $key = $field->name;
+                if (!isset($this->fieldData->$key)) {
+                    $this->fieldData->$key = null;
+                }
             }
+        }
+        if ($this->isEhrProtocolForm()) {
+            $this->addEhrProtocolModifications();
         }
     }
 
@@ -360,7 +438,7 @@ class Measurement
             'data' => $this->fieldData,
             'schema' => $this->getAssociativeSchema(),
             'patient' => $this->getParticipantId(),
-            'version' => $this->currentVersion,
+            'version' => $this->getFormVersion(),
             'datetime' => $datetime,
             'parent_rdr' => $parentRdr,
             'created_user' => $this->getUser()->getEmail(),
@@ -472,5 +550,280 @@ class Measurement
             $summary['heartrate'] = $heartrate;
         }
         return $summary;
+    }
+
+    public function canCancel()
+    {
+        return $this->getHistoryType() !== self::EVALUATION_CANCEL
+            && !$this->isEvaluationUnlocked()
+            && !$this->isEvaluationFailedToReachRDR();
+    }
+
+    public function canRestore()
+    {
+        return $this->getHistoryType() === self::EVALUATION_CANCEL
+            && !$this->isEvaluationUnlocked()
+            && !$this->isEvaluationFailedToReachRDR();
+    }
+
+    public function getHistoryType()
+    {
+        if (!empty($this->getHistory())) {
+            return $this->getHistory()->getType();
+        }
+        return null;
+    }
+
+    public function isEvaluationCancelled()
+    {
+        return $this->getHistoryType() === self::EVALUATION_CANCEL ? true : false;
+    }
+
+    public function isEvaluationUnlocked()
+    {
+        return !empty($this->getParticipantId()) && empty($this->getFinalizedTs());
+    }
+
+    public function isEvaluationFailedToReachRDR()
+    {
+        return !empty($this->getFinalizedTs()) && empty($this->getRdrId());
+    }
+
+    public function getReasonDisplayText()
+    {
+        if (empty($this->getHistory())) {
+            return null;
+        }
+        // Check only cancel reasons
+        $reasonDisplayText = array_search($this->getHistory()->getReason(), self::$cancelReasons);
+        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
+    }
+
+    public function setFieldData($fieldData) {
+        $this->fieldData = $fieldData;
+        $this->normalizeData('save');
+    }
+
+    public function getFieldData() {
+        return $this->fieldData;
+    }
+
+    public function isBloodDonorForm()
+    {
+        return strpos($this->getFormVersion(), self::BLOOD_DONOR) !== false;
+    }
+
+    public function isEhrProtocolForm()
+    {
+        return strpos($this->getFormVersion(), self::EHR_PROTOCOL_MODIFICATION) !== false;
+    }
+
+    public function getWarnings()
+    {
+        $warnings = [];
+        foreach ($this->schema->fields as $metric) {
+            if (!empty($metric->warnings) && is_array($metric->warnings)) {
+                $warnings[$metric->name] = $metric->warnings;
+            }
+        }
+        return $warnings;
+    }
+
+    public function getConversions()
+    {
+        $conversions = [];
+        foreach ($this->schema->fields as $metric) {
+            if (!empty($metric->convert)) {
+                $conversions[$metric->name] = $metric->convert;
+            }
+        }
+        return $conversions;
+    }
+
+    public function getLatestFormVersion()
+    {
+        if ($this->isBloodDonorForm()) {
+            return self::BLOOD_DONOR_CURRENT_VERSION;
+        }
+        if ($this->isEhrProtocolForm()) {
+            return self::EHR_CURRENT_VERSION;
+        }
+        return self::CURRENT_VERSION;
+    }
+
+    public function addBloodDonorProtocolModificationForRemovedFields()
+    {
+        $this->addBloodDonorProtocolModificationForWaistandHip();
+        $this->addBloodDonorProtocolModificationForBloodPressure();
+        $this->addBloodDonorProtocolModificationForHeight();
+    }
+
+    public function addEhrProtocolModifications()
+    {
+        if ($this->fieldData->{'blood-pressure-source'} === 'ehr') {
+            $this->fieldData->{'blood-pressure-protocol-modification'}[0] = self::EHR_PROTOCOL_MODIFICATION;
+            for ($reading = 1; $reading <= 2; $reading++) {
+                foreach (self::$bloodPressureFields as $field) {
+                    $this->fieldData->{$field}[$reading] = null;
+                }
+                foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
+                    $this->fieldData->{$field}[$reading] = false;
+                }
+                $this->fieldData->{'blood-pressure-protocol-modification'}[$reading] = self::EHR_PROTOCOL_MODIFICATION;
+            }
+        }
+        if ($this->fieldData->{'height-source'} === 'ehr') {
+            $this->fieldData->{"height-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        }
+        if ($this->fieldData->{'weight-source'} === 'ehr') {
+            $this->fieldData->{"weight-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+        }
+        if ($this->fieldData->{'waist-circumference-source'} === 'ehr') {
+            $this->fieldData->{'waist-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        }
+        if ($this->fieldData->{'hip-circumference-source'} === 'ehr') {
+            $this->fieldData->{'hip-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
+        }
+    }
+
+    public function addBloodDonorProtocolModificationForWaistandHip()
+    {
+        foreach (['waist-circumference-protocol-modification', 'hip-circumference-protocol-modification'] as $field) {
+            $this->fieldData->{$field} = array_fill(0, 2, self::BLOOD_DONOR_PROTOCOL_MODIFICATION);
+        }
+    }
+
+    public function addBloodDonorProtocolModificationForBloodPressure()
+    {
+        for ($reading = 1; $reading <= 2; $reading++) {
+            foreach (self::$bloodPressureFields as $field) {
+                $this->fieldData->{$field}[$reading] = null;
+            }
+            foreach (['irregular-heart-rate', 'manual-blood-pressure', 'manual-heart-rate'] as $field) {
+                $this->fieldData->{$field}[$reading] = false;
+            }
+            $this->fieldData->{'blood-pressure-protocol-modification'}[$reading] = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+        }
+    }
+
+    public function addBloodDonorProtocolModificationForHeight()
+    {
+        $this->fieldData->{"height-protocol-modification"} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+    }
+
+    public function getFinalizeErrors()
+    {
+        $errors = [];
+
+        if (!$this->isMinVersion('0.3.0')) {
+            // prior to version 0.3.0, any state is valid
+            return $errors;
+        }
+
+        // EHR protocol form
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $sourceField) {
+                if ($this->fieldData->{$sourceField} === self::EHR_PROTOCOL_MODIFICATION && empty($this->fieldData->{$sourceField . '-ehr-date'})) {
+                    $errors[] = $sourceField . '-ehr-date';
+                }
+            }
+        }
+
+        foreach (self::$bloodPressureFields as $field) {
+            foreach ($this->fieldData->$field as $k => $value) {
+                $displayError = false;
+                // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                if ($this->isEhrProtocolForm()) {
+                    $displayError = $k === 0 && $this->fieldData->{'blood-pressure-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                }
+
+                if ((!$this->fieldData->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
+                    $errors[] = [$field, $k];
+                }
+            }
+        }
+        foreach ($this->fieldData->{'blood-pressure-protocol-modification'} as $k => $value) {
+            if ($value === 'other' && empty($this->fieldData->{'blood-pressure-protocol-modification-notes'}[$k])) {
+                $errors[] = ['blood-pressure-protocol-modification-notes', $k];
+            }
+        }
+        foreach (['height', 'weight'] as $field) {
+            $displayError = false;
+            // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+            if ($this->isEhrProtocolForm()) {
+                $displayError = $this->fieldData->{$field . '-protocol-modification'} === self::EHR_PROTOCOL_MODIFICATION;
+            }
+            if ((!$this->fieldData->{$field . '-protocol-modification'} || $displayError) && !$this->fieldData->$field) {
+                $errors[] = $field;
+            }
+            if ($this->fieldData->{$field . '-protocol-modification'} === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'})) {
+                $errors[] = $field . '-protocol-modification-notes';
+            }
+        }
+        if (!$this->fieldData->pregnant && !$this->fieldData->wheelchair) {
+            foreach (['hip-circumference', 'waist-circumference'] as $field) {
+                foreach ($this->fieldData->$field as $k => $value) {
+                    if ($k == 2) {
+                        // not an error on the third measurement if first two aren't completed
+                        // or first two measurements are within 1 cm
+                        if (!$this->fieldData->{$field}[0] || !$this->fieldData->{$field}[1]) {
+                            break;
+                        }
+                        if (abs($this->fieldData->{$field}[0] - $this->fieldData->{$field}[1]) <= 1) {
+                            break;
+                        }
+                    }
+                    $displayError = false;
+                    // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                    if ($this->isEhrProtocolForm()) {
+                        $displayError = $k === 0 && $this->fieldData->{$field . '-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                    }
+                    if ((!$this->fieldData->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
+                        $errors[] = [$field, $k];
+                    }
+                    if ($this->fieldData->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'}[$k])) {
+                        $errors[] = [$field . '-protocol-modification-notes', $k];
+                    }
+                }
+            }
+        }
+
+        return $errors;
+    }
+
+    public function getFormFieldErrorMessage($field = null, $replicate = null)
+    {
+        if (($this->isBloodDonorForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
+            ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields))) ||
+            (in_array($field, self::$protocolModificationNotesFields))
+        ) {
+            return 'Please complete';
+        }
+        return 'Please complete or add protocol modification.';
+    }
+
+    public function canAutoModify()
+    {
+        if ($this->isBloodDonorForm()) {
+            return false;
+        }
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $field) {
+                if ($this->fieldData->{$field} === 'ehr') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    protected function isMinVersion($minVersion)
+    {
+        return Util::versionIsAtLeast($this->version, $minVersion);
+    }
+
+    public function getFormVersion()
+    {
+        return empty($this->version) ? $this->currentVersion : $this->version;
     }
 }
