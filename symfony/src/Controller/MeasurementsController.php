@@ -133,9 +133,7 @@ class MeasurementsController extends AbstractController
                             $measurement->setFinalizedSite($this->siteService->getSiteId());
                             // Send final evaluation to RDR and store resulting id
                             if ($measurement != null && $measurement->getParentId() != null) {
-                                $parentEvaluation = $this->em->getRepository(Evaluation::class)->findOneBy([
-                                    'id' => $measurement->getParentId()
-                                ]);
+                                $parentEvaluation = $this->em->getRepository(Measurement::class)->find($measurement->getParentId());
                                 $fhir = $measurement->getFhir($now, $parentEvaluation->getRdrId());
                             } else {
                                 $fhir = $measurement->getFhir($now);
