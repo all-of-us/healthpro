@@ -4,6 +4,7 @@ namespace App\Security;
 
 use App\Service\AuthService;
 use App\Service\EnvironmentService;
+use App\Service\UserService;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,12 +24,13 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     private $params;
     private $env;
 
-    public function __construct(AuthService $auth, UrlGeneratorInterface $urlGenerator, ContainerBagInterface $params, EnvironmentService $env)
+    public function __construct(AuthService $auth, UrlGeneratorInterface $urlGenerator, ContainerBagInterface $params, EnvironmentService $env, UserService $userService)
     {
         $this->auth = $auth;
         $this->urlGenerator = $urlGenerator;
         $this->params = $params;
         $this->env = $env;
+        $this->userService = $userService;
     }
 
     public function supports(Request $request)
@@ -80,7 +82,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        // TODO: add back functionality from $this->userService->updateLastLogin() which currently doesn't work
+        $this->userService->updateLastLogin();
         // Instead of using a service, the token should eventually contain the User entity (not Pmi\Security\User)
         // which will make updating the last login trivial.
         return $this->redirectToRoute('symfony_home');

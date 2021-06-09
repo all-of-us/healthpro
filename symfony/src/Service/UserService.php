@@ -106,11 +106,14 @@ class UserService
 
     public function updateLastLogin(): void
     {
-        $user = $this->getUser();
-        if ($user) {
-            $user->setLastLogin(new \DateTime());
-            $this->em->persist($user);
-            $this->em->flush();
+        $userInfo = $this->getUser();
+        if ($userInfo) {
+            $user = $this->em->getRepository(User::class)->findOneBy(['email' => $userInfo->getEmail()]);
+            if ($user) {
+                $user->setLastLogin(new \DateTime());
+                $this->em->persist($user);
+                $this->em->flush();
+            }
         }
     }
 }
