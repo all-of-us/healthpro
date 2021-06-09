@@ -60,7 +60,28 @@ class UserService
                 'timezone' => $googleUser->getTimzezone()
             ];
         }
-        $user = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
+
+        $attempts = 0;
+        $maxAttempts = 3;
+        do {
+            try {
+                $user = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
+                break;
+            } catch (\Exception $e) {
+                if ($attempts == 2) {
+                    sleep(1);
+                }
+                $attempts++;
+            }
+        } while ($attempts < $maxAttempts);
+        if (!$user) {
+            $user = new User;
+            $user->setEmail($googleUser->getEmail());
+            $user->setGoogleId($googleUser->getUserId());
+            $this->em->persist($user);
+            $this->em->flush();
+        }
+
         if (empty($user)) {
             throw new AuthenticationException('Failed to retrieve user information');
         }
