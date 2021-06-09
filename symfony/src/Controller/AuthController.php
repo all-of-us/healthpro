@@ -18,6 +18,9 @@ class AuthController extends AbstractController
      */
     public function login()
     {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('symfony_home');
+        }
         return $this->render('login.html.twig');
     }
 
