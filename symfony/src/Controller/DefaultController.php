@@ -7,13 +7,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Pmi\Audit\Log;
 
-/**
- * @Route("/s")
- */
 class DefaultController extends AbstractController
 {
     /**
-     * @Route("/", name="symfony_home")
+     * @Route("/s", name="symfony_home")
      */
     public function index()
     {
@@ -21,7 +18,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/admin", name="admin_home")
+     * @Route("/s/admin", name="admin_home")
      */
     public function adminIndex()
     {
