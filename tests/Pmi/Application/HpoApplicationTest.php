@@ -133,8 +133,8 @@ class HpoApplicationTest extends AbstractWebTestCase
         AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'), new GoogleGroup('hpo-site-2@gapps.com', 'Test Group 2', 'lorem ipsum 2')]);
         $client = $this->createClient();
         $client->followRedirects();
-        $crawler = $client->request('GET', '/participants');
-        $this->assertEquals(1, count($crawler->filter('#siteSelector')));
+        $client->request('GET', '/participants');
+        $this->assertMatchesRegularExpression('/\/site\/select$/', $client->getRequest()->getUri());
     }
 
     public function testDashSplash()
