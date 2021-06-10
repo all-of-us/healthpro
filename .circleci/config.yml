@@ -56,6 +56,9 @@ jobs:
     # Test
     - run: ./ci/test.sh
 
+    # Static Code Analysis
+    - run: ./vendor/bin/phpstan analyse --memory-limit 2G --error-format=junit > /tmp/circleci-test-results/phpstan.xml
+
     # Teardown
     - store_test_results:
         path: /tmp/circleci-test-results
