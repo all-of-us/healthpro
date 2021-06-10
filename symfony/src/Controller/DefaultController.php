@@ -41,7 +41,7 @@ class DefaultController extends AbstractController
                 return $this->render('site-select.html.twig', ['siteEmail' => $siteId]);
             }
             if ($siteService->switchSite($siteId)) {
-                return $this->redirectToRoute('home');
+                return $this->redirectToRoute('symfony_home');
             } else {
                 throw $this->createAccessDeniedException();
             }
