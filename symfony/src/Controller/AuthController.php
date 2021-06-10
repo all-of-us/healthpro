@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Form\MockLoginType;
 use App\Service\AuthService;
+use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -16,11 +18,28 @@ class AuthController extends AbstractController
     /**
      * @Route("/login", name="login")
      */
-    public function login()
+    public function login(UserService $userService, Request $request)
     {
         if ($this->getUser()) {
             return $this->redirectToRoute('symfony_home');
         }
+
+        if ($userService->canMockLogin()) {
+            $loginForm = $this->createForm(MockLoginType::class);
+
+            $loginForm->handleRequest($request);
+
+            if ($loginForm->isSubmitted() && $loginForm->isValid()) {
+                // Set mock user for local development
+                $userService->setMockUser($loginForm->get('userName')->getData());
+                return $this->redirect('/s');
+            }
+
+            return $this->render('mock-login.html.twig', [
+                'loginForm' => $loginForm->createView()
+            ]);
+        }
+
         return $this->render('login.html.twig');
     }
 

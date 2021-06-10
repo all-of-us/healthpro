@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Helper\MockUserHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -146,5 +147,11 @@ class UserService
                 $this->em->flush();
             }
         }
+    }
+
+    public function setMockUser($email): void
+    {
+        MockUserHelper::switchCurrentUser($email);
+        $this->session->set('mockUser', MockUserHelper::getCurrentUser());
     }
 }

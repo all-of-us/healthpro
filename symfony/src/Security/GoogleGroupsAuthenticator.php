@@ -35,11 +35,10 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function supports(Request $request)
     {
-        if ($request->attributes->get('_route') === 'login_callback') {
+        if ($request->attributes->get('_route') === 'login_callback' && !$this->userService->canMockLogin()) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function getCredentials(Request $request)
