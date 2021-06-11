@@ -15,7 +15,6 @@ use Pmi\Security\User;
 class DefaultController extends AbstractController
 {
     protected static $routes = [
-        ['home', '/'],
         ['dashSplash', '/splash'],
         ['logout', '/logout'],
         ['login', '/login'],
@@ -29,30 +28,6 @@ class DefaultController extends AbstractController
         ['patientStatus', '/participant/{participantId}/patient/status/{patientStatusId}', ['method' => 'GET']],
         ['mockLogin', '/mock-login', ['method' => 'GET|POST']]
     ];
-
-    public function homeAction(Application $app)
-    {
-        $checkTimeZone = $app->hasRole('ROLE_USER') || $app->hasRole('ROLE_ADMIN') || $app->hasRole('ROLE_AWARDEE') || $app->hasRole('ROLE_DV_ADMIN') || $app->hasRole('ROLE_BIOBANK') || $app->hasRole('ROLE_SCRIPPS') || $app->hasRole('ROLE_AWARDEE_SCRIPPS') ;
-        if ($checkTimeZone && !$app->getUserTimezone(false)) {
-            $app->addFlashNotice('Please select your current time zone');
-            return $app->redirectToRoute('settings');
-        }
-        if ($app->hasRole('ROLE_USER') || ($app->hasRole('ROLE_AWARDEE') && $app->hasRole('ROLE_DV_ADMIN'))) {
-            return $app['twig']->render('index.html.twig');
-        } elseif ($app->hasRole('ROLE_AWARDEE')) {
-            return $app->redirectToRoute('workqueue_index');
-        } elseif ($app->hasRole('ROLE_DV_ADMIN')) {
-            return $app->redirectToRoute('problem_reports');
-        } elseif ($app->hasRole('ROLE_ADMIN')) {
-            return $app->redirectToRoute('admin_home');
-        } elseif ($app->hasRole('ROLE_DASHBOARD')) {
-            return $app->redirectToRoute('dashboard_home');
-        } elseif ($app->hasRole('ROLE_BIOBANK') || $app->hasRole('ROLE_SCRIPPS')) {
-            return $app->redirectToRoute('biobank_home');
-        } else {
-            return $app->abort(403);
-        }
-    }
 
     public function dashSplashAction(Application $app)
     {
