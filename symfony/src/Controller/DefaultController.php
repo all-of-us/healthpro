@@ -15,7 +15,26 @@ class DefaultController extends AbstractController
      */
     public function index()
     {
-        return $this->render('index.html.twig');
+        $checkTimeZone = $this->isGranted('ROLE_USER') || $this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_AWARDEE') || $this->isGranted('ROLE_DV_ADMIN') || $this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS') || $this->isGranted('ROLE_AWARDEE_SCRIPPS');
+        if ($checkTimeZone && !$this->getUser()->getTimezone()) {
+            $this->addFlash('error', 'Please select your current time zone');
+            return $this->redirectToRoute('settings');
+        }
+        if ($this->isGranted('ROLE_USER') || ($this->isGranted('ROLE_AWARDEE') && $this->isGranted('ROLE_DV_ADMIN'))) {
+            return $this->render('index.html.twig');
+        } elseif ($this->isGranted('ROLE_AWARDEE')) {
+            return $this->redirectToRoute('workqueue_index');
+        } elseif ($this->isGranted('ROLE_DV_ADMIN')) {
+            return $this->redirectToRoute('problem_reports');
+        } elseif ($this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('admin_home');
+        } elseif ($this->isGranted('ROLE_DASHBOARD')) {
+            return $this->redirectToRoute('dashboard_home');
+        } elseif ($this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS')) {
+            return $this->redirectToRoute('biobank_home');
+        } else {
+            throw $this->createAccessDeniedException();
+        }
     }
 
     /**
