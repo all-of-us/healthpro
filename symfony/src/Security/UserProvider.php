@@ -7,6 +7,7 @@ use App\Service\GoogleGroupsService;
 use App\Service\MockGoogleGroupsService;
 use App\Service\UserService;
 use Pmi\Security\User;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -23,14 +24,16 @@ class UserProvider implements UserProviderInterface
     private $googleGroups;
     private $mockGoogleGroups;
     private $env;
+    private $params;
 
-    public function __construct(UserService $userService, SessionInterface $session, GoogleGroupsService $googleGroups, MockGoogleGroupsService $mockGoogleGroups, EnvironmentService $env)
+    public function __construct(UserService $userService, SessionInterface $session, GoogleGroupsService $googleGroups, MockGoogleGroupsService $mockGoogleGroups, EnvironmentService $env, ParameterBagInterface $params)
     {
         $this->userService = $userService;
         $this->session = $session;
         $this->googleGroups = $googleGroups;
         $this->mockGoogleGroups = $mockGoogleGroups;
         $this->env = $env;
+        $this->params = $params;
     }
 
     public function loadUserByUsername($username)
@@ -43,7 +46,7 @@ class UserProvider implements UserProviderInterface
         if ($this->session->has('googlegroups')) {
             $groups = $this->session->get('googlegroups');
         } else {
-            if ($this->env->isLocal() && $this->userService->canMockLogin()) {
+            if ($this->env->isLocal() && $this->userService->canMockLogin() && $this->params->has('gaBypass') && $this->params->get('gaBypass')) {
                 $groups = $this->mockGoogleGroups->getGroups($googleUser->getEmail());
             } else {
                 $groups = $this->googleGroups->getGroups($googleUser->getEmail());
