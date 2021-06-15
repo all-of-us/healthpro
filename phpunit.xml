@@ -12,6 +12,7 @@
       <ini name="error_reporting" value="E_ALL" />
       <env name="KERNEL_CLASS" value="App\Kernel" />
       <server name="PMI_ENV" value="local" />
+      <server name="APP_ENV" value="test" />
     </php>
     <testsuites>
         <testsuite name="Silex Unit Tests">
