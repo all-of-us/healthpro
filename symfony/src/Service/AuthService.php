@@ -8,21 +8,26 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Exception;
 use Google_Client as GoogleClient;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class AuthService
 {
     private $params;
     private $session;
     private $callbackUrl;
+    private $tokenStorage;
 
     public function __construct(
         ContainerBagInterface $params,
         SessionInterface $session,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
+        TokenStorageInterface $tokenStorage
     ) {
         $this->params = $params;
         $this->session = $session;
         $this->callbackUrl = $urlGenerator->generate('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $this->tokenStorage = $tokenStorage;
     }
 
     private function getGoogleClient(): GoogleClient
@@ -73,5 +78,11 @@ class AuthService
         $this->session->set('googleUser', $user);
 
         return $user;
+    }
+
+    public function setMockAuthToken($user)
+    {
+        $token = new PreAuthenticatedToken($user, null, 'main', $user->getRoles());
+        $this->tokenStorage->setToken($token);
     }
 }

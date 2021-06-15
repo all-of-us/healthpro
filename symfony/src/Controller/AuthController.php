@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Form\MockLoginType;
 use App\Service\AuthService;
+use App\Service\EnvironmentService;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * @Route("/s")
@@ -18,20 +20,22 @@ class AuthController extends AbstractController
     /**
      * @Route("/login", name="login")
      */
-    public function login(UserService $userService, Request $request)
+    public function login(UserService $userService, Request $request, UserProviderInterface $userProvider, EnvironmentService $env, AuthService $authService)
     {
         if ($this->getUser()) {
             return $this->redirectToRoute('symfony_home');
         }
 
-        if ($userService->canMockLogin()) {
+        if ($env->isLocal() && $userService->canMockLogin()) {
             $loginForm = $this->createForm(MockLoginType::class);
 
             $loginForm->handleRequest($request);
 
             if ($loginForm->isSubmitted() && $loginForm->isValid()) {
-                // Set mock user for local development
+                // Set mock user and token for local development
                 $userService->setMockUser($loginForm->get('userName')->getData());
+                $user = $userProvider->loadUserByUsername($loginForm->get('userName')->getData());
+                $authService->setMockAuthToken($user);
                 return $this->redirect('/s');
             }
 

@@ -2,7 +2,9 @@
 
 namespace App\Security;
 
+use App\Service\EnvironmentService;
 use App\Service\GoogleGroupsService;
+use App\Service\MockGoogleGroupsService;
 use App\Service\UserService;
 use Pmi\Security\User;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -19,12 +21,16 @@ class UserProvider implements UserProviderInterface
     private $userService;
     private $session;
     private $googleGroups;
+    private $mockGoogleGroups;
+    private $env;
 
-    public function __construct(UserService $userService, SessionInterface $session, GoogleGroupsService $googleGroups)
+    public function __construct(UserService $userService, SessionInterface $session, GoogleGroupsService $googleGroups, MockGoogleGroupsService $mockGoogleGroups, EnvironmentService $env)
     {
         $this->userService = $userService;
         $this->session = $session;
         $this->googleGroups = $googleGroups;
+        $this->mockGoogleGroups = $mockGoogleGroups;
+        $this->env = $env;
     }
 
     public function loadUserByUsername($username)
@@ -37,7 +43,11 @@ class UserProvider implements UserProviderInterface
         if ($this->session->has('googlegroups')) {
             $groups = $this->session->get('googlegroups');
         } else {
-            $groups = $this->googleGroups->getGroups($googleUser->getEmail());
+            if ($this->env->isLocal() && $this->userService->canMockLogin()) {
+                $groups = $this->mockGoogleGroups->getGroups($googleUser->getEmail());
+            } else {
+                $groups = $this->googleGroups->getGroups($googleUser->getEmail());
+            }
             // TODO: implement group management check
             $manageGroups = [];
             $this->session->set('googlegroups', $groups);
