@@ -86,9 +86,9 @@ class RequestListener
         if (!$this->session->has('site') && !$this->session->has('awardee') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE'))) {
             $user = $this->userService->getUser();
             if (count($user->getSites()) === 1 && empty($user->getAwardees()) && $this->siteService->isValidSite($user->getSites()[0]->email)) {
-                $this->siteServiceswitchSite($user->getSites()[0]->email);
+                $this->siteService->switchSite($user->getSites()[0]->email);
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
-                $this->switchSite($user->getAwardees()[0]->email);
+                $this->siteService->switchSite($user->getAwardees()[0]->email);
             } elseif (!preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site|login|site_select)($|\/).*/',
                     $this->request->getPathInfo()) && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/s/site/select');

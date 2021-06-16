@@ -2,9 +2,11 @@
 
 namespace App\Test\Application;
 
+use App\Service\MockGoogleGroupsService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
+use Tests\Pmi\GoogleGroup;
 
 class HealthProApplicationTest extends WebTestCase
 {
@@ -17,12 +19,12 @@ class HealthProApplicationTest extends WebTestCase
 
     public function testController()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/s');
-        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+        $this->client->followRedirects();
+        $this->client->request('GET', '/s');
+        self::assertMatchesRegularExpression('/\/s\/login$/', $this->client->getRequest()->getUri());
     }
 
-    private function logIn($email)
+    private function logIn($email, $groups)
     {
         $session = self::$container->get('session');
         $tokenStorage = self::$container->get('security.token_storage');
@@ -30,6 +32,9 @@ class HealthProApplicationTest extends WebTestCase
         $userProvider = self::$container->get('App\Security\UserProvider');
 
         $userService->setMockUser($email);
+        if (!empty($groups)) {
+            MockGoogleGroupsService::setGroups($email, $groups);
+        }
         $user = $userProvider->loadUserByUsername($email);
         $token = new PreAuthenticatedToken($user, null, 'main', $user->getRoles());
         $tokenStorage->setToken($token);
@@ -43,9 +48,9 @@ class HealthProApplicationTest extends WebTestCase
 
     public function testLogin()
     {
-        $this->logIn('testLogin@example.com');
+        $this->logIn('testLogin@example.com', [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->client->followRedirects();
         $this->client->request('GET', '/s');
-        self::assertMatchesRegularExpression('/\/site\/select$/', $this->client->getRequest()->getUri());
+        self::assertMatchesRegularExpression('/\/s$/', $this->client->getRequest()->getUri());
     }
 }
