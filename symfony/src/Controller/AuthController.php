@@ -20,7 +20,7 @@ class AuthController extends AbstractController
     /**
      * @Route("/login", name="login")
      */
-    public function login(UserService $userService, Request $request, UserProviderInterface $userProvider, EnvironmentService $env, AuthService $authService)
+    public function login(UserService $userService, Request $request, UserProviderInterface $userProvider, EnvironmentService $env, AuthService $authService, SessionInterface $session)
     {
         if ($this->getUser()) {
             return $this->redirectToRoute('symfony_home');
@@ -36,6 +36,7 @@ class AuthController extends AbstractController
                 $userService->setMockUser($loginForm->get('userName')->getData());
                 $user = $userProvider->loadUserByUsername($loginForm->get('userName')->getData());
                 $authService->setMockAuthToken($user);
+                $session->set('isLoginReturn', true);
                 return $this->redirect('/s');
             }
 
@@ -66,6 +67,7 @@ class AuthController extends AbstractController
             $user = $auth->processAuth($state, $code);
             $session->set('googleUser', $user);
             echo 'Logged in as ' . $user->getEmail();
+            $session->set('isLoginReturn', true);
             exit;
         } catch (\Exception $e) {
             $this->addFlash('error', 'Authentication failed. Please try again.');

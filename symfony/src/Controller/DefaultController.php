@@ -46,6 +46,14 @@ class DefaultController extends AbstractController
     }
 
     /**
+     * @Route("/s/splash", name="dash_splash")
+     */
+    public function dashSplashAction()
+    {
+        return $this->render('dash-splash.html.twig');
+    }
+
+    /**
      * @Route("/s/site/select", name="site_select")
      */
     public function siteSelectAction(Request $request, SiteService $siteService)
