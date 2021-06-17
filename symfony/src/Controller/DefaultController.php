@@ -87,8 +87,44 @@ class DefaultController extends AbstractController
             throw $this->createAccessDeniedException();
         }
         $request->getSession()->set('pmiLastUsed', time());
-        $response = new JsonResponse();
-        $response->setData(array());
-        return $response;
+        return (new JsonResponse())->setData([]);
+    }
+
+    /**
+     * @Route("/s/agree", name="agree_usage")
+     */
+    public function agreeUsageAction(Request $request)
+    {
+        if (!$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('agreeUsage', $request->request->get('csrf_token')))) {
+            throw $this->createAccessDeniedException();
+        }
+        $request->getSession()->set('isUsageAgreed', true);
+        return (new JsonResponse())->setData([]);
+    }
+
+    /**
+     * @Route("/s/client-timeout", name="client_timeout")
+     * Handles a clientside session timeout, which might not be a true session
+     * timeout if the user is working in multiple tabs.
+     */
+    public function clientTimeoutAction(Request $request) {
+        // if we got to this point, then the beforeCallback() has
+        // already checked the user's session is not expired - simply reload the page
+        if ($request->headers->get('referer')) {
+            return $this->redirect($request->headers->get('referer'));
+        }
+        return $this->redirect($this ->generateUrl('home'));
+    }
+
+    /**
+     * @Route("/s/hide-tz-warning", name="hide_tz_warning")
+     */
+    public function hideTZWarningAction(Request $request)
+    {
+        if (!$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('hideTZWarning', $request->request->get('csrf_token')))) {
+            throw $this->createAccessDeniedException();
+        }
+        $request->getSession()->set('hideTZWarning', true);
+        return (new JsonResponse())->setData([]);
     }
 }

@@ -26,15 +26,6 @@ evaluationBloodDonorCheck:
 dashboard_home:
     path: /dashboard
 
-clientTimeout:
-    path: /client-timeout
-
-agreeUsage:
-    path: /agree
-
-hideTZWarning:
-    path: /hide-tz-warning
-
 patientStatus:
     path: /participant/{participantId}/patient/status/{patientStatusId}
 
