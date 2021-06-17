@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Service\SiteService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 class DefaultController extends AbstractController
 {
@@ -74,5 +76,19 @@ class DefaultController extends AbstractController
             }
         }
         return $this->render('site-select.html.twig');
+    }
+    /**
+     * @Route("/s/keepalive", name="keep_alive")
+     * Dummy action that serves to extend the user's session.
+     */
+    public function keepAliveAction(Request $request)
+    {
+        if (!$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('keepAlive', $request->request->get('csrf_token')))) {
+            throw $this->createAccessDeniedException();
+        }
+        $request->getSession()->set('pmiLastUsed', time());
+        $response = new JsonResponse();
+        $response->setData(array());
+        return $response;
     }
 }

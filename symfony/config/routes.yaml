@@ -29,9 +29,6 @@ dashboard_home:
 clientTimeout:
     path: /client-timeout
 
-keepAlive:
-    path: /keepalive
-
 agreeUsage:
     path: /agree
 

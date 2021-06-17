@@ -119,7 +119,7 @@ class RequestListener
                 'logout',
                 'loginReturn',
                 'timeout',
-                'keepAlive',
+                'keep_alive',
                 'clientTimeout',
                 'agreeUsage'
             ]));
