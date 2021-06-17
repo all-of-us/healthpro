@@ -44,7 +44,7 @@ class DefaultController extends AbstractController
 
     public function loginReturnAction(Application $app)
     {
-        $app['session']->set('isLoginReturn', true);
+        //$app['session']->set('isLoginReturn', true);
         $url = $app['session']->get('loginDestUrl', $app->generateUrl('home'));
         return $app->redirect($url);
     }

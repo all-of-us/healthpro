@@ -84,7 +84,7 @@ class RequestListener
     private function checkSiteSelect()
     {
         $hasMultiple = ($this->authorizationChecker->isGranted('ROLE_DASHBOARD') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_ADMIN') || $this->authorizationChecker->isGranted('ROLE_AWARDEE') || $this->authorizationChecker->isGranted('ROLE_DV_ADMIN')));
-        if ($hasMultiple && $this->session->get('isLoginReturn') && !$this->isUpkeepRoute() && !preg_match('/^(\/s)?\/(splash)($|\/).*/', $this->request->getPathInfo())) {
+        if ($hasMultiple && $this->session->get('isLoginReturn') && !$this->isUpkeepRoute() && !preg_match('/^(\/s)?\/(splash|_wdt)($|\/).*/', $this->request->getPathInfo())) {
             return new RedirectResponse('/s/splash');
         }
 
@@ -103,7 +103,7 @@ class RequestListener
 
     public function onKernelFinishRequest()
     {
-        if ($this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if (!preg_match('/^(\/s)?\/(login|_wdt)($|\/).*/', $this->request->getPathInfo()) && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
             $this->session->set('isLoginReturn', false);
         }
     }
