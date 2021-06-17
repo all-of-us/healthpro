@@ -409,6 +409,8 @@ class WorkQueueService
         $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeFeb);
         $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeFebAuthored, $userTimezone);
         $row[] = WorkQueue::dateFromString($participant->enrollmentStatusCoreMinusPMTime, $userTimezone);
+        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute1);
+        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute1Authored, $userTimezone);
         return $row;
     }
 
@@ -431,16 +433,19 @@ class WorkQueueService
             return '';
         }
         $organizations = [];
-        foreach ($participant->patientStatus as $patientStatus) {
-            if ($patientStatus->status === $value) {
-                if ($type === 'export') {
-                    $organizations[] = $patientStatus->organization;
-                } else {
-                    $organizations[] = $this->siteService->getOrganizationDisplayName($patientStatus->organization);
+        if (is_array($participant->patientStatus)) {
+            foreach ($participant->patientStatus as $patientStatus) {
+                if ($patientStatus->status === $value) {
+                    if ($type === 'export') {
+                        $organizations[] = $patientStatus->organization;
+                    } else {
+                        $organizations[] = $this->siteService->getOrganizationDisplayName($patientStatus->organization);
+                    }
                 }
             }
+            return implode('; ', $organizations);
         }
-        return implode('; ', $organizations);
+        return '';
     }
 
 
