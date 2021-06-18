@@ -130,11 +130,10 @@ class RequestListener
         $route = $this->request->attributes->get('_route');
         return (in_array($route, [
                 'logout',
-                'loginReturn',
                 'timeout',
                 'keep_alive',
-                'clientTimeout',
-                'agreeUsage'
+                'client_timeout',
+                'agree_usage'
             ]));
     }
 
