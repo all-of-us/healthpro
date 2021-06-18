@@ -147,6 +147,7 @@ class UserService
                 $this->em->flush();
             }
         }
+        $this->session->set('isLoginReturn', true);
     }
 
     public function setMockUser($email): void

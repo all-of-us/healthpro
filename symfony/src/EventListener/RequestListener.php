@@ -99,7 +99,7 @@ class RequestListener
                 $this->siteService->switchSite($user->getSites()[0]->email);
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
                 $this->siteService->switchSite($user->getAwardees()[0]->email);
-            } elseif (!preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site|login|site_select)($|\/).*/',
+            } elseif (!preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site|login|site_select|splash)($|\/).*/',
                     $this->request->getPathInfo()) && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/s/site/select');
             }
