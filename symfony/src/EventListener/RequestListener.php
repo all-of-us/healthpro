@@ -42,11 +42,11 @@ class RequestListener
 
     public function onKernelRequest(RequestEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        $this->request = $event->getRequest();
+
+        if (!$event->isMasterRequest() || $this->request->attributes->get('_route') === '_wdt') {
             return;
         }
-
-        $this->request = $event->getRequest();
 
         $this->logRequest();
 
