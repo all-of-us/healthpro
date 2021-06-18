@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Pmi\Drc\GoogleUser;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Exception;
@@ -15,19 +16,24 @@ class AuthService
 {
     private $params;
     private $session;
+    private $urlGenerator;
     private $callbackUrl;
     private $tokenStorage;
+    private $env;
 
     public function __construct(
         ContainerBagInterface $params,
         SessionInterface $session,
         UrlGeneratorInterface $urlGenerator,
-        TokenStorageInterface $tokenStorage
+        TokenStorageInterface $tokenStorage,
+        EnvironmentService $env
     ) {
         $this->params = $params;
         $this->session = $session;
+        $this->urlGenerator = $urlGenerator;
         $this->callbackUrl = $urlGenerator->generate('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $this->tokenStorage = $tokenStorage;
+        $this->env = $env;
     }
 
     private function getGoogleClient(): GoogleClient
@@ -84,5 +90,16 @@ class AuthService
     {
         $token = new PreAuthenticatedToken($user, null, 'main', $user->getRoles());
         $this->tokenStorage->setToken($token);
+    }
+
+    public function getGoogleLogoutUrl($route = 'symfony_home')
+    {
+        $dest = $this->urlGenerator->generate($route, [], UrlGeneratorInterface::ABSOLUTE_URL);
+        
+        if ($this->env->isLocal() && $this->params->has('local_mock_auth') && $this->params->get('local_mock_auth')) {
+            return $_SERVER['APP_ENV'] === 'test' ? null : $dest;
+        }
+        // http://stackoverflow.com/a/14831349/1402028
+        return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
     }
 }

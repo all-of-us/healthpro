@@ -7,9 +7,6 @@ index:
 home:
     path: /
 
-logout:
-    path: /logout
-
 selectSite:
     path: /site/select
 

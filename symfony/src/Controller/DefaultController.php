@@ -3,10 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\AuthService;
+use App\Service\LoggerService;
 use App\Service\SiteService;
+use Pmi\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
@@ -126,5 +130,25 @@ class DefaultController extends AbstractController
         }
         $request->getSession()->set('hideTZWarning', true);
         return (new JsonResponse())->setData([]);
+    }
+
+    /**
+     * @Route("/s/timeout", name="timeout")
+     */
+    public function timeoutAction()
+    {
+        return $this->render('timeout.html.twig');
+    }
+
+    /**
+     * @Route("/s/logout", name="logout")
+     */
+    public function logoutAction(Request $request, LoggerService $loggerService, SessionInterface $session, AuthService $authService)
+    {
+        $timeout = $request->get('timeout');
+        $loggerService->log(Log::LOGOUT);
+        $this->get('security.token_storage')->setToken(null);
+        $session->invalidate();
+        return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'symfony_home'));
     }
 }

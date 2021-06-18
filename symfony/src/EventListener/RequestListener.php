@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\Service\EnvironmentService;
 use App\Service\SiteService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,10 +24,11 @@ class RequestListener
     private $userService;
     private $siteService;
     private $authorizationChecker;
+    private $env;
 
     private $request;
 
-    public function __construct(LoggerService $logger, EntityManagerInterface $em, TwigEnvironment $twig, SessionInterface $session, UserService $userService, SiteService $siteService, AuthorizationCheckerInterface $authorizationChecker)
+    public function __construct(LoggerService $logger, EntityManagerInterface $em, TwigEnvironment $twig, SessionInterface $session, UserService $userService, SiteService $siteService, AuthorizationCheckerInterface $authorizationChecker, EnvironmentService $env)
     {
         $this->logger = $logger;
         $this->em = $em;
@@ -35,6 +37,7 @@ class RequestListener
         $this->userService = $userService;
         $this->siteService = $siteService;
         $this->authorizationChecker = $authorizationChecker;
+        $this->env = $env;
     }
 
     public function onKernelRequest(RequestEvent $event)
@@ -46,6 +49,8 @@ class RequestListener
         $this->request = $event->getRequest();
 
         $this->logRequest();
+
+        $this->checkLoginExpired();
 
         if ($siteSelectResponse = $this->checkSiteSelect()) {
             $event->setResponse($siteSelectResponse);
@@ -101,9 +106,17 @@ class RequestListener
         }
     }
 
+    private function checkLoginExpired()
+    {
+        // log the user out if their session is expired
+        if ($this->isLoginExpired() && $this->request->attributes->get('_route') !== 'logout') {
+            return $this->redirectToRoute('logout', ['timeout' => true]);
+        }
+    }
+
     public function onKernelFinishRequest()
     {
-        if (!preg_match('/^(\/s)?\/(login|_wdt)($|\/).*/', $this->request->getPathInfo()) && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($this->request && !preg_match('/^(\/s)?\/(login|_wdt)($|\/).*/', $this->request->getPathInfo()) && !$this->isUpkeepRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
             $this->session->set('isLoginReturn', false);
         }
     }
@@ -123,5 +136,15 @@ class RequestListener
                 'clientTimeout',
                 'agreeUsage'
             ]));
+    }
+
+    /** Is the user's session expired? */
+    public function isLoginExpired()
+    {
+        $time = time();
+        // custom "last used" session time updated on keepAliveAction
+        $idle = $time - $this->session->get('pmiLastUsed', $time);
+        $remaining = $this->env->values['sessionTimeOut'] - $idle;
+        return $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY') && $remaining <= 0;
     }
 }
