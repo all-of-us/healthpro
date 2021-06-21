@@ -79,7 +79,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        // todo
+        $this->userService->updateLastLogin();
     }
 
     public function start(Request $request, AuthenticationException $authException = null)

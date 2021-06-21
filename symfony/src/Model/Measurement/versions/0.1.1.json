@@ -1,0 +1,125 @@
+{
+    "version": "0.1.1",
+    "fields": [
+        {
+            "name": "height",
+            "label": "Height",
+            "unit": "cm",
+            "image": "height.png",
+            "decimals": 1,
+            "max": 300,
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "weight",
+            "label": "Weight",
+            "unit": "kg",
+            "decimals": 1,
+            "max": 1000,
+            "warnings": [
+                {
+                    "min": 30,
+                    "max": 450,
+                    "message": "Please verify that this weight is correct"
+                }
+            ],
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "blood-pressure-systolic",
+            "label": "Blood Pressure: systolic",
+            "unit": "mmHg",
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "max": 180,
+                    "message": "Participant is in a hypertensive crisis"
+                },
+                {
+                    "min": 70,
+                    "message": "Participant may be hypotensive"
+                }
+            ],
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "blood-pressure-diastolic",
+            "label": "Blood Pressure: diastolic",
+            "unit": "mmHg",
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "max": 110,
+                    "message": "Participant is in a hypertensive crisis"
+                },
+                {
+                    "min": 40,
+                    "message": "Participant may be hypotensive"
+                }
+            ],
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "heart-rate",
+            "label": "Heart Rate",
+            "unit": "bpm",
+            "max": 300,
+            "warnings": [
+                {
+                    "min": 50,
+                    "max": 120,
+                    "message": "Please verify that this resting heart rate is correct"
+                }
+            ],
+            "help": {
+                "caption": "Help text placeholder."
+            }
+        },
+        {
+            "name": "hip-circumference",
+            "label": "Hip Circumference",
+            "unit": "cm",
+            "decimals": 1,
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "min": 50,
+                    "max": 150,
+                    "message": "Please verify that this circumference is correct"
+                }
+            ],
+            "help": {
+                "image": "hip.png"
+            }
+        },
+        {
+            "name": "waist-circumference",
+            "label": "Waist Circumference",
+            "unit": "cm",
+            "decimals": 1,
+            "replicates": 3,
+            "max": 300,
+            "warnings": [
+                {
+                    "min": 50,
+                    "max": 150,
+                    "message": "Please verify that this circumference is correct"
+                }
+            ],
+            "help": {
+                "image": "waist.png"
+            }
+        }
+    ]
+}

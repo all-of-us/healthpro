@@ -64,6 +64,7 @@ class WorkQueue
         'questionnaireOnCopeNovAuthored',
         'questionnaireOnCopeDecAuthored',
         'questionnaireOnCopeFebAuthored',
+        'questionnaireOnCopeVaccineMinute1',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -288,7 +289,8 @@ class WorkQueue
         'CopeJuly' => 'COPE July',
         'CopeNov' => 'COPE Nov',
         'CopeDec' => 'COPE Dec',
-        'CopeFeb' => 'COPE Feb'
+        'CopeFeb' => 'COPE Feb',
+        'CopeVaccineMinute1' => 'Summer Minute'
     ];
 
     public static $initialSurveys = [
@@ -634,6 +636,8 @@ class WorkQueue
         $headers[] = 'COPE Feb PPI Survey Complete';
         $headers[] = 'COPE Feb PPI Survey Completion Date';
         $headers[] = 'Core Participant Minus PM Date';
+        $headers[] = 'Summer Minute PPI Survey Complete';
+        $headers[] = 'Summer Minute PPI Survey Completion Date';
         return $headers;
     }
 }

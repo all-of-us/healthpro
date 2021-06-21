@@ -5,6 +5,7 @@ use App\EventListener\ResponseSecurityHeadersTrait;
 use Pmi\Application\AbstractApplication;
 use Pmi\Audit\Log;
 use Pmi\HttpClient;
+use Pmi\Service\UserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -25,12 +26,12 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     const OAUTH_FAILURE_MESSAGE = 'OAuth Failure';
 
     private $app;
-    
+
     public function __construct(AbstractApplication $app)
     {
         $this->app = $app;
     }
-    
+
     private function getAuthLoginClient($state = null)
     {
         if ($state) {
@@ -49,7 +50,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $client->setScopes(['email', 'profile']);
         return $client;
     }
-    
+
     public function buildCredentials($googleUser)
     {
         // a user's credentials are effectively their logged-in Google user,
@@ -124,12 +125,12 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             return '';
         }
     }
-    
+
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         return $userProvider->loadUserByUsername($credentials['googleUser']->getEmail());
     }
-    
+
     public function checkCredentials($credentials, UserInterface $user)
     {
         $validCredentials = is_array($credentials) && $credentials['googleUser'] &&
@@ -143,7 +144,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             return $validCredentials && count($user->getGroups()) > 0 && $valid2fa;
         }
     }
-    
+
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $code = 403;
@@ -153,7 +154,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
                 'email' => $googleUser->getEmail(),
                 'logoutUrl' => $this->app->getGoogleLogoutUrl()
             ];
-            
+
             // attempt to load the user object for error msg customization
             try {
                 $userProvider = new \Pmi\Security\UserProvider($this->app);
@@ -161,7 +162,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             } catch (\Exception $e) {
                 $user = null;
             }
-            
+
             // infer the reason behind the auth failure
             if ($user && $this->app->getConfig('enforce2fa') && !$user->hasTwoFactorAuth()) {
                 $template = 'error-2fa.html.twig';
@@ -185,14 +186,15 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $this->addSecurityHeaders($response);
         return $response;
     }
-    
+
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
         // a flag to indicate that the user has just logged in
         $request->getSession()->set('isLogin', true);
         // has the user agreed to the system usage agreement this session?
         $request->getSession()->set('isUsageAgreed', false);
-        
+        // Update last login for user record
+        UserService::updateLastLogin($this->app);
         if ($this->app->canMockLogin()) {
             // simulate the OAuth workflow for more accurate testing
             $this->app['session']->set('loginDestUrl', $request->getRequestUri());
@@ -202,12 +204,12 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             return;
         }
     }
-    
+
     public function supportsRememberMe()
     {
         return false;
     }
-    
+
     public function start(Request $request, AuthenticationException $authException = null)
     {
         if ($this->app->canMockLogin()) {

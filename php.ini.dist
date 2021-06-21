@@ -3,6 +3,6 @@ display_errors = 0
 error_reporting = E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED
 session.cookie_httponly = 1
 session.cookie_secure = 1
-session.cookie_samesite = "Strict" 
+session.cookie_samesite= "Lax"
 extension=grpc.so
 session.gc_probability = 0

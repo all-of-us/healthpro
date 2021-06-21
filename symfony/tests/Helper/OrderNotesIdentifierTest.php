@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\Service;
+namespace App\Test\Helper;
 
 use App\Helper\Participant;
 use PHPUnit\Framework\TestCase;
