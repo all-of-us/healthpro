@@ -25,7 +25,7 @@ class MockGoogleGroupsService
     public function getGroups($userEmail = null)
     {
         // use fixtures when using gaBypass in dev
-        if ($userEmail && $_SERVER['APP_ENV'] !== 'test' && empty(self::$groups[$userEmail])) {
+        if ($userEmail && !$this->env->values['isUnitTest'] && empty(self::$groups[$userEmail])) {
             if ($this->params->has('gaBypassGroups') && is_array($this->params->get('gaBypassGroups'))) {
                 $groups = [];
                 foreach ($this->params->get('gaBypassGroups') as $arr) {

@@ -46,7 +46,7 @@ class UserProvider implements UserProviderInterface
         if ($this->session->has('googlegroups')) {
             $groups = $this->session->get('googlegroups');
         } else {
-            if ($this->env->isLocal() && (($this->params->has('gaBypass') && $this->params->get('gaBypass')) || $_SERVER['APP_ENV'] === 'test')) {
+            if ($this->env->isLocal() && (($this->params->has('gaBypass') && $this->params->get('gaBypass')) || $this->env->values['isUnitTest'])) {
                 $groups = $this->mockGoogleGroups->getGroups($googleUser->getEmail());
             } else {
                 $groups = $this->googleGroups->getGroups($googleUser->getEmail());

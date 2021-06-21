@@ -36,14 +36,9 @@ class UserService
     public function getGoogleUser()
     {
         if ($this->canMockLogin()) {
-            if ($this->env->values['isUnitTest']) {
-                return MockUserService::getCurrentUser();
-            } else {
-                return $this->session->get('mockUser');
-            }
-        } else {
-            return $this->session->get('googleUser');
+            return $this->session->get('mockUser');
         }
+        return $this->session->get('googleUser');
     }
 
     public function canMockLogin()
@@ -58,7 +53,7 @@ class UserService
                 'id' => 1,
                 'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getUserId(),
-                'timezone' => $googleUser->getTimzezone()
+                'timezone' => $googleUser->getTimezone()
             ];
         }
 

@@ -97,7 +97,7 @@ class AuthService
         $dest = $this->urlGenerator->generate($route, [], UrlGeneratorInterface::ABSOLUTE_URL);
         
         if ($this->env->isLocal() && $this->params->has('local_mock_auth') && $this->params->get('local_mock_auth')) {
-            return $_SERVER['APP_ENV'] === 'test' ? null : $dest;
+            return $this->env->values['isUnitTest'] ? null : $dest;
         }
         // http://stackoverflow.com/a/14831349/1402028
         return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";

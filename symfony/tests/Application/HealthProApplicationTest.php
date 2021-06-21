@@ -3,6 +3,7 @@
 namespace App\Test\Application;
 
 use App\Service\MockGoogleGroupsService;
+use Pmi\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
@@ -40,6 +41,7 @@ class HealthProApplicationTest extends WebTestCase
         $tokenStorage->setToken($token);
 
         $session->set('_security_main', serialize($token));
+        $session->set('isLoginReturn', true);
         $session->save();
 
         $cookie = new Cookie($session->getName(), $session->getId());
@@ -53,4 +55,16 @@ class HealthProApplicationTest extends WebTestCase
         $this->client->request('GET', '/s');
         self::assertMatchesRegularExpression('/\/s$/', $this->client->getRequest()->getUri());
     }
+
+    public function testDashSplash()
+    {
+        $this->logIn('testDashSplash@example.com', [
+            new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
+        ]);
+        $this->client->followRedirects();
+        $crawler = $this->client->request('GET', '/s/participants');
+        self::assertEquals(1, count($crawler->filter('#dashSplashSelector')));
+    }
+
 }
