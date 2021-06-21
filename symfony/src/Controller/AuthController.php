@@ -59,20 +59,10 @@ class AuthController extends AbstractController
     /**
      * @Route("/login/callback", name="login_callback")
      */
-    public function loginCallback(AuthService $auth, Request $request, SessionInterface $session)
+    public function loginCallback()
     {
-        $state = $request->query->get('state');
-        $code = $request->query->get('code');
-        try {
-            $user = $auth->processAuth($state, $code);
-            $session->set('googleUser', $user);
-            echo 'Logged in as ' . $user->getEmail();
-            $session->set('isLoginReturn', true);
-            exit;
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Authentication failed. Please try again.');
-
-            return $this->redirectToRoute('login');
-        }
+        // This never gets executed as it's handled by guard authenticator
+        $this->addFlash('error', 'Authentication failed. Please try again.');
+        return $this->redirectToRoute('login');
     }
 }
