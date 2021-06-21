@@ -10,9 +10,9 @@ use App\Repository\ProblemRepository;
 use App\Service\LoggerService;
 use App\Service\ParticipantSummaryService;
 use App\Service\ProblemNotificationService;
+use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
-use Pmi\Entities\Participant;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -29,14 +29,16 @@ class ProblemController extends AbstractController
     protected $params;
     protected $em;
     protected $problemNotificationService;
+    protected $siteService;
 
-    public function __construct(SessionInterface $sessionInterface, LoggerService $loggerService, ParameterBagInterface $parameterBag, EntityManagerInterface $entityManager, ProblemNotificationService $problemNotificationService)
+    public function __construct(SessionInterface $sessionInterface, LoggerService $loggerService, ParameterBagInterface $parameterBag, EntityManagerInterface $entityManager, ProblemNotificationService $problemNotificationService, SiteService $siteService)
     {
         $this->session = $sessionInterface;
         $this->logger = $loggerService;
         $this->params = $parameterBag;
         $this->em = $entityManager;
         $this->problemNotificationService = $problemNotificationService;
+        $this->siteService = $siteService;
     }
 
     /**
@@ -89,15 +91,14 @@ class ProblemController extends AbstractController
         $formDisabled = false;
         $enableConstraints = false;
 
-        if (!$this->isDVSite()) {
+        if (!$this->siteService->isDvType()) {
             throw $this->createAccessDeniedException('Site is not a DV.');
         }
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        $participant = new Participant($participant);
-        if (!$participant->status || $this->isTestSite()) {
+        if (!$participant->status || $this->siteService->isTestSite()) {
             throw $this->createAccessDeniedException('Participant ineligible for problem report.');
         }
         if ($problemId) {
@@ -125,7 +126,7 @@ class ProblemController extends AbstractController
                 $problem->setUpdatedTs($now);
                 if ($request->request->has('reportable_finalize') && (!$problem || empty($problem->getFinalizedTs()))) {
                     $problem->setFinalizedUserId($this->getUser()->getId());
-                    $problem->setFinalizedSite($this->getSiteId());
+                    $problem->setFinalizedSite($this->siteService->getSiteId());
                     $problem->setFinalizedTs($now);
                 }
                 // Finalize an existing report
@@ -146,7 +147,7 @@ class ProblemController extends AbstractController
                 // Create a new report (optionally finalize at creation)
                 } else {
                     $problem->setUserId($this->getUser()->getId());
-                    $problem->setSite($this->getSiteId());
+                    $problem->setSite($this->siteService->getSiteId());
                     $problem->setParticipantId($participantId);
                     try {
                         $this->em->persist($problem);
@@ -195,15 +196,14 @@ class ProblemController extends AbstractController
      */
     public function problemComment($participantId, $problemId, Request $request, LoggerService $loggerService, ParticipantSummaryService $participantSummaryService, ProblemRepository $problemRepository): Response
     {
-        if (!$this->isDVSite()) {
+        if (!$this->siteService->isDvType()) {
             throw $this->createAccessDeniedException('Site is not a DV.');
         }
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        $participant = new Participant($participant);
-        if (!$participant->status || $this->isTestSite()) {
+        if (!$participant->status || $this->siteService->isTestSite()) {
             throw $this->createAccessDeniedException('Participant ineligible for problem report.');
         }
         if ($problemId) {
@@ -221,7 +221,7 @@ class ProblemController extends AbstractController
                 $problemComment = $problemCommentForm->getData();
                 $problemComment->setProblem($problem);
                 $problemComment->setUserId($this->getUser()->getId());
-                $problemComment->setSite($this->getSiteId());
+                $problemComment->setSite($this->siteService->getSiteId());
                 try {
                     $this->em->persist($problemComment);
                     $this->em->flush();
@@ -239,22 +239,4 @@ class ProblemController extends AbstractController
         $this->addFlash('error', 'Failed to create new comment.');
         return $this->redirectToRoute('problem_form', ['participantId' => $participantId, 'problemId' => $problem->getId()]);
     }
-
-    /* Private Methods */
-
-    private function getSiteId(): string
-    {
-        return $this->session->get('site')->id;
-    }
-
-    private function isDVSite(): bool
-    {
-        return $this->session->get('siteType') !== 'DV';
-    }
-
-    private function isTestSite(): bool
-    {
-        return $this->params->has('disable_test_access') && !empty($this->params->get('disable_test_access')) && $this->session->get('siteAwardeeId') === 'TEST';
-    }
-
 }
