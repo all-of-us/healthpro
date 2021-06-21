@@ -13,7 +13,6 @@ use App\Service\ProblemNotificationService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
-use Pmi\Entities\Participant;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -99,7 +98,6 @@ class ProblemController extends AbstractController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        $participant = new Participant($participant);
         if (!$participant->status || $this->siteService->isTestSite()) {
             throw $this->createAccessDeniedException('Participant ineligible for problem report.');
         }
@@ -205,7 +203,6 @@ class ProblemController extends AbstractController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        $participant = new Participant($participant);
         if (!$participant->status || $this->siteService->isTestSite()) {
             throw $this->createAccessDeniedException('Participant ineligible for problem report.');
         }
