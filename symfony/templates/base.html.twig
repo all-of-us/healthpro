@@ -74,19 +74,21 @@
                                 </a>
                             </li>
                         {% endif %}
-                        {% for key, roleNav in roleNavs %}
-                            {% if is_granted(roleNav.role) %}
-                                <li>
-                                    <a href="{{ path(roleNav.path) }}">
-                                        <i class="fas fa-arrow-circle-right"></i>
-                                        {% if key == currentRoleNav %}
-                                            <strong>{{ roleNav.title }}</strong>
-                                        {% else %}
-                                            {{ roleNav.title }}
-                                        {% endif %}
-                                    </a>
-                                </li>
-                            {% endif %}
+                        {% for key, roleNav in roleNavs|filter((roleNav, key) =>
+                            is_granted(roleNav.role) and
+                            not (key == 'biobank' and is_granted('ROLE_SCRIPPS'))
+                        ) %}
+                        {# Scripps and biobank roles point to the same route, so only display one if user has both roles #}
+                            <li>
+                                <a href="{{ path(roleNav.path) }}">
+                                    <i class="fas fa-arrow-circle-right"></i>
+                                    {% if key == currentRoleNav %}
+                                        <strong>{{ roleNav.title }}</strong>
+                                    {% else %}
+                                        {{ roleNav.title }}
+                                    {% endif %}
+                                </a>
+                            </li>
                         {% endfor %}
                     </ul>
                 </li>
