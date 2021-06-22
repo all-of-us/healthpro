@@ -62,7 +62,7 @@
                         {% endif %}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-role">
-                        <li><a href="{{ path('symfony_home') }}"><i class="fas fa-arrow-circle-right"></i> HealthPro</a></li>
+                        <li><a href="{{ path('home') }}"><i class="fas fa-arrow-circle-right"></i> HealthPro</a></li>
                         {% for key, roleNav in roleNavs %}
                             {% if is_granted(roleNav.role) %}
                                 <li>
