@@ -6,6 +6,7 @@ use App\Helper\MockUserHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Pmi\Service\MockUserService;
 use App\Entity\User;
@@ -18,19 +19,22 @@ class UserService
     private $env;
     private $session;
     private $security;
+    private $authorizationChecker;
 
     public function __construct(
         EntityManagerInterface $em,
         ContainerBagInterface $params,
         EnvironmentService $env,
         SessionInterface $session,
-        Security $security
+        Security $security,
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->em = $em;
         $this->params = $params;
         $this->env = $env;
         $this->session = $session;
         $this->security = $security;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     public function getGoogleUser()
@@ -149,5 +153,15 @@ class UserService
     {
         MockUserHelper::switchCurrentUser($email);
         $this->session->set('mockUser', MockUserHelper::getCurrentUser());
+    }
+
+    /** Is the user's session expired? */
+    public function isLoginExpired()
+    {
+        $time = time();
+        // custom "last used" session time updated on keepAliveAction
+        $idle = $time - $this->session->get('pmiLastUsed', $time);
+        $remaining = $this->env->values['sessionTimeOut'] - $idle;
+        return $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY') && $remaining <= 0;
     }
 }

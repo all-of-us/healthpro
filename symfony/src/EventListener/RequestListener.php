@@ -109,7 +109,7 @@ class RequestListener
     private function checkLoginExpired()
     {
         // log the user out if their session is expired
-        if ($this->isLoginExpired() && $this->request->attributes->get('_route') !== 'logout') {
+        if ($this->userService->isLoginExpired() && $this->request->attributes->get('_route') !== 'logout') {
             return $this->redirectToRoute('logout', ['timeout' => true]);
         }
     }
@@ -135,15 +135,5 @@ class RequestListener
                 'client_timeout',
                 'agree_usage'
             ]));
-    }
-
-    /** Is the user's session expired? */
-    public function isLoginExpired()
-    {
-        $time = time();
-        // custom "last used" session time updated on keepAliveAction
-        $idle = $time - $this->session->get('pmiLastUsed', $time);
-        $remaining = $this->env->values['sessionTimeOut'] - $idle;
-        return $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY') && $remaining <= 0;
     }
 }

@@ -13,6 +13,8 @@ class HealthProApplicationTest extends WebTestCase
 {
     private $client;
     private $session;
+    private $userService;
+    private $env;
 
     public function setUp(): void
     {
@@ -29,11 +31,12 @@ class HealthProApplicationTest extends WebTestCase
     private function logIn($email, $groups)
     {
         $this->session = self::$container->get('session');
+        $this->userService = self::$container->get('App\Service\UserService');
+        $this->env = self::$container->get('App\Service\EnvironmentService');
         $tokenStorage = self::$container->get('security.token_storage');
-        $userService = self::$container->get('App\Service\UserService');
         $userProvider = self::$container->get('App\Security\UserProvider');
 
-        $userService->setMockUser($email);
+        $this->userService->setMockUser($email);
         if (!empty($groups)) {
             MockGoogleGroupsService::setGroups($email, $groups);
         }
@@ -154,5 +157,21 @@ class HealthProApplicationTest extends WebTestCase
         self::assertSame(null, $this->session->get('site'));
         $this->client->request('GET', '/s');
         self::assertEquals('/s/admin', $this->client->getRequest()->getRequestUri());
+    }
+
+    public function testForceSiteSelect()
+    {
+        $this->logIn('testForceSiteSelect@example.com', [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'), new GoogleGroup('hpo-site-2@gapps.com', 'Test Group 2', 'lorem ipsum 2')]);
+        $this->client->followRedirects();
+        $this->client->request('GET', '/s/participants');
+        self::assertMatchesRegularExpression('/\/s\/site\/select$/', $this->client->getRequest()->getUri());
+    }
+
+    public function testHeaders()
+    {
+        $this->client->followRedirects();
+        $this->client->request('GET', '/s');
+        $xframeOptions = $this->client->getResponse()->headers->get('X-Frame-Options');
+        self::assertSame('SAMEORIGIN', $xframeOptions);
     }
 }
