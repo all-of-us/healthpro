@@ -31,7 +31,8 @@ class SymfonyMigrationController extends AbstractController
         ['biobank_home', '/biobank'],
         ['orders', '/orders'],
         ['selectSite', '/site/select', ['method' => 'GET|POST']],
-        ['home', '/']
+        ['home', '/'],
+        ['mockLogin', 'mock-login']
     ];
 
     public function deceased_reports_indexAction(Application $app)
@@ -214,5 +215,13 @@ class SymfonyMigrationController extends AbstractController
     public function homeAction(Application $app)
     {
         return $app->redirect('/s');
+    }
+
+    /**
+     * @deprecated 2021-06-22
+     */
+    public function mockLoginAction(Application $app)
+    {
+        return $app->redirect('/s/login');
     }
 }
