@@ -133,6 +133,41 @@ label.label-normal {
     text-transform: uppercase;
 }
 
+/* Nav bar role selector */
+.navbar-brand-role {
+    color: #f48d76;
+    font-weight: bold;
+}
+.navbar .dropdown-menu-role {
+    right: 0;
+    left: -15px;
+    font-size: 17px;
+}
+.navbar .dropdown-menu-role > li > a {
+    padding-left: 10px;
+}
+.navbar .dropdown-menu-role a i {
+    color: #363272;
+}
+.navbar-nav-role {
+    margin: 0;
+}
+@media(max-width:767px) {
+    .navbar-nav-role {
+        margin-top: 5px;
+    }
+    .navbar .dropdown-menu-role a i {
+        color: #FFFFFF;
+    }
+}
+.navbar-allofus .navbar-nav>.open>a.navbar-brand, .navbar-allofus .navbar-nav>.open>a.navbar-brand:focus, .navbar-allofus .navbar-nav>.open>a.navbar-brand:hover {
+    background-color: inherit;
+}
+.dropdown-toggle .navbar-brand-subtitle {
+    text-align: left;
+    margin-left: 50px;
+}
+
 /*
    IE >= 10 hack
    https://philipnewcomer.net/2014/04/target-internet-explorer-10-11-css/
