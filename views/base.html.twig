@@ -63,16 +63,18 @@
                             {% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-role">
-                            <li>
-                                <a href="{{ path('home') }}">
-                                    <i class="fas fa-arrow-circle-right"></i>
-                                    {% if not currentRoleNav %}
-                                        <strong>HealthPro</strong>
-                                    {% else %}
-                                        HealthPro
-                                    {% endif %}
-                                </a>
-                            </li>
+                            {% if is_granted(['ROLE_USER', 'ROLE_AWARDEE']) %}
+                                <li>
+                                    <a href="{{ path('home') }}">
+                                        <i class="fas fa-arrow-circle-right"></i>
+                                        {% if not currentRoleNav %}
+                                            <strong>HealthPro</strong>
+                                        {% else %}
+                                            HealthPro
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endif %}
                             {% for key, roleNav in roleNavs %}
                                 {% if is_granted(roleNav.role) %}
                                     <li>
