@@ -1,0 +1,27 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Class Symfony\\\\Bridge\\\\Twig\\\\Extension\\\\FormExtension does not have a constructor and must be instantiated without any parameters\\.$#"
+			count: 1
+			path: src/Pmi/Twig/Provider/TwigServiceProvider.php
+
+		-
+			message: "#^Class Symfony\\\\Bridge\\\\Twig\\\\Extension\\\\HttpKernelExtension does not have a constructor and must be instantiated without any parameters\\.$#"
+			count: 1
+			path: src/Pmi/Twig/Provider/TwigServiceProvider.php
+
+		-
+			message: "#^Class Symfony\\\\Bridge\\\\Twig\\\\Form\\\\TwigRenderer not found\\.$#"
+			count: 1
+			path: src/Pmi/Twig/Provider/TwigServiceProvider.php
+
+		-
+			message: "#^Instantiated class Symfony\\\\Bridge\\\\Twig\\\\Form\\\\TwigRenderer not found\\.$#"
+			count: 1
+			path: src/Pmi/Twig/Provider/TwigServiceProvider.php
+
+		-
+			message: "#^Call to static method getNormalizedFhir\\(\\) on an unknown class App\\\\Test\\\\Entity\\\\MeasurementTest\\.$#"
+			count: 1
+			path: symfony/src/Controller/MeasurementsController.php
+

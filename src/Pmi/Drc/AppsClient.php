@@ -61,7 +61,7 @@ class AppsClient
                 $response = $method->invokeArgs($resource, $params);
                 $doRetry = false;
             }
-            catch (Exception $e) {
+            catch (\Exception $e) {
                 // implies a rate-limiting error that we should retry
                 if ($e->getCode() == 403 && $retryCount < self::RETRY_LIMIT) {
                     $micros = self::calculateBackoff($retryCount);

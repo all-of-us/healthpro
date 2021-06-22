@@ -13,6 +13,10 @@ class Fhir
     protected $date;
     protected $metricUrns;
     protected $parentRdr;
+    protected $createdUser;
+    protected $createdSite;
+    protected $finalizedUser;
+    protected $finalizedSite;
     protected $summary;
 
     public function __construct(array $options)

@@ -5,6 +5,8 @@ use Pmi\Order\Order;
 
 class Review
 {
+    protected $db;
+
     public function __construct($db)
     {
         $this->db = $db;

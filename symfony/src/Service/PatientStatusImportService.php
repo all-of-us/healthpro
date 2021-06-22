@@ -12,6 +12,10 @@ class PatientStatusImportService
 
     const DEFAULT_CSV_ROWS_LIMIT = 5000;
 
+    protected $userService;
+    protected $em;
+    protected $params;
+
     public function __construct(UserService $userService, EntityManagerInterface $em, ParameterBagInterface $params)
     {
         $this->userService = $userService;

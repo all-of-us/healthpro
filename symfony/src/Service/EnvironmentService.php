@@ -115,20 +115,6 @@ class EnvironmentService
         return self::$timezoneOptions;
     }
 
-    public function getUserTimezone($useDefault = true)
-    {
-        if ($user = $this->getUser()) {
-            if (($info = $user->getInfo()) && isset($info['timezone'])) {
-                return $info['timezone'];
-            }
-        }
-        if ($useDefault) {
-            return self::DEFAULT_TIMEZONE;
-        } else {
-            return null;
-        }
-    }
-
     protected function loadConfiguration($override = [])
     {
         // default two-factor setting
