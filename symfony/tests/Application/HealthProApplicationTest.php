@@ -12,6 +12,7 @@ use Tests\Pmi\GoogleGroup;
 class HealthProApplicationTest extends WebTestCase
 {
     private $client;
+    private $session;
 
     public function setUp(): void
     {
@@ -27,7 +28,7 @@ class HealthProApplicationTest extends WebTestCase
 
     private function logIn($email, $groups)
     {
-        $session = self::$container->get('session');
+        $this->session = self::$container->get('session');
         $tokenStorage = self::$container->get('security.token_storage');
         $userService = self::$container->get('App\Service\UserService');
         $userProvider = self::$container->get('App\Security\UserProvider');
@@ -40,11 +41,11 @@ class HealthProApplicationTest extends WebTestCase
         $token = new PreAuthenticatedToken($user, null, 'main', $user->getRoles());
         $tokenStorage->setToken($token);
 
-        $session->set('_security_main', serialize($token));
-        $session->set('isLoginReturn', true);
-        $session->save();
+        $this->session->set('_security_main', serialize($token));
+        $this->session->set('isLoginReturn', true);
+        $this->session->save();
 
-        $cookie = new Cookie($session->getName(), $session->getId());
+        $cookie = new Cookie($this->session->getName(), $this->session->getId());
         $this->client->getCookieJar()->set($cookie);
     }
 
@@ -98,5 +99,60 @@ class HealthProApplicationTest extends WebTestCase
         $this->client->followRedirects();
         $crawler = $this->client->request('GET', '/s');
         self::assertEquals(1, count($crawler->filter('#dashSplashSelector')));
+    }
+
+    public function testUsageAgreement()
+    {
+        $this->logIn('testUsageAgreement@example.com', [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
+        $this->client->followRedirects();
+        $crawler = $this->client->request('GET', '/s');
+        self::assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on initial page load.');
+        $crawler = $this->client->reload();
+        self::assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on reload.');
+
+        $this->client->request('POST', '/s/agree', ['csrf_token' => self::$container->get('security.csrf.token_manager')->getToken('agreeUsage')]);
+        $crawler = $this->client->request('GET', '/s');
+        self::assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')), 'Do not see usage modal after confirmation.');
+    }
+
+    public function testSiteAutoselect()
+    {
+        $groupEmail = 'hpo-site-1@gapps.com';
+        $this->logIn('testSiteAutoselect@example.com', [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
+        $this->client->followRedirects();
+        self::assertSame(null, $this->session->get('site'));
+        $this->client->request('GET', '/s/participants');
+        self::assertSame($groupEmail, $this->session->get('site')->email);
+    }
+
+    public function testAwardeeAutoselect()
+    {
+        $groupEmail = 'awardee-1@gapps.com';
+        $this->logIn('testAwardeeAutoselect@example.com', [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
+        $this->client->followRedirects();
+        self::assertSame(null, $this->session->get('awardee'));
+        $this->client->request('GET', '/s');
+        self::assertSame($groupEmail, $this->session->get('awardee')->email);
+        self::assertEquals('/s/workqueue/', $this->client->getRequest()->getRequestUri());
+    }
+
+    public function testDvAdminAutoselect()
+    {
+        $groupEmail = User::ADMIN_DV . '@gapps.com';
+        $this->logIn('testDvAdminAutoselect@example.com', [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
+        $this->client->followRedirects();
+        self::assertSame(null, $this->session->get('site'));
+        $this->client->request('GET', '/s');
+        self::assertEquals('/s/problem/reports', $this->client->getRequest()->getRequestUri());
+    }
+
+    public function testAdminAutoselect()
+    {
+        $groupEmail = User::ADMIN_GROUP . '@gapps.com';
+        $this->logIn('testAdminAutoselect@example.com', [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
+        $this->client->followRedirects();
+        self::assertSame(null, $this->session->get('site'));
+        $this->client->request('GET', '/s');
+        self::assertEquals('/s/admin', $this->client->getRequest()->getRequestUri());
     }
 }
