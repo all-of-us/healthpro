@@ -1,0 +1,6 @@
+{% if is_granted('ROLE_SCRIPPS') %}
+    {% set currentRoleNav = 'scripps' %}
+{% elseif is_granted('ROLE_BIOBANK') %}
+    {% set currentRoleNav = 'biobank' %}
+{% endif %}
+{% extends 'base.html.twig' %}
