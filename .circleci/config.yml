@@ -56,11 +56,6 @@ jobs:
     # Test
     - run: ./ci/test.sh
 
-    # Static Code Analysis
-    - run: sed -i 's/var\/cache\/dev/var\/cache\/test/gI' phpstan.neon
-    - run: sed -i 's/srcApp_KernelDevDebugContainer/srcApp_KernelTestDebugContainer/gI' phpstan.neon
-    - run: ./vendor/bin/phpstan analyse --memory-limit 2G --error-format=junit > /tmp/circleci-test-results/phpstan.xml
-
     # Teardown
     - store_test_results:
         path: /tmp/circleci-test-results
