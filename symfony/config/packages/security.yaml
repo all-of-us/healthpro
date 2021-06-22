@@ -17,7 +17,7 @@ security:
 
     # Note: The *first* access control that matches will be used
     access_control:
-        - { path: ^/s/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^(/s)?/(login|logout|keepalive|client-timeout|agree|timeout), roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/s/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/s/admin($|\/).*, roles: ROLE_ADMIN }
         - { path: ^/s/problem($|\/).*, roles: ROLE_DV_ADMIN }
@@ -27,4 +27,5 @@ security:
         - { path: ^/s/workqueue($|\/).*, roles: [ROLE_USER, ROLE_AWARDEE] }
         - { path: ^/s/biobank\/\w+\/(order|quanum-order)\/\w+$, roles: [ROLE_AWARDEE, ROLE_BIOBANK, ROLE_SCRIPPS] }
         - { path: ^/s/biobank($|\/), roles: [ROLE_BIOBANK, ROLE_SCRIPPS] }
+        - { path: ^/s/splash($|\/), roles: [ROLE_USER, ROLE_AWARDEE, ROLE_ADMIN, ROLE_DV_ADMIN] }
         - { path: ^/s/.*$, roles: ROLE_USER }
