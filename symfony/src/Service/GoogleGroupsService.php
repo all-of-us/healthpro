@@ -114,7 +114,6 @@ class GoogleGroupsService
      */
     public function getRole(string $userEmail, string $groupEmail): ?string
     {
-        $subscribed = true;
         // Will throw a 4xx exception if the user is not in the group
         try {
             $result = $this->callApi('members', 'get', [$groupEmail, $userEmail]);
