@@ -14,15 +14,14 @@ class GoogleGroupsService
     private $client;
 
     public function __construct(ContainerBagInterface $params, EnvironmentService $env) {
-        //TODO: Optimize this using complex expressions
         if (!$env->values['isUnitTest']) {
-            $applicationName = $params->get('gaApplicatisdonName');
+            $applicationName = $params->get('gaApplicationName');
             $adminEmail = $params->get('gaAdminEmail');
             $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/googleapps_key.json';
             if ($env->isLocal() && file_exists($keyFile)) {
                 $authJson = file_get_contents($keyFile);
             } else {
-                $authJson = $app->getConfig('gaAuthJson');
+                $authJson = $params->get('gaAuthJson');
             }
             $client = new GoogleClient();
             $client->setApplicationName($applicationName);
