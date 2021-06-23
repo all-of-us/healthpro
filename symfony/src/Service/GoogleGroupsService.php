@@ -14,21 +14,24 @@ class GoogleGroupsService
     private $client;
 
     public function __construct(ContainerBagInterface $params, EnvironmentService $env) {
-        $applicationName = $params->get('gaApplicationName');
-        $adminEmail = $params->get('gaAdminEmail');
-        $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/googleapps_key.json';
-        if ($env->isLocal() && file_exists($keyFile)) {
-            $authJson = file_get_contents($keyFile);
-        } else {
-            $authJson = $app->getConfig('gaAuthJson');
+        //TODO: Optimize this using complex expressions
+        if (!$env->values['isUnitTest']) {
+            $applicationName = $params->get('gaApplicatisdonName');
+            $adminEmail = $params->get('gaAdminEmail');
+            $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/googleapps_key.json';
+            if ($env->isLocal() && file_exists($keyFile)) {
+                $authJson = file_get_contents($keyFile);
+            } else {
+                $authJson = $app->getConfig('gaAuthJson');
+            }
+            $client = new GoogleClient();
+            $client->setApplicationName($applicationName);
+            $client->setAuthConfig(json_decode($authJson, true));
+            $client->setSubject($adminEmail);
+            $client->setScopes(GoogleDirectory::ADMIN_DIRECTORY_GROUP_READONLY);
+            $this->client = new GoogleDirectory($client);
+            $this->domain = $params->get('gaDomain');
         }
-        $client = new GoogleClient();
-        $client->setApplicationName($applicationName);
-        $client->setAuthConfig(json_decode($authJson, true));
-        $client->setSubject($adminEmail);
-        $client->setScopes(GoogleDirectory::ADMIN_DIRECTORY_GROUP_READONLY);
-        $this->client = new GoogleDirectory($client);
-        $this->domain = $params->get('gaDomain');
     }
 
     /**
