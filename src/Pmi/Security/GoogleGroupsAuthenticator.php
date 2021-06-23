@@ -147,44 +147,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        $code = 403;
-        $googleUser = $this->app->getGoogleUser();
-        if ($googleUser) {
-            $params = [
-                'email' => $googleUser->getEmail(),
-                'logoutUrl' => $this->app->getGoogleLogoutUrl()
-            ];
-
-            // attempt to load the user object for error msg customization
-            try {
-                $userProvider = new \Pmi\Security\UserProvider($this->app);
-                $user = $userProvider->loadUserByUsername($googleUser->getEmail());
-            } catch (\Exception $e) {
-                $user = null;
-            }
-
-            // infer the reason behind the auth failure
-            if ($user && $this->app->getConfig('enforce2fa') && !$user->hasTwoFactorAuth()) {
-                $template = 'error-2fa.html.twig';
-            } else {
-                $template = 'error-auth.html.twig';
-            }
-        } elseif ($exception->getMessage() === self::OAUTH_FAILURE_MESSAGE) {
-            $template = 'error-oauth.html.twig';
-            $params = ['logoutUrl' => $this->app->getGoogleLogoutUrl()];
-        } elseif ($this->app->canMockLogin()) {
-            $template = 'error-gae-auth.html.twig';
-            $params = [];
-        } else {
-            $template = $this->app['errorTemplate'];
-            $params = ['code' => $code];
-        }
-        $this->app->log(Log::LOGIN_FAIL);
-        // clear session in case Google user and our user are out of sync
-        $this->app->logout();
-        $response = new Response($this->app['twig']->render($template, $params), $code);
-        $this->addSecurityHeaders($response);
-        return $response;
+        return $this->app->redirect('s/login');
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
@@ -229,7 +192,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
                 $this->app['session']->set('fromGoogleLogin', true);
                 return $this->app->redirect($this->app->getGoogleLogoutUrl());
             }
-            return $this->app->redirect($client->createAuthUrl());
+            return $this->app->redirect('s/login');
         } else {
             return $this->onAuthenticationFailure($request, $authException);
         }
