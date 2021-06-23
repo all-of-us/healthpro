@@ -50,6 +50,10 @@ jobs:
         paths:
           - vendor
 
+    # Webpack
+    - run: npm install
+    - run: npx encore prod
+
     # Database
     - run: ./ci/database.sh
 
