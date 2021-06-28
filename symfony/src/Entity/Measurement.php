@@ -9,7 +9,11 @@ use App\Exception\MissingSchemaException;
 use App\Helper\Util;
 
 /**
- * @ORM\Table(name="evaluations")
+ * @ORM\Table(name="evaluations", indexes={
+ *   @ORM\Index(
+ *     columns={"participant_id"},
+ *     name="participant_id")
+ *   })
  * @ORM\Entity(repositoryClass="App\Repository\MeasurementRepository")
  */
 class Measurement
@@ -115,12 +119,12 @@ class Measurement
     private $parentId;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
     private $createdTs;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
     private $updatedTs;
 
@@ -140,7 +144,7 @@ class Measurement
     private $finalizedTs;
 
     /**
-     * @ORM\Column(type="string", length=10)
+     * @ORM\Column(type="string", nullable=false, length=10)
      */
     private $version;
 

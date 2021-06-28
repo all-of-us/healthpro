@@ -6,7 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\OrderRepository")
- * @ORM\Table(name="`orders`")
+ * @ORM\Table(name="orders", uniqueConstraints={
+ *   @ORM\UniqueConstraint(name="order_id", columns={"order_id"})
+ * })
  */
 class Order
 {
@@ -132,7 +134,7 @@ class Order
     private $biobankId;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
     private $createdTs;
 

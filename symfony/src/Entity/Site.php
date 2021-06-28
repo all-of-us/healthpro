@@ -5,7 +5,9 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="sites")
+ * @ORM\Table(name="sites", uniqueConstraints={
+ *   @ORM\UniqueConstraint(name="site_id", columns={"site_id"})
+ * })
  * @ORM\Entity(repositoryClass="App\Repository\SiteRepository")
  */
 class Site

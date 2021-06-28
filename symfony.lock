@@ -48,12 +48,12 @@
         ]
     },
     "doctrine/doctrine-migrations-bundle": {
-        "version": "3.1",
+        "version": "1.2",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "master",
-            "version": "3.1",
-            "ref": "ee609429c9ee23e22d6fa5728211768f51ed2818"
+            "version": "1.2",
+            "ref": "b609494a0ab33d79acf3ead2067e3f67c9a47bd2"
         },
         "files": [
             "config/packages/doctrine_migrations.yaml",
