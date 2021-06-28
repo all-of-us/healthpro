@@ -65,6 +65,9 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function checkCredentials($credentials, UserInterface $user)
     {
+        if ($this->env->isProd() && $this->params->has('enforce2fa') && $this->params->get('enforce2fa')) {
+            return $user->hasTwoFactorAuth();
+        }
         return true;
     }
 
