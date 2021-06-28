@@ -65,10 +65,11 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function checkCredentials($credentials, UserInterface $user)
     {
-        if ($this->env->isProd() && $this->params->has('enforce2fa') && $this->params->get('enforce2fa')) {
-            return $user->hasTwoFactorAuth();
+        if (!$this->env->isProd() && $this->params->has('gaBypass') && $this->params->get('gaBypass')) {
+            return true; // Bypass groups auth
         }
-        return true;
+        $valid2fa = !($this->params->has('enforce2fa') && $this->params->get('enforce2fa')) || $user->hasTwoFactorAuth();
+        return count($user->getGroups()) > 0 && $valid2fa;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
