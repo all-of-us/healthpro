@@ -31,7 +31,7 @@ class AuthService
         $this->params = $params;
         $this->session = $session;
         $this->urlGenerator = $urlGenerator;
-        $this->callbackUrl = $urlGenerator->generate('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $this->callbackUrl = $this->generateUrl('login_callback');
         $this->tokenStorage = $tokenStorage;
         $this->env = $env;
     }
@@ -94,12 +94,23 @@ class AuthService
 
     public function getGoogleLogoutUrl($route = 'symfony_home')
     {
-        $dest = $this->urlGenerator->generate($route, [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $dest = $this->generateUrl($route);
         
         if ($this->env->isLocal() && $this->params->has('local_mock_auth') && $this->params->get('local_mock_auth')) {
             return $this->env->values['isUnitTest'] ? null : $dest;
         }
         // http://stackoverflow.com/a/14831349/1402028
         return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
+    }
+
+    public function generateUrl($route, $parameters = [])
+    {
+        // `login_url` is the URL prefix to use in the event that our site
+        // is being reverse-proxied from a different domain (i.e., from the WAF)
+        if ($this->params->has('login_url') && $this->params->get('login_url')) {
+            $path = preg_replace('/\/$/', '', $this->params->get('login_url'));
+            return $path . $this->urlGenerator->generate($route, $parameters);
+        }
+        return $this->urlGenerator->generate($route, $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 }
