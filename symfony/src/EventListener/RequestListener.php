@@ -110,7 +110,7 @@ class RequestListener
     {
         // log the user out if their session is expired
         if ($this->userService->isLoginExpired() && $this->request->attributes->get('_route') !== 'logout') {
-            return $this->redirectToRoute('logout', ['timeout' => true]);
+            return new RedirectResponse('/s/logout?timeout=1');
         }
     }
 
