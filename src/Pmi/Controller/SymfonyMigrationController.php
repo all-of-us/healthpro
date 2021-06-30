@@ -214,7 +214,7 @@ class SymfonyMigrationController extends AbstractController
      */
     public function homeAction(Application $app)
     {
-        return $app->redirect('/s');
+        return $app->redirect('/s/');
     }
 
     /**

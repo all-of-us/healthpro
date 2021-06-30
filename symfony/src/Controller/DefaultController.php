@@ -14,10 +14,13 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
+/**
+ * @Route("/s")
+ */
 class DefaultController extends AbstractController
 {
     /**
-     * @Route("/s", name="symfony_home")
+     * @Route("/", name="symfony_home")
      */
     public function index()
     {
@@ -44,7 +47,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/s/admin", name="admin_home")
+     * @Route("/admin", name="admin_home")
      */
     public function adminIndex()
     {
@@ -52,7 +55,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/s/splash", name="dash_splash")
+     * @Route("/splash", name="dash_splash")
      */
     public function dashSplashAction()
     {
@@ -60,7 +63,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/s/site/select", name="site_select")
+     * @Route("/site/select", name="site_select")
      */
     public function siteSelectAction(Request $request, SiteService $siteService)
     {
@@ -82,7 +85,7 @@ class DefaultController extends AbstractController
         return $this->render('site-select.html.twig');
     }
     /**
-     * @Route("/s/keepalive", name="keep_alive")
+     * @Route("/keepalive", name="keep_alive")
      * Dummy action that serves to extend the user's session.
      */
     public function keepAliveAction(Request $request)
@@ -95,7 +98,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/s/agree", name="agree_usage")
+     * @Route("/agree", name="agree_usage")
      */
     public function agreeUsageAction(Request $request)
     {
@@ -107,7 +110,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/s/client-timeout", name="client_timeout")
+     * @Route("/client-timeout", name="client_timeout")
      * Handles a clientside session timeout, which might not be a true session
      * timeout if the user is working in multiple tabs.
      */
@@ -121,7 +124,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/s/hide-tz-warning", name="hide_tz_warning")
+     * @Route("/hide-tz-warning", name="hide_tz_warning")
      */
     public function hideTZWarningAction(Request $request)
     {
@@ -133,7 +136,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/s/timeout", name="timeout")
+     * @Route("/timeout", name="timeout")
      */
     public function timeoutAction()
     {
@@ -141,7 +144,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/s/logout", name="logout")
+     * @Route("/logout", name="logout")
      */
     public function logoutAction(Request $request, LoggerService $loggerService, SessionInterface $session, AuthService $authService)
     {
