@@ -23,6 +23,3 @@ evaluationBloodDonorCheck:
 dashboard_home:
     path: /dashboard
 
-patientStatus:
-    path: /participant/{participantId}/patient/status/{patientStatusId}
-
