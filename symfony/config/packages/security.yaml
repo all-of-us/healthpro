@@ -28,4 +28,4 @@ security:
         - { path: ^/s/biobank\/\w+\/(order|quanum-order)\/\w+$, roles: [ROLE_AWARDEE, ROLE_BIOBANK, ROLE_SCRIPPS] }
         - { path: ^/s/biobank($|\/), roles: [ROLE_BIOBANK, ROLE_SCRIPPS] }
         - { path: ^/s/splash($|\/), roles: [ROLE_USER, ROLE_AWARDEE, ROLE_ADMIN, ROLE_DV_ADMIN] }
-        - { path: ^/s/.*$, roles: ROLE_USER }
+        - { path: ^/s/.*\S$, roles: ROLE_USER }
