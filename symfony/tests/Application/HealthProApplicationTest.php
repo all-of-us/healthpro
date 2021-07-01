@@ -57,7 +57,7 @@ class HealthProApplicationTest extends WebTestCase
         $this->logIn('testLogin@example.com', [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->client->followRedirects();
         $this->client->request('GET', '/s');
-        self::assertMatchesRegularExpression('/\/s$/', $this->client->getRequest()->getUri());
+        self::assertEquals('/s/', $this->client->getRequest()->getRequestUri());
     }
 
     public function testDashSplash()
