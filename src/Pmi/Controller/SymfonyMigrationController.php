@@ -32,7 +32,11 @@ class SymfonyMigrationController extends AbstractController
         ['orders', '/orders'],
         ['selectSite', '/site/select', ['method' => 'GET|POST']],
         ['home', '/'],
-        ['mockLogin', 'mock-login']
+        ['mockLogin', 'mock-login'],
+        ['logout', '/logout'],
+        ['dashSplash', '/splash'],
+        ['timeout', '/timeout'],
+        ['clientTimeout', '/client-timeout']
     ];
 
     public function deceased_reports_indexAction(Application $app)
@@ -223,5 +227,37 @@ class SymfonyMigrationController extends AbstractController
     public function mockLoginAction(Application $app)
     {
         return $app->redirect('/s/login');
+    }
+
+    /**
+     * @deprecated 2021-07-01
+     */
+    public function logoutAction(Application $app)
+    {
+        return $app->redirect('/s/logout');
+    }
+
+    /**
+     * @deprecated 2021-07-01
+     */
+    public function dashSplashAction(Application $app)
+    {
+        return $app->redirect('/s/splash');
+    }
+
+    /**
+     * @deprecated 2021-07-01
+     */
+    public function timeoutAction(Application $app)
+    {
+        return $app->redirect('/s/timeout');
+    }
+
+    /**
+     * @deprecated 2021-07-01
+     */
+    public function clientTimeoutAction(Application $app)
+    {
+        return $app->redirect('/s/client-timeout');
     }
 }
