@@ -12,6 +12,7 @@ services:
             - "53306:3306"
         volumes:
             - ./sql/healthpro:/docker-entrypoint-initdb.d
+            - healthpro-mysql-data:/var/lib/mysql
 
     web:
         environment:
@@ -28,3 +29,6 @@ services:
             - "8080:8080"
         volumes:
             - .:/app:delegated
+
+volumes:
+    healthpro-mysql-data:
