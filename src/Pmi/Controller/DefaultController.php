@@ -1,16 +1,11 @@
 <?php
 namespace Pmi\Controller;
 
-use Pmi\PatientStatus\PatientStatus;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Pmi\Audit\Log;
-use Pmi\Security\User;
 
 class DefaultController extends AbstractController
 {
@@ -19,8 +14,7 @@ class DefaultController extends AbstractController
         ['keepAlive', '/keepalive', [ 'method' => 'POST' ]],
         ['agreeUsage', '/agree', ['method' => 'POST']],
         ['groups', '/groups'],
-        ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']],
-        ['patientStatus', '/participant/{participantId}/patient/status/{patientStatusId}', ['method' => 'GET']]
+        ['hideTZWarning', '/hide-tz-warning', ['method' => 'POST']]
     ];
 
     public function loginReturnAction(Application $app)
@@ -64,34 +58,6 @@ class DefaultController extends AbstractController
         }
         return $app['twig']->render('googlegroups.html.twig', [
             'groupNames' => $groupNames
-        ]);
-    }
-
-    public function patientStatusAction($participantId, $patientStatusId, Application $app)
-    {
-        $participant = $app['pmi.drc.participants']->getById($participantId);
-        if (!$participant) {
-            $app->abort(404);
-        }
-        $patientStatus = new PatientStatus($app);
-        if (!$patientStatus->hasAccess($participant)) {
-            $app->abort(403);
-        }
-        $patientStatusData = $app['em']->getRepository('patient_status')->fetchOneBy([
-            'id' => $patientStatusId,
-            'participant_id' => $participantId
-        ]);
-        if (!empty($patientStatusData)) {
-            $organization = $patientStatusData['organization'];
-            $orgPatientStatusHistoryData = $patientStatus->getOrgPatientStatusHistoryData($participantId, $organization);
-            $organization = $patientStatusData['organization'];
-        } else {
-            $orgPatientStatusHistoryData = [];
-            $organization = null;
-        }
-        return $app['twig']->render('patient-status-history.html.twig', [
-            'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
-            'organization' => $organization
         ]);
     }
 

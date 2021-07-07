@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\PatientStatus\PatientStatus as PmiPatientStatus;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 
@@ -11,6 +10,17 @@ class PatientStatusImportService
 {
 
     const DEFAULT_CSV_ROWS_LIMIT = 5000;
+
+    public static $patientStatus = [
+        'Yes: Confirmed in EHR system' => 'YES',
+        'No: Not found in EHR system' => 'NO',
+        'No Access: Unable to check EHR system' => 'NO_ACCESS',
+        'Unknown: Inconclusive search results' => 'UNKNOWN'
+    ];
+
+    protected $userService;
+    protected $em;
+    protected $params;
 
     public function __construct(UserService $userService, EntityManagerInterface $em, ParameterBagInterface $params)
     {
@@ -28,7 +38,7 @@ class PatientStatusImportService
             $form['patient_status_csv']->addError(new FormError("Invalid file format"));
             return;
         }
-        $validStatus = array_values(PmiPatientStatus::$patientStatus);
+        $validStatus = array_values(self::$patientStatus);
         $rowsLimit = $this->params->has('csv_rows_limit') ? intval($this->params->get('csv_rows_limit')) : self::DEFAULT_CSV_ROWS_LIMIT;
         $csvFile = file($file->getPathname(), FILE_SKIP_EMPTY_LINES);
         if (count($csvFile) > $rowsLimit + 1) {

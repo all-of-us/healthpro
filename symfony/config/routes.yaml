@@ -19,6 +19,3 @@ evaluation_modify:
 
 evaluationBloodDonorCheck:
     path: /participant/{participantId}/measurements/blood/donor/check
-
-patientStatus:
-    path: /participant/{participantId}/patient/status/{patientStatusId}

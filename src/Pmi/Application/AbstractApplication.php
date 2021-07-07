@@ -258,6 +258,10 @@ abstract class AbstractApplication extends Application
     /** Populates $this->configuration */
     abstract protected function loadConfiguration($override = []);
 
+    abstract public function canMockLogin();
+
+    abstract public function getSiteId();
+
     public function getConfig($key)
     {
         if (isset($this->configuration[$key])) {

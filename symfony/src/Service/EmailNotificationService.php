@@ -4,7 +4,7 @@ namespace App\Service;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 
-class EmailNotificationService
+abstract class EmailNotificationService
 {
     protected $em;
     protected $managerRegistry;
@@ -26,6 +26,12 @@ class EmailNotificationService
     protected $levelField;
     protected $filterSummaries = false;
     protected $logEntity;
+
+    abstract protected function getSearchParams($id, $lastDeactivate);
+
+    protected function filterSummaries($summaries) {
+        return $summaries;
+    }
 
     public function getOrganizations()
     {
