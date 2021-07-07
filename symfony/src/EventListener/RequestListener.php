@@ -2,11 +2,16 @@
 
 namespace App\EventListener;
 
+use App\Service\EnvironmentService;
+use App\Service\SiteService;
+use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Environment as TwigEnvironment;
 use App\Entity\Notice;
 use App\Service\LoggerService;
@@ -17,26 +22,47 @@ class RequestListener
     private $em;
     private $twig;
     private $session;
+    private $userService;
+    private $siteService;
+    private $authorizationChecker;
+    private $env;
+    private $tokenStorage;
 
     private $request;
 
-    public function __construct(LoggerService $logger, EntityManagerInterface $em, TwigEnvironment $twig, SessionInterface $session)
-    {
+    public function __construct(
+        LoggerService $logger,
+        EntityManagerInterface $em,
+        TwigEnvironment $twig,
+        SessionInterface $session,
+        UserService $userService,
+        SiteService $siteService,
+        AuthorizationCheckerInterface $authorizationChecker,
+        EnvironmentService $env,
+        TokenStorageInterface $tokenStorage
+    ) {
         $this->logger = $logger;
         $this->em = $em;
         $this->twig = $twig;
         $this->session = $session;
+        $this->userService = $userService;
+        $this->siteService = $siteService;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->env = $env;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function onKernelRequest(RequestEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        $this->request = $event->getRequest();
+
+        if (!$event->isMasterRequest() || $this->request->attributes->get('_route') === '_wdt') {
             return;
         }
 
-        $this->request = $event->getRequest();
-
         $this->logRequest();
+
+        $this->checkLoginExpired();
 
         if ($siteSelectResponse = $this->checkSiteSelect()) {
             $event->setResponse($siteSelectResponse);
@@ -74,9 +100,48 @@ class RequestListener
 
     private function checkSiteSelect()
     {
-        if (!$this->session->has('site') && !preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue)($|\/).*/',
-                $this->request->getPathInfo())) {
-            return new RedirectResponse('/');
+        if (!$this->session->has('site') && !$this->session->has('awardee') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE'))) {
+            $user = $this->userService->getUser();
+            if (count($user->getSites()) === 1 && empty($user->getAwardees()) && $this->siteService->isValidSite($user->getSites()[0]->email)) {
+                $this->siteService->switchSite($user->getSites()[0]->email);
+            } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
+                $this->siteService->switchSite($user->getAwardees()[0]->email);
+            } elseif (!preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site|login|site_select)($|\/).*/',
+                    $this->request->getPathInfo()) && !$this->isUpkeepRoute()) {
+                return new RedirectResponse('/s/site/select');
+            }
         }
+    }
+
+    private function checkLoginExpired()
+    {
+        // log the user out if their session is expired
+        if ($this->userService->isLoginExpired() && $this->request->attributes->get('_route') !== 'logout') {
+            return new RedirectResponse('/s/logout?timeout=1');
+        }
+    }
+
+    public function onKernelFinishRequest()
+    {
+        if ($this->tokenStorage->getToken() && $this->request && !preg_match('/^(\/s)?\/(login|_wdt)($|\/).*/',
+                $this->request->getPathInfo()) && !$this->isUpkeepRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
+            $this->session->set('isLoginReturn', false);
+        }
+    }
+
+    /**
+     * "Upkeep" routes are routes that we typically want to allow through
+     * even when workflow dictates otherwise.
+     */
+    public function isUpkeepRoute()
+    {
+        $route = $this->request->attributes->get('_route');
+        return (in_array($route, [
+            'logout',
+            'timeout',
+            'keep_alive',
+            'client_timeout',
+            'agree_usage'
+        ]));
     }
 }

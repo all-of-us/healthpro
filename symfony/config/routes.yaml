@@ -7,9 +7,6 @@ index:
 home:
     path: /
 
-logout:
-    path: /logout
-
 selectSite:
     path: /site/select
 
@@ -22,18 +19,6 @@ evaluation_modify:
 
 evaluationBloodDonorCheck:
     path: /participant/{participantId}/measurements/blood/donor/check
-
-clientTimeout:
-    path: /client-timeout
-
-keepAlive:
-    path: /keepalive
-
-agreeUsage:
-    path: /agree
-
-hideTZWarning:
-    path: /hide-tz-warning
 
 patientStatus:
     path: /participant/{participantId}/patient/status/{patientStatusId}

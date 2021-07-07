@@ -29,7 +29,13 @@ class SymfonyMigrationController extends AbstractController
         ['participant', '/participant/{id}', ['method' => 'GET|POST']],
         ['participants', '/participants'],
         ['biobank_home', '/biobank'],
-        ['orders', '/orders']
+        ['orders', '/orders'],
+        ['selectSite', '/site/select', ['method' => 'GET|POST']],
+        ['home', '/'],
+        ['mockLogin', 'mock-login'],
+        ['logout', '/logout'],
+        ['timeout', '/timeout'],
+        ['clientTimeout', '/client-timeout']
     ];
 
     public function deceased_reports_indexAction(Application $app)
@@ -196,5 +202,53 @@ class SymfonyMigrationController extends AbstractController
     public function ordersAction(Application $app)
     {
         return $app->redirect('/s/orders/');
+    }
+
+    /**
+     * @deprecated 2021-05-21
+     */
+    public function selectSiteAction(Application $app)
+    {
+        return $app->redirect('/s/site/select');
+    }
+
+    /**
+     * @deprecated 2021-06-11
+     */
+    public function homeAction(Application $app)
+    {
+        return $app->redirect('/s/');
+    }
+
+    /**
+     * @deprecated 2021-06-22
+     */
+    public function mockLoginAction(Application $app)
+    {
+        return $app->redirect('/s/login');
+    }
+
+    /**
+     * @deprecated 2021-07-01
+     */
+    public function logoutAction(Application $app)
+    {
+        return $app->redirect('/s/logout');
+    }
+
+    /**
+     * @deprecated 2021-07-01
+     */
+    public function timeoutAction(Application $app)
+    {
+        return $app->redirect('/s/timeout');
+    }
+
+    /**
+     * @deprecated 2021-07-01
+     */
+    public function clientTimeoutAction(Application $app)
+    {
+        return $app->redirect('/s/client-timeout');
     }
 }

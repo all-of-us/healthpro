@@ -20,18 +20,18 @@
         "keepAliveCsrf": {{ csrf_token('keepAlive')|json_encode|raw }},
         "hideTZWarningCsrf": {{ csrf_token('hideTZWarning')|json_encode|raw }},
         "path": {
-            "clientTimeout": {{ path('clientTimeout')|json_encode|raw }},
+            "clientTimeout": {{ path('client_timeout')|json_encode|raw }},
             "logout": {{ path('logout')|json_encode|raw }},
-            "keepAlive": {{ path('keepAlive')|json_encode|raw }},
-            "agreeUsage": {{ path('agreeUsage')|json_encode|raw }},
+            "keepAlive": {{ path('keep_alive')|json_encode|raw }},
+            "agreeUsage": {{ path('agree_usage')|json_encode|raw }},
             "settings": {{ path('settings')|json_encode|raw }},
-            "hideTZWarning": {{ path('hideTZWarning')|json_encode|raw }}
+            "hideTZWarning": {{ path('hide_tz_warning')|json_encode|raw }}
         },
         "isLoggedIn": {{ is_granted('IS_AUTHENTICATED_FULLY')|json_encode|raw }},
         "isUsageAgreed": {{ app.session.get('isUsageAgreed')|json_encode|raw }},
         "views": {},
         "timeZones": {{ timeZones|json_encode|raw }},
-        "userTimeZone": {{ app.user.timezone|json_encode|raw }},
+        "userTimeZone": {{ (app.user ? app.user.timezone : null )|json_encode|raw }},
         "userSite": {{ app.session.get('site')|json_encode|raw }},
         "currentRoute": {{ app.request.attributes.get('_route')|json_encode|raw }},
         "hideTZWarning": {{ app.session.get('hideTZWarning')|json_encode|raw }}
