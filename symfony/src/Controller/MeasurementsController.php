@@ -473,7 +473,7 @@ class MeasurementsController extends AbstractController
         }
         $fhir = $measurement->getFhir($date, $parentRdrId);
         if ($isTest) {
-            $fhir = \Tests\Pmi\Evaluation\EvaluationTest::getNormalizedFhir($fhir);
+            $fhir = \App\Test\Entity\MeasurementTest::getNormalizedFhir($fhir);
             $response = new JsonResponse($fhir);
             $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
         } else {

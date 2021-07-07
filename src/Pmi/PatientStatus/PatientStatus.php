@@ -19,6 +19,7 @@ class PatientStatus
     protected $comments;
     protected $status;
     protected $createdTs;
+    protected $importId;
 
     public static $patientStatus = [
         'Yes: Confirmed in EHR system' => 'YES',

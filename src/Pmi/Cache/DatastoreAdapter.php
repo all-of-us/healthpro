@@ -52,6 +52,7 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
 
     protected function doSave(array $values, $lifetime)
     {
+        $failed = []; // Overwritten in method below (passed by reference)
         $values = $this->marshaller->marshall($values, $failed);
         if ($lifetime === 0) {
             $expireTime = null;
@@ -82,7 +83,7 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
     }
 
     public function prune()
-    {        
+    {
         $cache = new Cache();
         $results = $cache->getBatch('expire', new \DateTime(), '<', $this->limit);
         $cache->deleteBatch($results);

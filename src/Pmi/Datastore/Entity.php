@@ -11,6 +11,8 @@ abstract class Entity
 
     protected $writeLimit = 500;
 
+    abstract static protected function getKind();
+
     public static function fetchBy()
     {
         $datastoreClient = new DatastoreClientHelper();

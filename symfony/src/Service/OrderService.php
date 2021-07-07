@@ -21,6 +21,7 @@ class OrderService
     protected $em;
     protected $mayolinkOrderService;
     protected $env;
+    protected $userService;
     protected $siteService;
     protected $loggerService;
     protected $order;
