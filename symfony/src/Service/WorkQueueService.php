@@ -18,6 +18,7 @@ class WorkQueueService
     protected $params;
     protected $em;
     protected $env;
+    protected $userService;
     protected $siteService;
     protected $loggerService;
     protected $authorizationChecker;

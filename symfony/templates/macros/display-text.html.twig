@@ -128,7 +128,7 @@
 {% endmacro %}
 
 {% macro displayQuestSiteAddress(address) %}
-    {% if (address.line) %}
+    {% if address.line is defined %}
         {% for line in address.line %}
             {{ line }}<br />
         {% endfor %}

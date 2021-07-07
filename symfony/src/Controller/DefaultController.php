@@ -114,13 +114,14 @@ class DefaultController extends AbstractController
      * Handles a clientside session timeout, which might not be a true session
      * timeout if the user is working in multiple tabs.
      */
-    public function clientTimeoutAction(Request $request) {
+    public function clientTimeoutAction(Request $request)
+    {
         // if we got to this point, then the beforeCallback() has
         // already checked the user's session is not expired - simply reload the page
         if ($request->headers->get('referer')) {
             return $this->redirect($request->headers->get('referer'));
         }
-        return $this->redirect($this ->generateUrl('home'));
+        return $this->redirect($this->generateUrl('home'));
     }
 
     /**

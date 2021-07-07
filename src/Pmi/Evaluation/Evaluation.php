@@ -283,7 +283,7 @@ class Evaluation
                 $attributes['data-parsley-lt'] = $field->max;
             }
             if (isset($field->min)) {
-                $constraints[] = new Constraints\GreaterThanEqual($field->min);
+                $constraints[] = new Constraints\GreaterThanOrEqual($field->min);
                 $attributes['data-parsley-gt'] = $field->min;
             } elseif (!isset($field->options) && !in_array($type, ['checkbox', 'text', 'textarea', 'date'])) {
                 $constraints[] = new Constraints\GreaterThan(0);

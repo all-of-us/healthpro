@@ -18,6 +18,10 @@ class PatientStatusImportService
         'Unknown: Inconclusive search results' => 'UNKNOWN'
     ];
 
+    protected $userService;
+    protected $em;
+    protected $params;
+
     public function __construct(UserService $userService, EntityManagerInterface $em, ParameterBagInterface $params)
     {
         $this->userService = $userService;

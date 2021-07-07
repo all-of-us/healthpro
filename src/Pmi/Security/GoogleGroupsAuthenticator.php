@@ -147,7 +147,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return $this->app->redirect('s/login');
+        return $this->app->redirect('/s/login');
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
@@ -192,7 +192,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
                 $this->app['session']->set('fromGoogleLogin', true);
                 return $this->app->redirect($this->app->getGoogleLogoutUrl());
             }
-            return $this->app->redirect('s/login');
+            return $this->app->redirect('/s/login');
         } else {
             return $this->onAuthenticationFailure($request, $authException);
         }

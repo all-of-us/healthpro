@@ -9,6 +9,7 @@ use App\Repository\MeasurementRepository;
 use App\Service\ParticipantSummaryService;
 use App\Service\LoggerService;
 use App\Service\ReviewService;
+use App\Service\SiteService;
 use App\Service\TimezoneService;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
@@ -32,11 +33,14 @@ class ReviewController extends AbstractController
 
     protected $reviewService;
 
-    public function __construct(SessionInterface $session, ParticipantSummaryService $participantSummaryService, ReviewService $reviewService)
+    protected $siteService;
+
+    public function __construct(SessionInterface $session, ParticipantSummaryService $participantSummaryService, ReviewService $reviewService, SiteService $siteService)
     {
         $this->session = $session;
         $this->participantSummaryService = $participantSummaryService;
         $this->reviewService = $reviewService;
+        $this->siteService = $siteService;
     }
 
     /**
@@ -44,7 +48,7 @@ class ReviewController extends AbstractController
      */
     public function today(Request $request)
     {
-        $site = $this->getSiteId();
+        $site = $this->siteService->getSiteId();
         if (!$site) {
             $this->addFlash('error', 'You must select a valid site');
             return $this->redirectToRoute('home');
@@ -117,13 +121,13 @@ class ReviewController extends AbstractController
      */
     public function unfinalizedOrders(Request $request, OrderRepository $orderRepository)
     {
-        $site = $this->getSiteId();
+        $site = $this->siteService->getSiteId();
         if (!$site) {
             $this->addFlash('error', 'You must select a valid site');
             return $this->redirectToRoute('home');
         }
-        $unlockedOrders = $orderRepository->getSiteUnlockedOrders($this->getSiteId());
-        $unfinalizedOrders = $orderRepository->getSiteUnfinalizedOrders($this->getSiteId());
+        $unlockedOrders = $orderRepository->getSiteUnlockedOrders($site);
+        $unfinalizedOrders = $orderRepository->getSiteUnfinalizedOrders($site);
         $orders = array_merge($unlockedOrders, $unfinalizedOrders);
         return $this->render('review/unfinalized_orders.html.twig', [
             'orders' => $orders
@@ -136,7 +140,7 @@ class ReviewController extends AbstractController
      */
     public function unfinalizedMeasurements(Request $request, MeasurementRepository $measurementRepository)
     {
-        $site = $this->getSiteId();
+        $site = $this->siteService->getSiteId();
         if (!$site) {
             $this->addFlash('error', 'You must select a valid site');
             return $this->redirectToRoute('home');
@@ -153,12 +157,12 @@ class ReviewController extends AbstractController
      */
     public function modifiedOrders(Request $request, OrderRepository $orderRepository)
     {
-        $site = $this->getSiteId();
+        $site = $this->siteService->getSiteId();
         if (!$site) {
             $this->addFlash('error', 'You must select a valid site');
             return $this->redirectToRoute('home');
         }
-        $recentModifyOrders = $orderRepository->getSiteRecentModifiedOrders($this->getSiteId());
+        $recentModifyOrders = $orderRepository->getSiteRecentModifiedOrders($site);
         return $this->render('review/modified_orders.html.twig', [
             'orders' => $recentModifyOrders
         ]);
@@ -169,7 +173,7 @@ class ReviewController extends AbstractController
      */
     public function modifiedMeasurements(Request $request, MeasurementRepository $measurementRepository)
     {
-        $site = $this->getSiteId();
+        $site = $this->siteService->getSiteId();
         if (!$site) {
             $this->addFlash('error', 'You must select a valid site');
             return $this->redirectToRoute('home');
@@ -201,12 +205,4 @@ class ReviewController extends AbstractController
             'lastName' => $participant->lastName
         ]);
     }
-
-    /* Private Methods */
-
-    private function getSiteId(): string
-    {
-        return $this->session->get('site')->id;
-    }
-
 }

@@ -1,0 +1,14 @@
+includes:
+	- phpstan-baseline.neon
+
+parameters:
+	level: 0
+	paths:
+		- src
+		- symfony/src
+	bootstrapFiles:
+		- vendor/autoload.php
+	doctrine:
+		objectManagerLoader: symfony/tests/object-manager.php
+	symfony:
+		container_xml_path: symfony/var/cache/dev/srcApp_KernelDevDebugContainer.xml

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Environment as TwigEnvironment;
 use App\Entity\Notice;
@@ -25,11 +26,21 @@ class RequestListener
     private $siteService;
     private $authorizationChecker;
     private $env;
+    private $tokenStorage;
 
     private $request;
 
-    public function __construct(LoggerService $logger, EntityManagerInterface $em, TwigEnvironment $twig, SessionInterface $session, UserService $userService, SiteService $siteService, AuthorizationCheckerInterface $authorizationChecker, EnvironmentService $env)
-    {
+    public function __construct(
+        LoggerService $logger,
+        EntityManagerInterface $em,
+        TwigEnvironment $twig,
+        SessionInterface $session,
+        UserService $userService,
+        SiteService $siteService,
+        AuthorizationCheckerInterface $authorizationChecker,
+        EnvironmentService $env,
+        TokenStorageInterface $tokenStorage
+    ) {
         $this->logger = $logger;
         $this->em = $em;
         $this->twig = $twig;
@@ -38,6 +49,7 @@ class RequestListener
         $this->siteService = $siteService;
         $this->authorizationChecker = $authorizationChecker;
         $this->env = $env;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function onKernelRequest(RequestEvent $event)
@@ -89,7 +101,8 @@ class RequestListener
     private function checkSiteSelect()
     {
         $hasMultiple = ($this->authorizationChecker->isGranted('ROLE_DASHBOARD') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_ADMIN') || $this->authorizationChecker->isGranted('ROLE_AWARDEE') || $this->authorizationChecker->isGranted('ROLE_DV_ADMIN')));
-        if ($hasMultiple && $this->session->get('isLoginReturn') && !$this->isUpkeepRoute() && !preg_match('/^(\/s)?\/(splash|_wdt)($|\/).*/', $this->request->getPathInfo())) {
+        if ($hasMultiple && $this->session->get('isLoginReturn') && !$this->isUpkeepRoute() && !preg_match('/^(\/s)?\/(splash|_wdt)($|\/).*/',
+                $this->request->getPathInfo())) {
             return new RedirectResponse('/s/splash');
         }
 
@@ -116,7 +129,8 @@ class RequestListener
 
     public function onKernelFinishRequest()
     {
-        if ($this->request && !preg_match('/^(\/s)?\/(login|_wdt)($|\/).*/', $this->request->getPathInfo()) && !$this->isUpkeepRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($this->tokenStorage->getToken() && $this->request && !preg_match('/^(\/s)?\/(login|_wdt)($|\/).*/',
+                $this->request->getPathInfo()) && !$this->isUpkeepRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
             $this->session->set('isLoginReturn', false);
         }
     }
@@ -129,11 +143,11 @@ class RequestListener
     {
         $route = $this->request->attributes->get('_route');
         return (in_array($route, [
-                'logout',
-                'timeout',
-                'keep_alive',
-                'client_timeout',
-                'agree_usage'
-            ]));
+            'logout',
+            'timeout',
+            'keep_alive',
+            'client_timeout',
+            'agree_usage'
+        ]));
     }
 }
