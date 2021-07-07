@@ -27,7 +27,7 @@
                 </a>
             </div>
         {% endif %}
-        {% if (is_granted('ROLE_USER') and app.session.get('site') and app.session.get('siteOrganization')) or (is_granted('ROLE_AWARDEE') and app.session.get('awardee') and awardeeOrganization) %}
+        {% if (is_granted('ROLE_USER') and app.session.get('site') and app.session.get('siteOrganization')) or (is_granted('ROLE_AWARDEE') and app.session.get('awardee') and siteInfo.superUserAwardees) %}
             <div class="col-sm-6 col-md-4">
                 <a href="{{ path('workqueue_index') }}" class="btn btn-lg btn-default btn-block">
                     <i class="fa fa-table" aria-hidden="true"></i>
@@ -56,10 +56,19 @@
         {% endif %}
         {% if is_granted('ROLE_USER') and app.session.get('site') %}
             <div class="col-sm-6 col-md-4">
-                <a href="/s/patient/status/import" class="btn btn-lg btn-default btn-block">
+                <a href="{{ path('patientStatusImport') }}" class="btn btn-lg btn-default btn-block">
                     <i class="fa fa-upload" aria-hidden="true"></i>
                     Patient Status Import
                     <div class="description">Upload .csv files of participant Patient Status in bulk.</div>
+                </a>
+            </div>
+        {% endif %}
+        {% if is_granted('ROLE_USER') and app.session.get('site') %}
+            <div class="col-sm-6 col-md-4" id="deceased_report_block">
+                <a href="{{ path('deceased_reports_index') }}" class="btn btn-lg btn-default btn-block">
+                    <i class="fa fa-hourglass-o" aria-hidden="true"></i>
+                    Deceased Participants
+                    <div class="description">Review participants reported as deceased.</div>
                 </a>
             </div>
         {% endif %}
@@ -72,3 +81,21 @@
         </div>
     </div>
 {% endblock %}
+
+{% block pagejs %}
+    <script>
+        $(document).ready(function () {
+            // Add badge for count of Deceased Participant Reports for review
+            var deceasedReportCount = 0;
+            $.ajax({
+                url: '/s/deceased-reports/stats'
+            }).done(function (data) {
+                deceasedReportCount = data.pending
+                if (deceasedReportCount > 0) {
+                    $('#deceased_report_block > a').prepend($('<div class="welcome-page-badge">' + deceasedReportCount +'</div>'));
+                }
+            })
+        })
+    </script>
+{% endblock %}
+

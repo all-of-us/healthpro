@@ -8,21 +8,29 @@ use App\Entity\Site;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
 class SiteService
 {
     private $params;
     private $session;
     private $em;
+    private $userService;
+    private $env;
+    private $tokenStorage;
     protected $siteNameMapper = [];
     protected $organizationNameMapper = [];
     protected $awardeeNameMapper = [];
 
-    public function __construct(ParameterBagInterface $params, SessionInterface $session, EntityManagerInterface $em)
+    public function __construct(ParameterBagInterface $params, SessionInterface $session, EntityManagerInterface $em, UserService $userService, EnvironmentService $env, TokenStorageInterface $tokenStorage)
     {
         $this->params = $params;
         $this->session = $session;
         $this->em = $em;
+        $this->userService = $userService;
+        $this->env = $env;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function isTestSite(): bool
@@ -182,5 +190,107 @@ class SiteService
             return \Pmi\Security\User::SITE_PREFIX . $this->getSiteId();
         }
         return null;
+    }
+
+    public function isValidSite($email)
+    {
+        $user = $this->userService->getUser();
+        if (!$user || !$user->belongsToSite($email)) {
+            return false;
+        }
+        if ($this->env->isStable() || $this->env->isProd()) {
+            $siteGroup = $user->getSite($email);
+            $site = $this->em->getRepository(Site::class)->findBy([
+                'deleted' => 0,
+                'googleGroup' => $siteGroup->id,
+            ]);
+            if (!$site) {
+                return false;
+            }
+            if (empty($site->getMayolinkAccount()) && $site->getAwardeeId() !== 'TEST') {
+                // Site is invalid if it doesn't have a MayoLINK account id, unless it is in the TEST awardee
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function switchSite($email)
+    {
+        $user = $this->userService->getUser();
+        if ($user && $user->belongsToSite($email)) {
+            $this->session->set('site', $user->getSite($email));
+            $this->session->remove('awardee');
+            $this->setNewRoles($user);
+            $this->saveSiteMetaDataInSession();
+            return true;
+        } elseif ($user && $user->belongsToAwardee($email)) {
+            $this->session->set('awardee', $user->getAwardee($email));
+            $this->session->remove('site');
+            $this->setNewRoles($user);
+            // Clears previously set site meta data
+            $this->saveSiteMetaDataInSession();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected function setNewRoles($user)
+    {
+        $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->session->get('site'), $this->session->get('awardee'), $this->session->get('managegroups'));
+        if ($user->getAllRoles() != $userRoles) {
+            $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
+            $this->tokenStorage->setToken($token);
+        }
+    }
+
+    public function saveSiteMetaDataInSession()
+    {
+        $site = $this->getSiteEntity();
+        if (!empty($site)) {
+            $this->session->set('siteOrganization', $site->getOrganization());
+            $this->session->set('siteOrganizationId', $site->getOrganizationId());
+            $this->session->set('siteOrganizationDisplayName', $this->getOrganizationDisplayName($site->getOrganizationId()));
+            $this->session->set('siteAwardee', $site->getAwardee());
+            $this->session->set('siteAwardeeId', $site->getAwardeeId());
+            $this->session->set('siteAwardeeDisplayName', $this->getAwardeeDisplayName($site->getAwardeeId()));
+            $this->session->set('currentSiteDisplayName', $this->getAwardeeDisplayName($site->getName()));
+            $this->session->set('siteType', $this->getSiteType());
+            $this->session->set('orderType', $this->getOrderType());
+        } else {
+            $this->session->remove('siteOrganization');
+            $this->session->remove('siteOrganizationId');
+            $this->session->remove('siteOrganizationDisplayName');
+            $this->session->remove('siteAwardee');
+            $this->session->remove('siteAwardeeId');
+            $this->session->remove('siteAwardeeDisplayName');
+            $this->session->remove('currentSiteDisplayName');
+            $this->session->remove('siteType');
+            $this->session->remove('orderType');
+        }
+    }
+
+    public function getSiteEntity()
+    {
+        $googleGroup = $this->getSiteId();
+        if (!$googleGroup) {
+            return null;
+        }
+        $site = $this->em->getRepository(Site::class)->findBy(['deleted' => 0, 'googleGroup' => $googleGroup]);
+        return !empty($site) ? $site[0] : null;
+    }
+
+    public function getOrderType()
+    {
+        if ($this->isDVType() && !$this->isDiversionPouchSite()) {
+            return 'dv';
+        }
+        return 'hpo';
+    }
+
+    public function getSiteType()
+    {
+        return $this->isDVType() ? 'dv' : 'hpo';
     }
 }

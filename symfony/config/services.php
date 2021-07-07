@@ -50,3 +50,8 @@ if (!$env->values['isUnitTest'] && !$env->isPhpDevServer() && !$env->isLocal()) 
         $container->setParameter($config->key, $config->value);
     }
 }
+
+if ($env->values['isUnitTest']) {
+    $container->setParameter('local_mock_auth', true);
+    $container->setParameter('gaBypass', false);
+}

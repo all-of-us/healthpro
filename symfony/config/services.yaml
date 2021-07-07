@@ -31,6 +31,7 @@ services:
     App\EventListener\RequestListener:
         tags:
             - { name: kernel.event_listener, event: kernel.request }
+            - { name: kernel.event_listener, event: kernel.finish_request }
 
     App\EventListener\ResponseListener:
         tags:
