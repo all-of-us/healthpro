@@ -200,7 +200,7 @@ class SiteService
         }
         if ($this->env->isStable() || $this->env->isProd()) {
             $siteGroup = $user->getSite($email);
-            $site = $this->em->getRepository(Site::class)->findBy([
+            $site = $this->em->getRepository(Site::class)->findOneBy([
                 'deleted' => 0,
                 'googleGroup' => $siteGroup->id,
             ]);
