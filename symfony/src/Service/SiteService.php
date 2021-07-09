@@ -207,7 +207,7 @@ class SiteService
             if (!$site) {
                 return false;
             }
-            if (empty($site->getMayolinkAccount()) && $site->getAwardeeId() !== 'TEST') {
+            if (empty($site[0]->getMayolinkAccount()) && $site[0]->getAwardeeId() !== 'TEST') {
                 // Site is invalid if it doesn't have a MayoLINK account id, unless it is in the TEST awardee
                 return false;
             }
