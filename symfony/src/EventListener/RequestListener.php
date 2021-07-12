@@ -64,14 +64,16 @@ class RequestListener
 
         if ($loginExpiredResponse = $this->checkLoginExpired()) {
             $event->setResponse($loginExpiredResponse);
-        }
-
-        if ($siteSelectResponse = $this->checkSiteSelect()) {
-            $event->setResponse($siteSelectResponse);
+            return;
         }
 
         if ($fullPageNoticeResponse = $this->checkPageNotices()) {
             $event->setResponse($fullPageNoticeResponse);
+            return;
+        }
+
+        if ($siteSelectResponse = $this->checkSiteSelect()) {
+            $event->setResponse($siteSelectResponse);
         }
     }
 
