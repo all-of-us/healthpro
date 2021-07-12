@@ -62,7 +62,9 @@ class RequestListener
 
         $this->logRequest();
 
-        $this->checkLoginExpired();
+        if ($loginExpiredResponse = $this->checkLoginExpired()) {
+            $event->setResponse($loginExpiredResponse);
+        }
 
         if ($siteSelectResponse = $this->checkSiteSelect()) {
             $event->setResponse($siteSelectResponse);
