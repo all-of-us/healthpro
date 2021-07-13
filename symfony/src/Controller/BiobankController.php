@@ -399,7 +399,7 @@ class BiobankController extends AbstractController
 
         foreach ($quanumOrders as $quanumOrder) {
             if ($quanumOrder->origin === 'careevolution') {
-                $order = new Order;
+                $order = new Order();
                 $this->orderService->loadSamplesSchema($order);
                 $orders[] = $this->orderService->loadFromJsonObject($quanumOrder);
             }
