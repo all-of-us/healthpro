@@ -135,7 +135,7 @@ class RequestListener
     {
         if ($this->tokenStorage->getToken() && $this->request && !preg_match('/^(\/s)?\/(login|_wdt)($|\/).*/',
                 $this->request->getPathInfo()) && !$this->isUpkeepRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
-            $this->session->set('isLoginReturn', false);
+            $this->setSessionVariables();
         }
     }
 
@@ -153,5 +153,19 @@ class RequestListener
             'client_timeout',
             'agree_usage'
         ]));
+    }
+
+    private function setSessionVariables(): void
+    {
+        $this->session->set('isLoginReturn', false);
+        if (!$this->session->has('userSiteDisplayNames')) {
+            if (!empty($userSites = $this->userService->getUser()->getSites())) {
+                $userSiteDisplayNames = [];
+                foreach ($userSites as $userSite) {
+                    $userSiteDisplayNames[$userSite->id] = $this->siteService->getSiteDisplayName($userSite->id);
+                }
+                $this->session->set('userSiteDisplayNames', $userSiteDisplayNames);
+            }
+        }
     }
 }
