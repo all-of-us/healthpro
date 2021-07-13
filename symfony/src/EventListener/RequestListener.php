@@ -162,7 +162,7 @@ class RequestListener
             if (!empty($userSites = $this->userService->getUser()->getSites())) {
                 $userSiteDisplayNames = [];
                 foreach ($userSites as $userSite) {
-                    $userSiteDisplayNames[$userSite->id] = $this->siteService->getSiteDisplayName($userSite->id);
+                    $userSiteDisplayNames[$userSite->id] = $this->siteService->getSiteDisplayName($userSite->id, false);
                 }
                 $this->session->set('userSiteDisplayNames', $userSiteDisplayNames);
             }
