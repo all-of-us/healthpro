@@ -255,7 +255,7 @@ class SiteService
             $this->session->set('siteAwardee', $site->getAwardee());
             $this->session->set('siteAwardeeId', $site->getAwardeeId());
             $this->session->set('siteAwardeeDisplayName', $this->getAwardeeDisplayName($site->getAwardeeId()));
-            $this->session->set('currentSiteDisplayName', $this->getAwardeeDisplayName($site->getName()));
+            $this->session->set('currentSiteDisplayName', $site->getName());
             $this->session->set('siteType', $this->getSiteType());
             $this->session->set('orderType', $this->getOrderType());
         } else {
