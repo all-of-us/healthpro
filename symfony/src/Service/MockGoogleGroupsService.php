@@ -37,7 +37,6 @@ class MockGoogleGroupsService
                     new Group(['email' => User::SITE_PREFIX . 'hogwarts@pmi-ops.io', 'name' => 'Hogwarts']),
                     new Group(['email' => User::SITE_PREFIX . 'durmstrang@pmi-ops.io', 'name' => 'Durmstrang']),
                     new Group(['email' => User::SITE_PREFIX . 'beauxbatons@pmi-ops.io', 'name' => 'Beauxbatons']),
-                    new Group(['email' => User::DASHBOARD_GROUP . '@pmi-ops.io', 'name' => 'Admin Dashboard']),
                     new Group(['email' => User::ADMIN_GROUP . '@pmi-ops.io', 'name' => 'Site Admin'])
                 ];
             }

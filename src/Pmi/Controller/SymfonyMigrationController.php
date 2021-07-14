@@ -34,7 +34,6 @@ class SymfonyMigrationController extends AbstractController
         ['home', '/'],
         ['mockLogin', 'mock-login'],
         ['logout', '/logout'],
-        ['dashSplash', '/splash'],
         ['timeout', '/timeout'],
         ['clientTimeout', '/client-timeout']
     ];
@@ -235,14 +234,6 @@ class SymfonyMigrationController extends AbstractController
     public function logoutAction(Application $app)
     {
         return $app->redirect('/s/logout');
-    }
-
-    /**
-     * @deprecated 2021-07-01
-     */
-    public function dashSplashAction(Application $app)
-    {
-        return $app->redirect('/s/splash');
     }
 
     /**

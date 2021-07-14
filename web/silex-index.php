@@ -23,7 +23,6 @@ $app
     ->mount('/', new Controller\DefaultController())
     ->mount('/', new Controller\SymfonyMigrationController())
     ->mount('/_dev', new Controller\DevController())
-    ->mount('/dashboard', new Controller\DashboardController())
     ->mount('/_ah', new Controller\AppEngineController())
 ;
 

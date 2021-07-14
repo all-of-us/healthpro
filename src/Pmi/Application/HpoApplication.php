@@ -73,7 +73,6 @@ class HpoApplication extends AbstractApplication
                 [['path' => $anonRegex], 'IS_AUTHENTICATED_ANONYMOUSLY'],
                 [['path' => '^/_dev($|\/)$'], 'IS_AUTHENTICATED_FULLY'],
                 [['path' => $commonRegex], 'IS_AUTHENTICATED_FULLY'],
-                [['path' => '^/dashboard($|\/)'], 'ROLE_DASHBOARD'],
                 [['path' => '^/admin($|\/)'], 'ROLE_ADMIN'],
                 [['path' => '^/workqueue($|\/)'], ['ROLE_USER', 'ROLE_AWARDEE']],
                 [['path' => '^/problem($|\/)'], ['ROLE_DV_ADMIN']],
@@ -394,12 +393,6 @@ class HpoApplication extends AbstractApplication
             $this->addFlashSuccess('Welcome, ' . $this->getUser()->getEmail() . '!');
         }
 
-        // users with multiple roles must select their initial destination
-        $hasMultiple = ($this->hasRole('ROLE_DASHBOARD') && ($this->hasRole('ROLE_USER') || $this->hasRole('ROLE_ADMIN') || $this->hasRole('ROLE_AWARDEE') || $this->hasRole('ROLE_DV_ADMIN')));
-        if ($this['session']->get('isLoginReturn') && $hasMultiple && !$this->isUpkeepRoute($request)) {
-            return $this->forwardToRoute('dashSplash', $request);
-        }
-
         if ($this->isLoggedIn()) {
             $user = $this->getUser();
             $this['em']->setTimezone($this->getUserTimezone());
@@ -415,7 +408,6 @@ class HpoApplication extends AbstractApplication
                 $this->switchSite($user->getAwardees()[0]->email);
             } elseif ($request->attributes->get('_route') !== 'selectSite' &&
                     $request->attributes->get('_route') !== 'switchSite' &&
-                    strpos($request->attributes->get('_route'), 'dashboard_') !== 0 &&
                     strpos($request->attributes->get('_route'), 'problem_') !== 0 &&
                     strpos($request->attributes->get('_route'), 'admin_') !== 0 &&
                     strpos($request->attributes->get('_route'), 'biobank_') !== 0 &&

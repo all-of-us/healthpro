@@ -27,5 +27,4 @@ security:
         - { path: ^/s/workqueue($|\/).*, roles: [ROLE_USER, ROLE_AWARDEE] }
         - { path: ^/s/biobank\/\w+\/(order|quanum-order)\/\w+$, roles: [ROLE_AWARDEE, ROLE_BIOBANK, ROLE_SCRIPPS] }
         - { path: ^/s/biobank($|\/), roles: [ROLE_BIOBANK, ROLE_SCRIPPS] }
-        - { path: ^/s/splash($|\/), roles: [ROLE_USER, ROLE_AWARDEE, ROLE_ADMIN, ROLE_DV_ADMIN] }
         - { path: ^/s/.*\S$, roles: ROLE_USER }
