@@ -28,6 +28,8 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     private $env;
     private $twig;
     private $session;
+    private $authEmail;
+    private $authFailureReason;
 
     public function __construct(AuthService $auth, UrlGeneratorInterface $urlGenerator, ContainerBagInterface $params, EnvironmentService $env, UserService $userService, Environment $twig, SessionInterface $session)
     {
@@ -76,11 +78,11 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             return true; // Bypass groups auth
         }
         $valid2fa = !($this->params->has('enforce2fa') && $this->params->get('enforce2fa')) || $user->hasTwoFactorAuth();
-        $this->session->set('authEmail', $user->getUsername());
+        $this->authEmail = $user->getUsername();
         if (!$valid2fa) {
-            $this->session->set('authFailureReason', '2fa');
+            $this->authFailureReason = '2fa';
         } elseif (empty($user->getGroups())) {
-            $this->session->set('authFailureReason', 'groups');
+            $this->authFailureReason = 'groups';
         }
         return count($user->getGroups()) > 0 && $valid2fa;
     }
@@ -88,13 +90,13 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $template = 'error-gae-auth.html.twig';
-        if ($this->session->get('authFailureReason') === '2fa') {
+        if ($this->authFailureReason === '2fa') {
             $template = 'error-2fa.html.twig';
-        } elseif ($this->session->get('authFailureReason') === 'groups') {
+        } elseif ($this->authFailureReason === 'groups') {
             $template = 'error-auth.html.twig';
         }
         $response = new Response($this->twig->render($template, [
-            'email' => $this->session->get('authEmail') ,
+            'email' => $this->authEmail,
             'logoutUrl' => $this->auth->getGoogleLogoutUrl()
         ]));
         $this->session->invalidate();
