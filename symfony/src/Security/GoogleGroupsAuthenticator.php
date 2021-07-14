@@ -89,11 +89,11 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        $template = 'error-gae-auth.html.twig';
+        $template = 'error-auth.html.twig';
         if ($this->authFailureReason === '2fa') {
-            $template = 'error-2fa.html.twig';
+            $template = 'error-auth-2fa.html.twig';
         } elseif ($this->authFailureReason === 'groups') {
-            $template = 'error-auth.html.twig';
+            $template = 'error-auth-groups.html.twig';
         }
         $response = new Response($this->twig->render($template, [
             'email' => $this->authEmail,
