@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('symfony_home') }}">Home</a></li>
+        <li class="active">Managed Access Dashboard</li>
+    </ol>
+    <div class="page-header">
+        <h2><i class="fa fa-users-cog" aria-hidden="true"></i> Managed Access Dashboard</h2>
+    </div>
+    <div class="row home-menu row-equal-height">
+        <div class="col-sm-6 col-md-4">
+            <a href="{{ path('access_manage_user_groups') }}" class="btn btn-lg btn-default btn-block">
+                <i class="fa fa-users" aria-hidden="true"></i>
+                User Management
+                <div class="description">View and manage your site's users.</div>
+            </a>
+        </div>
+    </div>
+{% endblock %}
+

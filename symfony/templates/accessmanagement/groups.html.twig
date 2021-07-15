@@ -1,0 +1,41 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %}Sites - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
+{% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('symfony_home') }}">Home</a></li>
+        <li><a href="{{ path('access_manage_dashboard') }}">Managed Access Dashboard</a></li>
+        <li class="active">User Management</li>
+    </ol>
+    <div class="page-header">
+        <h2><h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
+    </div>
+    <br/>
+    {% if app.session.get('managegroups') %}
+        <table class="table table-striped table-hover table-bordered">
+            <thead>
+            <tr>
+                <th>Groups</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for group in app.session.get('managegroups') %}
+                <tr>
+                    <td>{{ group }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block pagejs %}
+    <script>
+        $(document).ready(function () {
+            $('table').DataTable({
+                order: [[0, 'asc']],
+                pageLength: 25
+            });
+        });
+    </script>
+{% endblock %}
