@@ -7,9 +7,6 @@ index:
 home:
     path: /
 
-logout:
-    path: /logout
-
 selectSite:
     path: /site/select
 
@@ -25,19 +22,4 @@ evaluationBloodDonorCheck:
 
 dashboard_home:
     path: /dashboard
-
-clientTimeout:
-    path: /client-timeout
-
-keepAlive:
-    path: /keepalive
-
-agreeUsage:
-    path: /agree
-
-hideTZWarning:
-    path: /hide-tz-warning
-
-patientStatus:
-    path: /participant/{participantId}/patient/status/{patientStatusId}
 

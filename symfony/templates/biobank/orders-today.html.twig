@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'biobank/base.html.twig' %}
 {% block title %}Today - Participant Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% set missingName = '' %}
@@ -92,7 +92,7 @@
         {% endfor %}
         </tbody>
     </table>
-{% endblock %} 
+{% endblock %}
 
 {% block pagejs %}
     <script>

@@ -39,7 +39,7 @@ class EnvironmentService
                 date('YmdHis') : getenv('PMI_RELEASE');
         }
         if (!array_key_exists('isUnitTest', $values)) {
-            $this->values['isUnitTest'] = false;
+            $this->values['isUnitTest'] = $_SERVER['APP_ENV'] === 'test' ? true : false;
         }
         if (!array_key_exists('debug', $values)) {
             $this->values['debug'] = ($this->values['env'] === self::ENV_LOCAL && !$this->values['isUnitTest']);
@@ -113,20 +113,6 @@ class EnvironmentService
     public function getTimeZones()
     {
         return self::$timezoneOptions;
-    }
-
-    public function getUserTimezone($useDefault = true)
-    {
-        if ($user = $this->getUser()) {
-            if (($info = $user->getInfo()) && isset($info['timezone'])) {
-                return $info['timezone'];
-            }
-        }
-        if ($useDefault) {
-            return self::DEFAULT_TIMEZONE;
-        } else {
-            return null;
-        }
     }
 
     protected function loadConfiguration($override = [])

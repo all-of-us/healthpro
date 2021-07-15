@@ -30,6 +30,10 @@ class ProblemNotificationService extends EmailNotificationService
         $this->logRepository = $this->em->getRepository(DeceasedLog::class);
     }
 
+    protected function getSearchParams($id, $lastDeactivate) {
+        // Not implemented for ProblemNotificationService
+    }
+
     public function sendProblemReportEmail($problemId)
     {
         if ($this->params->has('dvAdminEmail')) {

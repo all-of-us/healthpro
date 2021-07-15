@@ -15,21 +15,17 @@ security:
                 authenticators:
                     - App\Security\GoogleGroupsAuthenticator
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#firewalls-authentication
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
+    # Note: The *first* access control that matches will be used
     access_control:
-     - { path: ^/s/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-     - { path: ^/s/admin($|\/).*, roles: ROLE_ADMIN }
-     - { path: ^/s/problem($|\/).*, roles: ROLE_DV_ADMIN }
-     - { path: ^/s/settings($|\/), roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
-     - { path: ^/s/help/.*, roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
-     - { path: ^/s/workqueue($|\/).*, roles: [ROLE_USER, ROLE_AWARDEE] }
-     - { path: ^/s/biobank\/\w+\/(order|quanum-order)\/\w+$, roles: [ROLE_AWARDEE, ROLE_BIOBANK, ROLE_SCRIPPS] }
-     - { path: ^/s/biobank($|\/), roles: [ROLE_BIOBANK, ROLE_SCRIPPS] }
-     - { path: ^/.*$, roles: ROLE_USER }
+        - { path: ^(/s)?/(login|logout|keepalive|client-timeout|agree|timeout), roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/s/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/s/admin($|\/).*, roles: ROLE_ADMIN }
+        - { path: ^/s/problem($|\/).*, roles: ROLE_DV_ADMIN }
+        - { path: ^/s/settings($|\/), roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
+        - { path: ^/s/site($|\/), roles: [ROLE_USER, ROLE_AWARDEE] }
+        - { path: ^/s/help/.*, roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
+        - { path: ^/s/workqueue($|\/).*, roles: [ROLE_USER, ROLE_AWARDEE] }
+        - { path: ^/s/biobank\/\w+\/(order|quanum-order)\/\w+$, roles: [ROLE_AWARDEE, ROLE_BIOBANK, ROLE_SCRIPPS] }
+        - { path: ^/s/biobank($|\/), roles: [ROLE_BIOBANK, ROLE_SCRIPPS] }
+        - { path: ^/s/splash($|\/), roles: [ROLE_USER, ROLE_AWARDEE, ROLE_ADMIN, ROLE_DV_ADMIN] }
+        - { path: ^/s/.*\S$, roles: ROLE_USER }

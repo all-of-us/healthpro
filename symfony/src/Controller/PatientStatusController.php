@@ -5,10 +5,13 @@ namespace App\Controller;
 use App\Entity\Organization;
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusImportRow;
+use App\Repository\PatientStatusRepository;
+use App\Service\ParticipantSummaryService;
 use App\Service\PatientStatusImportService;
 use App\Service\LoggerService;
 use App\Form\PatientStatusImportFormType;
 use App\Form\PatientStatusImportConfirmFormType;
+use App\Service\PatientStatusService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -133,5 +136,39 @@ class PatientStatusController extends AbstractController
         } else {
             return $this->render('patientstatus/import-details.html.twig');
         }
+    }
+
+    /**
+     * @Route("/participant/{participantId}/patient/status/{patientStatusId}", name="patientStatus")
+     */
+    public function patientStatusAction(
+        $participantId,
+        $patientStatusId,
+        ParticipantSummaryService $participantSummaryService,
+        PatientStatusService $patientStatusService,
+        PatientStatusRepository $patientStatusRepository
+    ) {
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException();
+        }
+        if (!$patientStatusService->hasAccess($participant)) {
+            throw $this->createAccessDeniedException();
+        }
+        $patientStatusData = $patientStatusRepository->findOneBy([
+            'id' => $patientStatusId,
+            'participantId' => $participantId
+        ]);
+        if (!empty($patientStatusData)) {
+            $organization = $patientStatusData->getOrganization();
+            $orgPatientStatusHistoryData = $patientStatusRepository->getOrgPatientStatusHistoryData($participantId, $organization);
+        } else {
+            $orgPatientStatusHistoryData = [];
+            $organization = null;
+        }
+        return $this->render('patientstatus/history.html.twig', [
+            'orgPatientStatusHistoryData' => $orgPatientStatusHistoryData,
+            'organization' => $organization
+        ]);
     }
 }

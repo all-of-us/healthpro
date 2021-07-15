@@ -2,9 +2,11 @@
 
 namespace App\Service;
 
+use App\Helper\MockUserHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Pmi\Service\MockUserService;
 use App\Entity\User;
@@ -17,32 +19,30 @@ class UserService
     private $env;
     private $session;
     private $security;
+    private $authorizationChecker;
 
     public function __construct(
         EntityManagerInterface $em,
         ContainerBagInterface $params,
         EnvironmentService $env,
         SessionInterface $session,
-        Security $security
+        Security $security,
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->em = $em;
         $this->params = $params;
         $this->env = $env;
         $this->session = $session;
         $this->security = $security;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     public function getGoogleUser()
     {
         if ($this->canMockLogin()) {
-            if ($this->env->values['isUnitTest']) {
-                return MockUserService::getCurrentUser();
-            } else {
-                return $this->session->get('mockUser');
-            }
-        } else {
-            return $this->session->get('googleUser');
+            return $this->session->get('mockUser');
         }
+        return $this->session->get('googleUser');
     }
 
     public function canMockLogin()
@@ -57,10 +57,31 @@ class UserService
                 'id' => 1,
                 'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getUserId(),
-                'timezone' => $googleUser->getTimzezone()
+                'timezone' => $googleUser->getTimezone()
             ];
         }
-        $user = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
+
+        $attempts = 0;
+        $maxAttempts = 3;
+        do {
+            try {
+                $user = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
+                break;
+            } catch (\Exception $e) {
+                if ($attempts == 2) {
+                    sleep(1);
+                }
+                $attempts++;
+            }
+        } while ($attempts < $maxAttempts);
+        if (!$user) {
+            $user = new User;
+            $user->setEmail($googleUser->getEmail());
+            $user->setGoogleId($googleUser->getUserId());
+            $this->em->persist($user);
+            $this->em->flush();
+        }
+
         if (empty($user)) {
             throw new AuthenticationException('Failed to retrieve user information');
         }
@@ -83,13 +104,64 @@ class UserService
         return null;
     }
 
+    public function getRoles($roles, $site, $awardee, $managegroups)
+    {
+        if (!empty($site)) {
+            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if (in_array($site->email, $managegroups)) {
+                $roles[] = 'ROLE_MANAGE_USERS';
+            } else {
+                if (($key = array_search('ROLE_MANAGE_USERS', $roles)) !== false) {
+                    unset($roles[$key]);
+                }
+            }
+        }
+        if (!empty($awardee)) {
+            if (($key = array_search('ROLE_USER', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if (isset($awardee->id) && $awardee->id !== User::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if (($key = array_search('ROLE_MANAGE_USERS', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+        }
+        return $roles;
+    }
+
     public function updateLastLogin(): void
     {
-        $user = $this->getUser();
-        if ($user) {
-            $user->setLastLogin(new \DateTime());
-            $this->em->persist($user);
-            $this->em->flush();
+        $userInfo = $this->getUser();
+        if ($userInfo) {
+            $user = $this->em->getRepository(User::class)->findOneBy(['email' => $userInfo->getEmail()]);
+            if ($user) {
+                $user->setLastLogin(new \DateTime());
+                $this->em->persist($user);
+                $this->em->flush();
+            }
         }
+        $this->session->set('isLoginReturn', true);
+    }
+
+    public function setMockUser($email): void
+    {
+        MockUserHelper::switchCurrentUser($email);
+        $this->session->set('mockUser', MockUserHelper::getCurrentUser());
+    }
+
+    /** Is the user's session expired? */
+    public function isLoginExpired()
+    {
+        $time = time();
+        // custom "last used" session time updated on keepAliveAction
+        $idle = $time - $this->session->get('pmiLastUsed', $time);
+        $remaining = $this->env->values['sessionTimeOut'] - $idle;
+        return $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY') && $remaining <= 0;
     }
 }

@@ -20,8 +20,9 @@ class HpoApplicationTest extends AbstractWebTestCase
     public function testController()
     {
         $client = $this->createClient();
-        $crawler = $client->request('GET', '/');
-        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+        $client->followRedirects();
+        $client->request('GET', '/');
+        $this->assertEquals('/s/login', $client->getRequest()->getRequestUri());
     }
 
     public function testLogin()
@@ -37,21 +38,6 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertSame(true, $this->isLoginAfter);
         // gets set to false by the finishCallback()
         $this->assertSame(false, $this->app['session']->get('isLogin'));
-    }
-
-    public function testTwoFactorDeny()
-    {
-        $email = 'testTwoFactorDeny@example.com';
-        MockUserService::switchCurrentUser($email);
-        AppsClient::setGroups($email, [
-            new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
-            new GoogleGroup(User::TWOFACTOR_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
-        ]);
-        $client = $this->createClient();
-        $client->followRedirects();
-        $crawler = $client->request('GET', '/');
-        $this->assertSame(1, count($crawler->filter('#twoFactorAlert')));
-        $this->assertEquals(403, $client->getResponse()->getStatusCode());
     }
 
     public function testDashboardDeny()
@@ -126,139 +112,6 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertSame(true, strstr($crawler->html(), '/dashboard/') !== false);
     }
 
-    public function testForceSiteSelect()
-    {
-        $email = 'testForceSiteSelect@example.com';
-        MockUserService::switchCurrentUser($email);
-        AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'), new GoogleGroup('hpo-site-2@gapps.com', 'Test Group 2', 'lorem ipsum 2')]);
-        $client = $this->createClient();
-        $client->followRedirects();
-        $crawler = $client->request('GET', '/participants');
-        $this->assertEquals(1, count($crawler->filter('#siteSelector')));
-    }
-
-    public function testDashSplash()
-    {
-        $email = 'testDashSplash@example.com';
-        MockUserService::switchCurrentUser($email);
-        AppsClient::setGroups($email, [
-            new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
-            new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
-        ]);
-        $client = $this->createClient();
-        $client->followRedirects();
-        $crawler = $client->request('GET', '/participants');
-        $this->assertEquals(1, count($crawler->filter('#dashSplashSelector')));
-    }
-
-    public function testDashSplashAwardee()
-    {
-        $email = 'testDashSplashAwardee@example.com';
-        MockUserService::switchCurrentUser($email);
-        AppsClient::setGroups($email, [
-            new GoogleGroup('awardee-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
-            new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
-        ]);
-        $client = $this->createClient();
-        $client->followRedirects();
-        $crawler = $client->request('GET', '/');
-        $this->assertEquals(1, count($crawler->filter('#dashSplashSelector')));
-    }
-
-    public function testDashSplashAdmin()
-    {
-        $email = 'testDashSplashAdmin@example.com';
-        MockUserService::switchCurrentUser($email);
-        AppsClient::setGroups($email, [
-            new GoogleGroup(User::ADMIN_GROUP . '@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
-            new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
-        ]);
-        $client = $this->createClient();
-        $client->followRedirects();
-        $crawler = $client->request('GET', '/');
-        $this->assertEquals(1, count($crawler->filter('#dashSplashSelector')));
-    }
-
-    public function testDashSplashDvAdmin()
-    {
-        $email = 'testDashSplashDvAdmin@example.com';
-        MockUserService::switchCurrentUser($email);
-        AppsClient::setGroups($email, [
-            new GoogleGroup(User::ADMIN_DV . '@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
-            new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 2', 'lorem ipsum 2')
-        ]);
-        $client = $this->createClient();
-        $client->followRedirects();
-        $crawler = $client->request('GET', '/');
-        $this->assertEquals(1, count($crawler->filter('#dashSplashSelector')));
-    }
-
-    public function testUsageAgreement()
-    {
-        $email = 'testUsageAgreement@example.com';
-        MockUserService::switchCurrentUser($email, 'America\Chicago');
-        AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
-        $client = $this->createClient();
-        $client->followRedirects();
-        $crawler = $client->request('GET', '/');
-        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on initial page load.');
-        $crawler = $client->reload();
-        $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on reload.');
-        $client->request('POST', '/agree', ['csrf_token' => $this->app['csrf.token_manager']->getToken('agreeUsage')]);
-        $crawler = $client->request('GET', '/');
-        $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')), 'Do not see usage modal after confirmation.');
-    }
-
-    public function testSiteAutoselect()
-    {
-        $email = 'testSiteAutoselect@example.com';
-        MockUserService::switchCurrentUser($email);
-        $groupEmail = 'hpo-site-1@gapps.com';
-        AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
-        $client = $this->createClient();
-        $client->followRedirects();
-        $this->assertSame(null, $this->app->getSite());
-        $crawler = $client->request('GET', '/participants');
-        $this->assertSame($groupEmail, $this->app->getSite()->email);
-    }
-
-    public function testAwardeeAutoselect()
-    {
-        $email = 'testAwardeeAutoselect@example.com';
-        MockUserService::switchCurrentUser($email);
-        $groupEmail = 'awardee-1@gapps.com';
-        AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
-        $client = $this->createClient();
-        $client->followRedirects();
-        $this->assertSame(null, $this->app->getSite());
-        $crawler = $client->request('GET', '/workqueue');
-        $this->assertSame($groupEmail, $this->app->getAwardee()->email);
-    }
-
-    public function testDvAdminAutoselect()
-    {
-        $email = 'testDvAdminAutoselect@example.com';
-        MockUserService::switchCurrentUser($email);
-        $groupEmail = User::ADMIN_DV . '@gapps.com';
-        AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
-        $client = $this->createClient();
-        $this->assertSame(null, $this->app->getSite());
-        $crawler = $client->request('GET', '/problem/reports');
-        $this->assertEquals('/problem/reports', $this->app['session']->get('loginDestUrl'));
-    }
-
-    public function testAdminAutoselect()
-    {
-        $email = 'testAdminAutoselect@example.com';
-        MockUserService::switchCurrentUser($email);
-        $groupEmail = User::ADMIN_GROUP . '@gapps.com';
-        AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
-        $client = $this->createClient();
-        $this->assertSame(null, $this->app->getSite());
-        $crawler = $client->request('GET', '/admin');
-        $this->assertEquals('/admin', $this->app['session']->get('loginDestUrl'));
-    }
-
     public function testDashboardAutoselect()
     {
         $email = 'testDashboardAutoselect@example.com';
@@ -270,14 +123,5 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertSame(null, $this->app->getSite());
         $crawler = $client->request('GET', '/dashboard');
         $this->assertEquals(1, count($crawler->filter('#plotly-total-progress')));
-    }
-
-    public function testHeaders()
-    {
-        $client = $this->createClient();
-        $client->followRedirects();
-        $crawler = $client->request('GET', '/');
-        $xframeOptions = $client->getResponse()->headers->get('X-Frame-Options');
-        $this->assertSame('SAMEORIGIN', $xframeOptions);
     }
 }
