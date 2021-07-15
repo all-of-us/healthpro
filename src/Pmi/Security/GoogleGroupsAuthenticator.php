@@ -154,8 +154,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     {
         // a flag to indicate that the user has just logged in
         $request->getSession()->set('isLogin', true);
-        // has the user agreed to the system usage agreement this session?
-        $request->getSession()->set('isUsageAgreed', false);
+        
         // Update last login for user record
         UserService::updateLastLogin($this->app);
         if ($this->app->canMockLogin()) {
