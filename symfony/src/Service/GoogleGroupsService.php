@@ -126,4 +126,18 @@ class GoogleGroupsService
             return null;
         }
     }
+
+    public function getMembers(string $groupEmail)
+    {
+        try {
+            $result = $this->callApi('members', 'listMembers', [$groupEmail]);
+            if ($result) {
+                return $result->getMembers();
+            } else {
+                return null;
+            }
+        } catch (GoogleException $e) {
+            return null;
+        }
+    }
 }

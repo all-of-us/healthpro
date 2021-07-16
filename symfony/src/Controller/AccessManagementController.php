@@ -2,13 +2,10 @@
 
 namespace App\Controller;
 
-use App\Service\HelpService;
+use App\Service\GoogleGroupsService;
+use App\Service\SiteService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Pmi\HttpClient;
 
 /**
  * @Route("/s/access/manage")
@@ -29,5 +26,18 @@ class AccessManagementController extends AbstractController
     public function userGroups()
     {
         return $this->render('accessmanagement/groups.html.twig');
+    }
+
+    /**
+     * @Route("/user/group/{groupId}", name="access_manage_user_group")
+     */
+    public function userGroup($groupId, GoogleGroupsService $googleGroupsService)
+    {
+        $groupEmail = $this->getUser()->getEmailFromGroupId($groupId);
+        $members = $googleGroupsService->getMembers($groupEmail);
+        return $this->render('accessmanagement/group-members.html.twig', [
+            'groupEmail' => $groupEmail,
+            'members' => $members
+        ]);
     }
 }

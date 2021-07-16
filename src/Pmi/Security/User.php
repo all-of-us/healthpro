@@ -310,4 +310,16 @@ class User implements UserInterface
             return false;
         }
     }
+
+    public function getEmailFromGroupId($siteId)
+    {
+        $siteEmail = null;
+        foreach ($this->sites as $s) {
+            if ($s->id === $siteId) {
+                $siteEmail = $s->email;
+                break;
+            }
+        }
+        return $siteEmail;
+    }
 }
