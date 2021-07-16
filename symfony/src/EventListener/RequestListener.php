@@ -56,7 +56,7 @@ class RequestListener
     {
         $this->request = $event->getRequest();
 
-        if (!$event->isMasterRequest() || $this->request->attributes->get('_route') === '_wdt') {
+        if (!$event->isMasterRequest() || in_array($this->request->attributes->get('_route'), ['_wdt', '_profiler'])) {
             return;
         }
 
