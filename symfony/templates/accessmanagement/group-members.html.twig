@@ -9,8 +9,8 @@
     <div class="page-header">
         <h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
     </div>
-    <br/>
     <h3>{{ app.user.site(groupEmail).name }}</h3>
+    <br/>
     {% if app.session.get('managegroups') %}
         <table class="table table-striped table-hover table-bordered">
             <thead>
