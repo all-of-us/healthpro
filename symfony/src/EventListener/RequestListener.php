@@ -128,7 +128,7 @@ class RequestListener
     public function onKernelFinishRequest()
     {
         if ($this->tokenStorage->getToken() && $this->request && !preg_match('/^(\/s)?\/(login|_wdt)($|\/).*/',
-                $this->request->getPathInfo()) && !$this->isUpkeepRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
+                $this->request->getPathInfo()) && !$this->isUpkeepRoute() && !$this->isStreamingResponseRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
             $this->setSessionVariables();
         }
     }
@@ -146,6 +146,15 @@ class RequestListener
             'keep_alive',
             'client_timeout',
             'agree_usage'
+        ]));
+    }
+
+    public function isStreamingResponseRoute()
+    {
+        $route = $this->request->attributes->get('_route');
+        return (in_array($route, [
+            'workqueue_export',
+            'help_sopFile'
         ]));
     }
 

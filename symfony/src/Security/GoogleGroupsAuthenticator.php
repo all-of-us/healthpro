@@ -8,6 +8,8 @@ use App\Service\UserService;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -15,6 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Exception;
+use Twig\Environment;
 
 class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 {
@@ -23,14 +26,20 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     private $userService;
     private $params;
     private $env;
+    private $twig;
+    private $session;
+    private $authEmail;
+    private $authFailureReason;
 
-    public function __construct(AuthService $auth, UrlGeneratorInterface $urlGenerator, ContainerBagInterface $params, EnvironmentService $env, UserService $userService)
+    public function __construct(AuthService $auth, UrlGeneratorInterface $urlGenerator, ContainerBagInterface $params, EnvironmentService $env, UserService $userService, Environment $twig, SessionInterface $session)
     {
         $this->auth = $auth;
         $this->urlGenerator = $urlGenerator;
         $this->params = $params;
         $this->env = $env;
         $this->userService = $userService;
+        $this->twig = $twig;
+        $this->session= $session;
     }
 
     public function supports(Request $request)
@@ -69,18 +78,29 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             return true; // Bypass groups auth
         }
         $valid2fa = !($this->params->has('enforce2fa') && $this->params->get('enforce2fa')) || $user->hasTwoFactorAuth();
+        $this->authEmail = $user->getUsername();
+        if (!$valid2fa) {
+            $this->authFailureReason = '2fa';
+        } elseif (empty($user->getGroups())) {
+            $this->authFailureReason = 'groups';
+        }
         return count($user->getGroups()) > 0 && $valid2fa;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        if ($session = $request->getSession()) {
-            if ($flashBag = $session->getFlashBag()) {
-                $flashBag->add('error', 'Authentication failed. Please try again.');
-            }
+        $template = 'error-auth.html.twig';
+        if ($this->authFailureReason === '2fa') {
+            $template = 'error-auth-2fa.html.twig';
+        } elseif ($this->authFailureReason === 'groups') {
+            $template = 'error-auth-groups.html.twig';
         }
-
-        return $this->redirectToRoute('login');
+        $response = new Response($this->twig->render($template, [
+            'email' => $this->authEmail,
+            'logoutUrl' => $this->auth->getGoogleLogoutUrl()
+        ]));
+        $this->session->invalidate();
+        return $response;
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
