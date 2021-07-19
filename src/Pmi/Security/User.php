@@ -310,4 +310,16 @@ class User implements UserInterface
             return false;
         }
     }
+
+    public function getSiteFromId($siteId)
+    {
+        $site = null;
+        foreach ($this->sites as $s) {
+            if ($s->id === $siteId) {
+                $site = $s;
+                break;
+            }
+        }
+        return $site;
+    }
 }
