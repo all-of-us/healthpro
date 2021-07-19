@@ -19,7 +19,3 @@ evaluation_modify:
 
 evaluationBloodDonorCheck:
     path: /participant/{participantId}/measurements/blood/donor/check
-
-dashboard_home:
-    path: /dashboard
-

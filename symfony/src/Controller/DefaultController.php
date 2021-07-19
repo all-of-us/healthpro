@@ -37,8 +37,6 @@ class DefaultController extends AbstractController
             return $this->redirectToRoute('problem_reports');
         } elseif ($this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('admin_home');
-        } elseif ($this->isGranted('ROLE_DASHBOARD')) {
-            return $this->redirectToRoute('dashboard_home');
         } elseif ($this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS')) {
             return $this->redirectToRoute('biobank_home');
         } else {
@@ -52,14 +50,6 @@ class DefaultController extends AbstractController
     public function adminIndex()
     {
         return $this->render('admin/index.html.twig');
-    }
-
-    /**
-     * @Route("/splash", name="dash_splash")
-     */
-    public function dashSplashAction()
-    {
-        return $this->render('dash-splash.html.twig');
     }
 
     /**

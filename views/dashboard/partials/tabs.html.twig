@@ -1,9 +1,0 @@
-<ul class="nav nav-tabs top-pad" role="tablist">
-    <li role="presentation"{% if active_tab == 'total-progress' %} class="active"{% endif %}><a href="/dashboard/total-progress" role="tab"><span class="fa fa-users"></span> Total Progress to Date</a></li>
-    <li role="presentation"{% if active_tab == 'real-time' %} class="active"{% endif %}><a href="/dashboard/real-time" role="tab"><span class="fa fa-clock-o"></span> Real-Time Data</a></li>
-    <li role="presentation"{% if active_tab == 'participants-by-region' %} class="active"{% endif %}><a href="/dashboard/participants-by-region" role="tab"><span class="fa fa-globe"></span> Participants by Region</a></li>
-    <li role="presentation"{% if active_tab == 'participants-by-lifecycle' %} class="active"{% endif %}><a href="/dashboard/participants-by-lifecycle" role="tab"><span class="fa fa-sitemap"></span> Participants by Lifecycle Phase</a></li>
-    <li role="presentation"{% if active_tab == 'ehr' %} class="active"{% endif %}><a href="{{ path('dashboard_ehr') }}" role="tab"><span class="fa fa-medkit"></span> EHR Data</a></li>
-</ul>
-
-<br />

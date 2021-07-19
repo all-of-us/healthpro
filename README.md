@@ -1,4 +1,4 @@
-# HealthPro Portal and Admin Dashboard
+# HealthPro Portal
 
 ![Build Status of develop](https://circleci.com/gh/all-of-us/healthpro.png)
 

@@ -395,11 +395,12 @@ class BiobankController extends AbstractController
         $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participant->id], ['id' => 'desc']);
 
         // Quanum Orders
-        $order = new Order;
-        $this->orderService->loadSamplesSchema($order);
         $quanumOrders = $this->orderService->getOrdersByParticipant($participant->id);
+
         foreach ($quanumOrders as $quanumOrder) {
             if ($quanumOrder->origin === 'careevolution') {
+                $order = new Order();
+                $this->orderService->loadSamplesSchema($order);
                 $orders[] = $this->orderService->loadFromJsonObject($quanumOrder);
             }
         }
