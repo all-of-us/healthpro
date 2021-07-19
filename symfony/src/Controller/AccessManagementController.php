@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Service\GoogleGroupsService;
 use App\Service\SiteService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -33,10 +34,13 @@ class AccessManagementController extends AbstractController
      */
     public function userGroup($groupId, GoogleGroupsService $googleGroupsService)
     {
-        $groupEmail = $this->getUser()->getEmailFromGroupId($groupId);
-        $members = $googleGroupsService->getMembers($groupEmail);
+        $group = $this->getUser()->getSiteFromId($groupId);
+        if (empty($group)) {
+            throw $this->createNotFoundException();
+        }
+        $members = $googleGroupsService->getMembers($group->email);
         return $this->render('accessmanagement/group-members.html.twig', [
-            'groupEmail' => $groupEmail,
+            'group' => $group,
             'members' => $members
         ]);
     }

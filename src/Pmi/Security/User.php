@@ -311,15 +311,15 @@ class User implements UserInterface
         }
     }
 
-    public function getEmailFromGroupId($siteId)
+    public function getSiteFromId($siteId)
     {
-        $siteEmail = null;
+        $site = null;
         foreach ($this->sites as $s) {
             if ($s->id === $siteId) {
-                $siteEmail = $s->email;
+                $site = $s;
                 break;
             }
         }
-        return $siteEmail;
+        return $site;
     }
 }
