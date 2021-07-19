@@ -246,12 +246,15 @@ class User implements UserInterface
         if ($this->scrippsAwardee) {
             $roles[] = 'ROLE_AWARDEE_SCRIPPS';
         }
+        if (!empty($this->sessionInfo['managegroups'])) {
+            $roles[] = 'ROLE_MANAGE_USERS';
+        }
         return $roles;
     }
 
     public function getRoles()
     {
-        return UserService::getRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee'], $this->sessionInfo['managegroups']);
+        return UserService::getRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee']);
     }
 
     public function getPassword()
