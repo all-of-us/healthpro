@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
+use App\Form\GroupMemberType;
 use App\Service\GoogleGroupsService;
-use App\Service\SiteService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -42,6 +43,36 @@ class AccessManagementController extends AbstractController
         return $this->render('accessmanagement/group-members.html.twig', [
             'group' => $group,
             'members' => $members
+        ]);
+    }
+
+    /**
+     * @Route("/user/group/{groupId}/member", name="access_manage_user_group_member")
+     */
+    public function member($groupId, Request $request, GoogleGroupsService $googleGroupsService)
+    {
+        $group = $this->getUser()->getSiteFromId($groupId);
+        if (empty($group)) {
+            throw $this->createNotFoundException();
+        }
+        $groupMemberForm = $this->createForm(GroupMemberType::class);
+        $groupMemberForm->handleRequest($request);
+        if ($groupMemberForm->isSubmitted()) {
+            if ($groupMemberForm->isValid()) {
+                $email = $groupMemberForm->get('email')->getData();
+                $result = $googleGroupsService->addMember($group->email, $email);
+                if ($result['status'] === 'success') {
+                    $this->addFlash('success', $result['message']);
+                    return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
+                }
+                $this->addFlash('error', $result['message']);
+            } else {
+                $groupMemberForm->addError(new FormError('Please correct the errors below.'));
+            }
+        }
+        return $this->render('accessmanagement/add-member.html.twig', [
+            'group' => $group,
+            'groupMemberForm' => $groupMemberForm->createView()
         ]);
     }
 }

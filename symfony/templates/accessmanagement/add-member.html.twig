@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('symfony_home') }}">Home</a></li>
+        <li><a href="{{ path('access_manage_dashboard') }}">Managed Access Dashboard</a></li>
+        <li><a href="{{ path('access_manage_user_groups') }}">My Groups</a></li>
+        <li><a href="{{ path('access_manage_user_group', { groupId: group.id }) }}">{{ group.name }}</a></li>
+        <li class="active">Add Member</li>
+    </ol>
+    <div class="page-header">
+        <h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
+    </div>
+    <h3>{{ group.name }}</h3>
+    <br/>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="page-header">
+                <h4><i class="fa fa-user" aria-hidden="true"></i> Add Member</h4>
+            </div>
+            {{ form_start(groupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
+            {{ form_widget(groupMemberForm) }}
+            <p>
+                <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </p>
+            {{ form_end(groupMemberForm) }}
+        </div>
+    </div>
+{% endblock %}
