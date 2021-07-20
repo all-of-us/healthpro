@@ -14,6 +14,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AccessManagementController extends AbstractController
 {
+    const MEMBER_DOMAIN = '@pmi-ops.org';
+
     /**
      * @Route("/dashboard", name="access_manage_dashboard")
      */
@@ -59,7 +61,7 @@ class AccessManagementController extends AbstractController
         $groupMemberForm->handleRequest($request);
         if ($groupMemberForm->isSubmitted()) {
             if ($groupMemberForm->isValid()) {
-                $email = $groupMemberForm->get('email')->getData();
+                $email = $groupMemberForm->get('email')->getData() . self::MEMBER_DOMAIN;
                 $result = $googleGroupsService->addMember($group->email, $email);
                 if ($result['status'] === 'success') {
                     $this->addFlash('success', $result['message']);

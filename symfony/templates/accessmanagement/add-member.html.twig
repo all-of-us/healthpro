@@ -18,7 +18,13 @@
                 <h4><i class="fa fa-user" aria-hidden="true"></i> Add Member</h4>
             </div>
             {{ form_start(groupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
-            {{ form_widget(groupMemberForm) }}
+            {{ form_label(groupMemberForm.email) }}
+            <div class="input-group">
+                {{ form_widget(groupMemberForm.email) }}
+                <div class="input-group-addon">@pmi-ops.org</div>
+            </div>
+            <br/>
+            {{ form_rest(groupMemberForm) }}
             <p>
                 <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
                 <button type="submit" class="btn btn-primary">Submit</button>
