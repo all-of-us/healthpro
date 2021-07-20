@@ -22,7 +22,6 @@ $app
     ->setup()
     ->mount('/', new Controller\DefaultController())
     ->mount('/', new Controller\SymfonyMigrationController())
-    ->mount('/_dev', new Controller\DevController())
 ;
 
 $app->run();

@@ -265,27 +265,6 @@ class RdrParticipants
         }
     }
 
-    public function createParticipant($participant)
-    {
-        if (isset($participant['date_of_birth'])) {
-            $dt = new \DateTime($participant['date_of_birth']);
-            $participant['date_of_birth'] = $dt->format('Y-m-d');
-        }
-        try {
-            $response = $this->getClient()->request('POST', 'Participant', [
-                'json' => $participant
-            ]);
-            $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && (isset($result->drc_internal_id) || isset($result->participant_id))) {
-                return isset($result->drc_internal_id) ? $result->drc_internal_id : $result->participant_id;
-            }
-        } catch (\Exception $e) {
-            $this->rdrHelper->logException($e);
-            return false;
-        }
-        return false;
-    }
-
     public function getEvaluation($participantId, $evaluationId)
     {
         try {
@@ -437,23 +416,6 @@ class RdrParticipants
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->status) && $result->status === self::ORDER_EDIT_STATUS) {
                 return true;
-            }
-        } catch (\Exception $e) {
-            $this->rdrHelper->logException($e);
-            return false;
-        }
-        return false;
-    }
-
-    public function createMockBiobankSamples($participantId)
-    {
-        try {
-            $response = $this->getClient()->request('POST', "DataGen", [
-                'json' => ['create_biobank_samples' => $participantId]
-            ]);
-            $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->num_samples)) {
-                return $result->num_samples;
             }
         } catch (\Exception $e) {
             $this->rdrHelper->logException($e);
