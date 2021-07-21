@@ -11,26 +11,24 @@
     </div>
     <h3>{{ group.name }}</h3>
     <br/>
-    {% if app.session.get('managegroups') %}
-        <table class="table table-striped table-hover table-bordered">
-            <thead>
-            <tr>
-                <th>Pmi-Ops Credentials</th>
-                <th>Role</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for member in members %}
-                {% if member.email is not empty %}
-                    <tr>
-                        <td>{{ member.email }}</td>
-                        <td>{{ member.role }}</td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>Pmi-Ops Credentials</th>
+            <th>Role</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for member in members %}
+            {% if member.email is not empty %}
+                <tr>
+                    <td>{{ member.email }}</td>
+                    <td>{{ member.role }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
 {% block pagejs %}
