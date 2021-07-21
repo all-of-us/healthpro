@@ -9,27 +9,24 @@
         <h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
     </div>
     <br/>
-
-    {% if app.session.get('managegroups') %}
-        <table class="table table-striped table-hover table-bordered">
-            <thead>
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>Groups</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for group in app.session.get('managegroups') %}
+            {% set groupInfo = app.user.site(group) %}
             <tr>
-                <th>Groups</th>
+                <td>
+                    <h4>{{ groupInfo.name }}</h4>
+                    <a href="{{ path('access_manage_user_group', { groupId: groupInfo.id }) }}">{{ group }}</a>
+                </td>
             </tr>
-            </thead>
-            <tbody>
-            {% for group in app.session.get('managegroups') %}
-                {% set groupInfo = app.user.site(group) %}
-                <tr>
-                    <td>
-                        <h4>{{ groupInfo.name }}</h4>
-                        <a href="{{ path('access_manage_user_group', { groupId: groupInfo.id }) }}">{{ group }}</a>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
 {% block pagejs %}

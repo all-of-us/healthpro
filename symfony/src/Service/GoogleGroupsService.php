@@ -134,11 +134,10 @@ class GoogleGroupsService
             $result = $this->callApi('members', 'listMembers', [$groupEmail]);
             if ($result) {
                 return $result->getMembers();
-            } else {
-                return null;
             }
+            return [];
         } catch (GoogleException $e) {
-            return null;
+            return [];
         }
     }
 
