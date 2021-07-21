@@ -26,7 +26,7 @@
                 <tr>
                     <td>{{ member.email }}</td>
                     <td>{{ member.role }}</td>
-                    <td><a href="{{ path('access_manage_user_group_remove_member', { groupId: group.id, memberId: member.id }) }}" class="btn btn-danger">Remove</a></td>
+                    <td><a href="{{ path('access_manage_user_group_remove_member', { groupId: group.id, memberId: member.id }) }}" class="btn btn-xs btn-danger">Remove</a></td>
                 </tr>
             {% endif %}
         {% endfor %}
