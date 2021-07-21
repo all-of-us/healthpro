@@ -41,7 +41,12 @@ class SiteService
 
     public function isDvType(): bool
     {
-        return $this->session->get('siteType') === 'dv' ? true : false;
+        $site = $this->em->getRepository(Site::class)->findOneBy([
+            'deleted' => 0,
+            'googleGroup' => $this->getSiteId(),
+            'type' => 'DV'
+        ]);
+        return !empty($site);
     }
 
     public function getSiteId()
