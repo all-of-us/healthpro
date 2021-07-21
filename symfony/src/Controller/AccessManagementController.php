@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\GroupMemberType;
+use App\Form\RemoveGroupMemberType;
 use App\Service\GoogleGroupsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -75,6 +76,46 @@ class AccessManagementController extends AbstractController
         return $this->render('accessmanagement/add-member.html.twig', [
             'group' => $group,
             'groupMemberForm' => $groupMemberForm->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/user/group/{groupId}/member/{memberId}/remove", name="access_manage_user_group_remove_member")
+     */
+    public function removeMember($groupId, $memberId, Request $request, GoogleGroupsService $googleGroupsService)
+    {
+        $group = $this->getUser()->getSiteFromId($groupId);
+        if (empty($group)) {
+            throw $this->createNotFoundException();
+        }
+        $member = $googleGroupsService->getMemberById($group->email, $memberId);
+        if (empty($member)) {
+            throw $this->createNotFoundException();
+        }
+        $removeGoupMemberForm = $this->createForm(RemoveGroupMemberType::class);
+        $removeGoupMemberForm->handleRequest($request);
+        if ($removeGoupMemberForm->isSubmitted()) {
+            if ($removeGoupMemberForm->isValid()) {
+                $confirm = $removeGoupMemberForm->get('confirm')->getData();
+                if ($confirm === 'yes') {
+                    $result = $googleGroupsService->removeMember($group->email, $member->email);
+                    if ($result['status'] === 'success') {
+                        $this->addFlash('success', $result['message']);
+                        return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
+                    }
+                    $this->addFlash('error', $result['message']);
+                } else {
+                    $this->addFlash('notice', 'Member not deleted.');
+                    return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
+                }
+            } else {
+                $removeGoupMemberForm->addError(new FormError('Please correct the errors below.'));
+            }
+        }
+        return $this->render('accessmanagement/remove-member.html.twig', [
+            'group' => $group,
+            'member' => $member,
+            'removeGoupMemberForm' => $removeGoupMemberForm->createView()
         ]);
     }
 }

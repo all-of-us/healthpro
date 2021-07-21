@@ -17,6 +17,7 @@
         <tr>
             <th>Pmi-Ops Credentials</th>
             <th>Role</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -25,6 +26,7 @@
                 <tr>
                     <td>{{ member.email }}</td>
                     <td>{{ member.role }}</td>
+                    <td><a href="{{ path('access_manage_user_group_remove_member', { groupId: group.id, memberId: member.id }) }}" class="btn btn-danger">Remove</a></td>
                 </tr>
             {% endif %}
         {% endfor %}
@@ -38,7 +40,10 @@
         $(document).ready(function () {
             $('table').DataTable({
                 order: [[0, 'asc']],
-                pageLength: 25
+                pageLength: 25,
+                columnDefs: [
+                    {targets: 2, orderable: false}
+                ]
             });
         });
     </script>

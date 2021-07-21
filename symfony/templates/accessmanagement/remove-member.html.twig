@@ -5,7 +5,7 @@
         <li><a href="{{ path('access_manage_dashboard') }}">Managed Access Dashboard</a></li>
         <li><a href="{{ path('access_manage_user_groups') }}">My Groups</a></li>
         <li><a href="{{ path('access_manage_user_group', { groupId: group.id }) }}">{{ group.name }}</a></li>
-        <li class="active">Add Member</li>
+        <li class="active">Remove Member</li>
     </ol>
     <div class="page-header">
         <h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
@@ -15,21 +15,19 @@
     <div class="row">
         <div class="col-sm-6">
             <div class="page-header">
-                <h4 class="text-success"><i class="fa fa-user" aria-hidden="true"></i> Add Member</h4>
+                <h4 class="text-danger"><i class="fa fa-user" aria-hidden="true"></i> Remove Member</h4>
             </div>
-            {{ form_start(groupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
-            {{ form_label(groupMemberForm.email) }}
-            <div class="input-group">
-                {{ form_widget(groupMemberForm.email) }}
-                <div class="input-group-addon">@pmi-ops.org</div>
+            <div>
+                <p><label>Email:</label> {{ member.email }}</p>
+                <p><label>Role:</label> {{ member.role }}</p>
             </div>
-            <br/>
-            {{ form_rest(groupMemberForm) }}
+            {{ form_start(removeGoupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
+            {{ form_widget(removeGoupMemberForm) }}
             <p>
                 <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </p>
-            {{ form_end(groupMemberForm) }}
+            {{ form_end(removeGoupMemberForm) }}
         </div>
     </div>
 {% endblock %}

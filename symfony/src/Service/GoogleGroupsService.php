@@ -141,6 +141,15 @@ class GoogleGroupsService
         }
     }
 
+    public function getMemberById(string $groupEmail, string $memeberId)
+    {
+        try {
+            return $this->callApi('members', 'get', [$groupEmail, $memeberId]);
+        } catch (GoogleException $e) {
+            return null;
+        }
+    }
+
     public function addMember(string $groupEmail, string $email)
     {
         try {
@@ -152,6 +161,31 @@ class GoogleGroupsService
                 return [
                     'status' => 'success',
                     'message' => 'Member added.'
+                ];
+            }
+            return [
+                'status' => 'error',
+                'message' => 'Error occurred. Please try again.'
+            ];
+        } catch (GoogleException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getErrors()[0]['message']
+            ];
+        }
+    }
+
+    public function removeMember(string $groupEmail, string $email)
+    {
+        try {
+            $member = new GoogleMember();
+            $member->setEmail($email);
+            $member->setRole('MEMBER');
+            $result = $this->callApi('members', 'delete', [$groupEmail, $email]);
+            if ($result && $result->getStatusCode() === 204) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Member deleted.'
                 ];
             }
             return [
