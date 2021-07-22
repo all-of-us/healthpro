@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Form\GroupMemberType;
 use App\Form\RemoveGroupMemberType;
 use App\Service\GoogleGroupsService;
+use App\Service\LoggerService;
+use Pmi\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +18,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class AccessManagementController extends AbstractController
 {
     const MEMBER_DOMAIN = '@pmi-ops.org';
+
+    private $googleGroupsService;
+    private $loggerService;
+
+    public function __construct(GoogleGroupsService $googleGroupsService, LoggerService $loggerService)
+    {
+        $this->googleGroupsService = $googleGroupsService;
+        $this->loggerService = $loggerService;
+    }
 
     /**
      * @Route("/dashboard", name="access_manage_dashboard")
@@ -36,13 +47,13 @@ class AccessManagementController extends AbstractController
     /**
      * @Route("/user/group/{groupId}", name="access_manage_user_group")
      */
-    public function userGroup($groupId, GoogleGroupsService $googleGroupsService)
+    public function userGroup($groupId)
     {
         $group = $this->getUser()->getSiteFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
-        $members = $googleGroupsService->getMembers($group->email);
+        $members = $this->googleGroupsService->getMembers($group->email);
         return $this->render('accessmanagement/group-members.html.twig', [
             'group' => $group,
             'members' => $members
@@ -52,7 +63,7 @@ class AccessManagementController extends AbstractController
     /**
      * @Route("/user/group/{groupId}/member", name="access_manage_user_group_member")
      */
-    public function member($groupId, Request $request, GoogleGroupsService $googleGroupsService)
+    public function member($groupId, Request $request)
     {
         $group = $this->getUser()->getSiteFromId($groupId);
         if (empty($group)) {
@@ -63,12 +74,20 @@ class AccessManagementController extends AbstractController
         if ($groupMemberForm->isSubmitted()) {
             if ($groupMemberForm->isValid()) {
                 $email = $groupMemberForm->get('email')->getData() . self::MEMBER_DOMAIN;
-                $result = $googleGroupsService->addMember($group->email, $email);
+                $result = $this->googleGroupsService->addMember($group->email, $email);
                 if ($result['status'] === 'success') {
                     $this->addFlash('success', $result['message']);
+                    $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
+                        'member' => $email,
+                        'result' => 'success'
+                    ]);
                     return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
                 }
                 $this->addFlash('error', $result['message']);
+                $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
+                    'member' => $email,
+                    'result' => 'fail'
+                ]);
             } else {
                 $groupMemberForm->addError(new FormError('Please correct the errors below.'));
             }
@@ -82,13 +101,13 @@ class AccessManagementController extends AbstractController
     /**
      * @Route("/user/group/{groupId}/member/{memberId}/remove", name="access_manage_user_group_remove_member")
      */
-    public function removeMember($groupId, $memberId, Request $request, GoogleGroupsService $googleGroupsService)
+    public function removeMember($groupId, $memberId, Request $request)
     {
         $group = $this->getUser()->getSiteFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
-        $member = $googleGroupsService->getMemberById($group->email, $memberId);
+        $member = $this->googleGroupsService->getMemberById($group->email, $memberId);
         if (empty($member)) {
             throw $this->createNotFoundException();
         }
@@ -98,12 +117,20 @@ class AccessManagementController extends AbstractController
             if ($removeGoupMemberForm->isValid()) {
                 $confirm = $removeGoupMemberForm->get('confirm')->getData();
                 if ($confirm === 'yes') {
-                    $result = $googleGroupsService->removeMember($group->email, $member->email);
+                    $result = $this->googleGroupsService->removeMember($group->email, $member->email);
                     if ($result['status'] === 'success') {
                         $this->addFlash('success', $result['message']);
+                        $this->loggerService->log(Log::GROUP_MEMBER_REMOVE, [
+                            'member' => $member->email,
+                            'result' => 'success'
+                        ]);
                         return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
                     }
                     $this->addFlash('error', $result['message']);
+                    $this->loggerService->log(Log::GROUP_MEMBER_REMOVE, [
+                        'member' => $member->email,
+                        'result' => 'fail'
+                    ]);
                 } else {
                     $this->addFlash('notice', 'Member not deleted.');
                     return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
