@@ -22,7 +22,11 @@
                 <p><label>Role:</label> {{ member.role }}</p>
             </div>
             {{ form_start(removeGoupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
-            {{ form_widget(removeGoupMemberForm) }}
+            {{ form_label(removeGoupMemberForm.confirm) }}
+            {{ form_widget(removeGoupMemberForm.confirm) }}
+            <div class="reason-fields" style="display: none">
+                {{ form_rest(removeGoupMemberForm) }}
+            </div>
             <p>
                 <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -30,4 +34,20 @@
             {{ form_end(removeGoupMemberForm) }}
         </div>
     </div>
+{% endblock %}
+
+{% block pagejs %}
+    <script>
+        $(document).ready(function () {
+            var confirmRemove = 'input[name="remove_group_member[confirm]"]';
+            $(confirmRemove).on('change', function () {
+                if ($(confirmRemove + ':checked').val() === 'yes') {
+                    $('.reason-fields').show();
+                } else {
+                    $('.reason-fields').hide();
+                }
+            });
+            $('#remove_group_member_memberLastDay').pmiDateTimePicker({format: 'MM/DD/YYYY', maxDate: Date(), useCurrent: false});
+        });
+    </script>
 {% endblock %}
