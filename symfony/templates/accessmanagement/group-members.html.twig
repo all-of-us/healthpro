@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('symfony_home') }}">Home</a></li>
+        <li><a href="{{ path('access_manage_dashboard') }}">Managed Access Dashboard</a></li>
+        <li><a href="{{ path('access_manage_user_groups') }}">My Groups</a></li>
+        <li class="active">{{ group.name }}</li>
+    </ol>
+    <div class="page-header">
+        <h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
+    </div>
+    <h3>{{ group.name }}</h3>
+    <br/>
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>Pmi-Ops Credentials</th>
+            <th>Role</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for member in members %}
+            {% if member.email is not empty %}
+                <tr>
+                    <td>{{ member.email }}</td>
+                    <td>{{ member.role }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block pagejs %}
+    <script>
+        $(document).ready(function () {
+            $('table').DataTable({
+                order: [[0, 'asc']],
+                pageLength: 25
+            });
+        });
+    </script>
+{% endblock %}

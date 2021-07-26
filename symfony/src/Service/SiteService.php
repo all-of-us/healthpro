@@ -243,7 +243,7 @@ class SiteService
 
     protected function setNewRoles($user)
     {
-        $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->session->get('site'), $this->session->get('awardee'), $this->session->get('managegroups'));
+        $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->session->get('site'), $this->session->get('awardee'));
         if ($user->getAllRoles() != $userRoles) {
             $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
             $this->tokenStorage->setToken($token);
