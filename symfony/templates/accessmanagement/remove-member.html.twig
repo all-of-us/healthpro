@@ -22,26 +22,21 @@
                 <p><label>Role:</label> {{ member.role }}</p>
             </div>
             {{ form_start(removeGoupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
-            <div class="form-group">
-                {{ form_label(removeGoupMemberForm.confirm) }}
-                {{ form_widget(removeGoupMemberForm.confirm) }}
+            {{ form_errors(removeGoupMemberForm) }}
+            {{ form_row(removeGoupMemberForm.confirm) }}
+            <div class="form-group member-reason" style="display: none">
+                {{ form_label(removeGoupMemberForm.reason) }}
+                {% for reason in removeGoupMemberForm.reason %}
+                    {{ form_widget(reason) }}
+                    {% if loop.index == 1 %}
+                        <i class="text-info small">Note: Member will be removed from all associated HealthPro groups.</i>
+                    {% else %}
+                        <i class="text-info small">Note: Member will be removed from this group, but maintain access to HealthPro through other associated groups.</i>
+                    {% endif %}
+                {% endfor %}
             </div>
-            <div class="reason-fields" style="display: none">
-                <div class="form-group">
-                    {{ form_label(removeGoupMemberForm.memberLastDay) }}
-                    {{ form_widget(removeGoupMemberForm.memberLastDay) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(removeGoupMemberForm.reason) }}
-                    {% for reason in removeGoupMemberForm.reason %}
-                        {{ form_widget(reason) }}
-                        {% if loop.index == 1 %}
-                            <i class="text-info small">Note: Member will be removed from all associated HealthPro groups.</i>
-                        {% else %}
-                            <i class="text-info small">Note: Member will be removed from this group, but maintain access to HealthPro through other associated groups.</i>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+            <div class="member-last-date" style="display: none">
+                {{ form_row(removeGoupMemberForm.memberLastDay) }}
             </div>
             <p>
                 <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
@@ -58,12 +53,21 @@
             var confirmRemove = 'input[name="remove_group_member[confirm]"]';
             $(confirmRemove).on('change', function () {
                 if ($(confirmRemove + ':checked').val() === 'yes') {
-                    $('.reason-fields').show();
+                    $('.member-reason').show();
                 } else {
-                    $('.reason-fields').hide();
+                    $('.member-reason').hide();
+                    $('.member-last-date').hide();
                 }
             });
             $('#remove_group_member_memberLastDay').pmiDateTimePicker({format: 'MM/DD/YYYY', maxDate: Date(), useCurrent: false});
+            var removeReason = 'input[name="remove_group_member[reason]"]';
+            $(removeReason).on('change', function () {
+                if ($(removeReason + ':checked').val() === 'no') {
+                    $('.member-last-date').show();
+                } else {
+                    $('.member-last-date').hide();
+                }
+            });
         });
     </script>
 {% endblock %}
