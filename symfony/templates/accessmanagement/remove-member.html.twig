@@ -22,10 +22,26 @@
                 <p><label>Role:</label> {{ member.role }}</p>
             </div>
             {{ form_start(removeGoupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
-            {{ form_label(removeGoupMemberForm.confirm) }}
-            {{ form_widget(removeGoupMemberForm.confirm) }}
+            <div class="form-group">
+                {{ form_label(removeGoupMemberForm.confirm) }}
+                {{ form_widget(removeGoupMemberForm.confirm) }}
+            </div>
             <div class="reason-fields" style="display: none">
-                {{ form_rest(removeGoupMemberForm) }}
+                <div class="form-group">
+                    {{ form_label(removeGoupMemberForm.memberLastDay) }}
+                    {{ form_widget(removeGoupMemberForm.memberLastDay) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(removeGoupMemberForm.reason) }}
+                    {% for reason in removeGoupMemberForm.reason %}
+                        {{ form_widget(reason) }}
+                        {% if loop.index == 1 %}
+                            <i class="text-info small">Note: Member will be removed from all associated HealthPro groups.</i>
+                        {% else %}
+                            <i class="text-info small">Note: Member will be removed from this group, but maintain access to HealthPro through other associated groups.</i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
             <p>
                 <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
