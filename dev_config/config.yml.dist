@@ -134,3 +134,6 @@ ehr_protocol_banner_message:
 
 # When set only these sites will be able to access managed access dashbaord
 # feature.managegrouppilotsites:
+
+# DRC support email address
+# feature.drcsupportemail:

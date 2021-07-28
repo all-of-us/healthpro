@@ -31,16 +31,17 @@ class RemoveGroupMemberType extends AbstractType
                 'required' => false,
                 'html5' => false,
                 'format' => 'MM/dd/yyyy',
+                'attr' => ['autocomplete' => 'off'],
                 'constraints' => [
                     new Constraints\DateTime(),
                     new Constraints\LessThanOrEqual([
                         'value' => new \DateTime('today'),
                         'message' => 'Date cannot be in the future'
                     ]),
-                    new Constraints\Callback(function($memberLastDate, $context) {
+                    new Constraints\Callback(function ($memberLastDate, $context) {
                         $confirmRemove = $context->getObject()->getParent()->get('confirm')->getData();
                         $removeReason = $context->getObject()->getParent()->get('reason')->getData();
-                        if ($confirmRemove === 'yes' && $removeReason === 'no' && empty($memberLastDate) ) {
+                        if ($confirmRemove === 'yes' && $removeReason === 'no' && empty($memberLastDate)) {
                             $context->buildViolation('Please enter member last date')->addViolation();
                         }
                     })
@@ -57,9 +58,9 @@ class RemoveGroupMemberType extends AbstractType
                     'Staff member still supports the All of Us program but not this specific site' => 'yes'
                 ],
                 'constraints' => [
-                    new Constraints\Callback(function($removeReason, $context) {
+                    new Constraints\Callback(function ($removeReason, $context) {
                         $confirmRemove = $context->getObject()->getParent()->get('confirm')->getData();
-                        if ($confirmRemove === 'yes' && empty($removeReason) ) {
+                        if ($confirmRemove === 'yes' && empty($removeReason)) {
                             $context->buildViolation('Please select reason')->addViolation();
                         }
                     })
