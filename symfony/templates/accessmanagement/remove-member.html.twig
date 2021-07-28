@@ -17,12 +17,12 @@
             <div class="page-header">
                 <h4 class="text-danger"><i class="fa fa-user" aria-hidden="true"></i> Remove Member</h4>
             </div>
+            {{ form_start(removeGoupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
+            {{ form_errors(removeGoupMemberForm) }}
             <div>
                 <p><label>Email:</label> {{ member.email }}</p>
                 <p><label>Role:</label> {{ member.role }}</p>
             </div>
-            {{ form_start(removeGoupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
-            {{ form_errors(removeGoupMemberForm) }}
             {{ form_row(removeGoupMemberForm.confirm) }}
             <div class="form-group member-reason" style="display: none">
                 {{ form_label(removeGoupMemberForm.reason) }}
@@ -34,9 +34,12 @@
                         <i class="text-info small">Note: Member will be removed from this group, but maintain access to HealthPro through other associated groups.</i>
                     {% endif %}
                 {% endfor %}
+                {{ form_errors(removeGoupMemberForm.reason) }}
             </div>
-            <div class="member-last-date" style="display: none">
-                {{ form_row(removeGoupMemberForm.memberLastDay) }}
+            <div class="form-group member-last-date" style="display: none">
+                {{ form_label(removeGoupMemberForm.memberLastDay) }}
+                {{ form_widget(removeGoupMemberForm.memberLastDay) }}
+                {{ form_errors(removeGoupMemberForm.memberLastDay) }}
             </div>
             <p>
                 <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
@@ -50,24 +53,36 @@
 {% block pagejs %}
     <script>
         $(document).ready(function () {
-            var confirmRemove = 'input[name="remove_group_member[confirm]"]';
-            $(confirmRemove).on('change', function () {
+            var showHideReasonField = function (confirmRemove) {
                 if ($(confirmRemove + ':checked').val() === 'yes') {
                     $('.member-reason').show();
                 } else {
                     $('.member-reason').hide();
                     $('.member-last-date').hide();
                 }
-            });
-            $('#remove_group_member_memberLastDay').pmiDateTimePicker({format: 'MM/DD/YYYY', maxDate: Date(), useCurrent: false});
-            var removeReason = 'input[name="remove_group_member[reason]"]';
-            $(removeReason).on('change', function () {
+            };
+
+            var showHideMemberLastDayField = function (removeReason) {
                 if ($(removeReason + ':checked').val() === 'no') {
                     $('.member-last-date').show();
                 } else {
                     $('.member-last-date').hide();
                 }
+            };
+
+            var confirmRemove = 'input[name="remove_group_member[confirm]"]';
+            showHideReasonField(confirmRemove);
+            $(confirmRemove).on('change', function () {
+                showHideReasonField(confirmRemove);
             });
+
+            var removeReason = 'input[name="remove_group_member[reason]"]';
+            showHideMemberLastDayField(removeReason);
+            $(removeReason).on('change', function () {
+                showHideMemberLastDayField(removeReason);
+            });
+
+            $('#remove_group_member_memberLastDay').pmiDateTimePicker({format: 'MM/DD/YYYY', maxDate: Date(), useCurrent: false});
         });
     </script>
 {% endblock %}
