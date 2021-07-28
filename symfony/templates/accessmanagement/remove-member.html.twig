@@ -24,7 +24,7 @@
                 <p><label>Role:</label> {{ member.role }}</p>
             </div>
             {{ form_row(removeGoupMemberForm.confirm) }}
-            <div class="form-group member-reason" style="display: none">
+            <div class="form-group member-reason {% if removeGoupMemberForm.reason.vars.errors|length > 0 %} has-error {% endif %}" style="display: none">
                 {{ form_label(removeGoupMemberForm.reason) }}
                 {% for reason in removeGoupMemberForm.reason %}
                     {{ form_widget(reason) }}
@@ -36,10 +36,8 @@
                 {% endfor %}
                 {{ form_errors(removeGoupMemberForm.reason) }}
             </div>
-            <div class="form-group member-last-date" style="display: none">
-                {{ form_label(removeGoupMemberForm.memberLastDay) }}
-                {{ form_widget(removeGoupMemberForm.memberLastDay) }}
-                {{ form_errors(removeGoupMemberForm.memberLastDay) }}
+            <div class="member-last-date" style="display: none">
+                {{ form_row(removeGoupMemberForm.memberLastDay) }}
             </div>
             <p>
                 <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
