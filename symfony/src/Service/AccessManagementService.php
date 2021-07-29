@@ -37,12 +37,13 @@ class AccessManagementService
                 ->render('group-member-removal-email', [
                     'group' => $group,
                     'member' => $member,
-                    'memberLastDay' => $memberLastDay->format('Y-m-d'),
+                    'memberLastDay' => $memberLastDay->format('m/d/Y'),
                     'loggedUser' => $this->userService->getUser()->getEmail(),
-                    'currentTime' => $currentTime->format('Y-m-d H:i:s')
+                    'currentTime' => $currentTime->format('Y-m-d H:i:s e')
                 ])
                 ->send();
             $this->loggerService->log(Log::GROUP_MEMBER_REMOVE_NOTIFY, [
+                'member' => $member,
                 'memberLastDay' => $memberLastDay
             ]);
         }
