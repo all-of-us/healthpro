@@ -41,7 +41,7 @@
             </div>
             <p>
                 <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary" style="display:none">Submit</button>
             </p>
             {{ form_end(removeGoupMemberForm) }}
         </div>
@@ -54,9 +54,11 @@
             var showHideReasonField = function (confirmRemove) {
                 if ($(confirmRemove + ':checked').val() === 'yes') {
                     $('.member-reason').show();
+                    $('button[type=submit]').show();
                 } else {
                     $('.member-reason').hide();
                     $('.member-last-date').hide();
+                    $('button[type=submit]').hide();
                 }
             };
 
