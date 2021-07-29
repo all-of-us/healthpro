@@ -133,7 +133,7 @@ ehr_protocol_banner_message:
 # feature.blooddonorpm: false
 
 # When set only these sites will be able to access managed access dashbaord
-# feature.managegrouppilotsites:
+# feature.managegrouppilotsites: hpo-site-test@pmi-ops.org, hpo-site-test2@pmi-ops.org
 
 # DRC support email address
 # feature.drcsupportemail:
