@@ -109,7 +109,7 @@ class AccessManagementController extends AbstractController
             throw $this->createNotFoundException();
         }
         $member = $this->googleGroupsService->getMemberById($group->email, $memberId);
-        if (empty($member)) {
+        if (empty($member) || $member->getRole() !== 'MEMBER') {
             throw $this->createNotFoundException();
         }
         $removeGoupMemberForm = $this->createForm(RemoveGroupMemberType::class);

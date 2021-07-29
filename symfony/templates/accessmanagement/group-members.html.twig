@@ -26,7 +26,13 @@
                 <tr>
                     <td>{{ member.email }}</td>
                     <td>{{ member.role }}</td>
-                    <td><a href="{{ path('access_manage_user_group_remove_member', { groupId: group.id, memberId: member.id }) }}" class="btn btn-xs btn-danger">Remove</a></td>
+                    <td>
+                        {% if member.role == 'MEMBER' %}
+                            <a href="{{ path('access_manage_user_group_remove_member', { groupId: group.id, memberId: member.id }) }}" class="btn btn-xs btn-danger">Remove</a>
+                        {% else %}
+                            <button class="btn btn-xs btn-default" disabled>Remove</button>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endif %}
         {% endfor %}
