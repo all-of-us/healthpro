@@ -17,7 +17,7 @@
             <div class="page-header">
                 <h4 class="text-danger"><i class="fa fa-user" aria-hidden="true"></i> Remove Member</h4>
             </div>
-            {{ form_start(removeGoupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
+            {{ form_start(removeGoupMemberForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
             {{ form_errors(removeGoupMemberForm) }}
             <div>
                 <p><label>Email:</label> {{ member.email }}</p>
