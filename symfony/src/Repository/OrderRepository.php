@@ -260,4 +260,15 @@ class OrderRepository extends ServiceEntityRepository
             ->getResult()
             ;
     }
+
+    public function getBackfillOrders($limit)
+    {
+        return $this->createQueryBuilder('o')
+            ->where("o.createdTs > DATE_ADD(o.processedTs, 1, 'hour')")
+            ->orderBy('o.createdTs - o.processedTs', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

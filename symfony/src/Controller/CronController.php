@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Order;
 use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
@@ -11,6 +12,7 @@ use App\Service\PatientStatusService;
 use App\Service\SessionService;
 use App\Service\SiteSyncService;
 use App\Service\WithdrawalNotificationService;
+use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Cache\DatastoreAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -144,6 +146,30 @@ class CronController extends AbstractController
     public function resendMeasurementsToRdrAction(MeasurementQueueService $measurementQueueService)
     {
         $measurementQueueService->resendMeasurementsToRdr();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/backfill-order-processed-time", name="backfill_order_processed_time")
+     */
+    public function backfillOrderProcessedTimeAction(EntityManagerInterface $em, ParameterBagInterface $params)
+    {
+        $limit = $params->has('feature.backfillorderlimit') ? $params->get('feature.backfillorderlimit') : 500;
+        $orders = $em->getRepository(Order::class)->getBackfillOrders($limit);
+        $batchSize = 50;
+        foreach ($orders as $key => $order) {
+            $processedSamplesTs = json_decode($order->getProcessedSamplesTs(), true);
+            if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
+                $processedTs = new \DateTime();
+                $processedTs->setTimestamp(max($processedSamplesTs));
+                $order->setProcessedTs($processedTs);
+            }
+            $em->persist($order);
+            if (($key % $batchSize) === 0) {
+                $em->flush();
+            }
+        }
+        $em->flush();
         return $this->json(['success' => true]);
     }
 }
