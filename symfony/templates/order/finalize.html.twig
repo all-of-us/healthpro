@@ -203,7 +203,7 @@
             $('.finalize-form button[type="submit"]').on('click', function () {
                 //Display warning message
                 var message = 'Are you sure you want to finalize this order?';
-                $('input[name="form[finalized_samples][]"]').each(function () {
+                $('input[name="order[finalizedSamples][]"]').each(function () {
                     //Select samples that are unchecked and not disabled
                     if ($(this).prop('checked') === false && $(this).prop('disabled') === false) {
                         message = 'Warning: At least one sample that was collected and processed (as applicable) was not finalized. Are you sure you wish to continue?';
