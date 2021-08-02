@@ -175,9 +175,9 @@
             $('#fedex_barcode_first, #fedex_barcode_second').on('change keyup', function() {
                 var target;
                 if ($(this).attr('id') === 'fedex_barcode_second') {
-                    target = $('#form_fedex_tracking_second');
+                    target = $('#order_fedexTracking_second');
                 } else {
-                    target = $('#form_fedex_tracking_first');
+                    target = $('#order_fedexTracking_first');
                 }
                 target.attr('placeholder', '');
                 target.parent().removeClass('has-error').removeClass('has-success');
