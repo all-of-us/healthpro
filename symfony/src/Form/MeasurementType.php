@@ -97,7 +97,7 @@ class MeasurementType extends AbstractType
                 $constraints[] = new Constraints\Range([
                     'min' => new \DateTime('-6 months'),
                     'max' => new \DateTime('today'),
-                    'minMessage' => 'Date cannot greater than six months in the past',
+                    'minMessage' => 'Date cannot be greater than six months in the past',
                     'maxMessage' => 'Date cannot be in the future'
                 ]);
                 $dateOptions = [
