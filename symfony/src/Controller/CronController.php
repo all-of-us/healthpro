@@ -154,7 +154,7 @@ class CronController extends AbstractController
      */
     public function backfillOrderProcessedTimeAction(EntityManagerInterface $em, ParameterBagInterface $params)
     {
-        $limit = $params->has('feature.backfillorderlimit') ? $params->get('feature.backfillorderlimit') : 500;
+        $limit = $params->has('backfill_order_limit') ? $params->get('backfill_order_limit') : 500;
         $orders = $em->getRepository(Order::class)->getBackfillOrders($limit);
         $batchSize = 50;
         foreach ($orders as $key => $order) {
