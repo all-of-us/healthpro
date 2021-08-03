@@ -728,8 +728,12 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         this.finalized = obj.finalized;
         this.rendered = false;
         this.render();
+        var today = new Date();
+        var sixMonthsAgo = (new Date()).setMonth(today.getMonth() - 6);
         $('.ehr-date').pmiDateTimePicker({
             'format': 'MM/DD/YYYY',
+            'maxDate': today,
+            'minDate': sixMonthsAgo,
             'useCurrent': false
         });
     },
