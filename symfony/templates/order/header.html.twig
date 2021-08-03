@@ -82,11 +82,20 @@
             </div>
         {% endif %}
     {% endif %}
-    {% if activeStep == 'finalized' and showUnfinalizeMsg and finalizeForm.vars.valid %}
-        <div class="alert alert-danger well-sm">
-            <i class="fa fa-info-circle" aria-hidden="true"></i>
-            <strong>Order saved but not finalized. Please finalize the order.</strong>
-        </div>
+    {% if activeStep == 'finalized' %}
+        {% if siteInfo.siteId != order.site %}
+            <div class="alert alert-danger well-sm">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <strong>Warning! The site you are logged into {{ app.session.get('currentSiteDisplayName') }} does not match the site of order creation {{ siteInfo.siteDisplayName(order.site) }}. If you logged into a different site by error, please switch to the correct site.</strong>
+                <button class="btn btn-xs btn-info" data-toggle="modal" data-target="#siteModal">Switch Site</button>
+            </div>
+        {% endif %}
+        {% if showUnfinalizeMsg and finalizeForm.vars.valid %}
+            <div class="alert alert-danger well-sm">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <strong>Order saved but not finalized. Please finalize the order.</strong>
+            </div>
+        {% endif %}
     {% endif %}
 {% endif %}
 <ul class="nav nav-tabs">
