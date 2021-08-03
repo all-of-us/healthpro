@@ -94,9 +94,11 @@ class MeasurementType extends AbstractType
             } elseif ($type === 'date') {
                 unset($fieldOptions['scale']);
                 $class = Type\DateType::class;
-                $constraints[] = new Constraints\LessThanOrEqual([
-                    'value' => new \DateTime('today'),
-                    'message' => 'Date cannot be in the future'
+                $constraints[] = new Constraints\Range([
+                    'min' => new \DateTime('-6 months'),
+                    'max' => new \DateTime('today'),
+                    'minMessage' => 'Date cannot greater than six months in the past',
+                    'maxMessage' => 'Date cannot be in the future'
                 ]);
                 $dateOptions = [
                     'widget' => 'single_text',
