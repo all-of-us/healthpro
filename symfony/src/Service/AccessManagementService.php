@@ -43,6 +43,7 @@ class AccessManagementService
                 ])
                 ->send();
             $this->loggerService->log(Log::GROUP_MEMBER_REMOVE_NOTIFY, [
+                'group' => $group,
                 'member' => $member,
                 'memberLastDay' => $memberLastDay
             ]);
