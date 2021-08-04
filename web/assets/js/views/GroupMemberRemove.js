@@ -32,7 +32,7 @@ $(document).ready(function () {
 
     $('#remove_group_member_memberLastDay').pmiDateTimePicker({
         format: 'MM/DD/YYYY',
-        maxDate: Date(),
+        maxDate: new Date(),
         useCurrent: false
     });
 });
