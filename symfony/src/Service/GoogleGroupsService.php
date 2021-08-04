@@ -170,6 +170,7 @@ class GoogleGroupsService
         } catch (GoogleException $e) {
             return [
                 'status' => 'error',
+                'code' => $e->getCode(),
                 'message' => $e->getErrors()[0]['message']
             ];
         }
