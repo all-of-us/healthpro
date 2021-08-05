@@ -132,4 +132,7 @@ ehr_protocol_banner_message:
 # Enables physical measurements blood donor protocol modification workflow for diversion pouch sites
 # feature.blooddonorpm: false
 
+# Enables physical measurements blood donor protocol modification workflow for these sites
+# feature.blooddonorpmsites: testSiteId
+
 # backfill_order_limit: 1000

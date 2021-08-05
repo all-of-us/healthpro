@@ -96,7 +96,16 @@ class MeasurementService
 
     public function requireBloodDonorCheck()
     {
-        return $this->params->has('feature.blooddonorpm') && $this->params->get('feature.blooddonorpm') && $this->session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite();
+        return $this->params->has('feature.blooddonorpm') && $this->params->get('feature.blooddonorpm') && $this->session->get('siteType') === 'dv' && ($this->siteService->isDiversionPouchSite() || $this->isBloodDonorPmSite());
+    }
+
+    public function isBloodDonorPmSite(): bool
+    {
+        if ($this->params->has('feature.blooddonorpmsites') && $sites = $this->params->get('feature.blooddonorpmsites')) {
+            $sites = explode(',', $sites);
+            return in_array($this->siteService->getSiteId(), $sites);
+        }
+        return false;
     }
 
     public function getCurrentVersion($type)
