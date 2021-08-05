@@ -20,7 +20,7 @@
       {% for measurement in measurements %}
       <tr>
         <td>
-          <a href="{{ path('evaluation', { participantId: measurement.participant_id, evalId: measurement.id }) }}">{{ measurement.participant_id }}</a>
+          <a href="{{ path('measurement', { participantId: measurement.participant_id, measurementId: measurement.id }) }}">{{ measurement.participant_id }}</a>
         </td>
         <td>
           {{ today.displayDate(measurement, 'created_ts') }}
@@ -35,7 +35,7 @@
         </td>
         <td>
           {% if measurement.parent_id is empty %}
-          <a href="{{ path('evaluation_modify', { participantId: measurement.participant_id, evalId: measurement.id, type: 'cancel' }) }}" class="btn btn-xs btn-danger">Cancel Physical Measurements</a>
+          <a href="{{ path('measurement_modify', { participantId: measurement.participant_id, measurementId: measurement.id, type: 'cancel' }) }}" class="btn btn-xs btn-danger">Cancel Physical Measurements</a>
           {% endif %}
         </td>
       </tr>
