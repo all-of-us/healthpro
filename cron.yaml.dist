@@ -51,3 +51,7 @@ cron:
   url: /s/cron/ehr-withdrawal
   schedule: every day 07:15
   timezone: America/Chicago
+- description: "Used to backfill orders processed timestamp"
+  url: /s/cron/backfill-order-processed-time
+  schedule: 29 of feb 00:00
+  timezone: America/Chicago

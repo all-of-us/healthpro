@@ -84,10 +84,12 @@ class AccessManagementController extends AbstractController
                     ]);
                     return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
                 }
-                $this->addFlash('error', $result['message']);
+                $errorMessage = isset($result['code']) && $result['code'] === 409 ? 'Member already exists.' : 'Error occurred. Please try again.';
+                $this->addFlash('error', $errorMessage);
                 $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
                     'member' => $email,
-                    'result' => 'fail'
+                    'result' => 'fail',
+                    'errorMessage' => $result['message']
                 ]);
             } else {
                 $groupMemberForm->addError(new FormError('Please correct the errors below.'));
@@ -131,10 +133,11 @@ class AccessManagementController extends AbstractController
                         ]);
                         return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
                     }
-                    $this->addFlash('error', $result['message']);
+                    $this->addFlash('error', 'Error occurred. Please try again.');
                     $this->loggerService->log(Log::GROUP_MEMBER_REMOVE, [
                         'member' => $member->email,
-                        'result' => 'fail'
+                        'result' => 'fail',
+                        'errorMessage' => $result['message']
                     ]);
                 } else {
                     $this->addFlash('notice', 'Member not deleted.');
