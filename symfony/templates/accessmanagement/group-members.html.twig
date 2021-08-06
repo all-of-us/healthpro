@@ -10,12 +10,14 @@
         <h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
     </div>
     <h3>{{ group.name }}</h3>
-    <br/>
+    <a href="{{ path('access_manage_user_group_member', { groupId: group.id }) }}" class="btn btn-primary pull-right"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Member</a>
+    <br/><br/>
     <table class="table table-striped table-hover table-bordered">
         <thead>
         <tr>
             <th>Pmi-Ops Credentials</th>
             <th>Role</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -24,11 +26,19 @@
                 <tr>
                     <td>{{ member.email }}</td>
                     <td>{{ member.role }}</td>
+                    <td>
+                        {% if member.role == 'MEMBER' %}
+                            <a href="{{ path('access_manage_user_group_remove_member', { groupId: group.id, memberId: member.id }) }}" class="btn btn-xs btn-danger">Remove</a>
+                        {% else %}
+                            <button class="btn btn-xs btn-default" disabled>Remove</button>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endif %}
         {% endfor %}
         </tbody>
     </table>
+    <br/>
 {% endblock %}
 
 {% block pagejs %}
@@ -36,7 +46,10 @@
         $(document).ready(function () {
             $('table').DataTable({
                 order: [[0, 'asc']],
-                pageLength: 25
+                pageLength: 25,
+                columnDefs: [
+                    {targets: 2, orderable: false}
+                ]
             });
         });
     </script>

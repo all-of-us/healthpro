@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Google_Client as GoogleClient;
 use Google_Service_Directory as GoogleDirectory;
 use Google_Service_Exception as GoogleException;
+use Google_Service_Directory_Member as GoogleMember;
 
 class GoogleGroupsService
 {
@@ -27,7 +28,7 @@ class GoogleGroupsService
             $client->setApplicationName($applicationName);
             $client->setAuthConfig(json_decode($authJson, true));
             $client->setSubject($adminEmail);
-            $client->setScopes(GoogleDirectory::ADMIN_DIRECTORY_GROUP_READONLY);
+            $client->setScopes(GoogleDirectory::ADMIN_DIRECTORY_GROUP);
             $this->client = new GoogleDirectory($client);
             $this->domain = $params->get('gaDomain');
         }
@@ -137,6 +138,66 @@ class GoogleGroupsService
             return [];
         } catch (GoogleException $e) {
             return [];
+        }
+    }
+
+    public function getMemberById(string $groupEmail, string $memeberId)
+    {
+        try {
+            return $this->callApi('members', 'get', [$groupEmail, $memeberId]);
+        } catch (GoogleException $e) {
+            return null;
+        }
+    }
+
+    public function addMember(string $groupEmail, string $email)
+    {
+        try {
+            $member = new GoogleMember();
+            $member->setEmail($email);
+            $member->setRole('MEMBER');
+            $result = $this->callApi('members', 'insert', [$groupEmail, $member]);
+            if ($result && $email === $result->getEmail()) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Member added.'
+                ];
+            }
+            return [
+                'status' => 'error',
+                'message' => 'Error occurred. Please try again.'
+            ];
+        } catch (GoogleException $e) {
+            return [
+                'status' => 'error',
+                'code' => $e->getCode(),
+                'message' => $e->getErrors()[0]['message']
+            ];
+        }
+    }
+
+    public function removeMember(string $groupEmail, string $email)
+    {
+        try {
+            $member = new GoogleMember();
+            $member->setEmail($email);
+            $member->setRole('MEMBER');
+            $result = $this->callApi('members', 'delete', [$groupEmail, $email]);
+            if ($result && $result->getStatusCode() === 204) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Member deleted.'
+                ];
+            }
+            return [
+                'status' => 'error',
+                'message' => 'Error occurred. Please try again.'
+            ];
+        } catch (GoogleException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getErrors()[0]['message']
+            ];
         }
     }
 }
