@@ -189,4 +189,9 @@ class HelpService
         }
         return false;
     }
+
+    public static function getFeedbackUrl(): string
+    {
+        return 'https://redcap.pmi-ops.org/surveys/?s=JN33K7PKWC';
+    }
 }
