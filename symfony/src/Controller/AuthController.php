@@ -53,7 +53,7 @@ class AuthController extends AbstractController
             ]);
         }
 
-        return $this->redirectToRoute('login_start');
+        return $this->render('login.html.twig');
     }
 
     /**

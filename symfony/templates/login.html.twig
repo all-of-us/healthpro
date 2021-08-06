@@ -1,6 +1,34 @@
-{% extends 'base.html.twig' %}
-{% block body %}
-    <p>
-        <a href="{{ path('login_start') }}" class="btn btn-primary"><i class="fab fa-google"></i> Login</a>
-    </p>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>HealthPro Login</title>
+    {% include 'base-head.html.twig' %}
+    <link rel="stylesheet" href="/assets/css/login.css">
+  </head>
+  <body>
+    <div id="login-aou-banner" class="hidden-xs hidden-sm">
+      <img src="/assets/img/login/aou-horizontal-logo.jpg" alt="All of Us Research Program" class="img-responsive" />
+    </div>
+    <div id="login-container" class="container">
+      <div class="row">
+        <div id="login-action-box" class="col-md-5">
+          <div id="login-logo">
+            <img src="/assets/img/login/healthpro-logo.svg" alt="HealthPro" class="img-responsive" />
+          </div>
+          <div id="login-button">
+            <a href="{{ path('login_start') }}">
+              <img src="/assets/img/login/sign-in-with-google.svg" alt="Sign in with Google" />
+            </a>
+          </div>
+          <div id="login-help">
+            For immediate assistance or technical support, please contact the AoU Support Center at 844-842-2854 or <a href="mailto:help@joinallofus.org">help@joinallofus.org</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="login-copyright">
+      <em>All of Us</em> and the <em>All of Us</em> logo are service marks of the U.S. Department of Health and Human Services.
+    </div>
+  </body>
+</html>
