@@ -80,6 +80,15 @@ class SiteService
         return !empty($site);
     }
 
+    public function isBloodDonorPmSite(): bool
+    {
+        if ($this->params->has('feature.blooddonorpmsites') && $sites = $this->params->get('feature.blooddonorpmsites')) {
+            $sites = explode(',', $sites);
+            return in_array($this->getSiteId(), $sites);
+        }
+        return false;
+    }
+
     public function getSiteAwardee()
     {
         return $this->session->get('siteOrganization');
