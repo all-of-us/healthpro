@@ -38,6 +38,14 @@ class UserProvider implements UserProviderInterface
                             }
                         }
                     }
+                    if ($pilotSites = $this->app->getConfig('feature.managegrouppilotsites')) {
+                        $pilotSites = explode(',', $pilotSites);
+                        foreach ($manageGroups as $key => $manageGroup) {
+                            if (!in_array($manageGroup, $pilotSites)) {
+                                unset($manageGroups[$key]);
+                            }
+                        }
+                    }
                 }
                 $this->app['session']->set('managegroups', $manageGroups);
             } catch (\Exception $e) {
