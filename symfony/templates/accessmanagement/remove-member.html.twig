@@ -17,17 +17,37 @@
             <div class="page-header">
                 <h4 class="text-danger"><i class="fa fa-user" aria-hidden="true"></i> Remove Member</h4>
             </div>
+            {{ form_start(removeGoupMemberForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(removeGoupMemberForm) }}
             <div>
                 <p><label>Email:</label> {{ member.email }}</p>
                 <p><label>Role:</label> {{ member.role }}</p>
             </div>
-            {{ form_start(removeGoupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
-            {{ form_widget(removeGoupMemberForm) }}
+            {{ form_row(removeGoupMemberForm.confirm) }}
+            <div class="form-group member-reason {% if removeGoupMemberForm.reason.vars.errors|length > 0 %} has-error {% endif %}" style="display: none">
+                {{ form_label(removeGoupMemberForm.reason) }}
+                {% for reason in removeGoupMemberForm.reason %}
+                    {{ form_widget(reason) }}
+                    {% if loop.index == 1 %}
+                        <i class="text-info small">Note: Member will be removed from all associated HealthPro groups.</i>
+                    {% else %}
+                        <i class="text-info small">Note: Member will be removed from this group, but maintain access to HealthPro through other associated groups.</i>
+                    {% endif %}
+                {% endfor %}
+                {{ form_errors(removeGoupMemberForm.reason) }}
+            </div>
+            <div class="member-last-date" style="display: none">
+                {{ form_row(removeGoupMemberForm.memberLastDay) }}
+            </div>
             <p>
                 <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary" style="display:none">Submit</button>
             </p>
             {{ form_end(removeGoupMemberForm) }}
         </div>
     </div>
+{% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('group-member-remove') }}
 {% endblock %}

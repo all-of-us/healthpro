@@ -17,9 +17,10 @@
             <div class="page-header">
                 <h4 class="text-success"><i class="fa fa-user" aria-hidden="true"></i> Add Member</h4>
             </div>
-            {{ form_start(groupMemberForm, { attr: { class: 'prevent-resubmit' } }) }}
+            {{ form_start(groupMemberForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(groupMemberForm) }}
             {{ form_label(groupMemberForm.email) }}
-            <div class="input-group">
+            <div class="input-group {% if groupMemberForm.email.vars.errors|length > 0 %} has-error {% endif %}">
                 {{ form_widget(groupMemberForm.email) }}
                 <div class="input-group-addon">@pmi-ops.org</div>
             </div>

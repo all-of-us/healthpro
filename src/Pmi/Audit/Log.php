@@ -57,6 +57,7 @@ class Log
     const PATIENT_STATUS_IMPORT_EDIT = 'PATIENT_STATUS_IMPORT_EDIT';
     const GROUP_MEMBER_ADD = 'GROUP_MEMBER_ADD';
     const GROUP_MEMBER_REMOVE = 'GROUP_MEMBER_REMOVE';
+    const GROUP_MEMBER_REMOVE_NOTIFY = 'GROUP_MEMBER_REMOVE_NOTIFY';
 
     public function __construct($app, $action, $data)
     {

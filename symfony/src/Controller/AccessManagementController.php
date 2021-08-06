@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Form\GroupMemberType;
 use App\Form\RemoveGroupMemberType;
+use App\Service\AccessManagementService;
 use App\Service\GoogleGroupsService;
 use App\Service\LoggerService;
 use Pmi\Audit\Log;
@@ -103,14 +104,14 @@ class AccessManagementController extends AbstractController
     /**
      * @Route("/user/group/{groupId}/member/{memberId}/remove", name="access_manage_user_group_remove_member")
      */
-    public function removeMember($groupId, $memberId, Request $request)
+    public function removeMember($groupId, $memberId, Request $request, AccessManagementService $accessManagementService)
     {
         $group = $this->getUser()->getSiteFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
         $member = $this->googleGroupsService->getMemberById($group->email, $memberId);
-        if (empty($member)) {
+        if (empty($member) || $member->getRole() !== 'MEMBER') {
             throw $this->createNotFoundException();
         }
         $removeGoupMemberForm = $this->createForm(RemoveGroupMemberType::class);
@@ -121,6 +122,10 @@ class AccessManagementController extends AbstractController
                 if ($confirm === 'yes') {
                     $result = $this->googleGroupsService->removeMember($group->email, $member->email);
                     if ($result['status'] === 'success') {
+                        if ($removeGoupMemberForm->get('reason')->getData() === 'no') {
+                            $currentTime = new \DateTime("now");
+                            $accessManagementService->sendEmail($group->email, $member->email, $removeGoupMemberForm->get('memberLastDay')->getData(), $currentTime);
+                        }
                         $this->addFlash('success', $result['message']);
                         $this->loggerService->log(Log::GROUP_MEMBER_REMOVE, [
                             'member' => $member->email,
