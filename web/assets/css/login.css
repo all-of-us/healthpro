@@ -48,7 +48,15 @@ body {
   right: 0;
   top: 75px;
 }
-@media (max-width: 30em) {
+@media (max-width: 970px){
+  #login-aou-banner {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    position: relative;
+    text-align: center;
+    z-index: 99;
+  }
   #login-copyright {
     position: inherit;
     width: 100%;
