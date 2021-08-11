@@ -56,7 +56,8 @@
         "phpstan/phpstan": "^0.12.89",
         "phpstan/phpstan-symfony": "^0.12.36",
         "phpstan/phpstan-doctrine": "^0.12.39",
-        "phpstan/extension-installer": "^1.1"
+        "phpstan/extension-installer": "^1.1",
+        "friendsofphp/php-cs-fixer": "^3.0"
     },
     "extra": {
         "root-dir": "symfony",
