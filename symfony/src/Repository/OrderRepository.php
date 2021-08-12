@@ -264,9 +264,8 @@ class OrderRepository extends ServiceEntityRepository
     public function getBackfillOrders($limit)
     {
         return $this->createQueryBuilder('o')
-            ->where("o.createdTs > DATE_ADD(o.processedTs, 1, 'hour')")
+            ->where("o.processedTs < o.collectedTs")
             ->andWhere('o.processedSamplesTs is not null')
-            ->orderBy('o.createdTs - o.processedTs', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult()
