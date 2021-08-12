@@ -104,7 +104,7 @@ class UserService
         return null;
     }
 
-    public function getRoles($roles, $site, $awardee, $managegroups)
+    public function getRoles($roles, $site, $awardee)
     {
         if (!empty($site)) {
             if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
@@ -113,22 +113,12 @@ class UserService
             if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
                 unset($roles[$key]);
             }
-            if (in_array($site->email, $managegroups)) {
-                $roles[] = 'ROLE_MANAGE_USERS';
-            } else {
-                if (($key = array_search('ROLE_MANAGE_USERS', $roles)) !== false) {
-                    unset($roles[$key]);
-                }
-            }
         }
         if (!empty($awardee)) {
             if (($key = array_search('ROLE_USER', $roles)) !== false) {
                 unset($roles[$key]);
             }
             if (isset($awardee->id) && $awardee->id !== User::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if (($key = array_search('ROLE_MANAGE_USERS', $roles)) !== false) {
                 unset($roles[$key]);
             }
         }

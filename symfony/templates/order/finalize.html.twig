@@ -175,9 +175,9 @@
             $('#fedex_barcode_first, #fedex_barcode_second').on('change keyup', function() {
                 var target;
                 if ($(this).attr('id') === 'fedex_barcode_second') {
-                    target = $('#form_fedex_tracking_second');
+                    target = $('#order_fedexTracking_second');
                 } else {
-                    target = $('#form_fedex_tracking_first');
+                    target = $('#order_fedexTracking_first');
                 }
                 target.attr('placeholder', '');
                 target.parent().removeClass('has-error').removeClass('has-success');
@@ -202,11 +202,20 @@
 
             $('.finalize-form button[type="submit"]').on('click', function () {
                 //Display warning message
-                var message = 'Are you sure you want to finalize this order?';
-                $('input[name="form[finalized_samples][]"]').each(function () {
+                var confirmMessage = 'Are you sure you want to finalize this order?';
+                var message = confirmMessage;
+                {% if siteInfo.siteId != order.site %}
+                    var siteWarning = 'The order creation site and finalization site do not match. ';
+                    message = 'Warning! ' + siteWarning + confirmMessage;
+                {% endif %}
+                $('input[name="order[finalizedSamples][]"]').each(function () {
                     //Select samples that are unchecked and not disabled
                     if ($(this).prop('checked') === false && $(this).prop('disabled') === false) {
-                        message = 'Warning: At least one sample that was collected and processed (as applicable) was not finalized. Are you sure you wish to continue?';
+                        var sampleWarning = 'At least one sample that was collected and processed (as applicable) was not finalized. ';
+                        message = 'Warning! ' + sampleWarning + confirmMessage;
+                        if (typeof siteWarning !== 'undefined' && siteWarning) {
+                            message = 'Warning! 1) ' + siteWarning + '2) ' + sampleWarning + confirmMessage;
+                        }
                         return false;
                     }
                 });

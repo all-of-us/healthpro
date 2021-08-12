@@ -18,7 +18,6 @@
         "symfony/config": "^4.4",
         "symfony/console": "^4.4",
         "symfony/css-selector": "^4.4",
-        "symfony/finder": "^4.4",
         "symfony/form": "^4.4",
         "symfony/process": "^4.4",
         "symfony/security": "^4.4",

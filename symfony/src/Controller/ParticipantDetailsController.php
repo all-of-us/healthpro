@@ -100,17 +100,6 @@ class ParticipantDetailsController extends AbstractController
         if (empty($participant->cacheTime)) {
             $participant->cacheTime = new \DateTime();
         }
-        foreach ($orders as $order) {
-            // Display most recent processed sample time if exists
-            // This is for supporting old orders where this calculation is not implemented in the order process save step
-            $processedSamplesTs = json_decode($order->getProcessedSamplesTs(), true);
-            if (is_array($processedSamplesTs) && !empty($processedSamplesTs)) {
-                $processedTs = new \DateTime();
-                $processedTs->setTimestamp(max($processedSamplesTs));
-                $processedTs->setTimezone(new \DateTimeZone($this->getUser()->getTimezone()));
-                $order->setProcessedTs($processedTs);
-            }
-        }
         // Determine cancel route
         $cancelRoute = 'participants';
         if ($request->query->has('return')) {

@@ -56,7 +56,7 @@ class RequestListener
     {
         $this->request = $event->getRequest();
 
-        if (!$event->isMasterRequest() || $this->request->attributes->get('_route') === '_wdt') {
+        if (!$event->isMasterRequest() || in_array($this->request->attributes->get('_route'), ['_wdt', '_profiler'])) {
             return;
         }
 
@@ -104,19 +104,13 @@ class RequestListener
 
     private function checkSiteSelect()
     {
-        $hasMultiple = ($this->authorizationChecker->isGranted('ROLE_DASHBOARD') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_ADMIN') || $this->authorizationChecker->isGranted('ROLE_AWARDEE') || $this->authorizationChecker->isGranted('ROLE_DV_ADMIN')));
-        if ($hasMultiple && $this->session->get('isLoginReturn') && !$this->isUpkeepRoute() && !preg_match('/^(\/s)?\/(splash|_wdt)($|\/).*/',
-                $this->request->getPathInfo())) {
-            return new RedirectResponse('/s/splash');
-        }
-
         if (!$this->session->has('site') && !$this->session->has('awardee') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE'))) {
             $user = $this->userService->getUser();
             if (count($user->getSites()) === 1 && empty($user->getAwardees()) && $this->siteService->isValidSite($user->getSites()[0]->email)) {
                 $this->siteService->switchSite($user->getSites()[0]->email);
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
                 $this->siteService->switchSite($user->getAwardees()[0]->email);
-            } elseif (!preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site|login|site_select|splash)($|\/).*/',
+            } elseif (!preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site|login|site_select)($|\/).*/',
                     $this->request->getPathInfo()) && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/s/site/select');
             }

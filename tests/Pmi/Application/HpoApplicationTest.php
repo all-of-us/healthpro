@@ -40,34 +40,6 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertSame(false, $this->app['session']->get('isLogin'));
     }
 
-    public function testDashboardDeny()
-    {
-        $email = 'testDashboardDeny@example.com';
-        MockUserService::switchCurrentUser($email);
-        AppsClient::setGroups($email, [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
-        $this->assertSame(null, $this->app['session']->get('isLogin'));
-        $client = $this->createClient();
-        $client->followRedirects();
-        $crawler = $client->request('GET', '/dashboard');
-        $this->assertEquals(403, $client->getResponse()->getStatusCode());
-        $crawler = $client->request('GET', '/dashboard/');
-        $this->assertEquals(403, $client->getResponse()->getStatusCode());
-    }
-
-    public function testDashboardAllow()
-    {
-        $email = 'testDashboardAllow@example.com';
-        MockUserService::switchCurrentUser($email);
-        AppsClient::setGroups($email, [new GoogleGroup('admin-dashboard@gapps.com', 'Admin Dashboard', 'lorem ipsum 1')]);
-        $this->assertSame(null, $this->app['session']->get('isLogin'));
-        $client = $this->createClient();
-        $client->followRedirects();
-        $crawler = $client->request('GET', '/dashboard');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $crawler = $client->request('GET', '/dashboard/');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-    }
-
     public function testTimeout()
     {
         $email = 'testTimeout@example.com';
@@ -82,46 +54,5 @@ class HpoApplicationTest extends AbstractWebTestCase
         $this->assertEquals($email, $this->app->getUser()->getEmail());
         sleep($this->app['sessionTimeout']);
         $this->assertSame(true, $this->app->isLoginExpired());
-    }
-
-    public function testDashboardTimeout()
-    {
-        $email = 'testDashboardTimeout@example.com';
-        MockUserService::switchCurrentUser($email);
-        AppsClient::setGroups($email, [new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
-        $this->app['sessionTimeout'] = 2;
-        $client = $this->createClient();
-        $client->followRedirects();
-        $client->request('GET', '/');
-        $client->request('POST', '/keepalive', ['csrf_token' => $this->app['csrf.token_manager']->getToken('keepAlive')]);
-        $this->assertSame(false, $this->app->isLoginExpired());
-        $this->assertEquals($email, $this->app->getUser()->getEmail());
-        sleep($this->app['sessionTimeout']);
-        $this->assertSame(true, $this->app->isLoginExpired());
-    }
-
-    public function testDashboardRedirect()
-    {
-        $email = 'testDashboardRedirect@example.com';
-        MockUserService::switchCurrentUser($email);
-        AppsClient::setGroups($email, [new GoogleGroup(User::DASHBOARD_GROUP . '@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
-        $this->app['sessionTimeout'] = 2;
-        $client = $this->createClient();
-        $client->followRedirects();
-        $crawler = $client->request('GET', '/');
-        $this->assertSame(true, strstr($crawler->html(), '/dashboard/') !== false);
-    }
-
-    public function testDashboardAutoselect()
-    {
-        $email = 'testDashboardAutoselect@example.com';
-        MockUserService::switchCurrentUser($email);
-        $groupEmail = User::DASHBOARD_GROUP . '@gapps.com';
-        AppsClient::setGroups($email, [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
-        $client = $this->createClient();
-        $client->followRedirects();
-        $this->assertSame(null, $this->app->getSite());
-        $crawler = $client->request('GET', '/dashboard');
-        $this->assertEquals(1, count($crawler->filter('#plotly-total-progress')));
     }
 }

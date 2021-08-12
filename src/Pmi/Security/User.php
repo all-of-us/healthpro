@@ -8,7 +8,6 @@ class User implements UserInterface
 {
     const SITE_PREFIX = 'hpo-site-';
     const AWARDEE_PREFIX = 'awardee-';
-    const DASHBOARD_GROUP = 'admin-dashboard';
     const ADMIN_GROUP = 'site-admin';
     const TWOFACTOR_GROUP = 'mfa_exception';
     const TWOFACTOR_PREFIX = 'x-site-';
@@ -23,7 +22,6 @@ class User implements UserInterface
     private $groups;
     private $sites;
     private $awardees;
-    private $dashboardAccess;
     private $adminAccess;
     private $info;
     private $timezone;
@@ -43,7 +41,6 @@ class User implements UserInterface
         $this->sessionInfo = $sessionInfo;
         $this->sites = $this->computeSites();
         $this->awardees = $this->computeAwardees();
-        $this->dashboardAccess = $this->computeDashboardAccess();
         $this->adminAccess = $this->computeAdminAccess();
         $this->adminDvAccess = $this->computeAdminDvAccess();
         $this->biobankAccess = $this->computeBiobankAccess();
@@ -98,17 +95,6 @@ class User implements UserInterface
             }
         }
         return $awardees;
-    }
-
-    private function computeDashboardAccess()
-    {
-        $hasAccess = false;
-        foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), self::DASHBOARD_GROUP . '@') === 0) {
-                $hasAccess = true;
-            }
-        }
-        return $hasAccess;
     }
 
     private function computeAdminAccess()
@@ -245,9 +231,6 @@ class User implements UserInterface
         if (count($this->awardees) > 0) {
             $roles[] = 'ROLE_AWARDEE';
         }
-        if ($this->dashboardAccess) {
-            $roles[] = 'ROLE_DASHBOARD';
-        }
         if ($this->adminAccess) {
             $roles[] = 'ROLE_ADMIN';
         }
@@ -263,12 +246,15 @@ class User implements UserInterface
         if ($this->scrippsAwardee) {
             $roles[] = 'ROLE_AWARDEE_SCRIPPS';
         }
+        if (!empty($this->sessionInfo['managegroups'])) {
+            $roles[] = 'ROLE_MANAGE_USERS';
+        }
         return $roles;
     }
 
     public function getRoles()
     {
-        return UserService::getRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee'], $this->sessionInfo['managegroups']);
+        return UserService::getRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee']);
     }
 
     public function getPassword()
@@ -326,5 +312,17 @@ class User implements UserInterface
         } else {
             return false;
         }
+    }
+
+    public function getSiteFromId($siteId)
+    {
+        $site = null;
+        foreach ($this->sites as $s) {
+            if ($s->id === $siteId) {
+                $site = $s;
+                break;
+            }
+        }
+        return $site;
     }
 }

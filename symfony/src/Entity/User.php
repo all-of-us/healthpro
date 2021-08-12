@@ -12,7 +12,6 @@ class User
 {
     const SITE_PREFIX = 'hpo-site-';
     const AWARDEE_PREFIX = 'awardee-';
-    const DASHBOARD_GROUP = 'admin-dashboard';
     const ADMIN_GROUP = 'site-admin';
     const TWOFACTOR_GROUP = 'mfa_exception';
     const TWOFACTOR_PREFIX = 'x-site-';
