@@ -58,7 +58,7 @@
                             {% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-role">
-                            {% if is_granted(['ROLE_USER', 'ROLE_AWARDEE']) %}
+                            {% if is_granted('ROLE_USER') or is_granted('ROLE_AWARDEE') %}
                                 <li>
                                     <a href="{{ path('home') }}">
                                         <i class="fas fa-arrow-circle-right"></i>

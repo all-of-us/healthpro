@@ -149,8 +149,6 @@ class OrderType extends AbstractType
                 'label' => false,
                 'disabled' => $disabled,
                 'entry_options' => [
-                    'date_widget' => 'single_text',
-                    'time_widget' => 'single_text',
                     'widget' => 'single_text',
                     'format' => 'M/d/yyyy h:mm a',
                     'view_timezone' => $options['timeZone'],
